@@ -1,0 +1,35 @@
+
+/* Harbour launch scene — original, responsive browser UI layered over live 3D ships. */
+.harbour-screen{position:absolute;inset:0;z-index:7;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;isolation:isolate;pointer-events:auto;background:linear-gradient(180deg,rgba(7,40,62,.73) 0%,rgba(5,59,85,.15) 31%,rgba(0,33,53,.03) 48%,rgba(3,27,45,.9) 79%,#071c31 100%)}
+.harbour-sky{position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 33%,rgba(128,226,236,.14),transparent 44%),linear-gradient(140deg,rgba(17,108,153,.12),transparent 70%)}
+.harbour-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:max(18px,env(safe-area-inset-top)) 20px 4px}
+.harbour-profile{display:flex;gap:10px;align-items:center;min-width:0;background:linear-gradient(110deg,#0c2e44ed,#12374cbb);border:2px solid #d4a755;border-radius:13px;padding:7px 14px 7px 8px;box-shadow:0 5px 0 #062338,0 12px 20px #00182766}
+.harbour-avatar{width:40px;height:40px;display:grid;place-items:center;font-size:26px;color:#f5d68d;background:linear-gradient(155deg,#664326,#1a3442);border-radius:11px;border:2px solid #ffe29b}
+.harbour-profile strong{font-family:'Barlow Condensed',sans-serif;font-size:19px;color:#fff0cc;letter-spacing:1px;display:block}
+.harbour-profile small{display:block;font-size:8px;letter-spacing:1.4px;color:#9cd8dc;margin-top:2px}
+.harbour-preview{font-size:9px;letter-spacing:1px;border:1px solid #e7d39a55;border-radius:8px;padding:9px;color:#f4dbaf;background:#082b42b8;white-space:nowrap}
+.harbour-intro{align-self:center;text-align:center;max-width:min(480px,88vw);margin-top:8px;text-shadow:0 4px 20px #041d32}
+.harbour-kicker{font-size:9px;color:#f9d78f;letter-spacing:4px;font-weight:800}
+.harbour-intro h1{font-family:'Barlow Condensed',sans-serif;color:#fff6dd;font-size:clamp(38px,7.5vw,75px);line-height:.9;margin:12px 0 10px;text-transform:uppercase;letter-spacing:2px;filter:drop-shadow(0 4px 0 #0b3851)}
+.harbour-intro h1 em{font-style:normal;color:#ffcc65}
+.harbour-intro p{font-size:12px;color:#e8f2eb;line-height:1.45;margin:0 auto;max-width:320px}
+.harbour-center{align-self:center;display:flex;flex-direction:column;align-items:center;gap:5px;margin:auto 0 auto;pointer-events:none;text-shadow:0 3px 6px #031e2d}
+.harbour-ribbon{border:1px solid #f5d88a;padding:7px 18px;border-radius:7px;background:#06364acb;color:#fff2c8;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:2px;box-shadow:0 4px 12px #00202a88}
+.harbour-wheel{font-size:37px;color:#e3bd63;line-height:1;filter:drop-shadow(0 3px 3px #021d2a)}
+.harbour-panel{width:min(600px,calc(100% - 26px));margin:0 auto max(22px,env(safe-area-inset-bottom));border:1px solid #efc97999;border-radius:17px;padding:14px 16px 12px;background:linear-gradient(155deg,#10354beF,#061c31f7);box-shadow:0 12px 40px #04142699,inset 0 1px 0 #ffffff32}
+.harbour-panel-title{margin:0 0 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;font:800 13px 'Barlow Condensed',sans-serif;letter-spacing:1.5px;color:#ffe8b2}
+.harbour-panel-title span{font:700 8px 'Barlow',sans-serif;letter-spacing:1px;color:#9fd2dc}
+.harbour-battle-button{width:100%;min-height:80px;border:2px solid #fff1b0;border-radius:14px;background:linear-gradient(180deg,#ffe56e 0%,#ffbe39 48%,#ed8526 100%);color:#45270e;display:flex;align-items:center;justify-content:center;gap:13px;box-shadow:inset 0 3px 0 #fff9c5,0 6px 0 #8f4a16,0 12px 20px #00162588;text-shadow:0 1px #fff6b4}
+.harbour-battle-button>span{font-size:42px}
+.harbour-battle-button strong{font:900 42px 'Barlow Condensed',sans-serif;letter-spacing:2px}
+.harbour-battle-button small{font:800 9px 'Barlow',sans-serif;letter-spacing:1.3px;align-self:flex-end;margin:0 0 16px -96px}
+.harbour-battle-button:active{transform:translateY(4px);box-shadow:inset 0 2px #fff9c5,0 2px 0 #8f4a16}
+.harbour-future{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.harbour-future-tile{min-width:0;padding:10px 5px 7px;border:1px solid #a4c5d366;border-radius:10px;background:linear-gradient(#244d66,#092b43);display:flex;flex-direction:column;text-align:center;gap:2px;align-items:center;box-shadow:inset 0 1px #fff2}
+.harbour-future-tile>span{font-size:28px;color:#efc36f;line-height:1.2}
+.harbour-future-tile strong{font:800 15px 'Barlow Condensed',sans-serif;letter-spacing:1px}
+.harbour-future-tile small{font-size:7px;color:#a7cad5;letter-spacing:1px}
+.harbour-disclaimer{margin:11px 0 0;text-align:center;color:#b4ced4;font-size:9px;line-height:1.35}
+.return-harbour{position:absolute;z-index:4;left:18px;top:max(77px,calc(env(safe-area-inset-top) + 64px));font:800 10px 'Barlow',sans-serif;letter-spacing:1px;border:1px solid #e8cc82;border-radius:8px;padding:8px 10px;background:#0d3649e6;color:#ffe3a4}
+@media(max-width:600px){.harbour-header{padding-top:max(12px,env(safe-area-inset-top));padding-left:11px;padding-right:11px}.harbour-profile{padding:4px 8px 4px 5px;gap:6px}.harbour-avatar{width:35px;height:35px;font-size:23px}.harbour-profile strong{font-size:16px}.harbour-profile small{font-size:6px}.harbour-preview{font-size:7px;padding:8px}.harbour-intro{margin-top:4px}.harbour-intro h1{font-size:43px;margin:6px 0 7px}.harbour-intro p{font-size:10px}.harbour-ribbon{font-size:12px}.harbour-wheel{font-size:26px}.harbour-panel{padding:12px 10px 10px;margin-bottom:max(18px,env(safe-area-inset-bottom))}.harbour-battle-button{min-height:69px;gap:10px}.harbour-battle-button strong{font-size:36px}.harbour-battle-button small{font-size:7px;margin-left:-86px;margin-bottom:12px}.harbour-battle-button>span{font-size:36px}.harbour-future{margin-top:14px;gap:6px}.harbour-future-tile{padding:7px 2px 5px}.harbour-future-tile>span{font-size:22px}.harbour-future-tile strong{font-size:12px}.harbour-disclaimer{font-size:8px}.return-harbour{top:max(64px,calc(env(safe-area-inset-top) + 52px));left:10px;padding:6px;font-size:8px}}
+@media(max-height:700px){.harbour-intro h1{font-size:33px}.harbour-intro p{display:none}.harbour-center{margin:auto 0}.harbour-wheel{display:none}.harbour-panel{padding:9px 10px}.harbour-future{margin-top:10px}.harbour-future-tile>span{font-size:18px}.harbour-battle-button{min-height:57px}.harbour-battle-button strong{font-size:32px}.harbour-disclaimer{display:none}}
