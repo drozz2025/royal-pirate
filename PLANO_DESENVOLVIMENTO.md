@@ -1,3 +1,7 @@
+> Atualização Work 1 — 14/11/2026: A fundação Unity está agora preparada na branch Work 1, com contratos, cenário de integração e testes. Imagens oficiais e GLB adicionados. Compilação Unity e testes móveis continuam pendentes. Ver README.md e TASKS.md.
+>
+> O conteúdo abaixo é o registo inicial preservado.
+
 # ROYAL PIRATE — Plano inicial
 
 Motor: Unity Personal. Linguagem: C#. Repositório único. Orçamento máximo: 5.000 €, despesas apenas com aprovação. Meta desejada: Natal 2026 (não garantida).

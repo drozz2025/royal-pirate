@@ -1,3 +1,7 @@
+> Atualização Work 1 — 14/11/2026: O GLB original e os dois JPEG oficiais estão agora no repositório. A especificação de integração atual está em Documentation/NAVIO_01.md. O modelo continua sem importação/validação Unity e sem aprovação de arte final.
+>
+> O conteúdo abaixo é o registo inicial preservado.
+
 # Navio 01 — primeiro modelo modular
 
 **Estado:** protótipo geométrico GLB gerado e disponibilizado como anexo na conversa de 14/11/2026. Ainda não importado nem testado no Unity.

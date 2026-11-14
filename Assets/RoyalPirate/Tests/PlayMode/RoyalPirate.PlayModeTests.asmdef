@@ -1,0 +1,11 @@
+{
+  "name": "RoyalPirate.PlayModeTests",
+  "rootNamespace": "RoyalPirate",
+  "references": [
+    "RoyalPirate.Domain",
+    "RoyalPirate.Runtime"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

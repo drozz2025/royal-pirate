@@ -1,0 +1,9 @@
+{
+  "name": "RoyalPirate.Runtime",
+  "rootNamespace": "RoyalPirate",
+  "references": [
+    "RoyalPirate.Domain",
+    "Unity.InputSystem",
+    "RoyalPirate.Services"
+  ]
+}

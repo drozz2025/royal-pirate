@@ -1,0 +1,14 @@
+{
+  "name": "RoyalPirate.EditModeTests",
+  "rootNamespace": "RoyalPirate",
+  "references": [
+    "RoyalPirate.Domain",
+    "RoyalPirate.Services"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

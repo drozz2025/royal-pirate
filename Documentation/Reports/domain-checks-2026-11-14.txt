@@ -1,0 +1,26 @@
+PASS gravity / analytic reference
+PASS wind / analytic reference
+PASS NaN power rejected
+PASS out-of-range power rejected
+PASS overkill clamps
+PASS destruction emitted once
+PASS negative damage rejected
+PASS starter covers 10 component categories
+PASS upgrade charge / stale revision
+PASS insufficient funds atomicity
+PASS duplicate instance rejected
+PASS incompatible module rejected
+PASS invalid construction free of mutations
+PASS valid construction costs once
+PASS occupied mount rejected
+PASS turn ownership / double fire
+PASS resolution passes turn
+PASS timer passes turn
+PASS finished battle stays finished
+PASS domain DTO roundtrip (System.Text.Json)
+PASS max level rejects without charge
+PASS revision overflow rejected
+PASS missing structural hull rejected
+PASS future schema rejected
+PASS late resolution cannot skip a new turn
+RESULT: 25 checks passed. Unity compilation, collisions and device tests NOT run.

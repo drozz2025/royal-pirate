@@ -1,0 +1,6 @@
+{
+  "name": "RoyalPirate.Domain",
+  "rootNamespace": "RoyalPirate",
+  "references": [],
+  "noEngineReferences": true
+}

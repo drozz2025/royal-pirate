@@ -1,3 +1,7 @@
+> Atualização Work 1 — 14/11/2026: As duas imagens originais foram recuperadas e carregadas em 01_Imagens_Aprovadas. Ver ASSET_MANIFEST.md para origem e hashes. A direção artística abaixo mantém-se; o estado de upload descrito no registo inicial foi ultrapassado.
+>
+> O conteúdo abaixo é o registo inicial preservado.
+
 # ROYAL PIRATE — Guia visual
 
 ## Referências aprovadas
