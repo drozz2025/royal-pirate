@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems><TreatWarningsAsErrors>true</TreatWarningsAsErrors></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Assets/RoyalPirate/Scripts/Domain/*.cs" />
+    <Compile Include="../../Assets/RoyalPirate/Scripts/Runtime/Progression/*.cs" />
+    <Compile Include="../../Assets/RoyalPirate/Tests/Work4/EditMode/Work4Scenarios.cs" />
+    <Compile Include="Program.cs" />
+  </ItemGroup>
+</Project>
