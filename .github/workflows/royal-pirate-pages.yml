@@ -104,3 +104,28 @@ jobs:
           done
           echo "::error::Public Pages HTTP/version verification failed; do not announce the release as live."
           exit 1
+
+  audit:
+    if: ${{ always() && github.event_name == 'push' }}
+    needs: [verify, deploy]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Record release attempt in issue 23
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERIFY_RESULT: ${{ needs.verify.result }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+          RELEASE_VERSION: ${{ needs.verify.outputs.release_version }}
+        run: |
+          set -euo pipefail
+          RUN_LINK="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          if [[ "$VERIFY_RESULT" == "success" && "$DEPLOY_RESULT" == "success" ]]; then
+            RESULT="Publicação e verificação HTTP: APROVADAS"
+          else
+            RESULT="Publicação NÃO confirmada; consultar logs e corrigir o bloqueio"
+          fi
+          BODY=$(printf 'WORK 6 — Pages | %s\nVersão compilada: v%s\nCI verify: %s\nDeploy + HTTP: %s\nExecução: %s\nBranch: %s\nNão alterar main nem anunciar URL sem deploy e HTTP aprovados.' "$RESULT" "${RELEASE_VERSION:-desconhecida}" "$VERIFY_RESULT" "$DEPLOY_RESULT" "$RUN_LINK" "$GITHUB_REF_NAME")
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/23/comments" --raw-field "body=$BODY"
