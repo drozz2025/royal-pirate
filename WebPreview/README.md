@@ -51,3 +51,9 @@ The web simulation does not execute the C# domain or share saves/progression wit
 ## Cost and assets
 
 Spend: **0 €**. No paid services enabled. React and Three.js use their package licenses; Barlow/Barlow Condensed are self-hosted with SIL OFL text in `public/fonts/`. No external runtime CDN or remote font request is required. See `ASSET_NOTES.md`.
+
+## Soundtrack and effects (pending review)
+
+The `automation/web-audio-original-score-20261114` branch adds an **original procedural four-bar pirate melody** and distinct cannon/fire, hull impact, water splash, and victory/defeat sound cues. Use the sound icon to open separate **MUSIC** and **EFFECTS** switches. Both start OFF, so the game does not autoplay on an iPhone. The audio engine is suspended when the page is hidden and disposes resources when unmounted. This is web-only, separate from Unity.
+
+The sound implementation and new tests have not yet been executed/audibly verified on a real browser or device. See [audio QA evidence](AUDIO_QA_20261114.md). The existing battle controls and outcome rules are unchanged.
