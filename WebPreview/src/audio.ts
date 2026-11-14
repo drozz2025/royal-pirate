@@ -72,6 +72,12 @@ export class PirateSoundscape {
   private scheduleMusic() {
     const context = this.context;
     if (!context || !this.musicBus || !this.musicEnabled || context.state !== 'running') return;
+    // If a throttled/mobile timer ran late, skip silent beats instead of scheduling a burst.
+    if (this.nextAt < context.currentTime - STEP_SECONDS) {
+      const missed = Math.floor((context.currentTime - this.nextAt) / STEP_SECONDS);
+      this.step += missed + 1;
+      this.nextAt += (missed + 1) * STEP_SECONDS;
+    }
     while (this.nextAt < context.currentTime + 0.30) {
       const index = this.step % ORIGINAL_MELODY.length;
       const note = ORIGINAL_MELODY[index];
