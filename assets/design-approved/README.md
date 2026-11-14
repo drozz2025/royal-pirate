@@ -20,5 +20,19 @@ O ecrã Porto aprovado pelo utilizador é a referência de qualidade para todas 
 - Evitar valores económicos fictícios ou textos meramente decorativos nas interfaces funcionais.
 - Coordenar com WORK 0 e WORK 4 para uniformidade de design e UX.
 
-## Ficheiros visuais
-**PENDENTE DE UPLOAD:** a imagem original aprovada e o conjunto de oito conceitos visuais ainda não foram adicionados a esta pasta. Não interpretar este documento como entrega dos PNG/JPEG.
+## Ficheiros visuais — CARREGADOS E VERIFICADOS
+
+Os seguintes ficheiros `.webp` estão disponíveis nesta pasta, na branch `work6/web-3d-preview`:
+
+- `00-referencia-original-aprovada.webp` — referência prioritária, aprovada pelo utilizador
+- `00-painel-oito-ecras.webp` — vista geral de todos os ecrãs
+- `01-porto.webp`
+- `02-batalha.webp`
+- `03-frota.webp`
+- `04-melhorias-forja.webp`
+- `05-cartas.webp`
+- `06-loja.webp`
+- `07-missoes.webp`
+- `08-ranking-perfil.webp`
+
+Estas imagens são referências de design e não substituem modelos 3D nem código jogável. As propostas visuais devem seguir sobretudo a imagem original aprovada.
