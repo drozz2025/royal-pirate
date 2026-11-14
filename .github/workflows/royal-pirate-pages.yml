@@ -75,10 +75,8 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Enable/configure Pages for Actions deployment
+      - name: Read Pages configuration
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - name: Publish GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
