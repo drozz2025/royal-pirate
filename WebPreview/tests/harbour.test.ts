@@ -10,8 +10,8 @@ const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
 
 test('harbour preview is an actual screen integrated with the live battle', () => {
   assert.match(main, /harbour&&<Harbour onBattle=\{enterBattle\}/);
-  assert.match(main, /const enterBattle=\(\)=>\{reset\(\);setHarbour\(false\)/);
-  assert.match(main, /const returnHarbour=\(\)=>\{reset\(\);setHarbour\(true\)/);
+  assert.match(main, /const enterBattle=\(\)=>\{reset\(\);view\.current\?\.showBattle\(\);setHarbour\(false\)/);
+  assert.match(main, /const returnHarbour=\(\)=>\{reset\(\);view\.current\?\.showHarbour\(\);setHarbour\(true\)/);
   assert.match(main, /aria-label="Return to harbour"/);
 });
 test('harbour has one functional battle action and no fake transactions', () => {
@@ -20,7 +20,7 @@ test('harbour has one functional battle action and no fake transactions', () => 
   assert.doesNotMatch(harbour, /fetch\(|localStorage|payment|purchase\(/i);
 });
 test('harbour is accessible in portrait and respects safe-area inset', () => {
-  assert.match(css, /@media\(max-width:600px\)/);
+  assert.match(css, /@media\s*\(max-width:600px\)/);
   assert.match(css, /safe-area-inset-bottom/);
   assert.match(css, /harbour-battle-button:active/);
 });
