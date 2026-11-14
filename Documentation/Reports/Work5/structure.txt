@@ -1,0 +1,24 @@
+PASS required document: README.md
+PASS required document: ARCHITECTURE.md
+PASS required document: ROADMAP.md
+PASS required document: TASKS.md
+PASS required document: ASSET_MANIFEST.md
+PASS required document: TEST_PLAN.md
+PASS required document: CHANGELOG.md
+PASS URP pin
+PASS Editor pin
+PASS no floating/Git package dependencies
+PASS 68 unique GUIDs, assets and directories have metas
+PASS 9 assemblies: references resolve and graph is acyclic
+PASS domain independent of Unity
+PASS scene script GUID resolves
+PASS ten unique module definitions
+PASS all ten component categories covered
+PASS unique mount IDs
+PASS all starter mounts compatible
+PASS original checksum: Referencias_Visuais/01_Imagens_Aprovadas/01_Ecra_Principal_APROVADO.jpeg
+PASS original checksum: Referencias_Visuais/01_Imagens_Aprovadas/02_Batalha_APROVADA.jpeg
+PASS original checksum: Modelos_3D/Navio_01/RoyalPirate_Navio01_Modular.glb
+PASS GLB header, length, JSON and 26 meshes
+PASS no cache/build files in proposed source set
+RESULT: 23 structural checks passed. Unity NOT executed.
