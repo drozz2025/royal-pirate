@@ -22,7 +22,7 @@ namespace RoyalPirate.UI
         readonly Dictionary<string,Renderer[]> renderers=new Dictionary<string,Renderer[]>();
         readonly Dictionary<int,Vector2> pointers=new Dictionary<int,Vector2>();
         Vector2 pressPosition; bool dragged; float pinchDistance;
-        VisualElement viewport;
+        VisualElement viewport, backgroundBoundViewport;
         RenderTexture previewTexture;
         string selected;
         public void Initialize(Material template,ShipArtBindings bindings)
@@ -169,9 +169,17 @@ namespace RoyalPirate.UI
                     if(previewTexture!=null) { ViewCamera.targetTexture=null; previewTexture.Release(); Destroy(previewTexture); }
                     previewTexture=new RenderTexture(pixelWidth,pixelHeight,24) {name="Harbour viewport"};
                     previewTexture.Create(); ViewCamera.targetTexture=previewTexture;
+                    // A new texture needs a new UI Toolkit background binding.
+                    backgroundBoundViewport=null;
                 }
                 ViewCamera.aspect=(float)pixelWidth/pixelHeight;
-                viewport.style.backgroundImage=new StyleBackground(Background.FromRenderTexture(previewTexture));
+                // Keep the RenderTexture live, but do not dirty UI Toolkit styles every frame.
+                // Opening another menu builds a new viewport, which must be bound once too.
+                if(backgroundBoundViewport!=viewport)
+                {
+                    viewport.style.backgroundImage=new StyleBackground(Background.FromRenderTexture(previewTexture));
+                    backgroundBoundViewport=viewport;
+                }
             }
         }
         void Pick(Vector2 position)
