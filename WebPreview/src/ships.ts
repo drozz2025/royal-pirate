@@ -73,6 +73,28 @@ export function makeShip(red = false): ShipArt {
   for(const x of [-.8,0,.8]){put(cube,gold,x,2.8,-4.33,.54,.78,.08);put(cube,light,x,2.8,-4.39,.36,.57,.02);}
   for(let i=0;i<5;i++)put(cube,deck,0,2.05+i*.18,-2.1-i*.14,1.1,.15,.28);
   beam(new T.Vector3(0,2.35,4),new T.Vector3(0,3.8,6.2),.11,honey);
+  // v0.1.4 original figurehead: a gilded anchor and crown on the forward bowsprit.
+  // All details join the existing material bins to avoid extra draw calls on phones.
+  beam(new T.Vector3(0,3.55,6.03),new T.Vector3(0,4.7,6.03),.105,gold);
+  beam(new T.Vector3(-.44,4.38,6.03),new T.Vector3(.44,4.38,6.03),.082,gold);
+  for(const side of [-1,1]){
+    beam(new T.Vector3(0,3.62,6.03),new T.Vector3(side*.35,3.51,6.03),.075,gold);
+    beam(new T.Vector3(side*.35,3.51,6.03),new T.Vector3(side*.55,3.87,6.03),.075,gold);
+    beam(new T.Vector3(side*.55,3.87,6.03),new T.Vector3(side*.50,3.72,6.03),.065,gold);
+    beam(new T.Vector3(side*.42,4.74,6.03),new T.Vector3(side*.60,4.97,6.03),.05,gold);
+    beam(new T.Vector3(side*.12,4.74,6.03),new T.Vector3(side*.28,5.1,6.03),.05,gold);
+    beam(new T.Vector3(side*.25,3.9,5.75),new T.Vector3(side*1.05,2.75,4.15),.018,rope);
+  }
+  put(sphere,gold,0,4.73,6.03,.17,.17,.14);
+  beam(new T.Vector3(-.60,4.73,6.03),new T.Vector3(.60,4.73,6.03),.055,gold);
+  for(const x of [-.54,-.27,0,.27,.54])put(sphere,gold,x,x===0?5.12:4.92,6.03,.08,.08,.08);
+  // Stern cabin scrollwork: ornamental crest, separate from hit boxes and ship stats.
+  for(const x of [-1,1]){
+    beam(new T.Vector3(x*.23,3.1,-4.48),new T.Vector3(x*.77,3.22,-4.48),.065,gold);
+    beam(new T.Vector3(x*.77,3.22,-4.48),new T.Vector3(x*1.06,3.02,-4.48),.055,gold);
+    beam(new T.Vector3(x*.23,3.1,-4.48),new T.Vector3(x*.14,2.92,-4.48),.045,gold);
+  }
+  put(sphere,gold,0,3.16,-4.48,.17,.17,.075);
   for(const z of [-1.9,1.2]){put(cube,darkWood,0,2.02,z,1.25,.08,.8);for(let i=-2;i<=2;i++)put(cube,gold,i*.22,2.08,z,.04,.04,.8);}
   // Barrels, cannon carriages and iron hoops.
   for(const [x,z] of [[-.9,-2.3],[.85,-2.6],[-1,2.6]]){
