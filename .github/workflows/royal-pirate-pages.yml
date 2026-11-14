@@ -7,31 +7,30 @@ on:
     paths:
       - 'WebPreview/**'
       - '.github/workflows/royal-pirate-pages.yml'
+  pull_request:
+    branches:
+      - work6/web-3d-preview
+    paths:
+      - 'WebPreview/**'
+      - '.github/workflows/royal-pirate-pages.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: royal-pirate-pages
+  group: royal-pirate-pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  verify:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     defaults:
       run:
         working-directory: WebPreview
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
       - name: Node 22
         uses: actions/setup-node@v4
         with:
@@ -42,12 +41,44 @@ jobs:
         run: npm ci
       - name: Test game
         run: npm test
-      - name: Build preview for project path
+      - name: Build preview for GitHub Pages
         run: npm run build -- --base=/royal-pirate/
-      - name: Upload static site
+      - name: Assert release version and project asset paths
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          import assert from 'node:assert/strict';
+          const version = JSON.parse(readFileSync('package.json', 'utf8')).version;
+          const html = readFileSync('dist/index.html', 'utf8');
+          const css = readFileSync('dist/fonts/fonts.css', 'utf8');
+          assert.ok(html.includes('v' + version), 'visible version must match package version');
+          assert.ok(html.includes('/royal-pirate/fonts/fonts.css'), 'font stylesheet must use project base path');
+          assert.ok(!css.includes('url(/fonts/'), 'font files must resolve relative to their stylesheet');
+          assert.ok(css.includes('url(./font-0.ttf)'), 'self-hosted font paths must work under project path');
+          console.log('Release v' + version + ': version and project asset paths validated.');
+          NODE
+      - name: Upload verified site
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: WebPreview/dist
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Enable/configure Pages for Actions deployment
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - name: Publish GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
