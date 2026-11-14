@@ -77,7 +77,7 @@ jobs:
       pages: write
       id-token: write
     environment:
-      name: github-pages
+      name: royal-pirate-web-preview
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Read Pages configuration
