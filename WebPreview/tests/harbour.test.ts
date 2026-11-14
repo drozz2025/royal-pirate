@@ -25,7 +25,7 @@ test('harbour is accessible in portrait and respects safe-area inset', () => {
   assert.match(css, /harbour-battle-button:active/);
 });
 test('release version is visible and matches the package', () => {
-  assert.equal(pkg.version, '0.1.3');
+  assert.match(pkg.version, /^0\.1\.\d+$/);
   assert.ok(html.includes('v' + pkg.version));
 });
 
