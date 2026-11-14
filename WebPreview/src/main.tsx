@@ -11,15 +11,15 @@ function App(){
  const host=useRef<HTMLDivElement>(null),engine=useRef(new Battle()),view=useRef<OceanScene|null>(null);
  const [state,setState]=useState({phase:'ready',player:100,enemy:100,round:1,message:'Aim your broadside',shots:0,hits:0});
  const [harbour,setHarbour]=useState(true),[yaw,setYaw]=useState(0),[power,setPower]=useState(65),[progress,setProgress]=useState(false),[music,setMusic]=useState(false),[sound,setSound]=useState(false),[deck,setDeck]=useState(false),[error,setError]=useState(''),[loaded,setLoaded]=useState(false),[metrics,setMetrics]=useState<Metrics|null>(null),[diagnostics,setDiagnostics]=useState(false),[compatibility,setCompatibility]=useState(false);
- useEffect(()=>{let last='';try{const scene=new OceanScene(host.current!,engine.current,()=>{const b=engine.current;const key=[b.phase,b.health.player,b.health.enemy,b.round,b.lastMessage,b.shotsFired].join(':');if(key!==last){last=key;setState({phase:b.phase,player:b.health.player,enemy:b.health.enemy,round:b.round,message:b.lastMessage,shots:b.shotsFired,hits:b.hits});}},setMetrics,setError);view.current=scene;setCompatibility(scene.compatibility);setLoaded(true);return()=>scene.dispose();}catch(e){setError(`This browser could not start WebGL. ${e instanceof Error?e.message:'Please reload or try Safari/Chrome.'}`);}},[]);
+ useEffect(()=>{let last='';try{const scene=new OceanScene(host.current!,engine.current,()=>{const b=engine.current;const key=[b.phase,b.health.player,b.health.enemy,b.round,b.lastMessage,b.shotsFired].join(':');if(key!==last){last=key;setState({phase:b.phase,player:b.health.player,enemy:b.health.enemy,round:b.round,message:b.lastMessage,shots:b.shotsFired,hits:b.hits});}},setMetrics,setError);view.current=scene;setCompatibility(scene.compatibility);scene.showHarbour();setLoaded(true);return()=>scene.dispose();}catch(e){setError(`This browser could not start WebGL. ${e instanceof Error?e.message:'Please reload or try Safari/Chrome.'}`);}},[]);
  useEffect(()=>{if(view.current)view.current.paused=progress;},[progress]);
  useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==='Escape')setProgress(false);};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[]);
  const aim=(y:number,p:number)=>{engine.current.aim(y,p);setYaw(engine.current.yaw);setPower(engine.current.power);};
  const reset=()=>{view.current?.reset();setYaw(0);setPower(65);setDeck(false);};
- const enterBattle=()=>{reset();setHarbour(false);};
- const returnHarbour=()=>{reset();setHarbour(true);};
+ const enterBattle=()=>{reset();view.current?.showBattle();setHarbour(false);};
+ const returnHarbour=()=>{reset();view.current?.showHarbour();setHarbour(true);};
  const result=state.phase==='victory'||state.phase==='defeat',ready=state.phase==='ready'&&loaded&&!error;
- return <main className="app">
+ return <main className={'app '+(harbour?'in-harbour':'in-battle')}>
    <div ref={host} className="ocean"/><div className="vignette"/>
    {harbour&&<Harbour onBattle={enterBattle}/>}
    {!harbour&&<button className="return-harbour" type="button" aria-label="Return to harbour" onClick={returnHarbour}>⚓ HARBOUR</button>}
