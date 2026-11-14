@@ -212,3 +212,25 @@
  .harbour-battle-button strong{font-size:clamp(29px,9vw,41px)}
 }
 @media (prefers-reduced-motion:reduce){.harbour-battle-button,.harbour-nav-current{transition:none}}
+
+
+/* v0.1.4 interactive 3D ship viewer — foreground labels never intercept orbit gestures. */
+.harbour-inspect-button{pointer-events:auto;cursor:pointer;margin-top:5px;min-height:32px;padding:5px 13px;
+  border:2px solid #ffdc8d;border-radius:9px;background:linear-gradient(#386ca1,#12385e);
+  box-shadow:0 3px #36271a;color:#fff1c6;font:900 12px 'Barlow Condensed',sans-serif;
+  letter-spacing:1.2px;text-shadow:0 1px #0b1d3f}
+.harbour-inspect-button:focus-visible{outline:3px solid white;outline-offset:3px}
+.ship-inspection-ui{position:absolute;inset:0;z-index:8;pointer-events:none;display:flex;flex-direction:column;
+  justify-content:space-between;align-items:flex-start;padding:max(20px,env(safe-area-inset-top)) 18px max(30px,env(safe-area-inset-bottom))}
+.ship-inspection-ui>button{pointer-events:auto;min-height:48px;padding:10px 18px;
+  color:#ffe8aa;border:2px solid #e9bf69;border-radius:12px;
+  background:linear-gradient(#225480,#0b2851);box-shadow:0 5px #061e3b;
+  font:900 18px 'Barlow Condensed',sans-serif;letter-spacing:1.1px}
+.ship-inspection-ui>div{width:min(470px,100%);padding:12px 16px;border:1px solid #d8a95e9e;
+  border-radius:12px;background:#061a3fc4;text-shadow:0 2px #05172e}
+.ship-inspection-ui>div strong{display:block;color:#ffe6a6;font:900 24px 'Barlow Condensed',sans-serif}
+.ship-inspection-ui>div span{display:block;color:#e5eef9;font:700 11px 'Barlow',sans-serif;letter-spacing:.5px;margin-top:4px}
+@media(max-width:600px){.harbour-inspect-button{font-size:11px;min-height:34px}
+  .ship-inspection-ui{padding-left:12px;padding-right:12px}
+  .ship-inspection-ui>div strong{font-size:21px}
+  .ship-inspection-ui>div span{font-size:10px;line-height:1.5}}
