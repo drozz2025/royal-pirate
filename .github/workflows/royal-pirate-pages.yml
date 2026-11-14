@@ -24,6 +24,8 @@ concurrency:
 
 jobs:
   verify:
+    outputs:
+      release_version: ${{ steps.release.outputs.version }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -57,6 +59,9 @@ jobs:
           assert.ok(css.includes('url(./font-0.ttf)'), 'self-hosted font paths must work under project path');
           console.log('Release v' + version + ': version and project asset paths validated.');
           NODE
+      - name: Expose verified release version
+        id: release
+        run: echo "version=$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).version')" >> "$GITHUB_OUTPUT"
       - name: Upload verified site
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
@@ -80,3 +85,22 @@ jobs:
       - name: Publish GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify public Pages HTTP, release label, and CSS
+        env:
+          RELEASE_VERSION: ${{ needs.verify.outputs.release_version }}
+          PUBLIC_URL: https://drozz2025.github.io/royal-pirate/
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 18); do
+            echo "Checking public release v${RELEASE_VERSION} (attempt ${attempt}/18)"
+            if curl --max-time 15 -fsSL "${PUBLIC_URL}" -o /tmp/royal-pirate-index.html &&
+               grep -Fq "v${RELEASE_VERSION}" /tmp/royal-pirate-index.html &&
+               grep -Fq '/royal-pirate/fonts/fonts.css' /tmp/royal-pirate-index.html &&
+               curl --max-time 15 -fsSL "${PUBLIC_URL}fonts/fonts.css" -o /tmp/royal-pirate-fonts.css; then
+                 echo "PUBLIC RELEASE VERIFIED: v${RELEASE_VERSION} at ${PUBLIC_URL}"
+                 exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Public Pages HTTP/version verification failed; do not announce the release as live."
+          exit 1
