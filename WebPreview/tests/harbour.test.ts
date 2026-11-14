@@ -28,3 +28,25 @@ test('release version is visible and matches the package', () => {
   assert.equal(pkg.version, '0.1.3');
   assert.ok(html.includes('v' + pkg.version));
 });
+
+const scene = readFileSync(new URL('../src/scene.ts', import.meta.url), 'utf8');
+
+test('the harbour frames a real Three.js vessel and disables battle simulation', () => {
+  assert.match(scene, /showHarbour\(\)/);
+  assert.match(scene, /showBattle\(\)/);
+  assert.match(scene, /this\.ships\.enemy\.root\.visible=false/);
+  assert.match(scene, /this\.harbourDock\.visible=true/);
+  assert.match(scene, /this\.harbourDock\.visible=false/);
+  assert.match(scene, /this\.cameraMode!=='harbour'/);
+  assert.match(main, /scene\.showHarbour\(\)/);
+  assert.match(main, /view\.current\?\.showBattle\(\)/);
+});
+test('approved navigation is represented without fake in-game economy', () => {
+  for(const label of ['SHOP','CARDS','SHIP','MISSIONS','RANKING','UPGRADES','FORGE','REWARDS','DAILY CHESTS','BATTLE!']) {
+    assert.ok(harbour.includes(label), label+' must be present');
+  }
+  assert.match(harbour, /aria-disabled="true"/);
+  assert.match(harbour, /LIVE 3D/);
+  assert.match(css, /\.in-harbour \.battle-hud/);
+  assert.match(css, /\.harbour-central\{[^}]*min-height/);
+});
