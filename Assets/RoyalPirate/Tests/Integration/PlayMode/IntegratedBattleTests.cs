@@ -38,8 +38,11 @@ namespace RoyalPirate.IntegrationTests
             Assert.That(battle.GetComponent<CombatHud>(),Is.Null);
             Assert.That(battle.GetComponent<TouchCombatInput>().ExternalActionControls,Is.True);
             var doc=battle.GetComponent<UIDocument>();Assert.That(doc.rootVisualElement.Query<Button>("battle-fire").ToList().Count,Is.EqualTo(1));
+            var previousPanel=doc.panelSettings;
             bridge.enabled=false;Assert.That(bridge.Bound,Is.False);bridge.enabled=true;yield return null;yield return null;
-            Assert.That(bridge.Bound,Is.True);Assert.That(doc.rootVisualElement.Query<Button>("battle-fire").ToList().Count,Is.EqualTo(1));
+            Assert.That(bridge.Bound,Is.True);Assert.That(doc.panelSettings,Is.Not.Null);
+            Assert.That(doc.panelSettings,Is.Not.SameAs(previousPanel),"Rebind must attach a fresh panel before enabling UIDocument.");
+            Assert.That(doc.rootVisualElement.Query<Button>("battle-fire").ToList().Count,Is.EqualTo(1));
             var fire=doc.rootVisualElement.Q<Button>("battle-fire");var panel=doc.rootVisualElement.panel;
             var origin=RuntimePanelUtils.ScreenToPanel(panel,Vector2.zero);
             var edge=RuntimePanelUtils.ScreenToPanel(panel,new Vector2(Screen.width,Screen.height));
