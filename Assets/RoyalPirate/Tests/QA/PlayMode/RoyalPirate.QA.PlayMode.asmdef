@@ -1,0 +1,5 @@
+{
+  "name": "RoyalPirate.QA.PlayMode",
+  "references": ["RoyalPirate.Domain", "RoyalPirate.Runtime"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

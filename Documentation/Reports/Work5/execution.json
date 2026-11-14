@@ -1,0 +1,90 @@
+{
+  "dateUtc": "2026-11-14T14:53:48.410160+00:00",
+  "baseRemoteCommit": "7be4af3dd271018c386a2891b95f067e471dba7e",
+  "baseTree": "cfe592be52c712ac01061d3795504a81c5417d0e",
+  "unityExecuted": false,
+  "mobileExecuted": false,
+  "workflowExecuted": false,
+  "fullBattlesExecuted": 0,
+  "expensesEUR": 0,
+  "results": [
+    {
+      "name": "structure",
+      "exitCode": 0,
+      "status": "passed",
+      "log": "structure.txt"
+    },
+    {
+      "name": "source-hygiene",
+      "exitCode": 0,
+      "status": "passed",
+      "log": "source-hygiene.txt"
+    },
+    {
+      "name": "qa-tools",
+      "exitCode": 0,
+      "status": "passed",
+      "log": "qa-tools.txt"
+    },
+    {
+      "name": "baseline-domain",
+      "exitCode": 0,
+      "status": "passed",
+      "log": "baseline-domain.txt"
+    },
+    {
+      "name": "qa-domain",
+      "exitCode": 0,
+      "status": "passed",
+      "log": "qa-domain.txt"
+    },
+    {
+      "name": "unity-preflight",
+      "exitCode": 2,
+      "status": "blocked",
+      "log": "unity-preflight.txt"
+    }
+  ],
+  "sourceSHA256": {
+    "Assets/RoyalPirate/Tests/QA/EditMode/DomainRegressionTests.cs": "3359d8bc7d0b28bc0801a7aa78bf733382be37b3cac92212fb96ae3914c8305c",
+    "Assets/RoyalPirate/Tests/QA/EditMode/RoyalPirate.QA.EditMode.asmdef": "baea34e559d8cb6d831521b701e4ea280b9285e08b357a084f825c1764dae876",
+    "Assets/RoyalPirate/Tests/QA/EditMode/SaveRecoveryTests.cs": "ec050dbcd696c45d4bb867d4c6d699d48bb6e2fc0689f270d934769656cdffb3",
+    "Assets/RoyalPirate/Tests/QA/PlayMode/CombatRegressionTests.cs": "34f32da521a43bd717ecf866aa4a76f3229538b0b6a1976e2426f56bf36a7b57",
+    "Assets/RoyalPirate/Tests/QA/PlayMode/HeadlessBattleTests.cs": "166b0cff68accb7cd0cbc5e0d2ec0b5da5f2d88525d0b66165d35cb62b92cab3",
+    "Assets/RoyalPirate/Tests/QA/PlayMode/RoyalPirate.QA.PlayMode.asmdef": "4ced2479e422e902f2e8cdf952c81bfb49a10165648d914a37940ade40aa58d0",
+    "Assets/RoyalPirate/Tests/QA/Shared/DomainScenarios.cs": "08f09d6a43f5a456f0acf24f6876ae49714d30a9f52aa73c546df37990682e69",
+    "Assets/RoyalPirate/Tests/QA/Shared/RoyalPirate.QA.Shared.asmdef": "d0df1d3decdce959ac3b0fa1fb86eabbbd2654840d2d9248b2d702cf1b191ae2",
+    "Tools/QA/Program.cs": "e597004c97b156e20d12afe77080095aa3b589e48a6ef8ff88d35a156ce159ea",
+    "Tools/QA/QA.csproj": "9c4beaadd0673d5090bfdc87b3fa3db57ff39b002491dc6bb58deaf50346b8f5",
+    "Tools/QA/analyze_frames.py": "9725fe8c00ce7d6b9af8fede2c6c7de70bebb2f48aedc235b844b6cb9a8d5200",
+    "Tools/QA/run_unity.py": "74dca522ca75711e6dd2395ef054e5b919e67fc3dbe61a1359625ff37985e6b4",
+    "Tools/QA/static_checks.py": "0bfbc4c4ebac17a8e14ffbef2f1469b0e7d95b53581a78cca0caa96b01af3ea8",
+    "Tools/QA/test_tools.py": "48e62b0496005cf957712c2d89bf1a7ebfc53cb2327df9fbae70a808bc162591",
+    "Tools/QA/verify_test_results.py": "d04a95295cde996c19e6899e1c9b3af51d9af6d7d08036dcb41854ef54772e32",
+    "Assets/RoyalPirate/Editor/MobileProjectSetup.cs": "0673bce01b0b2deb8e8c4650bc682292354bfaa54ee48e8547ee7b97f4824e88",
+    "Assets/RoyalPirate/Editor/RoyalPirate.Editor.asmdef": "65180344e0388fe9fbcae3ff80d4e6a3b1d685cf7bec0f560490cac5c5fa72f8",
+    "Assets/RoyalPirate/Scripts/Domain/Ballistics.cs": "b978f7abad50d868462df8001746232ccf0851f8672df61c85409118eefd4fad",
+    "Assets/RoyalPirate/Scripts/Domain/Contracts.cs": "9c9f564019969ecff0b3c9f28f5dd00143a76efb15de56c333fa42b924f97f76",
+    "Assets/RoyalPirate/Scripts/Domain/RoyalPirate.Domain.asmdef": "3954183db0706af3e9f504d1cb40e688d5efde0434d442005260da638adb9601",
+    "Assets/RoyalPirate/Scripts/Domain/SandboxShipyard.cs": "099e4864f306c2b2608aa18ae5febc448b374a32ba5a1b6ff92372cd3527b067",
+    "Assets/RoyalPirate/Scripts/Domain/ShipModel.cs": "bb277732eb9186c346c7c1b76a7365246d8a063a97922354546eb6fa015f0dea",
+    "Assets/RoyalPirate/Scripts/Domain/TurnState.cs": "a915a2c2ad1d0c09074bad4268207dd031445ec89fca627e4770de425c0e62fa",
+    "Assets/RoyalPirate/Scripts/Runtime/BattleBootstrap.cs": "309b5bceea9b4b68e5311332bab189c14fb58fc39d37f63d68c9a53c9fe6c02f",
+    "Assets/RoyalPirate/Scripts/Runtime/CannonWeapon.cs": "1efab66369d1c260182954e1bdafc5f9831ca5fca6d0d38028ace3e8ea96a60f",
+    "Assets/RoyalPirate/Scripts/Runtime/ModuleView.cs": "b7165e01eb2650364c8ca0b623cef5d16d7f0c0b5e5a4f41796d1cdef103aa1f",
+    "Assets/RoyalPirate/Scripts/Runtime/ProjectileView.cs": "0f858917209bce647178fe705e6d4e20ff1b026010ea5d094694958499a986f5",
+    "Assets/RoyalPirate/Scripts/Runtime/RoyalPirate.Runtime.asmdef": "704d96d01d17399804caa3c356293ab8e0e6420a279d04d05a3a562c93349e97",
+    "Assets/RoyalPirate/Scripts/Runtime/ShipView.cs": "4e00e9b67901a6a7bc25f6f98e1648c7b45f6667ab8a4108c1eb6bc281333139",
+    "Assets/RoyalPirate/Scripts/Services/DisabledCommerce.cs": "a0a6e91effba72ed2ac8e758c4dbc28b1792a54b72477d0adb26d9f8cd037bd2",
+    "Assets/RoyalPirate/Scripts/Services/LocalLoadoutStore.cs": "40f304af468d97ca3d0a0d70975e08524b129f72151c1bba46051f0b0adc85a7",
+    "Assets/RoyalPirate/Scripts/Services/RoyalPirate.Services.asmdef": "4c67062287bb76176123c96d49a53f7d00c808ebe834637f099af1cc4694e3d9",
+    "Assets/RoyalPirate/Tests/EditMode/DomainTests.cs": "4a88d6fb89fbc0e698e6c43adb80b565b843ea14ee90a3f315db89ece3d87449",
+    "Assets/RoyalPirate/Tests/EditMode/PersistenceTests.cs": "c4663dda038045b38baf207a372c1c94d86bfc634ab12b6b0deb1c9338866e2d",
+    "Assets/RoyalPirate/Tests/EditMode/RoyalPirate.EditModeTests.asmdef": "a66030af93fb6e073b6b48bd69a692f871b6cc1cd37987128e5deaf90e01f6d0",
+    "Assets/RoyalPirate/Tests/PlayMode/ProjectileTests.cs": "81c9ee59ecbdd2254d75a1101c71183eb563f6d6e29372c8927a10b393462a54",
+    "Assets/RoyalPirate/Tests/PlayMode/RoyalPirate.PlayModeTests.asmdef": "cfa55707e7a23022bf03f667d9cb627f90fa9fb0f7b14b5feb7027af8835dbe5",
+    "Tools/DomainChecks/DomainChecks.csproj": "8cb9c35f9e193aa5efec7d5b78a4e1e023a44af8688a10ccaa68032c77de33b7",
+    "Tools/DomainChecks/Program.cs": "7e26f1c7d36995dae26b23e4d019e6c8283bfdbd1040cdaf826df1c66f46be89",
+    "Tools/validate_repository.py": "4769c46af34a52a11e088e634f0c5ceace2fab9520134968687d058623fe46d8"
+  }
+}
