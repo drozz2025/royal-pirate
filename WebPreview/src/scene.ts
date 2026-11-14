@@ -14,7 +14,7 @@ export class OceanScene {
   private pathGeometry=new T.BufferGeometry().setAttribute('position',new T.BufferAttribute(new Float32Array(240*3),3)); private path: T.Line; private marker: T.Mesh;
   private ball: T.Mesh; private particleGeometry=new T.IcosahedronGeometry(1,0); private particleMaterial=new T.MeshBasicMaterial({color:'#fff'});
   private particles: { mesh:T.Mesh;velocity:T.Vector3;age:number;life:number;size:number;smoke:boolean }[]=[];
-  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'='battle'; private shake=0;
+  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'='battle'; private harbourDock=new T.Group(); private shake=0;
   private renderMs=0;private lastRender=0;private frameSamples:number[]=[];private metricsAt=0; private pirateAudio=new PirateAudio(); paused=false; disposed=false;
   private onContextLost=(event:Event)=>{event.preventDefault();this.paused=true;this.onError('The 3D view was interrupted. Reload to restore the ocean.');};
   private onVisibility=()=>{this.previous=0;this.pirateAudio.setHidden(document.hidden);};
@@ -41,7 +41,7 @@ export class OceanScene {
     for(const side of ['player','enemy'] as const){this.ships[side].root.position.set(SHIPS[side].x,0,SHIPS[side].z);this.scene.add(this.ships[side].root);
       const foam=new T.Mesh(new T.RingGeometry(1,1.09,40),new T.MeshBasicMaterial({color:'#b5f9ed',transparent:true,opacity:.45,side:T.DoubleSide,depthWrite:false}));foam.rotation.x=-Math.PI/2;foam.scale.set(2.3,5.3,1);foam.position.set(SHIPS[side].x,.09,SHIPS[side].z);this.scene.add(foam);this.foam.push(foam);
     }
-    this.environment();
+    this.environment();this.buildHarbourDock();this.scene.add(this.harbourDock);
     this.controls=new OrbitControls(this.camera,this.canvas);this.controls.enableDamping=true;this.controls.enablePan=false;this.controls.minDistance=18;this.controls.maxDistance=110;this.controls.minPolarAngle=.32;this.controls.maxPolarAngle=1.28;this.controls.target.set(0,2,0);this.controls.rotateSpeed=.5;
     this.path=new T.Line(this.pathGeometry,new T.LineDashedMaterial({color:'#f9e5a4',dashSize:.35,gapSize:.2,transparent:true,opacity:.85}));this.scene.add(this.path);
     this.marker=new T.Mesh(new T.RingGeometry(.48,.58,36),new T.MeshBasicMaterial({color:'#ffdf7e',side:T.DoubleSide,transparent:true,opacity:.9,depthTest:false}));this.marker.rotation.x=-Math.PI/2;this.scene.add(this.marker);
@@ -73,9 +73,49 @@ export class OceanScene {
     const gullGeo=new T.BufferGeometry().setFromPoints([new T.Vector3(-.6,0,0),new T.Vector3(0,-.2,0),new T.Vector3(.6,0,0)]);
     for(let i=0;i<6;i++){const gull=new T.Line(gullGeo,new T.LineBasicMaterial({color:'#456770'}));gull.position.set(-18+i*7,16+Math.sin(i)*2,-25);this.scene.add(gull);}
   }
-  private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();}
+  /** Port furniture created from original geometry, with no new textures or downloaded assets. */
+  private buildHarbourDock(){
+    const plankMat=new T.MeshStandardMaterial({color:'#9d6038',roughness:.83});
+    const postMat=new T.MeshStandardMaterial({color:'#5c3421',roughness:.82});
+    const iron=new T.MeshStandardMaterial({color:'#253e49',metalness:.4,roughness:.57});
+    const lit=new T.MeshStandardMaterial({color:'#ffda71',emissive:'#ffac2c',emissiveIntensity:1.25});
+    const boardGeo=new T.BoxGeometry(3.3,.22,.56),postGeo=new T.CylinderGeometry(.21,.24,2.8,8);
+    const railGeo=new T.CylinderGeometry(.055,.055,3.2,6),barrelGeo=new T.CylinderGeometry(.43,.4,.78,10);
+    for(const side of [-1,1]){
+      const x=SHIPS.player.x+side*9.2,z=SHIPS.player.z+6;
+      for(let i=0;i<8;i++){
+        const p=new T.Mesh(boardGeo,plankMat);p.position.set(x,.38,z+i*.6);this.harbourDock.add(p);
+      }
+      for(const dx of [-1.55,1.55])for(const dz of [0,3.7]){
+        const p=new T.Mesh(postGeo,postMat);p.position.set(x+dx,.12,z+dz);this.harbourDock.add(p);
+        const cap=new T.Mesh(new T.CylinderGeometry(.26,.26,.16,8),iron);cap.position.set(x+dx,1.56,z+dz);this.harbourDock.add(cap);
+      }
+      for(let i=0;i<2;i++){
+        const barrel=new T.Mesh(barrelGeo,plankMat);barrel.position.set(x+(i?-.7:.8),1.16,z+1.4+i*1.3);this.harbourDock.add(barrel);
+        const band=new T.Mesh(new T.TorusGeometry(.42,.055,5,12),iron);band.rotation.x=Math.PI/2;band.position.copy(barrel.position);band.position.y+=.24;this.harbourDock.add(band);
+      }
+      const lampPost=new T.Mesh(new T.CylinderGeometry(.07,.07,2,7),iron);lampPost.position.set(x+side*1.3,1.65,z+.4);this.harbourDock.add(lampPost);
+      const lantern=new T.Mesh(new T.SphereGeometry(.26,10,8),lit);lantern.position.set(x+side*1.3,2.8,z+.4);this.harbourDock.add(lantern);
+      // A small rail reinforces the silhouette without introducing physics colliders.
+      const rail=new T.Mesh(railGeo,postMat);rail.rotation.x=Math.PI/2;rail.position.set(x+side*1.48,1.1,z+1.85);this.harbourDock.add(rail);
+    }
+    this.harbourDock.visible=false;
+  }
+  private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();}
   home(){this.cameraMode='battle';const aspect=this.host.clientWidth/this.host.clientHeight;const distance=aspect<.75?55:aspect<1.2?43:34;if(aspect<.75){this.camera.position.set(-distance*.74,distance*.62,distance*.58);this.controls.target.set(0,1.6,0);}else{this.camera.position.set(distance*.20,distance*.56,distance*.88);this.controls.target.set(0,2,0);}this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
+  /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
+  showHarbour(){
+    this.cameraMode='harbour';this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
+    this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
+    this.controls.enableRotate=false;this.controls.enableZoom=false;
+    const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
+    this.controls.target.set(ship.x,portrait?3.5:2.9,ship.z);
+    this.camera.position.set(ship.x+(portrait?2.5:5),portrait?10.8:10,ship.z+(portrait?24:19));
+    this.controls.update();
+  }
+  /** Returns to the existing working battle camera, with both ships visible. */
+  showBattle(){this.ships.enemy.root.visible=true;this.foam[1].visible=true;this.harbourDock.visible=false;this.controls.enableRotate=true;this.controls.enableZoom=true;this.home();}
   toggleMusic(){return this.pirateAudio.toggleMusic();}
   toggleEffects(){return this.pirateAudio.toggleEffects();}
   private effect(event:BattleEvent){
@@ -107,7 +147,7 @@ export class OceanScene {
     if(this.disposed)return;this.raf=requestAnimationFrame(this.animate);if(document.hidden||this.paused){this.previous=0;return;}
     if(this.compatibility&&timestamp-this.lastRender<45)return;this.lastRender=timestamp;
     const raw=this.previous?(timestamp-this.previous):16.7,dt=Math.min(raw/1000,.25);this.previous=timestamp;this.elapsed+=dt;this.frameSamples.push(raw);if(this.frameSamples.length>120)this.frameSamples.shift();
-    this.battle.tick(dt);for(const event of this.battle.drainEvents())this.effect(event);
+    if(this.cameraMode!=='harbour'){this.battle.tick(dt);for(const event of this.battle.drainEvents())this.effect(event);}
     this.water.uniforms.time.value=this.elapsed;
     for(const [side,art] of Object.entries(this.ships) as ['player'|'enemy',ShipArt][]){const health=this.battle.health[side];const damage=1-health/100;
       art.root.position.y=Math.sin(this.elapsed*1.1+(side==='player'?0:2))*.075-(health===0?1.3:0);art.root.rotation.z=Math.sin(this.elapsed*.9)*.018+(health===0?(side==='enemy'?-.23:.23):damage*.035);
@@ -121,7 +161,7 @@ export class OceanScene {
       ripple.mesh.scale.setScalar(state.scale);ripple.mesh.position.y=state.surfaceY;(ripple.mesh.material as T.MeshBasicMaterial).opacity=state.opacity;
     }
     const aimKey=`${this.battle.yaw}:${this.battle.power}`;
-    this.path.visible=this.marker.visible=this.battle.phase==='ready';
+    this.path.visible=this.marker.visible=this.cameraMode!=='harbour'&&this.battle.phase==='ready';
     if(aimKey!==this.lastAim){this.lastAim=aimKey;const points=predict(this.battle.yaw,this.battle.power).map(p=>new T.Vector3(p.x,p.y,p.z));const attr=this.pathGeometry.attributes.position;points.forEach((p,i)=>attr.setXYZ(i,p.x,p.y,p.z));attr.needsUpdate=true;this.pathGeometry.setDrawRange(0,points.length);this.pathGeometry.computeBoundingSphere();this.path.computeLineDistances();this.marker.position.copy(points[points.length-1]);this.marker.position.y=Math.max(.16,this.marker.position.y);}
     this.marker.rotation.z+=dt*.4;
     if(this.battle.shot){const s=this.battle.shot;this.ball.visible=true;this.ball.position.set(s.position.x,s.position.y,s.position.z);this.trail.visible=true;const p=this.ball.position.clone(),v=new T.Vector3(s.velocity.x,s.velocity.y-12*s.age,s.velocity.z).normalize();this.trail.geometry.setFromPoints([p,p.clone().addScaledVector(v,-1.2)]);}else{this.ball.visible=false;this.trail.visible=false;}
