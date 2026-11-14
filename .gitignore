@@ -38,3 +38,7 @@ TestResults/
 *.mobileprovision
 *.p12
 *.pem
+
+!Tools/Work4Checks/Work4Checks.csproj
+!Tools/Work4Syntax/Work4Syntax.csproj
+!Tools/IntegrationChecks/IntegrationChecks.csproj

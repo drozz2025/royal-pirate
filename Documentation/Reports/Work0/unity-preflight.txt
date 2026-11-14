@@ -1,0 +1,1 @@
+BLOCKED: UNITY_EDITOR must point to an installed, licensed Unity editor. No tests executed.

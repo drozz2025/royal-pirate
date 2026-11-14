@@ -1,0 +1,5 @@
+{
+  "name": "RoyalPirate.QA.Shared",
+  "references": ["RoyalPirate.Domain"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

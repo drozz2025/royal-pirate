@@ -1,0 +1,6 @@
+{
+  "name": "RoyalPirate.QA.EditMode",
+  "references": ["RoyalPirate.Domain", "RoyalPirate.Services", "RoyalPirate.QA.Shared"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

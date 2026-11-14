@@ -1,0 +1,47 @@
+PASS starter / configurable wallet
+PASS stable guest identifier
+PASS build empty mount
+PASS build debit exact
+PASS stale transaction no charge
+PASS upgrade existing part
+PASS locked module no mutation
+PASS structural hull cannot be removed
+PASS remove without currency creation
+PASS evolution unlocks second stage
+PASS build newly unlocked armor
+PASS snapshots cannot mutate authority
+PASS restart preserves full aggregate
+PASS combat snapshot has exact instances levels and revision
+PASS battle copy isolated from saved loadout
+PASS welcome reward idempotent
+PASS chest consumed exactly once
+PASS daily claim idempotent
+PASS tomorrow mission requires new activity
+PASS build hero position
+PASS equip unlocked hero
+PASS one hero per mount / replacement
+PASS locked hero rejected
+PASS wrong hero mount rejected
+PASS hero upgrade spends configured xp and coins
+PASS removing hero mount unequips crew
+PASS disk failure surfaced
+PASS disk failure rolls back wallet modules revision and mission
+PASS insufficient balance atomic
+PASS maximum module level
+PASS aggregate revision overflow rejected
+PASS duplicate module save rejected
+PASS unsupported aggregate version rejected
+PASS negative wallet rejected
+PASS all menu routes return home
+PASS empty folder is new profile
+PASS file roundtrip full aggregate
+PASS corrupt primary recovers validated backup
+PASS recovery preserves corrupt evidence and valid backup
+PASS missing primary recovers backup
+PASS future version blocks backup downgrade
+PASS future version blocks overwrite
+PASS oversized primary falls back to bounded backup
+PASS both corrupt generations block startup
+PASS interrupted initial save not silently reset
+PASS 5000 deterministic transaction interleavings maintain valid saved aggregates
+RESULT: 46 checks passed, including 5000 transactions. Actual domain/store sources. System.Text.Json codec; Unity not executed.

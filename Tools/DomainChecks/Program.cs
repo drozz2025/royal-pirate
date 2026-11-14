@@ -66,6 +66,8 @@ internal static class Program
         turn=new TurnState();turn.TryFire(0);int expiredTurn=turn.TurnNumber;
         turn.Tick(8);turn.TryFire(1);turn.ResolveShot(expiredTurn);
         Check(turn.ActivePlayer==1&&turn.Phase==BattlePhase.Resolving,"late resolution cannot skip a new turn");
+        foreach(var test in RoyalPirate.Tests.CombatContractChecks.Names)
+        { RoyalPirate.Tests.CombatContractChecks.Run(test); Check(true,"combat / "+test); }
         Console.WriteLine($"RESULT: {count} checks passed. Unity compilation, collisions and device tests NOT run.");
     }
 }

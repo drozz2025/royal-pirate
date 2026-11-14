@@ -1,0 +1,361 @@
+{
+  "schemaVersion": 1,
+  "initialCoins": 6000,
+  "initialGems": 25,
+  "experiencePerLevel": 100,
+  "starterMountIds": [
+    "mount.hull.01",
+    "mount.deck.01",
+    "mount.mast.01",
+    "mount.sail.01",
+    "mount.cannon.01"
+  ],
+  "stageNames": [
+    "Royal Sloop",
+    "Reinforced Sloop",
+    "Corsair Sloop",
+    "Royal Vanguard",
+    "Crown of the Seas"
+  ],
+  "stageCosts": [
+    400,
+    700,
+    1100,
+    1600
+  ],
+  "moduleGates": [
+    {
+      "moduleId": "module.hull.01",
+      "stage": 1
+    },
+    {
+      "moduleId": "module.bow.01",
+      "stage": 1
+    },
+    {
+      "moduleId": "module.stern.01",
+      "stage": 1
+    },
+    {
+      "moduleId": "module.deck.01",
+      "stage": 1
+    },
+    {
+      "moduleId": "module.mast.01",
+      "stage": 1
+    },
+    {
+      "moduleId": "module.sail.01",
+      "stage": 1
+    },
+    {
+      "moduleId": "module.cannon.01",
+      "stage": 1
+    },
+    {
+      "moduleId": "module.cabin.01",
+      "stage": 2
+    },
+    {
+      "moduleId": "module.armor.01",
+      "stage": 2
+    },
+    {
+      "moduleId": "module.heroslot.01",
+      "stage": 1
+    }
+  ],
+  "heroes": [
+    {
+      "id": "hero.mara",
+      "name": "Captain Mara",
+      "abilityId": "ability.rally",
+      "heroClass": 0,
+      "rarity": 0,
+      "unlockStage": 1,
+      "baseCost": 100,
+      "baseExperience": 50,
+      "maxLevel": 10
+    },
+    {
+      "id": "hero.bruno",
+      "name": "Bruno Flint",
+      "abilityId": "ability.barrage",
+      "heroClass": 1,
+      "rarity": 1,
+      "unlockStage": 2,
+      "baseCost": 150,
+      "baseExperience": 50,
+      "maxLevel": 10
+    },
+    {
+      "id": "hero.lyra",
+      "name": "Lyra Tide",
+      "abilityId": "ability.tailwind",
+      "heroClass": 2,
+      "rarity": 2,
+      "unlockStage": 3,
+      "baseCost": 200,
+      "baseExperience": 50,
+      "maxLevel": 10
+    },
+    {
+      "id": "hero.otto",
+      "name": "Otto Brass",
+      "abilityId": "ability.repair",
+      "heroClass": 3,
+      "rarity": 3,
+      "unlockStage": 4,
+      "baseCost": 250,
+      "baseExperience": 50,
+      "maxLevel": 10
+    },
+    {
+      "id": "hero.nyx",
+      "name": "Nyx Storm",
+      "abilityId": "ability.tempest",
+      "heroClass": 4,
+      "rarity": 3,
+      "unlockStage": 5,
+      "baseCost": 300,
+      "baseExperience": 50,
+      "maxLevel": 10
+    }
+  ],
+  "rewards": [
+    {
+      "id": "welcome",
+      "coins": 300,
+      "gems": 5,
+      "experience": 50,
+      "trophies": 0,
+      "chests": 1
+    },
+    {
+      "id": "daily.build",
+      "coins": 100,
+      "gems": 0,
+      "experience": 25,
+      "trophies": 0,
+      "chests": 0
+    },
+    {
+      "id": "chest.basic",
+      "coins": 200,
+      "gems": 2,
+      "experience": 50,
+      "trophies": 0,
+      "chests": 0
+    },
+    {
+      "id": "battle.win",
+      "coins": 120,
+      "gems": 0,
+      "experience": 40,
+      "trophies": 20,
+      "chests": 0
+    },
+    {
+      "id": "battle.loss",
+      "coins": 30,
+      "gems": 0,
+      "experience": 10,
+      "trophies": 0,
+      "chests": 0
+    }
+  ],
+  "ships": [
+    {
+      "id": "ship.navio01",
+      "name": "Royal Sloop",
+      "shipClass": "Sloop",
+      "unlockTrophies": 0,
+      "weaponCapacity": 1,
+      "available": true
+    },
+    {
+      "id": "ship.coral.runner",
+      "name": "Coral Runner",
+      "shipClass": "Sloop",
+      "unlockTrophies": 250,
+      "weaponCapacity": 1,
+      "available": false
+    },
+    {
+      "id": "ship.copper.finch",
+      "name": "Copper Finch",
+      "shipClass": "Sloop",
+      "unlockTrophies": 500,
+      "weaponCapacity": 1,
+      "available": false
+    },
+    {
+      "id": "ship.azure.swift",
+      "name": "Azure Swift",
+      "shipClass": "Sloop",
+      "unlockTrophies": 750,
+      "weaponCapacity": 1,
+      "available": false
+    },
+    {
+      "id": "ship.reef.corsair",
+      "name": "Reef Corsair",
+      "shipClass": "Sloop",
+      "unlockTrophies": 1000,
+      "weaponCapacity": 2,
+      "available": false
+    },
+    {
+      "id": "ship.golden.kestrel",
+      "name": "Golden Kestrel",
+      "shipClass": "Sloop",
+      "unlockTrophies": 1250,
+      "weaponCapacity": 2,
+      "available": false
+    },
+    {
+      "id": "ship.tidal.warden",
+      "name": "Tidal Warden",
+      "shipClass": "Brig",
+      "unlockTrophies": 1500,
+      "weaponCapacity": 2,
+      "available": false
+    },
+    {
+      "id": "ship.emerald.brig",
+      "name": "Emerald Brig",
+      "shipClass": "Brig",
+      "unlockTrophies": 1750,
+      "weaponCapacity": 2,
+      "available": false
+    },
+    {
+      "id": "ship.sunlit.raider",
+      "name": "Sunlit Raider",
+      "shipClass": "Brig",
+      "unlockTrophies": 2000,
+      "weaponCapacity": 3,
+      "available": false
+    },
+    {
+      "id": "ship.pearl.sentinel",
+      "name": "Pearl Sentinel",
+      "shipClass": "Brig",
+      "unlockTrophies": 2250,
+      "weaponCapacity": 3,
+      "available": false
+    },
+    {
+      "id": "ship.crimson.wake",
+      "name": "Crimson Wake",
+      "shipClass": "Brig",
+      "unlockTrophies": 2500,
+      "weaponCapacity": 3,
+      "available": false
+    },
+    {
+      "id": "ship.amber.voyager",
+      "name": "Amber Voyager",
+      "shipClass": "Brig",
+      "unlockTrophies": 2750,
+      "weaponCapacity": 3,
+      "available": false
+    },
+    {
+      "id": "ship.storm.petrel",
+      "name": "Storm Petrel",
+      "shipClass": "Frigate",
+      "unlockTrophies": 3000,
+      "weaponCapacity": 4,
+      "available": false
+    },
+    {
+      "id": "ship.sapphire.drake",
+      "name": "Sapphire Drake",
+      "shipClass": "Frigate",
+      "unlockTrophies": 3250,
+      "weaponCapacity": 4,
+      "available": false
+    },
+    {
+      "id": "ship.ivory.mariner",
+      "name": "Ivory Mariner",
+      "shipClass": "Frigate",
+      "unlockTrophies": 3500,
+      "weaponCapacity": 4,
+      "available": false
+    },
+    {
+      "id": "ship.cobalt.guardian",
+      "name": "Cobalt Guardian",
+      "shipClass": "Frigate",
+      "unlockTrophies": 3750,
+      "weaponCapacity": 4,
+      "available": false
+    },
+    {
+      "id": "ship.gilded.tempest",
+      "name": "Gilded Tempest",
+      "shipClass": "Frigate",
+      "unlockTrophies": 4000,
+      "weaponCapacity": 5,
+      "available": false
+    },
+    {
+      "id": "ship.silver.leviathan",
+      "name": "Silver Leviathan",
+      "shipClass": "Frigate",
+      "unlockTrophies": 4250,
+      "weaponCapacity": 5,
+      "available": false
+    },
+    {
+      "id": "ship.ruby.monarch",
+      "name": "Ruby Monarch",
+      "shipClass": "Galleon",
+      "unlockTrophies": 4500,
+      "weaponCapacity": 5,
+      "available": false
+    },
+    {
+      "id": "ship.royal.eclipse",
+      "name": "Royal Eclipse",
+      "shipClass": "Galleon",
+      "unlockTrophies": 4750,
+      "weaponCapacity": 5,
+      "available": false
+    },
+    {
+      "id": "ship.ocean.sovereign",
+      "name": "Ocean Sovereign",
+      "shipClass": "Galleon",
+      "unlockTrophies": 5000,
+      "weaponCapacity": 6,
+      "available": false
+    },
+    {
+      "id": "ship.celestial.armada",
+      "name": "Celestial Armada",
+      "shipClass": "Galleon",
+      "unlockTrophies": 5250,
+      "weaponCapacity": 6,
+      "available": false
+    },
+    {
+      "id": "ship.crown.galleon",
+      "name": "Crown Galleon",
+      "shipClass": "Galleon",
+      "unlockTrophies": 5500,
+      "weaponCapacity": 6,
+      "available": false
+    },
+    {
+      "id": "ship.eternal.horizon",
+      "name": "Eternal Horizon",
+      "shipClass": "Galleon",
+      "unlockTrophies": 5750,
+      "weaponCapacity": 6,
+      "available": false
+    }
+  ]
+}

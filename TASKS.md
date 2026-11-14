@@ -1,3 +1,7 @@
+## Work 0 integration handoff — 2026-11-14
+
+Work 0 owns the cross-area fixes on `work0/first-battle-integration-20261114` for review: HUD bridge/presenter, diagnostic input handoff, Integration scene, loadout recovery, muzzle VFX and regression tooling. Source Works remain unchanged. W3/W4/W5 changes are combined against W1 in this one integration branch; no main merge. See [audit and gates](Documentation/Reports/Work0/DELIVERY.md); #3–7/#10/#11 remain open until acceptance.
+
 # Tarefas e coordenação
 
 Estado em 14/11/2026. Implementado em código não significa testado no Unity.

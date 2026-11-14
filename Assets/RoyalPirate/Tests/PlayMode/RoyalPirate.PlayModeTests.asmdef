@@ -3,7 +3,8 @@
   "rootNamespace": "RoyalPirate",
   "references": [
     "RoyalPirate.Domain",
-    "RoyalPirate.Runtime"
+    "RoyalPirate.Runtime",
+    "Unity.InputSystem"
   ],
   "optionalUnityReferences": [
     "TestAssemblies"

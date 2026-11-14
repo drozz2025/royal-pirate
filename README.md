@@ -1,3 +1,7 @@
+## Work 0 — integration preview
+
+The combined first-battle branch is `work0/first-battle-integration-20261114`. See [implemented changes, reproducible checks and remaining Unity gates](Documentation/Reports/Work0/DELIVERY.md). In Unity 6000.3.28f1 use **Royal Pirate → Prepare First Battle Integration**, then open Harbour. Unity compilation and gameplay are still unverified.
+
 # ROYAL PIRATE
 
 Projeto Unity nativo, C#, iOS/Android, vertical. Work 1: fundação técnica de 14/11/2026.

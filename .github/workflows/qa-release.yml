@@ -1,0 +1,47 @@
+name: Royal Pirate QA
+# Deliberately manual until Work 1 verifies an existing zero-cost licensed runner.
+# Do not add hosted runners, activation secrets, pull_request_target or paid services.
+on:
+  workflow_dispatch:
+    inputs:
+      simulation_battles:
+        description: Real Unity physics fixture battles (1-10000)
+        required: true
+        default: '1000'
+permissions:
+  contents: read
+concurrency:
+  group: royal-qa-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  qa:
+    # An unset flag means NOT EXECUTED, never approval to merge.
+    if: vars.QA_ZERO_COST_RUNNER_READY == 'true'
+    runs-on: [self-hosted, royal-pirate-qa]
+    timeout-minutes: 180
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      ROYAL_QA_BATTLE_COUNT: ${{ inputs.simulation_battles }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Structure and source hygiene
+        run: |
+          python3 Tools/validate_repository.py
+          python3 Tools/QA/static_checks.py
+          python3 -m unittest discover -s Tools/QA -p 'test_*.py' -v
+      - name: Production domain checks
+        run: |
+          dotnet run --project Tools/DomainChecks/DomainChecks.csproj -- Assets/RoyalPirate/Data/Resources/Navio01.json
+          dotnet run --project Tools/QA/QA.csproj -- Assets/RoyalPirate/Data/Resources/Navio01.json TestResults/QA/domain.json
+      - name: Unity EditMode and PlayMode (UNITY_EDITOR configured locally)
+        run: python3 Tools/QA/run_unity.py --mode core
+      - name: Real physics scripted battles
+        run: python3 Tools/QA/run_unity.py --mode simulation --battles "$ROYAL_QA_BATTLE_COUNT"
+      # Results stay on the existing runner. No paid artifact storage is activated.
+      - name: Evidence location
+        if: always()
+        run: |
+          echo 'Inspect TestResults/QA on the runner. Copy XML, logs and evidence to the review record.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'A skipped, pending or failed job is not evidence of Unity validation.' >> "$GITHUB_STEP_SUMMARY"

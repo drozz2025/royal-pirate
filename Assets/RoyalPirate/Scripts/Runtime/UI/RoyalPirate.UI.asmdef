@@ -1,0 +1,1 @@
+{"name":"RoyalPirate.UI","rootNamespace":"RoyalPirate.UI","references":["RoyalPirate.Domain","RoyalPirate.Services","RoyalPirate.Runtime","RoyalPirate.Progression"]}

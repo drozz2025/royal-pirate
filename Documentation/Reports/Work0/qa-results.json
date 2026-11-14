@@ -1,0 +1,218 @@
+{
+  "suite": "production-domain-source-regressions",
+  "runtime": "8.0.34",
+  "passed": 34,
+  "failed": 0,
+  "unityExecuted": false,
+  "deviceExecuted": false,
+  "fullBattleSimulation": false,
+  "economySequences": 1000,
+  "economyOperations": 60000,
+  "turnTransitions": 1000,
+  "results": [
+    {
+      "name": "NoWind",
+      "passed": true,
+      "milliseconds": 142.3512,
+      "error": null
+    },
+    {
+      "name": "LateralWind",
+      "passed": true,
+      "milliseconds": 1.3116,
+      "error": null
+    },
+    {
+      "name": "HeadWind",
+      "passed": true,
+      "milliseconds": 0.6763,
+      "error": null
+    },
+    {
+      "name": "TailWind",
+      "passed": true,
+      "milliseconds": 0.5183,
+      "error": null
+    },
+    {
+      "name": "StepSubdivision",
+      "passed": true,
+      "milliseconds": 0.4422,
+      "error": null
+    },
+    {
+      "name": "MinimumPower",
+      "passed": true,
+      "milliseconds": 1.7251,
+      "error": null
+    },
+    {
+      "name": "MaximumPower",
+      "passed": true,
+      "milliseconds": 0.4915,
+      "error": null
+    },
+    {
+      "name": "YawRotation",
+      "passed": true,
+      "milliseconds": 1.6359,
+      "error": null
+    },
+    {
+      "name": "InvalidPower",
+      "passed": true,
+      "milliseconds": 5.085,
+      "error": null
+    },
+    {
+      "name": "InvalidStep",
+      "passed": true,
+      "milliseconds": 1.3181,
+      "error": null
+    },
+    {
+      "name": "InvalidWind",
+      "passed": true,
+      "milliseconds": 1.2174,
+      "error": null
+    },
+    {
+      "name": "HullDamage",
+      "passed": true,
+      "milliseconds": 0.8494,
+      "error": null
+    },
+    {
+      "name": "CannonDestruction",
+      "passed": true,
+      "milliseconds": 0.4524,
+      "error": null
+    },
+    {
+      "name": "MastDestruction",
+      "passed": true,
+      "milliseconds": 0.3728,
+      "error": null
+    },
+    {
+      "name": "ZeroDamage",
+      "passed": true,
+      "milliseconds": 0.6534,
+      "error": null
+    },
+    {
+      "name": "OverkillOnce",
+      "passed": true,
+      "milliseconds": 0.5085,
+      "error": null
+    },
+    {
+      "name": "NegativeDamage",
+      "passed": true,
+      "milliseconds": 0.8273,
+      "error": null
+    },
+    {
+      "name": "TurnOwnership",
+      "passed": true,
+      "milliseconds": 0.8091,
+      "error": null
+    },
+    {
+      "name": "AimTimeout",
+      "passed": true,
+      "milliseconds": 0.9903,
+      "error": null
+    },
+    {
+      "name": "ResolveTimeout",
+      "passed": true,
+      "milliseconds": 0.6291,
+      "error": null
+    },
+    {
+      "name": "StaleResolution",
+      "passed": true,
+      "milliseconds": 0.4475,
+      "error": null
+    },
+    {
+      "name": "FinishedIsTerminal",
+      "passed": true,
+      "milliseconds": 0.6039,
+      "error": null
+    },
+    {
+      "name": "InvalidTimer",
+      "passed": true,
+      "milliseconds": 0.5059,
+      "error": null
+    },
+    {
+      "name": "UpgradeReplay",
+      "passed": true,
+      "milliseconds": 0.8776,
+      "error": null
+    },
+    {
+      "name": "AllUpgradeCosts",
+      "passed": true,
+      "milliseconds": 0.5754,
+      "error": null
+    },
+    {
+      "name": "InsufficientFunds",
+      "passed": true,
+      "milliseconds": 0.3299,
+      "error": null
+    },
+    {
+      "name": "InstallReplay",
+      "passed": true,
+      "milliseconds": 0.7772,
+      "error": null
+    },
+    {
+      "name": "OccupiedMount",
+      "passed": true,
+      "milliseconds": 0.5309,
+      "error": null
+    },
+    {
+      "name": "RevisionOverflow",
+      "passed": true,
+      "milliseconds": 0.3411,
+      "error": null
+    },
+    {
+      "name": "InvalidLoadout",
+      "passed": true,
+      "milliseconds": 0.9326,
+      "error": null
+    },
+    {
+      "name": "FutureSchema",
+      "passed": true,
+      "milliseconds": 0.5214,
+      "error": null
+    },
+    {
+      "name": "NegativeBalance",
+      "passed": true,
+      "milliseconds": 0.4471,
+      "error": null
+    },
+    {
+      "name": "StressEconomy1000",
+      "passed": true,
+      "milliseconds": 284.0567,
+      "error": null
+    },
+    {
+      "name": "StressTurns1000",
+      "passed": true,
+      "milliseconds": 0.7122,
+      "error": null
+    }
+  ]
+}

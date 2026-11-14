@@ -1,0 +1,17 @@
+PASS exactly one scene combat
+PASS exactly one scene UI bridge
+PASS integrated HUD disables diagnostic presentation and action input
+PASS UI excludes touch aiming
+PASS bridge releases subscriptions
+PASS actions route to existing combat authority
+PASS draw and restricted power mapped
+PASS harbour and battle share validated loadout projection
+PASS no extra return overlay spawned
+PASS accepted shots trigger muzzle effect
+PASS reproducible runner Tools/DomainChecks/DomainChecks.csproj
+PASS reproducible runner Tools/Work4Checks/Work4Checks.csproj
+PASS reproducible runner Tools/QA/QA.csproj
+PASS reproducible runner Tools/IntegrationChecks/IntegrationChecks.csproj
+PASS reproducible runner Tools/Work4Syntax/Work4Syntax.csproj
+PASS combined explicit project setup
+RESULT: 16 integration wiring checks passed. Unity NOT executed.

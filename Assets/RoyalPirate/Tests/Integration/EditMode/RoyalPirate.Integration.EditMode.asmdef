@@ -1,0 +1,1 @@
+{"name":"RoyalPirate.Integration.EditMode","references":["RoyalPirate.Domain","RoyalPirate.Runtime","RoyalPirate.UI"],"includePlatforms":["Editor"],"optionalUnityReferences":["TestAssemblies"]}
