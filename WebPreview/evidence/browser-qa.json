@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-14",
+  "browser": "Cloud Chromium",
+  "renderer": "Canvas 3D CPU fallback; WebGL2 unavailable",
+  "layouts": [
+    {
+      "fire": {
+        "height": 101,
+        "width": 95,
+        "x": 255,
+        "y": 519.5
+      },
+      "height": 667,
+      "scrollWidth": 375,
+      "width": 375
+    },
+    {
+      "height": 844,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "height": 932,
+      "scrollWidth": 430,
+      "width": 430
+    }
+  ],
+  "verified": [
+    "page load",
+    "bearing 0 to 25",
+    "power 65 to 20",
+    "real miss/splash",
+    "enemy response",
+    "four-hit victory, player 34 enemy 0",
+    "five-miss defeat, player 0 enemy 100",
+    "restart after victory/defeat",
+    "restart during projectile",
+    "deck camera/reset",
+    "orbit gesture",
+    "progress modal open/close",
+    "no horizontal overflow at tested widths"
+  ],
+  "performance": {
+    "mobileObservedFPS": [
+      17,
+      19
+    ],
+    "sampleRenderMs": 20,
+    "sampleHeapMB": 58,
+    "notes": "Chromium estimate, development build; no physical mobile or long-duration leak benchmark"
+  },
+  "appConsoleErrorsSinceLatestFix": []
+}

@@ -1,0 +1,33 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> royal-pirate-web-preview@0.1.0 test
+> node --import tsx --test tests/*.test.ts
+
+✔ starts ready at full health (3.25198ms)
+✔ controls clamp finite values and reject NaN (0.261086ms)
+✔ rejects double fire and changing aim in flight (0.616108ms)
+✔ projectile obeys gravity and initial velocity (0.242673ms)
+✔ direction changes the actual trajectory (0.223186ms)
+✔ power changes range (0.867166ms)
+✔ swept collision catches high speed tunnelling (0.28467ms)
+✔ parallel segment outside box does not collide (0.177912ms)
+✔ default broadside hits and produces damage event (1.246483ms)
+✔ deliberate short shot splashes without enemy damage (0.674508ms)
+✔ AI responds with a projectile and returns control (3.815321ms)
+✔ four accurate broadsides lead to victory (6.841109ms)
+✔ repeated misses lead to defeat (3.598015ms)
+✔ restart during flight cancels stale projectile and resets stats (0.20389ms)
+✔ restart while AI waits cancels future enemy shot (0.471509ms)
+✔ restart after victory allows a fresh full battle (12.628942ms)
+✔ trajectory guide terminates at the same target as simulation (0.476669ms)
+✔ water collision precedes box if segment reaches sea first (0.253943ms)
+✔ 200 seeded accurate and missed matches terminate with bounded health (81.771884ms)
+✔ large frame delta is bounded; no negative/NaN time advances (0.438908ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 652.245087
