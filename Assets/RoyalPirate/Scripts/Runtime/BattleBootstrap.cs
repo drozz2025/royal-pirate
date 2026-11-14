@@ -39,9 +39,11 @@ namespace RoyalPirate.Runtime
         GameObject world;
         float previousFixedStep;
         int previousFrameRate;
+        bool ownsGlobalTiming;
         void Start()
         {
             previousFixedStep=Time.fixedDeltaTime; previousFrameRate=Application.targetFrameRate;
+            ownsGlobalTiming=true;
             Application.targetFrameRate=60; Time.fixedDeltaTime=.02f; Screen.orientation=ScreenOrientation.Portrait;
             try
             {
@@ -216,7 +218,13 @@ namespace RoyalPirate.Runtime
             Ready=false;
             if(PlayerWeapon!=null) PlayerWeapon.CancelShot(); if(EnemyWeapon!=null) EnemyWeapon.CancelShot();
             foreach(var material in new[] {wood,sail,metal,water,effectsMaterial}) if(material!=null) Destroy(material);
-            Time.fixedDeltaTime=previousFixedStep; Application.targetFrameRate=previousFrameRate;
+            // OnDestroy may run before Start (for example, a scene unloaded in the same frame).
+            // Never replace global timing with uninitialised zero values.
+            if(ownsGlobalTiming)
+            {
+                Time.fixedDeltaTime=previousFixedStep; Application.targetFrameRate=previousFrameRate;
+                ownsGlobalTiming=false;
+            }
         }
     }
 }
