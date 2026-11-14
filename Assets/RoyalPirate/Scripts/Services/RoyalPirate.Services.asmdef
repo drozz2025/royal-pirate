@@ -1,0 +1,7 @@
+{
+  "name": "RoyalPirate.Services",
+  "rootNamespace": "RoyalPirate",
+  "references": [
+    "RoyalPirate.Domain"
+  ]
+}

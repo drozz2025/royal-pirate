@@ -1,0 +1,237 @@
+{
+  "shipId": "ship.navio01",
+  "modules": [
+    {
+      "id": "module.hull.01",
+      "kind": 0,
+      "baseHealth": 500,
+      "baseCost": 100,
+      "damage": 0,
+      "maxLevel": 5,
+      "size": {
+        "x": 6,
+        "y": 1.5,
+        "z": 9
+      }
+    },
+    {
+      "id": "module.bow.01",
+      "kind": 1,
+      "baseHealth": 150,
+      "baseCost": 100,
+      "damage": 0,
+      "maxLevel": 5,
+      "size": {
+        "x": 4,
+        "y": 1.5,
+        "z": 2
+      }
+    },
+    {
+      "id": "module.stern.01",
+      "kind": 2,
+      "baseHealth": 150,
+      "baseCost": 100,
+      "damage": 0,
+      "maxLevel": 5,
+      "size": {
+        "x": 5,
+        "y": 1.5,
+        "z": 1
+      }
+    },
+    {
+      "id": "module.deck.01",
+      "kind": 3,
+      "baseHealth": 100,
+      "baseCost": 100,
+      "damage": 0,
+      "maxLevel": 5,
+      "size": {
+        "x": 5.5,
+        "y": 0.3,
+        "z": 8
+      }
+    },
+    {
+      "id": "module.mast.01",
+      "kind": 4,
+      "baseHealth": 120,
+      "baseCost": 100,
+      "damage": 0,
+      "maxLevel": 5,
+      "size": {
+        "x": 0.35,
+        "y": 7,
+        "z": 0.35
+      }
+    },
+    {
+      "id": "module.sail.01",
+      "kind": 5,
+      "baseHealth": 100,
+      "baseCost": 100,
+      "damage": 0,
+      "maxLevel": 5,
+      "size": {
+        "x": 4,
+        "y": 3,
+        "z": 0.15
+      }
+    },
+    {
+      "id": "module.cannon.01",
+      "kind": 6,
+      "baseHealth": 120,
+      "baseCost": 100,
+      "damage": 80,
+      "maxLevel": 5,
+      "size": {
+        "x": 0.8,
+        "y": 0.8,
+        "z": 2
+      }
+    },
+    {
+      "id": "module.cabin.01",
+      "kind": 7,
+      "baseHealth": 180,
+      "baseCost": 100,
+      "damage": 0,
+      "maxLevel": 5,
+      "size": {
+        "x": 3,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "module.armor.01",
+      "kind": 8,
+      "baseHealth": 150,
+      "baseCost": 100,
+      "damage": 0,
+      "maxLevel": 5,
+      "size": {
+        "x": 0.2,
+        "y": 1.2,
+        "z": 7
+      }
+    },
+    {
+      "id": "module.heroslot.01",
+      "kind": 9,
+      "baseHealth": 50,
+      "baseCost": 100,
+      "damage": 0,
+      "maxLevel": 5,
+      "size": {
+        "x": 0.7,
+        "y": 0.2,
+        "z": 0.7
+      }
+    }
+  ],
+  "mounts": [
+    {
+      "id": "mount.hull.01",
+      "kind": 0,
+      "defaultModuleId": "module.hull.01",
+      "position": {
+        "x": 0,
+        "y": 0.2,
+        "z": 0
+      }
+    },
+    {
+      "id": "mount.bow.01",
+      "kind": 1,
+      "defaultModuleId": "module.bow.01",
+      "position": {
+        "x": 0,
+        "y": 0.4,
+        "z": 5
+      }
+    },
+    {
+      "id": "mount.stern.01",
+      "kind": 2,
+      "defaultModuleId": "module.stern.01",
+      "position": {
+        "x": 0,
+        "y": 0.4,
+        "z": -5
+      }
+    },
+    {
+      "id": "mount.deck.01",
+      "kind": 3,
+      "defaultModuleId": "module.deck.01",
+      "position": {
+        "x": 0,
+        "y": 1.1,
+        "z": 0
+      }
+    },
+    {
+      "id": "mount.mast.01",
+      "kind": 4,
+      "defaultModuleId": "module.mast.01",
+      "position": {
+        "x": 0,
+        "y": 4.6,
+        "z": 0
+      }
+    },
+    {
+      "id": "mount.sail.01",
+      "kind": 5,
+      "defaultModuleId": "module.sail.01",
+      "position": {
+        "x": 0,
+        "y": 5,
+        "z": 0
+      }
+    },
+    {
+      "id": "mount.cannon.01",
+      "kind": 6,
+      "defaultModuleId": "module.cannon.01",
+      "position": {
+        "x": 0,
+        "y": 2,
+        "z": 4
+      }
+    },
+    {
+      "id": "mount.cabin.01",
+      "kind": 7,
+      "defaultModuleId": "module.cabin.01",
+      "position": {
+        "x": 0,
+        "y": 2.2,
+        "z": -3
+      }
+    },
+    {
+      "id": "mount.armor.01",
+      "kind": 8,
+      "defaultModuleId": "module.armor.01",
+      "position": {
+        "x": -3.1,
+        "y": 0.6,
+        "z": 0
+      }
+    },
+    {
+      "id": "mount.heroslot.01",
+      "kind": 9,
+      "defaultModuleId": "module.heroslot.01",
+      "position": {
+        "x": 1.5,
+        "y": 1.4,
+        "z": 2
+      }
+    }
+  ]
+}

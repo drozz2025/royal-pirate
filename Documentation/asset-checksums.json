@@ -1,0 +1,17 @@
+[
+  {
+    "path": "Referencias_Visuais/01_Imagens_Aprovadas/01_Ecra_Principal_APROVADO.jpeg",
+    "bytes": 706597,
+    "sha256": "2d3d4644f4982d61d623d762fb65c140756c6c20142d8c00e14e6dc6618e160e"
+  },
+  {
+    "path": "Referencias_Visuais/01_Imagens_Aprovadas/02_Batalha_APROVADA.jpeg",
+    "bytes": 817764,
+    "sha256": "ef31e316c1fae5268ae6c7ba477074747ad9bfd26ba6998e391e955e9cb2cb32"
+  },
+  {
+    "path": "Modelos_3D/Navio_01/RoyalPirate_Navio01_Modular.glb",
+    "bytes": 22000,
+    "sha256": "9afd40a1afd89150a40b968ac4e9d43e3abcdc0f5a25f4bf6e0a6591f0da9bac"
+  }
+]
