@@ -1,0 +1,1 @@
+Parsed 29 C# files with C# 9 grammar: 0 syntax errors. This does NOT validate Unity types, APIs or assembly compilation.
