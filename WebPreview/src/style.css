@@ -4,3 +4,9 @@
 @media(max-height:700px) and (max-width:600px){.scene-hint{display:none}.command-deck{bottom:29px}.controls-body{padding:10px 12px}.sliders{gap:4px}.fire-button{height:101px}.deck-footer{display:none}.battle-hud{top:74px}.health-card{padding:8px}.view-controls{top:37%}.result{top:42%}.result-badge{display:none}.result-stats{margin:15px 0}}@media(prefers-reduced-motion:reduce){.health-track>span{transition:none}}
 
 @media(min-width:851px){.scene-caption{top:auto;bottom:275px;left:32px}.scene-caption h1,.scene-caption p{display:none}.scene-caption .chapter{margin-top:12px}.scene-caption .eyebrow{font-size:8px}}
+
+/* Independent music and effects controls; hidden until the user opens audio settings. */
+.audio-settings{position:absolute;right:52px;top:104px;width:154px;display:flex;flex-direction:column;gap:6px;padding:8px;background:#082c3aef;border:1px solid #d6cb9880;border-radius:10px;box-shadow:0 14px 32px #001c29aa;backdrop-filter:blur(14px);z-index:8}
+.view-controls .audio-settings button{width:100%;height:42px;border-radius:7px;display:flex;align-items:center;justify-content:flex-start;gap:9px;padding:0 10px;white-space:nowrap;font-size:11px;font-weight:700;letter-spacing:.4px}
+.view-controls .audio-settings button[aria-pressed="true"]{background:#425c50;border-color:#edcc8b;color:#ffe7ab}
+@media(max-width:600px){.audio-settings{right:44px;top:90px;width:144px}.view-controls .audio-settings button{height:40px}}

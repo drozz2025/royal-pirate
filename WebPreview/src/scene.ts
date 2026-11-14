@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Battle, predict, SHIPS, type BattleEvent } from './battle';
 import { SoftwareRenderer } from './software-renderer';
 import { makeShip, type ShipArt } from './ships';
+import { PirateSoundscape } from './audio';
 export type Metrics = { fps: number; renderMs: number; calls: number; triangles: number; geometries: number; textures: number; effects: number; heapMB?: number };
 export class OceanScene {
   renderer: T.WebGLRenderer | SoftwareRenderer; compatibility=false; scene=new T.Scene(); camera=new T.PerspectiveCamera(42,1,.1,220); controls: OrbitControls;
@@ -12,9 +13,9 @@ export class OceanScene {
   private ball: T.Mesh; private particleGeometry=new T.IcosahedronGeometry(1,0); private particleMaterial=new T.MeshBasicMaterial({color:'#fff'});
   private particles: { mesh:T.Mesh;velocity:T.Vector3;age:number;life:number;size:number;smoke:boolean }[]=[];
   private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private lastAim=''; private cameraMode:'battle'|'deck'='battle'; private shake=0;
-  private renderMs=0;private lastRender=0;private frameSamples:number[]=[];private metricsAt=0; private audio: AudioContext|null=null; sound=false; paused=false; disposed=false;
+  private renderMs=0;private lastRender=0;private frameSamples:number[]=[];private metricsAt=0; private soundscape=new PirateSoundscape(); paused=false; disposed=false;
   private onContextLost=(event:Event)=>{event.preventDefault();this.paused=true;this.onError('The 3D view was interrupted. Reload to restore the ocean.');};
-  private onVisibility=()=>{this.previous=0;};
+  private onVisibility=()=>{this.previous=0;this.soundscape.onVisibility(document.hidden);};
   constructor(private host:HTMLElement, public battle:Battle, private onFrame:()=>void,private onMetrics:(m:Metrics)=>void,private onError:(message:string)=>void){
     const probe=document.createElement('canvas');const context=probe.getContext('webgl2',{antialias:true,alpha:false,powerPreference:'high-performance'});
     this.compatibility=!context;this.renderer=context?new T.WebGLRenderer({canvas:probe,context,antialias:true,alpha:false}):new SoftwareRenderer();
@@ -69,10 +70,10 @@ export class OceanScene {
   private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();}
   home(){this.cameraMode='battle';const aspect=this.host.clientWidth/this.host.clientHeight;const distance=aspect<.75?55:aspect<1.2?43:34;if(aspect<.75){this.camera.position.set(-distance*.74,distance*.62,distance*.58);this.controls.target.set(0,1.6,0);}else{this.camera.position.set(distance*.20,distance*.56,distance*.88);this.controls.target.set(0,2,0);}this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
-  toggleSound(){this.sound=!this.sound;if(this.sound){this.audio??=new AudioContext();void this.audio.resume();}return this.sound;}
-  private boom(){if(!this.sound||!this.audio)return;const ctx=this.audio;const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='triangle';osc.frequency.setValueAtTime(125,ctx.currentTime);osc.frequency.exponentialRampToValueAtTime(30,ctx.currentTime+.3);gain.gain.setValueAtTime(.28,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.45);osc.connect(gain);gain.connect(ctx.destination);osc.start();osc.stop(ctx.currentTime+.5);osc.onended=()=>{osc.disconnect();gain.disconnect();};}
+  toggleMusic(){return this.soundscape.toggleMusic();}
+  toggleEffects(){return this.soundscape.toggleEffects();}
   private effect(event:BattleEvent){
-    if(event.type==='result')return;this.boom();this.shake=event.type==='hit'?.18:.07;
+    this.soundscape.play(event.type,event.side);if(event.type==='result')return;this.shake=event.type==='hit'?.18:.07;
     const count=event.type==='hit'?38:event.type==='splash'?30:18;
     for(let i=0;i<count && this.pool.length;i++){const mesh=this.pool.pop()!;const smoke=event.type!=='splash'&&i>count*.45;const angle=i*2.399;const speed=event.type==='fire'?1.5:3.4;
       const color=event.type==='splash'?'#c3fcfa':smoke?'#535c5e':i%3===0?'#ad6b39':'#ffc54a';(mesh.material as T.MeshBasicMaterial).color.set(color);(mesh.material as T.MeshBasicMaterial).transparent=true;(mesh.material as T.MeshBasicMaterial).opacity=1;
@@ -104,5 +105,5 @@ export class OceanScene {
     this.controls.update();if(this.shake>0){this.camera.position.y+=Math.sin(timestamp*.1)*this.shake;this.shake*=.86;}
     const renderStart=performance.now();this.renderer.render(this.scene,this.camera);this.renderMs=performance.now()-renderStart;this.onFrame();if(timestamp-this.metricsAt>1000){this.metricsAt=timestamp;this.onMetrics(this.getMetrics());}
   };
-  dispose(){this.disposed=true;cancelAnimationFrame(this.raf);this.resizeObserver.disconnect();document.removeEventListener('visibilitychange',this.onVisibility);this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.controls.dispose();const geometries=new Set<T.BufferGeometry>(),materials=new Set<T.Material>(),textures=new Set<T.Texture>();this.scene.traverse(o=>{if(o instanceof T.Mesh||o instanceof T.Line){geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:[o.material]){materials.add(m);for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);}}});geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());this.renderer.dispose();this.canvas.remove();void this.audio?.close();}
+  dispose(){this.disposed=true;cancelAnimationFrame(this.raf);this.resizeObserver.disconnect();document.removeEventListener('visibilitychange',this.onVisibility);this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.controls.dispose();const geometries=new Set<T.BufferGeometry>(),materials=new Set<T.Material>(),textures=new Set<T.Texture>();this.scene.traverse(o=>{if(o instanceof T.Mesh||o instanceof T.Line){geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:[o.material]){materials.add(m);for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);}}});geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());this.renderer.dispose();this.canvas.remove();this.soundscape.dispose();}
 }
