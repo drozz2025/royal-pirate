@@ -1,0 +1,1 @@
+{"name":"RoyalPirate.Work4.EditModeTests","references":["RoyalPirate.Domain","RoyalPirate.Progression","RoyalPirate.UI"],"includePlatforms":["Editor"],"optionalUnityReferences":["TestAssemblies"]}

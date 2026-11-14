@@ -1,0 +1,1 @@
+{"name":"RoyalPirate.Work4.PlayModeTests","references":["RoyalPirate.Domain","RoyalPirate.Progression","RoyalPirate.UI","RoyalPirate.Services"],"optionalUnityReferences":["TestAssemblies"]}

@@ -1,0 +1,30 @@
+.root { flex-grow: 1; background-color: rgb(12, 78, 116); color: rgb(247, 249, 255); font-size: 17px; }
+.safe-area { position: absolute; left: 0; right: 0; top: 0; bottom: 0; padding: 8px; }
+.header { align-items: center; }
+.identity { flex-grow: 1; font-size: 21px; -unity-font-style: bold; }
+.resources { background-color: rgb(14, 36, 64); border-radius: 12px; padding: 12px 8px; font-size: 16px; -unity-font-style: bold; -unity-text-align: middle-center; }
+.status { font-size: 13px; min-height: 18px; white-space: normal; color: rgb(255, 222, 126); }
+.body { flex-grow: 1; flex-shrink: 1; min-height: 0; }
+.row { flex-direction: row; flex-shrink: 0; }
+.action { min-height: 54px; flex-grow: 1; flex-shrink: 1; flex-basis: 0; flex-direction: row; align-items: center; justify-content: center; background-color: rgb(22, 53, 89); color: white; border-width: 2px; border-color: rgb(209, 157, 63); border-radius: 12px; margin: 3px; padding: 7px; }
+.action > Label { white-space: normal; -unity-text-align: middle-center; -unity-font-style: bold; font-size: 17px; }
+.action:active { background-color: rgb(40, 89, 127); }
+.action:disabled { opacity: 0.42; }
+.primary { background-color: rgb(244, 171, 19); color: rgb(44, 31, 12); min-height: 66px; }
+.selected { border-color: rgb(255, 231, 115); background-color: rgb(38, 105, 135); }
+.icon { width: 25px; height: 25px; min-width: 25px; margin-right: 6px; }
+.brand { font-size: 28px; -unity-font-style: bold; -unity-text-align: middle-center; color: rgb(255, 215, 96); }
+.title { font-size: 20px; -unity-font-style: bold; white-space: normal; margin: 4px 0; }
+.subtitle { font-size: 17px; white-space: normal; -unity-text-align: middle-center; margin: 4px; }
+.viewport { flex-grow: 1; min-height: 110px; flex-shrink: 1; }
+.viewport-hint { position: absolute; bottom: 8px; left: 8px; right: 8px; font-size: 14px; -unity-text-align: middle-center; background-color: rgba(5, 30, 53, 0.6); border-radius: 8px; padding: 5px; }
+.footer { flex-shrink: 0; }
+.module-strip { height: 76px; flex-shrink: 0; }
+.module-strip .action { min-width: 115px; flex-basis: auto; }
+.card { background-color: rgb(14, 36, 64); border-radius: 14px; border-width: 1px; border-color: rgb(112, 156, 177); padding: 10px; margin: 4px 0; }
+.comparison { color: rgb(255, 226, 152); white-space: normal; font-size: 16px; margin: 5px 0; }
+.muted { color: rgb(183, 213, 228); white-space: normal; font-size: 14px; margin: 5px 0; }
+.sandbox { color: rgb(255, 225, 161); font-size: 12px; white-space: normal; -unity-text-align: middle-center; }
+.page-scroll { flex-grow: 1; min-height: 0; }
+.error { color: rgb(255, 179, 151); white-space: normal; }
+Toggle { min-height: 54px; font-size: 20px; padding: 12px; background-color: rgb(22, 53, 89); }
