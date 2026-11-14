@@ -1,0 +1,13 @@
+PASS fresh install has no projection
+PASS W5R02 missing primary recovers valid backup
+PASS W5R03 repair retains good backup
+PASS corrupt primary preserved separately
+PASS oversized primary uses backup
+PASS malformed JSON uses backup
+PASS two corrupt generations fail visibly
+PASS invalid loadout cannot replace primary
+PASS temporary file cannot override valid primary
+PASS interrupted first write is not silently reset
+PASS shipyard projection survives battle store reload
+PASS normal save rotates previous valid generation
+RESULT: 12 integration persistence checks passed. Production transaction code; System.Text.Json codec. Unity JsonUtility NOT executed.

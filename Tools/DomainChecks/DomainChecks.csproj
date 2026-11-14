@@ -8,5 +8,6 @@
   <ItemGroup>
     <Compile Include="../../Assets/RoyalPirate/Scripts/Domain/*.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="../../Assets/RoyalPirate/Tests/EditMode/CombatContractChecks.cs" />
   </ItemGroup>
 </Project>

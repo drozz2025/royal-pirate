@@ -1,0 +1,5 @@
+{
+  "suite": "source-hygiene",
+  "filesScanned": 316,
+  "failures": []
+}

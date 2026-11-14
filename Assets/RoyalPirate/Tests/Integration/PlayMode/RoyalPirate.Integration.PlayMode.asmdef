@@ -1,0 +1,1 @@
+{"name":"RoyalPirate.Integration.PlayMode","references":["RoyalPirate.Domain","RoyalPirate.Runtime","RoyalPirate.UI","Unity.InputSystem"],"optionalUnityReferences":["TestAssemblies"]}

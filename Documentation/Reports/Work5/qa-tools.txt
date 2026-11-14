@@ -1,0 +1,19 @@
+test_conflict (test_tools.ResultGateTests.test_conflict) ... ok
+test_empty_frames_rejected (test_tools.ResultGateTests.test_empty_frames_rejected) ... ok
+test_empty_rejected (test_tools.ResultGateTests.test_empty_rejected) ... ok
+test_failure_rejected (test_tools.ResultGateTests.test_failure_rejected) ... ok
+test_frame_metrics (test_tools.ResultGateTests.test_frame_metrics) ... ok
+test_missing_xml (test_tools.ResultGateTests.test_missing_xml) ... ok
+test_nonfinite_frames_rejected (test_tools.ResultGateTests.test_nonfinite_frames_rejected) ... ok
+test_pass (test_tools.ResultGateTests.test_pass) ... ok
+test_regular_source (test_tools.ResultGateTests.test_regular_source) ... ok
+test_secret_is_redacted (test_tools.ResultGateTests.test_secret_is_redacted) ... ok
+test_signing_file (test_tools.ResultGateTests.test_signing_file) ... ok
+test_skip_rejected_even_if_root_claims_pass (test_tools.ResultGateTests.test_skip_rejected_even_if_root_claims_pass) ... ok
+test_truncated_xml (test_tools.ResultGateTests.test_truncated_xml) ... ok
+test_wrong_count_rejected (test_tools.ResultGateTests.test_wrong_count_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.003s
+
+OK

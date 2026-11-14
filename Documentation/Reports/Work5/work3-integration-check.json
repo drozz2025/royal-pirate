@@ -1,0 +1,20 @@
+{
+  "remoteCommit": "f49d77ba651926fdb5291cca1852f3a02bb12757",
+  "verifiedTree": "fbe77a8d7d154f56bbc130fbe543fd3ea5b7041b",
+  "scope": "Temporary committed Work 3 tree plus Work 5 test-only overlay; no branch merged",
+  "unityExecuted": false,
+  "results": [
+    {
+      "name": "work3-domain",
+      "exitCode": 0
+    },
+    {
+      "name": "work3-qa-domain",
+      "exitCode": 0
+    },
+    {
+      "name": "work3-structure",
+      "exitCode": 0
+    }
+  ]
+}
