@@ -78,7 +78,11 @@ namespace RoyalPirate.Runtime
                 Ready=true; BeginTurn(); EvaluateOutcome(); PublishHud();
                 if(diagnosticHud) gameObject.AddComponent<CombatHud>().Initialize(this);
             }
-            catch(Exception exception) { StartupError=exception.Message; Debug.LogException(exception); Ready=false; enabled=false; }
+            catch(Exception exception)
+            {
+                StartupError=exception.Message; Debug.LogException(exception); Ready=false;
+                // Keep OnGUI active to display StartupError; Update and input are already gated by Ready.
+            }
         }
         Material MakeMaterial(Color color)
         {
