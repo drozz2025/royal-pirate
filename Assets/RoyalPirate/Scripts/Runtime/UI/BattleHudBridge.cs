@@ -16,6 +16,9 @@ namespace RoyalPirate.UI
         PanelSettings panel;
         UIDocument document;
         VisualElement safe;
+        Rect cachedSafeArea;
+        int cachedScreenWidth=-1, cachedScreenHeight=-1;
+        IPanel cachedPanel;
         public bool Bound => adapter!=null;
         void Awake() {battle=GetComponent<BattleBootstrap>();battle.diagnosticHud=false;}
         void OnEnable() {StartCoroutine(BindWhenReady());}
@@ -29,7 +32,7 @@ namespace RoyalPirate.UI
             panel.themeStyleSheet=Resources.Load<ThemeStyleSheet>("HarbourTheme");
             panel.scaleMode=PanelScaleMode.ScaleWithScreenSize;panel.referenceResolution=new Vector2Int(480,960);panel.match=0;
             document=GetComponent<UIDocument>();if(document==null)document=gameObject.AddComponent<UIDocument>();
-            document.enabled=true;document.panelSettings=panel;document.sortingOrder=20;
+            document.panelSettings=panel;document.sortingOrder=20;document.enabled=true;
             var root=document.rootVisualElement;root.Clear();root.pickingMode=PickingMode.Ignore;
             root.style.color=Color.white;root.style.fontSize=18;
             var styles=Resources.Load<StyleSheet>("Harbour");if(styles!=null)root.styleSheets.Add(styles);
@@ -58,9 +61,13 @@ namespace RoyalPirate.UI
         {
             if(safe?.panel==null)return;
             var area=Screen.safeArea;
+            // Screen.safeArea is stable during normal play: avoid dirtying UI Toolkit layout every frame.
+            if(cachedPanel==safe.panel && cachedSafeArea==area &&
+                cachedScreenWidth==Screen.width && cachedScreenHeight==Screen.height) return;
             var a=RuntimePanelUtils.ScreenToPanel(safe.panel,new Vector2(area.xMin,Screen.height-area.yMax));
             var b=RuntimePanelUtils.ScreenToPanel(safe.panel,new Vector2(area.xMax,Screen.height-area.yMin));
             safe.style.left=a.x;safe.style.top=a.y;safe.style.width=b.x-a.x;safe.style.height=b.y-a.y;
+            cachedSafeArea=area;cachedScreenWidth=Screen.width;cachedScreenHeight=Screen.height;cachedPanel=safe.panel;
         }
         void OnDisable()
         {
@@ -69,6 +76,7 @@ namespace RoyalPirate.UI
             if(input!=null){input.ClearCapture();input.AdditionalUiBlocker=null;input.ExternalActionControls=true;}
             if(document!=null){document.rootVisualElement.Clear();document.enabled=false;}
             if(panel!=null)Destroy(panel);panel=null;safe=null;
+            cachedPanel=null;cachedScreenWidth=cachedScreenHeight=-1;
         }
     }
 }
