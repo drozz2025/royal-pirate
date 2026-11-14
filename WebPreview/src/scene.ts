@@ -14,7 +14,7 @@ export class OceanScene {
   private pathGeometry=new T.BufferGeometry().setAttribute('position',new T.BufferAttribute(new Float32Array(240*3),3)); private path: T.Line; private marker: T.Mesh;
   private ball: T.Mesh; private particleGeometry=new T.IcosahedronGeometry(1,0); private particleMaterial=new T.MeshBasicMaterial({color:'#fff'});
   private particles: { mesh:T.Mesh;velocity:T.Vector3;age:number;life:number;size:number;smoke:boolean }[]=[];
-  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'='battle'; private harbourDock=new T.Group(); private shake=0;
+  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'|'inspect'='battle'; private harbourDock=new T.Group(); private shake=0;
   private renderMs=0;private lastRender=0;private frameSamples:number[]=[];private metricsAt=0; private pirateAudio=new PirateAudio(); paused=false; disposed=false;
   private onContextLost=(event:Event)=>{event.preventDefault();this.paused=true;this.onError('The 3D view was interrupted. Reload to restore the ocean.');};
   private onVisibility=()=>{this.previous=0;this.pirateAudio.setHidden(document.hidden);};
@@ -101,7 +101,7 @@ export class OceanScene {
     }
     this.harbourDock.visible=false;
   }
-  private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();}
+  private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();else if(this.cameraMode==='inspect')this.inspectShip();}
   home(){this.cameraMode='battle';const aspect=this.host.clientWidth/this.host.clientHeight;const distance=aspect<.75?55:aspect<1.2?43:34;if(aspect<.75){this.camera.position.set(-distance*.74,distance*.62,distance*.58);this.controls.target.set(0,1.6,0);}else{this.camera.position.set(distance*.20,distance*.56,distance*.88);this.controls.target.set(0,2,0);}this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
   /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
@@ -114,8 +114,20 @@ export class OceanScene {
     this.camera.position.set(ship.x+(portrait?2.5:5),portrait?10.8:10,ship.z+(portrait?24:19));
     this.controls.update();
   }
+  /** Active 3D inspection: orbit and pinch-zoom the real ship without starting a fight. */
+  inspectShip(){
+    this.cameraMode='inspect';
+    this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
+    this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
+    this.controls.enableRotate=true;this.controls.enableZoom=true;
+    this.controls.minDistance=10;this.controls.maxDistance=34;
+    const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
+    this.controls.target.set(ship.x,3.8,ship.z);
+    this.camera.position.set(ship.x+(portrait?8:11),portrait?10:8,ship.z+(portrait?20:17));
+    this.controls.update();
+  }
   /** Returns to the existing working battle camera, with both ships visible. */
-  showBattle(){this.ships.enemy.root.visible=true;this.foam[1].visible=true;this.harbourDock.visible=false;this.controls.enableRotate=true;this.controls.enableZoom=true;this.home();}
+  showBattle(){this.ships.enemy.root.visible=true;this.foam[1].visible=true;this.harbourDock.visible=false;this.controls.enableRotate=true;this.controls.enableZoom=true;this.controls.minDistance=18;this.controls.maxDistance=110;this.home();}
   toggleMusic(){return this.pirateAudio.toggleMusic();}
   toggleEffects(){return this.pirateAudio.toggleEffects();}
   private effect(event:BattleEvent){
@@ -147,7 +159,7 @@ export class OceanScene {
     if(this.disposed)return;this.raf=requestAnimationFrame(this.animate);if(document.hidden||this.paused){this.previous=0;return;}
     if(this.compatibility&&timestamp-this.lastRender<45)return;this.lastRender=timestamp;
     const raw=this.previous?(timestamp-this.previous):16.7,dt=Math.min(raw/1000,.25);this.previous=timestamp;this.elapsed+=dt;this.frameSamples.push(raw);if(this.frameSamples.length>120)this.frameSamples.shift();
-    if(this.cameraMode!=='harbour'){this.battle.tick(dt);for(const event of this.battle.drainEvents())this.effect(event);}
+    if(this.cameraMode==='battle'||this.cameraMode==='deck'){this.battle.tick(dt);for(const event of this.battle.drainEvents())this.effect(event);}
     this.water.uniforms.time.value=this.elapsed;
     for(const [side,art] of Object.entries(this.ships) as ['player'|'enemy',ShipArt][]){const health=this.battle.health[side];const damage=1-health/100;
       art.root.position.y=Math.sin(this.elapsed*1.1+(side==='player'?0:2))*.075-(health===0?1.3:0);art.root.rotation.z=Math.sin(this.elapsed*.9)*.018+(health===0?(side==='enemy'?-.23:.23):damage*.035);
@@ -161,7 +173,7 @@ export class OceanScene {
       ripple.mesh.scale.setScalar(state.scale);ripple.mesh.position.y=state.surfaceY;(ripple.mesh.material as T.MeshBasicMaterial).opacity=state.opacity;
     }
     const aimKey=`${this.battle.yaw}:${this.battle.power}`;
-    this.path.visible=this.marker.visible=this.cameraMode!=='harbour'&&this.battle.phase==='ready';
+    this.path.visible=this.marker.visible=(this.cameraMode==='battle'||this.cameraMode==='deck')&&this.battle.phase==='ready';
     if(aimKey!==this.lastAim){this.lastAim=aimKey;const points=predict(this.battle.yaw,this.battle.power).map(p=>new T.Vector3(p.x,p.y,p.z));const attr=this.pathGeometry.attributes.position;points.forEach((p,i)=>attr.setXYZ(i,p.x,p.y,p.z));attr.needsUpdate=true;this.pathGeometry.setDrawRange(0,points.length);this.pathGeometry.computeBoundingSphere();this.path.computeLineDistances();this.marker.position.copy(points[points.length-1]);this.marker.position.y=Math.max(.16,this.marker.position.y);}
     this.marker.rotation.z+=dt*.4;
     if(this.battle.shot){const s=this.battle.shot;this.ball.visible=true;this.ball.position.set(s.position.x,s.position.y,s.position.z);this.trail.visible=true;const p=this.ball.position.clone(),v=new T.Vector3(s.velocity.x,s.velocity.y-12*s.age,s.velocity.z).normalize();this.trail.geometry.setFromPoints([p,p.clone().addScaledVector(v,-1.2)]);}else{this.ball.visible=false;this.trail.visible=false;}
