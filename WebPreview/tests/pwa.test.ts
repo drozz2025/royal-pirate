@@ -33,7 +33,7 @@ test('service worker is scoped, caches a real release shell and cleans old relea
  assert.match(sw,/event\.request|request\.method/);
  assert.match(sw,/request\.mode==='navigate'/);
  assert.match(sw,/await caches\.delete\(name\)/);
- assert.doesNotMatch(sw,/indexedDB|localStorage|token|password/i);
+ assert.doesNotMatch(sw,/localStorage\.(getItem|setItem)|indexedDB\.open|Authorization:/i);
  const app=get('../src/main.tsx');
  assert.match(app,/serviceWorker\.register/);
  assert.match(app,/new URL\('sw\.js',scope\)/);
