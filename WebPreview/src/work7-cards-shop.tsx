@@ -152,6 +152,20 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
         <button type="button" aria-pressed={ownedOnly} onClick={()=>setOwnedOnly(true)}>MINHAS</button>
       </div></div>
       <div className="w7-collection-progress" role="progressbar" aria-label="Cartas da tripulação adquiridas" aria-valuemin={0} aria-valuemax={CREW.length} aria-valuenow={profile.ownedCrew.length}><span style={{width:(profile.ownedCrew.length/CREW.length*100)+"%"}}/></div>
+      <div className={'w7-spotlight w7-spotlight-'+active.id} aria-live="polite">
+        <div className="w7-spotlight-portrait"><CardArt id={active.id}/><span>{equipped?'EM SERVIÇO':owned?'ADQUIRIDA':'POR RECRUTAR'}</span></div>
+        <div className="w7-spotlight-info">
+          <span className="w7-eyebrow">CARTA EM DESTAQUE</span>
+          <h3>{active.name}</h3>
+          <p>{active.role}</p>
+          <div className="w7-spotlight-tags"><span>{visualTier[active.id]}</span><span>{owned?'NO INVENTÁRIO':active.cost+' MOEDAS LOCAIS'}</span></div>
+          <button type="button" disabled={equipped||(!owned&&!canRecruit)} onClick={press}
+            aria-label={equipped?active.name+' já equipado':owned?'Equipar '+active.name:canRecruit?'Recrutar '+active.name+' por '+active.cost+' moedas locais':'Faltam '+Math.max(0,active.cost-profile.coins)+' moedas para '+active.name}>
+            {equipped?'EQUIPADO':owned?'EQUIPAR':canRecruit?'RECRUTAR':'SEM MOEDAS'}
+          </button>
+        </div>
+      </div>
+      <div className="w7-line w7-crew-caption"><strong>TRIPULAÇÃO DISPONÍVEL</strong><span>TOCA NUMA CARTA PARA VER</span></div>
       <div className="w7-card-grid" role="group" aria-label="Escolher carta da tripulação">
         {cards.map(c=>{
           const isOwned=profile.ownedCrew.includes(c.id),isSelected=active.id===c.id,isEquipped=profile.equippedCrew===c.id;
@@ -168,13 +182,6 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
           <strong>NOVA CARTA</strong><small>EM BREVE</small>
           <span className="w7-future-note">Pré-visualização · sem personagem</span>
         </div>}
-      </div>
-      <div className="w7-detail">
-        <div><span className="w7-eyebrow">CARTA SELECIONADA</span><h3>{active.name}</h3><p>{active.role}</p></div>
-        <button type="button" disabled={equipped||(!owned&&!canRecruit)} onClick={press}
-          aria-label={equipped?active.name+' já equipado':owned?'Equipar '+active.name:canRecruit?'Recrutar '+active.name+' por '+active.cost+' moedas locais':'Faltam '+Math.max(0,active.cost-profile.coins)+' moedas para '+active.name}>
-          {equipped?'EQUIPADO':owned?'EQUIPAR':canRecruit?'RECRUTAR':'SEM MOEDAS'}
-        </button>
       </div>
       <p className="w7-disclaimer">Coleção guardada neste dispositivo. Níveis ainda indisponíveis. Raridades visuais sem efeitos de jogo; personagens equipadas ainda não alteram o combate.</p>
     </section>}
@@ -209,7 +216,15 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
     </header>
     <TabBar value={tab} onSelect={setTab} label="Loja" tabs={[['offers','OFERTAS'],['coins','MOEDAS'],['gems','GEMAS'],['special','ESPECIAIS']]}/>
     {tab==='offers'&&<section className="w7-content" role="tabpanel" aria-label="Ofertas disponíveis">
-      <div className="w7-banner"><span aria-hidden="true"><ShopRelic kind="special"/></span><div><small>OFERTAS LOCAIS</small><strong>RECRUTA A TUA TRIPULAÇÃO</strong><p>Moedas ganhas em batalhas. Sem dinheiro real.</p></div></div>
+      <div className="w7-market-feature">
+        <div className="w7-market-feature-art" aria-hidden="true"><ShopRelic kind="special"/><span className="w7-market-glint">✦</span></div>
+        <div className="w7-market-feature-copy">
+          <span className="w7-eyebrow">MERCADO DO CAPITÃO</span>
+          <h3>TESOUROS DO PORTO</h3>
+          <p>Recruta a tua tripulação com moedas ganhas nas batalhas. Sem dinheiro real.</p>
+          <span className="w7-market-balance">● {profile.coins} MOEDAS LOCAIS</span>
+        </div>
+      </div>
       <div className="w7-preview-strip" role="group" aria-label="Secções futuras da loja">
         {(['coins','gems','special'] as const).map(kind=><button type="button" key={kind} onClick={()=>setTab(kind)} aria-label={'Abrir '+(kind==='coins'?'Moedas':kind==='gems'?'Gemas':'Especiais')+', em breve'}>
           <ShopRelic kind={kind}/><strong>{kind==='coins'?'MOEDAS':kind==='gems'?'GEMAS':'ESPECIAIS'}</strong><small>EM BREVE</small>
@@ -225,9 +240,16 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
             aria-label={owned?c.name+' already collected':canBuy?'Recruit '+c.name+' for '+c.cost+' local coins':'Need '+Math.max(0,c.cost-profile.coins)+' more local coins to recruit '+c.name}
             onClick={()=>announce(c.name+' recrutado com moedas locais.',()=>onBuyCrew(c.id))}>{owned?'TEU':canBuy?'RECRUTAR':'SEM SALDO'}</button>
         </article>;
-      })}</div>
+      })}
+        <article className="w7-market-soon" aria-label="Novos produtos ainda indisponíveis">
+          <span className="w7-market-soon-art" aria-hidden="true"><ShopRelic kind="special"/></span>
+          <span className="w7-eyebrow">FUTURAS OFERTAS</span>
+          <strong>NOVOS TESOUROS</strong>
+          <small>EM BREVE · SEM PREÇO</small>
+        </article>
+      </div>
       <div className="w7-shop-actions"><button type="button" onClick={onBattle} aria-label="EARN COINS IN BATTLE">GANHAR MOEDAS</button><button type="button" onClick={onCards} aria-label="MANAGE CREW">VER CARTAS</button></div>
-      <p className="w7-disclaimer">No real-money checkout is available; secure payments não estão integrados. O progresso é saved on this device. Sem pagamentos reais. As moedas e as cartas são guardadas apenas neste dispositivo.</p>
+      <p className="w7-disclaimer">Compras reais não disponíveis. Recrutamentos usam apenas moedas locais conquistadas em batalhas; o saldo e as cartas ficam guardados neste dispositivo.</p>
     </section>}
     {pending&&<section className="w7-content w7-feature w7-pending" role="tabpanel" aria-label={pending.title}>
       <span className="w7-pending-relic"><ShopRelic kind={tab==='coins'?'coins':tab==='gems'?'gems':'special'}/></span>
