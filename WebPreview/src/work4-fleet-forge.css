@@ -205,42 +205,9 @@
 .app-sheet:has(.w4-screen) .app-sheet-content{
   padding:1px max(8px,calc((100% - 665px)/2)) 18px;scrollbar-color:#d7a258 #082944;
 }
-.app-sheet:has(.w4-screen) .app-dock{
-  min-height:79px;gap:1px;padding:4px 5px max(5px,env(safe-area-inset-bottom));
-  background:linear-gradient(180deg,#346996,#15375e 20%,#0a294e 67%,#051a36);
-  border-top:3px solid #ecc073;box-shadow:0 -4px 16px #03172f9e,inset 0 3px #fff0ac2e;
-}
-.app-sheet:has(.w4-screen) .app-dock button{
-  gap:1px;border:2px solid #ac864d88;border-radius:12px 12px 7px 7px;
-  background:linear-gradient(180deg,#244b76,#092948 85%);color:#ffedd4;
-  box-shadow:inset 0 2px #91bcd532;
-}
-.app-sheet:has(.w4-screen) .app-dock .app-tab-glyph{
-  min-height:33px;width:35px;height:35px;border-radius:50%;
-  background:radial-gradient(circle at 32% 30%,#39759f,#133452 75%);
-  border:1px solid #d0ad79b3;
-}
-.app-sheet:has(.w4-screen) .app-dock button .app-tab-glyph svg{
-  width:27px;height:27px;filter:drop-shadow(0 2px 1px #061c2d);
-}
-.app-sheet:has(.w4-screen) .app-dock button:nth-child(1) svg{color:#fff0bf}
-.app-sheet:has(.w4-screen) .app-dock button:nth-child(2) svg{color:#68d6fb}
-.app-sheet:has(.w4-screen) .app-dock button:nth-child(3) svg{color:#e4a8fd}
-.app-sheet:has(.w4-screen) .app-dock button:nth-child(4) svg{color:#ffcf60}
-.app-sheet:has(.w4-screen) .app-dock button:nth-child(5) svg{color:#ffe37e}
-.app-sheet:has(.w4-screen) .app-dock button strong{
-  font:900 clamp(11px,3.1vw,16px)/1 'Barlow Condensed',sans-serif;letter-spacing:.3px;
-  text-shadow:0 2px 2px #031b34;
-}
-.app-sheet:has(.w4-screen) .app-dock button[aria-current=page]{
-  background:linear-gradient(#fff0b0,#d3a14f 8%,#325c85 18%,#0c2d52);
-  border:3px solid #ffd778;color:#fff5df;box-shadow:0 0 11px #ffe18a88,inset 0 2px #fff4a7ad;
-  margin-top:-6px;
-}
-.app-sheet:has(.w4-screen) .app-dock button[aria-current=page] .app-tab-glyph{
-  border-color:#ffdc80;background:radial-gradient(circle at 35% 25%,#4f99b4,#163d5d 80%);
-}
-.app-sheet:has(.w4-screen) .app-dock button[aria-current=page] svg{color:#ffe1a1}
+/* A navegação inferior é exclusivamente do WORK 6.
+   Não aplicar estilos locais ao .app-dock: Porto é a referência visual aprovada.
+   Este ecrã apenas define a sua própria interface de Frota/Forja. */
 
 /* Shared gold/navy game-control language within WORK 4 only. */
 .w4-screen{max-width:660px;gap:7px;text-shadow:0 2px 3px #061b37b5}
@@ -993,4 +960,76 @@
 }
 @media(prefers-reduced-motion:reduce){
   .w4-fleet .w4-ship-slot{animation:none;transition:none}
+}
+
+
+/* WORK 4 · 22:04 — Screens 03/04 only.
+   Clear visual hierarchy for phone screens. The shared bottom navigation is untouched;
+   WORK 6 owns the exact Porto-size dock on every page. */
+.w4-screen{gap:6px}
+.w4-screen .w4-tabs{gap:5px;padding:0 2px 6px}
+.w4-screen .w4-tabs button{
+  min-height:50px;padding:5px 2px 5px;gap:3px;border-radius:10px;
+  font:900 clamp(11px,3.2vw,14px)/1.05 'Barlow Condensed',sans-serif;
+  box-shadow:inset 0 2px #e3f7ff5e,0 2px #543924;
+}
+.w4-screen .w4-tabs .w4-tab-symbol{
+  width:19px;height:19px;stroke-width:2.2;filter:drop-shadow(0 1px 1px #071b2d);
+}
+.w4-screen .w4-tabs button[aria-selected=true]{
+  background:linear-gradient(180deg,#69c6e9,#197baf 45%,#0a4778 100%);
+  border-color:#ffe4a0;box-shadow:0 0 0 1px #a37235,inset 0 2px #e4faff8f,0 3px #5a361c;
+}
+.w4-screen .w4-tabs button>span{overflow:hidden;text-overflow:clip}
+.w4-fleet .w4-harbour-stage{
+  min-height:clamp(240px,32dvh,313px);
+  border-radius:14px;
+}
+.w4-fleet .w4-harbour-stage>.w4-ship-art{
+  left:-11%;bottom:-1%;width:92%;transform:scale(1.055) rotate(-1deg);
+}
+.w4-fleet .w4-stage-label{
+  top:6%;right:2%;width:38%;padding:8px 7px;
+  border:2px solid #f5d291;
+}
+.w4-fleet .w4-stage-label>strong{font-size:clamp(19px,5.15vw,26px);line-height:.96}
+.w4-fleet .w4-stage-label>small{font-size:10px;line-height:1.22}
+.w4-fleet .w4-stage-stats{gap:1px;margin-top:1px}
+.w4-fleet .w4-stage-stats>span{min-height:23px;padding:2px 0}
+.w4-fleet .w4-stage-stats>span>strong,.w4-fleet .w4-stage-stats em{
+  font-size:clamp(11px,2.85vw,13px)
+}
+.w4-fleet .w4-stage-label>b{font-size:13px;padding:2px 9px}
+.w4-fleet .w4-cards-caption{padding:6px 9px 4px;font-size:19px;margin:2px 0 0}
+.w4-fleet .w4-ship-slot{min-height:109px}
+.w4-fleet .w4-ship-slot .w4-slot-art,
+.w4-fleet .w4-ship-slot.is-active .w4-slot-art{height:63px}
+.w4-fleet .w4-ship-small{transform:translate(-16%,-20px) scale(.95)}
+.w4-forge .w4-forge-stage{min-height:clamp(235px,30dvh,295px)}
+.w4-forge .w4-cannon-art{width:90%;left:-11%;bottom:-3%}
+.w4-forge .w4-forge-description{
+  top:7%;right:2%;width:40%;min-height:136px;padding:8px 7px;
+  gap:3px;border:2px solid #f4c988
+}
+.w4-forge .w4-forge-medallion{width:44px;height:44px}
+.w4-forge .w4-forge-medallion .w4-tab-symbol{width:29px;height:29px}
+.w4-forge .w4-forge-description h3{font-size:clamp(21px,5.4vw,27px)}
+.w4-forge .w4-forge-description strong{font-size:clamp(16px,4.3vw,21px)}
+.w4-forge .w4-improve-button{min-height:57px;width:min(94%,420px);margin:1px auto 6px;
+  font-size:clamp(20px,5.3vw,27px)}
+@media(max-width:390px){
+  .w4-screen .w4-tabs button{min-height:49px;font-size:clamp(10px,2.85vw,12px)}
+  .w4-screen .w4-tabs .w4-tab-symbol{width:18px;height:18px}
+  .w4-fleet .w4-harbour-stage{min-height:clamp(230px,30dvh,275px)}
+  .w4-fleet .w4-harbour-stage>.w4-ship-art{width:94%;left:-14%}
+  .w4-fleet .w4-stage-label{width:42%;padding:7px 5px}
+  .w4-fleet .w4-ship-slot{min-height:100px}
+  .w4-forge .w4-forge-stage{min-height:clamp(220px,28dvh,263px)}
+  .w4-forge .w4-cannon-art{width:92%}
+  .w4-forge .w4-forge-description{min-height:126px;width:43%}
+}
+@media(max-width:345px){
+  .w4-fleet .w4-stage-label>strong{font-size:18px}
+  .w4-fleet .w4-stage-stats>span{min-height:22px}
+  .w4-screen .w4-tabs button{font-size:10px}
 }
