@@ -51,3 +51,9 @@ The web simulation does not execute the C# domain or share saves/progression wit
 ## Cost and assets
 
 Spend: **0 €**. No paid services enabled. React and Three.js use their package licenses; Barlow/Barlow Condensed are self-hosted with SIL OFL text in `public/fonts/`. No external runtime CDN or remote font request is required. See `ASSET_NOTES.md`.
+
+## Offline save backup (v0.1.7)
+
+Open Profile > Protect your progress > SAVE BACKUP to download a local JSON save.
+Use RESTORE BACKUP to select the saved file (64 KB limit); malformed/corrupted files are rejected, and a confirmation is required before replacing existing progress.
+The save stays in browser `localStorage`. It is not synced across devices and is not authenticated by a server. Editable JSON balances cannot support an online leaderboard. Browser downloads and iPhone Safari must still be physically validated. Unit tests: `tests/backup.test.ts`.

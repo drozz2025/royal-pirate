@@ -99,3 +99,37 @@ export function claimDaily(p:LocalProfile,now:number):LocalProfile {
   const streak=p.lastDailyDay===yesterday?Math.min(7,p.dailyStreak+1):1;
   return {...p,lastDailyDay:today,dailyStreak:streak,coins:p.coins+15+streak*5};
 }
+
+/** Export/import strictly local saves. This data has no cloud identity or integrity guarantee. */
+export const BACKUP_FORMAT='royal-pirate-local-backup';
+export function exportProfileBackup(p:LocalProfile,now=Date.now()):string {
+  if(!Number.isFinite(now)||now<=0)throw new Error('Invalid backup time.');
+  return JSON.stringify({format:BACKUP_FORMAT,version:1,createdAt:new Date(now).toISOString(),
+    profile:parseProfile(JSON.stringify(p))},null,2);
+}
+export function importProfileBackup(raw:string):LocalProfile {
+  if(raw.length>65_536)throw new Error('Backup exceeds the 64 KB size limit.');
+  let file:unknown;
+  try {file=JSON.parse(raw);}catch{throw new Error('The backup file is not valid JSON.');}
+  if(!file||typeof file!=='object'||Array.isArray(file))throw new Error('Invalid backup file.');
+  const data=file as Record<string,unknown>;
+  if(data.format!==BACKUP_FORMAT||data.version!==1)throw new Error('Unsupported ROYAL PIRATE backup format.');
+  if(!data.profile||typeof data.profile!=='object'||Array.isArray(data.profile))throw new Error('Backup has no valid captain profile.');
+  const p=data.profile as Record<string,unknown>;
+  if(p.version!==1)throw new Error('Unsupported profile version.');
+  const validCounter=(v:unknown,max=MAX):v is number=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=0&&v<=max;
+  for(const key of ['coins','xp','wins','losses','hits','shots']){
+    if(!validCounter(p[key]))throw new Error('Invalid profile counter: '+key);
+  }
+  if((p.hits as number)>(p.shots as number))throw new Error('Invalid shot statistics.');
+  if(!Array.isArray(p.ownedCrew)||p.ownedCrew.some(id=>!CREW.some(c=>c.id===id))||!p.ownedCrew.includes('captain')||
+    new Set(p.ownedCrew).size!==p.ownedCrew.length)throw new Error('Invalid owned crew.');
+  if(!p.ownedCrew.includes(p.equippedCrew))throw new Error('Equipped captain does not belong to this save.');
+  if(!p.upgrades||typeof p.upgrades!=='object'||Array.isArray(p.upgrades))throw new Error('Invalid ship upgrades.');
+  for(const u of UPGRADES)if(!validCounter((p.upgrades as Record<string,unknown>)[u.id],5))throw new Error('Invalid ship upgrade level.');
+  if(!Array.isArray(p.claimedMissions)||p.claimedMissions.some(id=>!MISSIONS.some(m=>m.id===id))||
+    new Set(p.claimedMissions).size!==p.claimedMissions.length)throw new Error('Invalid mission history.');
+  if(typeof p.lastDailyDay!=='string'||(p.lastDailyDay!==''&&!/^\d{4}-\d{2}-\d{2}$/.test(p.lastDailyDay))||
+    !validCounter(p.dailyStreak,7))throw new Error('Invalid daily reward history.');
+  return parseProfile(JSON.stringify(p));
+}

@@ -4,7 +4,7 @@ import { Battle } from './battle';
 import { OceanScene, type Metrics } from './scene';
 import { Harbour } from './harbour';
 import { AppScreens, type AppScreenId } from './app-screens';
-import { STORAGE_KEY, parseProfile, finishBattle, claimDaily, claimMission, buyCrew, equipCrew, improve, type CrewId, type MissionId, type UpgradeId } from './progression';
+import { STORAGE_KEY, parseProfile, finishBattle, claimDaily, claimMission, buyCrew, equipCrew, improve, exportProfileBackup, importProfileBackup, type CrewId, type MissionId, type UpgradeId } from './progression';
 import './harbour.css';
 import './style.css';
 import './app-screens.css';
@@ -14,6 +14,8 @@ function App(){
  const host=useRef<HTMLDivElement>(null),engine=useRef(new Battle()),view=useRef<OceanScene|null>(null);
  const [state,setState]=useState({phase:'ready',player:100,enemy:100,round:1,message:'Aim your broadside',shots:0,hits:0});
  const [appScreen,setAppScreen]=useState<AppScreenId|null>(null);
+ const backupFile=useRef<HTMLInputElement>(null);
+ const [backupMessage,setBackupMessage]=useState('');
  const [profile,setProfile]=useState(()=>{try{return parseProfile(window.localStorage.getItem(STORAGE_KEY));}catch{return parseProfile(null);}});
  const recordedResult=useRef(false);
  const [harbour,setHarbour]=useState(true),[inspecting,setInspecting]=useState(false),[yaw,setYaw]=useState(0),[power,setPower]=useState(65),[progress,setProgress]=useState(false),[music,setMusic]=useState(false),[sound,setSound]=useState(false),[deck,setDeck]=useState(false),[error,setError]=useState(''),[loaded,setLoaded]=useState(false),[metrics,setMetrics]=useState<Metrics|null>(null),[diagnostics,setDiagnostics]=useState(false),[compatibility,setCompatibility]=useState(false);
@@ -29,14 +31,38 @@ function App(){
  const inspectShip=()=>{view.current?.inspectShip();setInspecting(true);setAppScreen(null);};
  const closeInspection=()=>{view.current?.showHarbour();setInspecting(false);};
  const navigateTo=(next:AppScreenId)=>{setInspecting(false);setAppScreen(next);};
+ const exportBackup=()=>{
+   try {
+     const json=exportProfileBackup(profile);
+     const url=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+     const link=document.createElement('a');
+     link.href=url;link.download='royal-pirate-save-'+new Date().toISOString().slice(0,10)+'.json';
+     document.body.appendChild(link);link.click();link.remove();
+     window.setTimeout(()=>URL.revokeObjectURL(url),1200);
+     setBackupMessage('Save file created. Keep it safe; progress is not cloud synced.');
+   }catch{setBackupMessage('Could not download your save file in this browser.');}
+ };
+ const restoreBackup=async(event:React.ChangeEvent<HTMLInputElement>)=>{
+   const file=event.currentTarget.files?.[0];event.currentTarget.value='';
+   if(!file)return;
+   if(file.size>65_536){setBackupMessage('Only save JSON files smaller than 64 KB are accepted.');return;}
+   try{
+     const next=importProfileBackup(await file.text());
+     if(!window.confirm('Replace this device\'s current progress with the backup? This cannot be undone without another backup.')){
+       setBackupMessage('Restore cancelled. Current progress was not changed.');return;
+     }
+     setProfile(next);setBackupMessage('Save restored on this device. No cloud synchronization.');
+   }catch(err){setBackupMessage(err instanceof Error?err.message:'Restore failed.');}
+ };
  const result=state.phase==='victory'||state.phase==='defeat',ready=state.phase==='ready'&&loaded&&!error;
  return <main className={'app '+(harbour?'in-harbour':'in-battle')}>
    <div ref={host} className="ocean"/><div className="vignette"/>
    {harbour&&!inspecting&&<Harbour onBattle={enterBattle} onInspect={inspectShip} onNavigate={navigateTo} coins={profile.coins} hidden={Boolean(appScreen)}/>}
+   <input ref={backupFile} type="file" hidden accept=".json,application/json" aria-label="Choose a local Royal Pirate save backup" onChange={restoreBackup}/>
    {harbour&&!inspecting&&appScreen&&<AppScreens screen={appScreen} profile={profile} onNavigate={navigateTo} onClose={()=>setAppScreen(null)} onBattle={enterBattle} onInspect={inspectShip}
       onBuyCrew={(id:CrewId)=>setProfile(p=>buyCrew(p,id))} onEquipCrew={(id:CrewId)=>setProfile(p=>equipCrew(p,id))}
       onUpgrade={(id:UpgradeId)=>setProfile(p=>improve(p,id))} onMission={(id:MissionId)=>setProfile(p=>claimMission(p,id))}
-      onDaily={()=>setProfile(p=>claimDaily(p,Date.now()))}/>}
+      onDaily={()=>setProfile(p=>claimDaily(p,Date.now()))} onExportBackup={exportBackup} onImportBackup={()=>backupFile.current?.click()} backupMessage={backupMessage}/>}
    {harbour&&inspecting&&<div className="ship-inspection-ui"><button type="button" onClick={closeInspection} aria-label="Back to harbour">‹ BACK TO PORT</button><div><strong>THE ROYAL CROWN</strong><span>LIVE 3D SHIP VIEWER · DRAG TO ORBIT · PINCH TO ZOOM</span></div></div>}
    {!harbour&&<button className="return-harbour" type="button" aria-label="Return to harbour" onClick={returnHarbour}>⚓ HARBOUR</button>}
    <header className="topbar"><a className="brand" href="#" aria-label="Royal Pirate"><span className="brand-emblem"><Icon name="anchor" size={28}/></span><span>ROYAL <b>PIRATE</b><small>THE FIRST BROADSIDE</small></span></a><span className="preview-pill"><i/> {compatibility?'3D COMPATIBILITY MODE':'LIVE 3D PREVIEW'}</span><button className="progress-button" aria-label="Development Progress" onClick={()=>setProgress(true)}><Icon name="chart" size={19}/><span>Development Progress</span></button></header>

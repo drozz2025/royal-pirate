@@ -11,7 +11,7 @@ const harbour=readFileSync(new URL('../src/harbour.tsx',import.meta.url),'utf8')
 const css=readFileSync(new URL('../src/app-screens.css',import.meta.url),'utf8');
 const noop=()=>{};
 const props={profile:initialProfile(),onNavigate:noop,onClose:noop,onBattle:noop,onInspect:noop,
-  onBuyCrew:noop,onEquipCrew:noop,onUpgrade:noop,onMission:noop,onDaily:noop};
+  onBuyCrew:noop,onEquipCrew:noop,onUpgrade:noop,onMission:noop,onDaily:noop,onExportBackup:noop,onImportBackup:noop,backupMessage:''};
 const all:AppScreenId[]=['battle','fleet','forge','cards','shop','missions','profile'];
 
 test('all seven app sheets have actual renderable content and controls',()=>{
@@ -46,4 +46,14 @@ test('no claim of online leaderboards, card combat bonuses or real-money checkou
  assert.match(html,/battle damage unchanged/i);
  assert.match(html,/secure payments/i);
  assert.match(html,/saved on this device/i);
+});
+
+test('captain profile exposes accessible, confirmed local backup actions',()=>{
+ const html=renderToStaticMarkup(React.createElement(AppScreens,{...props,screen:'profile',backupMessage:'Save restored'}));
+ assert.match(html,/SAVE BACKUP/);
+ assert.match(html,/RESTORE BACKUP/);
+ assert.match(html,/not cloud synced|no account, online backup/i);
+ assert.match(html,/role="status"/);
+ assert.match(main,/onChange=\{restoreBackup\}/);
+ assert.match(main,/window\.confirm\(/);
 });
