@@ -48,6 +48,9 @@ try {
   ws.addEventListener('message', e=>{
     const msg=JSON.parse(e.data);
     if (msg.method === 'Runtime.exceptionThrown') events.push(msg.params?.exceptionDetails?.text || 'JS exception');
+    if (msg.method === 'Log.entryAdded') events.push('log: '+(msg.params?.entry?.text||''));
+    if (msg.method === 'Network.loadingFailed') events.push('network: '+(msg.params?.errorText||''));
+    if (msg.method === 'Network.responseReceived' && msg.params?.response?.status >= 400) events.push('HTTP '+msg.params.response.status+' '+msg.params.response.url);
     if(!msg.id)return;
     const callback=pending.get(msg.id);
     if(callback){pending.delete(msg.id);msg.error?callback.reject(new Error(msg.error.message)):callback.resolve(msg.result);}
@@ -63,6 +66,8 @@ try {
   });
   await command('Page.enable');
   await command('Runtime.enable');
+  await command('Log.enable');
+  await command('Network.enable');
   await command('Emulation.setDeviceMetricsOverride',{
     width:390,height:844,deviceScaleFactor:1,mobile:true,
     screenWidth:390,screenHeight:844
@@ -90,7 +95,7 @@ try {
     const center=document.elementFromPoint(innerWidth*.5,innerHeight*.48);
     const gl=canvas?.getContext('webgl2');
     return {
-      url:location.href,readyState:document.readyState,bodyExcerpt:document.body.textContent.slice(0,400),error:document.querySelector('.error-panel')?.textContent||null,viewport:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio},
+      url:location.href,readyState:document.readyState,bodyExcerpt:document.body.textContent.slice(0,400),scripts:[...document.scripts].map(s=>s.src),error:document.querySelector('.error-panel')?.textContent||null,viewport:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio},
       canvas:canvas?box(canvas):null,webgl2:!!gl,contextLost:gl?.isContextLost()??null,
       harbour:harbour?box(harbour):null,centerTouchTarget:center?.tagName??null,
       navbarItems:harbour?.querySelectorAll('.harbour-nav-item').length??0,
@@ -100,6 +105,7 @@ try {
     };
   })()`);
   report.javascriptExceptions=events;
+  report.scriptResponses=await evaluate("Promise.all([...document.querySelectorAll('script[src]')].map(async s=>{try{const r=await fetch(s.src);return {url:s.src,status:r.status,type:r.headers.get('content-type')}}catch(e){return {url:s.src,error:String(e)}}}))");
   const screen=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
   await mkdir(out,{recursive:true});
   await writeFile(join(out,'porto-mobile-390x844.png'),Buffer.from(screen.data,'base64'));
