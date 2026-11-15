@@ -387,3 +387,26 @@
  .app-forge-board{grid-template-columns:1fr}.app-forge-seal{min-height:70px;flex-direction:row}
 }
 @media(prefers-reduced-motion:reduce){.app-deck button{transition:none}}
+
+
+/* WORK 4 — compact, accessible filters for the saved recent battle ledger.
+ * No new panels obstruct the Porto: these styles apply only inside Profile. */
+.app-history-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0 0 11px}
+.app-history-filters button{min-width:0;min-height:44px;padding:8px 3px;border:1px solid #8cabc1;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;gap:5px;background:#163653;color:#d7eaf4;
+  font:900 13px 'Barlow Condensed',sans-serif;letter-spacing:.2px}
+.app-history-filters button span{font:800 12px 'Barlow',sans-serif;color:#d6c391}
+.app-history-filters button[aria-pressed="true"]{background:linear-gradient(#f8d98c,#c18d44);border:2px solid #fff1ba;
+  color:#1b2b40;text-shadow:none;box-shadow:inset 0 1px #fff8d8}
+.app-history-filters button[aria-pressed="true"] span{color:#4e351d}
+.app-history-totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0 0 11px}
+.app-history-totals>span{min-width:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  gap:4px;padding:10px 3px;border:1px solid #638ea7;border-radius:8px;background:#0b2a46;text-align:center}
+.app-history-totals strong{font:900 clamp(17px,4.6vw,23px)/1 'Barlow Condensed',sans-serif;color:#ffe2a4;white-space:nowrap}
+.app-history-totals small{font:700 9px/1.2 'Barlow',sans-serif;color:#c9deeb}
+@media(max-width:350px){
+  .app-history-filters{gap:4px}
+  .app-history-filters button{font-size:11px;gap:3px}
+  .app-history-totals strong{font-size:16px}
+  .app-history-totals small{font-size:8px}
+}
