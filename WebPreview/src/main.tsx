@@ -3,27 +3,40 @@ import { createRoot } from 'react-dom/client';
 import { Battle } from './battle';
 import { OceanScene, type Metrics } from './scene';
 import { Harbour } from './harbour';
+import { AppScreens, type AppScreenId } from './app-screens';
+import { STORAGE_KEY, parseProfile, finishBattle, claimDaily, claimMission, buyCrew, equipCrew, improve, type CrewId, type MissionId, type UpgradeId } from './progression';
 import './harbour.css';
 import './style.css';
+import './app-screens.css';
 const Icon=({name,size=22}:{name:string;size?:number})=><svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{name==='anchor'?<><circle cx="12" cy="5" r="2.5"/><path d="M12 8v13M6 11h12M4 15c0 8 16 8 16 0M2 17l2-3 3 2m10 0 3-2 2 3"/></>:name==='restart'?<><path d="M3 10a9 9 0 1 1 1 8M3 4v6h6"/></>:name==='aim'?<><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 1v4m0 14v4M1 12h4m14 0h4"/></>:name==='music'?<><path d="M10 18V5l11-2v12"/><circle cx="7" cy="18" r="3"/><circle cx="18" cy="15" r="3"/></>:name==='sound'?<><path d="M4 9h4l5-4v14l-5-4H4zM17 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></>:name==='mute'?<><path d="M4 9h4l5-4v14l-5-4H4zM17 9l5 6m0-6-5 6"/></>:name==='chart'?<><path d="M4 4v16h16M8 15v-4m5 4V6m5 9v-7"/></>:name==='camera'?<><path d="M4 7h4l2-3h4l2 3h4v13H4z"/><circle cx="12" cy="13" r="4"/></>:name==='close'?<path d="m6 6 12 12M6 18 18 6"/>:name==='flag'?<><path d="M5 22V3m0 1c6-4 8 4 15 0v11c-7 4-9-4-15 0"/></>:name==='fire'?<><path d="M13 2c2 7-5 7-3 12 2 0 3-2 3-4 7 5 5 12-1 12S1 15 6 9c-1 4 1 5 2 4-1-5 4-6 5-11Z"/></>:name==='wind'?<><path d="M3 8h12c5 0 4-6 1-5M3 12h16c5 0 4 7 0 5M5 16h6c4 0 4 6 0 5"/></>:<><path d="m8 5 8 7-8 7"/></>}</svg>;
 const source='https://github.com/drozz2025/royal-pirate';
 function App(){
  const host=useRef<HTMLDivElement>(null),engine=useRef(new Battle()),view=useRef<OceanScene|null>(null);
  const [state,setState]=useState({phase:'ready',player:100,enemy:100,round:1,message:'Aim your broadside',shots:0,hits:0});
+ const [appScreen,setAppScreen]=useState<AppScreenId|null>(null);
+ const [profile,setProfile]=useState(()=>{try{return parseProfile(window.localStorage.getItem(STORAGE_KEY));}catch{return parseProfile(null);}});
+ const recordedResult=useRef(false);
  const [harbour,setHarbour]=useState(true),[inspecting,setInspecting]=useState(false),[yaw,setYaw]=useState(0),[power,setPower]=useState(65),[progress,setProgress]=useState(false),[music,setMusic]=useState(false),[sound,setSound]=useState(false),[deck,setDeck]=useState(false),[error,setError]=useState(''),[loaded,setLoaded]=useState(false),[metrics,setMetrics]=useState<Metrics|null>(null),[diagnostics,setDiagnostics]=useState(false),[compatibility,setCompatibility]=useState(false);
  useEffect(()=>{let last='';try{const scene=new OceanScene(host.current!,engine.current,()=>{const b=engine.current;const key=[b.phase,b.health.player,b.health.enemy,b.round,b.lastMessage,b.shotsFired].join(':');if(key!==last){last=key;setState({phase:b.phase,player:b.health.player,enemy:b.health.enemy,round:b.round,message:b.lastMessage,shots:b.shotsFired,hits:b.hits});}},setMetrics,setError);view.current=scene;setCompatibility(scene.compatibility);scene.showHarbour();setLoaded(true);return()=>scene.dispose();}catch(e){setError(`This browser could not start WebGL. ${e instanceof Error?e.message:'Please reload or try Safari/Chrome.'}`);}},[]);
+ useEffect(()=>{try{window.localStorage.setItem(STORAGE_KEY,JSON.stringify(profile));}catch{/* Private browsing may disable storage. */}},[profile]);
+ useEffect(()=>{if((state.phase==='victory'||state.phase==='defeat')&&!recordedResult.current){recordedResult.current=true;setProfile(p=>finishBattle(p,state.phase==='victory'?'victory':'defeat',state.hits,state.shots));}},[state.phase,state.hits,state.shots]);
  useEffect(()=>{if(view.current)view.current.paused=progress;},[progress]);
  useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==='Escape')setProgress(false);};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[]);
  const aim=(y:number,p:number)=>{engine.current.aim(y,p);setYaw(engine.current.yaw);setPower(engine.current.power);};
- const reset=()=>{view.current?.reset();setYaw(0);setPower(65);setDeck(false);};
- const enterBattle=()=>{reset();view.current?.showBattle();setInspecting(false);setHarbour(false);};
- const returnHarbour=()=>{reset();view.current?.showHarbour();setInspecting(false);setHarbour(true);};
- const inspectShip=()=>{view.current?.inspectShip();setInspecting(true);};
+ const reset=()=>{recordedResult.current=false;view.current?.reset();setYaw(0);setPower(65);setDeck(false);};
+ const enterBattle=()=>{reset();view.current?.showBattle();setInspecting(false);setHarbour(false);setAppScreen(null);};
+ const returnHarbour=()=>{reset();view.current?.showHarbour();setInspecting(false);setHarbour(true);setAppScreen(null);};
+ const inspectShip=()=>{view.current?.inspectShip();setInspecting(true);setAppScreen(null);};
  const closeInspection=()=>{view.current?.showHarbour();setInspecting(false);};
+ const navigateTo=(next:AppScreenId)=>{setInspecting(false);setAppScreen(next);};
  const result=state.phase==='victory'||state.phase==='defeat',ready=state.phase==='ready'&&loaded&&!error;
  return <main className={'app '+(harbour?'in-harbour':'in-battle')}>
    <div ref={host} className="ocean"/><div className="vignette"/>
-   {harbour&&!inspecting&&<Harbour onBattle={enterBattle} onInspect={inspectShip}/>}
+   {harbour&&!inspecting&&<Harbour onBattle={enterBattle} onInspect={inspectShip} onNavigate={navigateTo} coins={profile.coins}/>}
+   {harbour&&!inspecting&&appScreen&&<AppScreens screen={appScreen} profile={profile} onNavigate={navigateTo} onClose={()=>setAppScreen(null)} onBattle={enterBattle} onInspect={inspectShip}
+      onBuyCrew={(id:CrewId)=>setProfile(p=>buyCrew(p,id))} onEquipCrew={(id:CrewId)=>setProfile(p=>equipCrew(p,id))}
+      onUpgrade={(id:UpgradeId)=>setProfile(p=>improve(p,id))} onMission={(id:MissionId)=>setProfile(p=>claimMission(p,id))}
+      onDaily={()=>setProfile(p=>claimDaily(p,Date.now()))}/>}
    {harbour&&inspecting&&<div className="ship-inspection-ui"><button type="button" onClick={closeInspection} aria-label="Back to harbour">‹ BACK TO PORT</button><div><strong>THE ROYAL CROWN</strong><span>LIVE 3D SHIP VIEWER · DRAG TO ORBIT · PINCH TO ZOOM</span></div></div>}
    {!harbour&&<button className="return-harbour" type="button" aria-label="Return to harbour" onClick={returnHarbour}>⚓ HARBOUR</button>}
    <header className="topbar"><a className="brand" href="#" aria-label="Royal Pirate"><span className="brand-emblem"><Icon name="anchor" size={28}/></span><span>ROYAL <b>PIRATE</b><small>THE FIRST BROADSIDE</small></span></a><span className="preview-pill"><i/> {compatibility?'3D COMPATIBILITY MODE':'LIVE 3D PREVIEW'}</span><button className="progress-button" aria-label="Development Progress" onClick={()=>setProgress(true)}><Icon name="chart" size={19}/><span>Development Progress</span></button></header>
