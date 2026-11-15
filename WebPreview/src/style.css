@@ -4,3 +4,33 @@
 @media(max-height:700px) and (max-width:600px){.scene-hint{display:none}.command-deck{bottom:29px}.controls-body{padding:10px 12px}.sliders{gap:4px}.fire-button{height:101px}.deck-footer{display:none}.battle-hud{top:74px}.health-card{padding:8px}.view-controls{top:37%}.result{top:42%}.result-badge{display:none}.result-stats{margin:15px 0}}@media(prefers-reduced-motion:reduce){.health-track>span{transition:none}}
 
 @media(min-width:851px){.scene-caption{top:auto;bottom:275px;left:32px}.scene-caption h1,.scene-caption p{display:none}.scene-caption .chapter{margin-top:12px}.scene-caption .eyebrow{font-size:8px}}
+
+
+/* v0.1.4 — battle HUD styling to match the approved royal-navy visual identity. */
+.in-battle .topbar .brand{font-weight:900;color:#ffe6a4;text-shadow:0 3px #1a1a27,0 0 13px #092c61}
+.in-battle .brand-emblem{border:2px solid #f6ce74;background:radial-gradient(#1a5a91,#071b3c);box-shadow:inset 0 1px #ffe7ad,0 3px 0 #704722}
+.in-battle .battle-hud{gap:10px}
+.in-battle .health-card{border:2px solid #d7a95c;background:linear-gradient(180deg,rgba(39,75,121,.95),rgba(6,30,62,.97));box-shadow:inset 0 2px #ffffff3d,0 4px #583d28,0 8px 18px #00172a8c}
+.in-battle .health-crest{border:2px solid #e5ba65;color:#ffe5a2;background:#0c2b50}
+.in-battle .command-deck{border-color:#d6a657;background:linear-gradient(180deg,rgba(23,62,106,.95),rgba(8,28,59,.98));box-shadow:0 0 0 2px #593e2b,0 15px 32px #07152c99}
+.in-battle .fire-button{border:3px solid #ffe8a2;background:linear-gradient(180deg,#f9614d 0%,#d51b2f 53%,#8e0e21 100%);color:#fff6d0;box-shadow:inset 0 2px #ffd1a6,0 5px 0 #6e231c,0 9px 16px #00172799}
+.in-battle .fire-button:hover{filter:brightness(1.1)}
+.in-battle .fire-button:disabled{filter:saturate(.25) brightness(.65)}
+.in-battle .fire-button>span{font-weight:900;text-shadow:0 2px #6d091c}
+.in-battle .sliders input::-webkit-slider-thumb{background:#ffe28c;border-color:#905c2b}
+.in-battle .sliders input::-moz-range-thumb{background:#ffe28c;border-color:#905c2b}
+.in-battle .return-harbour{border:2px solid #ffe1a0;background:linear-gradient(#255b8c,#08294e)}
+@media(max-width:600px){.in-battle .health-card{padding:7px 8px}.in-battle .battle-hud{gap:5px}}
+
+/* v0.1.4 portrait HUD — readable without replacing controls or covering the ships. */
+@media(max-width:600px){
+  .in-battle .ship-label{font-size:9px;letter-spacing:.2px}
+  .in-battle .ship-label strong{font-size:11px}
+  .in-battle .round span{font-size:9px}
+  .in-battle .turn-line strong{font-size:10px}
+  .in-battle .message{font-size:11px}
+  .in-battle .sliders label>span{font-size:10px}
+  .in-battle .scale{font-size:9px;letter-spacing:.35px}
+  .in-battle .fire-button>small{font-size:9px;letter-spacing:.65px}
+  .in-battle .bottom-note{font-size:8px;letter-spacing:.3px}
+}

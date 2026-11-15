@@ -173,3 +173,76 @@
  .harbour-side-tile>span{font-size:30px}.harbour-side-tile strong{font-size:16px}
  .harbour-central{min-height:260px}
 }
+
+
+/* v0.1.4 — Approved reference visual language.
+   These are live DOM controls over the existing Three.js world, not screenshots. */
+.harbour-screen{background:linear-gradient(180deg,rgba(27,111,178,.08) 0%,transparent 43%,rgba(4,17,41,.35) 76%,rgba(4,17,41,.88) 100%);text-shadow:0 2px 4px #071931cc}
+.harbour-sky{background:radial-gradient(ellipse 75% 35% at 48% 12%,rgba(150,222,255,.35),transparent 82%)}
+.harbour-profile,.harbour-side-tile,.harbour-arena,.harbour-chests,.harbour-secondary-action,.harbour-nav{border-color:#eec66e;box-shadow:inset 0 2px rgba(255,243,175,.56),0 4px 0 #764724,0 8px 18px #06183299}
+.harbour-profile{background:linear-gradient(145deg,#234c77,#082b55 55%,#071f3d);border-radius:16px}
+.harbour-avatar{border-radius:50%;background:radial-gradient(circle at 35% 27%,#f9c46b,#a26930 42%,#271d25 88%);border:3px solid #ffdf81;box-shadow:0 0 0 2px #47311d,0 2px 14px #f7a82a55}
+.harbour-profile strong,.harbour-arena-title>span{color:#ffe18d}
+.harbour-resources>div{border:2px solid #e4b960;background:linear-gradient(180deg,#183b69,#081e3b);box-shadow:inset 0 2px #ffffff55,0 3px #694324}
+.harbour-arena{background:linear-gradient(180deg,#a87737 0%,#73461f 18%,#224b70 19%,#0d294e 100%);border-radius:16px}
+.harbour-arena-crest{border-radius:50%;color:#fff3ce;background:radial-gradient(circle at 35% 28%,#fff3a8,#d89626 60%,#764116)}
+.harbour-arena-track>span{background:linear-gradient(#fff5a3,#e7a018)}
+.harbour-side-tile{background:linear-gradient(160deg,#f3d37d 0%,#a36c28 9%,#214a75 11%,#0b284d 94%);border-radius:12px}
+.harbour-ship-label{border-radius:18px;border-top:1px solid rgba(255,216,131,.45);background:linear-gradient(90deg,transparent,#071e43df 19%,#071e43df 81%,transparent)}
+.harbour-ship-label strong{color:#ffe6a0;text-shadow:0 2px 3px #100b13}
+.harbour-chests{background:linear-gradient(180deg,rgba(22,66,110,.95),rgba(7,33,69,.97));color:#ffebbe;border:2px solid #d7a74c;text-shadow:0 2px 2px #001a38}
+.harbour-chest-header small{color:#f7d794}
+.harbour-chest{border:2px solid #c79c50;background:linear-gradient(160deg,#244e80,#0e2d55);box-shadow:inset 0 2px #ffffff44,0 2px #071c36}
+.harbour-chest small{color:#ffe1a2}
+.harbour-secondary-action{background:linear-gradient(#c28c48,#865026 12%,#173f6a 14%,#0b2e56 88%);border-radius:15px}
+.harbour-battle-button{border:4px solid #ffe19a;background:linear-gradient(180deg,#f9614d,#c51221 49%,#890917 100%);color:#fff7cf;text-shadow:0 3px #541122;box-shadow:inset 0 3px #ffb99d,0 0 0 3px #773b1e,0 6px 0 #602017,0 12px 20px #001b2d99}
+.harbour-battle-button strong{font-weight:900;text-shadow:0 3px #5c0717}
+.harbour-battle-button small{color:#ffe6ae}
+.harbour-battle-button:active{box-shadow:inset 0 3px #ffb99d,0 0 0 3px #773b1e,0 2px 0 #602017}
+.harbour-nav{background:linear-gradient(#285a90,#0e335d 31%,#091d42);border-top:3px solid #ffdf84}
+.harbour-nav-item{border-right:1px solid #e0b56670}
+.harbour-nav-item>span{color:#ffda76}
+.harbour-nav-current{background:linear-gradient(#fff1ae,#d18b2d);box-shadow:0 3px #7b4627,0 0 20px #f6c64b77}
+.harbour-disclaimer{color:#d9eafa}
+@media(max-width:600px){
+ .harbour-profile small{font-size:8px}
+ .harbour-side-tile small{font-size:9px}
+ .harbour-nav-item small{font-size:8px}
+ .harbour-disclaimer{font-size:9px;line-height:1.35}
+ .harbour-battle-button strong{font-size:clamp(29px,9vw,41px)}
+}
+@media (prefers-reduced-motion:reduce){.harbour-battle-button,.harbour-nav-current{transition:none}}
+
+
+/* v0.1.4 interactive 3D ship viewer — foreground labels never intercept orbit gestures. */
+.harbour-inspect-button{pointer-events:auto;cursor:pointer;margin-top:5px;min-height:32px;padding:5px 13px;
+  border:2px solid #ffdc8d;border-radius:9px;background:linear-gradient(#386ca1,#12385e);
+  box-shadow:0 3px #36271a;color:#fff1c6;font:900 12px 'Barlow Condensed',sans-serif;
+  letter-spacing:1.2px;text-shadow:0 1px #0b1d3f}
+.harbour-inspect-button:focus-visible{outline:3px solid white;outline-offset:3px}
+.ship-inspection-ui{position:absolute;inset:0;z-index:8;pointer-events:none;display:flex;flex-direction:column;
+  justify-content:space-between;align-items:flex-start;padding:max(20px,env(safe-area-inset-top)) 18px max(30px,env(safe-area-inset-bottom))}
+.ship-inspection-ui>button{pointer-events:auto;min-height:48px;padding:10px 18px;
+  color:#ffe8aa;border:2px solid #e9bf69;border-radius:12px;
+  background:linear-gradient(#225480,#0b2851);box-shadow:0 5px #061e3b;
+  font:900 18px 'Barlow Condensed',sans-serif;letter-spacing:1.1px}
+.ship-inspection-ui>div{width:min(470px,100%);padding:12px 16px;border:1px solid #d8a95e9e;
+  border-radius:12px;background:#061a3fc4;text-shadow:0 2px #05172e}
+.ship-inspection-ui>div strong{display:block;color:#ffe6a6;font:900 24px 'Barlow Condensed',sans-serif}
+.ship-inspection-ui>div span{display:block;color:#e5eef9;font:700 11px 'Barlow',sans-serif;letter-spacing:.5px;margin-top:4px}
+@media(max-width:600px){.harbour-inspect-button{font-size:11px;min-height:34px}
+  .ship-inspection-ui{padding-left:12px;padding-right:12px}
+  .ship-inspection-ui>div strong{font-size:21px}
+  .ship-inspection-ui>div span{font-size:10px;line-height:1.5}}
+
+/* Keep supporting labels legible on narrow iPhone-style portrait layouts. */
+@media(max-width:600px){
+  .harbour-profile strong{font-size:11px}
+  .harbour-profile div span{font-size:16px}
+  .harbour-profile small{font-size:9px}
+  .harbour-arena-body small{font-size:9px;letter-spacing:.3px}
+  .harbour-chest small{font-size:9px;letter-spacing:0}
+  .harbour-secondary-action small{font-size:9px}
+  .harbour-battle-button small{font-size:9px}
+  .harbour-nav-item small{font-size:9px;letter-spacing:0}
+}

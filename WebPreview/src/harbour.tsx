@@ -11,7 +11,7 @@ const upcoming = [
   { icon: '✦', title: 'MISSIONS' },
   { icon: '🏆', title: 'RANKING' },
 ];
-export function Harbour({ onBattle }: { onBattle: () => void }) {
+export function Harbour({ onBattle, onInspect }: { onBattle: () => void; onInspect: () => void }) {
   return <section className="harbour-screen" aria-label="Royal Pirate harbour">
     <div className="harbour-sky" aria-hidden="true" />
     <header className="harbour-header">
@@ -44,7 +44,7 @@ export function Harbour({ onBattle }: { onBattle: () => void }) {
         <div className="harbour-side-tile"><span aria-hidden="true">✦</span><strong>SPECIAL</strong><small>SOON</small></div>
       </div>
       <div className="harbour-ship-label">
-        <span aria-hidden="true">⚓</span><strong>THE ROYAL CROWN</strong><small>YOUR FIRST SHIP · LIVE 3D</small>
+        <span aria-hidden="true">⚓</span><strong>THE ROYAL CROWN</strong><small>YOUR FIRST SHIP · LIVE 3D</small><button className="harbour-inspect-button" type="button" onClick={onInspect} aria-label="Inspect your ship in interactive 3D">VIEW SHIP IN 3D</button>
       </div>
     </div>
     <div className="harbour-lower">
