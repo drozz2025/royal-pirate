@@ -322,3 +322,11 @@
 .harbour-actions{grid-template-columns:minmax(0,1fr) minmax(0,2.3fr) minmax(0,1fr)}
 .harbour-action-hint{min-height:40px;display:grid;place-items:center;font-size:25px;color:#ffe0a1;pointer-events:none}
 .harbour-inspect-button{display:none}
+
+/* v0.1.18 — compact daily reward shortcut. Full seven-day calendar lives in Missions. */
+.harbour-compact-daily{min-height:80px;background:linear-gradient(165deg,#79572c,#173e61 48%,#102b4b);border-color:#f0cc75}
+.harbour-compact-daily>span{font-size:28px;line-height:1}
+.harbour-compact-daily small{font-size:10px;letter-spacing:.2px}
+.harbour-compact-daily.harbour-reward-ready{box-shadow:0 0 0 2px #f9d27566,inset 0 1px #ffe9a9,0 5px #40291e}
+.harbour-compact-daily:focus-visible{outline:3px solid #fff4b4;outline-offset:3px}
+@media(max-width:390px){.harbour-compact-daily{min-height:72px}.harbour-compact-daily strong{font-size:14px}.harbour-compact-daily small{font-size:9px}}
