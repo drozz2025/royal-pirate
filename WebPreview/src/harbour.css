@@ -173,3 +173,82 @@
 @media(prefers-reduced-motion:reduce){
  .harbour-level-track>span,.harbour-battle-button{transition:none}
 }
+
+/* WORK 6 Porto premium pass — approved black/gold galleon and tropical harbour.
+ * Decorative depth is CSS-only; empty screen regions still pass touch to Three.js.
+ * No full-screen image, fake resource amount or blocking pane is introduced.
+ */
+body:has(.harbour-screen:not([aria-hidden="true"])) .rp-version{display:none}
+.harbour-avatar{
+  background:radial-gradient(circle at 50% 32%,#56b8eb 0%,#133f65 64%,#0a2745 100%);
+  border-color:#ffcf65;
+  box-shadow:0 0 0 2px #61361c,0 4px 10px #061b3aba,inset 0 2px #fff1a7;
+  transform:none;overflow:hidden;
+}
+.harbour-avatar .pirate-icon{width:95%;height:95%;filter:drop-shadow(0 2px 1px #102438)}
+.harbour-logo{
+  color:#ffdf83;
+  filter:drop-shadow(0 4px 0 #5b3016) drop-shadow(0 7px 3px #102441b8)
+}
+.harbour-logo>span:not(.harbour-logo-crown),.harbour-logo>b{
+  -webkit-text-stroke:1px #693612;
+  text-shadow:0 2px 0 #6e371b,0 4px 0 #261920,1px 0 2px #ffe29a;
+}
+.harbour-flank-button{
+  border-color:#eab350;
+  background:linear-gradient(145deg,#ffdb77 0%,#9e602b 3%,#1c5282 9%,#10385f 66%,#092648 88%,#a67433 97%,#ffe29b 100%);
+  box-shadow:inset 0 2px #ffe8aa9b,inset 0 -3px #091d38a8,0 3px #5b2f18,0 6px 8px #03283b99;
+}
+.harbour-flank-icon{color:#ffdf8f;filter:drop-shadow(0 2px #663e1d) drop-shadow(0 0 5px #f9b94355)}
+.harbour-flank-left .harbour-flank-button:first-child{
+  height:clamp(87px,13.5dvh,145px);
+  gap:1px;
+}
+.harbour-flank-left .harbour-flank-button:first-child .harbour-flank-icon{
+  height:clamp(34px,5.8dvh,58px)
+}
+.harbour-flank-left .harbour-flank-button:first-child .harbour-flank-icon .pirate-icon{
+  width:clamp(33px,8vw,54px);height:clamp(33px,8vw,54px)
+}
+.harbour-local-wins{
+  display:block;
+  font:800 clamp(8px,2.0vw,12px)/1 'Barlow Condensed',sans-serif;
+  color:#ffdb7d;white-space:nowrap;text-shadow:0 2px #031e3a
+}
+.harbour-stat{border-color:#d4a454;box-shadow:inset 0 2px #c1d8ec70,0 3px #62411f,0 4px 6px #04274477}
+.harbour-dock-chest{
+  background:repeating-linear-gradient(0deg,transparent 0 16px,#4c2717a5 17px 19px),
+    linear-gradient(90deg,#582c18,#b57638 31%,#a5632d 62%,#4d2918);
+  border-color:#edb953;
+  box-shadow:inset 0 0 0 4px #d8a65a,inset 0 -10px #543018,
+    0 6px 3px #071e36ad,0 0 14px #f8ca5344
+}
+.harbour-dock-chest-lid{
+  background:linear-gradient(#ffe7a5,#e8b14d 16%,#87421c 24%,#a5612d 83%,#5c2e18);
+  border-color:#edc063;
+}
+.harbour-battle-button{
+  width:min(62%,470px);
+  background:linear-gradient(180deg,#fd9065 0%,#e62f2d 11%,#d51020 48%,#9f0210 90%);
+  border-color:#ffd76a;
+  box-shadow:0 0 0 3px #793d1d,0 7px #6c3217,
+    inset 0 3px #fff5b3aa,inset 0 -4px #6d0010,0 12px 23px #04243e9c;
+}
+.harbour-battle-button strong{color:#fff3d6;text-shadow:0 3px #641316,0 0 5px #3a171a}
+.harbour-nav{
+  border-color:#d8a85c;
+  background:linear-gradient(180deg,#3b668e 0%,#173b64 13%,#0c2a50 74%,#071b39 100%)
+}
+.harbour-nav-current{
+  border-color:#ffdc78;
+  box-shadow:0 -3px 12px #ffe49193,inset 0 2px #fff4b5dd
+}
+@media(max-width:390px){
+  .harbour-battle-button{width:62%}
+  .harbour-battle-button strong{font-size:clamp(23px,7.3vw,29px)}
+  .harbour-local-wins{font-size:8px}
+}
+@media(max-height:690px){
+  .harbour-flank-left .harbour-flank-button:first-child{height:clamp(69px,11.5dvh,83px)}
+  .harbour-local-wins{font-size:8px}
+}
