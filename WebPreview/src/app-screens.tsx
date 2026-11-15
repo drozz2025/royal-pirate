@@ -78,10 +78,36 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
           <span className={'app-item-symbol app-crew-portrait '+(owned?'is-owned':'is-locked')} aria-hidden="true">{c.symbol}</span><div className="app-item-text"><strong>{c.name}</strong><small>{selected?'★ ACTIVE CAPTAIN':owned?'✓ COLLECTED':'◇ UNDISCOVERED'}</small><p>{c.role}</p></div>
           <button type="button" disabled={selected||(!owned&&profile.coins<c.cost)} onClick={()=>action(owned?c.name+' equipped locally. Combat abilities are not active yet.':c.name+' added to your local crew for '+c.cost+' coins.',()=>owned?onEquipCrew(c.id):onBuyCrew(c.id))}>{selected?'ACTIVE':owned?'EQUIP':c.cost+' ●'}</button>
         </article>})}</div>}
-      {screen==='shop'&&<div className="app-stack"><div className="app-kicker">PORT MARKET · DEVELOPMENT PREVIEW</div><h2>Shop</h2>
-        <div className="app-offer"><span aria-hidden="true">◆</span><div><strong>Royal Gems & Real-Money Bundles</strong><p>Unavailable until secure payments, account recovery and store approvals are implemented. No purchase is charged here.</p></div><strong>NOT LIVE</strong></div>
-        <div className="app-offer"><span aria-hidden="true">♛</span><div><strong>Crew available for local coins</strong><p>Earn coins by playing and claim specialists in the Crew section.</p></div><button onClick={()=>onNavigate('cards')}>VIEW CREW</button></div>
-        <div className="app-row-muted"><span>Cosmetic skins, chests & advertisements</span><span>PLANNED</span></div>
+      {screen==='shop'&&<div className="app-stack">
+        <div className="app-market-hero">
+          <div className="app-market-icon" aria-hidden="true"><PirateIcon name="shop" size={45}/></div>
+          <div className="app-market-copy"><div className="app-kicker">THE PORT MARKET · LOCAL PREVIEW</div><h2>Port Market</h2>
+            <p>Recruit original crew with coins earned in naval battles. No cash purchases, gems or simulated stock.</p></div>
+          <div className="app-market-purse" aria-label={profile.coins+' local coins available'}><strong>{profile.coins}</strong><small>● COINS</small></div>
+        </div>
+        <section className="app-market-roster" aria-labelledby="app-market-title">
+          <div className="app-market-heading"><div><div className="app-kicker">AVAILABLE IN THIS PREVIEW</div><h3 id="app-market-title">Recruit your crew</h3></div>
+            <small>{profile.ownedCrew.length} / {CREW.length} COLLECTED</small></div>
+          <div className="app-market-list">{CREW.map(c=>{
+            const owned=profile.ownedCrew.includes(c.id),affordable=profile.coins>=c.cost;
+            return <article className={'app-market-card '+(owned?'is-owned':'')} key={c.id}>
+              <span className="app-market-portrait" aria-hidden="true">{c.symbol}</span>
+              <div className="app-market-card-info"><strong>{c.name}</strong><small>{owned?'IN YOUR CREW':'LOCAL RECRUIT'}</small>
+                <p>{c.role}</p>
+                <span className="app-market-price">{owned?'COLLECTED':c.cost+' ● LOCAL COINS'}</span>
+              </div>
+              <button type="button" disabled={owned||!affordable} aria-label={owned?c.name+' already collected':affordable?'Recruit '+c.name+' for '+c.cost+' local coins':'Need '+(c.cost-profile.coins)+' more local coins to recruit '+c.name}
+                onClick={()=>action(c.name+' recruited for '+c.cost+' local coins. Manage this card in Crew.',()=>onBuyCrew(c.id))}>
+                {owned?'OWNED':affordable?'RECRUIT':'LOCKED'}
+              </button>
+            </article>;
+          })}</div>
+          <p className="app-fine">Crew collection and coin spending are saved on this device. Crew abilities do not affect combat yet.</p>
+          <div className="app-market-actions"><button type="button" onClick={()=>onNavigate('battle')}>EARN COINS IN BATTLE</button><button type="button" onClick={()=>onNavigate('cards')}>MANAGE CREW</button></div>
+        </section>
+        <div className="app-offer app-market-pending"><span aria-hidden="true">◆</span><div><strong>Gems & real-money bundles</strong>
+          <p>Not live until secure payments, account recovery and store approvals exist. No real-money checkout is available.</p></div><strong>NOT LIVE</strong></div>
+        <div className="app-row-muted"><span>Cosmetic skins, treasure chests & advertisements</span><span>PLANNED</span></div>
       </div>}
       {screen==='missions'&&<div className="app-stack"><div className="app-kicker">DAILY PORT REWARD</div><h2>Captain's Orders</h2>
         <article className="app-daily"><span aria-hidden="true">🎁</span><div><strong>Daily Supply Chest</strong><p>UTC day · streak {profile.dailyStreak}/7 · local device only</p><small>Next claim earns {15+nextDailyDay*5} coins. Daily reset is at 00:00 UTC.</small></div>
@@ -113,6 +139,16 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
           ['DEFEATS',String(profile.losses)],['BATTLES',String(battlesPlayed(profile))],
           ['ACCURACY',profile.shots?Math.round(100*profile.hits/profile.shots)+'%':'—']
         ].map(([label,value])=><div key={label}><small>{label}</small><strong>{value}</strong></div>)}</div>
+        <section className="app-captain-route" aria-labelledby="app-captain-route-title">
+          <div className="app-captain-route-top"><div><div className="app-kicker">PERSONAL VOYAGE · LOCAL ONLY</div><h3 id="app-captain-route-title">Captain's milestones</h3></div>
+            <strong>{profile.wins} <small>VICTORIES</small></strong></div>
+          <div className="app-captain-route-track" role="progressbar" aria-label="Personal victory milestones" aria-valuemin={0} aria-valuemax={10} aria-valuenow={Math.min(profile.wins,10)}>
+            <span style={{width:Math.min(100,profile.wins*10)+'%'}}/></div>
+          <ol className="app-captain-route-steps">{[1,3,5,10].map(target=><li key={target} className={profile.wins>=target?'is-earned':''}>
+            <span aria-hidden="true">{profile.wins>=target?'✓':'◆'}</span><strong>{target} {target===1?'WIN':'WINS'}</strong>
+          </li>)}</ol>
+          <p className="app-fine">Personal milestones use completed battles on this device. These are not online ranks, leagues or prize claims.</p>
+        </section>
         <section className="app-battle-log" aria-labelledby="app-battle-log-title">
           <div className="app-battle-log-heading"><div><div className="app-kicker">CAPTAIN'S LOG · LOCAL ONLY</div><h3 id="app-battle-log-title">Recent battles</h3></div><small>{profile.battleLog.length} / 12 saved</small></div>
           {profile.battleLog.length===0?<p className="app-battle-empty">No completed battles recorded yet. Finish a naval battle to write your first entry.</p>:
