@@ -21,7 +21,7 @@ test('crew deck shows only actual owned/active captain with no invented bonuses'
  assert.match(html,/Captain Mara/);
  assert.match(html,/★ ACTIVE CAPTAIN/);
  assert.match(html,/1 \/ 3 OWNED/);
- assert.match(html,/Need 60 more coins to recruit Iron Jack/);
+ assert.match(html,/View Iron Jack, locked/);
  assert.match(html,/One active captain/);
  assert.match(html,/no combat bonuses yet/);
  assert.equal((html.match(/aria-pressed="/g)||[]).length,3);
