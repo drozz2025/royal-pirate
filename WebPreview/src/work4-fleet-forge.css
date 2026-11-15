@@ -138,3 +138,327 @@
 .w4-system-levels small{font:700 10px 'Barlow',sans-serif;color:#e6c994}
 .w4-mini-track{display:block;height:6px;background:#183b53;border-radius:6px;margin-top:5px;overflow:hidden}
 .w4-mini-track i{display:block;height:100%;background:linear-gradient(#c5e69b,#3e9c55)}
+
+
+/* WORK 4 · 15 NOV 2026 — major visual alignment with approved frames 03/04.
+   These overrides are limited to Fleet/Forge. All balances/levels remain real.
+   :has() affects only the app shell while one of our two screens is visible. */
+.app-sheet:has(.w4-screen){
+  background:radial-gradient(ellipse 110% 55% at 50% 20%,#2385b5 0%,#0d547d 32%,transparent 78%),
+    linear-gradient(165deg,#022f61,#051b38 65%,#07152b);
+}
+.app-sheet:has(.w4-screen) .app-sheet-header{
+  flex:0 0 125px;min-height:125px;max-height:125px;box-sizing:border-box;
+  position:relative;isolation:isolate;padding:0 9px;
+  background:radial-gradient(ellipse 55% 100% at 50% 0%,#1187cf88,transparent),
+    linear-gradient(180deg,#0657a0 0%,#10699c 48%,#0a3967 100%);
+  border:0;box-shadow:inset 0 -7px 12px #051c3d55;
+}
+.app-sheet:has(.w4-screen) .app-sheet-header::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:9px;pointer-events:none;
+  background:linear-gradient(transparent,#0c2b47cc)
+}
+.app-sheet:has(.w4-screen) .app-back{
+  position:absolute;left:10px;top:max(12px,env(safe-area-inset-top));z-index:3;
+  width:49px;height:49px;border-radius:50%;border:3px solid #f8d88f;
+  background:radial-gradient(circle at 32% 25%,#b68c63,#7b5035 49%,#25293e 55%,#0b2847 90%);
+  color:#fff8dc;font-size:35px;line-height:1;box-shadow:0 0 0 2px #754322,0 5px 8px #041e41a8,inset 0 3px #fff5c299;
+}
+.app-sheet:has(.w4-screen) .app-sheet-brand{
+  position:absolute;left:50%;top:max(0px,env(safe-area-inset-top));z-index:2;
+  transform:translateX(-50%);min-width:0;width:57%;height:110px;
+  display:flex;flex-direction:column;align-items:center;pointer-events:none;text-align:center;
+}
+.app-sheet:has(.w4-screen) .app-sheet-brand>small{
+  font-size:0;line-height:0;display:block;position:relative;width:100%;height:49px;overflow:visible;
+}
+.app-sheet:has(.w4-screen) .app-sheet-brand>small::after{
+  content:"ROYAL PIRATE";position:absolute;top:4px;left:50%;transform:translateX(-50%);
+  white-space:nowrap;font:900 clamp(21px,6.2vw,34px)/1 'Barlow Condensed',Georgia,serif;
+  letter-spacing:-.5px;color:#ffe79b;-webkit-text-stroke:.85px #6a3417;
+  text-shadow:0 2px #3e261c,0 4px #201a22,0 5px 7px #021d3c;
+}
+.app-sheet:has(.w4-screen) .app-sheet-brand h1{
+  position:absolute;top:55px;left:50%;transform:translateX(-50%);
+  width:max-content;min-width:152px;max-width:83vw;min-height:43px;
+  margin:0;padding:7px 25px;border:3px solid #e7bd72;border-radius:17px 17px 12px 12px;
+  background:linear-gradient(180deg,#7c4d28 0%,#1a293a 23%,#0d2a45 75%,#7b481e 100%);
+  box-shadow:0 3px #412917,0 5px 8px #031a2eb5,inset 0 2px #ffe9a66b;
+  font-size:0;line-height:1;color:transparent;display:grid;place-items:center;
+}
+.app-sheet:has(.w4-screen) .app-sheet-brand h1 .app-page-glyph{display:none}
+.app-sheet:has(.w4-fleet) .app-sheet-brand h1::after{content:"FROTA"}
+.app-sheet:has(.w4-forge) .app-sheet-brand h1::after{content:"MELHORIAS"}
+.app-sheet:has(.w4-screen) .app-sheet-brand h1::after{
+  display:block;color:#fff5cb;font:900 clamp(22px,6.7vw,31px)/1 'Barlow Condensed',system-ui,sans-serif;
+  text-shadow:0 2px #030f24,0 0 3px #c08549;letter-spacing:.7px;
+}
+.app-sheet:has(.w4-screen) .app-wallet{
+  position:absolute;top:max(13px,env(safe-area-inset-top));right:8px;z-index:3;min-width:85px;max-width:29%;
+  min-height:40px;padding:5px 8px;border:2px solid #dcb86f;border-radius:13px;
+  background:linear-gradient(175deg,#164f78,#092b52);box-shadow:0 3px 5px #07203caa,inset 0 2px #e3f5ff33;
+}
+.app-sheet:has(.w4-screen) .app-wallet span{color:#ffd34e;text-shadow:0 1px #824717;font-size:20px}
+.app-sheet:has(.w4-screen) .app-wallet strong{font:900 clamp(17px,4vw,23px)/1 'Barlow Condensed',sans-serif}
+.app-sheet:has(.w4-screen) .app-wallet small{font-size:8px}
+.app-sheet:has(.w4-screen) .app-shortcuts{display:none}
+.app-sheet:has(.w4-screen) .app-sheet-content{
+  padding:1px max(8px,calc((100% - 665px)/2)) 18px;scrollbar-color:#d7a258 #082944;
+}
+.app-sheet:has(.w4-screen) .app-dock{
+  min-height:79px;gap:1px;padding:4px 5px max(5px,env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,#346996,#15375e 20%,#0a294e 67%,#051a36);
+  border-top:3px solid #ecc073;box-shadow:0 -4px 16px #03172f9e,inset 0 3px #fff0ac2e;
+}
+.app-sheet:has(.w4-screen) .app-dock button{
+  gap:1px;border:2px solid #ac864d88;border-radius:12px 12px 7px 7px;
+  background:linear-gradient(180deg,#244b76,#092948 85%);color:#ffedd4;
+  box-shadow:inset 0 2px #91bcd532;
+}
+.app-sheet:has(.w4-screen) .app-dock .app-tab-glyph{
+  min-height:33px;width:35px;height:35px;border-radius:50%;
+  background:radial-gradient(circle at 32% 30%,#39759f,#133452 75%);
+  border:1px solid #d0ad79b3;
+}
+.app-sheet:has(.w4-screen) .app-dock button .app-tab-glyph svg{
+  width:27px;height:27px;filter:drop-shadow(0 2px 1px #061c2d);
+}
+.app-sheet:has(.w4-screen) .app-dock button:nth-child(1) svg{color:#fff0bf}
+.app-sheet:has(.w4-screen) .app-dock button:nth-child(2) svg{color:#68d6fb}
+.app-sheet:has(.w4-screen) .app-dock button:nth-child(3) svg{color:#e4a8fd}
+.app-sheet:has(.w4-screen) .app-dock button:nth-child(4) svg{color:#ffcf60}
+.app-sheet:has(.w4-screen) .app-dock button:nth-child(5) svg{color:#ffe37e}
+.app-sheet:has(.w4-screen) .app-dock button strong{
+  font:900 clamp(11px,3.1vw,16px)/1 'Barlow Condensed',sans-serif;letter-spacing:.3px;
+  text-shadow:0 2px 2px #031b34;
+}
+.app-sheet:has(.w4-screen) .app-dock button[aria-current=page]{
+  background:linear-gradient(#fff0b0,#d3a14f 8%,#325c85 18%,#0c2d52);
+  border:3px solid #ffd778;color:#fff5df;box-shadow:0 0 11px #ffe18a88,inset 0 2px #fff4a7ad;
+  margin-top:-6px;
+}
+.app-sheet:has(.w4-screen) .app-dock button[aria-current=page] .app-tab-glyph{
+  border-color:#ffdc80;background:radial-gradient(circle at 35% 25%,#4f99b4,#163d5d 80%);
+}
+.app-sheet:has(.w4-screen) .app-dock button[aria-current=page] svg{color:#ffe1a1}
+
+/* Shared gold/navy game-control language within WORK 4 only. */
+.w4-screen{max-width:660px;gap:7px;text-shadow:0 2px 3px #061b37b5}
+.w4-screen .w4-title{display:none}
+.w4-screen .w4-tabs{padding:0 3px 4px;gap:4px}
+.w4-screen .w4-tabs button{
+  min-height:44px;padding:5px 3px;border:2px solid #d5a66c;border-radius:10px;
+  background:linear-gradient(180deg,#346483,#163955 28%,#0a263c 85%);
+  color:#fff8eb;font:900 clamp(12px,3.25vw,16px)/.99 'Barlow Condensed',sans-serif;
+  letter-spacing:.05px;text-shadow:0 2px #020f29;
+  box-shadow:0 3px 0 #583a21,inset 0 2px #cde9ed55;
+}
+.w4-screen .w4-tabs button[aria-selected=true]{
+  border-color:#fff0ad;background:linear-gradient(180deg,#42add8,#076f98 50%,#064f75);
+  box-shadow:0 0 0 2px #815627,0 3px #46341d,inset 0 2px #d1ffffa8,0 0 14px #6beeff5e;
+  color:white;
+}
+.w4-screen .w4-fleet-tabs{grid-template-columns:1.28fr 1fr 1.1fr}
+.w4-screen .w4-forge-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}
+.w4-screen .w4-harbour-stage,.w4-screen .w4-forge-stage{
+  border:3px solid #e6b872;border-radius:17px;overflow:hidden;
+  box-shadow:0 0 0 2px #442b1d,0 6px 13px #051b30bc,inset 0 3px #fff6b27b;
+}
+
+/* Screen 03: bright tropical ocean, selected vessel dominating the centre,
+   actual progression at right, four compact ship cards below. */
+.w4-fleet .w4-harbour-stage{
+  min-height:clamp(238px,34dvh,330px);
+  background:radial-gradient(ellipse 65% 37% at 57% 17%,#a1effb9e,transparent 93%),
+    radial-gradient(ellipse 28% 20% at 5% 59%,#377f5a 0%,transparent 98%),
+    linear-gradient(180deg,#078ec6 0%,#158bb8 30%,#096a9f 48%,#06a9c1 56%,#0b85a9 75%,#064a79 100%);
+}
+.w4-fleet .w4-harbour-stage::before{
+  background:radial-gradient(ellipse 65% 40% at 41% 7%,#ffffff75,transparent 68%),
+  radial-gradient(ellipse 38% 12% at 78% 62%,#d2fbff58,transparent);
+  inset:0;opacity:1;
+}
+.w4-fleet .w4-harbour-stage::after{
+  content:"";position:absolute;z-index:0;inset:auto 0 0;height:34%;
+  background:repeating-linear-gradient(-5deg,transparent 0 19px,#8cf3f94a 20px,#067b9e20 24px);
+  pointer-events:none;
+}
+.w4-fleet .w4-island{opacity:.94;bottom:29%;height:46%;width:31%;
+  background:radial-gradient(ellipse at 48% 20%,#549b50 0%,#255b3e 34%,transparent 35%),
+    linear-gradient(160deg,#57834c 0%,#175139 42%,#71553e 43%,#978261 76%,transparent 77%)}
+.w4-fleet .w4-island-left{left:-10%}
+.w4-fleet .w4-island-right{right:-21%}
+.w4-fleet .w4-harbour-stage>.w4-ship-art{
+  position:absolute;z-index:1;left:-6%;bottom:0;display:block;margin:0;
+  width:80%;max-width:none;height:auto;min-height:0;
+  filter:drop-shadow(0 9px 7px #063a63c9) drop-shadow(0 0 7px #ffd98c52);
+  transform:scale(1.09) rotate(-1deg);transform-origin:40% 75%;
+}
+.w4-fleet .w4-stage-label{
+  position:absolute;right:2.5%;top:10%;z-index:2;display:flex;flex-direction:column;align-items:flex-start;
+  width:39%;max-width:none;min-width:0;gap:3px;padding:9px 8px 10px;text-align:left;
+  background:linear-gradient(165deg,#0d3d63e8,#092440ee);border:2px solid #d5aa70;
+  border-radius:13px;box-shadow:inset 0 1px #ffefb95e,0 5px 10px #07213e99;
+}
+.w4-fleet .w4-stage-label>span{font:900 10px/1 'Barlow Condensed',sans-serif;color:#ffd67e}
+.w4-fleet .w4-stage-label>strong{
+  font:900 clamp(19px,5.4vw,29px)/.93 'Barlow Condensed',sans-serif;color:#fff0b2;
+  text-shadow:0 3px #101c34;overflow-wrap:break-word;
+}
+.w4-fleet .w4-stage-label>small{font:700 10px/1.3 'Barlow',sans-serif;color:#d1edf5}
+.w4-fleet .w4-stage-stats{display:grid;grid-template-columns:1fr;gap:3px;width:100%;margin-top:3px}
+.w4-fleet .w4-stage-stats>span{display:flex;justify-content:space-between;align-items:center;gap:4px;
+  border-bottom:1px solid #a8d1e444;padding:2px 0;color:#ffe4a7}
+.w4-fleet .w4-stage-stats>span>strong{min-width:0;font:800 12px/1 'Barlow Condensed',sans-serif}
+.w4-fleet .w4-stage-stats em{font:900 12px/1 'Barlow Condensed',sans-serif;color:#fff;font-style:normal;white-space:nowrap}
+.w4-fleet .w4-stage-label>b{align-self:flex-end;margin-top:4px;padding:3px 13px;border-radius:8px;
+  border:2px solid #beec7e;background:linear-gradient(#47d34e,#147f33);
+  color:#fff;font:900 15px 'Barlow Condensed',sans-serif;box-shadow:0 2px #0b451e}
+.w4-fleet .w4-fleet-state{
+  padding:7px 8px;gap:6px;border:2px solid #b79564;border-radius:10px;
+  background:linear-gradient(#164266,#092b4f)
+}
+.w4-fleet .w4-fleet-state:has(.w4-fleet-stats){border:0;padding:4px;background:none}
+.w4-fleet .w4-fleet-stats{display:none}
+.w4-fleet .w4-action-pair button{
+  min-height:46px;border:2px solid #e0b874;border-radius:11px;
+  background:linear-gradient(#25618b,#0e3556);box-shadow:0 3px #06243d,inset 0 2px #aee2ed5e;
+  color:#fff1d5;font:900 14px/1 'Barlow Condensed',sans-serif;
+}
+.w4-fleet .w4-action-pair button.w4-primary{
+  background:linear-gradient(180deg,#ffdc76,#ce9436 70%,#a76729);
+  color:#30201a;text-shadow:0 1px #ffeda1;box-shadow:0 3px #734522,inset 0 2px #fff4c3a8;
+}
+.w4-fleet .w4-cards-caption{padding:0 5px;align-items:baseline;font:900 17px 'Barlow Condensed',sans-serif;
+  color:#ffe3a2;text-shadow:0 3px #03233c}
+.w4-fleet .w4-ship-roster{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.w4-fleet .w4-ship-slot{
+  position:relative;min-height:111px;padding:4px 2px 6px;justify-content:flex-end;overflow:hidden;
+  border:2px solid #c4a16e;border-radius:12px;color:#ffedc6;
+  background:radial-gradient(ellipse 120% 45% at 50% 17%,#2e95b5,#11416f 65%,#051d3c);
+  box-shadow:inset 0 2px #a9e9fb7a,0 3px #092241;
+}
+.w4-fleet .w4-ship-slot.is-active{
+  border:3px solid #ffe69f;background:radial-gradient(ellipse at 35% 23%,#41b3d0,#11466f 67%,#061e39);
+  box-shadow:0 0 0 2px #c18b30,0 0 15px #ffd858a8,inset 0 2px #fff9a4a3;
+}
+.w4-fleet .w4-ship-slot .w4-slot-art{height:64px;display:block;width:100%}
+.w4-fleet .w4-ship-small{transform:translate(-17%,-20px) scale(.92);width:135px;height:97px}
+.w4-fleet .w4-slot-unavailable{opacity:.48;filter:grayscale(.85) brightness(.78)}
+.w4-fleet .w4-ship-slot.is-pending{opacity:.8;border-style:solid}
+.w4-fleet .w4-ship-slot.is-pending::before{
+  content:"🔒";position:absolute;top:3px;right:5px;font-size:13px;z-index:2;filter:drop-shadow(0 2px #10243f)
+}
+.w4-fleet .w4-ship-slot strong{font:900 clamp(10px,2.8vw,14px)/1 'Barlow Condensed',sans-serif;z-index:2;
+  color:#fff0c8;text-shadow:0 2px #02172a}
+.w4-fleet .w4-ship-slot small{font:800 clamp(8px,2vw,10px)/1.16 'Barlow',sans-serif;
+  color:#c0e9c8;z-index:2}
+.w4-fleet .w4-ship-slot.is-pending small{color:#ced6e3}
+
+/* Screen 04: large forged cannon hero and warm workshop instead of a second
+   tiny schematic; its figures are still exclusively local progress levels. */
+.w4-forge .w4-forge-stage{
+  min-height:clamp(215px,29dvh,285px);
+  background:radial-gradient(ellipse 60% 70% at 28% 75%,#ffa9458e,transparent 72%),
+    linear-gradient(130deg,#352d31 0%,#63513e 31%,#3c3d3d 42%,#122e46 68%,#071d36 100%);
+}
+.w4-forge .w4-forge-stage::before{
+  inset:0;z-index:-1;opacity:.65;
+  background:linear-gradient(120deg,transparent 0 18%,#c48b4d80 18% 19%,transparent 19% 41%,
+    #5e3c29af 41% 44%,transparent 44% 68%,#c59c6580 68% 70%,transparent 70%),
+    repeating-linear-gradient(0deg,transparent 0 41px,#e1a46d35 42px 44px),
+    repeating-linear-gradient(90deg,transparent 0 70px,#0c172c78 71px 77px);
+}
+.w4-forge .w4-forge-glow{
+  left:-8%;bottom:-25%;width:75%;height:66%;inset:auto auto -25% -8%;
+  background:radial-gradient(ellipse,#ff9f2eaa 0%,#ff6a2044 36%,transparent 72%);
+}
+.w4-forge .w4-cannon-art{
+  position:absolute;left:-10%;bottom:-2%;z-index:1;width:83%;height:auto;max-height:105%;
+  filter:drop-shadow(0 10px 6px #180e0ecb) drop-shadow(0 0 12px #ffc45e5c);
+}
+.w4-forge .w4-forge-stage>.w4-ship-art{
+  position:absolute;left:-7%;bottom:-2%;z-index:1;width:76%;min-height:0;height:auto;margin:0;
+  filter:drop-shadow(0 9px 7px #100e14d9);
+}
+.w4-forge .w4-forge-description{
+  position:absolute;z-index:2;right:2%;top:10%;width:40%;max-width:none;padding:10px 7px;
+  background:linear-gradient(145deg,#102c47ed,#071c33f2);border:2px solid #d5af78;
+  border-radius:12px;box-shadow:inset 0 2px #ffedab45,0 4px 10px #090f1fa8;
+}
+.w4-forge .w4-forge-description span{font:800 10px/1.2 'Barlow',sans-serif;color:#ffcc78}
+.w4-forge .w4-forge-description h3{font:900 clamp(21px,5.8vw,28px)/1 'Barlow Condensed',sans-serif;
+  margin:7px 0;color:#fff1bc;text-shadow:0 2px #01142d}
+.w4-forge .w4-forge-description strong{font:900 17px 'Barlow Condensed',sans-serif;color:#fffdf0}
+.w4-forge .w4-forge-description em{color:#9bfb79;font-style:normal}
+.w4-forge .w4-attributes,.w4-forge .w4-materials{
+  padding:9px;border:2px solid #d1a667;border-radius:12px;
+  background:linear-gradient(170deg,#1c4564,#0a2844);
+  box-shadow:inset 0 2px #a8dbf03d,0 3px #092137;
+}
+.w4-forge .w4-attributes h3,.w4-forge .w4-materials h3{
+  font:900 17px/1 'Barlow Condensed',sans-serif;letter-spacing:.25px;color:#ffe6ab;margin:0 0 8px;
+}
+.w4-forge .w4-level-track{gap:4px}
+.w4-forge .w4-level-track span{height:14px;background:linear-gradient(#265273,#092c47);border:1px solid #94b1bd}
+.w4-forge .w4-level-track span.is-filled{
+  background:linear-gradient(#b4f488,#40b356 55%,#1a7638);border-color:#dcffa4;box-shadow:inset 0 2px #f1ffc799
+}
+.w4-forge .w4-system-levels{gap:5px;margin-top:7px}
+.w4-forge .w4-system-levels>div{
+  background:linear-gradient(#27536e,#0c324f);border:1px solid #9bb6b9;
+  box-shadow:inset 0 1px #c3e5e344;padding:5px;border-radius:9px;
+}
+.w4-forge .w4-system-levels strong{font:900 14px 'Barlow Condensed',sans-serif}
+.w4-forge .w4-system-levels small{font:800 10px 'Barlow Condensed',sans-serif;color:#ffda8b}
+.w4-forge .w4-attributes p,.w4-forge .w4-materials p{font:600 10px/1.35 'Barlow',sans-serif;margin:6px 0 0}
+.w4-forge .w4-resource-grid>div{
+  padding:5px 3px;background:linear-gradient(#173f5e,#0a2b48);border:1px solid #ad9067;
+  box-shadow:inset 0 1px #d9eeec33;
+}
+.w4-forge .w4-resource-grid span{color:#ffdb7c;filter:drop-shadow(0 2px #693d24)}
+.w4-forge .w4-resource-grid small{font:800 9px/1.15 'Barlow',sans-serif;color:#d3e5f3}
+.w4-forge .w4-resource-grid strong{color:#fff2bd;font:900 18px 'Barlow Condensed',sans-serif}
+.w4-forge .w4-improve-button{
+  width:min(83%,380px);min-height:57px;margin:0 auto;
+  border:4px solid #fbe097!important;border-radius:13px;
+  background:linear-gradient(#b4ff74 0%,#48ce32 18%,#0c8f32 74%,#06682c);
+  color:#fffbed;font:900 24px/1 'Barlow Condensed',sans-serif;
+  box-shadow:0 0 0 2px #53351e,0 5px #492c1f,inset 0 3px #e5ffc1a8,0 9px 15px #030e1e9c;
+  text-shadow:0 2px #07541d;
+}
+.w4-forge .w4-improve-button:disabled{background:linear-gradient(#82958a,#34545a);box-shadow:0 3px #463526}
+.w4-forge .w4-action-pair button{min-height:39px}
+
+/* Small iPhones: protect labels, tap targets and horizontal layout. */
+@media(max-width:390px){
+ .app-sheet:has(.w4-screen) .app-sheet-header{flex-basis:116px;min-height:116px;max-height:116px}
+ .app-sheet:has(.w4-screen) .app-sheet-brand h1{top:54px;padding:6px 22px}
+ .app-sheet:has(.w4-screen) .app-wallet{max-width:30%;min-width:72px;padding:5px}
+ .app-sheet:has(.w4-screen) .app-wallet small{display:none}
+ .w4-fleet .w4-harbour-stage{min-height:224px}
+ .w4-fleet .w4-harbour-stage>.w4-ship-art{width:85%;left:-10%}
+ .w4-fleet .w4-stage-label{top:7%;right:1.5%;width:42%;padding:7px 5px}
+ .w4-fleet .w4-stage-label>strong{font-size:19px}
+ .w4-fleet .w4-stage-stats em,.w4-fleet .w4-stage-stats>span>strong{font-size:11px}
+ .w4-fleet .w4-ship-slot{min-height:98px}
+ .w4-fleet .w4-ship-slot .w4-slot-art{height:55px}
+ .w4-forge .w4-forge-stage{min-height:211px}
+ .w4-forge .w4-forge-description{width:43%;padding:7px 5px}
+ .w4-forge .w4-cannon-art{left:-14%;width:91%}
+ .w4-forge .w4-improve-button{width:94%;font-size:22px}
+}
+@media(max-width:345px){
+ .app-sheet:has(.w4-screen) .app-sheet-brand>small::after{font-size:20px}
+ .app-sheet:has(.w4-screen) .app-back{width:42px;height:42px;left:5px}
+ .app-sheet:has(.w4-screen) .app-wallet{min-width:69px;right:4px}
+ .w4-fleet .w4-stage-label>span{font-size:9px}
+ .w4-fleet .w4-stage-label>small{font-size:9px}
+ .w4-fleet .w4-stage-stats{gap:1px}
+ .w4-fleet .w4-stage-label>b{font-size:12px;padding:2px 9px}
+ .w4-fleet .w4-ship-slot strong{font-size:10px}
+ .w4-screen .w4-forge-tabs button{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+ .w4-fleet .w4-harbour-stage>.w4-ship-art,.w4-forge .w4-cannon-art{transition:none;animation:none}
+}
