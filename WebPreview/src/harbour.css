@@ -777,8 +777,8 @@ body:has(.harbour-screen:not([aria-hidden="true"])) .rp-version{display:none}
 .harbour-battle-button .porto-art{
   width:clamp(39px,10vw,56px);height:clamp(39px,10vw,56px);
 }
+ .harbour-screen{--porto-nav-height:clamp(82px,11dvh,112px)}
 .harbour-nav{
-  --porto-nav-height:clamp(82px,11dvh,112px);
   border-top:4px solid #ffdd88;
   background:linear-gradient(180deg,#5b7a9a 0%,#1d4b7d 9%,#0d2e55 56%,#061a36 100%);
   box-shadow:0 -4px 0 #664a27,0 -8px 16px #052d4fb0,
