@@ -362,3 +362,193 @@
   .app-stack:has(> .w8-tabs)>.app-stat-grid{gap:5px}
   .app-stack:has(> .w8-tabs)>.app-stat-grid>div{min-height:72px}
 }
+
+
+/* WORK 8 · 15 Nov · Full-width illustrated sea rather than another boxed icon.
+   Keeps all data/UI interactive. No generated rankings or static screen captures. */
+.w8-screen .w8-hero{isolation:isolate}
+.w8-seascape{
+  position:absolute;inset:0;width:100%;height:100%;z-index:0;
+  pointer-events:none;opacity:.8;filter:saturate(1.18)
+}
+.w8-screen .w8-hero::before{
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,#071d39b5 0%,#081f3dbd 30%,#0726448c 67%,#081e3699 100%)
+}
+.w8-screen .w8-hero>div{position:relative;z-index:2}
+.w8-screen .w8-hero-icon{
+  flex-basis:94px;width:94px;height:100px;
+  background:radial-gradient(ellipse at center,#d59b3d55,transparent 68%)
+}
+.w8-screen .w8-hero-icon .w8-art{
+  width:106px;height:106px;
+  filter:drop-shadow(0 4px 3px #061020) drop-shadow(0 0 9px #fff0ad77)
+}
+.w8-hero-live{
+  display:inline-flex;align-items:center;margin-top:8px;
+  padding:5px 9px;border:1px solid #f5d490aa;border-radius:30px;
+  background:linear-gradient(180deg,#3e6b78,#153d59);
+  box-shadow:inset 0 1px #fbf1bf55;
+  font:900 10px/1.15 'Barlow Condensed',sans-serif;
+  letter-spacing:.8px;color:#ffe2a1;white-space:normal
+}
+.w8-missions-scene{
+  background:
+    radial-gradient(ellipse 80% 22% at 50% 2%,#2495ad55,transparent),
+    radial-gradient(ellipse 110% 65% at 50% 87%,#11517966,transparent),
+    linear-gradient(180deg,#061e3b18,#082a4869)
+}
+.w8-missions-scene .w8-hero{
+  min-height:118px;padding:10px 10px 11px;
+  border-radius:16px 16px 11px 11px
+}
+.w8-missions-scene .w8-hero h2{
+  font-size:clamp(25px,7vw,34px)!important
+}
+.w8-missions-scene .w8-hero p{
+  font-size:11px;line-height:1.3
+}
+.w8-missions-scene .w8-daily{
+  min-height:101px;padding:9px 9px 9px 8px;
+  border-radius:13px;
+  background:radial-gradient(ellipse 40% 80% at 18% 25%,#e5a34c80,transparent),
+    linear-gradient(105deg,#7e4231 0%,#314f60 49%,#0e2e4f 100%)
+}
+.w8-missions-scene .w8-daily-orb{
+  flex-basis:71px;height:73px;
+  background:radial-gradient(ellipse,#ffce8a77,transparent 72%)
+}
+.w8-missions-scene .w8-daily-orb .w8-art{width:77px;height:77px}
+.w8-missions-scene .w8-daily-copy strong{
+  font-size:clamp(17px,4.5vw,22px);line-height:.98
+}
+.w8-missions-scene .w8-daily-copy small{
+  font-size:10px;line-height:1.23
+}
+.w8-missions-scene .w8-daily>button{
+  min-width:62px;min-height:39px;font-size:11px
+}
+.w8-missions-scene .w8-calendar{
+  padding:10px 7px 9px;
+  background:
+    linear-gradient(135deg,#2c6482,#153e64 42%,#0b2a4d)
+}
+.w8-missions-scene .w8-days{gap:3px}
+.w8-missions-scene .w8-days li{
+  min-height:66px;gap:4px;
+  padding:5px 0 3px;
+  border-color:#bc945c;background:linear-gradient(#2e647b,#113354 69%,#0a2444)
+}
+.w8-missions-scene .w8-days li .w8-day-token{
+  width:26px;height:26px;border-radius:50%;
+  background:radial-gradient(circle at 36% 25%,#ffe8a4,#d3983c 55%,#775029);
+  border:2px solid #ffe4a6;
+  box-shadow:inset 0 1px #fff5cb,0 2px #4e331d;
+  color:#4b2d20;font:900 17px/1 'Barlow Condensed',sans-serif;
+  text-shadow:none
+}
+.w8-missions-scene .w8-days .app-week-day.is-claimed .w8-day-token{
+  background:radial-gradient(circle at 35% 25%,#a1ffe1,#3dba87 70%,#126a56);
+  border-color:#a0ffe0;color:#164639
+}
+.w8-missions-scene .w8-days .app-week-day.is-next{
+  background:linear-gradient(#b37c3f,#654329);
+  box-shadow:0 0 0 1px #ffe7a9,0 0 11px #f4c05766
+}
+.w8-missions-scene .w8-calendar>p{margin-top:7px;font-size:10px}
+.w8-missions-scene .w8-mission{
+  min-height:70px;gap:8px;padding:8px 8px 8px 7px;
+  border-radius:11px;background:
+    radial-gradient(ellipse at 0 50%,#337c9277,transparent 54%),
+    linear-gradient(125deg,#28587b,#102d50)
+}
+.w8-missions-scene .w8-mission-icon{
+  flex-basis:54px;height:54px;
+  background:radial-gradient(ellipse,#f0bd624d,transparent 75%);
+  border:0;box-shadow:none
+}
+.w8-missions-scene .w8-mission-icon .w8-art{
+  width:56px;height:56px;filter:drop-shadow(0 3px 2px #06172f)
+}
+.w8-missions-scene .w8-mission-main>strong{
+  font-size:clamp(15px,4.2vw,19px);line-height:1
+}
+.w8-missions-scene .w8-mission-main>small{
+  font-size:10px;margin:5px 0 6px
+}
+.w8-missions-scene .w8-progress{
+  height:12px;border:2px solid #8c6341;
+  background:linear-gradient(#031c3b,#113655);
+  box-shadow:0 1px #9dcbda44
+}
+.w8-missions-scene .w8-progress>span{
+  background:linear-gradient(180deg,#d8ffb7,#40bf91 46%,#167b80);
+  box-shadow:inset 0 2px #f8ffdbaa
+}
+.w8-missions-scene .w8-mission>button{
+  min-width:63px;min-height:39px;font-size:11px
+}
+.w8-missions-scene .w8-section-heading h3{
+  letter-spacing:.45px
+}
+.w8-missions-scene .w8-secondary-cta{
+  min-height:45px;font:900 16px/1 'Barlow Condensed',sans-serif;
+  background:linear-gradient(180deg,#ffc193,#e75a41 55%,#ac302f);
+  border-color:#ffdea1;color:#fff4d1;text-shadow:0 2px #792727;
+  box-shadow:inset 0 2px #ffe4b0,0 4px #691e28
+}
+.w8-ranking-scene .w8-rank-hero{
+  min-height:142px
+}
+.w8-ranking-scene .w8-medal-card{
+  overflow:hidden;isolation:isolate;
+  background:radial-gradient(ellipse at 5% 45%,#e4a54d6b,transparent 52%),
+    linear-gradient(118deg,#255b77,#102c50 68%,#081d39)
+}
+.w8-ranking-scene .w8-medal-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:47%;z-index:-1;
+  background:repeating-conic-gradient(from 8deg at 42% 50%,#ffe8a42a 0deg 7deg,transparent 7deg 24deg);
+  opacity:.7
+}
+.w8-ranking-scene .w8-medal-art .w8-art{
+  filter:drop-shadow(0 6px 3px #06172a) drop-shadow(0 0 9px #ffd47d89)
+}
+.w8-ranking-scene .w8-stat-row>div:nth-child(1){
+  background:linear-gradient(#397d9d,#155078 50%,#0b2f57)
+}
+.w8-ranking-scene .w8-stat-row>div:nth-child(2){
+  background:linear-gradient(#77547b,#3c3a67 50%,#1a2e51)
+}
+.w8-ranking-scene .w8-stat-row>div:nth-child(3){
+  background:linear-gradient(#2b8c84,#175e6d 50%,#0d3653)
+}
+.w8-ranking-scene .w8-honesty{
+  position:relative;padding:16px 13px;
+  border-color:#9b9eb4;
+  background:linear-gradient(120deg,#1e526c,#0b2d4d)
+}
+.w8-ranking-scene .w8-honesty::after{
+  content:'OFFLINE';position:absolute;right:9px;top:-9px;
+  padding:3px 8px;border-radius:20px;
+  background:#173654;border:1px solid #cba96c;
+  color:#ffd99b;font:900 9px/1 'Barlow',sans-serif;letter-spacing:1px
+}
+.w8-screen button:focus-visible{
+  outline:3px solid #82e5ff;outline-offset:3px
+}
+@media(max-width:390px){
+  .w8-missions-scene{gap:9px;padding:3px 2px 10px}
+  .w8-missions-scene .w8-hero{min-height:111px;padding:8px}
+  .w8-missions-scene .w8-hero-icon{flex-basis:79px;width:79px;height:82px}
+  .w8-missions-scene .w8-hero-icon .w8-art{width:86px;height:86px}
+  .w8-missions-scene .w8-daily-orb{flex-basis:63px;height:69px}
+  .w8-missions-scene .w8-daily-orb .w8-art{width:68px;height:68px}
+  .w8-missions-scene .w8-hero-live{font-size:9px;padding:4px 7px}
+  .w8-missions-scene .w8-daily-copy{gap:4px}
+  .w8-missions-scene .w8-days li{min-height:62px}
+  .w8-missions-scene .w8-days li .w8-day-token{width:24px;height:24px}
+  .w8-missions-scene .w8-mission-icon{flex-basis:45px}
+  .w8-missions-scene .w8-mission-icon .w8-art{width:49px;height:49px}
+  .w8-ranking-scene .w8-hero-icon{flex-basis:83px;width:83px;height:88px}
+  .w8-ranking-scene .w8-hero-icon .w8-art{width:92px;height:92px}
+}
