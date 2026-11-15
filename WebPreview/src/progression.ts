@@ -93,10 +93,15 @@ export function canClaimDaily(p:LocalProfile,now:number):boolean {
   if(!Number.isFinite(now)||now<=0)return false;
   return !p.lastDailyDay||utcDay(now)>p.lastDailyDay;
 }
+/** Next eligible consecutive UTC claim; expired streaks start over at day one. */
+export function nextDailyStreak(p:LocalProfile,now:number):number {
+  if(!Number.isFinite(now)||now<=0)return 1;
+  const today=utcDay(now),yesterday=utcDay(now-86400000);
+  return p.lastDailyDay===today||p.lastDailyDay===yesterday?Math.min(7,p.dailyStreak+1):1;
+}
 export function claimDaily(p:LocalProfile,now:number):LocalProfile {
   if(!canClaimDaily(p,now))return p;
-  const today=utcDay(now),yesterday=utcDay(now-86400000);
-  const streak=p.lastDailyDay===yesterday?Math.min(7,p.dailyStreak+1):1;
+  const today=utcDay(now),streak=nextDailyStreak(p,now);
   return {...p,lastDailyDay:today,dailyStreak:streak,coins:p.coins+15+streak*5};
 }
 
