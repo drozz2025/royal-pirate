@@ -117,6 +117,26 @@ export class OceanScene {
       // A small rail reinforces the silhouette without introducing physics colliders.
       const rail=new T.Mesh(railGeo,postMat);rail.rotation.x=Math.PI/2;rail.position.set(x+side*1.48,1.1,z+1.85);this.harbourDock.add(rail);
     }
+    // Treasure chest anchored in world space on the left jetty, not a floating HUD badge.
+    const chest=new T.Group();
+    chest.position.set(SHIPS.player.x-9.2,.49,SHIPS.player.z+7.5);
+    const chestTimber=new T.MeshStandardMaterial({color:'#85411e',roughness:.8});
+    const chestLid=new T.MeshStandardMaterial({color:'#b36b31',roughness:.68});
+    const chestGold=new T.MeshStandardMaterial({color:'#f0be58',metalness:.62,roughness:.35});
+    const chestLock=new T.MeshStandardMaterial({color:'#5c351a',metalness:.22,roughness:.6});
+    function chestPart(geometry:T.BufferGeometry,material:T.Material,x:number,y:number,z:number){
+      const part=new T.Mesh(geometry,material);part.position.set(x,y,z);chest.add(part);return part;
+    }
+    chestPart(new T.BoxGeometry(2.05,.85,1.24),chestTimber,0,.44,0);
+    chestPart(new T.BoxGeometry(2.2,.34,1.36),chestLid,0,1.02,0);
+    for(const x of [-.73,.73]){
+      chestPart(new T.BoxGeometry(.15,1.25,1.43),chestGold,x,.66,0);
+      chestPart(new T.BoxGeometry(.24,.20,1.42),chestGold,x,1.14,0);
+    }
+    chestPart(new T.BoxGeometry(2.18,.13,1.36),chestGold,0,.13,0);
+    chestPart(new T.BoxGeometry(.37,.43,.12),chestGold,0,.79,.72);
+    chestPart(new T.BoxGeometry(.16,.22,.15),chestLock,0,.76,.81);
+    this.harbourDock.add(chest);
     this.harbourDock.visible=false;
   }
   /** Separate original low-poly town, palms and striped beacon, visible only in Porto.
@@ -134,7 +154,7 @@ export class OceanScene {
     const seaMat=new T.MeshStandardMaterial({color:'#fce8b5',emissive:'#f5d38d',emissiveIntensity:.3});
     const box=new T.BoxGeometry(1,1,1),isle=new T.IcosahedronGeometry(1,1);
     // City and hills behind the vessel: avoid occluding the foreground 3D hull.
-    for(const [side,dx,dz] of [[-1,-8,-27],[1,10,-33]] as const){
+    for(const [side,dx,dz] of [[-1,-8,-27],[1,25,-11]] as const){
       const x=ship.x+dx,z=ship.z+dz;
       const beach=new T.Mesh(isle,sand);beach.scale.set(7,2,4.5);beach.position.set(x,-.6,z);port.add(beach);
       const cliff=new T.Mesh(isle,stone);cliff.scale.set(6.2,4.8,4);cliff.position.set(x,1.1,z-1.2);port.add(cliff);
@@ -220,8 +240,8 @@ export class OceanScene {
     // Sunlit whitewashed houses fill the coast, with readable coloured windows.
     const houses:[number,number,number,number][]=[
       [-21,-25,3.0,2.6],[-19,-27,3.8,2.2],[-11,-27,4.2,2.9],
-      [-7,-32,2.8,2.5],[14,-33,3.1,2.9],[19,-34,4.3,3.2],
-      [23,-36,3.6,2.8],[17,-29,2.5,2.4]
+      [-7,-32,2.8,2.5],[22,-13,3.1,2.9],[26,-15,4.3,3.2],
+      [30,-17,3.6,2.8],[24,-9,2.5,2.4]
     ];
     for(let i=0;i<houses.length;i++){
       const [ox,oz,h,w]=houses[i],x=ship.x+ox,z=ship.z+oz,y=4.7+h*.5;
@@ -242,8 +262,8 @@ export class OceanScene {
     ],3));
     frondGeo.computeVertexNormals();
     const palms:[number,number,number][]=[
-      [-23,-23,5.7],[-13,-22,6.2],[-8,-29,5.0],[18,-23,5.6],
-      [24,-32,6.8],[8,-40,5.0]
+      [-23,-23,5.7],[-13,-22,6.2],[-8,-29,5.0],[18,-11,5.6],
+      [28,-11,6.8],[24,-18,5.0]
     ];
     for(const [ox,oz,h] of palms){
       const x=ship.x+ox,z=ship.z+oz;
@@ -281,7 +301,9 @@ export class OceanScene {
     this.controls.enableRotate=false;this.controls.enableZoom=false;
     const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
     this.controls.target.set(ship.x,portrait?3.5:2.9,ship.z);
-    this.camera.position.set(ship.x+(portrait?10.5:10),portrait?10.5:10,ship.z+(portrait?22.5:19));
+    // Side-biased three-quarter view makes the broadside readable with the bow to the right.
+    // Keep the ship genuinely raycast-touchable rather than replacing it with a PNG.
+    this.camera.position.set(ship.x-(portrait?18.8:18),portrait?9.3:9.4,ship.z+(portrait?16.5:17));
     this.controls.update();
   }
   /** Harbour only: activate OrbitControls if touch begins on real ship geometry. */
