@@ -23,7 +23,7 @@ test('next daily reward uses UTC consecutive day, resets after missing day, and 
  let current=first;
  for(let n=2;n<=8;n++)current=claimDaily(current,t+(n-1)*day);
  assert.equal(current.dailyStreak,7);
- assert.equal(nextDailyStreak(current,t+8*day),1); // skipped calendar day
+ assert.equal(nextDailyStreak(current,t+9*day),1); // skipped calendar day
  assert.equal(nextDailyStreak(current,t+7*day),7); // capped at day seven
 });
 
