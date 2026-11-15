@@ -48,7 +48,7 @@ export function parseProfile(raw:string|null):LocalProfile {
       hits:bounded(s.hits),shots:bounded(s.shots),ownedCrew:owned,equippedCrew:equipped,
       upgrades:{hull:bounded(upgrades.hull,5),cannons:bounded(upgrades.cannons,5),sails:bounded(upgrades.sails,5)},
       claimedMissions:missionIds.filter(id=>Array.isArray(s.claimedMissions)&&s.claimedMissions.includes(id)),
-      lastDailyDay:typeof s.lastDailyDay==='string'&&/^\\d{4}-\\d{2}-\\d{2}$/.test(s.lastDailyDay)?s.lastDailyDay:'',
+      lastDailyDay:typeof s.lastDailyDay==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s.lastDailyDay)?s.lastDailyDay:'',
       dailyStreak:bounded(s.dailyStreak,7)
     };
   }catch{return initialProfile();}
