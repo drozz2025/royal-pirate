@@ -233,26 +233,26 @@ export class OceanScene {
     }
     // A layered Mediterranean fortress with staggered towers and battlements.
     // Located behind the player ship so sails remain a clear touch target.
-    const castleX=ship.x+18,castleZ=ship.z-24;
-    add(rock,darkStone,castleX,1.2,castleZ,8,5.7,5.6);
-    add(rock,leaf,castleX,5.0,castleZ,8,1.7,5.9);
+    const castleX=ship.x+20,castleZ=ship.z-24;
+    add(rock,darkStone,castleX,.8,castleZ,8,5.7,5.6);
+    add(rock,leaf,castleX,4.0,castleZ,8,1.7,5.9);
     for(const [dx,dz,h] of [[-4.5,0,7],[2.9,-2,8.8],[-.6,-1.8,6.4]]){
       const x=castleX+dx,z=castleZ+dz;
-      add(block,cream,x,6.6+h/2,z,2.4,h,2.25);
-      add(block,stone,x,6.7+h,z,2.8,.46,2.6);
+      add(block,cream,x,3.5+h/2,z,2.4,h,2.25);
+      add(block,stone,x,3.6+h,z,2.8,.46,2.6);
       for(const xx of [-1.03,0,1.03]){
-        add(block,ivory,x+xx,7.15+h,z+1.08,.45,.76,.38);
+        add(block,ivory,x+xx,4.05+h,z+1.08,.45,.76,.38);
       }
-      const roof=add(cone,coral,x,7.75+h,z,1.95,1.75,1.95);
+      const roof=add(cone,coral,x,4.65+h,z,1.95,1.75,1.95);
       roof.rotation.y=Math.PI/4;
       for(let j=0;j<2;j++){
-        add(block,windowMat,x,8+j*1.65,z+1.17,.52,.78,.08);
-        add(block,ivory,x,8+j*1.65-.47,z+1.24,.69,.12,.12);
+        add(block,windowMat,x,4.9+j*1.65,z+1.17,.52,.78,.08);
+        add(block,ivory,x,4.9+j*1.65-.47,z+1.24,.69,.12,.12);
       }
       // Golden heraldic banners add identifiable architecture without flat art.
-      const banner=add(block,coral,x-.64,6.8+h*.44,z+1.23,.58,1.24,.075);
+      const banner=add(block,coral,x-.64,3.7+h*.44,z+1.23,.58,1.24,.075);
       banner.rotation.z=-.05;
-      add(block,gold,x-.64,7.43+h*.44,z+1.28,.66,.10,.10);
+      add(block,gold,x-.64,4.33+h*.44,z+1.28,.66,.10,.10);
     }
     // Sunlit whitewashed houses fill the coast, with readable coloured windows.
     const houses:[number,number,number,number][]=[
