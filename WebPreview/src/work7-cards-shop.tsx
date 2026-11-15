@@ -147,24 +147,11 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
     </header>
     <TabBar value={tab} onSelect={setTab} label="Cartas" tabs={[['collection','A MINHA COLEÇÃO'],['upgrade','MELHORAR'],['fusion','FUSÃO']]}/>
     {tab==='collection'&&<section className="w7-content" role="tabpanel" aria-label="A minha coleção">
-      <div className="w7-line"><strong>AS TUAS CARTAS</strong><div className="w7-filter" role="group" aria-label="Filter crew collection">
+      <div className="w7-line"><strong>ESCOLHE UMA CARTA</strong><div className="w7-filter" role="group" aria-label="Filter crew collection">
         <button type="button" aria-pressed={!ownedOnly} onClick={()=>setOwnedOnly(false)}>TODAS</button>
         <button type="button" aria-pressed={ownedOnly} onClick={()=>setOwnedOnly(true)}>MINHAS</button>
       </div></div>
       <div className="w7-collection-progress" role="progressbar" aria-label="Cartas da tripulação adquiridas" aria-valuemin={0} aria-valuemax={CREW.length} aria-valuenow={profile.ownedCrew.length}><span style={{width:(profile.ownedCrew.length/CREW.length*100)+"%"}}/></div>
-      <div className={'w7-spotlight w7-spotlight-'+active.id} aria-live="polite">
-        <div className="w7-spotlight-portrait"><CardArt id={active.id} featured/><span>{equipped?'EM SERVIÇO':owned?'ADQUIRIDA':'POR RECRUTAR'}</span></div>
-        <div className="w7-spotlight-info">
-          <span className="w7-eyebrow">CARTA EM DESTAQUE</span>
-          <h3>{active.name}</h3>
-          <p>{active.role}</p>
-          <div className="w7-spotlight-tags"><span>{visualTier[active.id]}</span><span>{owned?'NO INVENTÁRIO':active.cost+' MOEDAS LOCAIS'}</span></div>
-          <button type="button" disabled={equipped||(!owned&&!canRecruit)} onClick={press}
-            aria-label={equipped?active.name+' já equipado':owned?'Equipar '+active.name:canRecruit?'Recrutar '+active.name+' por '+active.cost+' moedas locais':'Faltam '+Math.max(0,active.cost-profile.coins)+' moedas para '+active.name}>
-            {equipped?'EQUIPADO':owned?'EQUIPAR':canRecruit?'RECRUTAR':'SEM MOEDAS'}
-          </button>
-        </div>
-      </div>
       <div className="w7-line w7-crew-caption"><strong>TRIPULAÇÃO DISPONÍVEL</strong><span>TOCA NUMA CARTA PARA VER</span></div>
       <div className="w7-card-grid" role="group" aria-label="Escolher carta da tripulação">
         {cards.map(c=>{
@@ -182,6 +169,19 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
           <strong>NOVA CARTA</strong><small>EM BREVE</small>
           <span className="w7-future-note">Pré-visualização · sem personagem</span>
         </div>}
+      </div>
+      <div className={'w7-spotlight w7-spotlight-'+active.id} aria-live="polite">
+        <div className="w7-spotlight-portrait"><CardArt id={active.id} featured/><span>{equipped?'EM SERVIÇO':owned?'ADQUIRIDA':'POR RECRUTAR'}</span></div>
+        <div className="w7-spotlight-info">
+          <span className="w7-eyebrow">CARTA EM DESTAQUE</span>
+          <h3>{active.name}</h3>
+          <p>{active.role}</p>
+          <div className="w7-spotlight-tags"><span>{visualTier[active.id]}</span><span>{owned?'NO INVENTÁRIO':active.cost+' MOEDAS LOCAIS'}</span></div>
+          <button type="button" disabled={equipped||(!owned&&!canRecruit)} onClick={press}
+            aria-label={equipped?active.name+' já equipado':owned?'Equipar '+active.name:canRecruit?'Recrutar '+active.name+' por '+active.cost+' moedas locais':'Faltam '+Math.max(0,active.cost-profile.coins)+' moedas para '+active.name}>
+            {equipped?'EQUIPADO':owned?'EQUIPAR':canRecruit?'RECRUTAR':'SEM MOEDAS'}
+          </button>
+        </div>
       </div>
       <p className="w7-disclaimer">Coleção guardada neste dispositivo. Níveis ainda indisponíveis. Raridades visuais sem efeitos de jogo; personagens equipadas ainda não alteram o combate.</p>
     </section>}
@@ -225,12 +225,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
           <span className="w7-market-balance">● {profile.coins} MOEDAS LOCAIS</span>
         </div>
       </div>
-      <div className="w7-preview-strip" role="group" aria-label="Secções futuras da loja">
-        {(['coins','gems','special'] as const).map(kind=><button type="button" key={kind} onClick={()=>setTab(kind)} aria-label={'Abrir '+(kind==='coins'?'Moedas':kind==='gems'?'Gemas':'Especiais')+', em breve'}>
-          <ShopRelic kind={kind}/><strong>{kind==='coins'?'MOEDAS':kind==='gems'?'GEMAS':'ESPECIAIS'}</strong><small>EM BREVE</small>
-        </button>)}
-      </div>
-      <div className="w7-line"><strong>DISPONÍVEL NO JOGO</strong><span>{profile.ownedCrew.length} / {CREW.length} CARTAS</span></div>
+      <div className="w7-line"><strong>TRIPULAÇÃO DO PORTO</strong><span>{profile.ownedCrew.length} / {CREW.length} CARTAS</span></div>
       <div className="w7-shop-list">{CREW.map(c=>{
         const owned=profile.ownedCrew.includes(c.id),canBuy=!owned&&c.cost>0&&profile.coins>=c.cost;
         return <article key={c.id} className={'w7-product w7-'+c.id}>
@@ -247,6 +242,11 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
           <strong>NOVOS TESOUROS</strong>
           <small>EM BREVE · SEM PREÇO</small>
         </article>
+      </div>
+      <div className="w7-preview-strip" role="group" aria-label="Secções futuras da loja">
+        {(['coins','gems','special'] as const).map(kind=><button type="button" key={kind} onClick={()=>setTab(kind)} aria-label={'Abrir '+(kind==='coins'?'Moedas':kind==='gems'?'Gemas':'Especiais')+', em breve'}>
+          <ShopRelic kind={kind}/><strong>{kind==='coins'?'MOEDAS':kind==='gems'?'GEMAS':'ESPECIAIS'}</strong><small>EM BREVE</small>
+        </button>)}
       </div>
       <div className="w7-shop-actions"><button type="button" onClick={onBattle} aria-label="EARN COINS IN BATTLE">GANHAR MOEDAS</button><button type="button" onClick={onCards} aria-label="MANAGE CREW">VER CARTAS</button></div>
       <p className="w7-disclaimer">No real-money checkout is available; secure payments não estão integrados. Recrutamentos usam apenas moedas locais conquistadas em batalhas; o saldo e as cartas ficam guardados neste dispositivo (saved on this device only).</p>
