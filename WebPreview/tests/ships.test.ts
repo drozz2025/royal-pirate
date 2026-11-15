@@ -14,7 +14,9 @@ test('original royal ship contains a real 3D hull, cannons, sails and gilded fig
   try {
     const ship = makeShip(false);
     assert.equal(ship.guns.length, 6);
-    assert.equal(ship.sails.length, 2);
+    assert.equal(ship.sails.length, 4, 'two curved sails per mast make the royal galleon visibly taller');
+    const upperSails = ship.sails.filter(s => s.geometry instanceof T.PlaneGeometry && s.geometry.parameters.height === 1.55);
+    assert.equal(upperSails.length, 2, 'topsails are real 3D cloth meshes, not a reference screenshot');
     assert.equal(ship.flags.length, 2);
     const bounds = new T.Box3().setFromObject(ship.root);
     assert.ok(bounds.max.z > 6, 'bowsprit extends ahead of the hull');

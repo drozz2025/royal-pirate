@@ -300,10 +300,12 @@ export class OceanScene {
     this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
     this.controls.enableRotate=false;this.controls.enableZoom=false;
     const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
-    this.controls.target.set(ship.x,portrait?3.5:2.9,ship.z);
-    // Side-biased three-quarter view makes the broadside readable with the bow to the right.
-    // Keep the ship genuinely raycast-touchable rather than replacing it with a PNG.
-    this.camera.position.set(ship.x-(portrait?18.8:18),portrait?9.3:9.4,ship.z+(portrait?16.5:17));
+    this.controls.target.set(ship.x,portrait?3.5:2.9,ship.z+(portrait?1:0));
+    // Verified in the 390x844 Chromium capture: the old close camera cropped
+    // the starboard bow, left flank and upper sails. Pull back in portrait so
+    // all four live sails fit between the HUD columns and clear the battle CTA.
+    // Keep the ship raycast-touchable; never substitute a flat hero picture.
+    this.camera.position.set(ship.x-(portrait?26.4:18),portrait?11.4:9.4,ship.z+(portrait?23.3:17));
     this.controls.update();
   }
   /** Harbour only: activate OrbitControls if touch begins on real ship geometry. */

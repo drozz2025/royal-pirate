@@ -4,6 +4,9 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 // Original procedural preview art, inspired by the approved direction. No third-party models.
 const mat = (color: string, metalness = 0, roughness = .65) => new T.MeshStandardMaterial({ color, metalness, roughness, flatShading: false });
 const wood = mat('#69361f'), honey = mat('#a35e2e'), darkWood = mat('#3e251a'), deck = mat('#bc8550');
+// Dark, varied strakes give the playable royal hull a black-and-gold broadside;
+// the enemy keeps its existing warm timber for instant combat recognition.
+const royalHull = mat('#293039'), royalPlank = mat('#493625');
 const gold = mat('#f5bd50', .62, .29), metal = mat('#263645', .7, .3), rope = mat('#e0b77b'), black = mat('#121b22');
 const light = new T.MeshStandardMaterial({ color: '#fff1a8', emissive: '#ffab35', emissiveIntensity: 1.5 });
 deck.side=T.DoubleSide;
@@ -132,7 +135,11 @@ export function makeShip(red = false): ShipArt {
     }
     const g = new T.BufferGeometry(); g.setAttribute('position',new T.Float32BufferAttribute(positions,3));g.setIndex(indices);g.computeVertexNormals();put(g,material,0,0,0);g.dispose();
   }
-  for(let i=0;i<7;i++){const y0=-.5+i*.35,y1=y0+.32;hullStrip(y0,y1,.53+i*.065,.53+(i+1)*.065,i%2?honey:wood);}
+  for(let i=0;i<7;i++){
+    const y0=-.5+i*.35,y1=y0+.32;
+    hullStrip(y0,y1,.53+i*.065,.53+(i+1)*.065,
+      red?(i%2?honey:wood):(i%2?royalPlank:royalHull));
+  }
   hullStrip(1.97,2.35,1,1.01,trim); hullStrip(2.36,2.49,1.035,1.035,gold);
   hullStrip(.35,.48,.78,.8,gold);hullStrip(1.6,1.73,.96,.98,gold);
   // Close seams and deck with custom outline.
@@ -187,16 +194,35 @@ export function makeShip(red = false): ShipArt {
   const sails:T.Mesh[]=[],flags:T.Mesh[]=[];
   const sailMat=new T.MeshStandardMaterial({map:sealTexture(red),side:T.DoubleSide,roughness:.9});
   const flagMat=new T.MeshStandardMaterial({map:sealTexture(red,true),side:T.DoubleSide,roughness:1});
+  // The smaller topsails are dark woven cloth. Keep the crowned skull emblem
+  // on the two full main sails and on the flags, not repeated four times.
+  const topsailMat=new T.MeshStandardMaterial({color:red?'#713331':'#19232d',side:T.DoubleSide,roughness:.88});
   for(const [z,h,w] of [[.9,8.3,4.5],[-2.1,7.1,3.5]]){
     // Rig is a separate group for damage. Static ropes stay attached to the hull.
-    const mast=new T.Mesh(new T.CylinderGeometry(.09,.16,h-2,10),honey);mast.position.set(0,(h+2)/2,z);rig.add(mast);
+    const mast=new T.Mesh(new T.CylinderGeometry(.07,.16,h-.6,10),honey);
+    mast.position.set(0,(h+2.6)/2,z);rig.add(mast);
     for(const y of [3,h-.8]){const band=new T.Mesh(new T.CylinderGeometry(.18,.18,.13,10),gold);band.position.set(0,y,z);rig.add(band);}
     const yard=new T.Mesh(new T.CylinderGeometry(.065,.085,w+.5,10),darkWood);yard.rotation.z=Math.PI/2;yard.position.set(0,h-.5,z);rig.add(yard);
+    // Royal two-tier canvas: a separate curved topsail makes both masts read
+    // as a tall galleon instead of a pair of flat rectangular banners.
+    const upperYard=new T.Mesh(new T.CylinderGeometry(.055,.075,w*.76,10),darkWood);
+    upperYard.rotation.z=Math.PI/2;upperYard.position.set(0,h+1.08,z);rig.add(upperYard);
+    const upperGeometry=new T.PlaneGeometry(w*.70,1.55,7,5);
+    const upperPositions=upperGeometry.attributes.position;
+    for(let i=0;i<upperPositions.count;i++){
+      const u=upperPositions.getX(i)/(w*.70)+.5;
+      const v=upperPositions.getY(i)/1.55+.5;
+      upperPositions.setZ(i,.21+Math.sin(u*Math.PI)*Math.sin(v*Math.PI)*.45);
+      upperPositions.setX(i,upperPositions.getX(i)*(1-.08*Math.cos(v*Math.PI*2)));
+    }
+    upperGeometry.computeVertexNormals();
+    const upperSail=new T.Mesh(upperGeometry,topsailMat);
+    upperSail.position.set(0,h+.28,z);rig.add(upperSail);sails.push(upperSail);
     const g=new T.PlaneGeometry(w,3.6,7,7);const p=g.attributes.position;
     for(let i=0;i<p.count;i++){const x=p.getX(i)/w+.5,y=p.getY(i)/3.6+.5;p.setZ(i,Math.sin(x*Math.PI)*Math.sin(y*Math.PI)*.8);p.setX(i,p.getX(i)*(1-.13*Math.cos(y*Math.PI*2)));}
     g.computeVertexNormals();const sail=new T.Mesh(g,sailMat);sail.position.set(0,h-2.3,z);rig.add(sail);sails.push(sail);
     const crow=new T.Mesh(new T.CylinderGeometry(.52,.3,.4,12),gold);crow.position.set(0,h-.05,z);rig.add(crow);
-    const flag=new T.Mesh(new T.PlaneGeometry(1.4,.8,4,2),flagMat);flag.position.set(.7,h+.6,z);rig.add(flag);flags.push(flag);
+    const flag=new T.Mesh(new T.PlaneGeometry(1.4,.8,4,2),flagMat);flag.position.set(.7,h+1.93,z);rig.add(flag);flags.push(flag);
     for(const side of [-1,1])for(const az of [z-1.3,z+1.3])beam(new T.Vector3(side*1.55,2.6,az),new T.Vector3(0,h-.1,z),.016,rope);
     for(const side of [-1,1])beam(new T.Vector3(side*w*.48,h-.5,z),new T.Vector3(side*1.4,2.5,z+1.4),.014,rope);
     for(let i=0;i<12;i++){const y=2.7+i*.36;beam(new T.Vector3(-.28,y,z+.12),new T.Vector3(.28,y,z+.12),.014,rope);}
