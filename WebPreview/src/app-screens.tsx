@@ -1,5 +1,6 @@
 import React from 'react';
 import { PirateIcon } from './app-icons';
+import { FleetShowcase } from './fleet-showcase';
 import { CREW, MISSIONS, UPGRADES, battlesPlayed, canClaimDaily, nextDailyStreak, levelFor, missionProgress, upgradeCost, type CrewId, type LocalProfile, type MissionId, type UpgradeId } from './progression';
 
 export type AppScreenId = 'battle'|'fleet'|'forge'|'cards'|'shop'|'missions'|'profile';
@@ -55,6 +56,7 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
         <div className="app-kicker">FLEET · ONE ACTUAL 3D SHIP</div><h2>Royal Crown</h2>
         <div className="app-ship-card"><span aria-hidden="true">⚓</span><div><strong>THE ROYAL CROWN</strong><small>Original 3D preview ship · Available</small><p>Inspect the ship by dragging to rotate and pinching to zoom.</p></div></div>
         <button className="app-cta" onClick={onInspect}>VIEW IN INTERACTIVE 3D</button>
+        <FleetShowcase profile={profile} onForge={()=>onNavigate('forge')} onCrew={()=>onNavigate('cards')}/>
         <div className="app-row-muted"><span>Future ships & custom hull modules</span><span>IN DEVELOPMENT</span></div>
       </div>}
       {screen==='forge'&&<div className="app-stack"><div className="app-kicker">NAVAL SHIPYARD · LOCAL PROGRESSION</div><h2>Improve the Royal Crown</h2>
