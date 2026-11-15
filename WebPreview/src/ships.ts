@@ -4,7 +4,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 // Original procedural preview art, inspired by the approved direction. No third-party models.
 const mat = (color: string, metalness = 0, roughness = .65) => new T.MeshStandardMaterial({ color, metalness, roughness, flatShading: false });
 const wood = mat('#69361f'), honey = mat('#a35e2e'), darkWood = mat('#3e251a'), deck = mat('#bc8550');
-const gold = mat('#ffce64', .62, .29), metal = mat('#263645', .7, .3), rope = mat('#e0b77b'), black = mat('#121b22');
+const gold = mat('#f5bd50', .62, .29), metal = mat('#263645', .7, .3), rope = mat('#e0b77b'), black = mat('#121b22');
 const light = new T.MeshStandardMaterial({ color: '#fff1a8', emissive: '#ffab35', emissiveIntensity: 1.5 });
 deck.side=T.DoubleSide;
 const geometryCache = new Map<string, T.BufferGeometry>();
@@ -73,6 +73,22 @@ function addLionFigurehead(root:T.Group){
   for(const side of [-1,1]){
     const scroll=new T.Mesh(new T.TorusGeometry(.27,.068,6,16,Math.PI*1.45),bright);
     scroll.position.set(side*.57,-.59,-.2);scroll.rotation.z=side*.5;statue.add(scroll);
+  }
+  // Merge lion details by material: 4 draw calls, not 30 independent meshes.
+  const mergedByMaterial=new Map<T.Material,T.BufferGeometry[]>();
+  for(const child of [...statue.children]){
+    if(!(child instanceof T.Mesh))continue;
+    child.updateMatrix();
+    const geometry=child.geometry.clone().applyMatrix4(child.matrix);
+    const material=child.material as T.Material;
+    if(!mergedByMaterial.has(material))mergedByMaterial.set(material,[]);
+    mergedByMaterial.get(material)!.push(geometry);
+    statue.remove(child);
+  }
+  for(const [material,parts] of mergedByMaterial){
+    const united=mergeGeometries(parts,false);
+    if(united){const mesh=new T.Mesh(united,material);mesh.castShadow=true;statue.add(mesh);}
+    parts.forEach(g=>g.dispose());
   }
   root.add(statue);
 }
