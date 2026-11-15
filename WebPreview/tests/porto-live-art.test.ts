@@ -17,6 +17,9 @@ test('premium black sails and sculpted lion are Three.js geometry, not a static 
   assert.match(ships,/if\(!red\)addLionFigurehead\(root\)/);
   assert.match(ships,/new T\.ConeGeometry\(1,1,7\)/);
   assert.match(ships,/new T\.CanvasTexture\(canvas\)/);
+  assert.match(ships,/Royal galleon detailing is real 3D geometry/);
+  assert.match(ships,/ornate|carved|carriage|Each cannon aperture has carved corner plates/);
+  assert.match(ships,/galleon-royal-scroll/);
   assert.doesNotMatch(scene,/new T\.TextureLoader\(\)\.load\([^)]*(?:porto|reference|approved)/);
 });
 
