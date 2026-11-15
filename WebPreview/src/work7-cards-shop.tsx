@@ -221,13 +221,13 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
       <div className="w7-market-feature">
         <div className="w7-market-feature-art" aria-hidden="true"><ShopRelic kind="special"/><span className="w7-market-glint">✦</span></div>
         <div className="w7-market-feature-copy">
-          <span className="w7-eyebrow">MOEDAS GANHAS EM BATALHA</span>
+          <span className="w7-eyebrow">RECRUTA A TUA TRIPULAÇÃO</span>
           <h3>TRIPULAÇÃO DO PORTO</h3>
           <p>Recruta membros reais da tua coleção. Sem pagamentos.</p>
           <span className="w7-market-balance">● {profile.coins} MOEDAS LOCAIS</span>
         </div>
       </div>
-      <div className="w7-line"><strong>DISPONÍVEIS NO PORTO</strong><span>{profile.ownedCrew.length} / {CREW.length} ADQUIRIDAS</span></div>
+      <div className="w7-line"><strong>DISPONÍVEIS NO PORTO</strong><span>{profile.ownedCrew.length} / {CREW.length} CARTAS</span></div>
       <div className="w7-shop-list">{CREW.map(c=>{
         const owned=profile.ownedCrew.includes(c.id),canBuy=!owned&&c.cost>0&&profile.coins>=c.cost;
         return <article key={c.id} className={'w7-product w7-'+c.id}>
