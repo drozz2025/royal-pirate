@@ -1,12 +1,13 @@
 import React from 'react';
+import { PirateIcon } from './app-icons';
 import { CREW, MISSIONS, UPGRADES, battlesPlayed, canClaimDaily, nextDailyStreak, levelFor, missionProgress, upgradeCost, type CrewId, type LocalProfile, type MissionId, type UpgradeId } from './progression';
 
 export type AppScreenId = 'battle'|'fleet'|'forge'|'cards'|'shop'|'missions'|'profile';
-const PAGES:ReadonlyArray<{id:AppScreenId;title:string;symbol:string}>=[
-  {id:'battle',title:'Battle',symbol:'⚔'},{id:'fleet',title:'Fleet',symbol:'⚓'},
-  {id:'forge',title:'Forge',symbol:'⚒'},{id:'cards',title:'Crew',symbol:'♛'},
-  {id:'shop',title:'Shop',symbol:'◆'},{id:'missions',title:'Missions',symbol:'✦'},
-  {id:'profile',title:'Profile',symbol:'♜'}
+const PAGES:ReadonlyArray<{id:AppScreenId;title:string}>=[
+  {id:'battle',title:'Battle'},{id:'fleet',title:'Fleet'},
+  {id:'forge',title:'Forge'},{id:'cards',title:'Crew'},
+  {id:'shop',title:'Shop'},{id:'missions',title:'Missions'},
+  {id:'profile',title:'Profile'}
 ];
 const mainNav:AppScreenId[]=['fleet','cards','battle','shop','profile'];
 export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,backupMessage}:
@@ -35,11 +36,11 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
   return <section className="app-sheet" role="dialog" aria-modal="true" onKeyDown={onDialogKeyDown} aria-labelledby="app-screen-title">
     <header className="app-sheet-header">
       <button type="button" className="app-back" onClick={onClose} aria-label="Back to harbour">‹</button>
-      <div className="app-sheet-brand"><small>ROYAL PIRATE · LOCAL PREVIEW</small><h1 ref={titleRef} tabIndex={-1} id="app-screen-title"><span aria-hidden="true">{page.symbol}</span> {page.title}</h1></div>
+      <div className="app-sheet-brand"><small>ROYAL PIRATE · LOCAL PREVIEW</small><h1 ref={titleRef} tabIndex={-1} id="app-screen-title"><span className="app-page-glyph" aria-hidden="true"><PirateIcon name={page.id} size={28}/></span> {page.title}</h1></div>
       <div className="app-wallet" aria-label={profile.coins+' locally earned coins'}><span aria-hidden="true">●</span><strong>{profile.coins}</strong><small>COINS</small></div>
     </header>
     <nav className="app-shortcuts" aria-label="Other screens">
-      {PAGES.filter(p=>!mainNav.includes(p.id)).map(p=><button type="button" key={p.id} onClick={()=>onNavigate(p.id)} aria-current={screen===p.id?'page':undefined}>{p.symbol} {p.title}</button>)}
+      {PAGES.filter(p=>!mainNav.includes(p.id)).map(p=><button type="button" key={p.id} onClick={()=>onNavigate(p.id)} aria-current={screen===p.id?'page':undefined}><PirateIcon name={p.id} size={18}/><span>{p.title}</span></button>)}
     </nav>
     <div className="app-sheet-announcement" role="status" aria-live="polite" aria-atomic="true">{announcement}</div>
     <div className="app-sheet-content" key={screen}>
@@ -124,6 +125,6 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
         </section>
       </div>}
     </div>
-    <nav className="app-dock" aria-label="Main game screens">{mainNav.map(id=>{const p=PAGES.find(p=>p.id===id)!;return <button type="button" key={id} aria-label={p.title} aria-current={screen===id?'page':undefined} onClick={()=>onNavigate(id)}><span aria-hidden="true">{p.symbol}</span><strong>{p.title}</strong></button>})}</nav>
+    <nav className="app-dock" aria-label="Main game screens">{mainNav.map(id=>{const p=PAGES.find(p=>p.id===id)!;return <button type="button" key={id} aria-label={p.title} aria-current={screen===id?'page':undefined} onClick={()=>onNavigate(id)}><span className="app-tab-glyph" aria-hidden="true"><PirateIcon name={p.id} size={27}/></span><strong>{p.title}</strong></button>})}</nav>
   </section>;
 }
