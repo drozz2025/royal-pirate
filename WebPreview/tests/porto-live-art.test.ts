@@ -23,7 +23,7 @@ test('premium black sails and sculpted lion are Three.js geometry, not a static 
 test('live harbour has independent layered 3D scenery, while battle camera is preserved',()=>{
   assert.match(scene,/buildPortBackdrop\(\);this\.buildHarbourDetails\(\)/);
   assert.match(scene,/private buildHarbourDetails\(\)/);
-  assert.match(scene,/const castleX=ship\.x\+18,castleZ=ship\.z-24/);
+  assert.match(scene,/const castleX=ship\.x\+20,castleZ=ship\.z-24/);
   assert.match(scene,/const palms:/);
   assert.match(scene,/const houses:/);
   assert.match(scene,/this\.harbourDock\.visible=false/);
