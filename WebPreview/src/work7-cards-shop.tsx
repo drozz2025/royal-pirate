@@ -6,8 +6,8 @@ const visualTier:Record<CrewId,string> = {
   captain:'INICIAL', gunner:'ESPECIAL · VISUAL', navigator:'RARO · VISUAL'
 };
 
-function CardArt({id}:{id:CrewId}) {
-  return <svg className="w7-art-svg" viewBox="0 0 180 160" role="img" aria-label={id==='captain'?'Retrato ilustrado de capitã pirata':id==='gunner'?'Ilustração de canhão de bronze':'Rosa dos ventos ilustrada'}>
+function CardArt({id,featured=false}:{id:CrewId;featured?:boolean}) {
+  return <svg className={featured?'w7-featured-svg':'w7-art-svg'} viewBox="0 0 180 160" role="img" aria-label={id==='captain'?'Retrato ilustrado de capitã pirata':id==='gunner'?'Ilustração de canhão de bronze':'Rosa dos ventos ilustrada'}>
     <defs>
       <radialGradient id={'w7-glow-'+id}><stop stopColor={id==='navigator'?'#97fff0':'#fff1bb'}/><stop offset="1" stopColor={id==='gunner'?'#633723':'#13334d'}/></radialGradient>
     </defs>
@@ -153,7 +153,7 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
       </div></div>
       <div className="w7-collection-progress" role="progressbar" aria-label="Cartas da tripulação adquiridas" aria-valuemin={0} aria-valuemax={CREW.length} aria-valuenow={profile.ownedCrew.length}><span style={{width:(profile.ownedCrew.length/CREW.length*100)+"%"}}/></div>
       <div className={'w7-spotlight w7-spotlight-'+active.id} aria-live="polite">
-        <div className="w7-spotlight-portrait"><CardArt id={active.id}/><span>{equipped?'EM SERVIÇO':owned?'ADQUIRIDA':'POR RECRUTAR'}</span></div>
+        <div className="w7-spotlight-portrait"><CardArt id={active.id} featured/><span>{equipped?'EM SERVIÇO':owned?'ADQUIRIDA':'POR RECRUTAR'}</span></div>
         <div className="w7-spotlight-info">
           <span className="w7-eyebrow">CARTA EM DESTAQUE</span>
           <h3>{active.name}</h3>
@@ -219,7 +219,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
       <div className="w7-market-feature">
         <div className="w7-market-feature-art" aria-hidden="true"><ShopRelic kind="special"/><span className="w7-market-glint">✦</span></div>
         <div className="w7-market-feature-copy">
-          <span className="w7-eyebrow">MERCADO DO CAPITÃO</span>
+          <span className="w7-eyebrow">RECRUTA A TUA TRIPULAÇÃO</span>
           <h3>TESOUROS DO PORTO</h3>
           <p>Recruta a tua tripulação com moedas ganhas nas batalhas. Sem dinheiro real.</p>
           <span className="w7-market-balance">● {profile.coins} MOEDAS LOCAIS</span>
@@ -249,7 +249,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
         </article>
       </div>
       <div className="w7-shop-actions"><button type="button" onClick={onBattle} aria-label="EARN COINS IN BATTLE">GANHAR MOEDAS</button><button type="button" onClick={onCards} aria-label="MANAGE CREW">VER CARTAS</button></div>
-      <p className="w7-disclaimer">Compras reais não disponíveis. Recrutamentos usam apenas moedas locais conquistadas em batalhas; o saldo e as cartas ficam guardados neste dispositivo.</p>
+      <p className="w7-disclaimer">No real-money checkout is available; secure payments não estão integrados. Recrutamentos usam apenas moedas locais conquistadas em batalhas; o saldo e as cartas ficam guardados neste dispositivo.</p>
     </section>}
     {pending&&<section className="w7-content w7-feature w7-pending" role="tabpanel" aria-label={pending.title}>
       <span className="w7-pending-relic"><ShopRelic kind={tab==='coins'?'coins':tab==='gems'?'gems':'special'}/></span>
