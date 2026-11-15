@@ -195,6 +195,16 @@ export class OceanScene {
         gallery.position.set(baseX,13.8,baseZ);port.add(gallery);
         const bulb=new T.Mesh(new T.SphereGeometry(.45,10,8),seaMat);bulb.position.set(baseX,14.4,baseZ);port.add(bulb);
         const cap=new T.Mesh(new T.ConeGeometry(1.15,1.3,12),roofMat);cap.position.set(baseX,15.1,baseZ);port.add(cap);
+        // Shadowed lantern gallery and four long window slits give the beacon
+        // a clear maritime silhouette rather than a blank striped cylinder.
+        const glass=new T.MeshStandardMaterial({color:'#154d69',metalness:.25,roughness:.36,
+          emissive:'#ffd37b',emissiveIntensity:.2});
+        for(let a=0;a<4;a++){
+          const angle=a*Math.PI/2;
+          const window=new T.Mesh(new T.BoxGeometry(.24,.76,.11),glass);
+          window.position.set(baseX+Math.sin(angle)*.73,12.05,baseZ+Math.cos(angle)*.73);
+          window.rotation.y=angle;port.add(window);
+        }
       }
     }
   }
@@ -223,7 +233,7 @@ export class OceanScene {
     }
     // A layered Mediterranean fortress with staggered towers and battlements.
     // Located behind the player ship so sails remain a clear touch target.
-    const castleX=ship.x-16,castleZ=ship.z-31;
+    const castleX=ship.x-7,castleZ=ship.z-22;
     add(rock,darkStone,castleX,1.2,castleZ,8,5.7,5.6);
     add(rock,leaf,castleX,5.0,castleZ,8,1.7,5.9);
     for(const [dx,dz,h] of [[-4.5,0,7],[2.9,-2,8.8],[-.6,-1.8,6.4]]){
@@ -235,12 +245,19 @@ export class OceanScene {
       }
       const roof=add(cone,coral,x,7.75+h,z,1.95,1.75,1.95);
       roof.rotation.y=Math.PI/4;
-      for(let j=0;j<2;j++)add(block,windowMat,x,8+j*1.65,z+1.17,.52,.78,.08);
+      for(let j=0;j<2;j++){
+        add(block,windowMat,x,8+j*1.65,z+1.17,.52,.78,.08);
+        add(block,ivory,x,8+j*1.65-.47,z+1.24,.69,.12,.12);
+      }
+      // Golden heraldic banners add identifiable architecture without flat art.
+      const banner=add(block,coral,x-.64,6.8+h*.44,z+1.23,.58,1.24,.075);
+      banner.rotation.z=-.05;
+      add(block,gold,x-.64,7.43+h*.44,z+1.28,.66,.10,.10);
     }
     // Sunlit whitewashed houses fill the coast, with readable coloured windows.
     const houses:[number,number,number,number][]=[
-      [-21,-25,3.0,2.6],[-19,-27,3.8,2.2],[-11,-27,4.2,2.9],
-      [-7,-32,2.8,2.5],[22,-13,3.1,2.9],[26,-15,4.3,3.2],
+      [-14,-23,3.0,2.6],[-11,-25,3.8,2.2],[-5,-27,4.2,2.9],
+      [-2,-29,2.8,2.5],[22,-13,3.1,2.9],[26,-15,4.3,3.2],
       [30,-17,3.6,2.8],[24,-9,2.5,2.4]
     ];
     for(let i=0;i<houses.length;i++){
@@ -253,6 +270,11 @@ export class OceanScene {
         add(block,ivory,x+side*w*.23,y+.2,z+w*.39+.09,.44,.07,.10);
       }
       add(block,wood,x,y-h*.26,z+w*.39+.06,.56,h*.46,.09);
+      // Dark arched lintels, terracotta ledges and pale facade edging are
+      // readable at phone size; only a handful of shared box geometries.
+      add(block,coral,x,y+h*.34,z+w*.39+.10,w*.80,.12,.15);
+      add(block,ivory,x-w*.42,y,z+w*.39+.08,.10,h*.85,.10);
+      add(block,ivory,x+w*.42,y,z+w*.39+.08,.10,h*.85,.10);
     }
     // 3D tapered palm leaves, built as triangles with a curved drooping tip.
     const frondGeo=new T.BufferGeometry();
