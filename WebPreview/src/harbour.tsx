@@ -63,7 +63,7 @@ export function Harbour({ onBattle, onInspect, onNavigate, coins }: { onBattle: 
       <nav className="harbour-nav" aria-label="Game screens">
         {upcoming.map((item,i)=><button type="button" key={item.title} onClick={()=>onNavigate(item.screen)} className={'harbour-nav-item '+(i===2?'harbour-nav-current':'')}><span aria-hidden="true">{item.icon}</span><strong>{item.title}</strong><small>OPEN</small></button>)}
       </nav>
-      <p className="harbour-disclaimer">LOCAL PREVIEW · COINS & MISSIONS SAVED ON THIS DEVICE · ONLINE RANKING & PAYMENTS NOT LIVE</p>
+      <p className="harbour-disclaimer">LOCAL PREVIEW · COINS & MISSIONS SAVED ON THIS DEVICE · ONLINE RANKING & IAP NOT LIVE</p>
     </div>
   </section>;
 }
