@@ -305,7 +305,7 @@ export class OceanScene {
     // the starboard bow, left flank and upper sails. Pull back in portrait so
     // all four live sails fit between the HUD columns and clear the battle CTA.
     // Keep the ship raycast-touchable; never substitute a flat hero picture.
-    this.camera.position.set(ship.x-(portrait?29.5:18),portrait?12.3:9.4,ship.z+(portrait?25.8:17));
+    this.camera.position.set(ship.x-(portrait?26.4:18),portrait?11.4:9.4,ship.z+(portrait?23.3:17));
     this.controls.update();
   }
   /** Harbour only: activate OrbitControls if touch begins on real ship geometry. */
