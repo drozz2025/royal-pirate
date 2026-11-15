@@ -35,7 +35,7 @@ test('completed battles append truthful rewards, time and hit statistics',()=>{
  assert.match(html,/3 \/ 5 cannon hits/);
  assert.match(html,/\+35 COINS/);
  assert.match(html,/NO COINS/);
- assert.match(html,/datetime="2026-11-15T06:01:00.000Z"/);
+ assert.match(html,/datetime="2026-11-15T06:01:00.000Z"/i);
 });
 
 test('journal is bounded to 12 newest entries while lifetime totals remain',()=>{
