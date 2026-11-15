@@ -763,3 +763,321 @@
   .w8-missions-scene .w8-daily-orb{flex-basis:49px}
   .w8-missions-scene .w8-daily-orb .w8-art{width:52px;height:52px}
 }
+
+
+/* WORK 8 · Mosaico 07/08 · peças gráficas reais em CSS, sem cartões falsos
+   Passo visual: ordens em pergaminho, 7 baús 3D e quadro mundial indisponível. */
+.w8-missions-scene,
+.w8-ranking-scene{
+  --w8-parchment:#ffe4a3;
+  --w8-rim:#e3b36c;
+  --w8-shadow:#08182c;
+  background:
+    radial-gradient(ellipse 115% 60% at 50% 0%,#2064814a,transparent 72%),
+    radial-gradient(ellipse 85% 35% at 48% 90%,#20617430,transparent 95%),
+    repeating-linear-gradient(114deg,transparent 0 30px,#bf99500b 30px 31px),
+    linear-gradient(#0b2a4b,#071a33);
+}
+.w8-missions-scene .w8-tabs,
+.w8-ranking-scene .w8-tabs{
+  padding:4px;
+  gap:3px;
+  background:linear-gradient(180deg,#153c5f,#071b34 64%,#092643);
+  box-shadow:inset 0 2px 0 #c3dfdf5e,0 4px 0 #694325,0 7px 9px #0414268f;
+}
+.w8-missions-scene .w8-tabs button,
+.w8-ranking-scene .w8-tabs button{
+  border-radius:7px;
+  border:1px solid #c2a16b99;
+  background:linear-gradient(#244c68,#0f2b4c 58%,#10213e);
+  box-shadow:inset 0 1px #adcad83c;
+  color:#f9e6b9;
+  letter-spacing:.4px;
+}
+.w8-missions-scene .w8-tabs button[aria-pressed=true],
+.w8-ranking-scene .w8-tabs button[aria-pressed=true]{
+  background:linear-gradient(180deg,#fff1b1,#e9bc68 45%,#bc742d);
+  border:2px solid #fff4ba;
+  color:#302417;
+  text-shadow:0 1px #ffedb0;
+  box-shadow:inset 0 1px #fff9d6,0 2px #8d5428,0 0 8px #f4d06d75;
+}
+.w8-missions-scene .w8-hero,
+.w8-ranking-scene .w8-rank-hero{
+  min-height:89px;
+  border:3px solid #e7b96c;
+  border-bottom-color:#795128;
+  background:linear-gradient(#184966,#092640 72%,#362b27);
+  box-shadow:inset 0 2px #ffecb177,0 4px #513820,0 7px 12px #031326c4;
+}
+.w8-missions-scene .w8-hero-icon,
+.w8-ranking-scene .w8-hero-icon{
+  flex-basis:75px;
+  width:75px;
+  height:76px;
+}
+.w8-missions-scene .w8-hero-icon .w8-art,
+.w8-ranking-scene .w8-hero-icon .w8-art{
+  width:77px;
+  height:77px;
+}
+.w8-missions-scene .w8-hero-live,
+.w8-ranking-scene .w8-hero-live{
+  font:900 10px/1.1 'Barlow Condensed',sans-serif;
+  padding:3px 8px;
+  color:#fff1c4;
+  border:1px solid #ffd78c;
+  border-radius:5px;
+  background:linear-gradient(#386e7e,#0b3553);
+}
+.w8-missions-scene .w8-missions{gap:7px}
+.w8-missions-scene .w8-missions .w8-explain{
+  display:block;
+  color:#d0e3e6;
+  margin:-3px 3px 1px;
+  font:800 9px/1.25 'Barlow',sans-serif;
+  letter-spacing:.1px;
+}
+.w8-missions-scene .w8-mission{
+  position:relative;
+  min-height:75px;
+  gap:8px;
+  padding:8px 7px 8px 5px;
+  border:2px solid #dcae65;
+  border-left:6px solid #eab96c;
+  border-bottom-color:#78502e;
+  border-radius:10px 16px 10px 16px;
+  background:
+    radial-gradient(ellipse 72% 80% at 0% 50%,#f1bd7b2a,transparent 95%),
+    linear-gradient(105deg,#315873,#143653 44%,#0b2946);
+  box-shadow:inset 0 1px #fce0a94f,0 3px #503925,0 6px 8px #0517289c;
+}
+.w8-missions-scene .w8-mission::after{
+  content:'';position:absolute;right:7px;top:5px;
+  width:8px;height:8px;
+  border-top:2px solid #e4bd82;
+  border-right:2px solid #e4bd82;
+  opacity:.75;pointer-events:none;
+}
+.w8-missions-scene .w8-mission[data-state="ready"]{
+  border-color:#f6dc86;border-left-color:#a0efbd;
+  background:linear-gradient(105deg,#3b7761,#153d56 46%,#0b2946);
+  box-shadow:0 0 11px #4ddd9a55,0 3px #315139;
+}
+.w8-missions-scene .w8-mission[data-state="claimed"]{
+  border-left-color:#79caa0;
+  background:linear-gradient(105deg,#2d6358,#153d50 45%,#0b2946);
+}
+.w8-missions-scene .w8-mission-icon{
+  position:relative;
+  flex:0 0 56px;
+  height:58px;
+  background:radial-gradient(ellipse,#f5cf875f,transparent 75%);
+}
+.w8-missions-scene .w8-mission-icon .w8-art{
+  width:56px;height:56px;
+  filter:drop-shadow(0 3px 2px #020f24) drop-shadow(0 0 2px #fff0a35e);
+}
+.w8-missions-scene .w8-mission-icon::after{
+  content:attr(data-quest);
+  position:absolute;bottom:-1px;left:-5px;
+  width:22px;height:19px;display:grid;place-items:center;
+  border:1px solid #ffe8af;border-radius:5px;
+  background:linear-gradient(#ffd977,#ba7b34);
+  color:#33241a;text-shadow:0 1px #fff2c1;
+  box-shadow:0 2px #633c25;
+  font:900 11px/1 'Barlow Condensed',sans-serif;
+}
+.w8-missions-scene .w8-mission-main>strong{
+  font-size:clamp(15px,4.3vw,20px);
+  color:#fff2d0;
+  text-shadow:0 2px #091b30;
+}
+.w8-missions-scene .w8-mission-main>small{
+  font:900 11px 'Barlow Condensed',sans-serif;
+  color:#d6e7ec;
+  margin:4px 0 5px;
+}
+.w8-missions-scene .w8-mission-main>small span{color:#ffd67a}
+.w8-missions-scene .w8-progress{
+  height:10px;border:1px solid #cba46d;border-radius:7px;
+  background:#061b31;box-shadow:inset 0 2px #001629;
+}
+.w8-missions-scene .w8-progress>span{
+  background:linear-gradient(#d9ffe3,#43d9ad 40%,#168c9e);
+}
+.w8-missions-scene .w8-mission>button{
+  min-width:63px;min-height:41px;
+  border:2px solid #fee9a4;
+  border-bottom-color:#9d5429;
+  border-radius:9px;
+  color:#38251b;
+  background:linear-gradient(#fff1b7,#ebbb61 55%,#b97130);
+  text-shadow:0 1px #fff0be;
+  box-shadow:inset 0 1px #fff9df,0 3px #754326;
+  font-size:12px;
+}
+.w8-missions-scene .w8-mission[data-state="ready"]>button{
+  border-color:#bbffe0;
+  background:linear-gradient(#bcffe3,#5ad5a7 55%,#16825b);
+  color:#103b39;text-shadow:0 1px #e1fff0;
+}
+.w8-missions-scene .w8-mission[data-state="claimed"]>button{
+  color:#d7ebe4;
+  background:linear-gradient(#526e76,#284c52);
+}
+.w8-missions-scene .w8-calendar{
+  border:3px solid #e2b56a;
+  border-bottom-color:#805025;
+  background:
+    radial-gradient(ellipse 90% 35% at 50% 0%,#2e7d91bb,transparent 85%),
+    linear-gradient(175deg,#1d4f65,#092440);
+  box-shadow:inset 0 2px #fff0ae58,0 4px #543820;
+}
+.w8-missions-scene .w8-days li{
+  background:linear-gradient(#22526a,#0f3750 58%,#07243e);
+  border:1px solid #c29b61;
+  box-shadow:inset 0 1px #b6dae048,0 2px #172a34;
+}
+.w8-missions-scene .w8-days li.is-claimed{
+  border-color:#70d8a4;
+  background:linear-gradient(#295e59,#104440 70%,#092a38);
+}
+.w8-missions-scene .w8-days li.is-next{
+  border:2px solid #fff0b8;
+  background:linear-gradient(#996834,#68462e 65%,#3b2a27);
+  box-shadow:0 0 11px #ffe2a080,inset 0 1px #ffecb76b;
+}
+.w8-missions-scene .w8-daily{
+  border-color:#f3d38a;
+  background:
+    radial-gradient(ellipse at 9% 30%,#ffc86a5e,transparent 39%),
+    linear-gradient(105deg,#834932,#23485f 52%,#0d2d4b);
+}
+.w8-ranking-scene .w8-medal-card{
+  min-height:136px;
+  padding:13px 12px;
+  border:3px solid #f2ce80;
+  border-bottom-color:#7c4922;
+  background:
+    radial-gradient(circle at 17% 48%,#efd59645 0,transparent 42%),
+    repeating-conic-gradient(from 10deg at 22% 50%,#e4b56320 0deg 7deg,transparent 7deg 24deg),
+    linear-gradient(115deg,#245b72,#103454 58%,#081c36);
+  box-shadow:inset 0 2px #fff7bc67,0 5px #59401f;
+}
+.w8-ranking-scene .w8-medal-art{width:101px;height:104px;flex-basis:101px}
+.w8-ranking-scene .w8-medal-art .w8-art{width:105px;height:105px}
+.w8-ranking-scene .w8-medal-data small{
+  color:#ffe3aa;
+  font:900 10px/1.1 'Barlow',sans-serif;
+  letter-spacing:.45px;
+}
+.w8-ranking-scene .w8-medal-data strong{
+  color:#fff0b7;
+  font-size:clamp(30px,8vw,42px);
+  text-shadow:0 3px #071629,0 0 8px #f4bf7436;
+}
+.w8-ranking-scene .w8-stat-row{gap:6px}
+.w8-ranking-scene .w8-stat-row>div{
+  min-height:103px;
+  padding:6px 3px;
+  border:2px solid #e7bd72;
+  border-bottom-color:#84512c;
+  border-radius:12px;
+  box-shadow:inset 0 1px #fff3b45c,0 4px #6b4a25;
+}
+.w8-ranking-scene .w8-stat-symbol{
+  display:grid;place-items:center;
+  height:32px;width:38px;
+  background:none;border:0;box-shadow:none;
+}
+.w8-ranking-scene .w8-stat-symbol .w8-art{
+  display:block;width:37px;height:37px;
+  filter:drop-shadow(0 2px 2px #06172d);
+}
+.w8-ranking-scene .w8-stat-row strong{
+  color:#fff5d0;
+  font-size:clamp(26px,7.7vw,36px);
+}
+.w8-ranking-scene .w8-ranking-locked{
+  position:relative;
+  min-height:143px;
+  padding:18px 12px 10px;
+  align-items:center;
+  gap:13px;
+  border:3px solid #cfa762;
+  border-bottom-color:#79502d;
+  border-radius:15px;
+  background:
+    radial-gradient(circle at 16% 50%,#3b7f8f66,transparent 52%),
+    linear-gradient(108deg,#24536d,#0c294a 72%);
+  box-shadow:inset 0 2px #ffe9b263,0 4px #503924;
+}
+.w8-ranking-scene .w8-ranking-locked::before{content:none}
+.w8-ranking-scene .w8-ranking-locked::after{
+  content:'OFFLINE';top:-9px;right:9px
+}
+.w8-ranking-locked-emblem{
+  flex:0 0 84px;
+  height:86px;
+  display:grid;place-items:center;
+  border-radius:50%;
+  background:radial-gradient(#e6c26c60,transparent 73%);
+}
+.w8-ranking-locked-emblem .w8-art{
+  width:83px;height:83px;
+  filter:drop-shadow(0 4px 2px #04182c);
+}
+.w8-ranking-locked-copy{min-width:0;flex:1}
+.w8-ranking-locked-label{
+  display:block;
+  margin-bottom:7px;
+  color:#ffe7a6;
+  font:900 11px/1 'Barlow Condensed',sans-serif;
+  letter-spacing:1px;
+}
+.w8-ranking-scene .w8-ranking-locked strong{
+  display:block;
+  color:#fff0c0;
+  font:900 clamp(16px,4.5vw,21px)/1.02 'Barlow Condensed',sans-serif;
+}
+.w8-ranking-scene .w8-ranking-locked p{
+  color:#d5e6eb;
+  font:700 11px/1.3 'Barlow',sans-serif;
+  margin:5px 0 7px;
+}
+.w8-ranking-locked-status{
+  display:inline-flex;gap:5px;align-items:center;
+  color:#c0e2e4;
+  font:800 9px 'Barlow Condensed',sans-serif;
+  letter-spacing:.2px;
+}
+.w8-ranking-scene>.app-cta{
+  min-height:49px;
+  border:3px solid #ffe8aa;
+  border-bottom-color:#8a4923;
+  background:linear-gradient(#f7d88d,#d99e48 55%,#b76a28);
+  box-shadow:inset 0 2px #fff3c4,0 4px #66381d;
+  color:#32251d;
+}
+.app-stack:has(> .w8-tabs)>.app-stat-grid>div{
+  background:radial-gradient(ellipse at 50% 0%,#499ab14f,transparent 70%),linear-gradient(#234f72,#0d294b);
+  border-color:#e2b56b;
+}
+.app-stack:has(> .w8-tabs)>.app-captain-route,
+.app-stack:has(> .w8-tabs)>.app-battle-log{
+  background:linear-gradient(135deg,#255c78,#102f51 58%,#0a2442);
+  border-color:#e0ad61;
+}
+@media(max-width:390px){
+  .w8-missions-scene .w8-mission{padding:6px 4px 6px 4px;gap:5px;min-height:73px}
+  .w8-missions-scene .w8-mission-icon{flex-basis:46px;height:50px}
+  .w8-missions-scene .w8-mission-icon .w8-art{width:49px;height:49px}
+  .w8-missions-scene .w8-mission-main>strong{font-size:15px}
+  .w8-missions-scene .w8-mission>button{min-width:56px;min-height:40px}
+  .w8-missions-scene .w8-days{gap:2px}
+  .w8-ranking-scene .w8-ranking-locked{gap:6px;padding:16px 7px 8px}
+  .w8-ranking-locked-emblem{flex-basis:61px;height:69px}
+  .w8-ranking-locked-emblem .w8-art{width:64px;height:64px}
+  .w8-ranking-scene .w8-ranking-locked p{font-size:10px}
+}
