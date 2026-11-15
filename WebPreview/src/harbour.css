@@ -324,3 +324,270 @@ body:has(.harbour-screen:not([aria-hidden="true"])) .rp-version{display:none}
 @media(prefers-reduced-motion:reduce){
  .harbour-nav-item,.harbour-flank-button{transition:none}
 }
+
+/* WORK 6 · PORTO MOSAIC ART PASS — 15 November 2026
+ * Only Porto is restyled. Real canvas, controls, profile and navigation stay live.
+ * Art direction: bright turquoise harbour behind hand-painted navy/gold game HUD.
+ * No fake gem balances or static screenshot background.
+ */
+.harbour-screen{
+  --porto-nav-height:clamp(78px,10.4dvh,106px);
+  text-shadow:0 2px 2px #10263c,0 2px 5px #051526;
+  background:
+    radial-gradient(ellipse 85% 32% at 50% 70%,transparent 35%,#03406a11 85%,#062c5080 100%),
+    linear-gradient(180deg,#006cb31b 0%,transparent 23%,transparent 68%,#032f5a13 79%,#061b3c67 100%);
+}
+.harbour-sky{
+  background:
+    radial-gradient(ellipse 45% 34% at 57% 9%,#e2fbff45,transparent 100%),
+    radial-gradient(ellipse 45% 48% at 5% 50%,#023f7518,transparent 95%),
+    radial-gradient(ellipse 40% 45% at 96% 50%,#01406d20,transparent 95%);
+}
+.harbour-header{
+  height:clamp(86px,14.6dvh,136px);
+  background:linear-gradient(180deg,#0d5b8e62,#286f9821 54%,transparent);
+}
+.harbour-profile{
+  top:max(10px,calc(env(safe-area-inset-top) + 8px));gap:6px;max-width:31%;
+}
+.harbour-avatar{
+  width:clamp(43px,11.6vw,67px);height:clamp(43px,11.6vw,67px);
+  border:3px solid #ffdc80;
+  background:radial-gradient(circle at 42% 22%,#71d7ed,#195b84 68%,#0a203e);
+  box-shadow:0 0 0 3px #412b1c,0 0 0 5px #a66d30,0 4px 10px #142239b5,
+    inset 0 2px 2px #fff7b8;
+}
+.harbour-avatar:after{
+  content:'';position:absolute;inset:4px;border:1px solid #ffedb454;
+  border-radius:50%;pointer-events:none;
+}
+.harbour-level>strong{
+  font-size:clamp(14px,4vw,21px);
+  color:#fffdf0;text-shadow:1px 2px 0 #061b34,0 0 8px #061b3469;
+}
+.harbour-level-track{
+  border-color:#d2a44b;background:linear-gradient(180deg,#0b2a43,#194164);
+  box-shadow:inset 0 2px 4px #061524,0 1px 4px #041d37;
+}
+.harbour-level-track>span{
+  background:linear-gradient(180deg,#b9fbff,#29c8f3 40%,#1086c3);
+  box-shadow:inset 0 1px 1px #e9ffff,0 0 8px #43e6ff99;
+}
+.harbour-logo{
+  top:max(6px,env(safe-area-inset-top));
+  padding:2px 8px 8px;
+  max-width:42%;
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:clamp(22px,5.9vw,43px);
+  line-height:.80;
+  letter-spacing:-.5px;
+  filter:drop-shadow(1px 3px 0 #713916) drop-shadow(0 5px 2px #05203cdd);
+}
+.harbour-logo::before{
+  inset:12px -5px -7px;
+  clip-path:polygon(10% 0,90% 0,100% 18%,100% 76%,88% 100%,12% 100%,0 76%,0 18%);
+  border-color:#d2a258;
+  background:linear-gradient(180deg,#143e71e8,#052745f4 69%,#102944f4 82%,#6f462a);
+  box-shadow:inset 0 2px #fff3bf91,0 2px 0 #7f4b26,0 6px 8px #062c47ad;
+}
+.harbour-logo::after{
+  content:'';position:absolute;bottom:-11px;left:30%;width:40%;
+  height:6px;border-radius:50%;z-index:-1;
+  background:linear-gradient(90deg,transparent,#ffe4a8,transparent);
+  box-shadow:0 0 8px #f8d181aa;
+}
+.harbour-logo>span:not(.harbour-logo-crown),.harbour-logo>b{
+  -webkit-text-stroke:.75px #6d3519;
+  text-shadow:0 1px #fff0b7,1px 3px #904920,0 4px #361f1a;
+}
+.harbour-logo-crown{
+  color:#ffdb62;
+  font-size:clamp(18px,4.7vw,31px);
+  text-shadow:0 2px #663716,0 0 5px #ffe39d88;
+}
+.harbour-wallet{
+  right:clamp(7px,2vw,17px);
+  top:max(8px,calc(env(safe-area-inset-top) + 4px));gap:5px;
+}
+.harbour-resources{gap:5px}
+.harbour-stat{
+  height:clamp(29px,4.1dvh,38px);
+  min-width:clamp(64px,16.5vw,108px);
+  border:2px solid #ffda79;border-radius:11px;
+  background:linear-gradient(180deg,#275e8ddf,#0c3459f2 58%,#071f3be6);
+  box-shadow:inset 0 2px #d5f6ff89,inset 0 -2px #07192c,0 2px #613f20,0 5px 7px #041e36b3;
+}
+.harbour-stat-glyph{
+  width:clamp(22px,5.5vw,32px);height:clamp(22px,5.5vw,32px);
+  border-color:#ffc962;
+  background:radial-gradient(circle at 28% 22%,#fff7be,#fbd05c 44%,#d58b1b 72%,#945411);
+  box-shadow:inset 0 1px #fff4be,0 0 5px #f5c45b88;
+}
+.harbour-settings{
+  border:2px solid #ffdb75;border-radius:12px;
+  background:linear-gradient(135deg,#e7b660,#ab6e2c 13%,#254a73 17%,#0c2c51 90%,#9e632a);
+  box-shadow:inset 0 2px #ffeab7,0 2px #623b24,0 5px 7px #0b2d4d;
+}
+.harbour-flank{
+  top:clamp(114px,16.5dvh,225px);
+  width:clamp(70px,19.2vw,120px);
+  gap:clamp(11px,2.6dvh,27px);
+}
+.harbour-flank-left{left:clamp(5px,1.65vw,17px)}
+.harbour-flank-right{
+  top:clamp(225px,32dvh,355px);
+  right:clamp(5px,1.65vw,17px);
+  width:clamp(65px,18.4vw,111px);
+  gap:clamp(10px,2.2dvh,23px);
+}
+.harbour-flank-button{
+  position:relative;
+  height:clamp(66px,9.5dvh,92px);
+  padding:3px 2px 4px;
+  gap:0;
+  border:3px solid #f3c166;
+  border-radius:12px;
+  background:
+    linear-gradient(180deg,#ffdd8d 0%,#9d602a 3%,#29689a 8%,#153c65 23%,#0c2b50 76%,#08223f 91%,#b78037 97%,#ffe39b 100%);
+  box-shadow:inset 0 2px #fff4c9b0,inset 0 0 0 2px #597d9577,inset 0 -3px #081c33,
+    0 2px 0 #6f3c1b,0 5px 7px #062440b8;
+  transition:filter .15s,transform .12s;
+}
+.harbour-flank-button::before{
+  content:'';position:absolute;pointer-events:none;inset:5px;
+  border:1px solid #ffe5aa34;border-radius:7px;
+  background:linear-gradient(148deg,#78adcb1b,transparent 33%);
+}
+.harbour-flank-button::after{
+  content:'';position:absolute;top:-2px;left:15%;right:15%;height:4px;border-radius:50%;
+  background:linear-gradient(90deg,transparent,#fff1b1,transparent);pointer-events:none;
+}
+.harbour-flank-icon{
+  position:relative;
+  display:grid;place-items:center;
+  height:clamp(34px,5.25dvh,49px);
+  width:100%;color:#ffdf95;
+  filter:drop-shadow(0 2px 1px #09182c80);
+}
+.harbour-flank-icon .porto-art{
+  width:clamp(33px,8.9vw,53px);height:clamp(33px,8.9vw,53px);
+  filter:drop-shadow(1px 2px 1px #020c18aa);
+}
+.harbour-flank-button strong{
+  position:relative;
+  font-size:clamp(11px,3vw,17px);
+  line-height:1;letter-spacing:.1px;
+  color:#fff6da;text-shadow:0 2px 1px #031c33,0 0 3px #031525;
+}
+.harbour-flank-left .harbour-flank-button:first-child{
+  height:clamp(109px,15.5dvh,145px);
+  gap:1px;padding-top:5px;
+}
+.harbour-flank-left .harbour-flank-button:first-child .harbour-flank-icon{
+  height:clamp(48px,6.7dvh,62px);
+}
+.harbour-flank-left .harbour-flank-button:first-child .porto-art{
+  width:clamp(42px,10.8vw,59px);height:clamp(42px,10.8vw,59px);
+}
+.harbour-training-mode{color:#fce3a3;font-size:clamp(8px,2.05vw,12px)}
+.harbour-local-wins{color:#ffce5f;font-size:clamp(9px,2.2vw,12px)}
+.harbour-flank-right .harbour-flank-button{
+  height:clamp(69px,9.7dvh,91px);
+}
+.harbour-flank-right .harbour-flank-icon{
+  height:clamp(37px,5.4dvh,50px);
+}
+.harbour-alert{
+  background:radial-gradient(circle at 33% 25%,#ff8a56,#e82d2e 46%,#9d041b);
+  border-color:#ffed9b;box-shadow:0 2px 5px #071a2e,0 0 6px #f64f2b;
+}
+.harbour-battle-button{
+  width:min(63%,470px);
+  height:clamp(70px,10.2dvh,95px);
+  bottom:calc(var(--porto-nav-height) + clamp(29px,6dvh,63px));
+  border:4px solid #ffdc7c;
+  border-radius:18px;
+  background:linear-gradient(180deg,#ffb66f 0%,#f15c35 7%,#d31b25 20%,#af0413 72%,#6b0814 100%);
+  box-shadow:0 0 0 3px #764223,0 7px 0 #4b241a,
+    inset 0 2px #ffe5a0,inset 0 0 0 3px #ffa34e7a,inset 0 -5px #56020e,
+    0 14px 22px #03253eb8;
+}
+.harbour-battle-button:before,.harbour-battle-button:after{
+  top:15%;bottom:15%;width:6px;
+  background:linear-gradient(#fff4ba,#e69a2d 50%,#9b5118);
+  box-shadow:0 0 3px #fff3a7a8;
+}
+.harbour-battle-button .harbour-crossed{
+  filter:drop-shadow(1px 2px 1px #5b1e08);
+}
+.harbour-battle-button .porto-art{
+  width:clamp(35px,9.2vw,54px);height:clamp(35px,9.2vw,54px);
+}
+.harbour-battle-button strong{
+  font-size:clamp(27px,8vw,52px);
+  color:#fff8e4;
+  text-shadow:0 2px #751521,0 3px 2px #431017;
+}
+.harbour-nav{
+  border-top:3px solid #ffdb7e;
+  border-radius:14px 14px 0 0;
+  background:linear-gradient(180deg,#49749d 0%,#173f6b 10%,#102f55 52%,#071a36 100%);
+  box-shadow:0 -4px 15px #072b4a9c,inset 0 2px #bfdaf088;
+}
+.harbour-nav-item{
+  gap:1px;padding:5px 0 4px;
+  border-right:1px solid #88abc65a;
+  background:linear-gradient(180deg,#41779b14,#051e3900);
+}
+.harbour-nav-icon{
+  height:clamp(37px,5.6dvh,55px);
+  color:#ffe3a0;
+  filter:drop-shadow(0 2px #162d40);
+}
+.harbour-nav-icon .porto-art{
+  width:clamp(33px,8.7vw,52px);height:clamp(33px,8.7vw,52px);
+  filter:drop-shadow(1px 2px 1px #020e21aa);
+}
+.harbour-nav-item strong{
+  font-size:clamp(12px,3.4vw,18px);
+  color:#fff9ea;text-shadow:0 2px #061832;
+}
+.harbour-nav-current{
+  margin-top:-7px;
+  border:3px solid #ffd271;border-bottom:0;
+  border-radius:13px 13px 0 0;
+  background:linear-gradient(180deg,#fff6bd 0%,#eeb856 7%,#204a78 14%,#0b3056 85%,#061d3d 100%);
+  box-shadow:0 -3px 10px #ffe19d8f,inset 0 3px #f9dfa4;
+}
+.harbour-nav-current .harbour-nav-icon{filter:drop-shadow(0 0 5px #ffce588a)}
+.harbour-nav-item:not(:disabled):active{filter:brightness(1.25)}
+@media(max-width:390px){
+  .harbour-logo{max-width:40%;font-size:clamp(19px,5.9vw,24px)}
+  .harbour-flank{width:clamp(66px,19.2vw,77px);gap:clamp(9px,2dvh,22px)}
+  .harbour-flank-right{width:clamp(63px,18.3vw,73px);top:clamp(218px,33dvh,320px)}
+  .harbour-flank-left .harbour-flank-button:first-child{height:clamp(96px,15dvh,132px)}
+  .harbour-flank-button strong{font-size:clamp(10px,2.75vw,12px)}
+  .harbour-training-mode{font-size:8px}
+  .harbour-local-wins{font-size:8px}
+  .harbour-battle-button{width:65%}
+  .harbour-battle-button strong{font-size:clamp(24px,7.65vw,31px)}
+  .harbour-nav-item strong{font-size:clamp(11px,3.1vw,13px)}
+}
+@media(max-height:690px){
+  .harbour-flank{top:clamp(105px,17dvh,146px);gap:clamp(7px,1.4dvh,15px)}
+  .harbour-flank-right{top:clamp(171px,30dvh,210px)}
+  .harbour-flank-button,.harbour-flank-right .harbour-flank-button{height:clamp(52px,9dvh,65px)}
+  .harbour-flank-left .harbour-flank-button:first-child{height:clamp(75px,12.8dvh,94px)}
+  .harbour-flank-icon,.harbour-flank-right .harbour-flank-icon{height:29px}
+  .harbour-flank-icon .porto-art{width:31px;height:31px}
+  .harbour-battle-button{height:clamp(58px,9.5dvh,72px);bottom:calc(var(--porto-nav-height) + 17px)}
+  .harbour-battle-button strong{font-size:clamp(24px,7.1vw,32px)}
+}
+@media(min-width:800px){
+  .harbour-flank-left{left:max(18px,5vw)}
+  .harbour-flank-right{right:max(18px,5vw)}
+  .harbour-nav-icon .porto-art{width:52px;height:52px}
+}
+@media(prefers-reduced-motion:reduce){
+  .harbour-flank-button,.harbour-nav-item{transition:none}
+}
