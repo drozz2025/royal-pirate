@@ -44,7 +44,7 @@ test('approved HUD CSS maintains touch-through ship space, mobile controls and g
   assert.match(css,/WORK 6 approved Porto HUD polish/);
   assert.match(css,/\.harbour-flank-right\s*\{[\s\S]*?42dvh/);
   assert.match(css,/\.harbour-logo::before\s*\{/);
-  assert.match(css,/\.harbour-arena-mode\s*\{/);
+  assert.match(css,/\.harbour-training-mode\s*\{/);
   assert.match(css,/\.harbour-nav-alert\s*\{/);
   assert.match(css,/\.harbour-battle-button::before/);
   assert.match(css,/\.harbour-screen\{[\s\S]*?pointer-events:none/);
