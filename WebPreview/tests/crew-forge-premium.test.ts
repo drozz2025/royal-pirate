@@ -50,17 +50,21 @@ test('real local purchases and equipment render with accurate state and balance'
  assert.match(html,/View Captain Mara, owned/);
 });
 
-test('forge overview reflects only purchased shipyard levels and explicitly disclaims effects',()=>{
+test('forge overview reflects only purchased levels and explicitly disclaims battle effects',()=>{
  const empty=renderForge(initialProfile());
- assert.match(empty,/Royal Crown shipyard overview/);
- assert.match(empty,/Shipyard blueprint/);
- assert.match(empty,/do not yet change damage, health or ship speed/);
- assert.equal((empty.match(/<small>0 \/ 5<\/small>/g)||[]).length,3);
- const upgraded=improve({...initialProfile(),coins:100},'hull');
+ assert.match(empty,/aria-label="Melhorias e forja"/);
+ assert.match(empty,/PROGRESSO DO ESTALEIRO/);
+ assert.match(empty,/ainda não altera dano, vida, velocidade/);
+ assert.equal((empty.match(/shipyard upgrade progress"/g)||[]).length,3);
+ assert.equal((empty.match(/NÍVEL 0 \/ 5/g)||[]).length,3);
+ assert.match(empty,/ARMADURA/);
+ assert.match(empty,/moedas locais são usadas/);
+ const upgraded=improve({...initialProfile(),coins:500},'hull');
  assert.equal(upgraded.upgrades.hull,1);
  const changed=renderForge(upgraded);
- assert.match(changed,/\bHull<\/strong><small>1 \/ 5/);
- assert.equal((changed.match(/<small>0 \/ 5<\/small>/g)||[]).length,2);
+ assert.match(changed,/Hull<\/strong><small>NÍVEL 1 \/ 5/);
+ assert.equal((changed.match(/NÍVEL 0 \/ 5/g)||[]).length,2);
+ assert.match(changed,/MELHORAR/);
 });
 
 test('crew and forge premium styling has portrait, keyboard focus and narrow viewport rules',()=>{

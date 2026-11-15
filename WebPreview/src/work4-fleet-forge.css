@@ -1,0 +1,140 @@
+/* WORK 4 — Ecrãs 03 (Frota) e 04 (Melhorias), versão original do mosaico aprovado.
+   Estilos estritamente locais a .w4-screen. Não alteram Porto, combate, cartas ou loja. */
+.w4-screen{--w4-ink:#081c36;--w4-gold:#e8b768;--w4-cream:#fff4d4;
+  font-family:'Barlow Condensed','Barlow',system-ui,sans-serif;max-width:680px;margin:0 auto;
+  color:#fff3df;text-shadow:0 2px 3px #06182a;display:flex;flex-direction:column;gap:9px}
+.w4-screen button{touch-action:manipulation;cursor:pointer}
+.w4-screen button:focus-visible{outline:3px solid #fff6be;outline-offset:2px}
+.w4-screen button:disabled{cursor:not-allowed}
+.w4-title{display:flex;flex-direction:column;align-items:center;padding:3px 0 0;gap:2px}
+.w4-kicker{font:800 10px/1.2 'Barlow',sans-serif;letter-spacing:1.15px;color:#e9ca87}
+.w4-title h2{display:flex;align-items:center;gap:8px;margin:0;padding:7px 28px;border:3px solid #d7a45b;
+ border-radius:12px 12px 22px 22px;background:linear-gradient(180deg,#68401f,#092442 25%,#0c2b4f 85%,#8a4e1d);
+ box-shadow:0 3px 0 #4b301d,0 6px 8px #061429a8,inset 0 2px #fff1bc88;
+ font:900 clamp(25px,7vw,35px)/1 'Barlow Condensed',sans-serif;color:#fff5d3;letter-spacing:.6px;text-transform:uppercase}
+.w4-title h2 svg{color:#ffcf78}
+.w4-tabs{display:grid;gap:4px;padding:2px 0 6px}
+.w4-fleet-tabs{grid-template-columns:1.25fr 1.02fr 1.15fr}
+.w4-forge-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}
+.w4-tabs button{min-width:0;min-height:45px;padding:7px 3px;border-radius:9px;border:2px solid #b28b56;
+ background:linear-gradient(180deg,#2d5b7e,#153855 37%,#0b253f);
+ box-shadow:inset 0 1px #d7e7e66b,0 2px #111c2b;color:#fff1d4;
+ font:900 clamp(11px,3.2vw,16px)/1 'Barlow Condensed',sans-serif;letter-spacing:.1px}
+.w4-tabs button[aria-selected=true]{border-color:#fff0b6;color:#fff7e2;
+ background:linear-gradient(180deg,#427a91,#0a5774 49%,#0d365d);
+ box-shadow:0 0 0 1px #d8983c,inset 0 2px #fff3af80,0 0 9px #f0c05965}
+.w4-harbour-stage,.w4-forge-stage{position:relative;isolation:isolate;overflow:hidden;border:3px solid #ce9c57;
+ border-radius:14px;min-height:245px;box-shadow:inset 0 1px #fff6ca8a,0 6px 14px #001326a8}
+.w4-harbour-stage{background:
+ radial-gradient(ellipse 110px 35px at 82% 39%,#d9f9ffd9,transparent),
+ linear-gradient(180deg,#087bb4 0%,#0a5584 37%,#0a6f92 64%,#064265 65%,#0c83a5 90%,#023351 100%)}
+.w4-harbour-stage:before{content:'';position:absolute;inset:0 0 35%;z-index:-1;
+ background:radial-gradient(ellipse 70% 50% at 50% 8%,#ffffff36,transparent 70%)}
+.w4-harbour-stage:after{content:'';position:absolute;inset:auto 0 0;height:28%;z-index:-1;
+ background:repeating-linear-gradient(-8deg,transparent,transparent 17px,#5bd8ef4d 18px,#08739a30 21px)}
+.w4-island{position:absolute;bottom:26%;width:27%;height:47%;z-index:0;opacity:.86;
+ background:linear-gradient(160deg,#44764b 0%,#21483a 40%,#61452f 41%,#7f7359 75%,transparent 75%)}
+.w4-island-left{left:-13%;clip-path:polygon(0 28%,33% 5%,75% 16%,100% 65%,100% 100%,0 100%)}
+.w4-island-right{right:-18%;clip-path:polygon(0 42%,35% 9%,80% 22%,100% 45%,100% 100%,0 100%)}
+.w4-ship-art{display:block;position:relative;z-index:1;width:80%;max-width:380px;margin:10px auto 0;
+ filter:drop-shadow(0 8px 6px #051e3d9e)}
+.w4-stage-label{position:absolute;right:9px;top:10px;z-index:2;max-width:45%;padding:6px 8px;
+ border-radius:9px;background:linear-gradient(90deg,#031b36de,#052e50e8);text-align:right}
+.w4-stage-label span,.w4-stage-label small,.w4-stage-label b{display:block}
+.w4-stage-label span{font:900 10px 'Barlow',sans-serif;color:#ffdd83}
+.w4-stage-label strong{font:900 clamp(19px,5vw,27px)/1 'Barlow Condensed',sans-serif;letter-spacing:.5px;color:#ffe5a9}
+.w4-stage-label small{font:700 10px/1.3 'Barlow',sans-serif;color:#d3eaf6}
+.w4-stage-label b{display:inline-block;margin-top:4px;border-radius:9px;padding:2px 8px;background:#0b713e;
+ border:1px solid #8fe5a0;color:#efffe8;font:900 12px 'Barlow Condensed',sans-serif}
+.w4-fleet-state{border:2px solid #bd9256;border-radius:11px;background:linear-gradient(#164368,#082944);
+ padding:10px 11px;display:grid;gap:8px}
+.w4-fleet-state h3{margin:0;font:900 23px 'Barlow Condensed',sans-serif;color:#ffdfa5}
+.w4-fleet-state p{margin:0;font:600 12px/1.5 'Barlow',sans-serif;color:#cee6f3}
+.w4-fleet-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.w4-fleet-stats>span{min-width:0;padding:6px 3px;background:#0b2f4d;border:1px solid #6395a3;border-radius:7px;text-align:center}
+.w4-fleet-stats b{display:block;color:#c4e1ef;font:800 10px 'Barlow',sans-serif;line-height:1.3}
+.w4-fleet-stats strong{display:block;color:#ffdfa0;font:900 17px 'Barlow Condensed',sans-serif}
+.w4-action-pair{display:flex;gap:8px;justify-content:center}
+.w4-action-pair button,.w4-fleet-state>.w4-primary{min-height:44px;flex:1;padding:8px 12px;
+ border-radius:9px;border:2px solid #dfb873;background:linear-gradient(#2c5676,#0b2b4a);color:#ffeacf;
+ font:900 clamp(12px,3.2vw,15px)/1.2 'Barlow Condensed',sans-serif}
+.w4-action-pair .w4-primary,.w4-fleet-state>.w4-primary{background:linear-gradient(#f3d487,#b57c38);
+ color:#261e1e;text-shadow:none}
+.w4-custom-captain{display:flex;gap:12px;align-items:center;padding:8px;border-radius:8px;background:#0d3554}
+.w4-custom-captain>span{display:grid;place-items:center;border:2px solid #b88d4b;border-radius:50%;width:44px;height:44px;
+ font-size:27px;color:#ffde85;background:#1b2b4e}
+.w4-custom-captain strong,.w4-custom-captain small{display:block}
+.w4-custom-captain strong{font:900 21px 'Barlow Condensed',sans-serif}
+.w4-custom-captain small{font:800 10px 'Barlow',sans-serif;color:#f6cf86}
+.w4-cards-caption{display:flex;justify-content:space-between;align-items:center;gap:8px;
+ color:#ffe1a2;font:900 15px 'Barlow Condensed',sans-serif}
+.w4-cards-caption small{font:700 9px 'Barlow',sans-serif;color:#bfd6de;text-align:right}
+.w4-ship-roster{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.w4-ship-slot{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;
+ min-width:0;min-height:105px;padding:4px 3px;border:2px solid #946f45;border-radius:10px;
+ background:linear-gradient(#2b5270,#091f3b);color:#ffebbf;text-align:center;line-height:1}
+.w4-ship-slot.is-active{border-color:#ffe998;box-shadow:0 0 10px #ffdd7a99,inset 0 0 9px #f9cd6d44}
+.w4-ship-slot strong{font:900 clamp(10px,2.75vw,13px)/1 'Barlow Condensed',sans-serif}
+.w4-ship-slot small{font:800 clamp(7px,1.95vw,9px)/1.25 'Barlow',sans-serif;color:#b9eacb}
+.w4-slot-art{display:block;width:100%;height:66px;overflow:hidden}
+.w4-ship-small{width:130px;max-width:none;height:95px;transform:translate(-10%, -14px);margin:0;filter:none}
+.w4-ship-slot.is-pending{opacity:.68;border-style:dashed}
+.w4-slot-empty{display:grid;place-items:center;flex:1;font-size:30px;opacity:.6}
+.w4-ship-slot.is-pending small{color:#e4cda8}
+.w4-footnote{margin:0 2px 4px;color:#b9d6e6;font:600 10px/1.45 'Barlow',sans-serif;text-align:center}
+.w4-forge-stage{min-height:208px;background:
+ radial-gradient(ellipse 46% 44% at 42% 80%,#ff9b3d88,transparent 90%),
+ linear-gradient(150deg,#19283e 0%,#35536a 35%,#15354e 70%,#091e36)}
+.w4-forge-stage:before{content:'';position:absolute;inset:0;opacity:.35;z-index:-1;
+ background:repeating-linear-gradient(0deg,transparent 0 38px,#e2a06359 39px 40px),
+ repeating-linear-gradient(90deg,transparent 0 61px,#e2a0637a 62px 64px)}
+.w4-forge-glow{position:absolute;inset:auto 40% -16% 10%;height:100px;
+ background:radial-gradient(ellipse,#ff8a21a8,transparent 70%)}
+.w4-forge-stage .w4-ship-art{width:60%;margin:0 auto 0 0;min-height:180px;
+ filter:drop-shadow(0 9px 10px #0d0a0aaf)}
+.w4-forge-stage .w4-part-cannons .w4-art-cannon{stroke:#fff19c;stroke-width:5}
+.w4-forge-stage .w4-part-sails .w4-art-sail{stroke:#fff09d;stroke-width:5}
+.w4-forge-stage .w4-part-hull .w4-art-hull{stroke:#fff09d;stroke-width:6}
+.w4-forge-description{position:absolute;right:7px;top:17px;max-width:43%;text-align:left;
+ background:#09233ed9;border:1px solid #dcb778;border-radius:10px;padding:10px 8px}
+.w4-forge-description span{display:block;font:800 9px 'Barlow',sans-serif;color:#ffdd9d}
+.w4-forge-description h3{margin:3px 0 6px;font:900 22px/1 'Barlow Condensed',sans-serif;color:#fff1c8}
+.w4-forge-description strong{font:900 15px 'Barlow Condensed',sans-serif}
+.w4-forge-description em{font-style:normal;color:#83eb73}
+.w4-attributes,.w4-materials{border:2px solid #b89256;background:linear-gradient(#133856,#08223c);
+ padding:10px;border-radius:11px}
+.w4-attributes h3,.w4-materials h3{margin:0 0 8px;font:900 16px 'Barlow Condensed',sans-serif;color:#ffe0a3}
+.w4-attributes p,.w4-materials p{margin:7px 0 0;font:600 11px/1.5 'Barlow',sans-serif;color:#bfdbe8}
+.w4-level-track{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.w4-level-track span{display:block;border:1px solid #64869d;background:#17344c;border-radius:4px;height:19px}
+.w4-level-track span.is-filled{background:linear-gradient(#c1e58c,#36864b);border-color:#d5f6a2}
+.w4-resource-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.w4-resource-grid>div{min-width:0;border:1px solid #6b93a6;border-radius:9px;padding:6px 3px;
+ background:#0a2b48;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}
+.w4-resource-grid span{color:#f8c35c;font-size:27px;line-height:1.1}
+.w4-resource-grid small{font:800 9px/1.15 'Barlow',sans-serif;color:#d3e4f3}
+.w4-resource-grid strong{font:900 17px 'Barlow Condensed',sans-serif;color:#fff1c8}
+.w4-improve-button{width:76%;align-self:center;min-height:53px;padding:8px 13px;border:3px solid #f6d88e!important;
+ border-radius:13px;background:linear-gradient(#8bdd40,#268e2f 55%,#196a28);
+ box-shadow:0 3px #584327,0 5px 12px #091b2d,inset 0 2px #edffbd99;
+ color:#fffeef;font:900 22px/1 'Barlow Condensed',sans-serif}
+.w4-improve-button:disabled{opacity:1!important;background:linear-gradient(#596f69,#304d50);color:#dfecdc}
+.w4-forge .w4-action-pair button{max-width:240px}
+@media (max-width:375px){
+  .w4-ship-slot{min-height:93px}.w4-slot-art{height:56px}.w4-ship-small{transform:translate(-17%,-22px)}
+  .w4-harbour-stage{min-height:215px}.w4-ship-art{width:86%;margin-top:17px}
+  .w4-forge-stage .w4-ship-art{width:64%}
+  .w4-stage-label{top:6px;right:5px;padding:5px}
+  .w4-stage-label strong{font-size:19px}
+  .w4-improve-button{width:94%}
+}
+@media (max-width:330px){.w4-tabs button{font-size:10px}.w4-stage-label{max-width:49%}}
+@media (prefers-reduced-motion:reduce){.w4-screen button{transition:none}}
+
+.w4-system-levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:9px}
+.w4-system-levels>div{min-width:0;padding:6px 5px;border:1px solid #63869a;border-radius:8px;background:#092c49}
+.w4-system-levels strong,.w4-system-levels small{display:block}
+.w4-system-levels strong{font:900 13px 'Barlow Condensed',sans-serif;color:#fff0cb}
+.w4-system-levels small{font:700 10px 'Barlow',sans-serif;color:#e6c994}
+.w4-mini-track{display:block;height:6px;background:#183b53;border-radius:6px;margin-top:5px;overflow:hidden}
+.w4-mini-track i{display:block;height:100%;background:linear-gradient(#c5e69b,#3e9c55)}
