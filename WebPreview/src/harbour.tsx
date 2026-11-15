@@ -55,7 +55,7 @@ export function Harbour({ onBattle, onInspect, onShipyard }: { onBattle: () => v
         </div>
       </section>
       <div className="harbour-actions">
-        <button type="button" className="harbour-secondary-action" onClick={onShipyard} aria-label="Open the 3D shipyard module preview"><span aria-hidden="true">⚒</span><strong>SHIPYARD</strong><small>3D DEMO</small></button>
+        <button type="button" className="harbour-secondary-action" onClick={onShipyard} aria-label="Open the 3D shipyard module preview"><span aria-hidden="true">⚒</span><strong>UPGRADES</strong><small>3D SHIPYARD</small></button>
         <button className="harbour-battle-button" type="button" onClick={onBattle} aria-label="Battle: enter playable naval combat"><span className="harbour-crossed" aria-hidden="true">⚔</span><strong>BATTLE!</strong><small>ENTER NAVAL COMBAT</small></button>
         <div className="harbour-secondary-action" aria-disabled="true"><span aria-hidden="true">⚙</span><strong>FORGE</strong><small>SOON</small></div>
       </div>
