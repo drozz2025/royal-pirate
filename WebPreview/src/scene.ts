@@ -59,7 +59,7 @@ export class OceanScene {
       flash.position.set(direction*1.15,0,0);flash.visible=false;gun.add(flash);this.muzzleFlash[side]=flash;
     }
     flashMaterial.dispose();
-    this.environment();this.buildHarbourDock();this.scene.add(this.harbourDock);
+    this.environment();this.buildHarbourDock();this.buildPortBackdrop();this.scene.add(this.harbourDock);
     this.controls=new OrbitControls(this.camera,this.canvas);this.controls.enableDamping=true;this.controls.enablePan=false;this.controls.minDistance=18;this.controls.maxDistance=110;this.controls.minPolarAngle=.32;this.controls.maxPolarAngle=1.28;this.controls.target.set(0,2,0);this.controls.rotateSpeed=.5;
     this.path=new T.Line(this.pathGeometry,new T.LineDashedMaterial({color:'#f9e5a4',dashSize:.35,gapSize:.2,transparent:true,opacity:.85}));this.scene.add(this.path);
     this.marker=new T.Mesh(new T.RingGeometry(.48,.58,36),new T.MeshBasicMaterial({color:'#ffdf7e',side:T.DoubleSide,transparent:true,opacity:.9,depthTest:false}));this.marker.rotation.x=-Math.PI/2;this.scene.add(this.marker);
@@ -119,6 +119,65 @@ export class OceanScene {
     }
     this.harbourDock.visible=false;
   }
+  /** Separate original low-poly town, palms and striped beacon, visible only in Porto.
+   * Positioned behind the playable ship. The approved art is not used as a flat backdrop. */
+  private buildPortBackdrop(){
+    const port=this.harbourDock,ship=SHIPS.player;
+    const stone=new T.MeshStandardMaterial({color:'#969f96',flatShading:true,roughness:.94});
+    const grass=new T.MeshStandardMaterial({color:'#529458',flatShading:true,roughness:1});
+    const sand=new T.MeshStandardMaterial({color:'#e6c98b',roughness:1});
+    const plaster=[new T.MeshStandardMaterial({color:'#f5e8bf',roughness:1}),
+      new T.MeshStandardMaterial({color:'#edcbaa',roughness:1}),
+      new T.MeshStandardMaterial({color:'#f1e4cd',roughness:1})];
+    const roofMat=new T.MeshStandardMaterial({color:'#b14c32',roughness:.8});
+    const trimMat=new T.MeshStandardMaterial({color:'#5a4634',roughness:.88});
+    const seaMat=new T.MeshStandardMaterial({color:'#fce8b5',emissive:'#f5d38d',emissiveIntensity:.3});
+    const box=new T.BoxGeometry(1,1,1),isle=new T.IcosahedronGeometry(1,1);
+    // City and hills behind the vessel: avoid occluding the foreground 3D hull.
+    for(const [side,dx,dz] of [[-1,-8,-27],[1,10,-33]] as const){
+      const x=ship.x+dx,z=ship.z+dz;
+      const beach=new T.Mesh(isle,sand);beach.scale.set(7,2,4.5);beach.position.set(x,-.6,z);port.add(beach);
+      const cliff=new T.Mesh(isle,stone);cliff.scale.set(6.2,4.8,4);cliff.position.set(x,1.1,z-1.2);port.add(cliff);
+      const shrub=new T.Mesh(isle,grass);shrub.scale.set(5.9,1.2,3.7);shrub.position.set(x,4.5,z-1.2);port.add(shrub);
+      for(let i=0;i<4;i++){
+        const bx=x+(i-1.5)*2.15,bz=z-1.8+(i%2)*1.5;
+        const height=2.1+(i%3)*.72;
+        const building=new T.Mesh(box,plaster[i%3]);building.position.set(bx,5.2+height/2,bz);
+        building.scale.set(1.75,height,1.65);port.add(building);
+        const roof=new T.Mesh(new T.ConeGeometry(1.36,1.35,4),roofMat);
+        roof.rotation.y=Math.PI/4;roof.position.set(bx,5.2+height+.5,bz);port.add(roof);
+        const door=new T.Mesh(box,trimMat);door.scale.set(.4,.84,.06);
+        door.position.set(bx,5.35,bz+.86);port.add(door);
+      }
+      // Layered palms on the green slopes, with 6 long curved leaves each.
+      for(let p=0;p<3;p++){
+        const px=x+(p-1)*2.65,pz=z+1.8+p%2;
+        const trunk=new T.Mesh(new T.CylinderGeometry(.10,.19,3.5,7),trimMat);
+        trunk.position.set(px,6.7,pz);trunk.rotation.z=(p-1)*.16;port.add(trunk);
+        for(let j=0;j<6;j++){
+          const theta=j*Math.PI/3;
+          const leaf=new T.Mesh(new T.SphereGeometry(1,7,4),grass);
+          leaf.position.set(px+Math.cos(theta)*.88,8.5,pz+Math.sin(theta)*.88);
+          leaf.scale.set(1.25,.12,.37);leaf.rotation.y=-theta;leaf.rotation.z=.13;
+          port.add(leaf);
+        }
+      }
+      if(side===1){
+        // A working harbor landmark: original white/red lighthouse and glowing beacon.
+        const baseX=x+2.3,baseZ=z+.5;
+        const white=new T.MeshStandardMaterial({color:'#f9f3dc',roughness:.8});
+        const red=new T.MeshStandardMaterial({color:'#c95a42',roughness:.8});
+        for(let j=0;j<5;j++){
+          const tier=new T.Mesh(new T.CylinderGeometry(1-.10*(j+1),1-.10*j,1.65,12),j%2===0?white:red);
+          tier.position.set(baseX,5.3+j*1.65+.82,baseZ);port.add(tier);
+        }
+        const gallery=new T.Mesh(new T.CylinderGeometry(.95,.95,.3,12),trimMat);
+        gallery.position.set(baseX,13.8,baseZ);port.add(gallery);
+        const bulb=new T.Mesh(new T.SphereGeometry(.45,10,8),seaMat);bulb.position.set(baseX,14.4,baseZ);port.add(bulb);
+        const cap=new T.Mesh(new T.ConeGeometry(1.15,1.3,12),roofMat);cap.position.set(baseX,15.1,baseZ);port.add(cap);
+      }
+    }
+  }
   private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();}
   home(){this.cameraMode='battle';const aspect=this.host.clientWidth/this.host.clientHeight;const distance=aspect<.75?55:aspect<1.2?43:34;if(aspect<.75){this.camera.position.set(-distance*.74,distance*.62,distance*.58);this.controls.target.set(0,1.6,0);}else{this.camera.position.set(distance*.20,distance*.56,distance*.88);this.controls.target.set(0,2,0);}this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
@@ -129,7 +188,7 @@ export class OceanScene {
     this.controls.enableRotate=false;this.controls.enableZoom=false;
     const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
     this.controls.target.set(ship.x,portrait?3.5:2.9,ship.z);
-    this.camera.position.set(ship.x+(portrait?2.5:5),portrait?10.8:10,ship.z+(portrait?24:19));
+    this.camera.position.set(ship.x+(portrait?10.5:10),portrait?10.5:10,ship.z+(portrait?22.5:19));
     this.controls.update();
   }
   /** Harbour only: activate OrbitControls if touch begins on real ship geometry. */

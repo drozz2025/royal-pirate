@@ -1,60 +1,92 @@
 import React from 'react';
-import { PirateIcon } from './app-icons';
+import { PirateIcon, type PirateIconName } from './app-icons';
 import type { AppScreenId } from './app-screens';
 import { canClaimDaily, levelFor, missionProgress, MISSIONS, nextDailyStreak, type LocalProfile } from './progression';
 
-/** Live Three.js harbour with navigable app-first menus.
- * All displayed resource amounts and milestones come from the local battle profile.
+/** Approved Porto 1:1 screen composition, rendered as real controls over the interactive 3D scene.
+ * No image of the reference screen is used as a background: the ship remains live geometry.
+ * Currency, level, daily claims and achievement notices are derived from saved local results.
  */
-const upcoming:ReadonlyArray<{icon:string;title:string;screen:AppScreenId}> = [
-  { icon: '▣', title: 'SHOP', screen:'shop' },
-  { icon: '♠', title: 'CARDS', screen:'cards' },
-  { icon: '⚓', title: 'FLEET', screen:'fleet' },
-  { icon: '✦', title: 'MISSIONS', screen:'missions' },
-  { icon: '♜', title: 'PROFILE', screen:'profile' },
+type PortAction = { title:string;icon:PirateIconName;screen:AppScreenId;label:string };
+const leftActions:ReadonlyArray<PortAction> = [
+  {title:'ARENA',icon:'arena',screen:'battle',label:'Enter the training arena briefing'},
+  {title:'BAÚS',icon:'chests',screen:'chests',label:'View the daily supply chest'},
+  {title:'EVENTOS',icon:'events',screen:'events',label:'View event availability'},
 ];
-export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=false }: { onBattle: () => void; onNavigate:(screen:AppScreenId)=>void;profile:LocalProfile;selected?:boolean;hidden?:boolean }) {
-  const now=Date.now();
-  const dailyAvailable=canClaimDaily(profile,now);
-  const nextDay=nextDailyStreak(profile,now);
-  const dailyPrize=15+nextDay*5;
+const rightActions:ReadonlyArray<PortAction> = [
+  {title:'RECOMPENSAS',icon:'rewards',screen:'rewards',label:'View earned local rewards'},
+  {title:'MISSÕES',icon:'missions',screen:'missions',label:'View local missions'},
+  {title:'OFERTAS',icon:'offers',screen:'offers',label:'View offer availability'},
+];
+const nav:ReadonlyArray<{title:string;icon:PirateIconName;screen:AppScreenId|null}> = [
+  {title:'PORTO',icon:'port',screen:null},
+  {title:'FROTA',icon:'fleet',screen:'fleet'},
+  {title:'CARTAS',icon:'cards',screen:'cards'},
+  {title:'LOJA',icon:'shop',screen:'shop'},
+  {title:'RANKING',icon:'ranking',screen:'ranking'},
+];
+
+export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=false }: {
+  onBattle:()=>void;onNavigate:(screen:AppScreenId)=>void;profile:LocalProfile;selected?:boolean;hidden?:boolean
+}) {
+  const now=Date.now(),dailyAvailable=canClaimDaily(profile,now),day=nextDailyStreak(profile,now);
+  const dailyCoins=15+day*5;
   const readyMissions=MISSIONS.filter(m=>missionProgress(profile,m.id)>=m.target&&!profile.claimedMissions.includes(m.id)).length;
-  const milestoneWins=Math.min(profile.wins,10);
-  return <section className="harbour-screen" aria-label="Royal Pirate harbour" aria-hidden={hidden} inert={hidden}>
-    <div className="harbour-sky" aria-hidden="true" />
+  const level=levelFor(profile.xp);
+  const levelStart=80*(level-1)*(level-1),levelEnd=80*level*level;
+  const xpPercent=level>=20?100:Math.min(100,Math.max(0,Math.round(100*(profile.xp-levelStart)/(levelEnd-levelStart))));
+  const coins=new Intl.NumberFormat('pt-PT').format(profile.coins);
+  const onAction=(screen:AppScreenId)=>onNavigate(screen);
+  const side=(items:ReadonlyArray<PortAction>,sideName:string)=>(
+    <nav className={'harbour-flank harbour-flank-'+sideName} aria-label={sideName==='left'?'Arena, chests and events':'Rewards, missions and offers'}>
+      {items.map(item=>{
+        const ready=item.screen==='chests'&&dailyAvailable||item.screen==='rewards'&&(dailyAvailable||readyMissions>0)||item.screen==='missions'&&readyMissions>0;
+        const label=item.screen==='chests'
+          ?(dailyAvailable?'Daily supply ready: claim '+dailyCoins+' local coins in Missions':'Daily supply collected today, streak '+profile.dailyStreak+' of 7')
+          :item.screen==='missions'&&readyMissions?'Missions: '+readyMissions+' reward claims ready':item.label;
+        return <button type="button" key={item.screen} className={'harbour-flank-button'+(ready?' is-ready':'')} onClick={()=>onAction(item.screen)} aria-label={label}>
+          <span className="harbour-flank-icon" aria-hidden="true"><PirateIcon name={item.icon} size={33}/></span>
+          <strong>{item.title}</strong>
+          {ready&&<span className="harbour-alert" aria-hidden="true">!</span>}
+        </button>;
+      })}
+    </nav>
+  );
+  return <section className="harbour-screen" aria-label="Royal Pirate Porto" aria-hidden={hidden} inert={hidden}>
+    <div className="harbour-sky" aria-hidden="true"/>
     <header className="harbour-header">
-      <button type="button" className="harbour-profile" onClick={()=>onNavigate('profile')} aria-label="Open local captain profile">
-        <span className="harbour-avatar" aria-hidden="true">☠</span>
-        <div><strong>CAPTAIN · LEVEL {levelFor(profile.xp)}</strong><span>ROYAL CROWN</span><small>LOCAL OFFLINE PROFILE</small></div>
+      <button type="button" className="harbour-profile" onClick={()=>onAction('profile')} aria-label={'Captain profile, level '+level+', local progress'}>
+        <span className="harbour-avatar" aria-hidden="true"><PirateIcon name="profile" size={36}/></span>
+        <span className="harbour-level">
+          <strong>NV. {level}</strong>
+          <span className="harbour-level-track" role="progressbar" aria-label="Captain level experience" aria-valuemin={0} aria-valuemax={100} aria-valuenow={xpPercent}><span style={{width:xpPercent+'%'}}/></span>
+        </span>
       </button>
-      <div className="harbour-resources" role="group" aria-label="Local captain statistics">
-        <div className="harbour-stat" aria-label={profile.coins+' locally earned coins'}><span className="harbour-stat-glyph" aria-hidden="true">●</span><strong>{profile.coins}</strong><small>COINS</small></div>
-        <div className="harbour-stat" aria-label={profile.wins+' victories from real battles'}><span className="harbour-stat-glyph" aria-hidden="true">★</span><strong>{profile.wins}</strong><small>WINS</small></div>
+      <h1 className="harbour-logo"><span className="harbour-logo-crown" aria-hidden="true">♛</span><span>ROYAL</span><b>PIRATE</b></h1>
+      <div className="harbour-wallet" role="group" aria-label="Local captain statistics">
+        <div className="harbour-resources">
+          <span className="harbour-stat" aria-label={profile.coins+' locally earned coins'}><span className="harbour-stat-glyph" aria-hidden="true">●</span><strong>{coins}</strong></span>
+          <span className="harbour-stat" aria-label={profile.wins+' victories from real battles'}><span className="harbour-stat-glyph" aria-hidden="true">★</span><strong>{profile.wins}</strong></span>
+        </div>
+        <button type="button" className="harbour-settings" onClick={()=>onAction('profile')} aria-label="Captain profile and local settings"><PirateIcon name="settings" size={27}/></button>
       </div>
     </header>
-    <section className="harbour-arena" aria-label="Training waters">
-      <span className="harbour-arena-crest" aria-hidden="true"><PirateIcon name="battle" size={32}/></span>
-      <div className="harbour-arena-body">
-        <div className="harbour-arena-title"><strong>TRAINING WATERS</strong><span>ARENA 01</span></div>
-        <div className="harbour-arena-track" role="progressbar" aria-label="Victories towards ten-win milestone" aria-valuemin={0} aria-valuemax={10} aria-valuenow={milestoneWins}><span style={{width:`${milestoneWins*10}%`}}/></div>
-        <small>{profile.wins} VICTORIES · LOCAL 10-WIN MILESTONE</small>
-      </div>
-      <span className="harbour-arena-cup" aria-hidden="true">★</span>
-    </section>
-    <div className="harbour-central">
-    </div>
-    <div className="harbour-lower">
-      <div className="harbour-actions">
-        <button type="button" className="harbour-secondary-action" onClick={()=>onNavigate('forge')}><span aria-hidden="true"><PirateIcon name="forge" size={27}/></span><strong>FORGE</strong><small>UPGRADES</small></button>
-        <button className="harbour-battle-button" type="button" onClick={onBattle} aria-label="Battle: enter playable naval combat"><span className="harbour-crossed" aria-hidden="true"><PirateIcon name="battle" size={40}/></span><strong>BATTLE!</strong><small>ENTER NAVAL COMBAT</small></button>
-        <button type="button" className={'harbour-secondary-action harbour-compact-daily '+(dailyAvailable?'harbour-reward-ready':'')} onClick={()=>onNavigate('missions')} aria-label={dailyAvailable?`Daily supply ready: claim ${dailyPrize} local coins in Missions`:`Daily supply collected today, streak ${profile.dailyStreak} of 7. Open calendar in Missions`}>
-          <span aria-hidden="true">🎁</span><strong>DAILY</strong><small>{dailyAvailable?`DAY ${nextDay} · CLAIM`:`✓ ${profile.dailyStreak}/7`}</small>
-        </button>
-      </div>
-      <nav className="harbour-nav" aria-label="Game screens">
-        {upcoming.map((item,i)=><button type="button" key={item.title} onClick={()=>onNavigate(item.screen)} className={'harbour-nav-item '+(i===2?'harbour-nav-current':'')} aria-label={item.screen==='missions'&&readyMissions?`Missions: ${readyMissions} reward claims ready`:item.title}><span aria-hidden="true"><PirateIcon name={item.screen} size={25}/></span><strong>{item.title}</strong><small>{item.screen==='missions'&&readyMissions?readyMissions+' READY':'OPEN'}</small></button>)}
-      </nav>
-      <p className="harbour-disclaimer">LOCAL PREVIEW · COINS & MISSIONS SAVED ON THIS DEVICE · ONLINE RANKING & IAP NOT LIVE</p>
-    </div>
+    <div className="harbour-central" aria-hidden="true"/>
+    {side(leftActions,'left')}
+    {side(rightActions,'right')}
+    <div className="harbour-dock-chest" aria-hidden="true"><span className="harbour-dock-chest-lid"/><span className="harbour-dock-chest-lock"/></div>
+    <button type="button" className="harbour-battle-button" onClick={onBattle} aria-label="Batalha: iniciar combate naval jogável">
+      <span className="harbour-crossed" aria-hidden="true"><PirateIcon name="battle" size={42}/></span><strong>BATALHA!</strong>
+    </button>
+    <nav className="harbour-nav" aria-label="Main game navigation">
+      {nav.map(item=><button type="button" key={item.title}
+        className={'harbour-nav-item'+(item.screen===null?' harbour-nav-current':'')}
+        disabled={item.screen===null} aria-current={item.screen===null?'page':undefined}
+        onClick={item.screen?()=>onAction(item.screen!):undefined}
+        aria-label={item.screen===null?'Porto, current screen':item.title}>
+        <span className="harbour-nav-icon" aria-hidden="true"><PirateIcon name={item.icon} size={30}/></span><strong>{item.title}</strong>
+      </button>)}
+    </nav>
+    <span className="harbour-sr-only" role="status">{selected?'3D ship selected. Drag directly on the ship to rotate, pinch to zoom.':''} Local offline preview. Online rankings and purchases are not available.</span>
   </section>;
 }
