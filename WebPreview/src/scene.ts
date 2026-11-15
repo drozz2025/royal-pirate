@@ -15,16 +15,21 @@ export class OceanScene {
   private pathGeometry=new T.BufferGeometry().setAttribute('position',new T.BufferAttribute(new Float32Array(240*3),3)); private path: T.Line; private marker: T.Mesh;
   private ball: T.Mesh; private particleGeometry=new T.IcosahedronGeometry(1,0); private particleMaterial=new T.MeshBasicMaterial({color:'#fff'});
   private particles: { mesh:T.Mesh;velocity:T.Vector3;age:number;life:number;size:number;smoke:boolean }[]=[];
-  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private muzzleFlash:Partial<Record<'player'|'enemy',T.Mesh>>={}; private recoilAge:Record<'player'|'enemy',number>={player:Infinity,enemy:Infinity}; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'|'inspect'='battle'; private harbourDock=new T.Group(); private shake=0;
+  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private muzzleFlash:Partial<Record<'player'|'enemy',T.Mesh>>={}; private recoilAge:Record<'player'|'enemy',number>={player:Infinity,enemy:Infinity}; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'='battle'; private harbourDock=new T.Group(); private shake=0;
+  private shipPointers=new Set<number>(); private shipStart: {x:number;y:number}|null=null; private shipMoved=false;
   private renderMs=0;private lastRender=0;private frameSamples:number[]=[];private metricsAt=0; private pirateAudio=new PirateAudio(); paused=false; disposed=false;
   private onContextLost=(event:Event)=>{event.preventDefault();this.paused=true;this.onError('The 3D view was interrupted. Reload to restore the ocean.');};
   private onVisibility=()=>{this.previous=0;this.pirateAudio.setHidden(document.hidden);};
-  constructor(private host:HTMLElement, public battle:Battle, private onFrame:()=>void,private onMetrics:(m:Metrics)=>void,private onError:(message:string)=>void){
+  constructor(private host:HTMLElement, public battle:Battle, private onFrame:()=>void,private onMetrics:(m:Metrics)=>void,private onError:(message:string)=>void,private onShipSelection:(selected:boolean)=>void=()=>{}){
     const probe=document.createElement('canvas');const context=probe.getContext('webgl2',{antialias:true,alpha:false,powerPreference:'high-performance'});
     this.compatibility=!context;this.renderer=context?new T.WebGLRenderer({canvas:probe,context,antialias:true,alpha:false}):new SoftwareRenderer();
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));this.renderer.outputColorSpace=T.SRGBColorSpace;this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.2;
     this.canvas=this.renderer.domElement;host.append(this.canvas);this.canvas.setAttribute('aria-label','3D naval battlefield. Drag to orbit, pinch to zoom.');
     this.canvas.addEventListener('webglcontextlost',this.onContextLost);
+    this.canvas.addEventListener('pointerdown',this.shipPointerDown,true);
+    this.canvas.addEventListener('pointermove',this.shipPointerMove,true);
+    this.canvas.addEventListener('pointerup',this.shipPointerUp,true);
+    this.canvas.addEventListener('pointercancel',this.shipPointerUp,true);
     this.scene.background=new T.Color('#93d8ed');this.scene.fog=new T.FogExp2('#9ad8df',.008);
     const hemi=new T.HemisphereLight('#d9f5ff','#497079',2.3);this.scene.add(hemi);
     const sun=new T.DirectionalLight('#ffe3af',3.6);sun.position.set(-24,40,15);this.scene.add(sun);
@@ -114,12 +119,12 @@ export class OceanScene {
     }
     this.harbourDock.visible=false;
   }
-  private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();else if(this.cameraMode==='inspect')this.inspectShip();}
+  private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();}
   home(){this.cameraMode='battle';const aspect=this.host.clientWidth/this.host.clientHeight;const distance=aspect<.75?55:aspect<1.2?43:34;if(aspect<.75){this.camera.position.set(-distance*.74,distance*.62,distance*.58);this.controls.target.set(0,1.6,0);}else{this.camera.position.set(distance*.20,distance*.56,distance*.88);this.controls.target.set(0,2,0);}this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
   /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
   showHarbour(){
-    this.cameraMode='harbour';this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
+    this.cameraMode='harbour';this.shipPointers.clear();this.shipStart=null;this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
     this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
     this.controls.enableRotate=false;this.controls.enableZoom=false;
     const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
@@ -127,20 +132,32 @@ export class OceanScene {
     this.camera.position.set(ship.x+(portrait?2.5:5),portrait?10.8:10,ship.z+(portrait?24:19));
     this.controls.update();
   }
-  /** Active 3D inspection: orbit and pinch-zoom the real ship without starting a fight. */
-  inspectShip(){
-    this.cameraMode='inspect';
-    this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
-    this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
+  /** Harbour only: activate OrbitControls if touch begins on real ship geometry. */
+  private shipPointerDown=(event:PointerEvent)=>{
+    if(this.cameraMode!=='harbour'||this.paused)return;
+    const box=this.canvas.getBoundingClientRect();
+    if(!box.width||!box.height)return;
+    const p=new T.Vector2((event.clientX-box.left)/box.width*2-1,-(event.clientY-box.top)/box.height*2+1);
+    const ray=new T.Raycaster();ray.setFromCamera(p,this.camera);
+    const hit=ray.intersectObject(this.ships.player.root,true).length>0;
+    if(!hit&&!this.shipPointers.size){this.onShipSelection(false);return;}
+    this.shipPointers.add(event.pointerId);
+    if(!this.shipStart)this.shipStart={x:event.clientX,y:event.clientY};
+    this.shipMoved=false;
     this.controls.enableRotate=true;this.controls.enableZoom=true;
-    this.controls.minDistance=10;this.controls.maxDistance=34;
-    const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
-    this.controls.target.set(ship.x,3.8,ship.z);
-    this.camera.position.set(ship.x+(portrait?8:11),portrait?10:8,ship.z+(portrait?20:17));
-    this.controls.update();
-  }
+  };
+  private shipPointerMove=(event:PointerEvent)=>{
+    if(this.cameraMode!=='harbour'||!this.shipPointers.has(event.pointerId)||!this.shipStart)return;
+    if(Math.hypot(event.clientX-this.shipStart.x,event.clientY-this.shipStart.y)>6)this.shipMoved=true;
+  };
+  private shipPointerUp=(event:PointerEvent)=>{
+    if(!this.shipPointers.has(event.pointerId))return;
+    this.shipPointers.delete(event.pointerId);
+    if(!this.shipMoved)this.onShipSelection(true);
+    if(this.shipPointers.size===0){this.shipStart=null;this.controls.enableRotate=false;this.controls.enableZoom=false;}
+  };
   /** Returns to the existing working battle camera, with both ships visible. */
-  showBattle(){this.ships.enemy.root.visible=true;this.foam[1].visible=true;this.harbourDock.visible=false;this.controls.enableRotate=true;this.controls.enableZoom=true;this.controls.minDistance=18;this.controls.maxDistance=110;this.home();}
+  showBattle(){this.shipPointers.clear();this.shipStart=null;this.ships.enemy.root.visible=true;this.foam[1].visible=true;this.harbourDock.visible=false;this.controls.enableRotate=true;this.controls.enableZoom=true;this.controls.minDistance=18;this.controls.maxDistance=110;this.home();}
   toggleMusic(){return this.pirateAudio.toggleMusic();}
   toggleEffects(){return this.pirateAudio.toggleEffects();}
   private effect(event:BattleEvent){
@@ -202,5 +219,5 @@ export class OceanScene {
     this.controls.update();if(this.shake>0){this.camera.position.y+=Math.sin(timestamp*.1)*this.shake;this.shake*=.86;}
     const renderStart=performance.now();this.renderer.render(this.scene,this.camera);this.renderMs=performance.now()-renderStart;this.onFrame();if(timestamp-this.metricsAt>1000){this.metricsAt=timestamp;this.onMetrics(this.getMetrics());}
   };
-  dispose(){this.disposed=true;cancelAnimationFrame(this.raf);this.resizeObserver.disconnect();document.removeEventListener('visibilitychange',this.onVisibility);this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.controls.dispose();const geometries=new Set<T.BufferGeometry>(),materials=new Set<T.Material>(),textures=new Set<T.Texture>();this.scene.traverse(o=>{if(o instanceof T.Mesh||o instanceof T.Line){geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:[o.material]){materials.add(m);for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);}}});geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());this.renderer.dispose();this.canvas.remove();this.pirateAudio.dispose();}
+  dispose(){this.disposed=true;cancelAnimationFrame(this.raf);this.resizeObserver.disconnect();document.removeEventListener('visibilitychange',this.onVisibility);this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.canvas.removeEventListener('pointerdown',this.shipPointerDown,true);this.canvas.removeEventListener('pointermove',this.shipPointerMove,true);this.canvas.removeEventListener('pointerup',this.shipPointerUp,true);this.canvas.removeEventListener('pointercancel',this.shipPointerUp,true);this.controls.dispose();const geometries=new Set<T.BufferGeometry>(),materials=new Set<T.Material>(),textures=new Set<T.Texture>();this.scene.traverse(o=>{if(o instanceof T.Mesh||o instanceof T.Line){geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:[o.material]){materials.add(m);for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);}}});geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());this.renderer.dispose();this.canvas.remove();this.pirateAudio.dispose();}
 }
