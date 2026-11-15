@@ -13,7 +13,14 @@ const PAGES:ReadonlyArray<{id:AppScreenId;title:string}>=[
   {id:'chests',title:'Daily chests'},{id:'events',title:'Events'},
   {id:'rewards',title:'Rewards'},{id:'offers',title:'Offers'}
 ];
-const mainNav:AppScreenId[]=['fleet','cards','battle','shop','profile'];
+// Keep the secondary screens' navigation consistent with the owner's approved Porto.
+const mainNav:ReadonlyArray<{title:string;icon:'port'|'fleet'|'cards'|'shop'|'ranking';screen:AppScreenId|null}>=[
+  {title:'PORTO',icon:'port',screen:null},
+  {title:'FROTA',icon:'fleet',screen:'fleet'},
+  {title:'CARTAS',icon:'cards',screen:'cards'},
+  {title:'LOJA',icon:'shop',screen:'shop'},
+  {title:'RANKING',icon:'ranking',screen:'ranking'}
+];
 const headerShortcuts:AppScreenId[]=['battle','forge','missions','profile'];
 export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,backupMessage}:
   {screen:AppScreenId;profile:LocalProfile;onNavigate:(screen:AppScreenId)=>void;onClose:()=>void;onBattle:()=>void;
@@ -22,8 +29,9 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
   const page=PAGES.find(p=>p.id===screen)!;
   const [announcement,setAnnouncement]=React.useState('');
   const [onlyOwned,setOnlyOwned]=React.useState(false);
+  const [selectedUpgrade,setSelectedUpgrade]=React.useState<UpgradeId>('hull');
   const titleRef=React.useRef<HTMLHeadingElement>(null);
-  React.useEffect(()=>{setAnnouncement('');setOnlyOwned(false);titleRef.current?.focus();},[screen]);
+  React.useEffect(()=>{setAnnouncement('');setOnlyOwned(false);setSelectedUpgrade('hull');titleRef.current?.focus();},[screen]);
   const action=(message:string,callback:()=>void)=>{callback();setAnnouncement(message);};
   const now=Date.now(),day=canClaimDaily(profile,now);
   const nextDailyDay=nextDailyStreak(profile,now);
@@ -97,13 +105,17 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
           <div className="app-forge-seal" aria-hidden="true"><PirateIcon name="forge" size={56}/><span>ROYAL CROWN</span></div>
           <div className="app-forge-status"><div className="app-kicker">THREE SHIP SYSTEMS · REAL LOCAL LEVELS</div>
             <h3>Shipyard blueprint</h3>
-            <div className="app-forge-mini-grid">{UPGRADES.map(u=><div key={u.id}>
+            <div className="app-forge-mini-grid" role="group" aria-label="Select ship system to upgrade">{UPGRADES.map(u=><button type="button" key={u.id}
+              aria-pressed={selectedUpgrade===u.id} aria-controls="app-forge-selected-upgrade"
+              onClick={()=>setSelectedUpgrade(u.id)}
+              aria-label={u.name+', level '+profile.upgrades[u.id]+' of 5. Show upgrade details'}>
               <span aria-hidden="true">{u.symbol}</span><strong>{u.name}</strong><small>{profile.upgrades[u.id]} / 5</small>
-            </div>)}</div>
+            </button>)}</div>
             <p>Visual progression only. Hull, cannon and sail upgrades do not yet change damage, health or ship speed in battle.</p>
           </div>
         </section>
-        {UPGRADES.map(u=>{const lvl=profile.upgrades[u.id],cost=upgradeCost(u.id,lvl),max=lvl>=5;return <article className="app-item app-upgrade-item" key={u.id}>
+        <p className="app-fine app-forge-selector-hint">Choose a ship section above to see its level and spend earned coins on that section only.</p>
+        {UPGRADES.filter(u=>u.id===selectedUpgrade).map(u=>{const lvl=profile.upgrades[u.id],cost=upgradeCost(u.id,lvl),max=lvl>=5;return <article className="app-item app-upgrade-item" id="app-forge-selected-upgrade" key={u.id}>
           <span className="app-item-symbol" aria-hidden="true">{u.symbol}</span><div className="app-item-text"><strong>{u.name}</strong><small>LEVEL {lvl} / 5</small><p>{u.description}</p>
           <div className="app-upgrade-steps" role="progressbar" aria-label={u.name+' upgrade level'} aria-valuemin={0} aria-valuemax={5} aria-valuenow={lvl}>{[1,2,3,4,5].map(step=><span key={step} className={step<=lvl?'is-complete':''}/>)}</div>
           <small className="app-cost-note">{max?'Fully upgraded':profile.coins<cost?`Earn ${cost-profile.coins} more local coins to upgrade`:`Next level costs ${cost} local coins`}</small></div>
@@ -212,6 +224,12 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
         </section>
       </div>}
     </div>
-    <nav className="app-dock" aria-label="Main game screens">{mainNav.map(id=>{const p=PAGES.find(p=>p.id===id)!;return <button type="button" key={id} aria-label={p.title} aria-current={screen===id?'page':undefined} onClick={()=>onNavigate(id)}><span className="app-tab-glyph" aria-hidden="true"><PirateIcon name={p.id} size={27}/></span><strong>{p.title}</strong></button>})}</nav>
+    <nav className="app-dock" aria-label="Main game screens">{mainNav.map(item=>{
+      const active=item.screen===screen||(item.screen==='fleet'&&screen==='forge');
+      return <button type="button" key={item.title} aria-label={item.screen===null?'Porto, return to harbour':item.title}
+        aria-current={item.screen===screen?'page':undefined} data-active={active?'true':undefined}
+        onClick={item.screen===null?onClose:()=>onNavigate(item.screen!)}
+        ><span className="app-tab-glyph" aria-hidden="true"><PirateIcon name={item.icon} size={27}/></span><strong>{item.title}</strong></button>;
+    })}</nav>
   </section>;
 }
