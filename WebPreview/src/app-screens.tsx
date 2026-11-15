@@ -1,5 +1,5 @@
 import React from 'react';
-import { CREW, MISSIONS, UPGRADES, battlesPlayed, canClaimDaily, levelFor, missionProgress, upgradeCost, type CrewId, type LocalProfile, type MissionId, type UpgradeId } from './progression';
+import { CREW, MISSIONS, UPGRADES, battlesPlayed, canClaimDaily, nextDailyStreak, levelFor, missionProgress, upgradeCost, type CrewId, type LocalProfile, type MissionId, type UpgradeId } from './progression';
 
 export type AppScreenId = 'battle'|'fleet'|'forge'|'cards'|'shop'|'missions'|'profile';
 const PAGES:ReadonlyArray<{id:AppScreenId;title:string;symbol:string}>=[
@@ -14,16 +14,24 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
    onBuyCrew:(id:CrewId)=>void;onEquipCrew:(id:CrewId)=>void;onUpgrade:(id:UpgradeId)=>void;onMission:(id:MissionId)=>void;onDaily:()=>void;
    onExportBackup:()=>void;onImportBackup:()=>void;backupMessage:string}) {
   const page=PAGES.find(p=>p.id===screen)!;
-  const day=canClaimDaily(profile,Date.now());
+  const [announcement,setAnnouncement]=React.useState('');
+  const titleRef=React.useRef<HTMLHeadingElement>(null);
+  React.useEffect(()=>{setAnnouncement('');titleRef.current?.focus();},[screen]);
+  const action=(message:string,callback:()=>void)=>{callback();setAnnouncement(message);};
+  const now=Date.now(),day=canClaimDaily(profile,now);
+  const nextDailyDay=nextDailyStreak(profile,now);
+  // When the previous claim is older than yesterday, the old streak is no longer active.
+  const visibleStreak=day&&nextDailyDay===1?0:profile.dailyStreak;
   return <section className="app-sheet" role="dialog" aria-modal="false" aria-labelledby="app-screen-title">
     <header className="app-sheet-header">
       <button type="button" className="app-back" onClick={onClose} aria-label="Back to harbour">‹</button>
-      <div className="app-sheet-brand"><small>ROYAL PIRATE · LOCAL PREVIEW</small><h1 id="app-screen-title"><span aria-hidden="true">{page.symbol}</span> {page.title}</h1></div>
+      <div className="app-sheet-brand"><small>ROYAL PIRATE · LOCAL PREVIEW</small><h1 ref={titleRef} tabIndex={-1} id="app-screen-title"><span aria-hidden="true">{page.symbol}</span> {page.title}</h1></div>
       <div className="app-wallet" aria-label={profile.coins+' locally earned coins'}><span aria-hidden="true">●</span><strong>{profile.coins}</strong><small>COINS</small></div>
     </header>
     <nav className="app-shortcuts" aria-label="Other screens">
       {PAGES.filter(p=>!mainNav.includes(p.id)).map(p=><button type="button" key={p.id} onClick={()=>onNavigate(p.id)} aria-current={screen===p.id?'page':undefined}>{p.symbol} {p.title}</button>)}
     </nav>
+    <div className="app-sheet-announcement" role="status" aria-live="polite" aria-atomic="true">{announcement}</div>
     <div className="app-sheet-content" key={screen}>
       {screen==='battle'&&<div className="app-intro">
         <span className="app-crest" aria-hidden="true">⚔</span><div className="app-kicker">ARENA 01 · TRAINING WATERS</div>
@@ -42,13 +50,13 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
         <p className="app-fine">Upgrades are saved on this device. They do not yet alter the 3D model or battle physics.</p>
         {UPGRADES.map(u=>{const lvl=profile.upgrades[u.id],cost=upgradeCost(u.id,lvl),max=lvl>=5;return <article className="app-item" key={u.id}>
           <span className="app-item-symbol" aria-hidden="true">{u.symbol}</span><div className="app-item-text"><strong>{u.name}</strong><small>LEVEL {lvl} / 5</small><p>{u.description}</p></div>
-          <button type="button" disabled={max||profile.coins<cost} onClick={()=>onUpgrade(u.id)}>{max?'MAX':cost+' ●'}</button>
+          <button type="button" disabled={max||profile.coins<cost} onClick={()=>action(u.name+' upgraded to level '+(lvl+1)+' locally. No battle stat changes yet.',()=>onUpgrade(u.id))}>{max?'MAX':cost+' ●'}</button>
         </article>})}</div>}
       {screen==='cards'&&<div className="app-stack"><div className="app-kicker">YOUR CREW · LOCAL COLLECTION</div><h2>Captains & Specialists</h2>
         <p className="app-fine">Equip one crew card. Collection is saved locally; abilities will be integrated into combat later.</p>
         {CREW.map(c=>{const owned=profile.ownedCrew.includes(c.id),selected=profile.equippedCrew===c.id;return <article className={'app-item '+(selected?'app-equipped':'')} key={c.id}>
           <span className="app-item-symbol" aria-hidden="true">{c.symbol}</span><div className="app-item-text"><strong>{c.name}</strong><small>{selected?'EQUIPPED':owned?'OWNED':'LOCKED'}</small><p>{c.role}</p></div>
-          <button type="button" disabled={selected||(!owned&&profile.coins<c.cost)} onClick={()=>owned?onEquipCrew(c.id):onBuyCrew(c.id)}>{selected?'ACTIVE':owned?'EQUIP':c.cost+' ●'}</button>
+          <button type="button" disabled={selected||(!owned&&profile.coins<c.cost)} onClick={()=>action(owned?c.name+' equipped locally. Combat abilities are not active yet.':c.name+' added to your local crew for '+c.cost+' coins.',()=>owned?onEquipCrew(c.id):onBuyCrew(c.id))}>{selected?'ACTIVE':owned?'EQUIP':c.cost+' ●'}</button>
         </article>})}</div>}
       {screen==='shop'&&<div className="app-stack"><div className="app-kicker">PORT MARKET · DEVELOPMENT PREVIEW</div><h2>Shop</h2>
         <div className="app-offer"><span aria-hidden="true">◆</span><div><strong>Royal Gems & Real-Money Bundles</strong><p>Unavailable until secure payments, account recovery and store approvals are implemented. No purchase is charged here.</p></div><strong>NOT LIVE</strong></div>
@@ -56,11 +64,27 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
         <div className="app-row-muted"><span>Cosmetic skins, chests & advertisements</span><span>PLANNED</span></div>
       </div>}
       {screen==='missions'&&<div className="app-stack"><div className="app-kicker">DAILY PORT REWARD</div><h2>Captain's Orders</h2>
-        <article className="app-daily"><span aria-hidden="true">🎁</span><div><strong>Daily Supply Chest</strong><p>UTC day · streak {profile.dailyStreak}/7 · local device only</p><small>Next claim earns {15+Math.min(7,profile.dailyStreak+1)*5} coins. Daily reset is at 00:00 UTC.</small></div>
-          <button type="button" disabled={!day} onClick={onDaily}>{day?'CLAIM':'CLAIMED'}</button></article>
+        <article className="app-daily"><span aria-hidden="true">🎁</span><div><strong>Daily Supply Chest</strong><p>UTC day · streak {profile.dailyStreak}/7 · local device only</p><small>Next claim earns {15+nextDailyDay*5} coins. Daily reset is at 00:00 UTC.</small></div>
+          <button type="button" disabled={!day} onClick={()=>action('Daily supply chest claimed locally. Return tomorrow after 00:00 UTC.',onDaily)}>{day?'CLAIM':'CLAIMED'}</button></article>
+        <section className="app-week-rewards" aria-labelledby="app-week-title">
+          <div className="app-week-heading"><h3 id="app-week-title">7-day supply route</h3><small>Consecutive UTC claims · local save</small></div>
+          <ol className="app-week-grid" aria-label="Seven consecutive daily rewards">
+            {Array.from({length:7},(_,n)=>n+1).map(n=>{
+              const claimed=n<=visibleStreak;
+              const next=day&&n===nextDailyDay;
+              return <li key={n} className={['app-week-day',claimed?'is-claimed':next?'is-next':''].filter(Boolean).join(' ')}>
+                <span className="app-week-day-label">DAY {n}</span>
+                <span className="app-week-day-icon" aria-hidden="true">{claimed?'✓':n===7?'♛':'◆'}</span>
+                <strong>{15+n*5} <span aria-hidden="true">●</span></strong>
+                <small>{claimed?'Streak earned':next?'Claim available':'Upcoming'}</small>
+              </li>;
+            })}
+          </ol>
+          <p className="app-fine">Missing a UTC day resets the streak to day 1. After day 7, the reward remains 50 local coins per consecutive day; this preview does not create real treasure chests.</p>
+        </section>
         <h3>Missions</h3>{MISSIONS.map(m=>{const progress=missionProgress(profile,m.id),claimed=profile.claimedMissions.includes(m.id);return <article className="app-item app-mission" key={m.id}>
-          <div className="app-item-text"><strong>{m.title}</strong><small>{progress} / {m.target} · REWARD {m.reward} ●</small><div className="app-track"><span style={{width:(progress/m.target*100)+'%'}}/></div></div>
-          <button disabled={claimed||progress<m.target} onClick={()=>onMission(m.id)}>{claimed?'DONE':'CLAIM'}</button></article>})}
+          <div className="app-item-text"><strong>{m.title}</strong><small>{progress} / {m.target} · REWARD {m.reward} ●</small><div className="app-track" role="progressbar" aria-label={m.title+' progress'} aria-valuemin={0} aria-valuemax={m.target} aria-valuenow={progress}><span style={{width:(progress/m.target*100)+'%'}}/></div></div>
+          <button disabled={claimed||progress<m.target} onClick={()=>action(m.title+': '+m.reward+' local coins claimed.',()=>onMission(m.id))}>{claimed?'DONE':'CLAIM'}</button></article>})}
         <p className="app-fine">Missions and daily rewards are one-time local claims. They are not synced to a server.</p>
       </div>}
       {screen==='profile'&&<div className="app-stack"><div className="app-kicker">YOUR LOCAL CAPTAIN PROFILE</div><h2>Royal Crown</h2>

@@ -27,7 +27,8 @@ test('install manifest is scoped relative to GitHub project and preview root',()
 });
 test('service worker is scoped, caches a real release shell and cleans old release caches',()=>{
  const sw=get('../public/sw.js');
- assert.match(sw,/royal-pirate-web-v0.1.8/);
+ const version=JSON.parse(get('../package.json')).version as string;
+ assert.ok(sw.includes('royal-pirate-web-v'+version),'cache name must change with release');
  assert.match(sw,/self\.registration\.scope/);
  assert.match(sw,/cache\.addAll\(unique\)/);
  assert.match(sw,/event\.request|request\.method/);
