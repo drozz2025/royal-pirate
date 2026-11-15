@@ -176,3 +176,24 @@
 .app-dock button .app-tab-glyph svg{width:27px;height:27px}
 .app-dock button[aria-current=page] .app-tab-glyph svg{color:#4b3427}
 @media(max-width:350px){.app-shortcuts button{gap:3px;font-size:11px}}
+
+
+/* v0.1.12 — real battle history, clear win/loss results and touch-sized scan targets. */
+.app-battle-log{border:1px solid #cba660;border-radius:15px;background:linear-gradient(145deg,#0a2846,#153b5c);padding:13px 12px}
+.app-battle-log-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}
+.app-battle-log-heading h3{font:900 23px 'Barlow Condensed',sans-serif;margin:3px 0;color:#ffe5af}
+.app-battle-log-heading>small{font:700 11px 'Barlow',sans-serif;color:#c3d9e5;white-space:nowrap}
+.app-battle-empty{margin:0;padding:16px 12px;border:1px dashed #879cae;border-radius:10px;background:#0b233c;color:#d1e5f0;font:600 13px/1.5 'Barlow',sans-serif}
+.app-battle-entries{list-style:none;display:grid;gap:7px;margin:0;padding:0}
+.app-battle-entry{display:flex;align-items:center;gap:10px;padding:11px 10px;min-height:69px;border-radius:11px;background:#153755;border:1px solid #799bb0}
+.app-battle-entry.is-win{border-left:4px solid #e9c87e}
+.app-battle-entry.is-loss{border-left:4px solid #8cb1ce}
+.app-battle-medallion{display:grid;place-items:center;flex:0 0 39px;width:39px;height:39px;border-radius:50%;border:1px solid #e0ba73;color:#f9dfa6;background:#253a50;font-size:21px}
+.app-battle-details{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.app-battle-details strong{font:900 16px 'Barlow Condensed',sans-serif;letter-spacing:.4px;color:#fff0cb}
+.app-battle-details time,.app-battle-details small{font:600 11px 'Barlow',sans-serif;color:#cfdee7}
+.app-battle-loot{display:flex;align-items:flex-end;flex-direction:column;gap:4px;flex:0 0 auto}
+.app-battle-loot strong{font:900 16px 'Barlow Condensed',sans-serif;color:#ffdc99}
+.app-battle-loot small{font:800 10px 'Barlow',sans-serif;color:#c6e5d8}
+.app-battle-log>.app-fine{font-size:11px;line-height:1.5;margin:12px 0 0}
+@media(max-width:370px){.app-battle-entry{gap:6px;padding:9px 6px}.app-battle-medallion{width:33px;height:33px;flex-basis:33px;font-size:18px}.app-battle-details time,.app-battle-details small{font-size:10px}}
