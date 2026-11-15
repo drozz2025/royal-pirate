@@ -1,5 +1,6 @@
 import React from 'react';
 import { PirateIcon } from './app-icons';
+import './work8.css';
 import { FleetShowcase } from './fleet-showcase';
 import { CrewDeck } from './crew-deck';
 import { CREW, MISSIONS, UPGRADES, battlesPlayed, canClaimDaily, nextDailyStreak, levelFor, missionProgress, upgradeCost, type CrewId, type LocalProfile, type MissionId, type UpgradeId } from './progression';
@@ -13,7 +14,7 @@ const PAGES:ReadonlyArray<{id:AppScreenId;title:string}>=[
   {id:'chests',title:'Daily chests'},{id:'events',title:'Events'},
   {id:'rewards',title:'Rewards'},{id:'offers',title:'Offers'}
 ];
-const mainNav:AppScreenId[]=['fleet','cards','battle','shop','profile'];
+const mainNav:AppScreenId[]=['fleet','cards','battle','shop','ranking'];
 const headerShortcuts:AppScreenId[]=['battle','forge','missions','profile'];
 export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,backupMessage}:
   {screen:AppScreenId;profile:LocalProfile;onNavigate:(screen:AppScreenId)=>void;onClose:()=>void;onBattle:()=>void;
@@ -22,8 +23,10 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
   const page=PAGES.find(p=>p.id===screen)!;
   const [announcement,setAnnouncement]=React.useState('');
   const [onlyOwned,setOnlyOwned]=React.useState(false);
+  const [missionTab,setMissionTab]=React.useState<'daily'|'weekly'|'events'>('daily');
+  const [rankTab,setRankTab]=React.useState<'ranking'|'profile'|'leagues'>('ranking');
   const titleRef=React.useRef<HTMLHeadingElement>(null);
-  React.useEffect(()=>{setAnnouncement('');setOnlyOwned(false);titleRef.current?.focus();},[screen]);
+  React.useEffect(()=>{setAnnouncement('');setOnlyOwned(false);setMissionTab('daily');setRankTab('ranking');titleRef.current?.focus();},[screen]);
   const action=(message:string,callback:()=>void)=>{callback();setAnnouncement(message);};
   const now=Date.now(),day=canClaimDaily(profile,now);
   const nextDailyDay=nextDailyStreak(profile,now);
@@ -50,10 +53,11 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
     <div className="app-sheet-announcement" role="status" aria-live="polite" aria-atomic="true">{announcement}</div>
     <div className="app-sheet-content" key={screen}>
       {screen==='ranking'&&<div className="app-stack">
-        <div className="app-kicker">RANKING · LOCAL RESULTS ONLY</div><h2>Captain's record</h2>
+        <nav className="work8-tabs" aria-label="Ranking and profile sections"><button aria-pressed={rankTab==='ranking'} onClick={()=>setRankTab('ranking')}>RANKING</button><button aria-pressed={rankTab==='profile'} onClick={()=>onNavigate('profile')}>MY PROFILE</button><button aria-pressed={rankTab==='leagues'} onClick={()=>setRankTab('leagues')}>LEAGUES</button></nav>
+        {rankTab==='ranking'?<><div className="app-kicker">RANKING · LOCAL RESULTS ONLY</div><h2>Captain's record</h2>
         <p className="app-fine">There is no global leaderboard yet. Your device stores only your own battles; no other players or fictional positions are displayed.</p>
         <div className="app-summary-strip"><span><strong>{profile.wins}</strong><small>WINS</small></span><span><strong>{profile.losses}</strong><small>DEFEATS</small></span><span><strong>{levelFor(profile.xp)}</strong><small>CAPTAIN LEVEL</small></span></div>
-        <button type="button" className="app-cta" onClick={()=>onNavigate('profile')}>OPEN LOCAL PROFILE</button>
+        <button type="button" className="app-cta" onClick={()=>onNavigate('profile')}>OPEN LOCAL PROFILE</button></>:<div className="work8-unavailable"><strong>LEAGUES NOT AVAILABLE</strong><p>There is no connected multiplayer service. No invented competitors, league placements or rewards are shown.</p><button onClick={()=>onNavigate('profile')}>VIEW MY LOCAL PROFILE</button></div>}
       </div>}
       {screen==='chests'&&<div className="app-stack">
         <div className="app-kicker">BAÚS · 7-DAY LOCAL SUPPLY ROUTE</div><h2>Daily reward chest</h2>
@@ -150,7 +154,8 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
           <p>Not live until secure payments, account recovery and store approvals exist. No real-money checkout is available.</p></div><strong>NOT LIVE</strong></div>
         <div className="app-row-muted"><span>Cosmetic skins, treasure chests & advertisements</span><span>PLANNED</span></div>
       </div>}
-      {screen==='missions'&&<div className="app-stack"><div className="app-kicker">DAILY PORT REWARD</div><h2>Captain's Orders</h2>
+      {screen==='missions'&&<div className="app-stack"><nav className="work8-tabs" aria-label="Mission categories"><button onClick={()=>setMissionTab('daily')} aria-pressed={missionTab==='daily'}>DAILY</button><button onClick={()=>setMissionTab('weekly')} aria-pressed={missionTab==='weekly'}>WEEKLY</button><button onClick={()=>setMissionTab('events')} aria-pressed={missionTab==='events'}>EVENTS</button></nav>
+        {missionTab==='daily'?<><div className="app-kicker">DAILY PORT REWARD</div><h2>Captain's Orders</h2>
         <article className="app-daily"><span aria-hidden="true">🎁</span><div><strong>Daily Supply Chest</strong><p>UTC day · streak {profile.dailyStreak}/7 · local device only</p><small>Next claim earns {15+nextDailyDay*5} coins. Daily reset is at 00:00 UTC.</small></div>
           <button type="button" disabled={!day} onClick={()=>action('Daily supply chest claimed locally. Return tomorrow after 00:00 UTC.',onDaily)}>{day?'CLAIM':'CLAIMED'}</button></article>
         <section className="app-week-rewards" aria-labelledby="app-week-title">
@@ -172,9 +177,9 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
         <h3>Missions</h3>{MISSIONS.map(m=>{const progress=missionProgress(profile,m.id),claimed=profile.claimedMissions.includes(m.id);return <article className="app-item app-mission" key={m.id}>
           <div className="app-item-text"><strong>{m.title}</strong><small>{progress} / {m.target} · REWARD {m.reward} ●</small><div className="app-track" role="progressbar" aria-label={m.title+' progress'} aria-valuemin={0} aria-valuemax={m.target} aria-valuenow={progress}><span style={{width:(progress/m.target*100)+'%'}}/></div></div>
           <button disabled={claimed||progress<m.target} onClick={()=>action(m.title+': '+m.reward+' local coins claimed.',()=>onMission(m.id))}>{claimed?'DONE':'CLAIM'}</button></article>})}
-        <p className="app-fine">Missions and daily rewards are one-time local claims. They are not synced to a server.</p>
+        <p className="app-fine">Missions and daily rewards are one-time local claims. They are not synced to a server.</p></>:<div className="work8-unavailable"><strong>{missionTab==='weekly'?'WEEKLY MISSIONS':'LIVE EVENTS'} COMING SOON</strong><p>{missionTab==='weekly'?'Weekly mission schedules and resets are not activated in this local preview. No imaginary progress or claimable rewards.':'There are no active online events. Local battle and upgrade actions remain saved to your device.'}</p><button type="button" onClick={()=>setMissionTab('daily')}>VIEW AVAILABLE MISSIONS</button></div>}
       </div>}
-      {screen==='profile'&&<div className="app-stack"><div className="app-kicker">YOUR LOCAL CAPTAIN PROFILE</div><h2>Royal Crown</h2>
+      {screen==='profile'&&<div className="app-stack"><nav className="work8-tabs" aria-label="Ranking and profile sections"><button onClick={()=>onNavigate('ranking')}>RANKING</button><button aria-pressed="true">MY PROFILE</button><button onClick={()=>onNavigate('ranking')}>LEAGUES</button></nav><div className="app-kicker">YOUR LOCAL CAPTAIN PROFILE</div><h2>Royal Crown</h2>
         <div className="app-stat-grid">{[
           ['LEVEL',String(levelFor(profile.xp))],['XP',String(profile.xp)],['VICTORIES',String(profile.wins)],
           ['DEFEATS',String(profile.losses)],['BATTLES',String(battlesPlayed(profile))],
