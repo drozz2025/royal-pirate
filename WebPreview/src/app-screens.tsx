@@ -15,14 +15,24 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
    onExportBackup:()=>void;onImportBackup:()=>void;backupMessage:string}) {
   const page=PAGES.find(p=>p.id===screen)!;
   const [announcement,setAnnouncement]=React.useState('');
+  const [onlyOwned,setOnlyOwned]=React.useState(false);
   const titleRef=React.useRef<HTMLHeadingElement>(null);
-  React.useEffect(()=>{setAnnouncement('');titleRef.current?.focus();},[screen]);
+  React.useEffect(()=>{setAnnouncement('');setOnlyOwned(false);titleRef.current?.focus();},[screen]);
   const action=(message:string,callback:()=>void)=>{callback();setAnnouncement(message);};
   const now=Date.now(),day=canClaimDaily(profile,now);
   const nextDailyDay=nextDailyStreak(profile,now);
   // When the previous claim is older than yesterday, the old streak is no longer active.
   const visibleStreak=day&&nextDailyDay===1?0:profile.dailyStreak;
-  return <section className="app-sheet" role="dialog" aria-modal="false" aria-labelledby="app-screen-title">
+  const onDialogKeyDown=(event:React.KeyboardEvent<HTMLElement>)=>{
+    if(event.key!=='Tab')return;
+    const items=Array.from(event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled),a[href],input:not(:disabled)'))
+      .filter(el=>el.getClientRects().length>0);
+    if(!items.length)return;
+    const first=items[0],last=items[items.length-1];
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+  };
+  return <section className="app-sheet" role="dialog" aria-modal="true" onKeyDown={onDialogKeyDown} aria-labelledby="app-screen-title">
     <header className="app-sheet-header">
       <button type="button" className="app-back" onClick={onClose} aria-label="Back to harbour">‹</button>
       <div className="app-sheet-brand"><small>ROYAL PIRATE · LOCAL PREVIEW</small><h1 ref={titleRef} tabIndex={-1} id="app-screen-title"><span aria-hidden="true">{page.symbol}</span> {page.title}</h1></div>
@@ -48,14 +58,23 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
       </div>}
       {screen==='forge'&&<div className="app-stack"><div className="app-kicker">NAVAL SHIPYARD · LOCAL PROGRESSION</div><h2>Improve the Royal Crown</h2>
         <p className="app-fine">Upgrades are saved on this device. They do not yet alter the 3D model or battle physics.</p>
-        {UPGRADES.map(u=>{const lvl=profile.upgrades[u.id],cost=upgradeCost(u.id,lvl),max=lvl>=5;return <article className="app-item" key={u.id}>
-          <span className="app-item-symbol" aria-hidden="true">{u.symbol}</span><div className="app-item-text"><strong>{u.name}</strong><small>LEVEL {lvl} / 5</small><p>{u.description}</p></div>
+        <div className="app-summary-strip"><span><strong>{UPGRADES.reduce((total,u)=>total+profile.upgrades[u.id],0)} / 15</strong><small>SHIPYARD LEVELS</small></span><span><strong>{profile.coins}</strong><small>AVAILABLE COINS</small></span></div>
+        {UPGRADES.map(u=>{const lvl=profile.upgrades[u.id],cost=upgradeCost(u.id,lvl),max=lvl>=5;return <article className="app-item app-upgrade-item" key={u.id}>
+          <span className="app-item-symbol" aria-hidden="true">{u.symbol}</span><div className="app-item-text"><strong>{u.name}</strong><small>LEVEL {lvl} / 5</small><p>{u.description}</p>
+          <div className="app-upgrade-steps" role="progressbar" aria-label={u.name+' upgrade level'} aria-valuemin={0} aria-valuemax={5} aria-valuenow={lvl}>{[1,2,3,4,5].map(step=><span key={step} className={step<=lvl?'is-complete':''}/>)}</div>
+          <small className="app-cost-note">{max?'Fully upgraded':profile.coins<cost?`Earn ${cost-profile.coins} more local coins to upgrade`:`Next level costs ${cost} local coins`}</small></div>
           <button type="button" disabled={max||profile.coins<cost} onClick={()=>action(u.name+' upgraded to level '+(lvl+1)+' locally. No battle stat changes yet.',()=>onUpgrade(u.id))}>{max?'MAX':cost+' ●'}</button>
         </article>})}</div>}
       {screen==='cards'&&<div className="app-stack"><div className="app-kicker">YOUR CREW · LOCAL COLLECTION</div><h2>Captains & Specialists</h2>
         <p className="app-fine">Equip one crew card. Collection is saved locally; abilities will be integrated into combat later.</p>
-        {CREW.map(c=>{const owned=profile.ownedCrew.includes(c.id),selected=profile.equippedCrew===c.id;return <article className={'app-item '+(selected?'app-equipped':'')} key={c.id}>
-          <span className="app-item-symbol" aria-hidden="true">{c.symbol}</span><div className="app-item-text"><strong>{c.name}</strong><small>{selected?'EQUIPPED':owned?'OWNED':'LOCKED'}</small><p>{c.role}</p></div>
+        <div className="app-crew-tools"><div><strong>{profile.ownedCrew.length} / {CREW.length}</strong><small>CREW COLLECTED</small></div>
+          <div className="app-crew-filters" role="group" aria-label="Filter crew collection">
+            <button type="button" aria-pressed={!onlyOwned} onClick={()=>setOnlyOwned(false)}>ALL</button>
+            <button type="button" aria-pressed={onlyOwned} onClick={()=>setOnlyOwned(true)}>OWNED</button>
+          </div>
+        </div>
+        {CREW.filter(c=>!onlyOwned||profile.ownedCrew.includes(c.id)).map(c=>{const owned=profile.ownedCrew.includes(c.id),selected=profile.equippedCrew===c.id;return <article className={'app-item app-crew-item '+(selected?'app-equipped':'')} key={c.id}>
+          <span className={'app-item-symbol app-crew-portrait '+(owned?'is-owned':'is-locked')} aria-hidden="true">{c.symbol}</span><div className="app-item-text"><strong>{c.name}</strong><small>{selected?'★ ACTIVE CAPTAIN':owned?'✓ COLLECTED':'◇ UNDISCOVERED'}</small><p>{c.role}</p></div>
           <button type="button" disabled={selected||(!owned&&profile.coins<c.cost)} onClick={()=>action(owned?c.name+' equipped locally. Combat abilities are not active yet.':c.name+' added to your local crew for '+c.cost+' coins.',()=>owned?onEquipCrew(c.id):onBuyCrew(c.id))}>{selected?'ACTIVE':owned?'EQUIP':c.cost+' ●'}</button>
         </article>})}</div>}
       {screen==='shop'&&<div className="app-stack"><div className="app-kicker">PORT MARKET · DEVELOPMENT PREVIEW</div><h2>Shop</h2>
