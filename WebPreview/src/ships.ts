@@ -22,6 +22,16 @@ function sealTexture(red: boolean, flag = false) {
   c.strokeStyle = red ? '#d6634d' : '#303741'; c.lineWidth = 2;
   for (let x = 16; x < 512; x += 48) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, 512); c.stroke(); }
   c.strokeStyle = '#d5bf8c'; c.lineWidth = 4; c.strokeRect(12, 12, 488, 488);
+  if(!red && !flag){
+    // Fine woven seams and gold-edged corner stitching stay on the actual
+    // curved sail mesh: no transparent art overlay blocks interaction.
+    c.strokeStyle='#8f7c5b';c.lineWidth=1.5;
+    for(let y=62;y<500;y+=96){c.beginPath();c.moveTo(18,y);c.quadraticCurveTo(256,y+13,494,y);c.stroke();}
+    c.strokeStyle='#d5a65e';c.lineWidth=3;
+    for(const side of [26,486])for(let y=44;y<500;y+=36){
+      c.beginPath();c.moveTo(side-6,y);c.lineTo(side+6,y+8);c.stroke();
+    }
+  }
   // Original skull & crossed cutlasses emblem drawn as a texture, not a copied asset.
   c.save(); c.translate(256, 266); c.strokeStyle = '#f5e5b7'; c.lineWidth = 18; c.lineCap = 'round';
   for (const s of [-1, 1]) { c.beginPath(); c.moveTo(-105, s * 78); c.quadraticCurveTo(20, -s * 10, 116, -s * 84); c.stroke(); }
@@ -89,7 +99,15 @@ function addLionFigurehead(root:T.Group){
   oval(0,-.19,.72,.21,.20,.27,gilt); // tapered bridge of muzzle
   const nose=new T.Mesh(new T.ConeGeometry(.17,.19,3),ink);
   nose.rotation.z=Math.PI;nose.position.set(0,-.24,.955);statue.add(nose);
-  oval(0,-.47,.64,.28,.075,.12,shade);
+  // Open jaws, lower lip and four pointed fangs: the gilded figurehead now
+  // reads as a roaring lion rather than a rounded toy on the bow.
+  oval(0,-.48,.65,.31,.16,.12,ink);
+  oval(0,-.61,.66,.31,.075,.15,bright);
+  for(const x of [-.20,-.08,.08,.20]){
+    const fang=new T.Mesh(new T.ConeGeometry(.055,.17,5),bright);
+    fang.position.set(x,-.46,.78);
+    fang.rotation.z=Math.PI;statue.add(fang);
+  }
   // Merge lion details by material: 4 draw calls, not 30 independent meshes.
   const mergedByMaterial=new Map<T.Material,T.BufferGeometry[]>();
   for(const child of [...statue.children]){
