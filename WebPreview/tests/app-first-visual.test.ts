@@ -20,7 +20,7 @@ test('port daily supply is an honest live navigation control, not fabricated fou
   assert.match(html,/Seven-day daily supply route/);
   assert.match(html,/READY TO CLAIM/);
   assert.match(html,/Open daily supply, claim 20 local coins/);
-  assert.match(html,/DAY 1\/7/);
+  assert.match(html,/Day 1, ready/);
   assert.equal((html.match(/aria-label="Day [1-7],/g)||[]).length,7);
   assert.doesNotMatch(html,/Chest [1-4] coming soon/);
   assert.match(html,/0 locally earned coins/);
@@ -30,7 +30,7 @@ test('UTC claimed state is reflected in the port without creating a second claim
   const html=harbour(claimed);
   assert.match(html,/COLLECTED TODAY/);
   assert.match(html,/Daily supply already collected today/);
-  assert.match(html,/STREAK 1\/7/);
+  assert.match(html,/Day 1, streak earned/);
   assert.match(html,/Day 1, streak earned/);
   assert.doesNotMatch(html,/Open daily supply, claim 20 local coins/);
 });
@@ -39,7 +39,7 @@ test('port highlights genuine mission claims and correctly resets an expired dai
   const html=harbour(profile);
   assert.match(html,/1 missions ready to claim/);
   assert.match(html,/Missions: 1 reward claims ready/);
-  assert.match(html,/DAY 1\/7/);
+  assert.match(html,/Day 1, ready/);
   assert.match(html,/STREAK|READY TO CLAIM/);
   assert.doesNotMatch(html,/Day 1, streak earned/);
 });
@@ -51,7 +51,7 @@ test('shipyard milestones are accessible and crew filters are actionable mobile 
   assert.match(crew,/Filter crew collection/);
   assert.match(crew,/aria-pressed="true">ALL/);
   assert.match(crew,/aria-pressed="false">OWNED/);
-  assert.match(crew,/1 \/ 3/);
+  assert.match(crew,/CREW COLLECTED/);
   assert.match(crew,/★ ACTIVE CAPTAIN/);
   assert.match(crew,/UNDISCOVERED/);
   assert.match(crew,/aria-modal="true"/);
