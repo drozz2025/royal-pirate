@@ -54,7 +54,7 @@ test('real 3D coastal town is visible only in the harbour and ship is framed obl
  assert.match(scene,/this\.harbourDock\.visible=true/);
  assert.match(scene,/this\.harbourDock\.visible=false/);
  assert.match(scene,/lighthouse and glowing beacon/);
- assert.match(scene,/portrait\?29\.5:18/);
+ assert.match(scene,/portrait\?26\.4:18/);
  assert.match(scene,/this\.ships\.enemy\.root\.visible=false/);
 });
 test('package and title use a matching release number',()=>{
