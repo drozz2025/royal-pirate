@@ -43,6 +43,36 @@ function CardArt({id}:{id:CrewId}) {
   </svg>;
 }
 
+
+function ShopRelic({kind}:{kind:'coins'|'gems'|'special'}) {
+  const id='w7-relic-'+kind;
+  return <svg className={'w7-relic-svg w7-relic-'+kind} viewBox="0 0 120 110" role="img" aria-label={kind==='coins'?'Moedas douradas ilustradas':kind==='gems'?'Gema azul ilustrada':'Baú de tesouro ilustrado'}>
+    <defs><linearGradient id={id+'-gold'} x1="0" x2="1" y1="0" y2="1"><stop stopColor="#fff5bc"/><stop offset=".5" stopColor="#f3bc54"/><stop offset="1" stopColor="#a95c23"/></linearGradient>
+    <linearGradient id={id+'-aqua'} x1="0" x2="1" y1="0" y2="1"><stop stopColor="#e8ffff"/><stop offset=".43" stopColor="#41d6ef"/><stop offset="1" stopColor="#3066aa"/></linearGradient></defs>
+    <ellipse cx="60" cy="95" rx="48" ry="10" fill="#061626" opacity=".45"/>
+    {kind==='coins'?<>
+      <path d="M18 67V85Q18 100 44 100T70 85V67" fill="#a95c25" stroke="#593317" strokeWidth="3"/>
+      <ellipse cx="44" cy="67" rx="26" ry="12" fill={'url(#'+id+'-gold)'} stroke="#fff2b6" strokeWidth="3"/>
+      <path d="M43 43V72Q43 83 69 83T95 72V43" fill="#cf8436" stroke="#67401e" strokeWidth="3"/>
+      <ellipse cx="69" cy="43" rx="26" ry="12" fill={'url(#'+id+'-gold)'} stroke="#fff2b6" strokeWidth="3"/>
+      <path d="M32 33Q46 9 69 24L88 38 64 58Z" fill={'url(#'+id+'-gold)'} stroke="#fff2bc" strokeWidth="3"/>
+      <path d="M55 30L69 25M73 35L65 45" stroke="#9e6127" strokeWidth="4" strokeLinecap="round"/>
+    </>:kind==='gems'?<>
+      <path d="M19 43L39 17H81L101 43 60 94Z" fill={'url(#'+id+'-aqua)'} stroke="#bdfaff" strokeWidth="4" strokeLinejoin="round"/>
+      <path d="M19 43H101M39 17L49 43 60 94 72 43 81 17" fill="none" stroke="#f0ffff" strokeWidth="3" opacity=".8"/>
+      <path d="M49 43L60 94 72 43" fill="#2468b9" opacity=".35"/>
+      <path d="M49 9V1M8 32L1 27M108 22L116 14" stroke="#fff5bf" strokeWidth="4" strokeLinecap="round"/>
+    </>:<>
+      <path d="M18 51Q18 31 60 31T102 51V85Q102 96 60 96T18 85Z" fill="#90502d" stroke="#ffe29a" strokeWidth="4"/>
+      <path d="M18 51Q18 22 60 22T102 51Z" fill="#b46a38" stroke="#ffdea0" strokeWidth="4"/>
+      <path d="M23 52H97M39 33V93M81 33V93" stroke="#f8c45c" strokeWidth="8"/>
+      <path d="M48 52H72V77Q60 86 48 77Z" fill={'url(#'+id+'-gold)'} stroke="#fff1b4" strokeWidth="3"/>
+      <circle cx="60" cy="65" r="4" fill="#70401d"/>
+      <path d="M55 8L60 1 65 8M102 17L111 13M12 22L3 17" fill="none" stroke="#fff1b3" strokeWidth="4" strokeLinecap="round"/>
+    </>}
+  </svg>;
+}
+
 function TabBar<T extends string>({value,tabs,onSelect,label}:{value:T;tabs:ReadonlyArray<readonly [T,string]>;onSelect:(value:T)=>void;label:string}) {
   return <div className={'w7-tabs '+(tabs.length===4?'w7-tabs-four':'')} role="tablist" aria-label={label}>
     {tabs.map(([id,name])=><button key={id} type="button" role="tab" aria-selected={value===id} onClick={()=>onSelect(id)}>{name}</button>)}
@@ -81,9 +111,15 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
               aria-label={'Ver '+c.name+(isOwned?', adquirido':', bloqueado')} onClick={()=>setSelected(c.id)}>
             <span className="w7-card-top"><span>{visualTier[c.id]}</span><span aria-hidden="true">{isOwned?'◆':'◇'}</span></span>
             <span className="w7-card-art"><CardArt id={c.id}/></span>
+            <span className="w7-card-level">NÍVEL — <span>EM BREVE</span></span>
             <strong>{c.name}</strong><small>{isEquipped?'★ EQUIPADO':isOwned?'✓ ADQUIRIDO':c.cost+' ● MOEDAS'}</small>
           </button>;
         })}
+        {!ownedOnly&&<div className="w7-future-card" aria-label="Espaço para futura carta, não disponível">
+          <div className="w7-future-seal" aria-hidden="true"><span>?</span></div>
+          <strong>NOVA CARTA</strong><small>EM BREVE</small>
+          <span className="w7-future-note">Pré-visualização · sem personagem</span>
+        </div>}
       </div>
       <div className="w7-detail">
         <div><span className="w7-eyebrow">CARTA SELECIONADA</span><h3>{active.name}</h3><p>{active.role}</p></div>
@@ -92,7 +128,7 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
           {equipped?'EQUIPADO':owned?'EQUIPAR':canRecruit?'RECRUTAR':'SEM MOEDAS'}
         </button>
       </div>
-      <p className="w7-disclaimer">Coleção saved on this device. Raridades visuais sem efeitos de jogo; personagens equipadas ainda não alteram o combate.</p>
+      <p className="w7-disclaimer">Coleção guardada neste dispositivo. Níveis ainda indisponíveis. Raridades visuais sem efeitos de jogo; personagens equipadas ainda não alteram o combate.</p>
     </section>}
     {tab==='upgrade'&&<section className="w7-content w7-feature" role="tabpanel" aria-label="Melhorar cartas">
       <span className="w7-feature-mark">✦</span><span className="w7-eyebrow">EVOLUÇÃO DE CARTAS</span><h3>MELHORAR</h3>
@@ -113,7 +149,7 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
 type MarketProps={profile:LocalProfile;onBuyCrew:(id:CrewId)=>void;onCards:()=>void;onBattle:()=>void;announce:(message:string,callback:()=>void)=>void};
 export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketProps) {
   const [tab,setTab]=React.useState<'offers'|'coins'|'gems'|'special'>('offers');
-  const future:{[key:string]:{symbol:string;title:string;description:string}}={
+  const future:Record<'coins'|'gems'|'special',{symbol:string;title:string;description:string}>={
     coins:{symbol:'●',title:'PACOTES DE MOEDAS',description:'Ainda não há compras integradas nem preços reais configurados.'},
     gems:{symbol:'◆',title:'GEMAS',description:'Não existe saldo de gemas nem compras de gemas nesta versão.'},
     special:{symbol:'♛',title:'ITENS ESPECIAIS',description:'Os artigos especiais ainda não têm inventário ou preços reais.'}
@@ -125,7 +161,12 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
     </header>
     <TabBar value={tab} onSelect={setTab} label="Loja" tabs={[['offers','OFERTAS'],['coins','MOEDAS'],['gems','GEMAS'],['special','ESPECIAIS']]}/>
     {tab==='offers'&&<section className="w7-content" role="tabpanel" aria-label="Ofertas disponíveis">
-      <div className="w7-banner"><span aria-hidden="true">♛</span><div><small>OFERTAS LOCAIS</small><strong>RECRUTA A TUA TRIPULAÇÃO</strong><p>Moedas ganhas em batalhas. Sem dinheiro real.</p></div></div>
+      <div className="w7-banner"><span aria-hidden="true"><ShopRelic kind="special"/></span><div><small>OFERTAS LOCAIS</small><strong>RECRUTA A TUA TRIPULAÇÃO</strong><p>Moedas ganhas em batalhas. Sem dinheiro real.</p></div></div>
+      <div className="w7-preview-strip" role="group" aria-label="Secções futuras da loja">
+        {(['coins','gems','special'] as const).map(kind=><button type="button" key={kind} onClick={()=>setTab(kind)} aria-label={'Abrir '+(kind==='coins'?'Moedas':kind==='gems'?'Gemas':'Especiais')+', em breve'}>
+          <ShopRelic kind={kind}/><strong>{kind==='coins'?'MOEDAS':kind==='gems'?'GEMAS':'ESPECIAIS'}</strong><small>EM BREVE</small>
+        </button>)}
+      </div>
       <div className="w7-line"><strong>DISPONÍVEL NO JOGO</strong><span>{profile.ownedCrew.length} / {CREW.length} CARTAS</span></div>
       <div className="w7-shop-list">{CREW.map(c=>{
         const owned=profile.ownedCrew.includes(c.id),canBuy=!owned&&c.cost>0&&profile.coins>=c.cost;
@@ -141,9 +182,14 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
       <p className="w7-disclaimer">No real-money checkout is available; secure payments não estão integrados. O progresso é saved on this device.</p>
     </section>}
     {pending&&<section className="w7-content w7-feature w7-pending" role="tabpanel" aria-label={pending.title}>
-      <span className="w7-feature-mark">{pending.symbol}</span><span className="w7-eyebrow">LOJA · PRÉ-VISUALIZAÇÃO NÃO COMERCIALIZÁVEL</span><h3>{pending.title}</h3>
+      <span className="w7-pending-relic"><ShopRelic kind={tab==='coins'?'coins':tab==='gems'?'gems':'special'}/></span>
+      <span className="w7-eyebrow">LOJA · PRÉ-VISUALIZAÇÃO NÃO COMERCIALIZÁVEL</span><h3>{pending.title}</h3>
       <p>{pending.description} Nenhuma transação simulada é permitida.</p>
-      <div className="w7-feature-row"><span aria-hidden="true">◇</span><strong>Conteúdo em preparação</strong><b>EM BREVE</b></div>
+      <div className="w7-pending-card"><span>PRODUTO AINDA INDISPONÍVEL</span>
+        <div className="w7-pending-price"><small>PREÇO</small><strong>POR DEFINIR</strong></div>
+        <b>EM BREVE</b>
+      </div>
+      <div className="w7-feature-row"><span aria-hidden="true">◇</span><strong>Sem pagamentos ou entregas nesta versão</strong><b>EM BREVE</b></div>
       <button type="button" onClick={()=>setTab('offers')}>VER OFERTAS LOCAIS</button>
     </section>}
     <div className="w7-foot"><span>COMPRA COM MOEDAS LOCAIS</span><span>SEM PAGAMENTOS REAIS</span></div>
