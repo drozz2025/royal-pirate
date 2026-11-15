@@ -34,7 +34,7 @@ test('owned-only filter hides locked cards, even before any purchases',()=>{
  const html=renderDeck(initialProfile(),true);
  assert.match(html,/Captain Mara/);
  assert.doesNotMatch(html,/Iron Jack|Northwind/);
- assert.equal((html.match(/class="app-deck-slot/g)||[]).length,1);
+ assert.equal((html.match(/class="app-deck-slot(?: is-preview)?"/g)||[]).length,1);
 });
 
 test('real local purchases and equipment render with accurate state and balance',()=>{
