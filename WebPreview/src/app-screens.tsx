@@ -9,9 +9,10 @@ const PAGES:ReadonlyArray<{id:AppScreenId;title:string;symbol:string}>=[
   {id:'profile',title:'Profile',symbol:'♜'}
 ];
 const mainNav:AppScreenId[]=['fleet','cards','battle','shop','profile'];
-export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily}:
+export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,backupMessage}:
   {screen:AppScreenId;profile:LocalProfile;onNavigate:(screen:AppScreenId)=>void;onClose:()=>void;onBattle:()=>void;onInspect:()=>void;
-   onBuyCrew:(id:CrewId)=>void;onEquipCrew:(id:CrewId)=>void;onUpgrade:(id:UpgradeId)=>void;onMission:(id:MissionId)=>void;onDaily:()=>void}) {
+   onBuyCrew:(id:CrewId)=>void;onEquipCrew:(id:CrewId)=>void;onUpgrade:(id:UpgradeId)=>void;onMission:(id:MissionId)=>void;onDaily:()=>void;
+   onExportBackup:()=>void;onImportBackup:()=>void;backupMessage:string}) {
   const page=PAGES.find(p=>p.id===screen)!;
   const day=canClaimDaily(profile,Date.now());
   return <section className="app-sheet" role="dialog" aria-modal="false" aria-labelledby="app-screen-title">
@@ -70,6 +71,14 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
         ].map(([label,value])=><div key={label}><small>{label}</small><strong>{value}</strong></div>)}</div>
         <div className="app-offer"><span aria-hidden="true">♜</span><div><strong>Worldwide Ranking</strong><p>Not available: no account, multiplayer service or connected leaderboard yet. These statistics exist only on this device.</p></div><strong>OFFLINE</strong></div>
         <div className="app-row-muted"><span>Active crew: {CREW.find(c=>c.id===profile.equippedCrew)?.name}</span><button onClick={()=>onNavigate('cards')}>EDIT CREW</button></div>
+        <section className="app-save-backup" aria-labelledby="app-backup-title">
+          <div className="app-kicker">SAVE MANAGEMENT · OFFLINE ONLY</div>
+          <h3 id="app-backup-title">Protect your progress</h3>
+          <p>Progress is stored in this browser. Export a JSON save to keep a copy, or restore one to this device. There is no account, online backup or server validation.</p>
+          <div className="app-backup-actions"><button type="button" onClick={onExportBackup}>↓ SAVE BACKUP</button><button type="button" onClick={onImportBackup}>↑ RESTORE BACKUP</button></div>
+          {backupMessage&&<p className="app-backup-status" role="status" aria-live="polite">{backupMessage}</p>}
+          <small>Restore replaces local progress after confirmation. Offline saves are editable and cannot count for future online rankings.</small>
+        </section>
       </div>}
     </div>
     <nav className="app-dock" aria-label="Main game screens">{mainNav.map(id=>{const p=PAGES.find(p=>p.id===id)!;return <button type="button" key={id} aria-label={p.title} aria-current={screen===id?'page':undefined} onClick={()=>onNavigate(id)}><span aria-hidden="true">{p.symbol}</span><strong>{p.title}</strong></button>})}</nav>
