@@ -99,7 +99,7 @@ export function PortoArt({name,size=38}:{name:PirateIconName;size?:number}) {
   };
   const illustration=art[name];
   if(!illustration)return <PirateIcon name={name} size={size}/>;
-  return <svg className="porto-art" data-porto-art={name} width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  return <svg className="porto-art" data-porto-art={name} data-pirate-icon={name} width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" focusable="false">
     <defs>
       <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#fff5b9"/><stop offset=".42" stopColor="#f9c350"/><stop offset="1" stopColor="#a96519"/></linearGradient>
       <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#fffdf3"/><stop offset=".45" stopColor="#c8e3e6"/><stop offset="1" stopColor="#60899b"/></linearGradient>
