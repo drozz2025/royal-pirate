@@ -269,7 +269,7 @@ body:has(.harbour-screen:not([aria-hidden="true"])) .rp-version{display:none}
 .harbour-flank-button:nth-child(3) .harbour-flank-icon{color:#ffdfae}
 .harbour-flank-right .harbour-flank-button:nth-child(1) .harbour-flank-icon{color:#ff9c53}
 .harbour-flank-right .harbour-flank-button:nth-child(3) .harbour-flank-icon{color:#f5bf42}
-.harbour-arena-mode{
+.harbour-training-mode{
   display:block;
   color:#ffe6ad;
   font:800 clamp(9px,2.25vw,14px)/1 'Barlow Condensed',sans-serif;
@@ -310,7 +310,7 @@ body:has(.harbour-screen:not([aria-hidden="true"])) .rp-version{display:none}
 .harbour-nav-item:not(:disabled):hover{background:linear-gradient(180deg,#4177a265,#102f5560)}
 @media(max-width:390px){
  .harbour-battle-button{width:57%}
- .harbour-arena-mode{font-size:9px}
+ .harbour-training-mode{font-size:9px}
  .harbour-local-wins{font-size:9px}
  .harbour-logo{font-size:clamp(20px,5.8vw,25px)}
  .harbour-flank-right{width:clamp(59px,17.5vw,70px)}
@@ -318,7 +318,7 @@ body:has(.harbour-screen:not([aria-hidden="true"])) .rp-version{display:none}
 @media(max-height:690px){
  .harbour-flank-right{top:clamp(180px,35dvh,245px);gap:clamp(7px,1.5dvh,15px)}
  .harbour-flank-left .harbour-flank-button:first-child{height:clamp(75px,12.5dvh,95px)}
- .harbour-arena-mode{font-size:9px}
+ .harbour-training-mode{font-size:9px}
  .harbour-local-wins{font-size:8px}
 }
 @media(prefers-reduced-motion:reduce){
