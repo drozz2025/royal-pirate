@@ -1,4 +1,5 @@
 import React from 'react';
+import { PirateIcon } from './app-icons';
 import type { AppScreenId } from './app-screens';
 import { canClaimDaily, levelFor, missionProgress, MISSIONS, nextDailyStreak, type LocalProfile } from './progression';
 
@@ -63,12 +64,12 @@ export function Harbour({ onBattle, onInspect, onNavigate, profile, hidden=false
         </button>
       </section>
       <div className="harbour-actions">
-        <button type="button" className="harbour-secondary-action" onClick={()=>onNavigate('forge')}><span aria-hidden="true">⚒</span><strong>UPGRADES</strong><small>OPEN</small></button>
-        <button className="harbour-battle-button" type="button" onClick={onBattle} aria-label="Battle: enter playable naval combat"><span className="harbour-crossed" aria-hidden="true">⚔</span><strong>BATTLE!</strong><small>ENTER NAVAL COMBAT</small></button>
-        <button type="button" className="harbour-secondary-action" onClick={()=>onNavigate('forge')}><span aria-hidden="true">⚙</span><strong>FORGE</strong><small>OPEN</small></button>
+        <button type="button" className="harbour-secondary-action" onClick={()=>onNavigate('forge')}><span aria-hidden="true"><PirateIcon name="forge" size={27}/></span><strong>UPGRADES</strong><small>OPEN</small></button>
+        <button className="harbour-battle-button" type="button" onClick={onBattle} aria-label="Battle: enter playable naval combat"><span className="harbour-crossed" aria-hidden="true"><PirateIcon name="battle" size={40}/></span><strong>BATTLE!</strong><small>ENTER NAVAL COMBAT</small></button>
+        <button type="button" className="harbour-secondary-action" onClick={()=>onNavigate('forge')}><span aria-hidden="true"><PirateIcon name="forge" size={27}/></span><strong>FORGE</strong><small>OPEN</small></button>
       </div>
       <nav className="harbour-nav" aria-label="Game screens">
-        {upcoming.map((item,i)=><button type="button" key={item.title} onClick={()=>onNavigate(item.screen)} className={'harbour-nav-item '+(i===2?'harbour-nav-current':'')} aria-label={item.screen==='missions'&&readyMissions?`Missions: ${readyMissions} reward claims ready`:item.title}><span aria-hidden="true">{item.icon}</span><strong>{item.title}</strong><small>{item.screen==='missions'&&readyMissions?readyMissions+' READY':'OPEN'}</small></button>)}
+        {upcoming.map((item,i)=><button type="button" key={item.title} onClick={()=>onNavigate(item.screen)} className={'harbour-nav-item '+(i===2?'harbour-nav-current':'')} aria-label={item.screen==='missions'&&readyMissions?`Missions: ${readyMissions} reward claims ready`:item.title}><span aria-hidden="true"><PirateIcon name={item.screen} size={25}/></span><strong>{item.title}</strong><small>{item.screen==='missions'&&readyMissions?readyMissions+' READY':'OPEN'}</small></button>)}
       </nav>
       <p className="harbour-disclaimer">LOCAL PREVIEW · COINS & MISSIONS SAVED ON THIS DEVICE · ONLINE RANKING & IAP NOT LIVE</p>
     </div>
