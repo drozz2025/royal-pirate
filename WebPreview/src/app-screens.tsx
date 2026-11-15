@@ -8,20 +8,22 @@ import { CREW, MISSIONS, battlesPlayed, canClaimDaily, nextDailyStreak, levelFor
 
 export type AppScreenId = 'battle'|'fleet'|'forge'|'cards'|'shop'|'missions'|'profile'|'ranking'|'chests'|'events'|'rewards'|'offers';
 const PAGES:ReadonlyArray<{id:AppScreenId;title:string}>=[
-  {id:'battle',title:'Battle'},{id:'fleet',title:'Fleet'},
-  {id:'forge',title:'Forge'},{id:'cards',title:'Crew'},
-  {id:'shop',title:'Shop'},{id:'missions',title:'Missions'},
-  {id:'profile',title:'Profile'},{id:'ranking',title:'Ranking'},
-  {id:'chests',title:'Daily chests'},{id:'events',title:'Events'},
-  {id:'rewards',title:'Rewards'},{id:'offers',title:'Offers'}
+  {id:'battle',title:'Batalha'},{id:'fleet',title:'Frota'},
+  {id:'forge',title:'Forja'},{id:'cards',title:'Cartas'},
+  {id:'shop',title:'Loja'},{id:'missions',title:'Missões'},
+  {id:'profile',title:'O meu perfil'},{id:'ranking',title:'Ranking'},
+  {id:'chests',title:'Baús'},{id:'events',title:'Eventos'},
+  {id:'rewards',title:'Recompensas'},{id:'offers',title:'Ofertas'}
 ];
 const headerShortcuts:AppScreenId[]=['battle','forge','missions','profile'];
-export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,backupMessage}:
+export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,onSetPlayerName,backupMessage}:
   {screen:AppScreenId;profile:LocalProfile;onNavigate:(screen:AppScreenId)=>void;onClose:()=>void;onBattle:()=>void;
    onBuyCrew:(id:CrewId)=>void;onEquipCrew:(id:CrewId)=>void;onUpgrade:(id:UpgradeId)=>void;onMission:(id:MissionId)=>void;onDaily:()=>void;
-   onExportBackup:()=>void;onImportBackup:()=>void;backupMessage:string}) {
+   onExportBackup:()=>void;onImportBackup:()=>void;onSetPlayerName:(name:string)=>void;backupMessage:string}) {
   const page=PAGES.find(p=>p.id===screen)!;
   const [announcement,setAnnouncement]=React.useState('');
+  const [playerNameDraft,setPlayerNameDraft]=React.useState(profile.playerName);
+  React.useEffect(()=>setPlayerNameDraft(profile.playerName),[profile.playerName]);
   const [rankingTab,setRankingTab]=React.useState<RankingTab>('ranking');
   const titleRef=React.useRef<HTMLHeadingElement>(null);
   React.useEffect(()=>{setAnnouncement('');titleRef.current?.focus();},[screen]);
@@ -42,8 +44,8 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
   return <section className="app-sheet" role="dialog" aria-modal="true" onKeyDown={onDialogKeyDown} aria-labelledby="app-screen-title">
     <header className="app-sheet-header">
       <button type="button" className="app-back" onClick={onClose} aria-label="Back to harbour">‹</button>
-      <div className="app-sheet-brand"><small>ROYAL PIRATE · LOCAL PREVIEW</small><h1 ref={titleRef} tabIndex={-1} id="app-screen-title"><span className="app-page-glyph" aria-hidden="true"><PirateIcon name={page.id} size={28}/></span> {page.title}</h1></div>
-      <div className="app-wallet" aria-label={profile.coins+' locally earned coins'}><span aria-hidden="true">●</span><strong>{profile.coins}</strong><small>COINS</small></div>
+      <div className="app-sheet-brand"><small title={profile.playerName}>{profile.playerName} · NV. {levelFor(profile.xp)} · PROGRESSO LOCAL</small><h1 ref={titleRef} tabIndex={-1} id="app-screen-title"><span className="app-page-glyph" aria-hidden="true"><PirateIcon name={page.id} size={23}/></span> {page.title}</h1></div>
+      <div className="app-wallet" aria-label={profile.coins+' locally earned coins'}><span aria-hidden="true">●</span><strong>{profile.coins}</strong><small>MOEDAS</small></div>
     </header>
     <nav className="app-shortcuts" aria-label="Other screens">
       {PAGES.filter(p=>headerShortcuts.includes(p.id)&&p.id!==screen).map(p=><button type="button" key={p.id} onClick={()=>onNavigate(p.id)} aria-current={screen===p.id?'page':undefined}><PirateIcon name={p.id} size={18}/><span>{p.title}</span></button>)}
@@ -90,6 +92,12 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
       {screen==='profile'&&<div className="app-stack">
         <RankingTabs active="profile" onNavigate={target=>{if(target==='ranking')setRankingTab('ranking');onNavigate(target);}}
           onLeagues={()=>{setRankingTab('leagues');onNavigate('ranking');}}/>
+        <form className="app-player-name-edit" onSubmit={event=>{event.preventDefault();const name=playerNameDraft.trim().slice(0,20);if(!name){setAnnouncement('Escreve um nome para o jogador.');return;}onSetPlayerName(name);setAnnouncement('Nome do jogador guardado neste dispositivo.');}}>
+          <label htmlFor="app-player-name">NOME DO JOGADOR</label>
+          <div><input id="app-player-name" type="text" autoComplete="nickname" maxLength={20} value={playerNameDraft} onChange={event=>setPlayerNameDraft(event.target.value)} aria-describedby="app-player-name-help"/>
+            <button type="submit" disabled={!playerNameDraft.trim()||playerNameDraft.trim()===profile.playerName}>GUARDAR</button></div>
+          <small id="app-player-name-help">Até 20 caracteres. Guardado apenas neste dispositivo, sem conta online.</small>
+        </form>
         <div className="app-kicker">YOUR LOCAL CAPTAIN PROFILE</div><h2>Royal Crown</h2>
         <div className="app-stat-grid">{[
           ['LEVEL',String(levelFor(profile.xp))],['XP',String(profile.xp)],['VICTORIES',String(profile.wins)],
