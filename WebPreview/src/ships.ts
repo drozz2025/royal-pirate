@@ -213,9 +213,9 @@ export function makeShip(red = false): ShipArt {
   // Royal galleon detailing is real 3D geometry, merged by material with the
   // existing hull. The enemy remains lightweight and visually distinct.
   if(!red){
-    const bronze=mat('#b88236',.54,.38);
-    const antique=mat('#f8d88d',.56,.28);
-    const deckSeam=mat('#5c3928',0,.85);
+    // Reuse existing physically based materials so decorative detail adds
+    // geometry but ZERO new draw calls to the mobile ship model.
+    const bronze=honey, antique=gold, deckSeam=darkWood;
     // Subtle hardwood caulking: separate seams, not a flat deck decal.
     for(let i=-5;i<=5;i++){
       const x=i*.225;
