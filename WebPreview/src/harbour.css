@@ -225,3 +225,102 @@ body:has(.harbour-screen:not([aria-hidden="true"])) .rp-version{display:none}
   .harbour-flank-left .harbour-flank-button:first-child{height:clamp(69px,11.5dvh,83px)}
   .harbour-local-wins{font-size:8px}
 }
+
+
+/* WORK 6 approved Porto HUD polish — 15 Nov 2026.
+   Prioritise the approved eight-screen artwork over additional ship geometry.
+   Every badge comes from the local progression model, never fictional gems/ligas. */
+.harbour-logo{
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:clamp(22px,5.45vw,44px);
+  line-height:.83;
+  letter-spacing:-.65px;
+  padding:4px 7px 6px;
+}
+.harbour-logo::before{
+  content:'';
+  position:absolute;
+  z-index:-1;
+  inset:9px -5px -4px;
+  border:2px solid #dfae4e;
+  border-radius:11px 11px 17px 17px;
+  background:linear-gradient(180deg,#163c68e0,#0c2445ef 85%,#38251cdd);
+  box-shadow:inset 0 1px #ffe4a08a,0 2px 0 #643618,0 4px 10px #0727458a;
+  clip-path:polygon(6% 0,94% 0,100% 20%,100% 77%,85% 100%,15% 100%,0 77%,0 20%);
+}
+.harbour-logo-crown{z-index:1;filter:drop-shadow(0 2px #4e290d)}
+.harbour-wallet{gap:5px}
+.harbour-stat{border-radius:11px;background:linear-gradient(180deg,#164e7af2 0%,#07223ded 92%)}
+.harbour-stat .pirate-icon{width:75%;height:75%;stroke-width:2.1}
+.harbour-flank-left .harbour-flank-button:first-child{height:clamp(110px,17.5dvh,160px);padding-top:7px}
+.harbour-flank-left{gap:clamp(12px,2.8dvh,29px)}
+.harbour-flank-right{
+  top:clamp(225px,42dvh,420px);
+  width:clamp(62px,17.5vw,110px);
+  gap:clamp(9px,2.1dvh,22px);
+}
+.harbour-flank-button{
+  border-width:3px;
+  border-radius:14px;
+  background:linear-gradient(145deg,#f6d079 0%,#b57d32 4%,#22517b 9%,#0c2f57 78%,#071c36 94%,#dfb65a);
+}
+.harbour-flank-button:focus-visible{z-index:4}
+.harbour-flank-button:nth-child(2) .harbour-flank-icon{color:#ffb44b}
+.harbour-flank-button:nth-child(3) .harbour-flank-icon{color:#ffdfae}
+.harbour-flank-right .harbour-flank-button:nth-child(1) .harbour-flank-icon{color:#ff9c53}
+.harbour-flank-right .harbour-flank-button:nth-child(3) .harbour-flank-icon{color:#f5bf42}
+.harbour-training-mode{
+  display:block;
+  color:#ffe6ad;
+  font:800 clamp(9px,2.25vw,14px)/1 'Barlow Condensed',sans-serif;
+  white-space:nowrap;
+  text-shadow:0 2px #061f39
+}
+.harbour-local-wins{font-size:clamp(10px,2.2vw,14px);white-space:nowrap}
+.harbour-battle-button{
+  width:min(55%,450px);
+  border-radius:22px;
+  background:linear-gradient(180deg,#f79d66 0%,#d82b22 14%,#bb0514 76%,#820514 100%);
+  box-shadow:0 0 0 3px #6c341b,0 7px #56301a,inset 0 3px #fff3aaaf,
+             inset 0 -5px #5d0010,0 12px 24px #082e429e;
+}
+.harbour-battle-button::before,.harbour-battle-button::after{
+  content:'';
+  position:absolute;
+  top:15%;bottom:15%;
+  width:5px;border-radius:6px;
+  background:linear-gradient(#fff3b1,#bd7e25);
+  box-shadow:0 1px 3px #562a11;
+}
+.harbour-battle-button::before{left:5px}
+.harbour-battle-button::after{right:5px}
+.harbour-nav-item:nth-child(2) .harbour-nav-icon{color:#fff4e1}
+.harbour-nav-item:nth-child(3) .harbour-nav-icon{color:#ffe0ab}
+.harbour-nav-item:nth-child(4) .harbour-nav-icon{color:#fbc894}
+.harbour-nav-item:nth-child(5) .harbour-nav-icon{color:#ffd760}
+.harbour-nav-alert{
+  position:absolute;z-index:3;top:1px;right:clamp(5px,1.5vw,15px);
+  display:grid;place-items:center;
+  min-width:19px;height:19px;border:2px solid #ffcd70;border-radius:50%;
+  background:linear-gradient(#fc5140,#bf0419);
+  box-shadow:0 2px 5px #07233d;
+  font:900 12px/1 'Barlow Condensed',sans-serif;
+  color:#fff;
+}
+.harbour-nav-item:not(:disabled):hover{background:linear-gradient(180deg,#4177a265,#102f5560)}
+@media(max-width:390px){
+ .harbour-battle-button{width:57%}
+ .harbour-training-mode{font-size:9px}
+ .harbour-local-wins{font-size:9px}
+ .harbour-logo{font-size:clamp(20px,5.8vw,25px)}
+ .harbour-flank-right{width:clamp(59px,17.5vw,70px)}
+}
+@media(max-height:690px){
+ .harbour-flank-right{top:clamp(180px,35dvh,245px);gap:clamp(7px,1.5dvh,15px)}
+ .harbour-flank-left .harbour-flank-button:first-child{height:clamp(75px,12.5dvh,95px)}
+ .harbour-training-mode{font-size:9px}
+ .harbour-local-wins{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+ .harbour-nav-item,.harbour-flank-button{transition:none}
+}
