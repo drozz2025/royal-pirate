@@ -54,26 +54,39 @@ function addLionFigurehead(root:T.Group){
     const m=new T.Mesh(globe,material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);
     m.castShadow=true;statue.add(m);
   }
-  for(let i=0;i<12;i++){
-    const angle=Math.PI*2*i/12;
-    const curl=new T.Mesh(cone,i%3===0?bright:gilt);
-    curl.scale.set(.22,.63,.25);
-    curl.position.set(Math.sin(angle)*.54,Math.cos(angle)*.52,-.06);
+  // Layered swept mane, pointed feline ears and a projecting muzzle.
+  // All parts are merged by material below to avoid many draw calls on mobile.
+  for(let i=0;i<16;i++){
+    const angle=Math.PI*2*i/16;
+    const curl=new T.Mesh(cone,i%4===0?bright:i%3===0?shade:gilt);
+    curl.scale.set(.20,.49,.23);
+    curl.position.set(Math.sin(angle)*.61,Math.cos(angle)*.62,-.17);
     curl.rotation.z=-angle;curl.castShadow=true;statue.add(curl);
   }
-  oval(0,0,-.10,.69,.77,.44,shade);
-  oval(0,.06,.27,.49,.56,.35,gilt);
-  oval(-.42,.48,.25,.19,.26,.13,bright);oval(.42,.48,.25,.19,.26,.13,bright);
-  oval(-.18,.12,.56,.18,.12,.07,shade);oval(.18,.12,.56,.18,.12,.07,shade);
-  oval(-.19,.15,.62,.069,.079,.029,ink);oval(.19,.15,.62,.069,.079,.029,ink);
-  oval(0,-.20,.57,.26,.28,.27,bright);
-  oval(-.15,-.28,.74,.16,.13,.12,gilt);oval(.15,-.28,.74,.16,.13,.12,gilt);
-  oval(0,-.20,.85,.12,.09,.05,ink);
-  oval(0,-.48,.59,.28,.09,.10,shade);
+  oval(0,.01,-.12,.71,.76,.48,shade); // mane behind the face
+  oval(0,.07,.28,.52,.53,.35,gilt);
   for(const side of [-1,1]){
+    const ear=new T.Mesh(cone,bright);
+    ear.scale.set(.18,.35,.16);ear.rotation.z=-side*.23;
+    ear.position.set(side*.45,.56,.22);statue.add(ear);
+    // Hooded eyes and strong brows make this a lion rather than a teddy bear.
+    oval(side*.205,.19,.576,.145,.070,.043,shade);
+    oval(side*.205,.15,.617,.079,.050,.035,ink);
+    oval(side*.20,.16,.646,.020,.020,.012,bright);
+    oval(side*.16,-.24,.61,.225,.18,.20,bright);
+    oval(side*.22,-.30,.76,.085,.067,.06,gilt);
+    for(let i=0;i<2;i++){
+      const whisker=new T.Mesh(new T.CylinderGeometry(.012,.012,.34,5),shade);
+      whisker.position.set(side*.36,-.28-i*.095,.78);
+      whisker.rotation.z=side*(.65+i*.20);statue.add(whisker);
+    }
     const scroll=new T.Mesh(new T.TorusGeometry(.27,.068,6,16,Math.PI*1.45),bright);
     scroll.position.set(side*.57,-.59,-.2);scroll.rotation.z=side*.5;statue.add(scroll);
   }
+  oval(0,-.19,.72,.21,.20,.27,gilt); // tapered bridge of muzzle
+  const nose=new T.Mesh(new T.ConeGeometry(.17,.19,3),ink);
+  nose.rotation.z=Math.PI;nose.position.set(0,-.24,.955);statue.add(nose);
+  oval(0,-.47,.64,.28,.075,.12,shade);
   // Merge lion details by material: 4 draw calls, not 30 independent meshes.
   const mergedByMaterial=new Map<T.Material,T.BufferGeometry[]>();
   for(const child of [...statue.children]){
