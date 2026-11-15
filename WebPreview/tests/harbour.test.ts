@@ -9,9 +9,9 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 test('harbour preview is an actual screen integrated with the live battle', () => {
-  assert.match(main, /harbour&&<Harbour onBattle=\{enterBattle\}/);
-  assert.match(main, /const enterBattle=\(\)=>\{reset\(\);view\.current\?\.showBattle\(\);setHarbour\(false\)/);
-  assert.match(main, /const returnHarbour=\(\)=>\{reset\(\);view\.current\?\.showHarbour\(\);setHarbour\(true\)/);
+  assert.match(main, /harbour&&!inspecting&&<Harbour onBattle=\{enterBattle\} onInspect=\{inspectShip\}/);
+  assert.match(main, /const enterBattle=\(\)=>\{reset\(\);view\.current\?\.showBattle\(\);setInspecting\(false\);setHarbour\(false\)/);
+  assert.match(main, /const returnHarbour=\(\)=>\{reset\(\);view\.current\?\.showHarbour\(\);setInspecting\(false\);setHarbour\(true\)/);
   assert.match(main, /aria-label="Return to harbour"/);
 });
 test('harbour has one functional battle action and no fake transactions', () => {
@@ -49,4 +49,18 @@ test('approved navigation is represented without fake in-game economy', () => {
   assert.match(harbour, /LIVE 3D/);
   assert.match(css, /\.in-harbour \.battle-hud/);
   assert.match(css, /\.harbour-central\{[^}]*min-height/);
+});
+
+test('functional ship viewer orbits live 3D without advancing the battle', () => {
+  assert.match(harbour, /onClick=\{onInspect\}/);
+  assert.match(harbour, /Inspect your ship in interactive 3D/);
+  assert.match(main, /const inspectShip=\(\)=>\{view\.current\?\.inspectShip\(\);setInspecting\(true\)/);
+  assert.match(main, /const closeInspection=\(\)=>\{view\.current\?\.showHarbour\(\);setInspecting\(false\)/);
+  assert.match(main, /harbour&&inspecting&&<div className="ship-inspection-ui"/);
+  assert.match(scene, /inspectShip\(\)\{/);
+  assert.match(scene, /this\.cameraMode='inspect'/);
+  assert.match(scene, /this\.controls\.enableRotate=true;this\.controls\.enableZoom=true/);
+  assert.match(scene, /if\(this\.cameraMode==='battle'\|\|this\.cameraMode==='deck'\)\{this\.battle\.tick\(dt\)/);
+  assert.match(css, /\.harbour-inspect-button\{pointer-events:auto/);
+  assert.match(css, /\.ship-inspection-ui\{[^}]*pointer-events:none/);
 });
