@@ -56,7 +56,8 @@ function sealTexture(red: boolean, flag = false) {
 /** Sculpted lion figurehead: real meshes attached to the player hull. */
 function addLionFigurehead(root:T.Group){
   const statue=new T.Group();
-  statue.position.set(0,2.55,5.05);
+  // Slightly larger sculptural ornament gives the prow a readable royal silhouette on mobile.
+  statue.position.set(0,2.58,5.05);statue.scale.setScalar(1.16);
   const gilt=new T.MeshStandardMaterial({color:'#eeb85b',metalness:.6,roughness:.31});
   const bright=new T.MeshStandardMaterial({color:'#ffdc79',metalness:.57,roughness:.29});
   const shade=new T.MeshStandardMaterial({color:'#a86b27',metalness:.55,roughness:.4});
@@ -208,6 +209,54 @@ export function makeShip(red = false): ShipArt {
     const barrel=new T.Mesh(new T.CylinderGeometry(.21,.29,1.08,12),metal);barrel.rotation.z=-side*Math.PI/2;barrel.position.x=side*.42;gun.add(barrel);
     const rim=new T.Mesh(new T.TorusGeometry(.21,.05,6,12),gold);rim.rotation.y=Math.PI/2;rim.position.x=side*.98;gun.add(rim);
     const bore=new T.Mesh(new T.CircleGeometry(.18,12),black);bore.rotation.y=side*Math.PI/2;bore.position.x=side*1.035;gun.add(bore);
+  }
+  // Royal galleon detailing is real 3D geometry, merged by material with the
+  // existing hull. The enemy remains lightweight and visually distinct.
+  if(!red){
+    const bronze=mat('#b88236',.54,.38);
+    const antique=mat('#f8d88d',.56,.28);
+    const deckSeam=mat('#5c3928',0,.85);
+    // Subtle hardwood caulking: separate seams, not a flat deck decal.
+    for(let i=-5;i<=5;i++){
+      const x=i*.225;
+      put(cube,deckSeam,x,1.989,-.05,.017,.014,5.45);
+    }
+    // Each cannon aperture has carved corner plates and polished rivets.
+    // Coordinates are just outside the broadside skin, not painted over it.
+    for(const side of [-1,1])for(const z of [-1.8,0,1.8]){
+      const face=side*1.95;
+      for(const dy of [-.46,.46])put(cube,gold,face,1.47+dy,z,.075,.09,1.03);
+      for(const dz of [-.50,.50])put(cube,bronze,face,1.47,z+dz,.075,1.0,.09);
+      for(const dy of [-.41,.41])for(const dz of [-.42,.42])
+        put(sphere,antique,face+side*.045,1.47+dy,z+dz,.069,.069,.069);
+      // Bronze lower apron gives the guns a substantial framed gun deck.
+      put(cube,bronze,face,1.02,z,.09,.08,.94);
+    }
+    // Upper carved side ribbons and warm gold rosettes break up the flat hull.
+    for(const side of [-1,1])for(let i=0;i<9;i++){
+      const z=-3.5+i*.86;
+      const width=1.55+Math.sin((z+3.5)/7*Math.PI)*.30;
+      put(sphere,i%2===0?gold:bronze,side*(width+.10),2.39,z,.10,.10,.10);
+    }
+    // Decorative raised scrollwork at the aft castle and a crown-shaped prow
+    // collar. These remain visible when the ship is rotated by touch.
+    const scroll=cached('galleon-royal-scroll',()=>new T.TorusGeometry(.31,.065,7,18,Math.PI*1.68));
+    for(const side of [-1,1]){
+      put(scroll,gold,side*1.47,3.04,-3.72,.90,1.05,.90,
+        new T.Euler(0,side*Math.PI/2,side*.28));
+      put(cube,antique,side*1.45,3.58,-3.45,.065,.085,1.30);
+      for(const z of [-4.03,-3.64,-3.25])put(sphere,gold,side*1.49,3.63,z,.10,.10,.10);
+    }
+    for(const side of [-1,1]){
+      beam(new T.Vector3(side*.18,2.66,4.7),new T.Vector3(side*.80,3.17,5.2),.082,antique);
+      beam(new T.Vector3(side*.80,3.17,5.2),new T.Vector3(side*.37,3.72,5.62),.067,gold);
+    }
+    // More pronounced gilded taffrail on the quarterdeck.
+    for(let i=0;i<8;i++){
+      const x=-1.15+i*.33;
+      put(cube,bronze,x,3.65,-4.37,.065,.31,.075);
+      put(sphere,antique,x,3.84,-4.37,.075,.075,.075);
+    }
   }
   const sails:T.Mesh[]=[],flags:T.Mesh[]=[];
   const sailMat=new T.MeshStandardMaterial({map:sealTexture(red),side:T.DoubleSide,roughness:.9});
