@@ -15,7 +15,7 @@ test('mosaic missions render Portuguese tabs, real objectives and accessible dai
   assert.match(html,/Recompensa diária/i);
   assert.match(html,/aria-label="Categorias de missões"/);
   assert.match(html,/role="progressbar"/);
-  assert.match(html,/>IR<\/button>/);
+  assert.match(html,/>JOGAR<\/button>/);
   assert.match(html,/Recompensa diária/i);
   assert.doesNotMatch(html,/fake leaderboard|global rank #1/i);
 });
