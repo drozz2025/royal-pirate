@@ -240,8 +240,8 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
             <span className="w7-chest-status">EM BREVE</span>
           </article>)}
       </div>
-      <div className="w7-shop-local-note"><strong>TRIPULAÇÃO DISPONÍVEL</strong><span>RECRUTAMENTO COM MOEDAS GANHAS NO JOGO</span></div>
-      <div className="w7-line"><strong>MEMBROS DO PORTO</strong><span>{profile.ownedCrew.length} / {CREW.length} ADQUIRIDOS</span></div>
+      <div className="w7-shop-local-note"><strong>RECRUTA A TUA TRIPULAÇÃO</strong><span>RECRUTAMENTO COM MOEDAS GANHAS NO JOGO</span></div>
+      <div className="w7-line"><strong>MEMBROS DO PORTO</strong><span>{profile.ownedCrew.length} / {CREW.length} CARTAS</span></div>
       <div className="w7-shop-list">{CREW.map(c=>{
         const owned=profile.ownedCrew.includes(c.id),canBuy=!owned&&c.cost>0&&profile.coins>=c.cost;
         return <article key={c.id} className={'w7-product w7-'+c.id}>
@@ -254,7 +254,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
       })}
       </div>
       <div className="w7-shop-actions"><button type="button" onClick={onBattle} aria-label="EARN COINS IN BATTLE">GANHAR MOEDAS</button><button type="button" onClick={onCards} aria-label="MANAGE CREW">VER CARTAS</button></div>
-      <p className="w7-disclaimer">Baús e packs ainda não têm preços, pagamentos ou entregas. Apenas o recrutamento com moedas locais ganhas nas batalhas está funcional. Progresso guardado neste dispositivo.</p>
+      <p className="w7-disclaimer">No real-money checkout is available; secure payments não estão integrados. Baús e packs não têm preços, pagamentos ou entregas. Apenas o recrutamento com moedas locais está funcional; dados saved on this device only.</p>
     </section>}
     {pending&&<section className="w7-content w7-feature w7-pending" role="tabpanel" aria-label={pending.title}>
       <span className="w7-pending-relic"><ShopRelic kind={tab==='coins'?'coins':tab==='gems'?'gems':'special'}/></span>
