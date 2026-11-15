@@ -10,7 +10,7 @@ export type BattleOutcome = 'victory' | 'defeat';
 /** Compact, truthful, device-only account of completed battles (newest first). */
 export type BattleRecord = {outcome:BattleOutcome; shots:number; hits:number; earnedCoins:number; earnedXp:number; completedAt:string};
 export type LocalProfile = {
-  version: 1; coins: number; xp: number; wins: number; losses: number; hits: number; shots: number;
+  version: 1; playerName: string; coins: number; xp: number; wins: number; losses: number; hits: number; shots: number;
   ownedCrew: CrewId[]; equippedCrew: CrewId; upgrades: Record<UpgradeId, number>;
   claimedMissions: MissionId[]; lastDailyDay: string; dailyStreak: number; battleLog: BattleRecord[];
 };
@@ -42,7 +42,7 @@ function validBattleRecord(v:unknown):v is BattleRecord {
     entry.earnedCoins===(entry.outcome==='victory'?35:0)&&validIso(entry.completedAt);
 }
 export function initialProfile():LocalProfile {
-  return {version:1,coins:0,xp:0,wins:0,losses:0,hits:0,shots:0,ownedCrew:['captain'],equippedCrew:'captain',
+  return {version:1,playerName:'Jogador',coins:0,xp:0,wins:0,losses:0,hits:0,shots:0,ownedCrew:['captain'],equippedCrew:'captain',
     upgrades:{hull:0,cannons:0,sails:0},claimedMissions:[],lastDailyDay:'',dailyStreak:0,battleLog:[]};
 }
 export function parseProfile(raw:string|null):LocalProfile {
@@ -56,7 +56,7 @@ export function parseProfile(raw:string|null):LocalProfile {
     const equipped=owned.includes(s.equippedCrew as CrewId)?s.equippedCrew as CrewId:'captain';
     const upgrades=s.upgrades&&typeof s.upgrades==='object'?s.upgrades:{hull:0,cannons:0,sails:0};
     return {
-      version:1,coins:bounded(s.coins),xp:bounded(s.xp),wins:bounded(s.wins),losses:bounded(s.losses),
+      version:1,playerName:typeof s.playerName==='string'&&s.playerName.trim()?s.playerName.trim().slice(0,20):'Jogador',coins:bounded(s.coins),xp:bounded(s.xp),wins:bounded(s.wins),losses:bounded(s.losses),
       hits:bounded(s.hits),shots:bounded(s.shots),ownedCrew:owned,equippedCrew:equipped,
       upgrades:{hull:bounded(upgrades.hull,5),cannons:bounded(upgrades.cannons,5),sails:bounded(upgrades.sails,5)},
       claimedMissions:missionIds.filter(id=>Array.isArray(s.claimedMissions)&&s.claimedMissions.includes(id)),
