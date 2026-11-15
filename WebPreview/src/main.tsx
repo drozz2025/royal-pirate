@@ -57,7 +57,7 @@ function App(){
  const result=state.phase==='victory'||state.phase==='defeat',ready=state.phase==='ready'&&loaded&&!error;
  return <main className={'app '+(harbour?'in-harbour':'in-battle')}>
    <div ref={host} className="ocean"/><div className="vignette"/>
-   {harbour&&!inspecting&&<Harbour onBattle={enterBattle} onInspect={inspectShip} onNavigate={navigateTo} coins={profile.coins} hidden={Boolean(appScreen)}/>}
+   {harbour&&!inspecting&&<Harbour onBattle={enterBattle} onInspect={inspectShip} onNavigate={navigateTo} profile={profile} hidden={Boolean(appScreen)}/>}
    <input ref={backupFile} type="file" hidden accept=".json,application/json" aria-label="Choose a local Royal Pirate save backup" onChange={restoreBackup}/>
    {harbour&&!inspecting&&appScreen&&<AppScreens screen={appScreen} profile={profile} onNavigate={navigateTo} onClose={()=>setAppScreen(null)} onBattle={enterBattle} onInspect={inspectShip}
       onBuyCrew={(id:CrewId)=>setProfile(p=>buyCrew(p,id))} onEquipCrew={(id:CrewId)=>setProfile(p=>equipCrew(p,id))}

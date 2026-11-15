@@ -16,7 +16,9 @@ test('harbour preview is an actual screen integrated with the live battle', () =
 });
 test('harbour has one functional battle action and no fake transactions', () => {
   assert.match(harbour, /onClick=\{onBattle\}/);
-  assert.match(harbour, /COMING SOON/);
+  assert.match(harbour, /Seven-day daily supply route/);
+  assert.match(harbour, /canClaimDaily\(profile,now\)/);
+  assert.doesNotMatch(harbour, /Chest \{/);
   assert.doesNotMatch(harbour, /fetch\(|localStorage|payment|purchase\(/i);
 });
 test('harbour is accessible in portrait and respects safe-area inset', () => {
@@ -42,10 +44,11 @@ test('the harbour frames a real Three.js vessel and disables battle simulation',
   assert.match(main, /view\.current\?\.showBattle\(\)/);
 });
 test('approved navigation is represented without fake in-game economy', () => {
-  for(const label of ['SHOP','CARDS','SHIP','MISSIONS','RANKING','UPGRADES','FORGE','REWARDS','DAILY CHESTS','BATTLE!']) {
+  for(const label of ['SHOP','CARDS','SHIP','MISSIONS','RANKING','UPGRADES','FORGE','DAILY SUPPLY ROUTE','BATTLE!']) {
     assert.ok(harbour.includes(label), label+' must be present');
   }
-  assert.match(harbour, /aria-disabled="true"/);
+  assert.match(harbour, /onNavigate\(\x27missions\x27\)/);
+  assert.match(harbour, /readyMissions/);
   assert.match(harbour, /LIVE 3D/);
   assert.match(css, /\.in-harbour \.battle-hud/);
   assert.match(css, /\.harbour-central\{[^}]*min-height/);

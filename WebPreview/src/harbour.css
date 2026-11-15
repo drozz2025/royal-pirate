@@ -256,3 +256,20 @@
 .harbour-secondary-action{cursor:pointer;color:#fff9e8;text-shadow:0 2px 2px #102f52}
 .harbour-profile{color:#fff9e8;text-align:left;cursor:pointer;text-shadow:0 2px 2px #152f4999}
 .harbour-side-tile:focus-visible,.harbour-secondary-action:focus-visible,.harbour-nav-item:focus-visible,.harbour-profile:focus-visible{outline:3px solid #fff4b4;outline-offset:3px}
+
+
+/* v0.1.10: real local UTC daily route replaces decorative locked chests. */
+.harbour-reward-ready{border-color:#fff0b8;box-shadow:0 0 0 2px #ffd26b6b,0 4px #432e2a,0 8px 13px #0a224366}
+.harbour-daily-route{padding-bottom:6px}
+.harbour-daily-route .harbour-chest-header{margin-bottom:5px}
+.harbour-daily-button{display:flex;flex-direction:column;gap:5px;width:100%;
+  padding:5px 7px 8px;background:linear-gradient(130deg,#21466aee,#0a2e51ed);border:1px solid #e5bf73;
+  border-radius:12px;color:#f8ebcf;box-shadow:inset 0 1px #ffeca344}
+.harbour-daily-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;width:100%}
+.harbour-daily-days>span{min-width:0;min-height:32px;display:grid;place-items:center;border-radius:7px;
+  border:1px solid #7e9eaf;background:#122c48;color:#bfd8e4;font:900 15px 'Barlow Condensed',sans-serif}
+.harbour-daily-days>span.earned{border-color:#80d7a4;background:#14534f;color:#baffd5}
+.harbour-daily-days>span.next{border:2px solid #ffdb83;background:#69492e;color:#fff4c5;box-shadow:0 0 8px #f3c96a66}
+.harbour-daily-summary{font:900 11px 'Barlow Condensed',sans-serif;letter-spacing:.6px;color:#f9e6aa}
+.harbour-daily-button:focus-visible{outline:3px solid #fff0ad;outline-offset:3px}
+@media(max-width:375px){.harbour-daily-days{gap:3px}.harbour-daily-days>span{min-height:28px;font-size:13px}}
