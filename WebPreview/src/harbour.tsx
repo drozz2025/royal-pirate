@@ -62,9 +62,10 @@ export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=
   return <section className="harbour-screen" aria-label="Royal Pirate Porto" aria-hidden={hidden} inert={hidden}>
     <div className="harbour-sky" aria-hidden="true"/>
     <header className="harbour-header">
-      <button type="button" className="harbour-profile" onClick={()=>onAction('profile')} aria-label={'Captain profile, level '+level+', local progress'}>
+      <button type="button" className="harbour-profile" onClick={()=>onAction('profile')} aria-label={profile.playerName+', level '+level+', local progress'}>
         <span className="harbour-avatar" aria-hidden="true"><PirateIcon name="profile" size={36}/></span>
         <span className="harbour-level">
+          <span className="harbour-player-name" title={profile.playerName}>{profile.playerName}</span>
           <strong>NV. {level}</strong>
           <span className="harbour-level-track" role="progressbar" aria-label="Captain level experience" aria-valuemin={0} aria-valuemax={100} aria-valuenow={xpPercent}><span style={{width:xpPercent+'%'}}/></span>
         </span>
