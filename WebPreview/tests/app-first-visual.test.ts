@@ -46,10 +46,11 @@ test('shipyard milestones are accessible and crew filters are actionable mobile 
   assert.match(forge,/ARMADURA/);
   const crew=app('cards',initialProfile());
   assert.match(crew,/Filter crew collection/);
-  assert.match(crew,/aria-pressed="true">ALL/);
-  assert.match(crew,/aria-pressed="false">OWNED/);
-  assert.match(crew,/CREW COLLECTED/);
-  assert.match(crew,/★ ACTIVE CAPTAIN/);
-  assert.match(crew,/UNDISCOVERED/);
+  assert.match(crew,/aria-pressed="true">TODAS/);
+  assert.match(crew,/aria-pressed="false">MINHAS/);
+  assert.match(crew,/CARTAS NO INVENTÁRIO/);
+  assert.match(crew,/Captain Mara/);
+  assert.match(crew,/EQUIPADO/);
+  assert.match(crew,/A MINHA COLEÇÃO/);
   assert.match(crew,/aria-modal="true"/);
 });
