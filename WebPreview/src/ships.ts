@@ -194,6 +194,9 @@ export function makeShip(red = false): ShipArt {
   const sails:T.Mesh[]=[],flags:T.Mesh[]=[];
   const sailMat=new T.MeshStandardMaterial({map:sealTexture(red),side:T.DoubleSide,roughness:.9});
   const flagMat=new T.MeshStandardMaterial({map:sealTexture(red,true),side:T.DoubleSide,roughness:1});
+  // The smaller topsails are dark woven cloth. Keep the crowned skull emblem
+  // on the two full main sails and on the flags, not repeated four times.
+  const topsailMat=new T.MeshStandardMaterial({color:red?'#713331':'#19232d',side:T.DoubleSide,roughness:.88});
   for(const [z,h,w] of [[.9,8.3,4.5],[-2.1,7.1,3.5]]){
     // Rig is a separate group for damage. Static ropes stay attached to the hull.
     const mast=new T.Mesh(new T.CylinderGeometry(.07,.16,h-.6,10),honey);
@@ -213,7 +216,7 @@ export function makeShip(red = false): ShipArt {
       upperPositions.setX(i,upperPositions.getX(i)*(1-.08*Math.cos(v*Math.PI*2)));
     }
     upperGeometry.computeVertexNormals();
-    const upperSail=new T.Mesh(upperGeometry,flagMat);
+    const upperSail=new T.Mesh(upperGeometry,topsailMat);
     upperSail.position.set(0,h+.28,z);rig.add(upperSail);sails.push(upperSail);
     const g=new T.PlaneGeometry(w,3.6,7,7);const p=g.attributes.position;
     for(let i=0;i<p.count;i++){const x=p.getX(i)/w+.5,y=p.getY(i)/3.6+.5;p.setZ(i,Math.sin(x*Math.PI)*Math.sin(y*Math.PI)*.8);p.setX(i,p.getX(i)*(1-.13*Math.cos(y*Math.PI*2)));}
