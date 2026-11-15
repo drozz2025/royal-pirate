@@ -39,8 +39,11 @@ test('mission badge reflects genuine reward claim and expired daily sequence res
 });
 test('shipyard milestones are accessible and crew filters are actionable mobile controls',()=>{
   const forge=app('forge',initialProfile());
-  assert.equal((forge.match(/role="progressbar" aria-label="(?:Hull|Cannons|Sails) upgrade level"/g)||[]).length,3);
-  assert.match(forge,/Earn 45 more local coins/);
+  assert.equal((forge.match(/shipyard upgrade progress"/g)||[]).length,3);
+  assert.match(forge,/aria-label="Níveis locais dos sistemas do navio"/);
+  assert.match(forge,/MOEDAS INSUFICIENTES/);
+  assert.match(forge,/NAVIO/);
+  assert.match(forge,/ARMADURA/);
   const crew=app('cards',initialProfile());
   assert.match(crew,/Filter crew collection/);
   assert.match(crew,/aria-pressed="true">ALL/);
