@@ -1,7 +1,7 @@
 import React from 'react';
 import { PirateIcon } from './app-icons';
 import { FleetShowcase } from './fleet-showcase';
-import { CrewDeck } from './crew-deck';
+import { CardsCollection, ShopMarket } from './work7-cards-shop';
 import { CREW, MISSIONS, UPGRADES, battlesPlayed, canClaimDaily, nextDailyStreak, levelFor, missionProgress, upgradeCost, type CrewId, type LocalProfile, type MissionId, type UpgradeId } from './progression';
 
 export type AppScreenId = 'battle'|'fleet'|'forge'|'cards'|'shop'|'missions'|'profile'|'ranking'|'chests'|'events'|'rewards'|'offers';
@@ -109,47 +109,8 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
           <small className="app-cost-note">{max?'Fully upgraded':profile.coins<cost?`Earn ${cost-profile.coins} more local coins to upgrade`:`Next level costs ${cost} local coins`}</small></div>
           <button type="button" disabled={max||profile.coins<cost} onClick={()=>action(u.name+' upgraded to level '+(lvl+1)+' locally. No battle stat changes yet.',()=>onUpgrade(u.id))}>{max?'MAX':cost+' ●'}</button>
         </article>})}</div>}
-      {screen==='cards'&&<div className="app-stack"><div className="app-kicker">YOUR CREW · LOCAL COLLECTION</div><h2>Captains & Specialists</h2>
-        <p className="app-fine">Equip one crew card. Collection is saved locally; abilities will be integrated into combat later.</p>
-        <div className="app-crew-tools"><div><strong>{profile.ownedCrew.length} / {CREW.length}</strong><small>CREW COLLECTED</small></div>
-          <div className="app-crew-filters" role="group" aria-label="Filter crew collection">
-            <button type="button" aria-pressed={!onlyOwned} onClick={()=>setOnlyOwned(false)}>ALL</button>
-            <button type="button" aria-pressed={onlyOwned} onClick={()=>setOnlyOwned(true)}>OWNED</button>
-          </div>
-        </div>
-        <CrewDeck profile={profile} onlyOwned={onlyOwned} onBuyCrew={onBuyCrew} onEquipCrew={onEquipCrew}
-          onBattle={()=>onNavigate('battle')} announce={action}/></div>}
-      {screen==='shop'&&<div className="app-stack">
-        <div className="app-market-hero">
-          <div className="app-market-icon" aria-hidden="true"><PirateIcon name="shop" size={45}/></div>
-          <div className="app-market-copy"><div className="app-kicker">THE PORT MARKET · LOCAL PREVIEW</div><h2>Port Market</h2>
-            <p>Recruit original crew with coins earned in naval battles. No cash purchases, gems or simulated stock.</p></div>
-          <div className="app-market-purse" aria-label={profile.coins+' local coins available'}><strong>{profile.coins}</strong><small>● COINS</small></div>
-        </div>
-        <section className="app-market-roster" aria-labelledby="app-market-title">
-          <div className="app-market-heading"><div><div className="app-kicker">AVAILABLE IN THIS PREVIEW</div><h3 id="app-market-title">Recruit your crew</h3></div>
-            <small>{profile.ownedCrew.length} / {CREW.length} COLLECTED</small></div>
-          <div className="app-market-list">{CREW.map(c=>{
-            const owned=profile.ownedCrew.includes(c.id),affordable=profile.coins>=c.cost;
-            return <article className={'app-market-card '+(owned?'is-owned':'')} key={c.id}>
-              <span className="app-market-portrait" aria-hidden="true">{c.symbol}</span>
-              <div className="app-market-card-info"><strong>{c.name}</strong><small>{owned?'IN YOUR CREW':'LOCAL RECRUIT'}</small>
-                <p>{c.role}</p>
-                <span className="app-market-price">{owned?'COLLECTED':c.cost+' ● LOCAL COINS'}</span>
-              </div>
-              <button type="button" disabled={owned||!affordable} aria-label={owned?c.name+' already collected':affordable?'Recruit '+c.name+' for '+c.cost+' local coins':'Need '+(c.cost-profile.coins)+' more local coins to recruit '+c.name}
-                onClick={()=>action(c.name+' recruited for '+c.cost+' local coins. Manage this card in Crew.',()=>onBuyCrew(c.id))}>
-                {owned?'OWNED':affordable?'RECRUIT':'LOCKED'}
-              </button>
-            </article>;
-          })}</div>
-          <p className="app-fine">Crew collection and coin spending are saved on this device. Crew abilities do not affect combat yet.</p>
-          <div className="app-market-actions"><button type="button" onClick={()=>onNavigate('battle')}>EARN COINS IN BATTLE</button><button type="button" onClick={()=>onNavigate('cards')}>MANAGE CREW</button></div>
-        </section>
-        <div className="app-offer app-market-pending"><span aria-hidden="true">◆</span><div><strong>Gems & real-money bundles</strong>
-          <p>Not live until secure payments, account recovery and store approvals exist. No real-money checkout is available.</p></div><strong>NOT LIVE</strong></div>
-        <div className="app-row-muted"><span>Cosmetic skins, treasure chests & advertisements</span><span>PLANNED</span></div>
-      </div>}
+      {screen==='cards'&&<CardsCollection profile={profile} onBuyCrew={onBuyCrew} onEquipCrew={onEquipCrew} onBattle={()=>onNavigate('battle')} announce={action}/>}
+      {screen==='shop'&&<ShopMarket profile={profile} onBuyCrew={onBuyCrew} onCards={()=>onNavigate('cards')} onBattle={()=>onNavigate('battle')} announce={action}/>}
       {screen==='missions'&&<div className="app-stack"><div className="app-kicker">DAILY PORT REWARD</div><h2>Captain's Orders</h2>
         <article className="app-daily"><span aria-hidden="true">🎁</span><div><strong>Daily Supply Chest</strong><p>UTC day · streak {profile.dailyStreak}/7 · local device only</p><small>Next claim earns {15+nextDailyDay*5} coins. Daily reset is at 00:00 UTC.</small></div>
           <button type="button" disabled={!day} onClick={()=>action('Daily supply chest claimed locally. Return tomorrow after 00:00 UTC.',onDaily)}>{day?'CLAIM':'CLAIMED'}</button></article>
