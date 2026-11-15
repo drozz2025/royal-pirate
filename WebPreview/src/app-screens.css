@@ -416,3 +416,13 @@
 .app-sheet > .app-shortcuts {
   display:none;
 }
+
+/* Edit the local player's display name in Profile. No Porto/nav geometry changes. */
+.app-player-name-editor{display:flex;flex-direction:column;gap:7px;padding:12px;border:2px solid #b58b4a;border-radius:12px;background:linear-gradient(160deg,#19496e,#091f43);color:#fff1c4}
+.app-player-name-editor label{font:800 13px 'Barlow Condensed',sans-serif;letter-spacing:.7px}
+.app-player-name-controls{display:flex;gap:8px;align-items:stretch}
+.app-player-name-controls input{flex:1;min-width:0;padding:11px 10px;border-radius:8px;border:2px solid #d4ad65;background:#f6f3e8;color:#09233f;font:700 16px system-ui,sans-serif}
+.app-player-name-controls input:focus-visible{outline:3px solid #7dd4fc;outline-offset:2px}
+.app-player-name-controls button{padding:8px 12px;border:2px solid #ffe3a3;border-radius:8px;background:linear-gradient(#e4b85c,#996126);color:#061e36;font-weight:900;cursor:pointer}
+.app-player-name-controls button:disabled{opacity:.5;cursor:default}
+.app-player-name-editor small{color:#ebdab9;line-height:1.3}
