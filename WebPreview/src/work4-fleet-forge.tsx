@@ -22,6 +22,34 @@ const forgeTabs:ReadonlyArray<{id:ForgeTab;title:string}>=[
   {id:'sails',title:'VELAS'}
 ];
 
+/** Original pictograms: these navigation tabs remain functioning controls. */
+function FleetForgeSymbol({id}:{id:FleetTab|ForgeTab}){
+  const art:Record<FleetTab|ForgeTab,React.ReactNode>={
+    mine:<><path d="M3 15h18l-3 5H6l-3-5ZM11 3v12M11 4 5 13h6M13 5l6 8h-6"/><path d="M5 22q3-2 6 0t7 0"/></>,
+    obtain:<><path d="M12 3v18M4 12h16M6 7l6-4 6 4M6 17l6 4 6-4"/><circle cx="12" cy="12" r="3"/></>,
+    customize:<><path d="M4 19 18 5m-6-2 3-2 8 8-3 3M2 17l5 5-5 1Z"/><path d="m3 5 2-2m1 6 2-2M17 17l2 2m-2 2 2-2"/></>,
+    hull:<><path d="M2 12q10 5 20 0l-4 8H6l-4-8ZM6 11V5h12v6M10 5V2h4v3"/><path d="M7 15h10"/></>,
+    cannons:<><path d="M3 8 18 5l3 5-14 4-4-6Z"/><circle cx="17" cy="18" r="4"/><path d="M10 15 7 21m4-8 4 3M2 23h21"/></>,
+    armour:<><path d="M12 2 3 6v6c0 5 3 8 9 10 6-2 9-5 9-10V6l-9-4Z"/><path d="m8 12 3 3 5-6"/></>,
+    sails:<><path d="M12 2v19M10 4 2 17h8V4Zm4 1v12h8L14 5ZM5 21h14"/></>,
+  };
+  return <svg className="w4-tab-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">{art[id]}</svg>;
+}
+/** Visual placeholders are silhouettes, never additional owned/purchasable ships. */
+function FleetShadow({variant}:{variant:number}){
+  const mast=variant===2?59:variant===3?66:73;
+  return <svg className="w4-teaser-silhouette" viewBox="0 0 132 87" aria-hidden="true" focusable="false">
+    <path d="M7 57Q65 68 125 56l-18 20Q63 84 24 73Z" fill="#102e42" stroke="#9ab4bd" strokeWidth="2.5"/>
+    <path d={`M${mast} 12V59 M${mast-20} 55V25 M${mast+24} 57V30`}
+      stroke="#b8b8ad" strokeWidth="2.5" fill="none"/>
+    <path d={`M${mast-4} 19Q${mast-30} 38 ${mast-4} 51Z M${mast+3} 17Q${mast+34} 30 ${mast+10} 53H${mast+3}Z`}
+      fill="#263d4b" stroke="#abc0c5" strokeWidth="2"/>
+    <path d="M18 61h102M22 70h90" stroke="#ad8460" strokeWidth="2" opacity=".68"/>
+    <path d="M12 81q14-7 28 0t30 0t30 0t25 0" stroke="#59a3b6" strokeWidth="3" fill="none"/>
+  </svg>;
+}
+
 function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'cannons'|'sails'|'hull'|'armour'}){
   return <svg className={'w4-ship-art '+(small?'w4-ship-small':'')+' w4-part-'+part}
     viewBox="0 0 340 234" role="img" aria-label="Ilustração original do navio Royal Crown">
@@ -178,7 +206,7 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
     <div role="tablist" aria-label="Secções da frota" className="w4-tabs w4-fleet-tabs">
       {fleetTabs.map(t=><button key={t.id} type="button" role="tab" id={'w4-fleet-tab-'+t.id}
         aria-selected={tab===t.id} aria-controls="w4-fleet-panel"
-        onClick={()=>setTab(t.id)}>{t.title}</button>)}
+        onClick={()=>setTab(t.id)}><FleetForgeSymbol id={t.id}/><span>{t.title}</span></button>)}
     </div>
     <div id="w4-fleet-panel" role="tabpanel" aria-labelledby={'w4-fleet-tab-'+tab}>
       <div className="w4-harbour-stage">
@@ -218,7 +246,7 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
       <div className="w4-cards-caption"><strong>NAVIOS DA FROTA</strong><small>1 disponível · restantes em desenvolvimento</small></div>
       <div className="w4-ship-roster" role="group" aria-label="Selecionar navio da frota">
         {[2,3,4].map(n=><div key={n} className="w4-ship-slot is-pending" aria-label={'Espaço '+n+' indisponível'}>
-          <span className="w4-slot-art w4-slot-unavailable" aria-hidden="true"><ShipArtwork small/></span>
+          <span className="w4-slot-art w4-slot-unavailable" aria-hidden="true"><FleetShadow variant={n}/></span>
           <strong>ESPAÇO {n}</strong><small>EM DESENVOLVIMENTO</small></div>)}
         <button type="button" className="w4-ship-slot is-active" aria-pressed={details}
           onClick={()=>setDetails(v=>!v)} aria-label="Royal Crown, navio ativo, alternar detalhes">
@@ -243,14 +271,14 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
     <div className="w4-tabs w4-forge-tabs" role="tablist" aria-label="Sistemas do navio">
       {forgeTabs.map(t=><button type="button" role="tab" id={'w4-forge-tab-'+t.id} key={t.id}
         aria-selected={tab===t.id} aria-controls="w4-forge-panel"
-        onClick={()=>setTab(t.id)}>{t.title}</button>)}
+        onClick={()=>setTab(t.id)}><FleetForgeSymbol id={t.id}/><span>{t.title}</span></button>)}
     </div>
     <div id="w4-forge-panel" role="tabpanel" aria-labelledby={'w4-forge-tab-'+tab}>
       <div className="w4-forge-stage">
         <div className="w4-forge-glow" aria-hidden="true"/>
         <ForgeBackdrop/>
         {tab==='cannons'?<ForgeCannonArtwork/>:<ShipArtwork part={tab==='armour'?'armour':tab==='hull'?'hull':tab}/>} 
-        <div className="w4-forge-description"><span>{upgrade?'MELHORIA LOCAL DISPONÍVEL':'FUNÇÃO FUTURA'}</span>
+        <div className="w4-forge-description"><div className="w4-forge-medallion"><FleetForgeSymbol id={tab}/></div><span>{upgrade?'MELHORIA LOCAL DISPONÍVEL':'FUNÇÃO FUTURA'}</span>
           <h3>{upgrade?upgrade.name:'Armadura'}</h3>
           {upgrade?<strong>NÍVEL {level} <em>→ {max?'MAX':level+1}</em></strong>:<strong>INDISPONÍVEL</strong>}
         </div>
