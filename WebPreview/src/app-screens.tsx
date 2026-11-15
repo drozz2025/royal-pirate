@@ -1,5 +1,6 @@
 import React from 'react';
 import { PirateIcon } from './app-icons';
+import { PortoBottomNav } from './porto-bottom-nav';
 import { MissionsPanel, RankingPanel, RankingTabs, type RankingTab } from './work8-panels';
 import { FleetPanel, ForgePanel } from './work4-fleet-forge';
 import { CardsCollection, ShopMarket } from './work7-cards-shop';
@@ -14,7 +15,6 @@ const PAGES:ReadonlyArray<{id:AppScreenId;title:string}>=[
   {id:'chests',title:'Daily chests'},{id:'events',title:'Events'},
   {id:'rewards',title:'Rewards'},{id:'offers',title:'Offers'}
 ];
-const mainNav:AppScreenId[]=['fleet','cards','shop','ranking'];
 const headerShortcuts:AppScreenId[]=['battle','forge','missions','profile'];
 export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,backupMessage}:
   {screen:AppScreenId;profile:LocalProfile;onNavigate:(screen:AppScreenId)=>void;onClose:()=>void;onBattle:()=>void;
@@ -128,10 +128,6 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
         </section>
       </div>}
     </div>
-    <nav className="app-dock" aria-label="Main game screens">
-      <button type="button" aria-label="Porto" onClick={onClose}><span className="app-tab-glyph" aria-hidden="true"><PirateIcon name="port" size={27}/></span><strong>PORTO</strong></button>
-      {mainNav.map(id=>{const labels:Record<string,string>={fleet:'FROTA',cards:'CARTAS',shop:'LOJA',ranking:'RANKING'};return <button type="button" key={id} aria-label={labels[id]} aria-current={screen===id||(screen==='forge'&&id==='fleet')?'page':undefined}
-        onClick={()=>onNavigate(id)}><span className="app-tab-glyph" aria-hidden="true"><PirateIcon name={id} size={27}/></span><strong>{labels[id]}</strong></button>})}
-    </nav>
+    <PortoBottomNav screen={screen} profile={profile} onNavigate={onNavigate} onPorto={onClose}/>
   </section>;
 }
