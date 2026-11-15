@@ -61,6 +61,42 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
   </svg>;
 }
 
+
+/** Original 2D cannon illustration for the Forge's largest visual stage.
+ * Decorative only: it never claims to be an installed 3D cannon or a combat stat. */
+function ForgeCannonArtwork(){
+  return <svg className="w4-cannon-art" viewBox="0 0 420 290" role="img" aria-label="Canhão pirata de bronze e aço, ilustração original da forja">
+    <defs>
+      <linearGradient id="w4-cannon-barrel" x1="0" y1="0" x2=".25" y2="1">
+        <stop stopColor="#ffe5a1"/><stop offset=".12" stopColor="#be985e"/><stop offset=".32" stopColor="#51616b"/>
+        <stop offset=".55" stopColor="#122333"/><stop offset=".84" stopColor="#071b2c"/><stop offset="1" stopColor="#bda06f"/>
+      </linearGradient>
+      <linearGradient id="w4-cannon-brass" x1="0" y1="0" x2="1" y2="1">
+        <stop stopColor="#fff6bc"/><stop offset=".24" stopColor="#f1c670"/><stop offset=".56" stopColor="#9b612b"/><stop offset="1" stopColor="#5c371f"/>
+      </linearGradient>
+      <radialGradient id="w4-cannon-muzzle"><stop stopColor="#020d1c"/><stop offset=".8" stopColor="#0a1923"/><stop offset="1" stopColor="#7b6a57"/></radialGradient>
+    </defs>
+    <ellipse cx="188" cy="250" rx="172" ry="22" fill="#061928" opacity=".55"/>
+    <path d="M63 233 L285 173 L377 206 L162 273Z" fill="#502d22" stroke="#d99c54" strokeWidth="8" strokeLinejoin="round"/>
+    <path d="M84 231 L284 187 L351 209 L157 258" fill="none" stroke="#f9cc7a" strokeWidth="5"/>
+    <path d="M97 240 L127 268 M184 217 L202 252 M275 199 L290 229" stroke="#2a1b1e" strokeWidth="12"/>
+    <circle cx="277" cy="218" r="46" fill="#462b27" stroke="#e4b56e" strokeWidth="11"/>
+    <circle cx="277" cy="218" r="26" fill="#765032" stroke="#291f22" strokeWidth="5"/>
+    <path d="M277 178v80m-40-40h80m-67-28 54 56m0-56-54 56" stroke="#f0bd6b" strokeWidth="6"/>
+    <circle cx="277" cy="218" r="10" fill="#f2d28b" stroke="#714521" strokeWidth="4"/>
+    <path d="M69 144 L287 93 L328 158 L93 219 Z" fill="url(#w4-cannon-barrel)" stroke="#d4a15c" strokeWidth="5" strokeLinejoin="round"/>
+    <path d="M125 130L290 96L310 155L148 197Z" fill="none" stroke="#f0cb88" strokeWidth="6" opacity=".75"/>
+    <path d="M217 112 L231 173 M265 101 L281 165" stroke="#f8d187" strokeWidth="15" opacity=".88"/>
+    <path d="M217 112 L231 173 M265 101 L281 165" stroke="#653d23" strokeWidth="3"/>
+    <path d="M88 143 Q59 143 43 158 L59 223 Q77 229 102 218Z" fill="url(#w4-cannon-brass)" stroke="#f8e09b" strokeWidth="4"/>
+    <ellipse cx="64" cy="187" rx="37" ry="43" transform="rotate(-12 64 187)" fill="url(#w4-cannon-brass)" stroke="#f9dd9e" strokeWidth="7"/>
+    <ellipse cx="64" cy="187" rx="24" ry="31" transform="rotate(-12 64 187)" fill="url(#w4-cannon-muzzle)" stroke="#8f7046" strokeWidth="5"/>
+    <path d="M301 107 L339 106 L355 135 L331 155 L312 155Z" fill="url(#w4-cannon-brass)" stroke="#fbd88e" strokeWidth="5"/>
+    <circle cx="344" cy="129" r="10" fill="#8d5124" stroke="#fce5a0" strokeWidth="3"/>
+    <path d="M36 236Q64 226 83 240M353 234Q380 219 397 235" stroke="#fbcc7b" strokeWidth="3" fill="none" opacity=".7"/>
+  </svg>;
+}
+
 export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfile;onForge:()=>void;onCrew:()=>void;onPorto:()=>void}){
   const [tab,setTab]=React.useState<FleetTab>('mine');
   const [details,setDetails]=React.useState(true);
@@ -83,6 +119,9 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
         <ShipArtwork/>
         <div className="w4-stage-label"><span>★ NAVIO REAL</span><strong>ROYAL CROWN</strong>
           <small>1 navio disponível · Capitão {captain}</small>
+          <div className="w4-stage-stats" aria-label="Níveis reais da frota">
+            {UPGRADES.map(u=><span key={u.id}><strong>{u.name}</strong><em>{profile.upgrades[u.id]} / 5</em></span>)}
+          </div>
           <b>✓ ATIVO</b>
         </div>
       </div>
@@ -109,12 +148,13 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
       </div>}
       <div className="w4-cards-caption"><strong>NAVIOS DA FROTA</strong><small>1 disponível · restantes em desenvolvimento</small></div>
       <div className="w4-ship-roster" role="group" aria-label="Selecionar navio da frota">
+        {[2,3,4].map(n=><div key={n} className="w4-ship-slot is-pending" aria-label={'Espaço '+n+' indisponível'}>
+          <span className="w4-slot-art w4-slot-unavailable" aria-hidden="true"><ShipArtwork small/></span>
+          <strong>ESPAÇO {n}</strong><small>EM DESENVOLVIMENTO</small></div>)}
         <button type="button" className="w4-ship-slot is-active" aria-pressed={details}
           onClick={()=>setDetails(v=>!v)} aria-label="Royal Crown, navio ativo, alternar detalhes">
           <span className="w4-slot-art"><ShipArtwork small/></span><strong>ROYAL CROWN</strong><small>✓ DISPONÍVEL</small>
         </button>
-        {[2,3,4].map(n=><div key={n} className="w4-ship-slot is-pending" aria-label={'Espaço '+n+' indisponível'}>
-          <span className="w4-slot-empty" aria-hidden="true">⚓</span><strong>ESPAÇO {n}</strong><small>EM DESENVOLVIMENTO</small></div>)}
       </div>
       {details&&<p className="w4-footnote">Royal Crown selecionada. O navio 3D interativo encontra-se no Porto. O estaleiro guarda níveis reais, mas ainda não altera o combate.</p>}
     </div>
@@ -122,7 +162,7 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
 }
 
 export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onUpgrade:(id:UpgradeId)=>void;onFleet:()=>void}){
-  const [tab,setTab]=React.useState<ForgeTab>('hull');
+  const [tab,setTab]=React.useState<ForgeTab>('cannons');
   const upgrade=tab==='armour'?undefined:UPGRADES.find(u=>u.id===tab);
   const level=upgrade?profile.upgrades[upgrade.id]:0;
   const max=Boolean(upgrade)&&level>=5;
@@ -139,7 +179,7 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
     <div id="w4-forge-panel" role="tabpanel" aria-labelledby={'w4-forge-tab-'+tab}>
       <div className="w4-forge-stage">
         <div className="w4-forge-glow" aria-hidden="true"/>
-        <ShipArtwork part={tab==='armour'?'armour':tab==='hull'?'hull':tab}/>
+        {tab==='cannons'?<ForgeCannonArtwork/>:<ShipArtwork part={tab==='armour'?'armour':tab==='hull'?'hull':tab}/>} 
         <div className="w4-forge-description"><span>{upgrade?'MELHORIA LOCAL DISPONÍVEL':'FUNÇÃO FUTURA'}</span>
           <h3>{upgrade?upgrade.name:'Armadura'}</h3>
           {upgrade?<strong>NÍVEL {level} <em>→ {max?'MAX':level+1}</em></strong>:<strong>INDISPONÍVEL</strong>}
