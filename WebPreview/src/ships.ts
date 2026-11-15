@@ -3,8 +3,8 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 // Original procedural preview art, inspired by the approved direction. No third-party models.
 const mat = (color: string, metalness = 0, roughness = .65) => new T.MeshStandardMaterial({ color, metalness, roughness, flatShading: false });
-const wood = mat('#774027'), honey = mat('#bd7440'), darkWood = mat('#48291e'), deck = mat('#d09b58');
-const gold = mat('#f5bd50', .65, .32), metal = mat('#263645', .7, .3), rope = mat('#bba57a'), black = mat('#121b22');
+const wood = mat('#69361f'), honey = mat('#a35e2e'), darkWood = mat('#3e251a'), deck = mat('#bc8550');
+const gold = mat('#f5bd50', .62, .29), metal = mat('#263645', .7, .3), rope = mat('#e0b77b'), black = mat('#121b22');
 const light = new T.MeshStandardMaterial({ color: '#fff1a8', emissive: '#ffab35', emissiveIntensity: 1.5 });
 deck.side=T.DoubleSide;
 const geometryCache = new Map<string, T.BufferGeometry>();
@@ -15,25 +15,88 @@ const sphere = cached('sphere', () => new T.SphereGeometry(1, 10, 8));
 function sealTexture(red: boolean, flag = false) {
   const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 512;
   const c = canvas.getContext('2d')!;
-  c.fillStyle = flag ? '#172535' : red ? '#a7342f' : '#203952'; c.fillRect(0, 0, 512, 512);
-  c.strokeStyle = red ? '#d6634d' : '#567184'; c.lineWidth = 2;
+  c.fillStyle = flag ? '#151923' : red ? '#a7342f' : '#101923'; c.fillRect(0, 0, 512, 512);
+  c.strokeStyle = red ? '#d6634d' : '#303741'; c.lineWidth = 2;
   for (let x = 16; x < 512; x += 48) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, 512); c.stroke(); }
   c.strokeStyle = '#d5bf8c'; c.lineWidth = 4; c.strokeRect(12, 12, 488, 488);
   // Original skull & crossed cutlasses emblem drawn as a texture, not a copied asset.
   c.save(); c.translate(256, 266); c.strokeStyle = '#f5e5b7'; c.lineWidth = 18; c.lineCap = 'round';
   for (const s of [-1, 1]) { c.beginPath(); c.moveTo(-105, s * 78); c.quadraticCurveTo(20, -s * 10, 116, -s * 84); c.stroke(); }
   c.fillStyle = '#f5e5b7'; c.beginPath(); c.ellipse(0, -25, 75, 79, 0, 0, Math.PI * 2); c.fill(); c.fillRect(-38, 10, 76, 58);
-  c.fillStyle = red ? '#a7342f' : '#203952';
+  c.fillStyle = red ? '#a7342f' : '#101923';
   for (const x of [-28, 28]) { c.beginPath(); c.ellipse(x, -29, 20, 25, x * .008, 0, Math.PI * 2); c.fill(); }
   c.beginPath(); c.moveTo(0, 1); c.lineTo(-11, 22); c.lineTo(11, 22); c.fill();
   for (const x of [-20, 0, 20]) c.fillRect(x - 3, 48, 6, 23);
+  // Royal gold crown above the skull remains readable on a phone.
+  if(!red){
+    c.fillStyle='#f5c65c';c.strokeStyle='#764618';c.lineWidth=7;
+    c.beginPath();c.moveTo(-77,-111);c.lineTo(-81,-154);c.lineTo(-42,-133);
+    c.lineTo(0,-177);c.lineTo(42,-133);c.lineTo(81,-154);
+    c.lineTo(77,-111);c.closePath();c.fill();c.stroke();
+    c.fillRect(-72,-113,144,16);c.strokeRect(-72,-113,144,16);
+    for(const x of [-43,0,43]){c.beginPath();c.arc(x,-121,5,0,Math.PI*2);c.fillStyle='#fff3ab';c.fill();}
+  }
   c.restore();
   const tex = new T.CanvasTexture(canvas); tex.colorSpace = T.SRGBColorSpace; tex.anisotropy = 4; tex.userData.backgroundColor=red?'#a7342f':'#203952';return tex;
 }
+
+/** Sculpted lion figurehead: real meshes attached to the player hull. */
+function addLionFigurehead(root:T.Group){
+  const statue=new T.Group();
+  statue.position.set(0,2.55,5.05);
+  const gilt=new T.MeshStandardMaterial({color:'#eeb85b',metalness:.6,roughness:.31});
+  const bright=new T.MeshStandardMaterial({color:'#ffdc79',metalness:.57,roughness:.29});
+  const shade=new T.MeshStandardMaterial({color:'#a86b27',metalness:.55,roughness:.4});
+  const ink=new T.MeshStandardMaterial({color:'#241b16',metalness:.1,roughness:.65});
+  const globe=new T.SphereGeometry(1,12,10);
+  const cone=new T.ConeGeometry(1,1,7);
+  function oval(x:number,y:number,z:number,sx:number,sy:number,sz:number,material:T.Material){
+    const m=new T.Mesh(globe,material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);
+    m.castShadow=true;statue.add(m);
+  }
+  for(let i=0;i<12;i++){
+    const angle=Math.PI*2*i/12;
+    const curl=new T.Mesh(cone,i%3===0?bright:gilt);
+    curl.scale.set(.22,.63,.25);
+    curl.position.set(Math.sin(angle)*.54,Math.cos(angle)*.52,-.06);
+    curl.rotation.z=-angle;curl.castShadow=true;statue.add(curl);
+  }
+  oval(0,0,-.10,.69,.77,.44,shade);
+  oval(0,.06,.27,.49,.56,.35,gilt);
+  oval(-.42,.48,.25,.19,.26,.13,bright);oval(.42,.48,.25,.19,.26,.13,bright);
+  oval(-.18,.12,.56,.18,.12,.07,shade);oval(.18,.12,.56,.18,.12,.07,shade);
+  oval(-.19,.15,.62,.069,.079,.029,ink);oval(.19,.15,.62,.069,.079,.029,ink);
+  oval(0,-.20,.57,.26,.28,.27,bright);
+  oval(-.15,-.28,.74,.16,.13,.12,gilt);oval(.15,-.28,.74,.16,.13,.12,gilt);
+  oval(0,-.20,.85,.12,.09,.05,ink);
+  oval(0,-.48,.59,.28,.09,.10,shade);
+  for(const side of [-1,1]){
+    const scroll=new T.Mesh(new T.TorusGeometry(.27,.068,6,16,Math.PI*1.45),bright);
+    scroll.position.set(side*.57,-.59,-.2);scroll.rotation.z=side*.5;statue.add(scroll);
+  }
+  // Merge lion details by material: 4 draw calls, not 30 independent meshes.
+  const mergedByMaterial=new Map<T.Material,T.BufferGeometry[]>();
+  for(const child of [...statue.children]){
+    if(!(child instanceof T.Mesh))continue;
+    child.updateMatrix();
+    const geometry=child.geometry.clone().applyMatrix4(child.matrix);
+    const material=child.material as T.Material;
+    if(!mergedByMaterial.has(material))mergedByMaterial.set(material,[]);
+    mergedByMaterial.get(material)!.push(geometry);
+    statue.remove(child);
+  }
+  for(const [material,parts] of mergedByMaterial){
+    const united=mergeGeometries(parts,false);
+    if(united){const mesh=new T.Mesh(united,material);mesh.castShadow=true;statue.add(mesh);}
+    parts.forEach(g=>g.dispose());
+  }
+  root.add(statue);
+}
+
 export type ShipArt = { root: T.Group; rig: T.Group; sails: T.Mesh[]; flags: T.Mesh[]; guns: T.Group[]; scars: T.Mesh[]; trim: T.MeshStandardMaterial; health: number };
 export function makeShip(red = false): ShipArt {
   const root = new T.Group(), rig = new T.Group(); root.add(rig);
-  const trim = mat(red ? '#8f3530' : '#24536a', .05, .5);
+  const trim = mat(red ? '#8f3530' : '#5b321f', .05, .47);
   const bins = new Map<T.Material, T.BufferGeometry[]>();
   function put(geometry: T.BufferGeometry, material: T.Material, x: number, y: number, z: number, sx=1, sy=1, sz=1, rotation?: T.Euler) {
     const m = new T.Matrix4().compose(new T.Vector3(x,y,z), new T.Quaternion().setFromEuler(rotation ?? new T.Euler()), new T.Vector3(sx,sy,sz));
@@ -134,6 +197,7 @@ export function makeShip(red = false): ShipArt {
   const scars:T.Mesh[]=[];
   const scarMat=mat('#211c1a');
   for(const side of [-1,1])for(const z of [-2,0,2]){const m=new T.Mesh(new T.CircleGeometry(.6,8),scarMat);m.rotation.y=side*Math.PI/2;m.position.set(side*1.82,1.05,z);m.visible=false;root.add(m);scars.push(m);}
+  if(!red)addLionFigurehead(root);
   root.traverse(o=>{if(o instanceof T.Mesh){o.castShadow=true;o.receiveShadow=true;}});
   return {root,rig,sails,flags,guns,scars,trim,health:100};
 }

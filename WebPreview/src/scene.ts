@@ -30,8 +30,8 @@ export class OceanScene {
     this.canvas.addEventListener('pointermove',this.shipPointerMove,true);
     this.canvas.addEventListener('pointerup',this.shipPointerUp,true);
     this.canvas.addEventListener('pointercancel',this.shipPointerUp,true);
-    this.scene.background=new T.Color('#93d8ed');this.scene.fog=new T.FogExp2('#9ad8df',.008);
-    const hemi=new T.HemisphereLight('#d9f5ff','#497079',2.3);this.scene.add(hemi);
+    this.scene.background=new T.Color('#58baf1');this.scene.fog=new T.FogExp2('#9ddff4',.0055);
+    const hemi=new T.HemisphereLight('#e7f8ff','#497f8b',2.6);this.scene.add(hemi);
     const sun=new T.DirectionalLight('#ffe3af',3.6);sun.position.set(-24,40,15);this.scene.add(sun);
     const rim=new T.DirectionalLight('#97deff',1.4);rim.position.set(16,12,-18);this.scene.add(rim);
     this.water=new T.ShaderMaterial({uniforms:{time:{value:0},sun:{value:new T.Vector3(-24,40,15).normalize()}},vertexShader:`
@@ -40,7 +40,7 @@ export class OceanScene {
       void main(){vec3 p=position;p.z=wave(p.xy);float dx=(wave(p.xy+vec2(.05,0.))-p.z)/.05;float dy=(wave(p.xy+vec2(0.,.05))-p.z)/.05;vNormal=normalize(mat3(modelMatrix)*vec3(-dx,-dy,1.));vec4 world=modelMatrix*vec4(p,1.);vWorld=world.xyz;vWave=p.z;gl_Position=projectionMatrix*viewMatrix*world;}
     `,fragmentShader:`
       uniform float time;uniform vec3 sun;varying vec3 vWorld;varying vec3 vNormal;varying float vWave;
-      void main(){vec3 view=normalize(cameraPosition-vWorld);vec3 n=normalize(vNormal);float fres=pow(1.-max(dot(view,n),0.),3.);float spec=pow(max(dot(n,normalize(sun+view)),0.),95.);float pattern=sin(vWorld.x*2.4+sin(vWorld.z*1.7+time)*1.5)*sin(vWorld.z*2.8-time*1.4);float chop=sin(vWorld.x*5.1+time*3.2)*sin(vWorld.z*4.7-time*2.4);float foam=smoothstep(.86,1.,pattern)*.16+smoothstep(.91,1.,chop+vWave*.28)*.07;vec3 col=mix(vec3(.015,.32,.43),vec3(.025,.63,.7),clamp(.5+vWave*2.,0.,1.));col=mix(col,vec3(.38,.78,.83),fres*.7);col+=vec3(.72,.93,.91)*foam+vec3(1.,.86,.55)*spec*.85;float fog=1.-exp(-length(cameraPosition-vWorld)*.008);gl_FragColor=vec4(mix(col,vec3(.6,.85,.87),fog),1.);}
+      void main(){vec3 view=normalize(cameraPosition-vWorld);vec3 n=normalize(vNormal);float fres=pow(1.-max(dot(view,n),0.),3.);float spec=pow(max(dot(n,normalize(sun+view)),0.),95.);float pattern=sin(vWorld.x*2.4+sin(vWorld.z*1.7+time)*1.5)*sin(vWorld.z*2.8-time*1.4);float chop=sin(vWorld.x*5.1+time*3.2)*sin(vWorld.z*4.7-time*2.4);float foam=smoothstep(.86,1.,pattern)*.16+smoothstep(.91,1.,chop+vWave*.28)*.07;vec3 col=mix(vec3(.009,.30,.50),vec3(.025,.66,.86),clamp(.5+vWave*2.,0.,1.));col=mix(col,vec3(.38,.78,.83),fres*.7);col+=vec3(.72,.93,.91)*foam+vec3(1.,.86,.55)*spec*.85;float fog=1.-exp(-length(cameraPosition-vWorld)*.008);gl_FragColor=vec4(mix(col,vec3(.6,.85,.87),fog),1.);}
     `});
     const ocean=new T.Mesh(new T.PlaneGeometry(210,210,190,190),this.water);ocean.rotation.x=-Math.PI/2;ocean.position.y=-.05;this.scene.add(ocean);
     this.ships={player:makeShip(false),enemy:makeShip(true)};
@@ -59,7 +59,7 @@ export class OceanScene {
       flash.position.set(direction*1.15,0,0);flash.visible=false;gun.add(flash);this.muzzleFlash[side]=flash;
     }
     flashMaterial.dispose();
-    this.environment();this.buildHarbourDock();this.buildPortBackdrop();this.scene.add(this.harbourDock);
+    this.environment();this.buildHarbourDock();this.buildPortBackdrop();this.buildHarbourDetails();this.scene.add(this.harbourDock);
     this.controls=new OrbitControls(this.camera,this.canvas);this.controls.enableDamping=true;this.controls.enablePan=false;this.controls.minDistance=18;this.controls.maxDistance=110;this.controls.minPolarAngle=.32;this.controls.maxPolarAngle=1.28;this.controls.target.set(0,2,0);this.controls.rotateSpeed=.5;
     this.path=new T.Line(this.pathGeometry,new T.LineDashedMaterial({color:'#f9e5a4',dashSize:.35,gapSize:.2,transparent:true,opacity:.85}));this.scene.add(this.path);
     this.marker=new T.Mesh(new T.RingGeometry(.48,.58,36),new T.MeshBasicMaterial({color:'#ffdf7e',side:T.DoubleSide,transparent:true,opacity:.9,depthTest:false}));this.marker.rotation.x=-Math.PI/2;this.scene.add(this.marker);
@@ -178,6 +178,99 @@ export class OceanScene {
       }
     }
   }
+
+  /** Extra architectural layers for the approved tropical harbour.
+   * Original 3D geometry is switched off outside Porto; nothing here is a screenshot.
+   * Materials and primitive geometries are shared to keep mobile memory bounded.
+   */
+  private buildHarbourDetails(){
+    const port=this.harbourDock,ship=SHIPS.player;
+    const cream=new T.MeshStandardMaterial({color:'#f7dfad',roughness:.92});
+    const ivory=new T.MeshStandardMaterial({color:'#fff2d2',roughness:.9});
+    const coral=new T.MeshStandardMaterial({color:'#c66745',roughness:.82});
+    const stone=new T.MeshStandardMaterial({color:'#a6a795',roughness:.95});
+    const darkStone=new T.MeshStandardMaterial({color:'#747b78',roughness:.95});
+    const leaf=new T.MeshStandardMaterial({color:'#348a4e',roughness:.94,side:T.DoubleSide});
+    const palmWood=new T.MeshStandardMaterial({color:'#6f4c30',roughness:.92});
+    const wood=new T.MeshStandardMaterial({color:'#81512d',roughness:.84});
+    const gold=new T.MeshStandardMaterial({color:'#f9c75a',metalness:.5,roughness:.3});
+    const windowMat=new T.MeshStandardMaterial({color:'#21546b',roughness:.64});
+    const block=new T.BoxGeometry(1,1,1),cone=new T.ConeGeometry(1,1,4);
+    const cylinder=new T.CylinderGeometry(1,1,1,8),rock=new T.IcosahedronGeometry(1,1);
+    function add(g:T.BufferGeometry,m:T.Material,x:number,y:number,z:number,sx=1,sy=1,sz=1){
+      const mesh=new T.Mesh(g,m);mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);port.add(mesh);
+      return mesh;
+    }
+    // A layered Mediterranean fortress with staggered towers and battlements.
+    // Located behind the player ship so sails remain a clear touch target.
+    const castleX=ship.x-16,castleZ=ship.z-31;
+    add(rock,darkStone,castleX,1.2,castleZ,8,5.7,5.6);
+    add(rock,leaf,castleX,5.0,castleZ,8,1.7,5.9);
+    for(const [dx,dz,h] of [[-4.5,0,7],[2.9,-2,8.8],[-.6,-1.8,6.4]]){
+      const x=castleX+dx,z=castleZ+dz;
+      add(block,cream,x,6.6+h/2,z,2.4,h,2.25);
+      add(block,stone,x,6.7+h,z,2.8,.46,2.6);
+      for(const xx of [-1.03,0,1.03]){
+        add(block,ivory,x+xx,7.15+h,z+1.08,.45,.76,.38);
+      }
+      const roof=add(cone,coral,x,7.75+h,z,1.95,1.75,1.95);
+      roof.rotation.y=Math.PI/4;
+      for(let j=0;j<2;j++)add(block,windowMat,x,8+j*1.65,z+1.17,.52,.78,.08);
+    }
+    // Sunlit whitewashed houses fill the coast, with readable coloured windows.
+    const houses:[number,number,number,number][]=[
+      [-21,-25,3.0,2.6],[-19,-27,3.8,2.2],[-11,-27,4.2,2.9],
+      [-7,-32,2.8,2.5],[14,-33,3.1,2.9],[19,-34,4.3,3.2],
+      [23,-36,3.6,2.8],[17,-29,2.5,2.4]
+    ];
+    for(let i=0;i<houses.length;i++){
+      const [ox,oz,h,w]=houses[i],x=ship.x+ox,z=ship.z+oz,y=4.7+h*.5;
+      add(block,i%3===0?ivory:cream,x,y,z,w,h,w*.78);
+      const roof=add(cone,coral,x,y+h/2+.65,z,w*.86,1.5,w*.75);
+      roof.rotation.y=Math.PI/4;
+      for(const side of [-1,1]){
+        add(block,windowMat,x+side*w*.23,y+.2,z+w*.39+.04,.36,.57,.08);
+        add(block,ivory,x+side*w*.23,y+.2,z+w*.39+.09,.44,.07,.10);
+      }
+      add(block,wood,x,y-h*.26,z+w*.39+.06,.56,h*.46,.09);
+    }
+    // 3D tapered palm leaves, built as triangles with a curved drooping tip.
+    const frondGeo=new T.BufferGeometry();
+    frondGeo.setAttribute('position',new T.Float32BufferAttribute([
+      0,0,0, 1.65,.16,.18, 2.7,-.30,0,
+      0,0,0, 2.7,-.30,0, 1.50,.14,-.27
+    ],3));
+    frondGeo.computeVertexNormals();
+    const palms:[number,number,number][]=[
+      [-23,-23,5.7],[-13,-22,6.2],[-8,-29,5.0],[18,-23,5.6],
+      [24,-32,6.8],[8,-40,5.0]
+    ];
+    for(const [ox,oz,h] of palms){
+      const x=ship.x+ox,z=ship.z+oz;
+      const trunk=add(cylinder,palmWood,x,h/2+4.8,z,.20,h,.24);
+      trunk.rotation.z=ox<0?-.12:.12;
+      for(let i=0;i<8;i++){
+        const leafMesh=new T.Mesh(frondGeo,leaf);
+        leafMesh.position.set(x,4.8+h,z);
+        leafMesh.rotation.y=i*Math.PI/4;
+        leafMesh.rotation.z=(i%2===0?.06:-.06);
+        port.add(leafMesh);
+      }
+      add(rock,leaf,x,4.9,z,1.1,.26,1.1);
+    }
+    // Near-water pilings, rope rails and lanterns frame the bottom of the screen.
+    // These remain to the sides; no decorative overlay may intercept ship touches.
+    const railwood=new T.CylinderGeometry(.11,.14,2.4,8);
+    for(const side of [-1,1]){
+      const x=ship.x+side*11.5;
+      for(let i=0;i<5;i++){
+        const z=ship.z+9+i*1.9;
+        add(railwood,wood,x,.65,z,1,1,1);
+        add(new T.CylinderGeometry(.18,.18,.17,8),gold,x,1.94,z);
+      }
+    }
+  }
+
   private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();}
   home(){this.cameraMode='battle';const aspect=this.host.clientWidth/this.host.clientHeight;const distance=aspect<.75?55:aspect<1.2?43:34;if(aspect<.75){this.camera.position.set(-distance*.74,distance*.62,distance*.58);this.controls.target.set(0,1.6,0);}else{this.camera.position.set(distance*.20,distance*.56,distance*.88);this.controls.target.set(0,2,0);}this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
