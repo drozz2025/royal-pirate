@@ -25,9 +25,11 @@ test('actual dockside 3D chest replaces misleading floating overlay',()=>{
 
 test('Porto silhouettes now place fortress and beacon on opposite sides of broadside',()=>{
   assert.match(scene,/\[\[-1,-8,-27\],\[1,25,-11\]\]/);
-  assert.match(scene,/const castleX=ship\.x-16/);
+  assert.match(scene,/const castleX=ship\.x\+20/);
   assert.match(scene,/const houses:/);
   assert.match(scene,/const palms:/);
   assert.match(ships,/Layered swept mane, pointed feline ears/);
+  assert.match(ships,/Open jaws, lower lip and four pointed fangs/);
+  assert.match(scene,/Golden heraldic banners add identifiable architecture/);
   assert.doesNotMatch(scene,/new T\.TextureLoader\(\)\.load/);
 });
