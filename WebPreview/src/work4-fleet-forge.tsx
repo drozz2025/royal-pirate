@@ -153,6 +153,15 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
             {[1,2,3,4,5].map(i=><span key={i} className={i<=level?'is-filled':''}/>)}
           </div>:
           <p>Não existe um sistema de armadura no progresso local. Não há níveis, preços ou benefícios para apresentar.</p>}
+        <div className="w4-system-levels" aria-label="Níveis locais dos sistemas do navio">
+          {UPGRADES.map(u=><div key={u.id}>
+            <strong>{u.name}</strong><small>NÍVEL {profile.upgrades[u.id]} / 5</small>
+            <span role="progressbar" aria-label={u.name+' shipyard upgrade progress'} aria-valuemin={0} aria-valuemax={5}
+              aria-valuenow={profile.upgrades[u.id]} className="w4-mini-track">
+              <i style={{width:profile.upgrades[u.id]*20+'%'}}/>
+            </span>
+          </div>)}
+        </div>
         {upgrade&&<p>O nível fica guardado no dispositivo. Esta melhoria ainda não altera dano, vida, velocidade ou o modelo 3D no combate.</p>}
       </div>
       <div className="w4-materials" aria-label="Custo e materiais disponíveis">
