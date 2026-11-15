@@ -100,7 +100,7 @@ export class OceanScene {
     const boardGeo=new T.BoxGeometry(3.3,.22,.56),postGeo=new T.CylinderGeometry(.21,.24,2.8,8);
     const railGeo=new T.CylinderGeometry(.055,.055,3.2,6),barrelGeo=new T.CylinderGeometry(.43,.4,.78,10);
     for(const side of [-1,1]){
-      const x=SHIPS.player.x+side*9.2,z=SHIPS.player.z+6;
+      const x=SHIPS.player.x+side*9.2,z=SHIPS.player.z+2;
       for(let i=0;i<8;i++){
         const p=new T.Mesh(boardGeo,plankMat);p.position.set(x,.38,z+i*.6);this.harbourDock.add(p);
       }
@@ -119,7 +119,7 @@ export class OceanScene {
     }
     // Treasure chest anchored in world space on the left jetty, not a floating HUD badge.
     const chest=new T.Group();
-    chest.position.set(SHIPS.player.x-9.2,.49,SHIPS.player.z+7.5);
+    chest.position.set(SHIPS.player.x-9.2,.49,SHIPS.player.z+3.35);
     const chestTimber=new T.MeshStandardMaterial({color:'#85411e',roughness:.8});
     const chestLid=new T.MeshStandardMaterial({color:'#b36b31',roughness:.68});
     const chestGold=new T.MeshStandardMaterial({color:'#f0be58',metalness:.62,roughness:.35});
@@ -233,7 +233,7 @@ export class OceanScene {
     }
     // A layered Mediterranean fortress with staggered towers and battlements.
     // Located behind the player ship so sails remain a clear touch target.
-    const castleX=ship.x-7,castleZ=ship.z-22;
+    const castleX=ship.x+18,castleZ=ship.z-24;
     add(rock,darkStone,castleX,1.2,castleZ,8,5.7,5.6);
     add(rock,leaf,castleX,5.0,castleZ,8,1.7,5.9);
     for(const [dx,dz,h] of [[-4.5,0,7],[2.9,-2,8.8],[-.6,-1.8,6.4]]){
@@ -256,8 +256,8 @@ export class OceanScene {
     }
     // Sunlit whitewashed houses fill the coast, with readable coloured windows.
     const houses:[number,number,number,number][]=[
-      [-14,-23,3.0,2.6],[-11,-25,3.8,2.2],[-5,-27,4.2,2.9],
-      [-2,-29,2.8,2.5],[22,-13,3.1,2.9],[26,-15,4.3,3.2],
+      [7,-19,3.0,2.6],[9,-22,3.8,2.2],[14,-24,4.2,2.9],
+      [16,-27,2.8,2.5],[22,-13,3.1,2.9],[26,-15,4.3,3.2],
       [30,-17,3.6,2.8],[24,-9,2.5,2.4]
     ];
     for(let i=0;i<houses.length;i++){
