@@ -74,7 +74,7 @@ jobs:
         continue-on-error: true
         run: |
           set -euo pipefail
-          npx vite preview --host 127.0.0.1 --port 4173 --strictPort >/tmp/royal-porto-vite.log 2>&1 &
+          npx vite preview --host 127.0.0.1 --port 4173 --strictPort --base=/royal-pirate/ >/tmp/royal-porto-vite.log 2>&1 &
           preview_pid=$!
           trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
           for attempt in $(seq 1 40); do
