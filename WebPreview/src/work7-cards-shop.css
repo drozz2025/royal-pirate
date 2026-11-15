@@ -1312,3 +1312,82 @@
  .w7-screen[data-work7-screen="shop"] .w7-product-art{width:100%;height:69px;min-height:69px}
  .w7-screen[data-work7-screen="shop"] .w7-product button{max-width:none;width:100%}
 }
+
+/* WORK 7 — Mosaic 05/06 composition: an honest 8-slot album and a treasure shop.
+   Scoped entirely to Cartas/Loja; Porto/nav geometry and shared HUD remain untouched.
+   Locked slots and chests carry NO fake levels, prices, balances or purchasable items. */
+.w7-screen[data-work7-screen="cards"] .w7-future-card{
+ border-style:solid; border-color:#887a78; background:
+ radial-gradient(ellipse at 50% 35%,#5b749055,transparent 70%),linear-gradient(#233d57,#091b36);
+ box-shadow:inset 0 2px #d9d8b034,0 4px 0 #071425;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card:nth-child(4n+2){border-color:#7672a4;background:radial-gradient(ellipse at 50% 30%,#5b3c9473,transparent 75%),linear-gradient(#293957,#0a1733)}
+.w7-screen[data-work7-screen="cards"] .w7-future-card:nth-child(4n+3){border-color:#6a9f9c;background:radial-gradient(ellipse at 50% 30%,#247c7973,transparent 75%),linear-gradient(#1b465a,#0a1b32)}
+.w7-screen[data-work7-screen="cards"] .w7-future-card:nth-child(4n+4){border-color:#af8252;background:radial-gradient(ellipse at 50% 30%,#a56a3373,transparent 75%),linear-gradient(#3b3450,#101c32)}
+.w7-screen[data-work7-screen="cards"] .w7-future-seal{width:min(100%,74px);height:71px;border-radius:12px 12px 8px 8px;border-width:2px;box-shadow:inset 0 2px #dfdbbb78,0 3px #111e32}
+.w7-screen[data-work7-screen="cards"] .w7-future-seal span{font-size:45px}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>strong{font-size:clamp(12px,3vw,17px);line-height:1.05;overflow-wrap:anywhere}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>small{font-size:9px}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+ position:relative;min-width:0;min-height:145px;overflow:hidden;
+ display:grid;grid-template-columns:minmax(105px,43%) minmax(0,1fr);
+ gap:7px;align-items:center;padding:10px 13px;border:2px solid #f6c26d;
+ border-bottom:5px solid #915b31;border-radius:13px;
+ background:radial-gradient(ellipse at 30% 38%,#e1857c80,transparent 43%),radial-gradient(ellipse at 85% 5%,#ce69ed65,transparent 58%),linear-gradient(120deg,#54204d,#210f43 64%,#14244c);
+ box-shadow:inset 0 2px #fff3ac80,0 5px 0 #07172a,0 9px 16px #0006;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack:after{content:'';inset:5px;position:absolute;border:1px solid #ffd78b5e;border-radius:8px;pointer-events:none}
+.w7-screen[data-work7-screen="shop"] .w7-pack-ribbon{
+ position:absolute;right:-24px;top:12px;z-index:2;transform:rotate(28deg);
+ width:103px;text-align:center;padding:4px 0;background:linear-gradient(#e54b4a,#8f192d);
+ border:1px solid #ffab8e;box-shadow:0 2px #471328;
+ color:#ffebc1;font:900 10px 'Barlow Condensed',sans-serif;letter-spacing:.4px;
+}
+.w7-captain-pack-art{position:relative;display:grid;place-items:center;height:125px;min-width:0}
+.w7-captain-pack-art .w7-relic-svg{height:129px;width:100%;max-width:148px;filter:drop-shadow(0 5px 1px #0e0731)}
+.w7-pack-glint{position:absolute;left:6px;top:4px;font-size:27px;color:#fff1ba;text-shadow:0 0 9px #fbc765}
+.w7-captain-pack-info{min-width:0;display:grid;gap:5px;align-content:center;padding-right:4px;z-index:1}
+.w7-screen .w7-captain-pack-info h3{font:900 clamp(22px,6vw,31px)/.94 'Barlow Condensed',sans-serif;color:#fff3b9;margin:0;text-shadow:0 2px #110f32}
+.w7-captain-pack-info p{margin:0;color:#eee5fa;font:700 11px/1.24 'Barlow',sans-serif}
+.w7-pack-unavailable{
+ display:grid;place-items:center;min-height:33px;background:linear-gradient(#b8df70,#467e32);
+ border:2px solid #ddf6af;border-radius:8px;box-shadow:0 3px #25401e;
+ color:#122d19;font:900 15px 'Barlow Condensed',sans-serif;
+}
+.w7-captain-pack-info small{font:700 9px/1.2 'Barlow',sans-serif;color:#f4daea}
+.w7-chests-heading,.w7-shop-local-note{display:flex;align-items:center;justify-content:space-between;gap:5px;min-width:0}
+.w7-chests-heading>strong,.w7-shop-local-note>strong{color:#ffd991;font:900 14px 'Barlow Condensed',sans-serif}
+.w7-chests-heading>span,.w7-shop-local-note>span{font:800 9px 'Barlow Condensed',sans-serif;color:#aacbdf;text-align:right}
+.w7-chest-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.w7-chest{display:grid;justify-items:center;align-content:space-between;gap:5px;min-width:0;min-height:155px;
+ padding:8px 4px 7px;border:2px solid #75b8e0;border-bottom:5px solid #18426a;border-radius:11px;
+ background:radial-gradient(ellipse at 50% 32%,#6deaff77,transparent 62%),linear-gradient(#2078b4,#092d59);
+ box-shadow:inset 0 2px #ceefff9c,0 4px #061426;color:#fff6d9}
+.w7-chest>strong{font:900 clamp(11px,2.9vw,16px)/1.08 'Barlow Condensed',sans-serif;text-align:center;white-space:normal}
+.w7-chest-art{display:grid;place-items:center;min-height:72px;width:100%;overflow:hidden}
+.w7-chest-art .w7-relic-svg{width:100%;max-width:110px;height:80px;filter:drop-shadow(0 3px #06243f)}
+.w7-chest-status{display:grid;place-items:center;width:100%;min-height:28px;
+ background:linear-gradient(#a2cf5e,#4a8432);border:1px solid #dbffb7;border-radius:8px;
+ box-shadow:0 2px #1a411f;color:#193b19;font:900 12px 'Barlow Condensed',sans-serif}
+.w7-chest-epic{background:radial-gradient(ellipse at 50% 32%,#d5a5ff79,transparent 62%),linear-gradient(#7d3c9b,#28114e);border-color:#d18de4;border-bottom-color:#632a83}
+.w7-chest-epic .w7-relic-svg{filter:hue-rotate(57deg) saturate(1.4) drop-shadow(0 3px #241039)}
+.w7-chest-legend{background:radial-gradient(ellipse at 50% 32%,#ffe59786,transparent 62%),linear-gradient(#ba8536,#4f2719);border-color:#ffdc78;border-bottom-color:#8c4a26}
+.w7-chest-legend .w7-relic-svg{filter:saturate(1.6) brightness(1.1) drop-shadow(0 3px #57260f)}
+.w7-shop-local-note{padding:8px 2px 0;border-top:1px solid #c79c658a}
+@media(max-width:390px){
+ .w7-screen[data-work7-screen="shop"] .w7-captain-pack{grid-template-columns:minmax(90px,40%) minmax(0,1fr);min-height:139px;padding:8px 9px}
+ .w7-captain-pack-art{height:116px}
+ .w7-captain-pack-art .w7-relic-svg{height:116px}
+ .w7-chest{min-height:141px;padding:6px 3px}
+ .w7-chest-art .w7-relic-svg{height:72px}
+ .w7-chest-status{font-size:11px;min-height:26px}
+ .w7-captain-pack-info small{font-size:8px}
+ .w7-chests-heading>span,.w7-shop-local-note>span{font-size:8px}
+}
+@media(max-width:354px){
+ .w7-screen[data-work7-screen="shop"] .w7-captain-pack{grid-template-columns:35% 1fr}
+ .w7-captain-pack-info p{font-size:10px}
+ .w7-chest-grid{gap:4px}
+ .w7-chest>strong{font-size:11px}
+ .w7-chest-art .w7-relic-svg{height:65px}
+}
