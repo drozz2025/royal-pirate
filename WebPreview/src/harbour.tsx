@@ -17,7 +17,6 @@ export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=
   const now=Date.now();
   const dailyAvailable=canClaimDaily(profile,now);
   const nextDay=nextDailyStreak(profile,now);
-  const displayedStreak=dailyAvailable&&nextDay===1?0:profile.dailyStreak;
   const dailyPrize=15+nextDay*5;
   const readyMissions=MISSIONS.filter(m=>missionProgress(profile,m.id)>=m.target&&!profile.claimedMissions.includes(m.id)).length;
   const milestoneWins=Math.min(profile.wins,10);
@@ -48,17 +47,12 @@ export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=
       </div>
     </div>
     <div className="harbour-lower">
-      <section className="harbour-chests harbour-daily-route" aria-label="Seven-day daily supply route">
-        <div className="harbour-chest-header"><strong>DAILY SUPPLY ROUTE</strong><small>{dailyAvailable?'READY TO CLAIM':'COLLECTED TODAY'}</small></div>
-        <button type="button" className="harbour-daily-button" onClick={()=>onNavigate('missions')} aria-label={dailyAvailable?`Open daily supply, claim ${dailyPrize} local coins`:'Open daily supply calendar'}>
-          <span className="harbour-daily-days">{Array.from({length:7},(_,n)=>n+1).map(n=><span key={n} className={n<=displayedStreak?'earned':dailyAvailable&&n===nextDay?'next':''} aria-label={`Day ${n}, ${n<=displayedStreak?'streak earned':dailyAvailable&&n===nextDay?'ready':'upcoming'}`}><b>{n<=displayedStreak?'✓':n}</b></span>)}</span>
-          <span className="harbour-daily-summary">{dailyAvailable?`+ ${dailyPrize} COINS · CLAIM IN MISSIONS`:`STREAK ${displayedStreak}/7 · RESET 00:00 UTC`}</span>
-        </button>
-      </section>
       <div className="harbour-actions">
         <button type="button" className="harbour-secondary-action" onClick={()=>onNavigate('forge')}><span aria-hidden="true"><PirateIcon name="forge" size={27}/></span><strong>FORGE</strong><small>UPGRADES</small></button>
         <button className="harbour-battle-button" type="button" onClick={onBattle} aria-label="Battle: enter playable naval combat"><span className="harbour-crossed" aria-hidden="true"><PirateIcon name="battle" size={40}/></span><strong>BATTLE!</strong><small>ENTER NAVAL COMBAT</small></button>
-        <div className="harbour-action-hint" aria-hidden="true">⚓</div>
+        <button type="button" className={'harbour-secondary-action harbour-compact-daily '+(dailyAvailable?'harbour-reward-ready':'')} onClick={()=>onNavigate('missions')} aria-label={dailyAvailable?`Daily supply ready: claim ${dailyPrize} local coins in Missions`:`Daily supply collected today, streak ${profile.dailyStreak} of 7. Open calendar in Missions`}>
+          <span aria-hidden="true">🎁</span><strong>DAILY</strong><small>{dailyAvailable?`DAY ${nextDay} · CLAIM`:`✓ ${profile.dailyStreak}/7`}</small>
+        </button>
       </div>
       <nav className="harbour-nav" aria-label="Game screens">
         {upcoming.map((item,i)=><button type="button" key={item.title} onClick={()=>onNavigate(item.screen)} className={'harbour-nav-item '+(i===2?'harbour-nav-current':'')} aria-label={item.screen==='missions'&&readyMissions?`Missions: ${readyMissions} reward claims ready`:item.title}><span aria-hidden="true"><PirateIcon name={item.screen} size={25}/></span><strong>{item.title}</strong><small>{item.screen==='missions'&&readyMissions?readyMissions+' READY':'OPEN'}</small></button>)}

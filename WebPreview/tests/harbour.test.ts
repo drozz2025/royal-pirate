@@ -16,7 +16,7 @@ test('harbour preview is an actual screen integrated with the live battle', () =
 });
 test('harbour has one functional battle action and no fake transactions', () => {
   assert.match(harbour, /onClick=\{onBattle\}/);
-  assert.match(harbour, /Seven-day daily supply route/);
+  assert.match(harbour, /harbour-compact-daily/);
   assert.match(harbour, /canClaimDaily\(profile,now\)/);
   assert.doesNotMatch(harbour, /Chest \{/);
   assert.doesNotMatch(harbour, /fetch\(|localStorage|payment|purchase\(/i);
@@ -44,7 +44,7 @@ test('the harbour frames a real Three.js vessel and disables battle simulation',
   assert.match(main, /view\.current\?\.showBattle\(\)/);
 });
 test('approved navigation is represented without fake in-game economy', () => {
-  for(const label of ['SHOP','CARDS','FLEET','MISSIONS','PROFILE','UPGRADES','FORGE','DAILY SUPPLY ROUTE','BATTLE!']) {
+  for(const label of ['SHOP','CARDS','FLEET','MISSIONS','PROFILE','UPGRADES','FORGE','DAILY','BATTLE!']) {
     assert.ok(harbour.includes(label), label+' must be present');
   }
   assert.match(harbour, /onNavigate\(\x27missions\x27\)/);
