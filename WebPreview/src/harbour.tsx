@@ -4,14 +4,14 @@ import type { AppScreenId } from './app-screens';
 import { canClaimDaily, levelFor, missionProgress, MISSIONS, nextDailyStreak, type LocalProfile } from './progression';
 
 /** Live Three.js harbour with navigable app-first menus.
- * Coins are the strictly local earned balance; unsupported gems/rankings remain blank.
+ * All displayed resource amounts and milestones come from the local battle profile.
  */
 const upcoming:ReadonlyArray<{icon:string;title:string;screen:AppScreenId}> = [
   { icon: '▣', title: 'SHOP', screen:'shop' },
   { icon: '♠', title: 'CARDS', screen:'cards' },
   { icon: '⚓', title: 'SHIP', screen:'fleet' },
   { icon: '✦', title: 'MISSIONS', screen:'missions' },
-  { icon: '♜', title: 'RANKING', screen:'profile' },
+  { icon: '♜', title: 'PROFILE', screen:'profile' },
 ];
 export function Harbour({ onBattle, onInspect, onNavigate, profile, hidden=false }: { onBattle: () => void; onInspect: () => void; onNavigate:(screen:AppScreenId)=>void;profile:LocalProfile;hidden?:boolean }) {
   const now=Date.now();
@@ -20,6 +20,7 @@ export function Harbour({ onBattle, onInspect, onNavigate, profile, hidden=false
   const displayedStreak=dailyAvailable&&nextDay===1?0:profile.dailyStreak;
   const dailyPrize=15+nextDay*5;
   const readyMissions=MISSIONS.filter(m=>missionProgress(profile,m.id)>=m.target&&!profile.claimedMissions.includes(m.id)).length;
+  const milestoneWins=Math.min(profile.wins,10);
   return <section className="harbour-screen" aria-label="Royal Pirate harbour" aria-hidden={hidden} inert={hidden}>
     <div className="harbour-sky" aria-hidden="true" />
     <header className="harbour-header">
@@ -27,29 +28,28 @@ export function Harbour({ onBattle, onInspect, onNavigate, profile, hidden=false
         <span className="harbour-avatar" aria-hidden="true">☠</span>
         <div><strong>CAPTAIN · LEVEL {levelFor(profile.xp)}</strong><span>ROYAL CROWN</span><small>LOCAL OFFLINE PROFILE</small></div>
       </button>
-      <div className="harbour-resources" aria-label="Local coins and unimplemented resource counters">
-        <div><span aria-hidden="true">◆</span><strong>—</strong></div>
-        <div aria-label={profile.coins+' locally earned coins'}><span aria-hidden="true">●</span><strong>{profile.coins}</strong></div>
-        <div><span aria-hidden="true">▰</span><strong>—</strong></div>
+      <div className="harbour-resources" role="group" aria-label="Local captain statistics">
+        <div className="harbour-stat" aria-label={profile.coins+' locally earned coins'}><span className="harbour-stat-glyph" aria-hidden="true">●</span><strong>{profile.coins}</strong><small>COINS</small></div>
+        <div className="harbour-stat" aria-label={profile.wins+' victories from real battles'}><span className="harbour-stat-glyph" aria-hidden="true">★</span><strong>{profile.wins}</strong><small>WINS</small></div>
       </div>
     </header>
     <section className="harbour-arena" aria-label="Training waters">
-      <span className="harbour-arena-crest" aria-hidden="true">⚔</span>
+      <span className="harbour-arena-crest" aria-hidden="true"><PirateIcon name="battle" size={32}/></span>
       <div className="harbour-arena-body">
         <div className="harbour-arena-title"><strong>TRAINING WATERS</strong><span>ARENA 01</span></div>
-        <div className="harbour-arena-track" aria-hidden="true"><span/></div>
-        <small>THE FIRST BROADSIDE · PLAYABLE PREVIEW</small>
+        <div className="harbour-arena-track" role="progressbar" aria-label="Victories towards ten-win milestone" aria-valuemin={0} aria-valuemax={10} aria-valuenow={milestoneWins}><span style={{width:`${milestoneWins*10}%`}}/></div>
+        <small>{profile.wins} VICTORIES · LOCAL 10-WIN MILESTONE</small>
       </div>
       <span className="harbour-arena-cup" aria-hidden="true">★</span>
     </section>
     <div className="harbour-central">
       <div className="harbour-side harbour-side-left" aria-label="Upcoming rewards">
         <button type="button" onClick={()=>onNavigate('missions')} className={'harbour-side-tile '+(dailyAvailable?'harbour-reward-ready':'')} aria-label={dailyAvailable?`Daily supply ready: ${dailyPrize} coins`:'Daily supply already collected today'}><span aria-hidden="true">🎁</span><strong>SUPPLY</strong><small>{dailyAvailable?'CLAIM':'COLLECTED'}</small></button>
-        <button type="button" onClick={()=>onNavigate('missions')} className="harbour-side-tile" aria-label={`Daily reward calendar, day ${nextDay} of 7`}><span aria-hidden="true">☷</span><strong>DAILY</strong><small>DAY {nextDay}/7</small></button>
+        <button type="button" onClick={()=>onNavigate('missions')} className="harbour-side-tile" aria-label={`Daily reward calendar, day ${nextDay} of 7`}><span aria-hidden="true"><PirateIcon name="missions" size={24}/></span><strong>DAILY</strong><small>DAY {nextDay}/7</small></button>
       </div>
       <div className="harbour-side harbour-side-right" aria-label="Upcoming crew and specials">
-        <button type="button" onClick={()=>onNavigate('cards')} className="harbour-side-tile harbour-character"><span aria-hidden="true">☠</span><strong>CREW</strong><small>OPEN</small></button>
-        <button type="button" onClick={()=>onNavigate('missions')} className="harbour-side-tile" aria-label={readyMissions?`${readyMissions} missions ready to claim`:'Open missions'}><span aria-hidden="true">✦</span><strong>MISSIONS</strong><small>{readyMissions?readyMissions+' READY':'OPEN'}</small></button>
+        <button type="button" onClick={()=>onNavigate('cards')} className="harbour-side-tile harbour-character"><span aria-hidden="true"><PirateIcon name="cards" size={24}/></span><strong>CREW</strong><small>OPEN</small></button>
+        <button type="button" onClick={()=>onNavigate('missions')} className="harbour-side-tile" aria-label={readyMissions?`${readyMissions} missions ready to claim`:'Open missions'}><span aria-hidden="true"><PirateIcon name="missions" size={24}/></span><strong>MISSIONS</strong><small>{readyMissions?readyMissions+' READY':'OPEN'}</small></button>
       </div>
       <div className="harbour-ship-label">
         <span aria-hidden="true">⚓</span><strong>THE ROYAL CROWN</strong><small>YOUR FIRST SHIP · LIVE 3D</small><button className="harbour-inspect-button" type="button" onClick={onInspect} aria-label="Inspect your ship in interactive 3D">VIEW SHIP IN 3D</button>
@@ -64,9 +64,9 @@ export function Harbour({ onBattle, onInspect, onNavigate, profile, hidden=false
         </button>
       </section>
       <div className="harbour-actions">
-        <button type="button" className="harbour-secondary-action" onClick={()=>onNavigate('forge')}><span aria-hidden="true"><PirateIcon name="forge" size={27}/></span><strong>UPGRADES</strong><small>OPEN</small></button>
+        <button type="button" className="harbour-secondary-action" onClick={()=>onNavigate('forge')}><span aria-hidden="true"><PirateIcon name="forge" size={27}/></span><strong>FORGE</strong><small>UPGRADES</small></button>
         <button className="harbour-battle-button" type="button" onClick={onBattle} aria-label="Battle: enter playable naval combat"><span className="harbour-crossed" aria-hidden="true"><PirateIcon name="battle" size={40}/></span><strong>BATTLE!</strong><small>ENTER NAVAL COMBAT</small></button>
-        <button type="button" className="harbour-secondary-action" onClick={()=>onNavigate('forge')}><span aria-hidden="true"><PirateIcon name="forge" size={27}/></span><strong>FORGE</strong><small>OPEN</small></button>
+        <button type="button" className="harbour-secondary-action" onClick={()=>onNavigate('fleet')}><span aria-hidden="true"><PirateIcon name="fleet" size={27}/></span><strong>FLEET</strong><small>OPEN</small></button>
       </div>
       <nav className="harbour-nav" aria-label="Game screens">
         {upcoming.map((item,i)=><button type="button" key={item.title} onClick={()=>onNavigate(item.screen)} className={'harbour-nav-item '+(i===2?'harbour-nav-current':'')} aria-label={item.screen==='missions'&&readyMissions?`Missions: ${readyMissions} reward claims ready`:item.title}><span aria-hidden="true"><PirateIcon name={item.screen} size={25}/></span><strong>{item.title}</strong><small>{item.screen==='missions'&&readyMissions?readyMissions+' READY':'OPEN'}</small></button>)}
