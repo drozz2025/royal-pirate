@@ -44,7 +44,7 @@ test('the harbour frames a real Three.js vessel and disables battle simulation',
   assert.match(main, /view\.current\?\.showBattle\(\)/);
 });
 test('approved navigation is represented without fake in-game economy', () => {
-  for(const label of ['SHOP','CARDS','SHIP','MISSIONS','RANKING','UPGRADES','FORGE','DAILY SUPPLY ROUTE','BATTLE!']) {
+  for(const label of ['SHOP','CARDS','SHIP','MISSIONS','PROFILE','UPGRADES','FORGE','FLEET','DAILY SUPPLY ROUTE','BATTLE!']) {
     assert.ok(harbour.includes(label), label+' must be present');
   }
   assert.match(harbour, /onNavigate\(\x27missions\x27\)/);
