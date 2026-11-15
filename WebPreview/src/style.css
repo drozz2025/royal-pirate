@@ -21,3 +21,16 @@
 .in-battle .sliders input::-moz-range-thumb{background:#ffe28c;border-color:#905c2b}
 .in-battle .return-harbour{border:2px solid #ffe1a0;background:linear-gradient(#255b8c,#08294e)}
 @media(max-width:600px){.in-battle .health-card{padding:7px 8px}.in-battle .battle-hud{gap:5px}}
+
+/* v0.1.4 portrait HUD — readable without replacing controls or covering the ships. */
+@media(max-width:600px){
+  .in-battle .ship-label{font-size:9px;letter-spacing:.2px}
+  .in-battle .ship-label strong{font-size:11px}
+  .in-battle .round span{font-size:9px}
+  .in-battle .turn-line strong{font-size:10px}
+  .in-battle .message{font-size:11px}
+  .in-battle .sliders label>span{font-size:10px}
+  .in-battle .scale{font-size:9px;letter-spacing:.35px}
+  .in-battle .fire-button>small{font-size:9px;letter-spacing:.65px}
+  .in-battle .bottom-note{font-size:8px;letter-spacing:.3px}
+}
