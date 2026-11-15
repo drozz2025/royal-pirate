@@ -13,7 +13,7 @@ const upcoming:ReadonlyArray<{icon:string;title:string;screen:AppScreenId}> = [
   { icon: '✦', title: 'MISSIONS', screen:'missions' },
   { icon: '♜', title: 'PROFILE', screen:'profile' },
 ];
-export function Harbour({ onBattle, onInspect, onNavigate, profile, hidden=false }: { onBattle: () => void; onInspect: () => void; onNavigate:(screen:AppScreenId)=>void;profile:LocalProfile;hidden?:boolean }) {
+export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=false }: { onBattle: () => void; onNavigate:(screen:AppScreenId)=>void;profile:LocalProfile;selected?:boolean;hidden?:boolean }) {
   const now=Date.now();
   const dailyAvailable=canClaimDaily(profile,now);
   const nextDay=nextDailyStreak(profile,now);
@@ -43,16 +43,8 @@ export function Harbour({ onBattle, onInspect, onNavigate, profile, hidden=false
       <span className="harbour-arena-cup" aria-hidden="true">★</span>
     </section>
     <div className="harbour-central">
-      <div className="harbour-side harbour-side-left" aria-label="Upcoming rewards">
-        <button type="button" onClick={()=>onNavigate('missions')} className={'harbour-side-tile '+(dailyAvailable?'harbour-reward-ready':'')} aria-label={dailyAvailable?`Daily supply ready: ${dailyPrize} coins`:'Daily supply already collected today'}><span aria-hidden="true">🎁</span><strong>SUPPLY</strong><small>{dailyAvailable?'CLAIM':'COLLECTED'}</small></button>
-        <button type="button" onClick={()=>onNavigate('missions')} className="harbour-side-tile" aria-label={`Daily reward calendar, day ${nextDay} of 7`}><span aria-hidden="true"><PirateIcon name="missions" size={24}/></span><strong>DAILY</strong><small>DAY {nextDay}/7</small></button>
-      </div>
-      <div className="harbour-side harbour-side-right" aria-label="Upcoming crew and specials">
-        <button type="button" onClick={()=>onNavigate('cards')} className="harbour-side-tile harbour-character"><span aria-hidden="true"><PirateIcon name="cards" size={24}/></span><strong>CREW</strong><small>OPEN</small></button>
-        <button type="button" onClick={()=>onNavigate('missions')} className="harbour-side-tile" aria-label={readyMissions?`${readyMissions} missions ready to claim`:'Open missions'}><span aria-hidden="true"><PirateIcon name="missions" size={24}/></span><strong>MISSIONS</strong><small>{readyMissions?readyMissions+' READY':'OPEN'}</small></button>
-      </div>
       <div className="harbour-ship-label">
-        <span aria-hidden="true">⚓</span><strong>THE ROYAL CROWN</strong><small>YOUR FIRST SHIP · LIVE 3D</small><button className="harbour-inspect-button" type="button" onClick={onInspect} aria-label="Inspect your ship in interactive 3D">VIEW SHIP IN 3D</button>
+        <span aria-hidden="true">⚓</span><strong>THE ROYAL CROWN</strong><small>{selected?'SHIP SELECTED · DRAG · PINCH TO ZOOM':'TOUCH THE SHIP · DRAG TO ROTATE'}</small>
       </div>
     </div>
     <div className="harbour-lower">
@@ -66,7 +58,7 @@ export function Harbour({ onBattle, onInspect, onNavigate, profile, hidden=false
       <div className="harbour-actions">
         <button type="button" className="harbour-secondary-action" onClick={()=>onNavigate('forge')}><span aria-hidden="true"><PirateIcon name="forge" size={27}/></span><strong>FORGE</strong><small>UPGRADES</small></button>
         <button className="harbour-battle-button" type="button" onClick={onBattle} aria-label="Battle: enter playable naval combat"><span className="harbour-crossed" aria-hidden="true"><PirateIcon name="battle" size={40}/></span><strong>BATTLE!</strong><small>ENTER NAVAL COMBAT</small></button>
-        <button type="button" className="harbour-secondary-action" onClick={()=>onNavigate('fleet')}><span aria-hidden="true"><PirateIcon name="fleet" size={27}/></span><strong>FLEET</strong><small>OPEN</small></button>
+        <div className="harbour-action-hint" aria-hidden="true">⚓</div>
       </div>
       <nav className="harbour-nav" aria-label="Game screens">
         {upcoming.map((item,i)=><button type="button" key={item.title} onClick={()=>onNavigate(item.screen)} className={'harbour-nav-item '+(i===2?'harbour-nav-current':'')} aria-label={item.screen==='missions'&&readyMissions?`Missions: ${readyMissions} reward claims ready`:item.title}><span aria-hidden="true"><PirateIcon name={item.screen} size={25}/></span><strong>{item.title}</strong><small>{item.screen==='missions'&&readyMissions?readyMissions+' READY':'OPEN'}</small></button>)}
