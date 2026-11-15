@@ -1081,3 +1081,237 @@
   .w8-ranking-locked-emblem .w8-art{width:64px;height:64px}
   .w8-ranking-scene .w8-ranking-locked p{font-size:10px}
 }
+
+
+/* WORK 8 / mosaico 07–08 · Composition pass: title crest, captain board,
+   inset reward coins and compact quest parchment. Scoped to these two screens. */
+.w8-screen{
+  gap:9px;
+  padding:1px 3px 18px;
+  background:linear-gradient(180deg,#0a3a5966,#08223e24 36%,#081a332b);
+}
+.w8-screen::before{height:175px;opacity:.16}
+.w8-screen>.w8-hero{order:-1}
+.w8-screen>.w8-tabs{order:0}
+.w8-screen>.w8-hero{
+  min-height:94px;
+  padding:9px 11px;
+  gap:9px;
+  border:3px solid #f1c06c;
+  border-bottom-color:#7a451e;
+  border-radius:11px 11px 18px 18px;
+  background:linear-gradient(90deg,#0d2c4b,#174d70 55%,#0d2f4f);
+  box-shadow:inset 0 2px #fff5c07a,0 4px #59391e,0 7px 14px #03132480;
+}
+.w8-screen>.w8-hero::after{
+  width:128px;height:128px;right:-34px;bottom:-94px;
+  border-color:#e3b6622d;
+}
+.w8-screen>.w8-hero::before{
+  background:linear-gradient(90deg,#061b35dd 0%,#06243dbb 39%,#0c3e577d 73%,#061e36a9)
+}
+.w8-screen>.w8-hero .w8-hero-icon{
+  flex:0 0 68px;width:68px;height:68px;overflow:visible;
+  background:radial-gradient(circle,#e9bb665c,transparent 70%);
+}
+.w8-screen>.w8-hero .w8-hero-icon .w8-art{
+  width:77px;height:77px;transform:rotate(-7deg);
+  filter:drop-shadow(0 3px 2px #03152b) drop-shadow(0 0 5px #ffe7a564);
+}
+.w8-screen>.w8-hero .w8-eyebrow{font-size:9px;letter-spacing:1px}
+.w8-screen>.w8-hero h2,.app-sheet-content .w8-screen>.w8-hero h2{
+  margin:1px 0 3px!important;
+  font:900 clamp(28px,8vw,37px)/.94 'Barlow Condensed',sans-serif!important;
+  color:#fff2c2!important;
+  text-shadow:0 3px #06162a,0 0 9px #f7bd5738;
+}
+.w8-screen>.w8-hero p{font-size:10px;line-height:1.2;max-width:270px}
+.w8-screen>.w8-hero .w8-hero-live{padding:2px 7px;margin-top:4px;font-size:9px}
+.w8-screen>.w8-tabs{
+  min-height:54px;
+  padding:4px;
+  border-color:#e3b66d;
+  border-radius:11px;
+  background:linear-gradient(#0e3458,#071a32);
+  box-shadow:inset 0 1px #ffebaa5c,0 3px #06162a;
+}
+.w8-screen>.w8-tabs button{
+  min-height:42px;font:900 clamp(12px,3.3vw,15px)/1 'Barlow Condensed',sans-serif;
+  border:1px solid #627a8199;border-radius:7px;
+  background:linear-gradient(#264f71,#0b2948);
+}
+.w8-screen>.w8-tabs button[aria-pressed=true]{
+  border:2px solid #fff1b4;
+  background:linear-gradient(#fff1b2,#f2c467 45%,#b97630);
+  box-shadow:inset 0 1px #fff8d9,0 2px #69411e;
+}
+.w8-missions-scene .w8-missions{gap:7px}
+.w8-missions-scene .w8-quest-heading{
+  min-height:31px;align-items:center;
+  padding:5px 11px 4px;
+  border:1px solid #a27f49;border-radius:7px;
+  background:linear-gradient(90deg,#09233e,#245272 60%,#09233d);
+  box-shadow:inset 0 1px #f6d38c47;
+}
+.w8-missions-scene .w8-quest-heading h3{
+  margin:0;font:900 19px/1 'Barlow Condensed',sans-serif;color:#fff0bf;
+}
+.w8-missions-scene .w8-quest-heading small{
+  padding:4px 6px;border-radius:5px;
+  background:#5c4227;color:#ffeab2;font:900 10px 'Barlow Condensed',sans-serif
+}
+.w8-missions-scene .w8-missions .w8-explain{
+  margin:-1px 2px 3px;font-size:9px;color:#bfdae2
+}
+.w8-missions-scene .w8-mission{
+  min-height:76px;gap:6px;
+  padding:7px 6px 7px 5px;
+  border:2px solid #efbd67;
+  border-left-width:3px;border-radius:9px;
+  background:linear-gradient(180deg,#2a6485 0%,#153c5d 38%,#092642 100%);
+  box-shadow:inset 0 1px #fff2b15c,0 3px #5e3e24,0 5px 6px #04172e;
+}
+.w8-missions-scene .w8-mission-icon{
+  flex:0 0 48px;height:54px;
+  background:radial-gradient(circle at 50% 40%,#c8a45870,#26435c00 73%);
+  border:0;border-radius:8px;
+}
+.w8-missions-scene .w8-mission-icon .w8-art{width:53px;height:53px}
+.w8-missions-scene .w8-mission-icon::after{
+  left:0;bottom:-3px;width:17px;height:16px;font-size:9px
+}
+.w8-missions-scene .w8-mission-main>strong{
+  color:#fff5d7;font-size:clamp(14px,3.9vw,18px);line-height:1;
+  text-wrap:balance
+}
+.w8-missions-scene .w8-mission-main>small{
+  margin:6px 0 5px;color:#bbd5e1;font-size:9px
+}
+.w8-missions-scene .w8-mission-main>small span{font-size:11px;color:#ffe8a5}
+.w8-missions-scene .w8-progress{
+  height:12px;border:2px solid #8fb2b4;border-radius:7px;
+  background:linear-gradient(#0a1c32,#0c3152)
+}
+.w8-missions-scene .w8-progress>span{
+  background:linear-gradient(#fff0a6,#f2b53c 50%,#cd8723);
+  box-shadow:inset 0 1px #fffce7;
+}
+.w8-mission-bounty{
+  flex:0 0 42px;min-height:48px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
+  border:2px solid #cba366;border-radius:9px;
+  background:linear-gradient(#305a75,#123450);
+  box-shadow:inset 0 1px #ffedb846,0 2px #06192d;
+}
+.w8-mission-bounty>span{
+  display:grid;place-items:center;width:17px;height:17px;
+  border:2px solid #fff1b1;border-radius:50%;
+  background:linear-gradient(#ffe9a1,#d68f25);
+  color:#a56a23;text-shadow:none;
+  font-size:9px;box-shadow:0 1px #593c22
+}
+.w8-mission-bounty strong{font:900 15px/1 'Barlow Condensed',sans-serif;color:#ffe7aa}
+.w8-missions-scene .w8-mission>button{
+  min-width:40px;width:43px;min-height:42px;
+  font:900 13px 'Barlow Condensed',sans-serif;
+  padding:3px 1px;letter-spacing:0;
+  box-shadow:inset 0 1px #fff3be,0 2px #65401f;
+}
+.w8-missions-scene .w8-daily-heading{
+  padding:0 2px 6px;align-items:center;
+  border-bottom:1px solid #c69b5e;
+}
+.w8-missions-scene .w8-daily-heading h3{margin:0;font-size:21px}
+.w8-missions-scene .w8-calendar{padding:9px 8px 8px;border-radius:11px}
+.w8-missions-scene .w8-days li{min-height:69px}
+.w8-missions-scene .w8-calendar>p{font-size:9px;margin:7px 2px 0}
+.w8-missions-scene .w8-daily{
+  min-height:94px;
+  background:radial-gradient(circle at 15% 42%,#ef9c4e85,transparent 44%),linear-gradient(100deg,#87432c,#224a63 56%,#081e3a)
+}
+.w8-missions-scene .w8-daily-copy strong{font-size:clamp(17px,4.9vw,21px)}
+.w8-ranking-scene .w8-captain-showcase{
+  display:flex;align-items:center;gap:9px;min-height:111px;padding:9px;
+  border:3px solid #e9ba69;border-bottom-color:#815020;
+  background:radial-gradient(circle at 10% 60%,#4f96ac77,transparent 53%),linear-gradient(#204e73,#082641);
+}
+.w8-captain-portrait{
+  display:grid;place-items:center;
+  flex:0 0 77px;width:77px;height:81px;
+  border:3px solid #ffe9ac;border-radius:50%;
+  background:radial-gradient(circle,#2e86a6,#0c2a4e 75%);
+  box-shadow:inset 0 1px #fff4b6,0 3px #734d25,0 0 12px #ffda8355;
+}
+.w8-captain-portrait svg{width:70px;height:70px;filter:drop-shadow(0 2px 2px #061b32)}
+.w8-ranking-scene .w8-captain-showcase .w8-medal-data{min-width:0;flex:1;gap:4px}
+.w8-ranking-scene .w8-captain-showcase .w8-medal-data small{
+  color:#fbd390;font-size:9px;letter-spacing:.2px
+}
+.w8-ranking-scene .w8-captain-showcase .w8-medal-data strong{
+  font-size:clamp(20px,5.8vw,29px);line-height:.95;white-space:normal;
+}
+.w8-ranking-scene .w8-captain-showcase .w8-medal-data>span{font-size:10px}
+.w8-ranking-scene .w8-captain-showcase .w8-xp-track{
+  height:12px;border:2px solid #a2d7c5;background:#09223a;
+}
+.w8-captain-battles{
+  color:#c5e2e7!important;font:900 9px 'Barlow Condensed',sans-serif!important;
+}
+.w8-captain-trophy{
+  flex:0 0 65px;width:65px;display:flex;align-items:center;flex-direction:column;
+  justify-content:center;gap:0;
+}
+.w8-captain-trophy .w8-art{width:66px;height:66px}
+.w8-captain-trophy small{
+  display:block;border:1px solid #ba9862;border-radius:5px;
+  padding:3px;color:#ffe2a0;background:#0a304e;
+  font:900 9px/1 'Barlow Condensed',sans-serif
+}
+.w8-ranking-scene .w8-stat-row{gap:5px}
+.w8-ranking-scene .w8-stat-row>div{
+  min-height:87px;padding:4px 2px;
+  border-radius:10px;background:linear-gradient(#2b6783,#103757 65%,#071e39);
+}
+.w8-ranking-scene .w8-stat-symbol{width:31px;height:26px}
+.w8-ranking-scene .w8-stat-symbol .w8-art{width:34px;height:34px}
+.w8-ranking-scene .w8-stat-row strong{font-size:clamp(25px,7.2vw,33px)}
+.w8-ranking-scene .w8-stat-row small{font-size:9px}
+.w8-ranking-scene .w8-ranking-locked{
+  display:block;min-height:140px;padding:0;
+  overflow:visible;
+  border-color:#dcb36b;border-bottom-color:#805025;
+  border-radius:11px;
+  background:linear-gradient(175deg,#1a4668,#0b2c4b);
+}
+.w8-ranking-scene .w8-ranking-locked::after{right:7px}
+.w8-top-board-heading{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px 7px;
+  border-bottom:2px solid #a67c4f;
+  color:#ffdea0;font:900 19px/1 'Barlow Condensed',sans-serif;
+  text-shadow:0 2px #081830;
+}
+.w8-top-board-heading small{font:900 9px 'Barlow',sans-serif;color:#bcd8e7}
+.w8-ranking-offline-board{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 11px 9px;
+}
+.w8-ranking-scene .w8-ranking-locked-emblem{
+  flex:0 0 67px;height:74px;
+}
+.w8-ranking-scene .w8-ranking-locked-emblem .w8-art{width:70px;height:70px}
+.w8-ranking-scene .w8-ranking-locked strong{font-size:clamp(17px,4.3vw,20px)}
+.w8-ranking-scene .w8-ranking-locked p{font-size:10px;line-height:1.32}
+.w8-ranking-scene>.app-cta{min-height:45px}
+@media(max-width:375px){
+  .w8-missions-scene .w8-mission{gap:4px;padding:6px 3px}
+  .w8-mission-bounty{flex-basis:36px;min-height:44px}
+  .w8-missions-scene .w8-mission>button{min-width:36px;width:36px;font-size:11px}
+  .w8-missions-scene .w8-mission-icon{flex-basis:39px;height:46px}
+  .w8-missions-scene .w8-mission-icon .w8-art{width:47px;height:47px}
+  .w8-captain-portrait{flex-basis:62px;width:62px;height:68px}
+  .w8-captain-portrait svg{width:61px;height:61px}
+  .w8-captain-trophy{flex-basis:50px;width:50px}
+  .w8-captain-trophy .w8-art{width:54px;height:54px}
+  .w8-ranking-scene .w8-captain-showcase .w8-medal-data strong{font-size:20px}
+}
