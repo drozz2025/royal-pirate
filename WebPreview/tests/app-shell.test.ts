@@ -21,7 +21,8 @@ test('all seven app sheets have actual renderable content and controls',()=>{
   assert.match(html,/aria-label="Main game screens"/,screen);
   assert.match(html,/Back to harbour/,screen);
   assert.match(html,/ROYAL PIRATE/,screen);
-  assert.match(html,/aria-label="Battle"/,screen);
+  assert.match(html,/aria-label="Porto"/,screen);
+  assert.match(html,/aria-label="FROTA"/,screen);
  }
 });
 test('the eighth approved page is the live 3D harbour, not a static screenshot',()=>{
@@ -57,7 +58,7 @@ test('all five additional Porto shortcut pages show honest and functional local-
 test('no claim of online leaderboards, card combat bonuses or real-money checkout',()=>{
  const html=all.map(screen=>renderToStaticMarkup(React.createElement(AppScreens,{...props,screen}))).join('\n');
  assert.match(html,/no account, multiplayer service or connected leaderboard yet/i);
- assert.match(html,/battle damage unchanged/i);
+ assert.match(html,/ainda não altera dano, vida, velocidade/i);
  assert.match(html,/secure payments/i);
  assert.match(html,/saved on this device/i);
 });
