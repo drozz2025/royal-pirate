@@ -7,10 +7,12 @@ export type CrewId = 'captain' | 'gunner' | 'navigator';
 export type UpgradeId = 'hull' | 'cannons' | 'sails';
 export type MissionId = 'first-win' | 'five-hits' | 'three-battles';
 export type BattleOutcome = 'victory' | 'defeat';
+/** Compact, truthful, device-only account of completed battles (newest first). */
+export type BattleRecord = {outcome:BattleOutcome; shots:number; hits:number; earnedCoins:number; earnedXp:number; completedAt:string};
 export type LocalProfile = {
   version: 1; coins: number; xp: number; wins: number; losses: number; hits: number; shots: number;
   ownedCrew: CrewId[]; equippedCrew: CrewId; upgrades: Record<UpgradeId, number>;
-  claimedMissions: MissionId[]; lastDailyDay: string; dailyStreak: number;
+  claimedMissions: MissionId[]; lastDailyDay: string; dailyStreak: number; battleLog: BattleRecord[];
 };
 export const CREW: ReadonlyArray<{id:CrewId;name:string;role:string;cost:number;symbol:string}> = [
   {id:'captain',name:'Captain Mara',role:'Starter captain · collection only',cost:0,symbol:'♛'},
@@ -29,9 +31,19 @@ export const MISSIONS: ReadonlyArray<{id:MissionId;title:string;target:number;re
 ];
 const MAX = 1_000_000_000;
 const bounded = (v:unknown, max=MAX) => typeof v==='number'&&Number.isSafeInteger(v)&&v>=0&&v<=max?v:0;
+const LOG_LIMIT=12;
+const validIso=(v:unknown):v is string=>typeof v==='string'&&/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(v)&&!Number.isNaN(Date.parse(v))&&new Date(v).toISOString()===v;
+function validBattleRecord(v:unknown):v is BattleRecord {
+  if(!v||typeof v!=='object'||Array.isArray(v))return false;
+  const entry=v as Partial<BattleRecord>;
+  if(entry.outcome!=='victory'&&entry.outcome!=='defeat')return false;
+  return bounded(entry.shots,1000)===entry.shots&&bounded(entry.hits,1000)===entry.hits&&
+    (entry.hits as number)<=(entry.shots as number)&&entry.earnedXp===(entry.outcome==='victory'?50:10)&&
+    entry.earnedCoins===(entry.outcome==='victory'?35:0)&&validIso(entry.completedAt);
+}
 export function initialProfile():LocalProfile {
   return {version:1,coins:0,xp:0,wins:0,losses:0,hits:0,shots:0,ownedCrew:['captain'],equippedCrew:'captain',
-    upgrades:{hull:0,cannons:0,sails:0},claimedMissions:[],lastDailyDay:'',dailyStreak:0};
+    upgrades:{hull:0,cannons:0,sails:0},claimedMissions:[],lastDailyDay:'',dailyStreak:0,battleLog:[]};
 }
 export function parseProfile(raw:string|null):LocalProfile {
   if(!raw)return initialProfile();
@@ -49,17 +61,21 @@ export function parseProfile(raw:string|null):LocalProfile {
       upgrades:{hull:bounded(upgrades.hull,5),cannons:bounded(upgrades.cannons,5),sails:bounded(upgrades.sails,5)},
       claimedMissions:missionIds.filter(id=>Array.isArray(s.claimedMissions)&&s.claimedMissions.includes(id)),
       lastDailyDay:typeof s.lastDailyDay==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s.lastDailyDay)?s.lastDailyDay:'',
-      dailyStreak:bounded(s.dailyStreak,7)
+      dailyStreak:bounded(s.dailyStreak,7),
+      battleLog:Array.isArray(s.battleLog)?s.battleLog.filter(validBattleRecord).slice(0,LOG_LIMIT):[]
     };
   }catch{return initialProfile();}
 }
 export const levelFor=(xp:number)=>Math.min(20,1+Math.floor(Math.sqrt(Math.max(0,xp)/80)));
 export const battlesPlayed=(p:LocalProfile)=>p.wins+p.losses;
-export function finishBattle(p:LocalProfile,outcome:BattleOutcome,hits:number,shots:number):LocalProfile {
+export function finishBattle(p:LocalProfile,outcome:BattleOutcome,hits:number,shots:number,now=Date.now()):LocalProfile {
   const count=bounded(shots,1000), landed=Math.min(count,bounded(hits,1000));
+  const earnedXp=outcome==='victory'?50:10,earnedCoins=outcome==='victory'?35:0;
+  const safeNow=Number.isSafeInteger(now)&&now>0&&now<=8_640_000_000_000_000?now:Date.now();
+  const record:BattleRecord={outcome,shots:count,hits:landed,earnedCoins,earnedXp,completedAt:new Date(safeNow).toISOString()};
   return {...p,wins:p.wins+(outcome==='victory'?1:0),losses:p.losses+(outcome==='defeat'?1:0),
-    hits:p.hits+landed,shots:p.shots+count,xp:p.xp+(outcome==='victory'?50:10),
-    coins:p.coins+(outcome==='victory'?35:0)};
+    hits:p.hits+landed,shots:p.shots+count,xp:p.xp+earnedXp,coins:p.coins+earnedCoins,
+    battleLog:[record,...(p.battleLog||[])].slice(0,LOG_LIMIT)};
 }
 export function missionProgress(p:LocalProfile,id:MissionId):number {
   const m=MISSIONS.find(m=>m.id===id);if(!m)return 0;
@@ -136,5 +152,8 @@ export function importProfileBackup(raw:string):LocalProfile {
     new Set(p.claimedMissions).size!==p.claimedMissions.length)throw new Error('Invalid mission history.');
   if(typeof p.lastDailyDay!=='string'||(p.lastDailyDay!==''&&!/^\d{4}-\d{2}-\d{2}$/.test(p.lastDailyDay))||
     !validCounter(p.dailyStreak,7))throw new Error('Invalid daily reward history.');
+  // Older v1 backups have no battleLog. Reject malformed additions rather than silently accepting forged rows.
+  if(p.battleLog!==undefined&&(!Array.isArray(p.battleLog)||p.battleLog.length>LOG_LIMIT||
+    !p.battleLog.every(validBattleRecord)))throw new Error('Invalid local battle history.');
   return parseProfile(JSON.stringify(p));
 }
