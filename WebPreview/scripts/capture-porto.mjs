@@ -112,6 +112,39 @@ try {
   await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify(report,null,2));
   if(report.navbarItems!==5||report.leftActions!==3||report.rightActions!==3)throw new Error('Porto navigation/layout mismatch');
+
+  // Visual handoff: compare the bottom navigation geometry on four real React
+  // screens against Porto. These are 390x844 Chrome viewport screenshots,
+  // not physical-device screenshots or static design mockups.
+  const geometry=()=>evaluate(`(()=>{
+    const nav=document.querySelector('.app-sheet > .harbour-nav')||
+      document.querySelector('.harbour-screen .harbour-nav');
+    if(!nav)return null;
+    const r=nav.getBoundingClientRect();
+    return {x:Math.round(r.x),y:Math.round(r.y),width:Math.round(r.width),
+      height:Math.round(r.height),tabs:nav.querySelectorAll('.harbour-nav-item').length,
+      labels:[...nav.querySelectorAll('.harbour-nav-item strong')].map(x=>x.textContent)};
+  })()`);
+  const portoNav=await geometry();
+  report.navigationComparison=[{screen:'porto',...portoNav,matched:true}];
+  for(const [screen,tab] of [['fleet',2],['cards',3],['shop',4],['ranking',5]]){
+    const selector=report.navigationComparison.length===1
+      ? '.harbour-screen .harbour-nav-item:nth-child('+tab+')'
+      : '.app-sheet > .harbour-nav .harbour-nav-item:nth-child('+tab+')';
+    const opened=await evaluate("(()=>{const b=document.querySelector("+JSON.stringify(selector)+");if(!b)return false;b.click();return true})()");
+    if(!opened)throw new Error('Could not navigate to '+screen);
+    await delay(250);
+    const current=await geometry();
+    if(!current||current.tabs!==5)throw new Error('Five tabs missing on '+screen);
+    const same=['x','y','width','height'].every(key=>Math.abs(current[key]-portoNav[key])<=2);
+    const labelsMatch=current.labels.join('|')===portoNav.labels.join('|');
+    report.navigationComparison.push({screen,...current,matched:same&&labelsMatch});
+    const capture=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+    await writeFile(join(out,screen+'-mobile-390x844.png'),Buffer.from(capture.data,'base64'));
+    if(!same||!labelsMatch)throw new Error(screen+' navigation diverges from approved Porto sizing');
+  }
+  await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
+
   if(report.bodyOverflow)throw new Error('Porto viewport scrolls horizontally');
   if(!report.webgl2||report.contextLost)console.warn('No confirmed WebGL2 context: screenshot is not proof of 3D performance');
 } finally {
