@@ -51,7 +51,7 @@ export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=
         return <button type="button" key={item.screen} className={'harbour-flank-button'+(ready?' is-ready':'')} onClick={()=>onAction(item.screen)} aria-label={label}>
           <span className="harbour-flank-icon" aria-hidden="true"><PirateIcon name={item.icon} size={33}/></span>
           <strong>{item.title}</strong>
-          {item.screen==='battle'&&<small className="harbour-arena-mode">TREINO LOCAL</small>}
+          {item.screen==='battle'&&<small className="harbour-training-mode">TREINO LOCAL</small>}
           {item.screen==='battle'&&<small className="harbour-local-wins" aria-label={profile.wins+' local battle victories'}>★ {profile.wins} VITÓRIAS</small>}
           {ready&&<span className="harbour-alert" aria-hidden="true">!</span>}
         </button>;
