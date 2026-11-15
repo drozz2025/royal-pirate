@@ -29,8 +29,8 @@
 .w8-days small{font:900 10px 'Barlow Condensed',sans-serif;color:#d5dbe1;white-space:nowrap}
 .w8-days li>span{color:#ebc277;font:900 19px/1 'Barlow Condensed',sans-serif}
 .w8-days strong{white-space:nowrap;font:900 11px 'Barlow Condensed',sans-serif;color:#ffe6a5}
-.w8-days .available{background:#72502c;border-color:#ffe9a7;box-shadow:inset 0 0 0 1px #ffd775}
-.w8-days .collected{background:#1a594b;border-color:#85d7ad}
+.w8-days .app-week-day.is-next{background:#72502c;border-color:#ffe9a7;box-shadow:inset 0 0 0 1px #ffd775}
+.w8-days .app-week-day.is-claimed{background:#1a594b;border-color:#85d7ad}
 .w8-calendar>p,.w8-explain,.w8-footnote{font:600 11px/1.45 'Barlow',sans-serif;color:#bed2e1;margin:11px 0 0}
 .w8-missions{display:flex;flex-direction:column;gap:9px}
 .w8-missions .w8-explain{margin:-5px 0 3px}
