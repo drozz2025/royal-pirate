@@ -1,5 +1,5 @@
 import React from 'react';
-import { CREW, MISSIONS, UPGRADES, battlesPlayed, canClaimDaily, levelFor, missionProgress, upgradeCost, type CrewId, type LocalProfile, type MissionId, type UpgradeId } from './progression';
+import { CREW, MISSIONS, UPGRADES, battlesPlayed, canClaimDaily, nextDailyStreak, levelFor, missionProgress, upgradeCost, type CrewId, type LocalProfile, type MissionId, type UpgradeId } from './progression';
 
 export type AppScreenId = 'battle'|'fleet'|'forge'|'cards'|'shop'|'missions'|'profile';
 const PAGES:ReadonlyArray<{id:AppScreenId;title:string;symbol:string}>=[
@@ -18,8 +18,10 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
   const titleRef=React.useRef<HTMLHeadingElement>(null);
   React.useEffect(()=>{setAnnouncement('');titleRef.current?.focus();},[screen]);
   const action=(message:string,callback:()=>void)=>{callback();setAnnouncement(message);};
-  const day=canClaimDaily(profile,Date.now());
-  const nextDailyDay=Math.min(7,profile.dailyStreak+1);
+  const now=Date.now(),day=canClaimDaily(profile,now);
+  const nextDailyDay=nextDailyStreak(profile,now);
+  // When the previous claim is older than yesterday, the old streak is no longer active.
+  const visibleStreak=day&&nextDailyDay===1?0:profile.dailyStreak;
   return <section className="app-sheet" role="dialog" aria-modal="false" aria-labelledby="app-screen-title">
     <header className="app-sheet-header">
       <button type="button" className="app-back" onClick={onClose} aria-label="Back to harbour">‹</button>
@@ -62,13 +64,13 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
         <div className="app-row-muted"><span>Cosmetic skins, chests & advertisements</span><span>PLANNED</span></div>
       </div>}
       {screen==='missions'&&<div className="app-stack"><div className="app-kicker">DAILY PORT REWARD</div><h2>Captain's Orders</h2>
-        <article className="app-daily"><span aria-hidden="true">🎁</span><div><strong>Daily Supply Chest</strong><p>UTC day · streak {profile.dailyStreak}/7 · local device only</p><small>Next claim earns {15+Math.min(7,profile.dailyStreak+1)*5} coins. Daily reset is at 00:00 UTC.</small></div>
+        <article className="app-daily"><span aria-hidden="true">🎁</span><div><strong>Daily Supply Chest</strong><p>UTC day · streak {profile.dailyStreak}/7 · local device only</p><small>Next claim earns {15+nextDailyDay*5} coins. Daily reset is at 00:00 UTC.</small></div>
           <button type="button" disabled={!day} onClick={()=>action('Daily supply chest claimed locally. Return tomorrow after 00:00 UTC.',onDaily)}>{day?'CLAIM':'CLAIMED'}</button></article>
         <section className="app-week-rewards" aria-labelledby="app-week-title">
           <div className="app-week-heading"><h3 id="app-week-title">7-day supply route</h3><small>Consecutive UTC claims · local save</small></div>
           <ol className="app-week-grid" aria-label="Seven consecutive daily rewards">
             {Array.from({length:7},(_,n)=>n+1).map(n=>{
-              const claimed=n<=profile.dailyStreak;
+              const claimed=n<=visibleStreak;
               const next=day&&n===nextDailyDay;
               return <li key={n} className={'app-week-day '+(claimed?'is-claimed':next?'is-next':'')}>
                 <span className="app-week-day-label">DAY {n}</span>
