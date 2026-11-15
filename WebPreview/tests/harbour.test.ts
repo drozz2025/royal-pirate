@@ -37,7 +37,7 @@ test('the harbour frames a real Three.js vessel and disables battle simulation',
   assert.match(scene, /this\.ships\.enemy\.root\.visible=false/);
   assert.match(scene, /this\.harbourDock\.visible=true/);
   assert.match(scene, /this\.harbourDock\.visible=false/);
-  assert.match(scene, /this\.cameraMode!=='harbour'/);
+  assert.match(scene, /if\(this\.cameraMode==='battle'\|\|this\.cameraMode==='deck'\)/);
   assert.match(main, /scene\.showHarbour\(\)/);
   assert.match(main, /view\.current\?\.showBattle\(\)/);
 });
