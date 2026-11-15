@@ -1,6 +1,7 @@
 import React from 'react';
 import { PirateIcon } from './app-icons';
 import { FleetShowcase } from './fleet-showcase';
+import { CrewDeck } from './crew-deck';
 import { CREW, MISSIONS, UPGRADES, battlesPlayed, canClaimDaily, nextDailyStreak, levelFor, missionProgress, upgradeCost, type CrewId, type LocalProfile, type MissionId, type UpgradeId } from './progression';
 
 export type AppScreenId = 'battle'|'fleet'|'forge'|'cards'|'shop'|'missions'|'profile';
@@ -62,6 +63,16 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
       {screen==='forge'&&<div className="app-stack"><div className="app-kicker">NAVAL SHIPYARD · LOCAL PROGRESSION</div><h2>Improve the Royal Crown</h2>
         <p className="app-fine">Upgrades are saved on this device. They do not yet alter the 3D model or battle physics.</p>
         <div className="app-summary-strip"><span><strong>{UPGRADES.reduce((total,u)=>total+profile.upgrades[u.id],0)} / 15</strong><small>SHIPYARD LEVELS</small></span><span><strong>{profile.coins}</strong><small>AVAILABLE COINS</small></span></div>
+        <section className="app-forge-board" aria-label="Royal Crown shipyard overview">
+          <div className="app-forge-seal" aria-hidden="true"><PirateIcon name="forge" size={56}/><span>ROYAL CROWN</span></div>
+          <div className="app-forge-status"><div className="app-kicker">THREE SHIP SYSTEMS · REAL LOCAL LEVELS</div>
+            <h3>Shipyard blueprint</h3>
+            <div className="app-forge-mini-grid">{UPGRADES.map(u=><div key={u.id}>
+              <span aria-hidden="true">{u.symbol}</span><strong>{u.name}</strong><small>{profile.upgrades[u.id]} / 5</small>
+            </div>)}</div>
+            <p>Visual progression only. Hull, cannon and sail upgrades do not yet change damage, health or ship speed in battle.</p>
+          </div>
+        </section>
         {UPGRADES.map(u=>{const lvl=profile.upgrades[u.id],cost=upgradeCost(u.id,lvl),max=lvl>=5;return <article className="app-item app-upgrade-item" key={u.id}>
           <span className="app-item-symbol" aria-hidden="true">{u.symbol}</span><div className="app-item-text"><strong>{u.name}</strong><small>LEVEL {lvl} / 5</small><p>{u.description}</p>
           <div className="app-upgrade-steps" role="progressbar" aria-label={u.name+' upgrade level'} aria-valuemin={0} aria-valuemax={5} aria-valuenow={lvl}>{[1,2,3,4,5].map(step=><span key={step} className={step<=lvl?'is-complete':''}/>)}</div>
@@ -76,10 +87,8 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
             <button type="button" aria-pressed={onlyOwned} onClick={()=>setOnlyOwned(true)}>OWNED</button>
           </div>
         </div>
-        {CREW.filter(c=>!onlyOwned||profile.ownedCrew.includes(c.id)).map(c=>{const owned=profile.ownedCrew.includes(c.id),selected=profile.equippedCrew===c.id;return <article className={'app-item app-crew-item '+(selected?'app-equipped':'')} key={c.id}>
-          <span className={'app-item-symbol app-crew-portrait '+(owned?'is-owned':'is-locked')} aria-hidden="true">{c.symbol}</span><div className="app-item-text"><strong>{c.name}</strong><small>{selected?'★ ACTIVE CAPTAIN':owned?'✓ COLLECTED':'◇ UNDISCOVERED'}</small><p>{c.role}</p></div>
-          <button type="button" disabled={selected||(!owned&&profile.coins<c.cost)} onClick={()=>action(owned?c.name+' equipped locally. Combat abilities are not active yet.':c.name+' added to your local crew for '+c.cost+' coins.',()=>owned?onEquipCrew(c.id):onBuyCrew(c.id))}>{selected?'ACTIVE':owned?'EQUIP':c.cost+' ●'}</button>
-        </article>})}</div>}
+        <CrewDeck profile={profile} onlyOwned={onlyOwned} onBuyCrew={onBuyCrew} onEquipCrew={onEquipCrew}
+          onBattle={()=>onNavigate('battle')} announce={action}/></div>}
       {screen==='shop'&&<div className="app-stack">
         <div className="app-market-hero">
           <div className="app-market-icon" aria-hidden="true"><PirateIcon name="shop" size={45}/></div>
