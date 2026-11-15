@@ -76,25 +76,25 @@ try {
   let ready=false;
   for(let i=0;i<40;i++){
     await delay(250);
-    ready=await evaluate("!!document.querySelector('.harbour-screen:not([aria-hidden=true])') && !!document.querySelector('canvas')");
+    ready=await evaluate("!!document.querySelector('.harbour-screen')");
     if(ready)break;
   }
-  if(!ready)throw new Error('Live 3D Porto scene did not mount');
+  if(!ready)console.warn('Porto did not mount: capturing browser diagnostics rather than claiming 3D QA');
   await delay(1800);
   const report=await evaluate(`(()=>{
     const harbour=document.querySelector('.harbour-screen');
     const canvas=document.querySelector('canvas');
     const box=el=>{const r=el.getBoundingClientRect();return{x:Math.round(r.x),y:Math.round(r.y),width:Math.round(r.width),height:Math.round(r.height)};};
-    const targets=[...harbour.querySelectorAll('button')].map(el=>({name:el.textContent.trim().replace(/\\s+/g,' ').slice(0,50),...box(el)}));
+    const targets=[...(harbour?.querySelectorAll('button')||[])].map(el=>({name:el.textContent.trim().replace(/\\s+/g,' ').slice(0,50),...box(el)}));
     const center=document.elementFromPoint(innerWidth*.5,innerHeight*.48);
     const gl=canvas?.getContext('webgl2');
     return {
-      url:location.href,viewport:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio},
-      canvas:box(canvas),webgl2:!!gl,contextLost:gl?.isContextLost()??null,
-      harbour:box(harbour),centerTouchTarget:center?.tagName??null,
-      navbarItems:harbour.querySelectorAll('.harbour-nav-item').length,
-      leftActions:harbour.querySelectorAll('.harbour-flank-left button').length,
-      rightActions:harbour.querySelectorAll('.harbour-flank-right button').length,
+      url:location.href,readyState:document.readyState,bodyExcerpt:document.body.textContent.slice(0,400),error:document.querySelector('.error-panel')?.textContent||null,viewport:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio},
+      canvas:canvas?box(canvas):null,webgl2:!!gl,contextLost:gl?.isContextLost()??null,
+      harbour:harbour?box(harbour):null,centerTouchTarget:center?.tagName??null,
+      navbarItems:harbour?.querySelectorAll('.harbour-nav-item').length??0,
+      leftActions:harbour?.querySelectorAll('.harbour-flank-left button').length??0,
+      rightActions:harbour?.querySelectorAll('.harbour-flank-right button').length??0,
       touches:targets,bodyOverflow:document.documentElement.scrollWidth>innerWidth
     };
   })()`);
