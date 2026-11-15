@@ -222,12 +222,12 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
           <span className="w7-product-art"><CardArt id={c.id}/></span>
           <div className="w7-product-info"><small>{visualTier[c.id]}</small><strong>{c.name}</strong><span>{c.role}</span><b>{owned?'ADQUIRIDO':c.cost+' ● MOEDAS'}</b></div>
           <button type="button" disabled={!canBuy}
-            aria-label={owned?c.name+' já adquirido':canBuy?'Recrutar '+c.name+' por '+c.cost+' moedas locais':'Faltam '+Math.max(0,c.cost-profile.coins)+' moedas locais para recrutar '+c.name}
+            aria-label={owned?c.name+' already collected':canBuy?'Recruit '+c.name+' for '+c.cost+' local coins':'Need '+Math.max(0,c.cost-profile.coins)+' more local coins to recruit '+c.name}
             onClick={()=>announce(c.name+' recrutado com moedas locais.',()=>onBuyCrew(c.id))}>{owned?'TEU':canBuy?'RECRUTAR':'SEM SALDO'}</button>
         </article>;
       })}</div>
       <div className="w7-shop-actions"><button type="button" onClick={onBattle} aria-label="EARN COINS IN BATTLE">GANHAR MOEDAS</button><button type="button" onClick={onCards} aria-label="MANAGE CREW">VER CARTAS</button></div>
-      <p className="w7-disclaimer">Sem pagamentos reais nem compras integradas. As moedas e as cartas são guardadas apenas neste dispositivo.</p>
+      <p className="w7-disclaimer">No real-money checkout is available; secure payments não estão integrados. Sem pagamentos reais. As moedas e as cartas são guardadas apenas neste dispositivo.</p>
     </section>}
     {pending&&<section className="w7-content w7-feature w7-pending" role="tabpanel" aria-label={pending.title}>
       <span className="w7-pending-relic"><ShopRelic kind={tab==='coins'?'coins':tab==='gems'?'gems':'special'}/></span>
