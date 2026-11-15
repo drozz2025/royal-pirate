@@ -36,7 +36,7 @@ export function PortoBottomNav({screen,profile,onNavigate,onPorto}:{
         disabled={current} aria-current={current?'page':undefined}
         onClick={item.screen===null?onPorto:()=>onNavigate(item.screen!)}
         aria-label={label}>
-        <span className="harbour-nav-icon" aria-hidden="true"><PortoArt name={item.icon} size={42}/></span>
+        <span className="harbour-nav-icon" aria-hidden="true"><span className="app-tab-glyph"><PortoArt name={item.icon} size={42}/></span></span>
         <strong>{item.title}</strong>
         {actionable&&<span className="harbour-nav-alert" aria-hidden="true">!</span>}
       </button>;
