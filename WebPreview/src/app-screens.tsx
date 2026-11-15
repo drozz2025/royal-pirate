@@ -119,7 +119,7 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
           <ol className="app-battle-entries">{profile.battleLog.map((entry,i)=><li key={entry.completedAt+'-'+i} className={'app-battle-entry '+(entry.outcome==='victory'?'is-win':'is-loss')}>
             <span className="app-battle-medallion" aria-hidden="true">{entry.outcome==='victory'?'★':'◆'}</span>
             <div className="app-battle-details"><strong>{entry.outcome==='victory'?'VICTORY':'DEFEAT'}</strong><time dateTime={entry.completedAt}>{entry.completedAt.slice(0,16).replace('T',' ')} UTC</time><small>{entry.hits} / {entry.shots} cannon hits</small></div>
-            <div className="app-battle-loot"><strong>+{entry.earnedXp} XP</strong><small>{entry.earnedCoins?'+ '+entry.earnedCoins+' COINS':'NO COINS'}</small></div>
+            <div className="app-battle-loot"><strong>+{entry.earnedXp} XP</strong><small>{entry.earnedCoins?'+'+entry.earnedCoins+' COINS':'NO COINS'}</small></div>
           </li>)}</ol>}
           <p className="app-fine">The latest 12 completed battles are saved only in this browser and included in local backups. Older battles remain in the lifetime totals above.</p>
         </section>
