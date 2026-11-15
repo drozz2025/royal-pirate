@@ -1,4 +1,5 @@
 @import './work4-fleet-forge.css';
+@import './work7-cards-shop.css';
 /* ROYAL PIRATE app-first mobile shell. Original responsive navy/gold UI over live ocean. */
 .app-sheet{--gold:#ffe0a0;position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;
   color:#fff3dd;background:radial-gradient(ellipse 90% 35% at 50% 12%,#3b83b28a,transparent 95%),
