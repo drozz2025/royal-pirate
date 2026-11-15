@@ -9,7 +9,20 @@ const artwork:Record<PirateIconName,React.ReactNode> = {
   cards:<><rect x="3" y="7" width="13" height="15" rx="2"/><path d="M8 4h11a2 2 0 0 1 2 2v12M9.5 11l1.5 2 2-1-1 3-3 1 .5-2-2-1 2-2Z"/></>,
   shop:<><path d="M5 9h14l1 12H4L5 9Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4M3 9h18"/><path d="M9 15h6m-3-3v6"/></>,
   missions:<><path d="M7 3h12v17H7a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Z"/><path d="M7 3a3 3 0 0 0 0 6h12M10 13l2 2 4-4M9 19h10"/></>,
-  profile:<><path d="M4 21c1-5 5-7 8-7s7 2 8 7"/><circle cx="12" cy="9" r="4"/><path d="m5 5 7-3 7 3-7 2-7-2ZM12 2v-1"/></>,
+  // Painted pirate-captain portrait, designed as original SVG at mobile icon scale.
+  profile:<>
+    <circle cx="12" cy="12" r="11" fill="#1c5b85" stroke="#efce80" strokeWidth=".65"/>
+    <path d="M3 23c.3-5 4-7 9-7s8.7 2 9 7" fill="#a83431" stroke="#531e20" strokeWidth=".7"/>
+    <path d="M7 14c.2 4 2 6.6 5 6.6s4.8-2.6 5-6.6l-1-4H8Z" fill="#312321" stroke="#9a5f3c" strokeWidth=".7"/>
+    <ellipse cx="12" cy="11.1" rx="4.35" ry="4.8" fill="#e5ac71" stroke="#87522e" strokeWidth=".65"/>
+    <path d="M7.4 11c1.5-1 3.2-.9 4.6-.2 1.5-.9 3.2-.8 4.6.2" stroke="#573320" strokeWidth="1"/>
+    <circle cx="10" cy="11" r=".45" fill="#182332" stroke="none"/><circle cx="14" cy="11" r=".45" fill="#182332" stroke="none"/>
+    <path d="M11.7 11.3 11 13h1.5" stroke="#ab703a" strokeWidth=".6"/>
+    <path d="M8.2 13.7c1.3-.7 2.3-.4 3.8.5 1.5-.9 2.5-1.2 3.8-.5-.5 1.6-1.7 2.5-3.8 2.5s-3.3-.9-3.8-2.5Z" fill="#332323" stroke="#211c1b" strokeWidth=".4"/>
+    <path d="M4.5 8.1c2-2.9 3.1-4.6 4-6 1.9-1.4 5.6-1.4 7.1.2l3.7 5.8c-3.8-1.4-10.4-1.4-14.8 0Z" fill="#121a2a" stroke="#f3c15e" strokeWidth=".95"/>
+    <path d="M4 8.4c4.7-1.3 11.3-1.3 16 0" stroke="#f5b84b" strokeWidth="1.65"/>
+    <circle cx="12" cy="4.5" r=".8" fill="#f7d488" stroke="none"/>
+  </>,
   port:<><path d="M12 3v17m-8-7h16M2 14c0 10 20 10 20 0M8 5h8M12 2v2m-3 14 3 3 3-3"/><circle cx="12" cy="6" r="2"/></>,
   ranking:<><path d="M5 21h14M7 16h10l2-10-5 3-2-6-2 6-5-3z"/><path d="M12 3v-2M4 4 2 2m18 2 2-2M8 13h8"/></>,
   chests:<><rect x="2" y="9" width="20" height="12" rx="2"/><path d="M2 9c0-5 4-7 10-7s10 2 10 7M9 9V3m6 6V3M2 13h20M10 12h4v5h-4z"/></>,
