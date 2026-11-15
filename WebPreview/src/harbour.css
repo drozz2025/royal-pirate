@@ -990,3 +990,7 @@ body:has(.harbour-screen:not([aria-hidden="true"])) .rp-version{display:none}
 @media(prefers-reduced-motion:reduce){
   .harbour-flank-button,.harbour-battle-button{transition:none}
 }
+
+/* Player name above the existing level, without resizing the Porto avatar or dock. */
+.harbour-player-name{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:900 clamp(11px,2.7vw,15px)/1.1 'Barlow Condensed',sans-serif;color:#fff3bc;text-shadow:0 2px 2px #071c38,0 0 5px #071c38;letter-spacing:.2px}
+.harbour-level{gap:2px}
