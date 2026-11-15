@@ -246,3 +246,13 @@
   .harbour-battle-button small{font-size:9px}
   .harbour-nav-item small{font-size:9px;letter-spacing:0}
 }
+
+/* App-first: navigation tiles are real buttons, not decorative disabled placeholders. */
+.harbour-side{pointer-events:auto}
+.harbour-side-tile{pointer-events:auto;cursor:pointer;color:#fff9e8;text-shadow:0 2px 3px #102f52}
+.harbour-side-tile:active,.harbour-secondary-action:active,.harbour-nav-item:active{transform:translateY(2px)}
+.harbour-nav-item{background:transparent;cursor:pointer;text-shadow:0 2px 2px #132b4a}
+.harbour-nav-current{background:linear-gradient(#ffdc70,#df9134)}
+.harbour-secondary-action{cursor:pointer;color:#fff9e8;text-shadow:0 2px 2px #102f52}
+.harbour-profile{color:#fff9e8;text-align:left;cursor:pointer;text-shadow:0 2px 2px #152f4999}
+.harbour-side-tile:focus-visible,.harbour-secondary-action:focus-visible,.harbour-nav-item:focus-visible,.harbour-profile:focus-visible{outline:3px solid #fff4b4;outline-offset:3px}

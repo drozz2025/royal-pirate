@@ -34,3 +34,9 @@
   .in-battle .fire-button>small{font-size:9px;letter-spacing:.65px}
   .in-battle .bottom-note{font-size:8px;letter-spacing:.3px}
 }
+
+/* APP FIRST: the battle-result screen now completes the return-to-port loop. */
+.result .result-loot{padding:10px 12px;border:1px solid #dfb97181;border-radius:9px;background:#23435cae;color:#ffe1a1;
+  font:800 11px 'Barlow',sans-serif;letter-spacing:.3px}
+.result .return-port-button{margin-top:12px;border:1px solid #d8b375;background:linear-gradient(#2c5870,#102f50);
+  color:#ffe5ad;box-shadow:none}
