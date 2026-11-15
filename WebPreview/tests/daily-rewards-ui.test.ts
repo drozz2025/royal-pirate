@@ -39,7 +39,7 @@ test('missions render seven days with earned and next statuses, accurate local-c
  assert.match(html,/Next claim earns 25 coins/);
  assert.match(html,/class="app-week-day is-claimed"/);
  assert.match(html,/class="app-week-day is-next"/);
- assert.match(html,/role="progressbar" aria-label="Win your first battle progress" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0"/);
+ assert.match(html,/role="progressbar" aria-label="Vence a primeira batalha — progresso" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0"/);
  assert.match(html,/role="status" aria-live="polite" aria-atomic="true"/);
 });
 
