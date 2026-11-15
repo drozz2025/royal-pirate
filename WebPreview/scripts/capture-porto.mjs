@@ -4,7 +4,7 @@
  * A failed WebGL context is recorded, never claimed as real-device QA.
  */
 import { spawn } from 'node:child_process';
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -13,29 +13,30 @@ const origin = process.env.PORTO_PREVIEW_URL || 'http://127.0.0.1:4173/royal-pir
 const out = process.env.PORTO_CAPTURE_DIR || 'porto-qa';
 const chromeBinary = process.env.CHROME_BIN || 'google-chrome';
 const profile = await mkdtemp(join(tmpdir(), 'royal-porto-chrome-'));
+const chromePort=9231;
 const chrome = spawn(chromeBinary, [
   '--headless=new', '--no-sandbox', '--disable-dev-shm-usage',
   '--enable-webgl', '--enable-unsafe-swiftshader',
   '--use-gl=angle', '--use-angle=swiftshader',
-  '--remote-allow-origins=*', '--remote-debugging-port=0',
+  '--remote-allow-origins=*', '--remote-debugging-port=' + chromePort,
   '--user-data-dir=' + profile, 'about:blank'
-], { stdio: 'ignore' });
+], { stdio: ['ignore','ignore','pipe'] });
+let chromeErrors='';
+chrome.stderr.on('data', chunk=>{chromeErrors=(chromeErrors+chunk.toString()).slice(-3000);});
 const events = [];
 let ws;
 try {
-  let port;
-  for (let i=0; i<50; i++) {
-    if (chrome.exitCode !== null) throw new Error('Chromium exited before CDP was ready');
+  let list;
+  for (let i=0; i<80; i++) {
+    if (chrome.exitCode !== null) throw new Error('Chromium quit: '+chromeErrors);
     try {
-      const active = await readFile(join(profile, 'DevToolsActivePort'), 'utf8');
-      port = Number(active.split('\n')[0]);
-      if (port) break;
-    } catch { /* startup */ }
+      const response=await fetch('http://127.0.0.1:' + chromePort + '/json/list',{signal:AbortSignal.timeout(600)});
+      if(response.ok){list=await response.json();break;}
+    } catch { /* Chrome is starting */ }
     await delay(150);
   }
-  if (!port) throw new Error('Chrome DevTools port did not open');
-  const list = await fetch('http://127.0.0.1:' + port + '/json/list').then(r=>r.json());
-  const page = list.find(t=>t.type==='page');
+  if (!list) throw new Error('Chrome debugging did not open: '+chromeErrors);
+    const page = list.find(t=>t.type==='page');
   if (!page) throw new Error('No Chrome page target');
   ws = new WebSocket(page.webSocketDebuggerUrl);
   await new Promise((resolve,reject)=>{
