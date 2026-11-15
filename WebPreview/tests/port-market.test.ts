@@ -14,11 +14,11 @@ function screen(id:AppScreenId,profile:LocalProfile){
  }));
 }
 
-test('port market shows true local inventory, real coin costs and unavailable paid services',()=>{
+test('Work 7 shop shows canonical prices and disables unavailable paid services',()=>{
  const html=screen('shop',initialProfile());
- assert.match(html,/Port Market/);
- assert.match(html,/Recruit your crew/);
- assert.match(html,/3 COLLECTED|1 \/ 3 COLLECTED/);
+ for(const tab of ['OFERTAS','MOEDAS','GEMAS','ESPECIAIS'])assert.match(html,new RegExp(tab));
+ assert.match(html,/RECRUTA A TUA TRIPULAÇÃO/);
+ assert.match(html,/1 \/ 3 CARTAS/);
  assert.match(html,/Captain Mara already collected/);
  assert.match(html,/Need 60 more local coins to recruit Iron Jack/);
  assert.match(html,/Need 90 more local coins to recruit Northwind/);
@@ -40,7 +40,7 @@ test('market recruitment follows actual coin balance and local crew ownership',(
  html=screen('shop',bought);
  assert.match(html,/Iron Jack already collected/);
  assert.match(html,/Need 80 more local coins to recruit Northwind/);
- assert.match(html,/2 \/ 3 COLLECTED/);
+ assert.match(html,/2 \/ 3 CARTAS/);
 });
 
 test('personal victory milestone route reflects completed real battles, not online rankings',()=>{

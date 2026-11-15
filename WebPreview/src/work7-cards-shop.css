@@ -1,0 +1,120 @@
+/* WORK 7 — screens 05/06. Isolated selectors; no Porto/Frota/Forge overrides. */
+.w7-screen{
+ --w7-gold:#f9d48d;--w7-edge:#b88243;--w7-navy:#071c3a;
+ display:grid;gap:12px;min-width:0;padding-bottom:14px;
+ color:#fff0d1;font-family:'Barlow',sans-serif;
+}
+.w7-screen *{box-sizing:border-box}
+.w7-hero{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:105px;
+ padding:14px 16px;border:2px solid #d5a65b;border-radius:17px;
+ background:radial-gradient(circle at 7% 20%,#28759999,transparent 55%),linear-gradient(140deg,#21456b,#0c2348 73%);
+ box-shadow:0 5px 0 #061225, inset 0 2px #f8d99b70;position:relative;overflow:hidden}
+.w7-hero:after{content:'✦';position:absolute;color:#efcc7c38;font-size:115px;right:75px;top:-44px;pointer-events:none}
+.w7-eyebrow{display:block;font:800 10px 'Barlow',sans-serif;letter-spacing:1.4px;color:#edc476}
+.w7-screen .w7-hero h2{margin:1px 0!important;color:#ffe9af;font:900 clamp(37px,11vw,60px) 'Barlow Condensed',sans-serif!important;line-height:.96;text-shadow:0 3px #482b20}
+.w7-hero p{margin:3px 0 0;font:700 12px 'Barlow',sans-serif;color:#d1e1f0}
+.w7-medal{flex:none;display:grid;align-content:center;justify-items:center;width:78px;height:76px;border:3px solid #eac57c;border-radius:20px;
+ background:radial-gradient(circle at 50% 8%,#437795,#112c52 72%);box-shadow:inset 0 1px #fff1bd,0 3px 0 #68401e;z-index:1}
+.w7-medal strong{font:900 28px 'Barlow Condensed',sans-serif;color:#ffdf94;line-height:1}
+.w7-medal small{font:900 10px 'Barlow',sans-serif;color:#d9e4eb;margin-top:6px}
+.w7-wallet{width:100px}
+.w7-wallet strong{font-size:25px}
+.w7-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px;
+ background:#081b35;border:2px solid #9a764d;border-radius:13px;box-shadow:0 3px 0 #020c19}
+.w7-tabs-four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.w7-tabs button{min-width:0;min-height:49px;border-radius:8px;border:1px solid #4d7596;background:linear-gradient(#26577d,#153554);
+ color:#e8edf2;font:900 clamp(10px,2.8vw,13px) 'Barlow Condensed',sans-serif;letter-spacing:.2px;
+ line-height:1.05;white-space:normal;padding:5px 2px;text-shadow:0 1px #06172b}
+.w7-tabs button[aria-selected=true]{background:linear-gradient(180deg,#ffe9b5,#e5b96c 48%,#b87c38);
+ border-color:#fff3cd;color:#39281c;text-shadow:0 1px #ffeab0;box-shadow:inset 0 2px #fff8d0,0 2px 3px #0009}
+.w7-content{display:grid;gap:12px;min-width:0}
+.w7-line{display:flex;align-items:center;justify-content:space-between;gap:7px;min-height:34px;color:#e8c480;font:900 12px 'Barlow Condensed',sans-serif;letter-spacing:.7px}
+.w7-line>span{color:#abc8db;font:800 11px 'Barlow',sans-serif}
+.w7-filter{display:flex;gap:4px;border:1px solid #557d90;background:#09243d;padding:3px;border-radius:8px}
+.w7-filter button{min-height:33px;padding:5px 10px;border:0;border-radius:6px;color:#c9deea;background:transparent;font:900 11px 'Barlow',sans-serif}
+.w7-filter button[aria-pressed=true]{background:#e8bd79;color:#142b46}
+.w7-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;align-items:stretch}
+.w7-card{display:flex;flex-direction:column;align-items:stretch;gap:4px;text-align:center;min-width:0;min-height:221px;
+ padding:7px 7px 10px;border:3px solid #c2a168;border-radius:13px 13px 18px 18px;position:relative;overflow:hidden;
+ background:radial-gradient(circle at 50% 35%,#285c86,#0a2344 65%);
+ color:#fff1d0;box-shadow:0 5px 0 #08162c, inset 0 2px #ffe9ba50}
+.w7-card:before{content:'';position:absolute;inset:4px;border:1px solid #d9b67844;border-radius:8px 8px 13px 13px;pointer-events:none}
+.w7-card.is-selected{border-color:#ffedb3;box-shadow:0 0 0 2px #bd8537,0 6px 0 #06152a,0 0 22px #f3c36845}
+.w7-card.is-locked .w7-card-art{filter:saturate(.55) brightness(.85)}
+.w7-card-top{display:flex;justify-content:space-between;text-align:left;color:#ffe2ac;font:900 9px 'Barlow Condensed',sans-serif;letter-spacing:.7px;z-index:1}
+.w7-card-top span:last-child{font-size:17px;line-height:1}
+.w7-card-art{display:block;min-width:0;min-height:115px;height:clamp(110px,30vw,150px);z-index:1}
+.w7-art-svg{width:100%;height:100%;filter:drop-shadow(0 7px 5px #07132870)}
+.w7-card>strong{font:900 clamp(20px,5vw,27px) 'Barlow Condensed',sans-serif;line-height:1.05;color:#fff1ca;z-index:1}
+.w7-card>small{font:900 10px 'Barlow',sans-serif;color:#f0cc83;z-index:1}
+.w7-gunner{background:radial-gradient(circle at 50% 34%,#8f4a3a,#271f3c 73%)}
+.w7-navigator{background:radial-gradient(circle at 50% 34%,#317b89,#09263f 75%)}
+.w7-detail{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px;
+ border:2px solid #b58e55;border-radius:12px;background:linear-gradient(105deg,#193d65,#0b2444)}
+.w7-screen .w7-detail h3{font:900 26px 'Barlow Condensed',sans-serif;color:#ffe4a3;margin:1px 0 2px}
+.w7-detail p{font:600 11px 'Barlow',sans-serif;color:#c8dbe5;margin:0}
+.w7-detail button,.w7-feature>button,.w7-shop-actions button{flex:none;min-height:45px;max-width:130px;padding:7px 9px;border:2px solid #ffe7ad;border-radius:10px;
+ color:#31261d;background:linear-gradient(#ffeba7,#d29a4d);font:900 13px 'Barlow Condensed',sans-serif;box-shadow:0 3px #644320}
+.w7-screen button:disabled{opacity:.7;cursor:not-allowed;box-shadow:none}
+.w7-disclaimer{font:600 11px/1.55 'Barlow',sans-serif;color:#b9d2de;margin:0}
+.w7-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;
+ border-top:1px solid #a68f6670;padding:13px 3px 3px;color:#b8cede;font:800 10px 'Barlow',sans-serif}
+.w7-foot button{border:0;color:#ffdb93;background:transparent;font:900 13px 'Barlow Condensed',sans-serif;text-decoration:underline;text-underline-offset:3px}
+.w7-feature{justify-items:center;text-align:center;padding:27px 15px;background:linear-gradient(165deg,#225478,#0b264b);
+ border:2px solid #bb965f;border-radius:16px;box-shadow:inset 0 1px #fff0b365}
+.w7-feature-mark{display:grid;place-items:center;min-width:93px;min-height:93px;padding:8px;border:3px solid #f1d28d;
+ border-radius:24px;background:radial-gradient(circle at 50% 28%,#4c84a3,#0c2a4b);
+ box-shadow:0 8px 0 #07203b;color:#ffe1a1;font:900 34px 'Barlow Condensed',sans-serif;text-shadow:0 3px #6c4835}
+.w7-screen .w7-feature h3{font:900 36px 'Barlow Condensed',sans-serif;color:#ffdea4;margin:0}
+.w7-feature p{font:600 13px/1.55 'Barlow',sans-serif;max-width:390px;margin:0;color:#d5e5ed}
+.w7-feature-row{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:1px solid #76909d;
+ background:#0c2b4a;padding:13px;border-radius:12px;font:800 11px 'Barlow',sans-serif}
+.w7-feature-row>span{font-size:24px;color:#ffcf7d}
+.w7-feature-row strong{flex:1;color:#dde8ed}
+.w7-feature-row b{color:#ffd58a;font:900 12px 'Barlow Condensed',sans-serif}
+.w7-feature>button{max-width:none;padding:9px 17px}
+.w7-shop-hero{background:radial-gradient(circle at 25% 40%,#5e758a70,transparent 60%),linear-gradient(130deg,#214065,#071b38)}
+.w7-banner{display:flex;align-items:center;gap:16px;padding:16px 12px;border-radius:15px;border:2px solid #d4ad6d;
+ background:radial-gradient(circle at 11% 55%,#ac743888,transparent 42%),linear-gradient(110deg,#254961,#10243e);
+ box-shadow:inset 0 1px #ffeaba70}
+.w7-banner>span{display:grid;place-items:center;min-width:65px;height:70px;font-size:42px;color:#ffe19b;
+ text-shadow:0 4px #422919;background:radial-gradient(#836443,#2e3850 70%);border:2px solid #c59f60;border-radius:15px}
+.w7-banner>div{display:grid;gap:4px}
+.w7-banner small{color:#f5cd87;font:900 10px 'Barlow',sans-serif;letter-spacing:1px}
+.w7-banner strong{color:#fff0c6;font:900 22px/1.0 'Barlow Condensed',sans-serif}
+.w7-banner p{margin:0;font:600 11px 'Barlow',sans-serif;color:#d9e6ed}
+.w7-shop-list{display:grid;gap:9px}
+.w7-product{display:grid;grid-template-columns:92px minmax(0,1fr) 72px;gap:10px;align-items:center;
+ padding:8px;border:2px solid #bd9658;border-radius:14px;background:linear-gradient(115deg,#234f6d,#0c294b);
+ box-shadow:0 4px 0 #091b34}
+.w7-product-art{display:grid;place-items:center;height:89px;background:radial-gradient(#5a7b93,#132948 74%);
+ border:1px solid #c7a56a;border-radius:11px}
+.w7-product.w7-gunner .w7-product-art{background:radial-gradient(#8d5b43,#291f39 78%)}
+.w7-product.w7-navigator .w7-product-art{background:radial-gradient(#52929d,#153a51 78%)}
+.w7-product-info{display:grid;gap:2px;min-width:0}
+.w7-product-info small{color:#fad79a;font:900 9px 'Barlow',sans-serif;letter-spacing:.5px}
+.w7-product-info strong{color:#ffe4af;font:900 22px 'Barlow Condensed',sans-serif;line-height:1}
+.w7-product-info span{color:#cbdce5;font:600 10px/1.25 'Barlow',sans-serif}
+.w7-product-info b{color:#ffdf8a;font:900 14px 'Barlow Condensed',sans-serif;margin-top:4px}
+.w7-product button{min-height:43px;max-width:76px;padding:5px 3px;background:linear-gradient(#ffe8ad,#c9934b);
+ border:2px solid #fff0b8;color:#2e281f;border-radius:9px;font:900 11px 'Barlow Condensed',sans-serif;line-height:1.1}
+.w7-shop-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.w7-shop-actions button{max-width:none}
+.w7-pending{min-height:400px;align-content:center}
+.w7-screen button:focus-visible{outline:3px solid #fff4c4;outline-offset:3px}
+@media(max-width:390px){
+ .w7-screen{gap:10px}.w7-hero{padding:12px;min-height:97px}
+ .w7-card{min-height:207px}.w7-card-grid{gap:8px}
+ .w7-product{grid-template-columns:72px minmax(0,1fr) 65px;gap:7px;padding:7px}
+ .w7-product-art{height:73px}.w7-product-info strong{font-size:20px}
+ .w7-product button{font-size:10px}
+}
+@media(max-width:340px){
+ .w7-tabs{gap:2px;padding:3px}.w7-tabs button{font-size:9px}
+ .w7-medal{width:65px;height:65px}.w7-wallet{width:78px}.w7-wallet strong{font-size:19px}
+ .w7-product{grid-template-columns:57px minmax(0,1fr) 59px;gap:5px}
+ .w7-product-art{height:62px}.w7-product-info strong{font-size:18px}
+ .w7-detail{flex-direction:column;align-items:stretch}
+ .w7-detail button{max-width:none}
+}
+@media(prefers-reduced-motion:reduce){.w7-screen *{transition:none!important;animation:none!important}}
