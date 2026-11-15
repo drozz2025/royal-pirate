@@ -245,13 +245,13 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
       </div>}
       <div className="w4-cards-caption"><strong>NAVIOS DA FROTA</strong><small>1 disponível · restantes em desenvolvimento</small></div>
       <div className="w4-ship-roster" role="group" aria-label="Selecionar navio da frota">
-        {[2,3,4].map(n=><div key={n} className="w4-ship-slot is-pending" aria-label={'Espaço '+n+' indisponível'}>
-          <span className="w4-slot-art w4-slot-unavailable" aria-hidden="true"><FleetShadow variant={n}/></span>
-          <strong>ESPAÇO {n}</strong><small>EM DESENVOLVIMENTO</small></div>)}
         <button type="button" className="w4-ship-slot is-active" aria-pressed={details}
           onClick={()=>setDetails(v=>!v)} aria-label="Royal Crown, navio ativo, alternar detalhes">
           <span className="w4-slot-art"><ShipArtwork small/></span><strong>ROYAL CROWN</strong><small>✓ DISPONÍVEL</small>
         </button>
+        {[2,3,4].map(n=><div key={n} className="w4-ship-slot is-pending" aria-label={'Espaço '+n+' indisponível'}>
+          <span className="w4-slot-art w4-slot-unavailable" aria-hidden="true"><FleetShadow variant={n}/></span>
+          <strong>ESPAÇO {n}</strong><small>EM DESENVOLVIMENTO</small></div>)}
       </div>
       {details&&<p className="w4-footnote">Royal Crown selecionada. O navio 3D interativo encontra-se no Porto. O estaleiro guarda níveis reais, mas ainda não altera o combate.</p>}
     </div>
