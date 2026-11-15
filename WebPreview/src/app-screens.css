@@ -387,3 +387,21 @@
  .app-forge-board{grid-template-columns:1fr}.app-forge-seal{min-height:70px;flex-direction:row}
 }
 @media(prefers-reduced-motion:reduce){.app-deck button{transition:none}}
+
+/* WORK 4: view-only mobile module inspector. Never overlays the live Porto or spends coins. */
+.app-fleet-module.is-selected{border:2px solid #ffe0a0;background:linear-gradient(#4d5262,#163b59);padding:10px 8px}
+.app-fleet-module-inspect{display:block;min-height:42px;width:100%;margin-top:9px;padding:6px 3px;border:1px solid #ecc781;
+ border-radius:8px;background:#153d5a;color:#ffe9b4;font:900 12px 'Barlow Condensed',sans-serif;letter-spacing:.25px}
+.app-fleet-module.is-selected .app-fleet-module-inspect{background:linear-gradient(#f7dea3,#c28f47);color:#2b271f;text-shadow:none}
+.app-fleet-module-inspect:focus-visible{outline:3px solid #fff4b0;outline-offset:2px}
+.app-fleet-blueprint.is-hull .app-fleet-hull-shape{fill:#daa567;stroke:#fff2c7;stroke-width:3}
+.app-fleet-blueprint.is-cannons .app-fleet-porthole{fill:#ffdb70;stroke:#fff5c3;stroke-width:3}
+.app-fleet-blueprint.is-sails .app-fleet-sail{fill:#ffe5aa;stroke:#fff9db;stroke-width:3}
+.app-fleet-inspection{border:1px solid #bdad87;border-radius:11px;padding:10px 12px;margin:0 0 12px;background:#0d324d}
+.app-fleet-inspection>div{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.app-fleet-inspection strong{font:900 18px 'Barlow Condensed',sans-serif;color:#ffe2a2}
+.app-fleet-inspection span{font:900 11px 'Barlow',sans-serif;color:#f3cd87}
+.app-fleet-inspection p{margin:7px 0;color:#d2e4eb;font:600 12px/1.4 'Barlow',sans-serif}
+.app-fleet-inspection small{display:block;color:#ffdda4;font:700 11px/1.4 'Barlow',sans-serif}
+@media(max-width:390px){.app-fleet-module.is-selected{padding:8px 4px}.app-fleet-module-inspect{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.app-fleet-module-inspect{transition:none}}

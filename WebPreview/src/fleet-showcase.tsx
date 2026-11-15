@@ -1,10 +1,26 @@
-import {CREW, UPGRADES, upgradeCost, type LocalProfile} from './progression';
+import React from 'react';
+import {CREW, UPGRADES, upgradeCost, type LocalProfile, type UpgradeId} from './progression';
 import {PirateIcon} from './app-icons';
 
-/** The schematic is original, decorative shipyard artwork; the live ship remains in WebGL. */
+/** A view-only breakdown of existing progression; no coins are spent here. */
+export function fleetModuleSummary(profile:LocalProfile,id:UpgradeId){
+  const upgrade=UPGRADES.find(item=>item.id===id)!;
+  const level=profile.upgrades[id];
+  const maximum=level>=5;
+  const cost=maximum?0:upgradeCost(id,level);
+  return {id,name:upgrade.name,level,maximum,cost,shortfall:maximum?0:Math.max(0,cost-profile.coins)};
+}
+const moduleNotes:Record<UpgradeId,string>={
+  hull:'Your saved hull level is a shipyard milestone. It does not yet change battle health or the 3D hull.',
+  cannons:'Your saved cannon level is a shipyard milestone. It does not yet change aiming, damage or firing rate.',
+  sails:'Your saved sail level is a shipyard milestone. It does not yet change sailing speed, wind or the 3D sails.'
+};
+/** The schematic is original visual guidance; the live ship remains interactive in the Porto. */
 export function FleetShowcase({profile,onForge,onCrew}:{
   profile:LocalProfile;onForge:()=>void;onCrew:()=>void;
 }){
+  const [selectedId,setSelectedId]=React.useState<UpgradeId>('hull');
+  const selected=fleetModuleSummary(profile,selectedId);
   const levels=UPGRADES.reduce((sum,upgrade)=>sum+profile.upgrades[upgrade.id],0);
   const captain=CREW.find(crew=>crew.id===profile.equippedCrew)?.name??'Captain Mara';
   return <section className="app-fleet-showcase" aria-labelledby="app-fleet-status-title">
@@ -12,7 +28,7 @@ export function FleetShowcase({profile,onForge,onCrew}:{
       <div><div className="app-kicker">ROYAL CROWN · SHIPYARD STATUS</div><h3 id="app-fleet-status-title">Your flagship</h3></div>
       <span className="app-fleet-levels"><strong>{levels} / 15</strong><small>LOCAL LEVELS</small></span>
     </header>
-    <div className="app-fleet-blueprint" aria-hidden="true">
+    <div className={'app-fleet-blueprint is-'+selectedId} aria-hidden="true">
       <svg viewBox="0 0 320 156" focusable="false" preserveAspectRatio="xMidYMid meet">
         <path className="app-fleet-wave" d="M0 132 Q25 122 50 132T100 132T150 132T200 132T250 132T300 132T350 132"/>
         <path className="app-fleet-hull-shape" d="M30 105 Q160 119 292 105 L274 127 Q158 147 49 127 Z"/>
@@ -24,19 +40,32 @@ export function FleetShowcase({profile,onForge,onCrew}:{
         <circle className="app-fleet-porthole" cx="151" cy="124" r="5"/>
         <circle className="app-fleet-porthole" cx="210" cy="120" r="5"/>
       </svg>
-      <span>SHIPYARD SCHEMATIC · LIVE 3D AVAILABLE ABOVE</span>
+      <span>SHIPYARD SCHEMATIC · SELECT A MODULE BELOW</span>
     </div>
     <div className="app-fleet-modules" aria-label="Saved local shipyard levels">
       {UPGRADES.map(u=>{
-        const level=profile.upgrades[u.id];
-        return <article className="app-fleet-module" key={u.id}>
+        const summary=fleetModuleSummary(profile,u.id);
+        const level=summary.level;
+        const isSelected=u.id===selectedId;
+        return <article className={'app-fleet-module'+(isSelected?' is-selected':'')} key={u.id}>
           <div className="app-fleet-module-top"><span aria-hidden="true">{u.symbol}</span><strong>{u.name}</strong><small>LEVEL {level} / 5</small></div>
           <div className="app-fleet-progress" role="progressbar" aria-label={u.name+' shipyard upgrade progress'} aria-valuemin={0} aria-valuemax={5} aria-valuenow={level}>
             <span style={{width:(level*20)+'%'}}/>
           </div>
-          <small>{level>=5?'Maximum local level': 'Next level: '+upgradeCost(u.id,level)+' coins'}</small>
+          <small>{summary.maximum?'Maximum local level': 'Next level: '+summary.cost+' coins'}</small>
+          <button type="button" className="app-fleet-module-inspect" aria-pressed={isSelected}
+            aria-label={'Inspect '+u.name+', level '+level+' of 5'} onClick={()=>setSelectedId(u.id)}>
+            {isSelected?'SELECTED':'INSPECT'}
+          </button>
         </article>;
       })}
+    </div>
+    <div className="app-fleet-inspection" role="status" aria-live="polite" aria-atomic="true">
+      <div><strong>{selected.name.toUpperCase()}</strong><span>LEVEL {selected.level} / 5</span></div>
+      <p>{moduleNotes[selectedId]}</p>
+      <small>{selected.maximum?'Max local level reached.':selected.shortfall>0
+        ?'Next shipyard level: '+selected.cost+' coins · need '+selected.shortfall+' more.'
+        :'Next shipyard level: '+selected.cost+' coins · affordable now.'} Use Open Shipyard to upgrade.</small>
     </div>
     <p className="app-fleet-captain">Equipped captain: <strong>{captain}</strong></p>
     <div className="app-fleet-actions">
