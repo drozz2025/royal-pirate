@@ -49,14 +49,14 @@ test('approved navigation is represented without fake in-game economy', () => {
   }
   assert.match(harbour, /onNavigate\(\x27missions\x27\)/);
   assert.match(harbour, /readyMissions/);
-  assert.match(harbour, /TOUCH THE SHIP/);
+  assert.doesNotMatch(harbour, /harbour-ship-label|TOUCH THE SHIP/);
   assert.match(css, /\.in-harbour \.battle-hud/);
   assert.match(css, /\.harbour-central\{[^}]*min-height/);
 });
 
 test('touch and pinch interact with the visible harbour ship; no viewer screen', () => {
   assert.doesNotMatch(harbour,/VIEW SHIP IN 3D|onInspect/);
-  assert.match(harbour,/TOUCH THE SHIP/);
+  assert.doesNotMatch(harbour,/harbour-ship-label|TOUCH THE SHIP/);
   assert.match(main,/setShipSelected/);
   assert.doesNotMatch(main,/ship-inspection-ui|inspectShip/);
   assert.match(scene,/shipPointerDown=/);

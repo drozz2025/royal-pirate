@@ -42,9 +42,6 @@ export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=
       <span className="harbour-arena-cup" aria-hidden="true">★</span>
     </section>
     <div className="harbour-central">
-      <div className="harbour-ship-label">
-        <span aria-hidden="true">⚓</span><strong>THE ROYAL CROWN</strong><small>{selected?'SHIP SELECTED · DRAG · PINCH TO ZOOM':'TOUCH THE SHIP · DRAG TO ROTATE'}</small>
-      </div>
     </div>
     <div className="harbour-lower">
       <div className="harbour-actions">
