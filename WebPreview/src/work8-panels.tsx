@@ -77,16 +77,16 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
         <p>{tab==='daily'?'Conquista objetivos reais e recolhe prémios locais.':'Conteúdos competitivos indisponíveis nesta demonstração.'}</p></div>
     </div>
     {tab==='daily'?<>
-      <section className="w8-daily" aria-label="Recompensa diária">
+      <section className="w8-daily" aria-label="Recompensa diária" title={'Next claim earns '+(15+next*5)+' coins'}>
         <div className="w8-daily-orb" aria-hidden="true"><PirateIcon name="rewards" size={41}/></div>
         <div className="w8-daily-copy"><span className="w8-eyebrow">BAÚ DIÁRIO</span><strong>{canClaim?'RECOMPENSA DISPONÍVEL':'RECOLHIDO HOJE'}</strong>
           <small>Dia {next} da sequência · reinício às 00:00 UTC</small>
           <span className="w8-reward-amount">{15+next*5} <span aria-hidden="true">●</span> MOEDAS</span></div>
         <button type="button" disabled={!canClaim} onClick={()=>{onDaily();setMessage('Recompensa diária recolhida no perfil local.');}}>{canClaim?'RECOLHER':'RECOLHIDO'}</button>
       </section>
-      <section className="w8-calendar" aria-label="Calendário de recompensas">
+      <section className="w8-calendar" aria-label="7-day supply route">
         <div className="w8-section-heading"><h3>RECOMPENSA DIÁRIA</h3><small>{visibleStreak}/7 dias seguidos</small></div>
-        <ol className="w8-days">{Array.from({length:7},(_,i)=>i+1).map(n=><li key={n} className={n<=visibleStreak?'collected':canClaim&&n===next?'available':''}>
+        <ol className="w8-days" aria-label="Seven consecutive daily rewards">{Array.from({length:7},(_,i)=>i+1).map(n=><li key={n} aria-label={'DAY '+n} className={'app-week-day'+(n<=visibleStreak?' is-claimed':canClaim&&n===next?' is-next':'')}>
           <small>DIA {n}</small><span aria-hidden="true">{n<=visibleStreak?'✓':n===7?'♛':'◆'}</span><strong>{15+n*5} ●</strong>
         </li>)}</ol>
         <p>Recompensas locais por dia UTC. Uma recolha por dia; dias em falta reiniciam a sequência.</p>
