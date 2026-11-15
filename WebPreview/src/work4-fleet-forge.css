@@ -148,7 +148,7 @@
     linear-gradient(165deg,#022f61,#051b38 65%,#07152b);
 }
 .app-sheet:has(.w4-screen) .app-sheet-header{
-  flex:0 0 125px;min-height:125px;max-height:125px;box-sizing:border-box;
+  flex:0 0 calc(125px + env(safe-area-inset-top));min-height:calc(125px + env(safe-area-inset-top));max-height:none;box-sizing:border-box;
   position:relative;isolation:isolate;padding:0 9px;
   background:radial-gradient(ellipse 55% 100% at 50% 0%,#1187cf88,transparent),
     linear-gradient(180deg,#0657a0 0%,#10699c 48%,#0a3967 100%);
@@ -432,7 +432,7 @@
 
 /* Small iPhones: protect labels, tap targets and horizontal layout. */
 @media(max-width:390px){
- .app-sheet:has(.w4-screen) .app-sheet-header{flex-basis:116px;min-height:116px;max-height:116px}
+ .app-sheet:has(.w4-screen) .app-sheet-header{flex-basis:calc(116px + env(safe-area-inset-top));min-height:calc(116px + env(safe-area-inset-top));max-height:none}
  .app-sheet:has(.w4-screen) .app-sheet-brand h1{top:54px;padding:6px 22px}
  .app-sheet:has(.w4-screen) .app-wallet{max-width:30%;min-width:72px;padding:5px}
  .app-sheet:has(.w4-screen) .app-wallet small{display:none}
