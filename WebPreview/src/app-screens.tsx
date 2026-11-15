@@ -13,6 +13,7 @@ const PAGES:ReadonlyArray<{id:AppScreenId;title:string}>=[
   {id:'chests',title:'Daily chests'},{id:'events',title:'Events'},
   {id:'rewards',title:'Rewards'},{id:'offers',title:'Offers'}
 ];
+const mainNav:AppScreenId[]=['fleet','cards','battle','shop','profile'];
 const headerShortcuts:AppScreenId[]=['battle','forge','missions','profile'];
 export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,backupMessage}:
   {screen:AppScreenId;profile:LocalProfile;onNavigate:(screen:AppScreenId)=>void;onClose:()=>void;onBattle:()=>void;
