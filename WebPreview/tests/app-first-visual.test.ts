@@ -15,33 +15,27 @@ const app=(screen:'forge'|'cards',profile:LocalProfile)=>renderToStaticMarkup(Re
   onEquipCrew:noop,onUpgrade:noop,onMission:noop,onDaily:noop,onExportBackup:noop,onImportBackup:noop,backupMessage:''
 }));
 
-test('port daily supply is an honest live navigation control, not fabricated four chests',()=>{
+test('port daily supply is a compact side shortcut, with calendar in Missions',()=>{
   const html=harbour(initialProfile());
   assert.match(html,/Daily supply ready: claim 20 local coins in Missions/);
-  assert.match(html,/DAY 1 · CLAIM/);
-  assert.match(html,/harbour-compact-daily/);
-  assert.match(html,/DAY 1 · CLAIM/);
-  assert.equal((html.match(/harbour-compact-daily/g)||[]).length,1);
-  assert.doesNotMatch(html,/Chest [1-4] coming soon/);
+  assert.match(html,/data-pirate-icon="chests"/);
+  assert.equal((html.match(/data-pirate-icon="chests"/g)||[]).length,1);
+  assert.doesNotMatch(html,/DAILY SUPPLY ROUTE|DAY 1 · CLAIM|harbour-compact-daily/);
   assert.match(html,/0 locally earned coins/);
 });
-test('UTC claimed state is reflected in the port without creating a second claim',()=>{
+test('claimed daily supply has accurate state in the compact chests shortcut',()=>{
   const claimed=claimDaily(initialProfile(),Date.now());
   const html=harbour(claimed);
   assert.match(html,/Daily supply collected today, streak 1 of 7/);
-  assert.match(html,/✓ 1\/7/);
+  assert.doesNotMatch(html,/Daily supply ready: claim/);
   assert.doesNotMatch(html,/DAILY SUPPLY ROUTE/);
-  assert.doesNotMatch(html,/DAILY SUPPLY ROUTE/);
-  assert.doesNotMatch(html,/DAY 1 · CLAIM/);
 });
-test('port highlights genuine mission claims and correctly resets an expired daily sequence',()=>{
+test('mission badge reflects genuine reward claim and expired daily sequence resets',()=>{
   const profile={...initialProfile(),wins:1,lastDailyDay:new Date(Date.now()-3*86400000).toISOString().slice(0,10),dailyStreak:5};
   const html=harbour(profile);
-  assert.match(html,/1 READY/);
   assert.match(html,/Missions: 1 reward claims ready/);
-  assert.match(html,/DAY 1 · CLAIM/);
-  assert.match(html,/DAY 1 · CLAIM/);
-  assert.doesNotMatch(html,/STREAK 5\/7/);
+  assert.match(html,/Daily supply ready: claim 20 local coins in Missions/);
+  assert.doesNotMatch(html,/streak 5 of 7/);
 });
 test('shipyard milestones are accessible and crew filters are actionable mobile controls',()=>{
   const forge=app('forge',initialProfile());
