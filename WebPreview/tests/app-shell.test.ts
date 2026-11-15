@@ -25,7 +25,7 @@ test('all seven app sheets have actual renderable content and controls',()=>{
  }
 });
 test('the eighth approved page is the live 3D harbour, not a static screenshot',()=>{
- assert.match(main,/harbour&&!inspecting&&<Harbour/);
+ assert.match(main,/harbour&&<Harbour/);
  assert.match(main,/view\.current\?\.showHarbour\(\)/);
  assert.match(main,/view\.current\?\.showBattle\(\)/);
  assert.match(harbour,/onClick=\{onBattle\}/);

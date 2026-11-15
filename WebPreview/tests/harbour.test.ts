@@ -9,9 +9,9 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 test('harbour preview is an actual screen integrated with the live battle', () => {
-  assert.match(main, /harbour&&!inspecting&&<Harbour onBattle=\{enterBattle\} onInspect=\{inspectShip\}/);
-  assert.match(main, /const enterBattle=\(\)=>\{reset\(\);view\.current\?\.showBattle\(\);setInspecting\(false\);setHarbour\(false\)/);
-  assert.match(main, /const returnHarbour=\(\)=>\{reset\(\);view\.current\?\.showHarbour\(\);setInspecting\(false\);setHarbour\(true\)/);
+  assert.match(main, /harbour&&<Harbour onBattle=\{enterBattle\}/);
+  assert.match(main, /const enterBattle=\(\)=>\{reset\(\);view\.current\?\.showBattle\(\);setShipSelected\(false\);setHarbour\(false\)/);
+  assert.match(main, /const returnHarbour=\(\)=>\{reset\(\);view\.current\?\.showHarbour\(\);setShipSelected\(false\);setHarbour\(true\)/);
   assert.match(main, /aria-label="Return to harbour"/);
 });
 test('harbour has one functional battle action and no fake transactions', () => {
@@ -44,26 +44,24 @@ test('the harbour frames a real Three.js vessel and disables battle simulation',
   assert.match(main, /view\.current\?\.showBattle\(\)/);
 });
 test('approved navigation is represented without fake in-game economy', () => {
-  for(const label of ['SHOP','CARDS','SHIP','MISSIONS','PROFILE','UPGRADES','FORGE','FLEET','DAILY SUPPLY ROUTE','BATTLE!']) {
+  for(const label of ['SHOP','CARDS','FLEET','MISSIONS','PROFILE','UPGRADES','FORGE','DAILY SUPPLY ROUTE','BATTLE!']) {
     assert.ok(harbour.includes(label), label+' must be present');
   }
   assert.match(harbour, /onNavigate\(\x27missions\x27\)/);
   assert.match(harbour, /readyMissions/);
-  assert.match(harbour, /LIVE 3D/);
+  assert.match(harbour, /TOUCH THE SHIP/);
   assert.match(css, /\.in-harbour \.battle-hud/);
   assert.match(css, /\.harbour-central\{[^}]*min-height/);
 });
 
-test('functional ship viewer orbits live 3D without advancing the battle', () => {
-  assert.match(harbour, /onClick=\{onInspect\}/);
-  assert.match(harbour, /Inspect your ship in interactive 3D/);
-  assert.match(main, /const inspectShip=\(\)=>\{view\.current\?\.inspectShip\(\);setInspecting\(true\)/);
-  assert.match(main, /const closeInspection=\(\)=>\{view\.current\?\.showHarbour\(\);setInspecting\(false\)/);
-  assert.match(main, /harbour&&inspecting&&<div className="ship-inspection-ui"/);
-  assert.match(scene, /inspectShip\(\)\{/);
-  assert.match(scene, /this\.cameraMode='inspect'/);
-  assert.match(scene, /this\.controls\.enableRotate=true;this\.controls\.enableZoom=true/);
-  assert.match(scene, /if\(this\.cameraMode==='battle'\|\|this\.cameraMode==='deck'\)\{this\.battle\.tick\(dt\)/);
-  assert.match(css, /\.harbour-inspect-button\{pointer-events:auto/);
-  assert.match(css, /\.ship-inspection-ui\{[^}]*pointer-events:none/);
+test('touch and pinch interact with the visible harbour ship; no viewer screen', () => {
+  assert.doesNotMatch(harbour,/VIEW SHIP IN 3D|onInspect/);
+  assert.match(harbour,/TOUCH THE SHIP/);
+  assert.match(main,/setShipSelected/);
+  assert.doesNotMatch(main,/ship-inspection-ui|inspectShip/);
+  assert.match(scene,/shipPointerDown=/);
+  assert.match(scene,/intersectObject\(this\.ships\.player\.root,true\)/);
+  assert.match(scene,/this\.controls\.enableRotate=true;this\.controls\.enableZoom=true/);
+  assert.match(scene,/this\.controls\.enableRotate=false;this\.controls\.enableZoom=false/);
+  assert.match(scene,/if\(this\.cameraMode==='battle'\|\|this\.cameraMode==='deck'\)\{this\.battle\.tick\(dt\)/);
 });

@@ -18,19 +18,17 @@ function App(){
  const [backupMessage,setBackupMessage]=useState('');
  const [profile,setProfile]=useState(()=>{try{return parseProfile(window.localStorage.getItem(STORAGE_KEY));}catch{return parseProfile(null);}});
  const recordedResult=useRef(false);
- const [harbour,setHarbour]=useState(true),[inspecting,setInspecting]=useState(false),[yaw,setYaw]=useState(0),[power,setPower]=useState(65),[progress,setProgress]=useState(false),[music,setMusic]=useState(false),[sound,setSound]=useState(false),[deck,setDeck]=useState(false),[error,setError]=useState(''),[loaded,setLoaded]=useState(false),[metrics,setMetrics]=useState<Metrics|null>(null),[diagnostics,setDiagnostics]=useState(false),[compatibility,setCompatibility]=useState(false);
- useEffect(()=>{let last='';try{const scene=new OceanScene(host.current!,engine.current,()=>{const b=engine.current;const key=[b.phase,b.health.player,b.health.enemy,b.round,b.lastMessage,b.shotsFired].join(':');if(key!==last){last=key;setState({phase:b.phase,player:b.health.player,enemy:b.health.enemy,round:b.round,message:b.lastMessage,shots:b.shotsFired,hits:b.hits});}},setMetrics,setError);view.current=scene;setCompatibility(scene.compatibility);scene.showHarbour();setLoaded(true);return()=>scene.dispose();}catch(e){setError(`This browser could not start WebGL. ${e instanceof Error?e.message:'Please reload or try Safari/Chrome.'}`);}},[]);
+ const [harbour,setHarbour]=useState(true),[shipSelected,setShipSelected]=useState(false),[yaw,setYaw]=useState(0),[power,setPower]=useState(65),[progress,setProgress]=useState(false),[music,setMusic]=useState(false),[sound,setSound]=useState(false),[deck,setDeck]=useState(false),[error,setError]=useState(''),[loaded,setLoaded]=useState(false),[metrics,setMetrics]=useState<Metrics|null>(null),[diagnostics,setDiagnostics]=useState(false),[compatibility,setCompatibility]=useState(false);
+ useEffect(()=>{let last='';try{const scene=new OceanScene(host.current!,engine.current,()=>{const b=engine.current;const key=[b.phase,b.health.player,b.health.enemy,b.round,b.lastMessage,b.shotsFired].join(':');if(key!==last){last=key;setState({phase:b.phase,player:b.health.player,enemy:b.health.enemy,round:b.round,message:b.lastMessage,shots:b.shotsFired,hits:b.hits});}},setMetrics,setError,setShipSelected);view.current=scene;setCompatibility(scene.compatibility);scene.showHarbour();setLoaded(true);return()=>scene.dispose();}catch(e){setError(`This browser could not start WebGL. ${e instanceof Error?e.message:'Please reload or try Safari/Chrome.'}`);}},[]);
  useEffect(()=>{try{window.localStorage.setItem(STORAGE_KEY,JSON.stringify(profile));}catch{/* Private browsing may disable storage. */}},[profile]);
  useEffect(()=>{if((state.phase==='victory'||state.phase==='defeat')&&!recordedResult.current){recordedResult.current=true;setProfile(p=>finishBattle(p,state.phase==='victory'?'victory':'defeat',state.hits,state.shots));}},[state.phase,state.hits,state.shots]);
  useEffect(()=>{if(view.current)view.current.paused=progress||Boolean(appScreen);},[progress,appScreen]);
  useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==='Escape'){setProgress(false);setAppScreen(null);}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[]);
  const aim=(y:number,p:number)=>{engine.current.aim(y,p);setYaw(engine.current.yaw);setPower(engine.current.power);};
  const reset=()=>{recordedResult.current=false;view.current?.reset();setYaw(0);setPower(65);setDeck(false);};
- const enterBattle=()=>{reset();view.current?.showBattle();setInspecting(false);setHarbour(false);setAppScreen(null);};
- const returnHarbour=()=>{reset();view.current?.showHarbour();setInspecting(false);setHarbour(true);setAppScreen(null);};
- const inspectShip=()=>{view.current?.inspectShip();setInspecting(true);setAppScreen(null);};
- const closeInspection=()=>{view.current?.showHarbour();setInspecting(false);};
- const navigateTo=(next:AppScreenId)=>{setInspecting(false);setAppScreen(next);};
+ const enterBattle=()=>{reset();view.current?.showBattle();setShipSelected(false);setHarbour(false);setAppScreen(null);};
+ const returnHarbour=()=>{reset();view.current?.showHarbour();setShipSelected(false);setHarbour(true);setAppScreen(null);};
+ const navigateTo=(next:AppScreenId)=>{setShipSelected(false);setAppScreen(next);};
  const exportBackup=()=>{
    try {
      const json=exportProfileBackup(profile);
@@ -57,13 +55,12 @@ function App(){
  const result=state.phase==='victory'||state.phase==='defeat',ready=state.phase==='ready'&&loaded&&!error;
  return <main className={'app '+(harbour?'in-harbour':'in-battle')}>
    <div ref={host} className="ocean"/><div className="vignette"/>
-   {harbour&&!inspecting&&<Harbour onBattle={enterBattle} onInspect={inspectShip} onNavigate={navigateTo} profile={profile} hidden={Boolean(appScreen)}/>}
+   {harbour&&<Harbour onBattle={enterBattle} onNavigate={navigateTo} profile={profile} selected={shipSelected} hidden={Boolean(appScreen)}/>}
    <input ref={backupFile} type="file" hidden accept=".json,application/json" aria-label="Choose a local Royal Pirate save backup" onChange={restoreBackup}/>
-   {harbour&&!inspecting&&appScreen&&<AppScreens screen={appScreen} profile={profile} onNavigate={navigateTo} onClose={()=>setAppScreen(null)} onBattle={enterBattle} onInspect={inspectShip}
+   {harbour&&appScreen&&<AppScreens screen={appScreen} profile={profile} onNavigate={navigateTo} onClose={()=>setAppScreen(null)} onBattle={enterBattle}
       onBuyCrew={(id:CrewId)=>setProfile(p=>buyCrew(p,id))} onEquipCrew={(id:CrewId)=>setProfile(p=>equipCrew(p,id))}
       onUpgrade={(id:UpgradeId)=>setProfile(p=>improve(p,id))} onMission={(id:MissionId)=>setProfile(p=>claimMission(p,id))}
       onDaily={()=>setProfile(p=>claimDaily(p,Date.now()))} onExportBackup={exportBackup} onImportBackup={()=>backupFile.current?.click()} backupMessage={backupMessage}/>}
-   {harbour&&inspecting&&<div className="ship-inspection-ui"><button type="button" onClick={closeInspection} aria-label="Back to harbour">‹ BACK TO PORT</button><div><strong>THE ROYAL CROWN</strong><span>LIVE 3D SHIP VIEWER · DRAG TO ORBIT · PINCH TO ZOOM</span></div></div>}
    {!harbour&&<button className="return-harbour" type="button" aria-label="Return to harbour" onClick={returnHarbour}>⚓ HARBOUR</button>}
    <header className="topbar"><a className="brand" href="#" aria-label="Royal Pirate"><span className="brand-emblem"><Icon name="anchor" size={28}/></span><span>ROYAL <b>PIRATE</b><small>THE FIRST BROADSIDE</small></span></a><span className="preview-pill"><i/> {compatibility?'3D COMPATIBILITY MODE':'LIVE 3D PREVIEW'}</span><button className="progress-button" aria-label="Development Progress" onClick={()=>setProgress(true)}><Icon name="chart" size={19}/><span>Development Progress</span></button></header>
    <section className="battle-hud" aria-label="Battle health"><Health name="THE ROYAL CROWN" label="YOUR SHIP" value={state.player}/><div className="round"><Icon name="anchor" size={21}/><span>ROUND {state.round.toString().padStart(2,'0')}</span></div><Health name="CRIMSON TIDE" label="ENEMY SHIP" value={state.enemy} enemy/></section>

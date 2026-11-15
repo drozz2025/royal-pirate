@@ -315,3 +315,10 @@
   .harbour-arena-body small{font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){.harbour-arena-track>span{transition:none}}
+
+/* The Porto ship is interactive directly in the open central 3D canvas. */
+.harbour-central{pointer-events:none}
+.harbour-ship-label{pointer-events:none}
+.harbour-actions{grid-template-columns:minmax(0,1fr) minmax(0,2.3fr) minmax(0,1fr)}
+.harbour-action-hint{min-height:40px;display:grid;place-items:center;font-size:25px;color:#ffe0a1;pointer-events:none}
+.harbour-inspect-button{display:none}

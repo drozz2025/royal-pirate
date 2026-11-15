@@ -39,7 +39,7 @@ test('arena milestone reflects real results and caps the visual bar at ten wins'
 test('port navigation opens distinct forge and fleet screens; no false online ranking',()=>{
   const source=readFileSync(new URL('../src/harbour.tsx',import.meta.url),'utf8');
   assert.match(source,/onNavigate\('forge'\)/);
-  assert.match(source,/onNavigate\('fleet'\)/);
+  assert.match(source,/screen:'fleet'/);
   assert.match(source,/title: 'PROFILE', screen:'profile'/);
   assert.doesNotMatch(source,/title: 'RANKING'/);
   const html=render(initialProfile());

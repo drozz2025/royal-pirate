@@ -12,8 +12,8 @@ const PAGES:ReadonlyArray<{id:AppScreenId;title:string}>=[
   {id:'profile',title:'Profile'}
 ];
 const mainNav:AppScreenId[]=['fleet','cards','battle','shop','profile'];
-export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,backupMessage}:
-  {screen:AppScreenId;profile:LocalProfile;onNavigate:(screen:AppScreenId)=>void;onClose:()=>void;onBattle:()=>void;onInspect:()=>void;
+export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,backupMessage}:
+  {screen:AppScreenId;profile:LocalProfile;onNavigate:(screen:AppScreenId)=>void;onClose:()=>void;onBattle:()=>void;
    onBuyCrew:(id:CrewId)=>void;onEquipCrew:(id:CrewId)=>void;onUpgrade:(id:UpgradeId)=>void;onMission:(id:MissionId)=>void;onDaily:()=>void;
    onExportBackup:()=>void;onImportBackup:()=>void;backupMessage:string}) {
   const page=PAGES.find(p=>p.id===screen)!;
@@ -55,8 +55,8 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
       </div>}
       {screen==='fleet'&&<div className="app-stack">
         <div className="app-kicker">FLEET · ONE ACTUAL 3D SHIP</div><h2>Royal Crown</h2>
-        <div className="app-ship-card"><span aria-hidden="true">⚓</span><div><strong>THE ROYAL CROWN</strong><small>Original 3D preview ship · Available</small><p>Inspect the ship by dragging to rotate and pinching to zoom.</p></div></div>
-        <button className="app-cta" onClick={onInspect}>VIEW IN INTERACTIVE 3D</button>
+        <div className="app-ship-card"><span aria-hidden="true">⚓</span><div><strong>THE ROYAL CROWN</strong><small>Original 3D preview ship · Available</small><p>In the Porto, touch the ship directly and drag or pinch to explore.</p></div></div>
+        <p className="app-hint">Return to the Porto and touch the ship directly to rotate or pinch-zoom it.</p>
         <FleetShowcase profile={profile} onForge={()=>onNavigate('forge')} onCrew={()=>onNavigate('cards')}/>
         <div className="app-row-muted"><span>Future ships & custom hull modules</span><span>IN DEVELOPMENT</span></div>
       </div>}

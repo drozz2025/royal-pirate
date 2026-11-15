@@ -29,7 +29,7 @@ test('UTC claimed state is reflected in the port without creating a second claim
   const claimed=claimDaily(initialProfile(),Date.now());
   const html=harbour(claimed);
   assert.match(html,/COLLECTED TODAY/);
-  assert.match(html,/Daily supply already collected today/);
+  assert.match(html,/Open daily supply calendar/);
   assert.match(html,/Day 1, streak earned/);
   assert.match(html,/Day 1, streak earned/);
   assert.doesNotMatch(html,/Open daily supply, claim 20 local coins/);
@@ -37,7 +37,7 @@ test('UTC claimed state is reflected in the port without creating a second claim
 test('port highlights genuine mission claims and correctly resets an expired daily sequence',()=>{
   const profile={...initialProfile(),wins:1,lastDailyDay:new Date(Date.now()-3*86400000).toISOString().slice(0,10),dailyStreak:5};
   const html=harbour(profile);
-  assert.match(html,/1 missions ready to claim/);
+  assert.match(html,/1 READY/);
   assert.match(html,/Missions: 1 reward claims ready/);
   assert.match(html,/Day 1, ready/);
   assert.match(html,/STREAK|READY TO CLAIM/);

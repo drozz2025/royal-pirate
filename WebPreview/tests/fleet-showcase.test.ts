@@ -17,7 +17,7 @@ function fleet(profile:LocalProfile){
 
 test('fleet shows actual single 3D ship, original schematic and usable shipyard navigation',()=>{
   const html=fleet(initialProfile());
-  assert.match(html,/VIEW IN INTERACTIVE 3D/);
+  assert.match(html,/Return to the Porto and touch the ship directly/);
   assert.match(html,/SHIPYARD STATUS/);
   assert.match(html,/Your flagship/);
   assert.match(html,/OPEN SHIPYARD/);
