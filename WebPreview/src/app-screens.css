@@ -416,3 +416,15 @@
 .app-sheet > .app-shortcuts {
   display:none;
 }
+
+/* WORK 6 — player identity and scale consistent with the approved Porto HUD.
+   This styles only internal screens, never harbour-screen or harbour-nav. */
+.app-sheet-brand small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f4dca5;letter-spacing:.5px;font-size:clamp(10px,2.7vw,12px)}
+.app-sheet-brand h1{font-size:clamp(23px,6vw,34px)}
+.app-player-name-edit{display:flex;flex-direction:column;gap:8px;padding:13px 14px;border:2px solid #bd995c;border-radius:14px;background:linear-gradient(130deg,#1c5274e8,#0b264be8);box-shadow:inset 0 1px #ffecba77,0 5px 14px #04152c80}
+.app-player-name-edit label{font:900 13px 'Barlow Condensed',sans-serif;letter-spacing:.7px;color:#ffe5a4}
+.app-player-name-edit>div{display:flex;gap:9px;align-items:center}
+.app-player-name-edit input{min-width:0;flex:1;height:43px;border:2px solid #8bafc7;border-radius:9px;background:#071d3d;color:#fff9e8;padding:8px 11px;font:800 17px 'Barlow Condensed',sans-serif}
+.app-player-name-edit button{min-height:43px;border:2px solid #ffe1a1;border-radius:9px;background:linear-gradient(#f7df9b,#c69048);color:#2c251d;padding:8px 12px;font:900 13px 'Barlow Condensed',sans-serif;text-shadow:none}
+.app-player-name-edit button:disabled{opacity:.55;cursor:not-allowed}
+.app-player-name-edit small{color:#c8dce9;font:600 11px/1.35 'Barlow',sans-serif}
