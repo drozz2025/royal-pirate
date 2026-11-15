@@ -265,3 +265,54 @@
   .app-market-card-info>strong{font-size:17px}.app-market-card>button{min-width:62px;padding:6px 4px;font-size:11px}
   .app-market-actions button{font-size:11px}.app-captain-route-steps li strong{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.app-market-card button,.app-market-actions button{transition:none}}
+
+/* v0.1.14 — original fleet blueprint. Decorative only; actual 3D inspection is unchanged. */
+.app-fleet-showcase{padding:14px 12px;border:2px solid #d8b777;border-radius:17px;
+  background:radial-gradient(ellipse at 50% 6%,#35678688,transparent 66%),linear-gradient(160deg,#153b5a,#071f3c 95%);
+  box-shadow:inset 0 1px #ffedc04a,0 7px 17px #021428aa}
+.app-fleet-status-heading{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.app-fleet-status-heading h3{font:900 28px/1.1 'Barlow Condensed',sans-serif;color:#ffebba;margin:4px 0 8px}
+.app-fleet-levels{display:flex;flex-direction:column;align-items:center;flex-shrink:0;
+  border:1px solid #e9c886;border-radius:10px;background:#0c2844;padding:6px 10px}
+.app-fleet-levels strong{font:900 24px 'Barlow Condensed',sans-serif;color:#ffe4aa}
+.app-fleet-levels small{font:800 9px 'Barlow',sans-serif;color:#cbdce4;letter-spacing:.3px}
+.app-fleet-blueprint{position:relative;overflow:hidden;border:1px solid #b89d71;border-radius:13px;
+  background:radial-gradient(ellipse at 48% 100%,#32678d6b,transparent 80%),linear-gradient(#0e3556,#071c32);
+  padding:7px 10px 12px;text-align:center}
+.app-fleet-blueprint svg{display:block;width:100%;max-height:178px;margin:0 auto}
+.app-fleet-hull-shape{fill:#956e4c;stroke:#ffdfa1;stroke-width:2.2}
+.app-fleet-deck,.app-fleet-mast{fill:none;stroke:#f7db98;stroke-width:3;stroke-linejoin:round}
+.app-fleet-sail{fill:#e7d9b8;stroke:#e4c68c;stroke-width:2}
+.app-fleet-flag{fill:#d8a04b;stroke:#ffe2a5;stroke-width:1}
+.app-fleet-wave{fill:none;stroke:#66a9bb;stroke-width:3;opacity:.7}
+.app-fleet-porthole{fill:#143750;stroke:#ffd995;stroke-width:2}
+.app-fleet-blueprint>span{font:800 9px/1.4 'Barlow',sans-serif;color:#c6dce8;letter-spacing:.55px}
+.app-fleet-modules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.app-fleet-module{min-width:0;padding:11px 9px;border:1px solid #9ab2bf;border-radius:11px;background:linear-gradient(#204963,#0a2745)}
+.app-fleet-module-top{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.app-fleet-module-top>span{font-size:20px;color:#f8dd9d}
+.app-fleet-module-top strong{font:900 17px 'Barlow Condensed',sans-serif;color:#ffe7b1}
+.app-fleet-module-top small{flex-basis:100%;font:800 10px 'Barlow',sans-serif;color:#cadfea}
+.app-fleet-progress{height:11px;border-radius:10px;border:1px solid #98adbb;overflow:hidden;margin:10px 0 7px;background:#081e32}
+.app-fleet-progress>span{display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,#dab46e,#ffe4a6)}
+.app-fleet-module>small{display:block;font:700 10px/1.4 'Barlow',sans-serif;color:#d1e2ee}
+.app-fleet-captain{margin:0 0 10px;font:700 13px 'Barlow',sans-serif;color:#d1e4ed}
+.app-fleet-captain strong{color:#ffe6a8}
+.app-fleet-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.app-fleet-actions button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:48px;
+  border:2px solid #eed090;border-radius:11px;background:linear-gradient(#f9dea0,#c88a40);
+  color:#30231a;text-shadow:none;font:900 14px 'Barlow Condensed',sans-serif}
+.app-fleet-actions button:last-child{background:linear-gradient(#325f7d,#173851);color:#ffe3a6}
+.app-fleet-actions button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.app-fleet-showcase>.app-fine{font-size:11px;line-height:1.5;margin:12px 0 0}
+@media(max-width:390px){
+ .app-fleet-showcase{padding:10px 8px}
+ .app-fleet-status-heading h3{font-size:24px}
+ .app-fleet-modules{gap:5px}.app-fleet-module{padding:9px 5px}
+ .app-fleet-module-top strong{font-size:14px}.app-fleet-module-top>span{font-size:17px}
+ .app-fleet-module>small{font-size:9px}
+ .app-fleet-actions button{font-size:12px;gap:4px;padding:6px 4px}
+}
+@media(max-width:335px){.app-fleet-modules{grid-template-columns:1fr}
+ .app-fleet-module-top small{flex-basis:auto;margin-left:auto}}
+@media(prefers-reduced-motion:reduce){.app-fleet-actions button{transition:none}}
