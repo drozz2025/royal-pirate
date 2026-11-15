@@ -44,7 +44,7 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
   return <section className="app-sheet" role="dialog" aria-modal="true" onKeyDown={onDialogKeyDown} aria-labelledby="app-screen-title">
     <header className="app-sheet-header">
       <button type="button" className="app-back" onClick={onClose} aria-label="Back to harbour">‹</button>
-      <div className="app-sheet-brand"><small title={profile.playerName}>{profile.playerName} · NV. {levelFor(profile.xp)} · PROGRESSO LOCAL</small><h1 ref={titleRef} tabIndex={-1} id="app-screen-title"><span className="app-page-glyph" aria-hidden="true"><PirateIcon name={page.id} size={23}/></span> {page.title}</h1></div>
+      <div className="app-sheet-brand" title="ROYAL PIRATE"><small title={profile.playerName}>{profile.playerName} · NV. {levelFor(profile.xp)} · PROGRESSO LOCAL</small><h1 ref={titleRef} tabIndex={-1} id="app-screen-title"><span className="app-page-glyph" aria-hidden="true"><PirateIcon name={page.id} size={23}/></span> {page.title}</h1></div>
       <div className="app-wallet" aria-label={profile.coins+' locally earned coins'}><span aria-hidden="true">●</span><strong>{profile.coins}</strong><small>MOEDAS</small></div>
     </header>
     <nav className="app-shortcuts" aria-label="Other screens">
