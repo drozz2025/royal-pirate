@@ -3,8 +3,10 @@ import {CREW, type CrewId, type LocalProfile} from './progression';
 
 /** WORK 7. Visual card tiers are decorative: canonical progression has no rarity mechanics. */
 const visualTier:Record<CrewId,string> = {
-  captain:'INICIAL', gunner:'ESPECIAL · VISUAL', navigator:'RARO · VISUAL'
+  captain:'INICIAL', gunner:'ESPECIAL', navigator:'RARO'
 };
+/** Short captions preserve legibility in the approved four-column mobile grid. */
+const compactCrewName:Record<CrewId,string> = {captain:'Mara',gunner:'Iron Jack',navigator:'Northwind'};
 
 function CardArt({id,featured=false}:{id:CrewId;featured?:boolean}) {
   return <svg className={featured?'w7-featured-svg':'w7-art-svg'} viewBox="0 0 180 160" role="img" aria-label={id==='captain'?'Retrato ilustrado de capitã pirata':id==='gunner'?'Ilustração de canhão de bronze':'Rosa dos ventos ilustrada'}>
@@ -160,8 +162,8 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
               aria-label={'Ver '+c.name+(isOwned?', adquirido':', bloqueado')} onClick={()=>setSelected(c.id)}>
             <span className="w7-card-top"><span>{visualTier[c.id]}</span><span aria-hidden="true">{isOwned?'◆':'◇'}</span></span>
             <span className="w7-card-art"><CardArt id={c.id}/></span>
-            <span className="w7-card-level">NÍVEL — <span>EM BREVE</span></span>
-            <strong>{c.name}</strong><small>{isEquipped?'★ EQUIPADO':isOwned?'✓ ADQUIRIDO':c.cost+' ● MOEDAS'}</small>
+            <span className="w7-card-level" title="Níveis de cartas ainda indisponíveis">NV. <span>—</span></span>
+            <strong title={c.name}>{compactCrewName[c.id]}</strong><small>{isEquipped?'★ EQUIPADO':isOwned?'✓ ADQUIRIDO':c.cost+' ● MOEDAS'}</small>
           </button>;
         })}
         {!ownedOnly&&<div className="w7-future-card" aria-label="Espaço para futura carta, não disponível">
@@ -220,33 +222,22 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
         <div className="w7-market-feature-art" aria-hidden="true"><ShopRelic kind="special"/><span className="w7-market-glint">✦</span></div>
         <div className="w7-market-feature-copy">
           <span className="w7-eyebrow">RECRUTA A TUA TRIPULAÇÃO</span>
-          <h3>TESOUROS DO PORTO</h3>
-          <p>Recruta a tua tripulação com moedas ganhas nas batalhas. Sem dinheiro real.</p>
+          <h3>TRIPULAÇÃO DO PORTO</h3>
+          <p>Recruta membros reais da tua coleção. Sem pagamentos.</p>
           <span className="w7-market-balance">● {profile.coins} MOEDAS LOCAIS</span>
         </div>
       </div>
-      <div className="w7-line"><strong>TRIPULAÇÃO DO PORTO</strong><span>{profile.ownedCrew.length} / {CREW.length} CARTAS</span></div>
+      <div className="w7-line"><strong>DISPONÍVEIS NO PORTO</strong><span>{profile.ownedCrew.length} / {CREW.length} CARTAS</span></div>
       <div className="w7-shop-list">{CREW.map(c=>{
         const owned=profile.ownedCrew.includes(c.id),canBuy=!owned&&c.cost>0&&profile.coins>=c.cost;
         return <article key={c.id} className={'w7-product w7-'+c.id}>
           <span className="w7-product-art"><CardArt id={c.id}/></span>
-          <div className="w7-product-info"><small>{visualTier[c.id]}</small><strong>{c.name}</strong><span>{c.role}</span><b>{owned?'ADQUIRIDO':c.cost+' ● MOEDAS'}</b></div>
+          <div className="w7-product-info"><small>{visualTier[c.id]}</small><strong title={c.name}>{compactCrewName[c.id]}</strong><span>{c.role}</span><b>{owned?'ADQUIRIDO':c.cost+' ● MOEDAS'}</b></div>
           <button type="button" disabled={!canBuy}
             aria-label={owned?c.name+' already collected':canBuy?'Recruit '+c.name+' for '+c.cost+' local coins':'Need '+Math.max(0,c.cost-profile.coins)+' more local coins to recruit '+c.name}
             onClick={()=>announce(c.name+' recrutado com moedas locais.',()=>onBuyCrew(c.id))}>{owned?'TEU':canBuy?'RECRUTAR':'SEM SALDO'}</button>
         </article>;
       })}
-        <article className="w7-market-soon" aria-label="Novos produtos ainda indisponíveis">
-          <span className="w7-market-soon-art" aria-hidden="true"><ShopRelic kind="special"/></span>
-          <span className="w7-eyebrow">FUTURAS OFERTAS</span>
-          <strong>NOVOS TESOUROS</strong>
-          <small>EM BREVE · SEM PREÇO</small>
-        </article>
-      </div>
-      <div className="w7-preview-strip" role="group" aria-label="Secções futuras da loja">
-        {(['coins','gems','special'] as const).map(kind=><button type="button" key={kind} onClick={()=>setTab(kind)} aria-label={'Abrir '+(kind==='coins'?'Moedas':kind==='gems'?'Gemas':'Especiais')+', em breve'}>
-          <ShopRelic kind={kind}/><strong>{kind==='coins'?'MOEDAS':kind==='gems'?'GEMAS':'ESPECIAIS'}</strong><small>EM BREVE</small>
-        </button>)}
       </div>
       <div className="w7-shop-actions"><button type="button" onClick={onBattle} aria-label="EARN COINS IN BATTLE">GANHAR MOEDAS</button><button type="button" onClick={onCards} aria-label="MANAGE CREW">VER CARTAS</button></div>
       <p className="w7-disclaimer">No real-money checkout is available; secure payments não estão integrados. Recrutamentos usam apenas moedas locais conquistadas em batalhas; o saldo e as cartas ficam guardados neste dispositivo (saved on this device only).</p>
