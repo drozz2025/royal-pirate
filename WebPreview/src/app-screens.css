@@ -164,3 +164,15 @@
 .app-crew-item.app-equipped{background:linear-gradient(120deg,#285a6e,#132c50 88%)}
 @media(max-width:370px){.app-summary-strip,.app-crew-tools{padding:9px}.app-crew-filters button{min-width:50px}}
 @media(prefers-reduced-motion:reduce){.app-upgrade-steps span{transition:none}}
+
+
+/* v0.1.11: custom vector icons, legible on mobile Retina displays and at browser zoom. */
+.app-page-glyph,.app-tab-glyph{display:inline-flex;align-items:center;justify-content:center}
+.app-page-glyph svg{vertical-align:middle;filter:drop-shadow(0 2px 2px #091527)}
+.app-shortcuts button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.app-shortcuts button .pirate-icon{flex:0 0 auto;color:#ffe4a7}
+.app-shortcuts button[aria-current=page] .pirate-icon{color:#372914}
+.app-dock button .app-tab-glyph{min-height:29px}
+.app-dock button .app-tab-glyph svg{width:27px;height:27px}
+.app-dock button[aria-current=page] .app-tab-glyph svg{color:#4b3427}
+@media(max-width:350px){.app-shortcuts button{gap:3px;font-size:11px}}

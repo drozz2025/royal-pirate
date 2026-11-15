@@ -273,3 +273,8 @@
 .harbour-daily-summary{font:900 11px 'Barlow Condensed',sans-serif;letter-spacing:.6px;color:#f9e6aa}
 .harbour-daily-button:focus-visible{outline:3px solid #fff0ad;outline-offset:3px}
 @media(max-width:375px){.harbour-daily-days{gap:3px}.harbour-daily-days>span{min-height:28px;font-size:13px}}
+
+
+/* Original navy/gold nautical icons shared between the harbour and app navigation. */
+.harbour-nav-item>span .pirate-icon,.harbour-secondary-action>span .pirate-icon,.harbour-battle-button .harbour-crossed .pirate-icon{width:1em;height:1em;display:block}
+.harbour-nav-item>span,.harbour-secondary-action>span{display:inline-flex;align-items:center;justify-content:center}
