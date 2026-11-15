@@ -20,8 +20,8 @@ function App(){
  useEffect(()=>{let last='';try{const scene=new OceanScene(host.current!,engine.current,()=>{const b=engine.current;const key=[b.phase,b.health.player,b.health.enemy,b.round,b.lastMessage,b.shotsFired].join(':');if(key!==last){last=key;setState({phase:b.phase,player:b.health.player,enemy:b.health.enemy,round:b.round,message:b.lastMessage,shots:b.shotsFired,hits:b.hits});}},setMetrics,setError);view.current=scene;setCompatibility(scene.compatibility);scene.showHarbour();setLoaded(true);return()=>scene.dispose();}catch(e){setError(`This browser could not start WebGL. ${e instanceof Error?e.message:'Please reload or try Safari/Chrome.'}`);}},[]);
  useEffect(()=>{try{window.localStorage.setItem(STORAGE_KEY,JSON.stringify(profile));}catch{/* Private browsing may disable storage. */}},[profile]);
  useEffect(()=>{if((state.phase==='victory'||state.phase==='defeat')&&!recordedResult.current){recordedResult.current=true;setProfile(p=>finishBattle(p,state.phase==='victory'?'victory':'defeat',state.hits,state.shots));}},[state.phase,state.hits,state.shots]);
- useEffect(()=>{if(view.current)view.current.paused=progress;},[progress]);
- useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==='Escape')setProgress(false);};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[]);
+ useEffect(()=>{if(view.current)view.current.paused=progress||Boolean(appScreen);},[progress,appScreen]);
+ useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==='Escape'){setProgress(false);setAppScreen(null);}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[]);
  const aim=(y:number,p:number)=>{engine.current.aim(y,p);setYaw(engine.current.yaw);setPower(engine.current.power);};
  const reset=()=>{recordedResult.current=false;view.current?.reset();setYaw(0);setPower(65);setDeck(false);};
  const enterBattle=()=>{reset();view.current?.showBattle();setInspecting(false);setHarbour(false);setAppScreen(null);};
