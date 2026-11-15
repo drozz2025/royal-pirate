@@ -225,7 +225,7 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
         </li>)}</ol>
         <p>Recompensas locais por dia UTC. Uma recolha por dia; dias em falta reiniciam a sequência.</p>
       </section>
-      <section className="w8-daily" aria-label="Recompensa diária" title={canClaim?'Próxima recompensa: '+(15+rewardDay*5)+' moedas locais':'Recompensa de hoje já recolhida'}>
+      <section className="w8-daily" aria-label="Recompensa diária" title={canClaim?'Next claim earns '+(15+rewardDay*5)+' coins · Próxima recompensa local':'Recompensa de hoje já recolhida'}>
         <div className="w8-daily-orb" aria-hidden="true"><W8Art kind="chest"/></div>
         <div className="w8-daily-copy"><span className="w8-eyebrow">BAÚ DIÁRIO</span><strong>{canClaim?'RECOMPENSA DISPONÍVEL':'RECOLHIDO HOJE'}</strong>
           <small>{canClaim?'Dia '+rewardDay+' da sequência · disponível agora':'Dia '+rewardDay+' recolhido · próxima recolha às 00:00 UTC'}</small>
