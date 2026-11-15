@@ -4,14 +4,16 @@ import { FleetShowcase } from './fleet-showcase';
 import { CrewDeck } from './crew-deck';
 import { CREW, MISSIONS, UPGRADES, battlesPlayed, canClaimDaily, nextDailyStreak, levelFor, missionProgress, upgradeCost, type CrewId, type LocalProfile, type MissionId, type UpgradeId } from './progression';
 
-export type AppScreenId = 'battle'|'fleet'|'forge'|'cards'|'shop'|'missions'|'profile';
+export type AppScreenId = 'battle'|'fleet'|'forge'|'cards'|'shop'|'missions'|'profile'|'ranking'|'chests'|'events'|'rewards'|'offers';
 const PAGES:ReadonlyArray<{id:AppScreenId;title:string}>=[
   {id:'battle',title:'Battle'},{id:'fleet',title:'Fleet'},
   {id:'forge',title:'Forge'},{id:'cards',title:'Crew'},
   {id:'shop',title:'Shop'},{id:'missions',title:'Missions'},
-  {id:'profile',title:'Profile'}
+  {id:'profile',title:'Profile'},{id:'ranking',title:'Ranking'},
+  {id:'chests',title:'Daily chests'},{id:'events',title:'Events'},
+  {id:'rewards',title:'Rewards'},{id:'offers',title:'Offers'}
 ];
-const mainNav:AppScreenId[]=['fleet','cards','battle','shop','profile'];
+const headerShortcuts:AppScreenId[]=['battle','forge','missions','profile'];
 export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,backupMessage}:
   {screen:AppScreenId;profile:LocalProfile;onNavigate:(screen:AppScreenId)=>void;onClose:()=>void;onBattle:()=>void;
    onBuyCrew:(id:CrewId)=>void;onEquipCrew:(id:CrewId)=>void;onUpgrade:(id:UpgradeId)=>void;onMission:(id:MissionId)=>void;onDaily:()=>void;
@@ -42,10 +44,37 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
       <div className="app-wallet" aria-label={profile.coins+' locally earned coins'}><span aria-hidden="true">●</span><strong>{profile.coins}</strong><small>COINS</small></div>
     </header>
     <nav className="app-shortcuts" aria-label="Other screens">
-      {PAGES.filter(p=>!mainNav.includes(p.id)).map(p=><button type="button" key={p.id} onClick={()=>onNavigate(p.id)} aria-current={screen===p.id?'page':undefined}><PirateIcon name={p.id} size={18}/><span>{p.title}</span></button>)}
+      {PAGES.filter(p=>headerShortcuts.includes(p.id)&&p.id!==screen).map(p=><button type="button" key={p.id} onClick={()=>onNavigate(p.id)} aria-current={screen===p.id?'page':undefined}><PirateIcon name={p.id} size={18}/><span>{p.title}</span></button>)}
     </nav>
     <div className="app-sheet-announcement" role="status" aria-live="polite" aria-atomic="true">{announcement}</div>
     <div className="app-sheet-content" key={screen}>
+      {screen==='ranking'&&<div className="app-stack">
+        <div className="app-kicker">RANKING · LOCAL RESULTS ONLY</div><h2>Captain's record</h2>
+        <p className="app-fine">There is no global leaderboard yet. Your device stores only your own battles; no other players or fictional positions are displayed.</p>
+        <div className="app-summary-strip"><span><strong>{profile.wins}</strong><small>WINS</small></span><span><strong>{profile.losses}</strong><small>DEFEATS</small></span><span><strong>{levelFor(profile.xp)}</strong><small>CAPTAIN LEVEL</small></span></div>
+        <button type="button" className="app-cta" onClick={()=>onNavigate('profile')}>OPEN LOCAL PROFILE</button>
+      </div>}
+      {screen==='chests'&&<div className="app-stack">
+        <div className="app-kicker">BAÚS · 7-DAY LOCAL SUPPLY ROUTE</div><h2>Daily reward chest</h2>
+        <p className="app-fine">{day?`Your next daily claim is ready: ${15+nextDailyDay*5} local coins.`:'Today’s daily reward was already claimed.'} The complete seven-day calendar and the claim button are in Missions.</p>
+        <button type="button" className="app-cta" onClick={()=>onNavigate('missions')}>OPEN DAILY REWARDS</button>
+      </div>}
+      {screen==='events'&&<div className="app-stack">
+        <div className="app-kicker">EVENTOS · CURRENT STATUS</div><h2>Events at sea</h2>
+        <p className="app-fine">Timed online events are not active in this offline demo. You can still complete the real local mission objectives and collect their rewards.</p>
+        <button type="button" className="app-cta" onClick={()=>onNavigate('missions')}>VIEW LOCAL MISSIONS</button>
+      </div>}
+      {screen==='rewards'&&<div className="app-stack">
+        <div className="app-kicker">RECOMPENSAS · VERIFIED LOCAL PROGRESS</div><h2>Your collected rewards</h2>
+        <div className="app-summary-strip"><span><strong>{profile.coins}</strong><small>AVAILABLE COINS</small></span><span><strong>{profile.claimedMissions.length}</strong><small>MISSIONS CLAIMED</small></span></div>
+        <p className="app-fine">{day?'Today’s daily supply is available.':'Today’s daily supply has been claimed.'} Rewards and balances are saved on this device only.</p>
+        <button type="button" className="app-cta" onClick={()=>onNavigate('missions')}>OPEN CLAIMS & CALENDAR</button>
+      </div>}
+      {screen==='offers'&&<div className="app-stack">
+        <div className="app-kicker">OFERTAS · SHOP STATUS</div><h2>Special offers</h2>
+        <p className="app-fine">No real-money offers or in-app purchases are available in this demo. The local store is available without payment services.</p>
+        <button type="button" className="app-cta" onClick={()=>onNavigate('shop')}>VIEW LOCAL STORE</button>
+      </div>}
       {screen==='battle'&&<div className="app-intro">
         <span className="app-crest" aria-hidden="true">⚔</span><div className="app-kicker">ARENA 01 · TRAINING WATERS</div>
         <h2>The First Broadside</h2><p>Your ship against the computer-controlled Crimson Tide. The existing 3D battle uses real trajectory, damage and turns.</p>
