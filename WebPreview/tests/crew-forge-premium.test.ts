@@ -59,7 +59,7 @@ test('forge overview reflects only purchased levels and explicitly disclaims bat
  assert.equal((empty.match(/NÍVEL 0 \/ 5/g)||[]).length,3);
  assert.match(empty,/ARMADURA/);
  assert.match(empty,/moedas locais são usadas/);
- const upgraded=improve({...initialProfile(),coins:100},'hull');
+ const upgraded=improve({...initialProfile(),coins:500},'hull');
  assert.equal(upgraded.upgrades.hull,1);
  const changed=renderForge(upgraded);
  assert.match(changed,/Hull<\/strong><small>NÍVEL 1 \/ 5/);
