@@ -227,7 +227,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
         </article>;
       })}</div>
       <div className="w7-shop-actions"><button type="button" onClick={onBattle} aria-label="EARN COINS IN BATTLE">GANHAR MOEDAS</button><button type="button" onClick={onCards} aria-label="MANAGE CREW">VER CARTAS</button></div>
-      <p className="w7-disclaimer">No real-money checkout is available; secure payments não estão integrados. Sem pagamentos reais. As moedas e as cartas são guardadas apenas neste dispositivo.</p>
+      <p className="w7-disclaimer">No real-money checkout is available; secure payments não estão integrados. O progresso é saved on this device. Sem pagamentos reais. As moedas e as cartas são guardadas apenas neste dispositivo.</p>
     </section>}
     {pending&&<section className="w7-content w7-feature w7-pending" role="tabpanel" aria-label={pending.title}>
       <span className="w7-pending-relic"><ShopRelic kind={tab==='coins'?'coins':tab==='gems'?'gems':'special'}/></span>
