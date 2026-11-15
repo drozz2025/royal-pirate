@@ -28,7 +28,7 @@ try {
     if (chrome.exitCode !== null) throw new Error('Chromium exited before CDP was ready');
     try {
       const active = await readFile(join(profile, 'DevToolsActivePort'), 'utf8');
-      port = Number(active.split('\\n')[0]);
+      port = Number(active.split('\n')[0]);
       if (port) break;
     } catch { /* startup */ }
     await delay(150);
@@ -76,7 +76,7 @@ try {
   let ready=false;
   for(let i=0;i<40;i++){
     await delay(250);
-    ready=await evaluate("!!document.querySelector('.harbour-screen:not([aria-hidden=\\\"true\\\"])') && !!document.querySelector('canvas')");
+    ready=await evaluate("!!document.querySelector('.harbour-screen:not([aria-hidden=true])') && !!document.querySelector('canvas')");
     if(ready)break;
   }
   if(!ready)throw new Error('Live 3D Porto scene did not mount');
@@ -102,7 +102,7 @@ try {
   const screen=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
   await mkdir(out,{recursive:true});
   await writeFile(join(out,'porto-mobile-390x844.png'),Buffer.from(screen.data,'base64'));
-  await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\\n');
+  await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify(report,null,2));
   if(report.navbarItems!==5||report.leftActions!==3||report.rightActions!==3)throw new Error('Porto navigation/layout mismatch');
   if(report.bodyOverflow)throw new Error('Porto viewport scrolls horizontally');
