@@ -7,8 +7,8 @@ const scene=source('../src/scene.ts'),port=source('../src/harbour.tsx'),css=sour
 const ships=source('../src/ships.ts');
 
 test('Porto broadside is shown from the left with the lion prow toward the right',()=>{
-  assert.match(scene,/this\.camera\.position\.set\(ship\.x-\(portrait\?29\.5:18\)/);
-  assert.match(scene,/portrait\?25\.8:17/);
+  assert.match(scene,/this\.camera\.position\.set\(ship\.x-\(portrait\?26\.4:18\)/);
+  assert.match(scene,/portrait\?23\.3:17/);
   assert.match(scene,/intersectObject\(this\.ships\.player\.root,true\)/);
   assert.match(scene,/showBattle\(\)\{/);
   assert.match(scene,/this\.harbourDock\.visible=false/);
