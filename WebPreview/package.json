@@ -1,10 +1,12 @@
 {
   "name": "royal-pirate-web-preview",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "node scripts/generate-icons.mjs",
     "dev": "vite --host 0.0.0.0",
+    "prebuild": "node scripts/generate-icons.mjs",
     "build": "tsc --noEmit && vite build",
     "test": "node --import tsx --test tests/*.test.ts"
   },

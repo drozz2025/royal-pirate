@@ -57,3 +57,10 @@ Spend: **0 €**. No paid services enabled. React and Three.js use their package
 Open Profile > Protect your progress > SAVE BACKUP to download a local JSON save.
 Use RESTORE BACKUP to select the saved file (64 KB limit); malformed/corrupted files are rejected, and a confirmation is required before replacing existing progress.
 The save stays in browser `localStorage`. It is not synced across devices and is not authenticated by a server. Editable JSON balances cannot support an online leaderboard. Browser downloads and iPhone Safari must still be physically validated. Unit tests: `tests/backup.test.ts`.
+
+## PWA foundation (v0.1.8)
+
+A scoped Web App Manifest, generated 192/512 PNG icons and a same-origin service worker are included for GitHub Pages and root-hosted previews.
+The icon generator uses only Node.js core modules, no external art or commercial assets. The build creates the PNG icons before Vite packages `public/`.
+After one successful **online** install, the worker precaches the static Vite entry assets so the shell can load offline where supported; network-first navigation preserves updates.
+Local progress is still stored solely in this browser; clearing site data deletes it, and PWA installation is **not** a native iOS/Android App Store build. Safari/iPhone installation and real offline use still require device verification.

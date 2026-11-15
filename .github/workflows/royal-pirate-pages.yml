@@ -54,6 +54,14 @@ jobs:
           const html = readFileSync('dist/index.html', 'utf8');
           const css = readFileSync('dist/fonts/fonts.css', 'utf8');
           assert.ok(html.includes('v' + version), 'visible version must match package version');
+          const { existsSync } = await import('node:fs');
+          const manifest = JSON.parse(readFileSync('dist/manifest.webmanifest','utf8'));
+          assert.equal(manifest.start_url,'./');
+          assert.equal(manifest.scope,'./');
+          assert.equal(manifest.icons.length,2);
+          assert.ok(existsSync('dist/icon-192.png') && existsSync('dist/icon-512.png'));
+          assert.ok(existsSync('dist/sw.js'), 'PWA worker must be deployed');
+          assert.ok(html.includes('/royal-pirate/manifest.webmanifest'), 'PWA manifest must have project base path');
           assert.ok(html.includes('/royal-pirate/fonts/fonts.css'), 'font stylesheet must use project base path');
           assert.ok(!css.includes('url(/fonts/'), 'font files must resolve relative to their stylesheet');
           assert.ok(css.includes('url(./font-0.ttf)'), 'self-hosted font paths must work under project path');
@@ -96,7 +104,10 @@ jobs:
             if curl --max-time 15 -fsSL "${PUBLIC_URL}" -o /tmp/royal-pirate-index.html &&
                grep -Fq "v${RELEASE_VERSION}" /tmp/royal-pirate-index.html &&
                grep -Fq '/royal-pirate/fonts/fonts.css' /tmp/royal-pirate-index.html &&
-               curl --max-time 15 -fsSL "${PUBLIC_URL}fonts/fonts.css" -o /tmp/royal-pirate-fonts.css; then
+               curl --max-time 15 -fsSL "${PUBLIC_URL}fonts/fonts.css" -o /tmp/royal-pirate-fonts.css &&
+               curl --max-time 15 -fsSL "${PUBLIC_URL}manifest.webmanifest" -o /tmp/royal-pirate-manifest.json &&
+               curl --max-time 15 -fsSL "${PUBLIC_URL}icon-192.png" -o /tmp/royal-pirate-icon.png &&
+               curl --max-time 15 -fsSL "${PUBLIC_URL}sw.js" -o /tmp/royal-pirate-sw.js; then
                  echo "PUBLIC RELEASE VERIFIED: v${RELEASE_VERSION} at ${PUBLIC_URL}"
                  exit 0
             fi

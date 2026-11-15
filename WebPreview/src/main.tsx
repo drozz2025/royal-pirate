@@ -94,3 +94,16 @@ const modules=[
 ];
 function Progress({close}:{close:()=>void}){const closeRef=useRef<HTMLButtonElement>(null);useEffect(()=>{closeRef.current?.focus();},[]);return <div className="modal-backdrop" onClick={e=>{if(e.target===e.currentTarget)close();}}><section className="progress-modal" role="dialog" aria-modal="true" aria-labelledby="progress-title" onKeyDown={e=>{if(e.key==='Tab'){const items=e.currentTarget.querySelectorAll<HTMLElement>('button,a[href]');const first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}}}><header><div><span className="eyebrow">ROYAL PIRATE · WORK 6</span><h2 id="progress-title">Development Progress</h2></div><button ref={closeRef} aria-label="Close progress" onClick={close}><Icon name="close"/></button></header><div className="progress-intro"><span className="audit-dot"/> ESTADO AUDITADO · 14 NOV 2026<p>Esta batalha é uma demonstração web independente. O jogo definitivo continua em Unity. Os estados abaixo não representam percentagens de conclusão.</p><a href={`${source}/pull/12`} target="_blank" rel="noreferrer">Integração Work 0 · 0620645 ↗</a></div><div className="status-legend"><span>Implementado e testado = evidência de execução</span><span>Implementado, não validado = código sem validação suficiente</span><span>Demonstração web = funcionalidade do navegador</span><span>Pendente = execução ou implementação em falta</span></div><div className="module-list">{modules.map(([name,status,description,path],i)=><article key={name}><span className="module-number">{String(i+1).padStart(2,'0')}</span><div><h3>{name}</h3><span className={'status '+(status==='Demonstração web'?'web':status==='Pendente'?'pending':'unverified')}>{status}</span><p>{description}</p><a href={`${source}/blob/${path.startsWith('WebPreview')?'work6/web-3d-preview':'work0/first-battle-integration-20261114'}/${path}`} target="_blank" rel="noreferrer">Consultar fonte ↗</a></div></article>)}</div><div className="verification"><h3>Verificação desta demonstração</h3><p>20 testes automáticos passaram, incluindo 200 partidas simuladas. No Chromium, o modo Canvas 3D foi jogado até vitória e derrota; pontaria, potência, resposta inimiga e reinício foram verificados. WebGL2 está indisponível no navegador deste ambiente. Safari, iPhone físico, Unity e builds mobile não foram executados neste ambiente.</p><a href={`${source}/blob/work6/web-3d-preview/WebPreview/TEST_REPORT.md`} target="_blank" rel="noreferrer">Evidências e reprodução dos testes ↗</a></div><footer>0 € DE DESPESAS · SEM COMPRAS · SEM ANÚNCIOS · SEM PAGAMENTOS</footer></section></div>}
 createRoot(document.getElementById('root')!).render(<App/>);
+
+/* Installable web preview foundation; scope follows the deployed manifest URL. */
+if(typeof window!=='undefined'&&'serviceWorker' in navigator&&window.isSecureContext){
+ const manifest=document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
+ if(manifest){
+   const scope=new URL('.',manifest.href);
+   window.addEventListener('load',()=>{
+     navigator.serviceWorker.register(new URL('sw.js',scope).href,{scope:scope.href}).catch(()=>{
+       // Private browsing and restricted browsers can disallow service workers.
+     });
+   },{once:true});
+ }
+}
