@@ -794,3 +794,246 @@
  .w7-tabs button{font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){.w7-card{transition:none!important}}
+
+
+/* WORK 7 — 15 NOV 2026. Screen 05/06 theatrical mobile composition.
+   Isolated to Cartas/Loja: no global HUD, Porto or battle overrides.
+   Art is decorative; collection and local-shop state remain canonical. */
+.w7-screen[data-work7-screen="cards"] .w7-content,
+.w7-screen[data-work7-screen="shop"] .w7-content{gap:13px}
+.w7-spotlight{
+  position:relative;isolation:isolate;overflow:hidden;
+  display:grid;grid-template-columns:minmax(95px,36%) minmax(0,1fr);
+  align-items:center;gap:12px;min-height:173px;
+  padding:12px 13px 12px 10px;
+  border:3px solid #ffe1a1;border-bottom:6px solid #86552b;border-radius:19px;
+  background:radial-gradient(ellipse at 7% 15%,#58a6b988,transparent 66%),
+    linear-gradient(118deg,#214a73 3%,#0a2848 54%,#06162e);
+  box-shadow:inset 0 2px #fff7d18c,0 7px #06142a,0 12px 18px #0007
+}
+.w7-spotlight:before{
+  content:'';position:absolute;inset:6px;border:1px solid #fce1aa6e;
+  border-radius:12px;pointer-events:none;z-index:-1;
+}
+.w7-spotlight:after{
+  content:'✦';position:absolute;right:12px;top:4px;
+  font-size:29px;color:#ffe5ac42;pointer-events:none;
+}
+.w7-spotlight-gunner{
+  background:radial-gradient(ellipse at 10% 20%,#de8c6999,transparent 70%),linear-gradient(120deg,#5b3449,#211e39 68%,#0e1a35)
+}
+.w7-spotlight-navigator{
+  background:radial-gradient(ellipse at 10% 20%,#74dfe8a3,transparent 70%),linear-gradient(120deg,#1c6578,#092b4e 68%,#0a1b34)
+}
+.w7-spotlight-portrait{
+  align-self:stretch;position:relative;min-height:151px;display:flex;align-items:center;justify-content:center;
+  border:3px solid #ffe4a2;border-bottom:5px solid #8d552d;border-radius:13px;
+  background:radial-gradient(circle at 51% 31%,#b5d8e487,transparent 62%),linear-gradient(#37758b,#0a2e51 75%);
+  box-shadow:inset 0 2px #fff7dc,0 3px #07182b,0 9px 16px #051226aa;
+}
+.w7-spotlight-portrait:before{
+  content:'★';position:absolute;top:-9px;left:calc(50% - 14px);
+  width:28px;height:23px;display:grid;place-items:center;color:#57371d;font-size:13px;
+  background:linear-gradient(#fff5cc,#e7b766);border:2px solid #fff5c7;border-radius:0 0 9px 9px;z-index:2
+}
+.w7-spotlight-portrait .w7-art-svg{
+  width:110%;height:126px;flex:none;transform:scale(1.05);
+  filter:drop-shadow(0 8px 5px #071326a8)
+}
+.w7-spotlight-portrait>span{
+  position:absolute;bottom:5px;left:5px;right:5px;
+  border:1px solid #f8dfa2;border-radius:4px;background:#061f3ce8;
+  padding:4px 1px;color:#ffedb7;text-align:center;
+  font:900 9px 'Barlow Condensed',sans-serif;letter-spacing:.35px;z-index:2
+}
+.w7-spotlight-info{min-width:0;display:grid;align-content:center;gap:7px}
+.w7-screen .w7-spotlight-info h3{
+  margin:0;color:#fff0c5;font:900 clamp(24px,7vw,34px)/.98 'Barlow Condensed',sans-serif;
+  text-shadow:0 3px #071424
+}
+.w7-spotlight-info p{font:600 11px/1.3 'Barlow',sans-serif;color:#d5eaf3;margin:0}
+.w7-spotlight-tags{display:flex;flex-wrap:wrap;gap:5px}
+.w7-spotlight-tags span{
+  display:inline-block;padding:5px 7px;border:1px solid #cea971;border-radius:6px;
+  background:#09213bdc;color:#ffe4a8;font:800 9px/1.1 'Barlow Condensed',sans-serif;
+  letter-spacing:.2px
+}
+.w7-spotlight-info button{
+  min-height:43px;width:100%;border:2px solid #fff1be;border-bottom:5px solid #885226;
+  border-radius:9px;background:linear-gradient(#fff2bd 0%,#eebd67 55%,#b97935);
+  box-shadow:inset 0 2px #fffadd,0 3px #071426;
+  color:#3d2818;font:900 17px 'Barlow Condensed',sans-serif;letter-spacing:.5px
+}
+.w7-spotlight-info button:disabled{border-color:#c4ac84;filter:saturate(.6);color:#5c5447}
+.w7-crew-caption{min-height:23px;padding-top:2px}
+.w7-crew-caption>span{font-size:9px}
+.w7-screen[data-work7-screen="cards"] .w7-card-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;align-items:stretch;
+}
+.w7-screen[data-work7-screen="cards"] .w7-card,
+.w7-screen[data-work7-screen="cards"] .w7-future-card{
+  min-height:171px;padding:5px 4px 7px;border-width:3px;
+  border-bottom-width:6px;border-radius:12px 12px 16px 16px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-card{
+  box-shadow:0 0 0 1px #543e25,0 5px 0 #06162b,0 8px 11px #0009,inset 0 3px #fff5c273;
+}
+.w7-screen[data-work7-screen="cards"] .w7-card.is-selected{
+  transform:translateY(-2px);
+  box-shadow:0 0 0 2px #ffe2a1,0 7px 0 #06162b,0 0 18px #ffe0a98c
+}
+.w7-screen[data-work7-screen="cards"] .w7-card-top{
+  min-height:20px;padding:3px;margin:0 -1px;
+  font-size:clamp(7px,1.95vw,9px);line-height:1.1;letter-spacing:0
+}
+.w7-screen[data-work7-screen="cards"] .w7-card-top span:last-child{font-size:12px}
+.w7-screen[data-work7-screen="cards"] .w7-card-art{
+  min-height:76px;height:clamp(76px,24vw,103px);margin:0 -5px
+}
+.w7-screen[data-work7-screen="cards"] .w7-art-svg{transform:scale(1.14)}
+.w7-screen[data-work7-screen="cards"] .w7-card-level{
+  min-height:17px;padding:1px;margin:-2px 0 0;
+  gap:2px;font-size:8px;letter-spacing:0
+}
+.w7-screen[data-work7-screen="cards"] .w7-card-level span{font-size:7px}
+.w7-screen[data-work7-screen="cards"] .w7-card>strong{
+  font-size:clamp(14px,3.55vw,19px);line-height:.97;
+  overflow-wrap:anywhere
+}
+.w7-screen[data-work7-screen="cards"] .w7-card>small{
+  font-size:clamp(7px,1.9vw,9px);line-height:1.15
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card{
+  justify-content:center;gap:5px;border-style:dashed;padding:9px 4px
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-seal{
+  width:65px;height:70px;border-radius:50% 50% 12px 12px
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-seal span{font-size:49px}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>strong{font-size:16px}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>small{font-size:9px}
+.w7-screen[data-work7-screen="cards"] .w7-future-note{font-size:8px}
+
+/* Shop: illustrated treasure display and real local-coin catalogue. */
+.w7-market-feature{
+  display:grid;grid-template-columns:minmax(93px,36%) minmax(0,1fr);
+  align-items:center;gap:13px;position:relative;overflow:hidden;
+  min-height:153px;padding:12px 13px;
+  border:3px solid #ffe1a0;border-bottom:6px solid #8c552d;border-radius:18px;
+  background:radial-gradient(circle at 13% 25%,#e7af5d4d,transparent 52%),
+    linear-gradient(120deg,#3c5466,#103252 57%,#081e3d);
+  box-shadow:inset 0 2px #ffedb4b8,0 7px #06152c,0 12px 18px #0008
+}
+.w7-market-feature:before{
+  content:'';position:absolute;inset:6px;border:1px solid #ffe9a17a;border-radius:11px;pointer-events:none
+}
+.w7-market-feature-art{
+  position:relative;display:grid;place-items:center;
+  min-height:126px;border:2px solid #efca88;border-radius:16px;
+  background:radial-gradient(circle at 50% 38%,#8d8a80a8,transparent 66%),linear-gradient(#466d84,#192e4e);
+  box-shadow:inset 0 2px #fff1b8a8,0 5px #0a1b2d
+}
+.w7-market-feature-art .w7-relic-svg{
+  width:100%;height:114px;transform:scale(1.15);
+  filter:drop-shadow(0 9px 4px #091526ab)
+}
+.w7-market-glint{
+  position:absolute;top:-5px;right:1px;color:#fff3bf;
+  font-size:28px;text-shadow:0 0 12px #ffe59b
+}
+.w7-market-feature-copy{min-width:0;display:grid;gap:8px}
+.w7-screen .w7-market-feature h3{
+  margin:0;color:#ffe6ac;
+  font:900 clamp(22px,6.9vw,31px)/1 'Barlow Condensed',sans-serif;
+  text-shadow:0 3px #061426
+}
+.w7-market-feature p{margin:0;font:600 11px/1.45 'Barlow',sans-serif;color:#e3eff5}
+.w7-market-balance{
+  display:inline-block;justify-self:start;
+  padding:7px 9px;border-radius:7px;border:1px solid #efcf91;
+  background:linear-gradient(#294e64,#0b2a46);box-shadow:inset 0 1px #fff4c240;
+  font:900 11px 'Barlow Condensed',sans-serif;color:#ffe6a6
+}
+.w7-screen[data-work7-screen="shop"] .w7-shop-list{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;align-items:stretch
+}
+.w7-screen[data-work7-screen="shop"] .w7-product,
+.w7-market-soon{
+  display:flex;flex-direction:column;align-items:stretch;
+  position:relative;gap:7px;min-width:0;min-height:254px;padding:9px;
+  border:3px solid #f5cd86;border-bottom:6px solid #805127;
+  border-radius:16px;background:radial-gradient(ellipse at 50% 20%,#367b9e70,transparent 62%),linear-gradient(#284e70,#0a2343);
+  box-shadow:inset 0 2px #fff6cf8c,0 5px #07172e,0 10px 13px #0007
+}
+.w7-screen[data-work7-screen="shop"] .w7-product.w7-gunner{
+  background:radial-gradient(ellipse at 50% 20%,#d889647a,transparent 62%),linear-gradient(#65424d,#201b35)
+}
+.w7-screen[data-work7-screen="shop"] .w7-product.w7-navigator{
+  background:radial-gradient(ellipse at 50% 20%,#5fd3e183,transparent 62%),linear-gradient(#1f6375,#0a2845)
+}
+.w7-screen[data-work7-screen="shop"] .w7-product-art{
+  width:100%;height:118px;min-height:118px;display:grid;place-items:center
+}
+.w7-screen[data-work7-screen="shop"] .w7-product-art .w7-art-svg{height:106px;width:100%;transform:scale(1.06)}
+.w7-screen[data-work7-screen="shop"] .w7-product-info{flex:1;gap:4px}
+.w7-screen[data-work7-screen="shop"] .w7-product-info small{font-size:9px}
+.w7-screen[data-work7-screen="shop"] .w7-product-info strong{font-size:clamp(19px,5vw,25px)}
+.w7-screen[data-work7-screen="shop"] .w7-product-info span{font-size:10px;line-height:1.3}
+.w7-screen[data-work7-screen="shop"] .w7-product-info b{
+  justify-self:start;padding:5px 7px;border:1px solid #dec081;
+  border-radius:6px;background:#081b35c9;font-size:13px
+}
+.w7-screen[data-work7-screen="shop"] .w7-product button{
+  width:100%;min-height:43px;max-width:none;margin-top:auto;
+  font-size:13px;letter-spacing:.4px
+}
+.w7-market-soon{
+  align-items:center;justify-content:center;text-align:center;
+  gap:8px;border-style:dashed;border-color:#99a9aa;
+  background:radial-gradient(ellipse at 50% 25%,#57838d61,transparent 65%),linear-gradient(#203a52,#10243c)
+}
+.w7-market-soon-art{
+  display:grid;place-items:center;width:86px;height:103px;
+  padding:4px;border:2px solid #8eabae;border-radius:17px;
+  background:linear-gradient(#2b5b71,#14283e);
+  filter:grayscale(.5) saturate(.7)
+}
+.w7-market-soon-art .w7-relic-svg{width:78px;height:89px}
+.w7-market-soon>strong{font:900 21px/1.05 'Barlow Condensed',sans-serif;color:#f4dba9}
+.w7-market-soon>small{font:900 9px 'Barlow',sans-serif;color:#b8cfda}
+@media(min-width:520px){
+  .w7-spotlight{grid-template-columns:150px minmax(0,1fr)}
+  .w7-screen[data-work7-screen="cards"] .w7-card-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:390px){
+  .w7-spotlight{grid-template-columns:minmax(86px,35%) minmax(0,1fr);gap:9px;padding:9px}
+  .w7-spotlight-portrait{min-height:144px}
+  .w7-spotlight-portrait .w7-art-svg{height:116px}
+  .w7-screen .w7-spotlight-info h3{font-size:clamp(22px,6.5vw,28px)}
+  .w7-spotlight-tags span{font-size:8px;padding:4px}
+  .w7-screen[data-work7-screen="cards"] .w7-card-grid{gap:7px}
+  .w7-screen[data-work7-screen="cards"] .w7-card,
+  .w7-screen[data-work7-screen="cards"] .w7-future-card{min-height:168px}
+  .w7-market-feature{grid-template-columns:minmax(82px,35%) minmax(0,1fr);gap:10px;padding:9px;min-height:145px}
+  .w7-market-feature-art{min-height:118px}
+  .w7-market-feature-art .w7-relic-svg{height:108px}
+  .w7-screen[data-work7-screen="shop"] .w7-shop-list{gap:9px}
+  .w7-screen[data-work7-screen="shop"] .w7-product,
+  .w7-market-soon{min-height:248px;padding:7px}
+}
+@media(max-width:340px){
+  .w7-spotlight{grid-template-columns:88px minmax(0,1fr)}
+  .w7-spotlight-portrait{min-height:133px}
+  .w7-spotlight-portrait .w7-art-svg{height:105px}
+  .w7-screen .w7-spotlight-info h3{font-size:22px}
+  .w7-spotlight-info button{min-height:39px;font-size:14px}
+  .w7-crew-caption>span{display:none}
+  .w7-screen[data-work7-screen="cards"] .w7-card-top{font-size:7px}
+  .w7-screen[data-work7-screen="cards"] .w7-card>strong{font-size:12px}
+  .w7-screen[data-work7-screen="cards"] .w7-card-art{height:72px;min-height:72px}
+  .w7-market-feature-art{min-height:110px}
+  .w7-screen[data-work7-screen="shop"] .w7-product-art{height:95px;min-height:95px}
+  .w7-screen[data-work7-screen="shop"] .w7-product-info strong{font-size:18px}
+}
