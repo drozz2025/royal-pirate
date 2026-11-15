@@ -75,7 +75,6 @@ export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=
     <div className="harbour-central" aria-hidden="true"/>
     {side(leftActions,'left')}
     {side(rightActions,'right')}
-    <div className="harbour-dock-chest" aria-hidden="true"><span className="harbour-dock-chest-lid"/><span className="harbour-dock-chest-lock"/></div>
     <button type="button" className="harbour-battle-button" onClick={onBattle} aria-label="Batalha: iniciar combate naval jogável">
       <span className="harbour-crossed" aria-hidden="true"><PirateIcon name="battle" size={42}/></span><strong>BATALHA!</strong>
     </button>
