@@ -16,13 +16,23 @@ const PAGES:ReadonlyArray<{id:AppScreenId;title:string}>=[
   {id:'rewards',title:'Rewards'},{id:'offers',title:'Offers'}
 ];
 const headerShortcuts:AppScreenId[]=['battle','forge','missions','profile'];
-export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,backupMessage}:
+export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew,onEquipCrew,onUpgrade,onMission,onDaily,onExportBackup,onImportBackup,backupMessage,onPlayerNameChange}:
   {screen:AppScreenId;profile:LocalProfile;onNavigate:(screen:AppScreenId)=>void;onClose:()=>void;onBattle:()=>void;
    onBuyCrew:(id:CrewId)=>void;onEquipCrew:(id:CrewId)=>void;onUpgrade:(id:UpgradeId)=>void;onMission:(id:MissionId)=>void;onDaily:()=>void;
-   onExportBackup:()=>void;onImportBackup:()=>void;backupMessage:string}) {
+   onExportBackup:()=>void;onImportBackup:()=>void;backupMessage:string;onPlayerNameChange:(name:string)=>void}) {
   const page=PAGES.find(p=>p.id===screen)!;
   const [announcement,setAnnouncement]=React.useState('');
   const [rankingTab,setRankingTab]=React.useState<RankingTab>('ranking');
+  const [playerNameDraft,setPlayerNameDraft]=React.useState(profile.playerName);
+  React.useEffect(()=>{setPlayerNameDraft(profile.playerName);},[profile.playerName]);
+  const savePlayerName=(event:React.FormEvent<HTMLFormElement>)=>{
+    event.preventDefault();
+    const cleaned=playerNameDraft.trim().replace(/\s+/g,' ').slice(0,20);
+    if(!cleaned){setAnnouncement('Escreve um nome de jogador.');return;}
+    onPlayerNameChange(cleaned);
+    setPlayerNameDraft(cleaned);
+    setAnnouncement('Nome do jogador guardado neste dispositivo.');
+  };
   const titleRef=React.useRef<HTMLHeadingElement>(null);
   React.useEffect(()=>{setAnnouncement('');titleRef.current?.focus();},[screen]);
   const action=(message:string,callback:()=>void)=>{callback();setAnnouncement(message);};
@@ -90,7 +100,16 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
       {screen==='profile'&&<div className="app-stack">
         <RankingTabs active="profile" onNavigate={target=>{if(target==='ranking')setRankingTab('ranking');onNavigate(target);}}
           onLeagues={()=>{setRankingTab('leagues');onNavigate('ranking');}}/>
-        <div className="app-kicker">YOUR LOCAL CAPTAIN PROFILE</div><h2>Royal Crown</h2>
+        <div className="app-kicker">PERFIL LOCAL DO JOGADOR</div><h2>{profile.playerName}</h2>
+        <form className="app-player-name-editor" onSubmit={savePlayerName}>
+          <label htmlFor="app-player-name">NOME DO JOGADOR</label>
+          <div className="app-player-name-controls">
+            <input id="app-player-name" type="text" maxLength={20} autoComplete="nickname" value={playerNameDraft}
+              onChange={event=>setPlayerNameDraft(event.target.value)} placeholder="Escolhe o teu nome" />
+            <button type="submit" disabled={!playerNameDraft.trim()||playerNameDraft.trim()===profile.playerName}>GUARDAR</button>
+          </div>
+          <small>Até 20 caracteres. O nome fica guardado neste dispositivo e aparece no Porto, acima do nível.</small>
+        </form>
         <div className="app-stat-grid">{[
           ['LEVEL',String(levelFor(profile.xp))],['XP',String(profile.xp)],['VICTORIES',String(profile.wins)],
           ['DEFEATS',String(profile.losses)],['BATTLES',String(battlesPlayed(profile))],
