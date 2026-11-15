@@ -30,7 +30,8 @@ test('new captain starts with a visible portrait but locked crew remains locked'
   const html=renderDeck();
   assert.match(html,/data-crew-portrait="captain"/);
   assert.match(html,/Captain Mara/);
-  assert.match(html,/NOT ENOUGH COINS/);
+  assert.match(html,/ACTIVE CAPTAIN/);
+  assert.doesNotMatch(html,/RECRUIT CREW/);
   assert.match(html,/View Northwind, locked/);
   assert.match(html,/1 \/ 3 OWNED/);
   assert.match(html,/One active captain/);
