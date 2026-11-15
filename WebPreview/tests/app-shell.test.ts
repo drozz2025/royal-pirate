@@ -21,7 +21,9 @@ test('all seven app sheets have actual renderable content and controls',()=>{
   assert.match(html,/aria-label="Main game screens"/,screen);
   assert.match(html,/Back to harbour/,screen);
   assert.match(html,/ROYAL PIRATE/,screen);
-  assert.match(html,/aria-label="Battle"/,screen);
+  assert.match(html,/aria-label="Porto, return to harbour"/,screen);
+  assert.match(html,/aria-label="RANKING"/,screen);
+  if(screen==='battle')assert.match(html,/START NAVAL BATTLE/,screen);
  }
 });
 test('the eighth approved page is the live 3D harbour, not a static screenshot',()=>{

@@ -387,3 +387,36 @@
  .app-forge-board{grid-template-columns:1fr}.app-forge-seal{min-height:70px;flex-direction:row}
 }
 @media(prefers-reduced-motion:reduce){.app-deck button{transition:none}}
+
+/* WORK 4 — Secondary screens reuse the exact five Porto navigation destinations.
+   Keep the inactive tabs free of individual boxes; only highlight the active tab. */
+.app-dock{gap:0;padding-inline:3px;background:linear-gradient(180deg,#345f88,#173b64 14%,#0c2b52 100%)}
+.app-dock button{min-height:55px;border:0;border-right:1px solid #7292aa55;border-radius:0;text-transform:uppercase}
+.app-dock button:last-child{border-right:0}
+.app-dock button strong{font-size:clamp(11px,3.25vw,15px);letter-spacing:0}
+.app-dock button[data-active="true"],.app-dock button[aria-current="page"]{
+  border:2px solid #f4c36b;border-bottom:0;border-radius:13px 13px 0 0;
+  margin-top:-7px;background:linear-gradient(#f3d37e,#b97a31 14%,#184368 19%,#0d3156 96%);
+  color:#fff4d3;box-shadow:inset 0 2px #fff0b877,0 -2px 8px #f3d07855}
+.app-dock button[data-active="true"] .app-tab-glyph,
+.app-dock button[aria-current="page"] .app-tab-glyph{color:#ffe1a1}
+.app-dock button[data-active="true"] .app-tab-glyph svg,
+.app-dock button[aria-current="page"] .app-tab-glyph svg{color:#ffe1a1}
+.app-dock button:focus-visible{outline:3px solid #fff4b8;outline-offset:-3px}
+.app-forge-mini-grid>button{
+  appearance:none;min-width:0;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:8px 3px;border:1px solid #8aaabb;border-radius:9px;background:#0b2c4b;
+  color:#fff4dc;text-shadow:0 2px 3px #021b32;cursor:pointer}
+.app-forge-mini-grid>button span{font-size:24px;color:#ffdfa0;line-height:1}
+.app-forge-mini-grid>button strong{font:900 12px 'Barlow Condensed',sans-serif}
+.app-forge-mini-grid>button small{font:800 11px 'Barlow',sans-serif;color:#ffda8c}
+.app-forge-mini-grid>button[aria-pressed="true"]{border:2px solid #ffe098;background:linear-gradient(#a76b32,#684c39 20%,#194a70 25%,#0b294b);box-shadow:inset 0 1px #fff0be9c,0 0 9px #f4c87755}
+.app-forge-mini-grid>button:focus-visible{outline:3px solid #fff8be;outline-offset:2px}
+.app-forge-selector-hint{margin:0!important}
+@media(max-width:390px){
+  .app-forge-mini-grid>button{min-height:68px;padding:6px 1px}
+  .app-forge-mini-grid>button span{font-size:19px}
+  .app-forge-mini-grid>button strong{font-size:11px}
+  .app-forge-mini-grid>button small{font-size:9px}
+  .app-dock button .app-tab-glyph svg{width:25px;height:25px}
+}
