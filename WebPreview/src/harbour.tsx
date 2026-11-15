@@ -1,9 +1,8 @@
 import React from 'react';
 import type { AppScreenId } from './app-screens';
 
-/** Harbour previews the approved pirate-game hierarchy with an actual Three.js ship
- * behind it. Only BATTLE navigates today; never imply purchases, earned chests,
- * rankings or currency balances exist before the corresponding systems ship.
+/** Live Three.js harbour with navigable app-first menus.
+ * Coins are the strictly local earned balance; unsupported gems/rankings remain blank.
  */
 const upcoming:ReadonlyArray<{icon:string;title:string;screen:AppScreenId}> = [
   { icon: '▣', title: 'SHOP', screen:'shop' },
@@ -12,8 +11,8 @@ const upcoming:ReadonlyArray<{icon:string;title:string;screen:AppScreenId}> = [
   { icon: '✦', title: 'MISSIONS', screen:'missions' },
   { icon: '♜', title: 'RANKING', screen:'profile' },
 ];
-export function Harbour({ onBattle, onInspect, onNavigate, coins }: { onBattle: () => void; onInspect: () => void; onNavigate:(screen:AppScreenId)=>void;coins:number }) {
-  return <section className="harbour-screen" aria-label="Royal Pirate harbour">
+export function Harbour({ onBattle, onInspect, onNavigate, coins, hidden=false }: { onBattle: () => void; onInspect: () => void; onNavigate:(screen:AppScreenId)=>void;coins:number;hidden?:boolean }) {
+  return <section className="harbour-screen" aria-label="Royal Pirate harbour" aria-hidden={hidden} inert={hidden}>
     <div className="harbour-sky" aria-hidden="true" />
     <header className="harbour-header">
       <button type="button" className="harbour-profile" onClick={()=>onNavigate('profile')} aria-label="Open local captain profile">
