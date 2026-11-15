@@ -130,3 +130,11 @@
 }
 @media (max-width:330px){.w4-tabs button{font-size:10px}.w4-stage-label{max-width:49%}}
 @media (prefers-reduced-motion:reduce){.w4-screen button{transition:none}}
+
+.w4-system-levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:9px}
+.w4-system-levels>div{min-width:0;padding:6px 5px;border:1px solid #63869a;border-radius:8px;background:#092c49}
+.w4-system-levels strong,.w4-system-levels small{display:block}
+.w4-system-levels strong{font:900 13px 'Barlow Condensed',sans-serif;color:#fff0cb}
+.w4-system-levels small{font:700 10px 'Barlow',sans-serif;color:#e6c994}
+.w4-mini-track{display:block;height:6px;background:#183b53;border-radius:6px;margin-top:5px;overflow:hidden}
+.w4-mini-track i{display:block;height:100%;background:linear-gradient(#c5e69b,#3e9c55)}
