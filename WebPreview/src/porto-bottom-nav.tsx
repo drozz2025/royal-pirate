@@ -25,7 +25,7 @@ export function PortoBottomNav({screen,profile,onNavigate,onPorto}:{
   // Exactly the same real, locally-derived alert criteria as Porto.
   const fleetUpgradeReady=UPGRADES.some(u=>profile.upgrades[u.id]<5&&profile.coins>=upgradeCost(u.id,profile.upgrades[u.id]));
   const crewCardReady=CREW.some(c=>!profile.ownedCrew.includes(c.id)&&c.cost>0&&profile.coins>=c.cost);
-  return <nav className="harbour-nav" aria-label="Main game screens">
+  return <nav className="harbour-nav app-dock-porto" aria-label="Main game screens">
     {tabs.map(item=>{
       const current=item.screen===screen||(item.screen==='fleet'&&screen==='forge')||
         (item.screen==='ranking'&&screen==='profile');
