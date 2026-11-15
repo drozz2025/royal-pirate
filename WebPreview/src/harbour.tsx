@@ -9,7 +9,7 @@ import { canClaimDaily, levelFor, missionProgress, MISSIONS, nextDailyStreak, ty
 const upcoming:ReadonlyArray<{icon:string;title:string;screen:AppScreenId}> = [
   { icon: '▣', title: 'SHOP', screen:'shop' },
   { icon: '♠', title: 'CARDS', screen:'cards' },
-  { icon: '⚓', title: 'SHIP', screen:'fleet' },
+  { icon: '⚓', title: 'FLEET', screen:'fleet' },
   { icon: '✦', title: 'MISSIONS', screen:'missions' },
   { icon: '♜', title: 'PROFILE', screen:'profile' },
 ];
