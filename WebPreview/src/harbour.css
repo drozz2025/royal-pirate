@@ -234,3 +234,15 @@
   .ship-inspection-ui{padding-left:12px;padding-right:12px}
   .ship-inspection-ui>div strong{font-size:21px}
   .ship-inspection-ui>div span{font-size:10px;line-height:1.5}}
+
+/* Keep supporting labels legible on narrow iPhone-style portrait layouts. */
+@media(max-width:600px){
+  .harbour-profile strong{font-size:11px}
+  .harbour-profile div span{font-size:16px}
+  .harbour-profile small{font-size:9px}
+  .harbour-arena-body small{font-size:9px;letter-spacing:.3px}
+  .harbour-chest small{font-size:9px;letter-spacing:0}
+  .harbour-secondary-action small{font-size:9px}
+  .harbour-battle-button small{font-size:9px}
+  .harbour-nav-item small{font-size:9px;letter-spacing:0}
+}
