@@ -1,332 +1,175 @@
-/* ROYAL PIRATE — original premium game-harbour interface.
- * Real Three.js ship remains animated behind this responsive 2D chrome.
- * Coming-soon surfaces intentionally do not have fake click handlers.
- */
-.in-harbour .vignette{opacity:.1}
+/* ROYAL PIRATE · Approved Porto 1:1 silhouette. The Three.js canvas behind this
+   interface remains the live, interactive ship. No flat screenshot or invisible
+   interface-wide touch blocker. Responsive proportions follow the approved image. */
+.in-harbour .vignette{opacity:.07}
 .in-harbour .topbar,.in-harbour .battle-hud,.in-harbour .scene-caption,
 .in-harbour .view-controls,.in-harbour .scene-hint,.in-harbour .command-deck,
 .in-harbour .bottom-note,.in-harbour .diagnostics,.in-harbour .return-harbour{display:none}
-.harbour-screen{position:absolute;inset:0;z-index:7;isolation:isolate;overflow-x:hidden;overflow-y:auto;
-  display:flex;flex-direction:column;color:#fff9e8;text-shadow:0 2px 2px #152f4999;
-  background:linear-gradient(180deg,#0a548a38 0%,#08b2eb05 25%,transparent 51%,#083e5a25 69%,#06304a99 100%);
-  -webkit-overflow-scrolling:touch}
-.harbour-sky{position:absolute;inset:0;z-index:-1;pointer-events:none;
-  background:radial-gradient(ellipse 100% 36% at 50% 10%,#8fe0f320,transparent 80%);
+.harbour-screen{
+ --porto-nav-height:clamp(74px,10.4dvh,110px);
+ position:absolute;inset:0;z-index:7;isolation:isolate;overflow:hidden;
+ color:#fff8df;text-shadow:0 2px 2px #0e2743,0 3px 5px #04192d;
+ pointer-events:none; /* browser gestures reach the ship behind empty spaces */
+ background:linear-gradient(180deg,rgba(40,164,237,.02) 2%,transparent 43%,rgba(4,53,85,.03) 60%,rgba(11,46,75,.22) 88%,rgba(3,18,39,.28) 100%);
+ font-family:'Barlow Condensed','Barlow',system-ui,sans-serif
 }
-.harbour-header{width:100%;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
-  padding:max(14px,env(safe-area-inset-top)) 12px 4px;min-height:70px;flex-shrink:0}
-.harbour-profile{display:flex;align-items:center;gap:7px;min-width:0;padding:4px 10px 4px 4px;
-  border:2px solid #d7a450;border-radius:15px;
-  background:linear-gradient(180deg,#284660,#092b45);box-shadow:inset 0 2px #ffffff55,0 4px 0 #123049,0 7px 13px #061c3599}
-.harbour-avatar{width:46px;height:46px;display:grid;place-items:center;flex-shrink:0;
-  border-radius:12px;background:linear-gradient(140deg,#ffa54c,#8b4827 52%,#322a30);
-  border:2px solid #ffdb78;color:#fff7dc;font-size:26px;box-shadow:inset 0 3px #fff4a866,0 2px #472f34}
-.harbour-profile>div{display:flex;flex-direction:column;line-height:1.1;white-space:nowrap}
-.harbour-profile strong{font:800 12px 'Barlow Condensed',sans-serif;letter-spacing:2px;color:#efc76a}
-.harbour-profile div span{font:900 20px 'Barlow Condensed',sans-serif;letter-spacing:.4px;color:#fff4dd}
-.harbour-profile small{font:700 8px 'Barlow',sans-serif;letter-spacing:.2px;color:#a8dcf4}
-.harbour-resources{display:flex;gap:4px;min-width:0;align-items:flex-start;margin-top:2px}
-.harbour-resources>div{display:flex;align-items:center;justify-content:center;gap:5px;min-width:43px;height:34px;
-  padding:2px 6px;border:2px solid #24415f;border-radius:11px;background:linear-gradient(#2e4967,#152c4c);
-  box-shadow:0 3px 0 #071e39,inset 0 1px #ffffff66;color:#f4f2f6}
-.harbour-resources strong{font:900 17px 'Barlow Condensed',sans-serif}
-.harbour-resources span{font-size:20px;line-height:1;color:#d55bf6;filter:drop-shadow(0 2px #5c2375)}
-.harbour-resources>div:nth-child(2) span{color:#ffd758;filter:drop-shadow(0 2px #a6621b)}
-.harbour-resources>div:nth-child(3) span{color:#c5e3f0;filter:drop-shadow(0 2px #5b6f9c)}
-.harbour-arena{width:min(590px,calc(100% - 60px));flex-shrink:0;margin:8px auto 2px;min-height:62px;
-  display:flex;gap:8px;align-items:center;justify-content:space-between;padding:5px 9px 5px 5px;
-  border:3px solid #ddaa48;border-radius:16px;background:linear-gradient(180deg,#8e5b31 0%,#6c3d25 22%,#183450 23%,#173d5f 100%);
-  box-shadow:inset 0 2px #ffe59d,0 5px #623820,0 8px 15px #00284385}
-.harbour-arena-crest{width:52px;height:52px;display:grid;place-items:center;flex-shrink:0;
-  font-size:32px;background:linear-gradient(145deg,#fcd260,#c17d26);border:3px solid #ffe2a1;
-  border-radius:15px;box-shadow:0 3px 0 #78411b,inset 0 2px #fff6bc;color:#fff3db}
-.harbour-arena-body{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
-.harbour-arena-title{display:flex;align-items:center;gap:8px;justify-content:space-between}
-.harbour-arena-title strong{font:900 20px 'Barlow Condensed',sans-serif;white-space:nowrap;letter-spacing:.6px;text-shadow:0 3px #0d2338}
-.harbour-arena-title>span{font:900 11px 'Barlow Condensed',sans-serif;color:#ffda74;white-space:nowrap}
-.harbour-arena-track{height:9px;border:2px solid #10263a;border-radius:30px;background:#061e3c;box-shadow:inset 0 1px 4px #0009}
-.harbour-arena-track>span{display:block;height:100%;width:15%;border-radius:30px;background:linear-gradient(#ffec72,#f5a41d)}
-.harbour-arena-body small{font:800 8px 'Barlow Condensed',sans-serif;letter-spacing:1px;color:#cfe6e8}
-.harbour-arena-cup{font-size:27px;color:#ffd658;text-shadow:0 2px #8c5019}
-.harbour-central{flex:1;position:relative;min-height:200px;pointer-events:none;display:flex;justify-content:space-between}
-.harbour-side{position:relative;display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding:16px 8px;pointer-events:none}
-.harbour-side-right{align-items:flex-end}
-.harbour-side-tile{width:77px;min-height:68px;border-radius:13px;border:2px solid #e6b355;
-  background:linear-gradient(145deg,#b67c37,#6f3d24 25%,#18374f 27%,#0a2c4b);
-  box-shadow:0 4px #432e2a,0 8px 13px #0a224366;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;padding:5px;gap:1px}
-.harbour-side-tile>span{font-size:25px;line-height:1.2;color:#ffdf67}
-.harbour-side-tile strong{font:900 13px 'Barlow Condensed',sans-serif}
-.harbour-side-tile small{font:800 8px 'Barlow',sans-serif;letter-spacing:1px;color:#f8d689}
-.harbour-character{background:linear-gradient(150deg,#7c2b4f,#d95c43 48%,#5b2d34)}
-.harbour-ship-label{position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:max-content;
-  max-width:70%;display:flex;flex-direction:column;align-items:center;gap:1px;letter-spacing:1px;
-  background:linear-gradient(90deg,transparent,#16344aaa 15%,#16344aaa 85%,transparent);
-  padding:5px 25px;text-align:center;filter:drop-shadow(0 2px 6px #082b4d)}
-.harbour-ship-label>span{color:#ffe6a8;font-size:17px}
-.harbour-ship-label strong{font:900 19px 'Barlow Condensed',sans-serif;color:#fff5cf;white-space:nowrap}
-.harbour-ship-label small{font:700 9px 'Barlow',sans-serif;color:#e0ebf4;white-space:nowrap}
-.harbour-lower{flex-shrink:0;width:100%;display:flex;flex-direction:column;align-items:center;
-  background:linear-gradient(180deg,transparent,#00254333 10%,#092846a8 90%);padding:0 8px max(5px,env(safe-area-inset-bottom))}
-.harbour-chests{width:min(540px,100%);border:2px solid #e8bd73;border-radius:14px;padding:7px 9px;
-  background:linear-gradient(180deg,#edf8f5f5,#abcbdff5);box-shadow:0 4px 0 #315171,0 10px 16px #002d46bb;
-  color:#553420;text-shadow:none}
-.harbour-chest-header{display:flex;justify-content:space-between;align-items:center;padding:0 4px 5px}
-.harbour-chest-header strong{font:900 17px 'Barlow Condensed',sans-serif}
-.harbour-chest-header small{font:900 9px 'Barlow Condensed',sans-serif;letter-spacing:1px;color:#536574}
-.harbour-chest-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.harbour-chest{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0;
-  background:linear-gradient(#c9d8e2,#e6edf1);border-radius:10px;min-height:52px;border:1px solid #a5b7bf;
-  box-shadow:inset 0 2px #fff8}
-.harbour-chest>span{font-size:32px;font-family:system-ui;color:#b76b2e;line-height:1;text-shadow:0 2px #5a2f21}
-.harbour-chest-1>span{color:#6296d4;text-shadow:0 2px #274478}
-.harbour-chest-2>span{color:#b15adb;text-shadow:0 2px #69337b}
-.harbour-chest-3>span{color:#e7b72e;text-shadow:0 2px #8f6d18}
-.harbour-chest small{font:800 7px 'Barlow',sans-serif;color:#526475;letter-spacing:.8px}
-.harbour-actions{width:min(580px,100%);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.3fr) minmax(0,1fr);
-  align-items:end;gap:10px;margin:13px 0 16px}
-.harbour-secondary-action{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;height:80px;
-  border:3px solid #e4b457;border-radius:15px;background:linear-gradient(#b47742,#84472c 58%,#703a28);
-  box-shadow:inset 0 2px #ffdb93,0 5px #40291e,0 9px 12px #001e3d7a}
-.harbour-secondary-action>span{font-size:27px;line-height:1.2;color:#ffde75}
-.harbour-secondary-action strong{font:900 15px 'Barlow Condensed',sans-serif}
-.harbour-secondary-action small{font:800 7px 'Barlow',sans-serif;color:#f8d68e}
-.harbour-battle-button{position:relative;min-height:93px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:0;border:3px solid #ffdd89;border-radius:19px;background:linear-gradient(180deg,#ffef88 0%,#ffd247 47%,#ffa52e 75%,#f68220 100%);
-  color:#452819;text-shadow:0 2px #fff5b7;box-shadow:inset 0 3px #fff7b8,0 6px 0 #a24e1a,0 10px 18px #001b2d88;
-  -webkit-tap-highlight-color:transparent}
-.harbour-battle-button .harbour-crossed{position:absolute;top:-25px;line-height:1;color:#f1f7ff;font-size:41px;
-  filter:drop-shadow(0 3px #344e79);text-shadow:none}
-.harbour-battle-button strong{font:900 41px 'Barlow Condensed',sans-serif;letter-spacing:1px;line-height:1.08;padding-top:12px}
-.harbour-battle-button small{font:800 9px 'Barlow',sans-serif;letter-spacing:1px;color:#8f4b16}
-.harbour-battle-button:active{transform:translateY(4px);box-shadow:inset 0 3px #fff7b8,0 2px #a24e1a}
-.harbour-battle-button:focus-visible{outline:3px solid #fff;outline-offset:5px}
-.harbour-nav{width:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:linear-gradient(#234a72,#102d52);
-  border-top:3px solid #6094ba;border-radius:17px 17px 0 0;overflow:visible;box-shadow:0 -5px 14px #042c4966}
-.harbour-nav-item{display:flex;flex-direction:column;gap:0;align-items:center;justify-content:center;
-  border-right:1px solid #7092af55;padding:7px 1px 6px;min-width:0;color:#d8e4ee}
-.harbour-nav-item:last-child{border:0}
-.harbour-nav-item>span{font-size:24px;line-height:1.2;color:#f8d47c;filter:drop-shadow(0 2px #5b362a)}
-.harbour-nav-item strong{font:900 14px 'Barlow Condensed',sans-serif;letter-spacing:.3px}
-.harbour-nav-item small{font:800 7px 'Barlow',sans-serif;letter-spacing:.7px;color:#9ab6cb}
-.harbour-nav-current{border:2px solid #ffda74!important;border-radius:11px;background:linear-gradient(#ffdc70,#df9134);
-  margin:-9px 0 -1px;box-shadow:0 4px #884922,0 0 15px #f7b93288;color:#321b11}
-.harbour-nav-current>span{font-size:34px;color:#54300c}
-.harbour-nav-current small{color:#5e330b}
-.harbour-disclaimer{margin:6px 0 0;text-align:center;font:600 8px 'Barlow',sans-serif;letter-spacing:.5px;color:#bcd9e6;text-shadow:0 1px 3px #06314f}
-.return-harbour{position:absolute;z-index:4;left:12px;top:max(82px,calc(env(safe-area-inset-top) + 74px));
-  border:2px solid #f4d283;border-radius:10px;padding:7px 10px;background:linear-gradient(#2c556a,#0a3546);
-  box-shadow:0 4px #062c40;color:#ffe7a6;font:900 12px 'Barlow Condensed',sans-serif;letter-spacing:1px}
-@media (max-width:600px){
- .harbour-header{min-height:61px;padding-left:7px;padding-right:7px;gap:5px;padding-top:max(9px,env(safe-area-inset-top))}
- .harbour-profile{gap:5px;padding:3px 6px 3px 3px;border-radius:11px}
- .harbour-avatar{width:38px;height:38px;font-size:23px}
- .harbour-profile strong{font-size:9px;letter-spacing:1px}
- .harbour-profile div span{font-size:15px}
- .harbour-profile small{font-size:6px}
- .harbour-resources{gap:3px}
- .harbour-resources>div{min-width:35px;height:30px;padding:2px 4px;border-width:1px}
- .harbour-resources span{font-size:17px}.harbour-resources strong{font-size:15px}
- .harbour-arena{width:calc(100% - 62px);min-height:57px;margin-top:4px;padding:3px 6px 3px 3px;border-width:2px;gap:5px}
- .harbour-arena-crest{width:42px;height:43px;font-size:27px;border-width:2px}
- .harbour-arena-title strong{font-size:16px}
- .harbour-arena-title>span{font-size:9px}
- .harbour-arena-body small{font-size:7px}
- .harbour-arena-cup{font-size:21px}
- .harbour-side{padding:14px 5px;gap:9px}
- .harbour-side-tile{width:62px;min-height:59px;border-width:2px;border-radius:12px}
- .harbour-side-tile>span{font-size:21px}
- .harbour-side-tile strong{font-size:11px}.harbour-side-tile small{font-size:7px}
- .harbour-central{min-height:180px}
- .harbour-ship-label{bottom:7px}.harbour-ship-label strong{font-size:16px}.harbour-ship-label small{font-size:8px}
- .harbour-chests{padding:5px 7px}
- .harbour-chest-header{padding-bottom:3px}.harbour-chest-header strong{font-size:15px}
- .harbour-chest{min-height:43px}.harbour-chest>span{font-size:28px}.harbour-chest small{font-size:6px}
- .harbour-actions{gap:5px;margin:11px 0 13px}
- .harbour-secondary-action{height:69px;border-width:2px;border-radius:12px}
- .harbour-secondary-action>span{font-size:23px}.harbour-secondary-action strong{font-size:12px}
- .harbour-battle-button{min-height:80px;border-width:2px;border-radius:15px}
- .harbour-battle-button .harbour-crossed{top:-22px;font-size:35px}
- .harbour-battle-button strong{font-size:34px}
- .harbour-battle-button small{font-size:7px}
- .harbour-nav-item{padding:6px 0 5px}
- .harbour-nav-item>span{font-size:22px}.harbour-nav-item strong{font-size:12px}.harbour-nav-item small{font-size:6px}
- .harbour-nav-current>span{font-size:29px}
- .harbour-disclaimer{font-size:7px}
- .return-harbour{top:max(61px,calc(env(safe-area-inset-top) + 50px));font-size:10px;padding:5px 7px}
+.harbour-screen[aria-hidden="true"]{visibility:hidden}
+.harbour-sky{position:absolute;inset:0;pointer-events:none;z-index:-1;
+ background:radial-gradient(ellipse 70% 20% at 52% 12%,#c0ebff15,transparent 90%)}
+.harbour-header{position:absolute;inset:0 0 auto;height:clamp(100px,17dvh,160px);pointer-events:none;
+ background:linear-gradient(180deg,#115d994d,transparent 94%)}
+.harbour-header button{pointer-events:auto}
+.harbour-profile{position:absolute;left:clamp(5px,1.7vw,17px);top:max(12px,calc(env(safe-area-inset-top) + 8px));
+ display:flex;align-items:center;gap:4px;max-width:31%;padding:0;color:#fffbe6;
+ background:transparent;border:0;text-align:left;z-index:2}
+.harbour-avatar{display:grid;place-items:center;flex:none;width:clamp(42px,11vw,67px);height:clamp(42px,11vw,67px);
+ border:3px solid #dca844;border-radius:50%;background:
+ radial-gradient(circle at 35% 26%,#e8c781,#8c633c 40%,#362b38 78%,#10253b 100%);
+ box-shadow:0 0 0 2px #4d2c13,0 4px 10px #0d3046b3,inset 0 3px 5px #ffdd8e;
+ color:#ffe3a0;transform:rotate(-6deg)}
+.harbour-avatar .pirate-icon{width:65%;height:65%;filter:drop-shadow(0 2px #55341a)}
+.harbour-level{min-width:0;display:flex;flex-direction:column;gap:4px}
+.harbour-level>strong{font:900 clamp(14px,3.9vw,21px)/1 'Barlow Condensed',sans-serif;
+ color:#fffdf0;text-shadow:0 2px #061b38,1px 1px 3px #09223a;white-space:nowrap}
+.harbour-level-track{display:block;overflow:hidden;width:clamp(46px,12vw,85px);height:clamp(9px,1.45dvh,14px);
+ border:2px solid #08263e;border-radius:9px;background:linear-gradient(#072039,#23425b);box-shadow:0 2px #092d4c,inset 0 1px 2px #0009}
+.harbour-level-track>span{display:block;height:100%;background:linear-gradient(#93faff,#0fb9ed 70%,#1687b5);
+ border-radius:9px;box-shadow:inset 0 2px #d8ffff88}
+.harbour-logo{position:absolute;top:max(10px,calc(env(safe-area-inset-top) + 2px));left:50%;transform:translateX(-50%);
+ display:flex;flex-direction:column;align-items:center;gap:0;margin:0;min-width:105px;max-width:42%;pointer-events:none;
+ font:900 clamp(25px,6.5vw,56px)/.82 'Barlow Condensed',sans-serif;
+ letter-spacing:clamp(.3px,.25vw,2px);text-align:center;color:#f8d779;
+ filter:drop-shadow(0 5px 2px #281818b8)}
+.harbour-logo>span:not(.harbour-logo-crown),.harbour-logo>b{
+ display:block;-webkit-text-stroke:clamp(.6px,.17vw,1.5px) #57301b;
+ text-shadow:0 2px #21191d,2px 4px #683824,0 0 5px #27151f}
+.harbour-logo>b{color:#ffe5a0}
+.harbour-logo-crown{display:block;font:900 clamp(22px,4.3vw,42px)/.8 serif;color:#ffde67;
+ text-shadow:0 3px #753c18;transform:rotate(-8deg)}
+.harbour-wallet{position:absolute;top:max(9px,calc(env(safe-area-inset-top) + 5px));right:clamp(5px,1.8vw,16px);
+ display:flex;flex-direction:row;align-items:flex-start;gap:4px;z-index:2}
+.harbour-resources{display:flex;flex-direction:column;gap:4px}
+.harbour-stat{display:flex;align-items:center;justify-content:flex-start;gap:5px;min-width:clamp(60px,15vw,112px);
+ height:clamp(26px,3.8dvh,37px);border:2px solid #ba872e;border-radius:8px;padding:1px 6px 1px 3px;
+ background:linear-gradient(180deg,#1b4f76de,#082744ef);box-shadow:inset 0 2px #9dcce455,0 3px #143344,
+ 0 4px 6px #04274477;color:#fff8d8}
+.harbour-stat-glyph{display:grid;place-items:center;border:2px solid #bd7c17;border-radius:50%;
+ width:clamp(21px,5.2vw,31px);height:clamp(21px,5.2vw,31px);
+ background:radial-gradient(circle at 34% 30%,#fffeb0,#e6ad2c 52%,#9c5614);
+ color:#ffdd6d;font-size:clamp(16px,4vw,25px);text-shadow:0 1px #5e3711;line-height:1}
+.harbour-stat:nth-child(2) .harbour-stat-glyph{background:radial-gradient(circle at 34% 30%,#fff6bb,#bf8e2a 54%,#6c4715);color:#fff0a3}
+.harbour-stat strong{font:900 clamp(14px,4vw,22px)/1 'Barlow Condensed',sans-serif;
+ text-shadow:0 2px #081e38;font-variant-numeric:tabular-nums}
+.harbour-settings{display:grid;place-items:center;width:clamp(31px,8vw,46px);height:clamp(32px,8.5vw,46px);
+ padding:3px;background:linear-gradient(#aa7337,#704321 13%,#163d66 20%,#092b4c 96%);
+ border:2px solid #d8ab55;border-radius:10px;color:#ffe4a0;
+ box-shadow:inset 0 2px #fff4aa66,0 3px #432711,0 4px 8px #0a264577}
+.harbour-central{min-height:20%;position:absolute;inset:18% 20% 26%;pointer-events:none}
+.harbour-flank{position:absolute;top:clamp(125px,19dvh,255px);z-index:2;
+ display:flex;flex-direction:column;align-items:center;gap:clamp(12px,3.2dvh,40px);
+ width:clamp(67px,18.5vw,126px);pointer-events:none}
+.harbour-flank-left{left:clamp(3px,1.8vw,18px)}
+.harbour-flank-right{right:clamp(3px,1.8vw,18px);top:clamp(225px,32dvh,355px)}
+.harbour-flank-button{position:relative;pointer-events:auto;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;gap:2px;width:100%;height:clamp(65px,10dvh,103px);padding:5px 2px;
+ background:linear-gradient(155deg,#c68b35,#e7b957 5%,#173f69 11%,#09294b 87%,#091e3b 93%,#bd8538);
+ color:#fff7e8;border:2px solid #dba746;border-radius:clamp(11px,3vw,17px);
+ box-shadow:inset 0 2px #fff3ae77,inset 0 -2px #07192db8,0 3px #59341c,0 6px 9px #0436518c;
+ text-align:center}
+.harbour-flank-icon{display:grid;place-items:center;color:#ffda7c;
+ filter:drop-shadow(1px 2px #5b361d);height:clamp(27px,4.5dvh,49px)}
+.harbour-flank-icon .pirate-icon{width:clamp(26px,6.5vw,45px);height:clamp(26px,6.5vw,45px)}
+.harbour-flank-button strong{font:900 clamp(10px,2.9vw,17px)/.97 'Barlow Condensed',sans-serif;
+ text-transform:uppercase;letter-spacing:-.15px;text-shadow:0 2px #00182f,0 0 3px #030f20;max-width:100%;overflow-wrap:anywhere}
+.harbour-alert{position:absolute;top:-10px;right:-8px;display:grid;place-items:center;
+ min-width:clamp(19px,5vw,27px);height:clamp(19px,5vw,27px);padding:0 3px;
+ background:linear-gradient(#ff4b36,#c30519);color:white;border:2px solid #ffe08a;border-radius:50%;
+ font:900 15px/1 'Barlow Condensed',sans-serif;text-shadow:0 1px #831226;box-shadow:0 2px 5px #062037}
+.harbour-dock-chest{position:absolute;pointer-events:none;left:clamp(8px,3vw,35px);
+ bottom:calc(var(--porto-nav-height) + clamp(18px,4.5dvh,46px));
+ width:clamp(56px,15vw,115px);height:clamp(53px,11dvh,103px);
+ border:4px solid #be7324;border-radius:14px 14px 9px 9px;
+ background:linear-gradient(90deg,#6a351c,#a75b2c 28%,#bd773a 52%,#673115 100%);
+ transform:rotate(-5deg);box-shadow:inset 0 0 0 4px #d8a65a,inset 0 -10px #543018,0 6px 5px #071e36ad}
+.harbour-dock-chest:before,.harbour-dock-chest:after{content:'';position:absolute;top:0;bottom:0;width:7px;
+ background:linear-gradient(90deg,#ae601b,#ffdd70,#ba7a2b);box-shadow:0 0 0 1px #643512}
+.harbour-dock-chest:before{left:17%}.harbour-dock-chest:after{right:17%}
+.harbour-dock-chest-lid{position:absolute;left:-5px;right:-5px;top:-12px;height:35%;
+ border:4px solid #b9782d;border-radius:45% 45% 10px 10px;
+ background:linear-gradient(#f4c568,#cb7228 34%,#61311b 36%,#ac6232 88%);box-shadow:inset 0 3px #ffefb7}
+.harbour-dock-chest-lock{position:absolute;z-index:1;top:30%;left:50%;transform:translateX(-50%);
+ width:clamp(11px,3vw,19px);height:clamp(16px,3.5dvh,28px);border:2px solid #90541d;
+ border-radius:4px;background:linear-gradient(#fff2a4,#dfaf42,#ad691e)}
+.harbour-battle-button{position:absolute;z-index:3;pointer-events:auto;left:50%;transform:translateX(-50%);
+ bottom:calc(var(--porto-nav-height) + clamp(25px,6dvh,69px));
+ width:min(54%,420px);height:clamp(69px,10.5dvh,108px);display:flex;flex-direction:row;
+ align-items:center;justify-content:center;gap:clamp(7px,2.2vw,18px);padding:7px 6px;
+ border:4px solid #edba55;border-radius:clamp(14px,4vw,27px);
+ background:linear-gradient(#e76e51 0%,#b4071c 22%,#cf0e24 53%,#a00317 91%);
+ box-shadow:0 0 0 3px #723b22,0 7px #633112,inset 0 3px #ffcc9a99,inset 0 -4px #6d0010,0 12px 24px #08233b9c;
+ color:#fff5dc;text-shadow:0 3px #69020e,0 0 3px #480b13}
+.harbour-battle-button .harbour-crossed{display:grid;place-items:center;color:#ffdf72;
+ flex:0 0 auto;filter:drop-shadow(0 2px #693b0e)}
+.harbour-battle-button .harbour-crossed .pirate-icon{width:clamp(28px,6.8vw,53px);height:clamp(28px,6.8vw,53px)}
+.harbour-battle-button strong{font:900 clamp(26px,7.7vw,55px)/1 'Barlow Condensed',sans-serif;
+ text-transform:uppercase;letter-spacing:.2px;white-space:nowrap}
+.harbour-battle-button:active{transform:translate(-50%,4px);box-shadow:0 0 0 3px #723b22,0 3px #633112,inset 0 3px #ffcc9a99}
+.harbour-nav{position:absolute;z-index:5;pointer-events:auto;bottom:0;left:0;right:0;
+ display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:stretch;
+ height:var(--porto-nav-height);padding-bottom:env(safe-area-inset-bottom);
+ border-top:3px solid #c79c5c;border-radius:12px 12px 0 0;
+ background:linear-gradient(180deg,#345f88 0%,#173b64 13%,#0e2d55 70%,#0b2545 100%);
+ box-shadow:0 -6px 18px #0629488a}
+.harbour-nav-item{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;
+ gap:2px;padding:5px 0 4px;min-width:0;border:0;border-right:1px solid #6e93ae77;
+ background:transparent;color:#fff8e8;text-shadow:0 2px #00192f}
+.harbour-nav-item:last-child{border-right:0}
+.harbour-nav-icon{display:grid;place-items:center;color:#f6d486;filter:drop-shadow(0 2px #2d281d)}
+.harbour-nav-icon .pirate-icon{width:clamp(29px,7.8vw,52px);height:clamp(29px,7.8vw,52px)}
+.harbour-nav-item strong{font:900 clamp(13px,3.35vw,21px)/1 'Barlow Condensed',sans-serif;white-space:nowrap;
+ letter-spacing:-.15px;text-shadow:0 2px #00162e,0 0 3px #0c2041}
+.harbour-nav-current{color:#fff3d5;background:linear-gradient(#ffdf82,#bf792e 15%,#133b60 17%,#0a2b50 90%);
+ border:3px solid #ffc452;border-bottom:0;border-radius:15px 15px 0 0;margin-top:-8px;
+ box-shadow:0 -3px 10px #fff0ab7e,inset 0 2px #ffe5a0b0;cursor:default}
+.harbour-nav-current .harbour-nav-icon{color:#ffe5a0}
+.harbour-nav-item:disabled{opacity:1}
+.harbour-screen button:focus-visible{outline:3px solid #fff8a7;outline-offset:3px}
+.harbour-flank-button:active,.harbour-nav-item:not(:disabled):active,.harbour-settings:active{transform:translateY(2px)}
+.harbour-screenreader-contract,.harbour-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+ overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:600px){
+ .harbour-logo{font-size:clamp(23px,7vw,36px)}
+ .harbour-logo-crown{font-size:clamp(22px,5.2vw,30px)}
+ .harbour-flank-button{border-width:2px}
+ .harbour-battle-button{border-width:3px}
+ .harbour-nav{border-top-width:2px}
+}
+@media(max-width:390px){
+ .harbour-flank-button strong{font-size:10px}
+ .harbour-flank{width:clamp(60px,18.5vw,72px)}
+ .harbour-logo{max-width:35%}
+ .harbour-avatar{width:41px;height:41px}
+ .harbour-stat{gap:2px;padding-right:2px}
+ .harbour-wallet{gap:2px}
+ .harbour-settings{padding:1px}
+ .harbour-battle-button{width:56%}
+ .harbour-battle-button strong{font-size:clamp(23px,7.3vw,29px)}
+ .harbour-nav-item strong{font-size:clamp(11px,3.2vw,13px)}
 }
 @media(max-height:690px){
- .harbour-central{min-height:150px}
- .harbour-side-tile{min-height:48px}.harbour-side-tile>span{font-size:18px}
- .harbour-chests{padding:4px 6px}
- .harbour-chest{min-height:35px}.harbour-chest>span{font-size:22px}
- .harbour-actions{margin:8px 0 8px}
- .harbour-secondary-action{height:56px}.harbour-secondary-action>span{font-size:20px}
- .harbour-battle-button{min-height:68px}.harbour-battle-button strong{font-size:30px}
- .harbour-nav-item{padding:4px 0}.harbour-nav-item>span{font-size:18px}
- .harbour-disclaimer{display:none}
+ .harbour-flank{top:clamp(104px,18dvh,145px);gap:clamp(8px,2.5dvh,17px)}
+ .harbour-flank-right{top:clamp(155px,27dvh,188px)}
+ .harbour-flank-button{height:clamp(50px,9dvh,65px)}
+ .harbour-flank-icon{height:25px}
+ .harbour-flank-icon .pirate-icon{width:25px;height:25px}
+ .harbour-dock-chest{width:54px;height:53px}
+ .harbour-battle-button{height:clamp(59px,10dvh,70px);bottom:calc(var(--porto-nav-height) + 22px)}
 }
 @media(min-width:800px){
- .harbour-arena{margin-top:12px}
- .harbour-side{padding:45px max(24px,8vw);gap:16px}
- .harbour-side-tile{width:100px;min-height:85px}
- .harbour-side-tile>span{font-size:30px}.harbour-side-tile strong{font-size:16px}
- .harbour-central{min-height:260px}
+ .harbour-flank{left:max(18px,5vw)}
+ .harbour-flank-right{left:auto;right:max(18px,5vw)}
+ .harbour-battle-button{width:min(52%,500px)}
 }
-
-
-/* v0.1.4 — Approved reference visual language.
-   These are live DOM controls over the existing Three.js world, not screenshots. */
-.harbour-screen{background:linear-gradient(180deg,rgba(27,111,178,.08) 0%,transparent 43%,rgba(4,17,41,.35) 76%,rgba(4,17,41,.88) 100%);text-shadow:0 2px 4px #071931cc}
-.harbour-sky{background:radial-gradient(ellipse 75% 35% at 48% 12%,rgba(150,222,255,.35),transparent 82%)}
-.harbour-profile,.harbour-side-tile,.harbour-arena,.harbour-chests,.harbour-secondary-action,.harbour-nav{border-color:#eec66e;box-shadow:inset 0 2px rgba(255,243,175,.56),0 4px 0 #764724,0 8px 18px #06183299}
-.harbour-profile{background:linear-gradient(145deg,#234c77,#082b55 55%,#071f3d);border-radius:16px}
-.harbour-avatar{border-radius:50%;background:radial-gradient(circle at 35% 27%,#f9c46b,#a26930 42%,#271d25 88%);border:3px solid #ffdf81;box-shadow:0 0 0 2px #47311d,0 2px 14px #f7a82a55}
-.harbour-profile strong,.harbour-arena-title>span{color:#ffe18d}
-.harbour-resources>div{border:2px solid #e4b960;background:linear-gradient(180deg,#183b69,#081e3b);box-shadow:inset 0 2px #ffffff55,0 3px #694324}
-.harbour-arena{background:linear-gradient(180deg,#a87737 0%,#73461f 18%,#224b70 19%,#0d294e 100%);border-radius:16px}
-.harbour-arena-crest{border-radius:50%;color:#fff3ce;background:radial-gradient(circle at 35% 28%,#fff3a8,#d89626 60%,#764116)}
-.harbour-arena-track>span{background:linear-gradient(#fff5a3,#e7a018)}
-.harbour-side-tile{background:linear-gradient(160deg,#f3d37d 0%,#a36c28 9%,#214a75 11%,#0b284d 94%);border-radius:12px}
-.harbour-ship-label{border-radius:18px;border-top:1px solid rgba(255,216,131,.45);background:linear-gradient(90deg,transparent,#071e43df 19%,#071e43df 81%,transparent)}
-.harbour-ship-label strong{color:#ffe6a0;text-shadow:0 2px 3px #100b13}
-.harbour-chests{background:linear-gradient(180deg,rgba(22,66,110,.95),rgba(7,33,69,.97));color:#ffebbe;border:2px solid #d7a74c;text-shadow:0 2px 2px #001a38}
-.harbour-chest-header small{color:#f7d794}
-.harbour-chest{border:2px solid #c79c50;background:linear-gradient(160deg,#244e80,#0e2d55);box-shadow:inset 0 2px #ffffff44,0 2px #071c36}
-.harbour-chest small{color:#ffe1a2}
-.harbour-secondary-action{background:linear-gradient(#c28c48,#865026 12%,#173f6a 14%,#0b2e56 88%);border-radius:15px}
-.harbour-battle-button{border:4px solid #ffe19a;background:linear-gradient(180deg,#f9614d,#c51221 49%,#890917 100%);color:#fff7cf;text-shadow:0 3px #541122;box-shadow:inset 0 3px #ffb99d,0 0 0 3px #773b1e,0 6px 0 #602017,0 12px 20px #001b2d99}
-.harbour-battle-button strong{font-weight:900;text-shadow:0 3px #5c0717}
-.harbour-battle-button small{color:#ffe6ae}
-.harbour-battle-button:active{box-shadow:inset 0 3px #ffb99d,0 0 0 3px #773b1e,0 2px 0 #602017}
-.harbour-nav{background:linear-gradient(#285a90,#0e335d 31%,#091d42);border-top:3px solid #ffdf84}
-.harbour-nav-item{border-right:1px solid #e0b56670}
-.harbour-nav-item>span{color:#ffda76}
-.harbour-nav-current{background:linear-gradient(#fff1ae,#d18b2d);box-shadow:0 3px #7b4627,0 0 20px #f6c64b77}
-.harbour-disclaimer{color:#d9eafa}
-@media(max-width:600px){
- .harbour-profile small{font-size:8px}
- .harbour-side-tile small{font-size:9px}
- .harbour-nav-item small{font-size:8px}
- .harbour-disclaimer{font-size:9px;line-height:1.35}
- .harbour-battle-button strong{font-size:clamp(29px,9vw,41px)}
+@media(prefers-reduced-motion:reduce){
+ .harbour-level-track>span,.harbour-battle-button{transition:none}
 }
-@media (prefers-reduced-motion:reduce){.harbour-battle-button,.harbour-nav-current{transition:none}}
-
-
-/* v0.1.4 interactive 3D ship viewer — foreground labels never intercept orbit gestures. */
-.harbour-inspect-button{pointer-events:auto;cursor:pointer;margin-top:5px;min-height:32px;padding:5px 13px;
-  border:2px solid #ffdc8d;border-radius:9px;background:linear-gradient(#386ca1,#12385e);
-  box-shadow:0 3px #36271a;color:#fff1c6;font:900 12px 'Barlow Condensed',sans-serif;
-  letter-spacing:1.2px;text-shadow:0 1px #0b1d3f}
-.harbour-inspect-button:focus-visible{outline:3px solid white;outline-offset:3px}
-.ship-inspection-ui{position:absolute;inset:0;z-index:8;pointer-events:none;display:flex;flex-direction:column;
-  justify-content:space-between;align-items:flex-start;padding:max(20px,env(safe-area-inset-top)) 18px max(30px,env(safe-area-inset-bottom))}
-.ship-inspection-ui>button{pointer-events:auto;min-height:48px;padding:10px 18px;
-  color:#ffe8aa;border:2px solid #e9bf69;border-radius:12px;
-  background:linear-gradient(#225480,#0b2851);box-shadow:0 5px #061e3b;
-  font:900 18px 'Barlow Condensed',sans-serif;letter-spacing:1.1px}
-.ship-inspection-ui>div{width:min(470px,100%);padding:12px 16px;border:1px solid #d8a95e9e;
-  border-radius:12px;background:#061a3fc4;text-shadow:0 2px #05172e}
-.ship-inspection-ui>div strong{display:block;color:#ffe6a6;font:900 24px 'Barlow Condensed',sans-serif}
-.ship-inspection-ui>div span{display:block;color:#e5eef9;font:700 11px 'Barlow',sans-serif;letter-spacing:.5px;margin-top:4px}
-@media(max-width:600px){.harbour-inspect-button{font-size:11px;min-height:34px}
-  .ship-inspection-ui{padding-left:12px;padding-right:12px}
-  .ship-inspection-ui>div strong{font-size:21px}
-  .ship-inspection-ui>div span{font-size:10px;line-height:1.5}}
-
-/* Keep supporting labels legible on narrow iPhone-style portrait layouts. */
-@media(max-width:600px){
-  .harbour-profile strong{font-size:11px}
-  .harbour-profile div span{font-size:16px}
-  .harbour-profile small{font-size:9px}
-  .harbour-arena-body small{font-size:9px;letter-spacing:.3px}
-  .harbour-chest small{font-size:9px;letter-spacing:0}
-  .harbour-secondary-action small{font-size:9px}
-  .harbour-battle-button small{font-size:9px}
-  .harbour-nav-item small{font-size:9px;letter-spacing:0}
-}
-
-/* App-first: navigation tiles are real buttons, not decorative disabled placeholders. */
-.harbour-side{pointer-events:auto}
-.harbour-side-tile{pointer-events:auto;cursor:pointer;color:#fff9e8;text-shadow:0 2px 3px #102f52}
-.harbour-side-tile:active,.harbour-secondary-action:active,.harbour-nav-item:active{transform:translateY(2px)}
-.harbour-nav-item{background:transparent;cursor:pointer;text-shadow:0 2px 2px #132b4a}
-.harbour-nav-current{background:linear-gradient(#ffdc70,#df9134)}
-.harbour-secondary-action{cursor:pointer;color:#fff9e8;text-shadow:0 2px 2px #102f52}
-.harbour-profile{color:#fff9e8;text-align:left;cursor:pointer;text-shadow:0 2px 2px #152f4999}
-.harbour-side-tile:focus-visible,.harbour-secondary-action:focus-visible,.harbour-nav-item:focus-visible,.harbour-profile:focus-visible{outline:3px solid #fff4b4;outline-offset:3px}
-
-
-/* v0.1.10: real local UTC daily route replaces decorative locked chests. */
-.harbour-reward-ready{border-color:#fff0b8;box-shadow:0 0 0 2px #ffd26b6b,0 4px #432e2a,0 8px 13px #0a224366}
-.harbour-daily-route{padding-bottom:6px}
-.harbour-daily-route .harbour-chest-header{margin-bottom:5px}
-.harbour-daily-button{display:flex;flex-direction:column;gap:5px;width:100%;
-  padding:5px 7px 8px;background:linear-gradient(130deg,#21466aee,#0a2e51ed);border:1px solid #e5bf73;
-  border-radius:12px;color:#f8ebcf;box-shadow:inset 0 1px #ffeca344}
-.harbour-daily-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;width:100%}
-.harbour-daily-days>span{min-width:0;min-height:32px;display:grid;place-items:center;border-radius:7px;
-  border:1px solid #7e9eaf;background:#122c48;color:#bfd8e4;font:900 15px 'Barlow Condensed',sans-serif}
-.harbour-daily-days>span.earned{border-color:#80d7a4;background:#14534f;color:#baffd5}
-.harbour-daily-days>span.next{border:2px solid #ffdb83;background:#69492e;color:#fff4c5;box-shadow:0 0 8px #f3c96a66}
-.harbour-daily-summary{font:900 11px 'Barlow Condensed',sans-serif;letter-spacing:.6px;color:#f9e6aa}
-.harbour-daily-button:focus-visible{outline:3px solid #fff0ad;outline-offset:3px}
-@media(max-width:375px){.harbour-daily-days{gap:3px}.harbour-daily-days>span{min-height:28px;font-size:13px}}
-
-
-/* Original navy/gold nautical icons shared between the harbour and app navigation. */
-.harbour-nav-item>span .pirate-icon,.harbour-secondary-action>span .pirate-icon,.harbour-battle-button .harbour-crossed .pirate-icon{width:1em;height:1em;display:block}
-.harbour-nav-item>span,.harbour-secondary-action>span{display:inline-flex;align-items:center;justify-content:center}
-
-
-/* v0.1.16 — premium navy/gold harbour: real local stats and battle milestones.
- * No fictitious gems, loading counters, rankings or decorative progress percentages. */
-.harbour-header{align-items:center;padding-top:max(14px,calc(env(safe-area-inset-top) + 7px));padding-bottom:7px;
-  background:linear-gradient(180deg,rgba(4,20,46,.92),rgba(6,37,68,.60) 75%,transparent)}
-.harbour-profile{border-color:#f1c87b;box-shadow:inset 0 1px #fff2bd77,0 4px 0 #123049,0 8px 16px #04162cc7}
-.harbour-resources{gap:7px;align-items:center;margin-top:0;flex-shrink:0}
-.harbour-resources>.harbour-stat{display:grid;grid-template-columns:23px minmax(24px,1fr);grid-template-rows:auto auto;
-  align-content:center;column-gap:5px;min-width:79px;min-height:45px;height:auto;padding:5px 8px;
-  border:2px solid #c99f5c;border-radius:12px;background:linear-gradient(155deg,#204b76,#071e42);
-  box-shadow:inset 0 1px #ffe8ae66,0 4px 0 #14243d}
-.harbour-stat .harbour-stat-glyph{grid-row:1/3;align-self:center;font-size:20px;line-height:1;color:#ffd369;filter:drop-shadow(0 2px #5e371c)}
-.harbour-stat strong{font:900 20px/1 'Barlow Condensed',sans-serif;color:#fff2cc;font-variant-numeric:tabular-nums}
-.harbour-stat small{font:800 9px/1.4 'Barlow',sans-serif;letter-spacing:.6px;color:#a9d9ed}
-.harbour-resources>.harbour-stat:nth-child(2) .harbour-stat-glyph{color:#f8d67c;filter:drop-shadow(0 2px #80581c)}
-.harbour-arena-track{height:10px}
-.harbour-arena-track>span{width:0;transition:width .22s ease-out;background:linear-gradient(90deg,#e5a94b,#ffed9c)}
-.harbour-arena-body small{font-size:10px;letter-spacing:.5px;color:#f6e0a8}
-.harbour-arena-crest .pirate-icon,.harbour-side-tile>span .pirate-icon{display:block;width:1em;height:1em}
-.harbour-nav-item{min-height:55px}
-@media(max-width:390px){
-  .harbour-header{gap:5px;padding-left:6px;padding-right:6px}
-  .harbour-profile{gap:4px;padding-right:5px}
-  .harbour-profile div span{font-size:15px}
-  .harbour-profile strong{font-size:9px;letter-spacing:.5px}
-  .harbour-profile small{font-size:8px}
-  .harbour-avatar{width:34px;height:34px}
-  .harbour-resources{gap:4px}
-  .harbour-resources>.harbour-stat{min-width:63px;min-height:42px;grid-template-columns:15px minmax(20px,1fr);
-    column-gap:3px;padding:3px 4px;border-width:1px}
-  .harbour-stat .harbour-stat-glyph{font-size:15px}
-  .harbour-stat strong{font-size:17px}
-  .harbour-stat small{font-size:8px;letter-spacing:0}
-  .harbour-arena-body small{font-size:9px}
-}
-@media(prefers-reduced-motion:reduce){.harbour-arena-track>span{transition:none}}
-
-/* The Porto ship is interactive directly in the open central 3D canvas. */
-.harbour-central{pointer-events:none}
-.harbour-ship-label{pointer-events:none}
-.harbour-actions{grid-template-columns:minmax(0,1fr) minmax(0,2.3fr) minmax(0,1fr)}
-.harbour-action-hint{min-height:40px;display:grid;place-items:center;font-size:25px;color:#ffe0a1;pointer-events:none}
-.harbour-inspect-button{display:none}
-
-/* v0.1.18 — compact daily reward shortcut. Full seven-day calendar lives in Missions. */
-.harbour-compact-daily{min-height:80px;background:linear-gradient(165deg,#79572c,#173e61 48%,#102b4b);border-color:#f0cc75}
-.harbour-compact-daily>span{font-size:28px;line-height:1}
-.harbour-compact-daily small{font-size:10px;letter-spacing:.2px}
-.harbour-compact-daily.harbour-reward-ready{box-shadow:0 0 0 2px #f9d27566,inset 0 1px #ffe9a9,0 5px #40291e}
-.harbour-compact-daily:focus-visible{outline:3px solid #fff4b4;outline-offset:3px}
-@media(max-width:390px){.harbour-compact-daily{min-height:72px}.harbour-compact-daily strong{font-size:14px}.harbour-compact-daily small{font-size:9px}}
