@@ -316,3 +316,74 @@
 @media(max-width:335px){.app-fleet-modules{grid-template-columns:1fr}
  .app-fleet-module-top small{flex-basis:auto;margin-left:auto}}
 @media(prefers-reduced-motion:reduce){.app-fleet-actions button{transition:none}}
+
+/* v0.1.15 — original interactive crew deck; actual local ownership and active captain. */
+.app-deck{display:flex;flex-direction:column;gap:11px;padding:13px;border:2px solid #d8b777;border-radius:18px;
+ background:radial-gradient(ellipse at 20% 5%,#326d8699,transparent 60%),linear-gradient(160deg,#153b5c,#081e38);
+ box-shadow:inset 0 1px #ffe7bb66,0 9px 23px #011427bb}
+.app-deck-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.app-deck-top h3{font:900 27px/1 'Barlow Condensed',sans-serif;color:#ffebbb;margin:5px 0}
+.app-deck-count{flex:none;color:#ffe4a8;font:900 11px 'Barlow',sans-serif;border:1px solid #b8a175;
+ background:#092945;padding:7px;border-radius:9px}
+.app-deck-feature{display:grid;grid-template-columns:minmax(100px,42%) minmax(0,1fr);gap:12px;
+ border:1px solid #b8a47b;border-radius:14px;padding:11px;background:linear-gradient(110deg,#284b66,#0b2846)}
+.app-deck-illustration{position:relative;align-self:center;min-width:0;border-radius:14px;
+ background:radial-gradient(circle,#42688277,#061d3699 75%)}
+.app-deck-illustration svg{display:block;width:100%;height:auto;max-height:198px}
+.app-deck-emblem{position:absolute;right:2px;bottom:0;width:39px;height:39px;display:grid;place-items:center;
+ border:2px solid #ffe0a4;border-radius:50%;background:linear-gradient(#675338,#302a33);font:900 26px 'Barlow Condensed',sans-serif;color:#ffdf97}
+.app-deck-info{min-width:0;display:flex;align-items:flex-start;flex-direction:column;justify-content:center;gap:6px}
+.app-deck-info>small{color:#f6d593;font:900 10px 'Barlow',sans-serif;letter-spacing:.4px}
+.app-deck-info h4{margin:0;font:900 clamp(22px,5.6vw,32px)/.95 'Barlow Condensed',sans-serif;color:#fff4d7}
+.app-deck-info p{margin:0;color:#c3dce9;font:600 11px/1.35 'Barlow',sans-serif}
+.app-deck-info>strong{color:#ffe0a5;font:900 13px 'Barlow Condensed',sans-serif}
+.app-deck-afford{color:#c8dae7;font:700 11px/1.35 'Barlow',sans-serif}
+.app-deck-info button{width:100%;min-height:46px;padding:8px;border:2px solid #ffe0a2;border-radius:10px;
+ background:linear-gradient(#ffe9af,#cc9651);color:#2b2c33;text-shadow:none;font:900 13px 'Barlow Condensed',sans-serif}
+.app-deck-info button:disabled{background:#294d65;color:#f3dcae;border-color:#b5a17e;opacity:1}
+.app-deck-roster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.app-deck-slot{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;min-width:0;
+ padding:9px 4px;min-height:96px;border:1px solid #88a8b8;border-radius:11px;background:linear-gradient(#1c4667,#0a253d);
+ color:#e7eff2;text-shadow:none}
+.app-deck-slot.is-preview{border:2px solid #ffe0a0;background:linear-gradient(#71543b,#243952)}
+.app-deck-slot-icon{display:grid;place-items:center;width:39px;height:39px;border:1px solid #e8c989;
+ border-radius:50%;font:900 25px 'Barlow Condensed',sans-serif;color:#ffdc93;background:#152b45}
+.app-deck-slot strong{max-width:100%;font:900 13px 'Barlow Condensed',sans-serif;overflow-wrap:anywhere;line-height:1.15}
+.app-deck-slot small{font:800 10px 'Barlow',sans-serif;color:#ffdfa0}
+.app-deck-footer{display:flex;gap:9px;align-items:center;justify-content:space-between}
+.app-deck-footer>span{flex:1;color:#cddfea;font:600 11px/1.35 'Barlow',sans-serif}
+.app-deck-footer button{min-height:46px;padding:7px 11px;flex:none;border:2px solid #e8c786;border-radius:10px;
+ font:900 12px 'Barlow Condensed',sans-serif;color:#ffdfa5;background:#123b60}
+.app-deck button:focus-visible,.app-forge-board button:focus-visible{outline:3px solid #fff4bc;outline-offset:3px}
+
+/* The Forge board shows recorded upgrade levels without fictional combat effects. */
+.app-forge-board{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:center;padding:12px;
+ border:2px solid #d3b273;border-radius:17px;background:linear-gradient(120deg,#224f66,#0a2745);
+ box-shadow:inset 0 1px #ffebc244,0 7px 17px #00172e88}
+.app-forge-seal{min-height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+ border:1px solid #bd9b67;border-radius:12px;background:radial-gradient(circle,#3c6374,#142f4e 70%);
+ color:#ffe0a1}
+.app-forge-seal span{font:900 11px 'Barlow Condensed',sans-serif;letter-spacing:.8px}
+.app-forge-status h3{font:900 25px 'Barlow Condensed',sans-serif;color:#ffe6ae;margin:4px 0 10px}
+.app-forge-mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.app-forge-mini-grid>div{min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 3px;
+ border:1px solid #8aaabb;border-radius:9px;background:#0b2c4b}
+.app-forge-mini-grid span{font-size:24px;color:#ffdfa0;line-height:1}
+.app-forge-mini-grid strong{font:900 12px 'Barlow Condensed',sans-serif}
+.app-forge-mini-grid small{font:800 11px 'Barlow',sans-serif;color:#ffda8c}
+.app-forge-status p{color:#c5dbe6;font:600 10px/1.45 'Barlow',sans-serif;margin:9px 0 0}
+@media(max-width:390px){
+ .app-deck{padding:9px;gap:8px}.app-deck-feature{padding:8px;gap:7px;grid-template-columns:minmax(92px,40%) minmax(0,1fr)}
+ .app-deck-info h4{font-size:23px}.app-deck-info>small{font-size:9px}.app-deck-info button{font-size:11px;padding:5px}
+ .app-deck-slot{min-height:90px}.app-deck-slot strong{font-size:12px}
+ .app-deck-footer button{font-size:11px;padding:5px}
+ .app-forge-board{grid-template-columns:75px minmax(0,1fr);gap:7px;padding:8px}
+ .app-forge-seal{min-height:135px}.app-forge-seal svg{width:44px}.app-forge-seal span{font-size:9px}
+ .app-forge-mini-grid span{font-size:19px}.app-forge-mini-grid strong{font-size:10px}
+ .app-forge-status h3{font-size:22px}
+}
+@media(max-width:330px){.app-deck-feature{grid-template-columns:1fr}
+ .app-deck-illustration{max-width:145px;margin:auto}.app-deck-info h4{font-size:25px}
+ .app-forge-board{grid-template-columns:1fr}.app-forge-seal{min-height:70px;flex-direction:row}
+}
+@media(prefers-reduced-motion:reduce){.app-deck button{transition:none}}
