@@ -390,3 +390,29 @@
  .app-forge-board{grid-template-columns:1fr}.app-forge-seal{min-height:70px;flex-direction:row}
 }
 @media(prefers-reduced-motion:reduce){.app-deck button{transition:none}}
+
+
+/* WORK 6 — Porto is the approved dimension/shape reference, 15 Nov 2026.
+ * Other app sheets use its exact harbour-nav markup, illustrations and CSS.
+ * Do not restyle harbour-screen or the approved Porto menu.
+ */
+.app-sheet {
+  --porto-nav-height:clamp(82px,11dvh,112px);
+}
+.app-sheet > .harbour-nav {
+  position:relative;
+  inset:auto;
+  width:100%;
+  flex:0 0 var(--porto-nav-height);
+  z-index:5;
+}
+.app-sheet > .harbour-nav .harbour-nav-item:disabled {
+  opacity:1;
+  cursor:default;
+}
+/* Extra shortcuts duplicated the same destinations above the page content.
+ * Their routes remain available from Porto and the page's real CTA controls.
+ */
+.app-sheet > .app-shortcuts {
+  display:none;
+}
