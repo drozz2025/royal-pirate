@@ -54,7 +54,7 @@ export function CrewDeck({profile,onlyOwned,onBuyCrew,onEquipCrew,onBattle,annou
           aria-label={'View '+c.name+(isActive?', active captain':isOwned?', owned':', locked')}>
           <span className="app-deck-slot-icon" aria-hidden="true">{c.symbol}</span>
           <strong>{c.name}</strong>
-          <small>{isActive?'ACTIVE':isOwned?'OWNED':c.cost+' ●'}</small>
+          <small>{isActive?'ACTIVE':isOwned?'OWNED':'UNDISCOVERED · '+c.cost+' ●'}</small>
         </button>;
       })}
     </div>
