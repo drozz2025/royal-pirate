@@ -462,3 +462,166 @@
 @media(prefers-reduced-motion:reduce){
  .w4-fleet .w4-harbour-stage>.w4-ship-art,.w4-forge .w4-cannon-art{transition:none;animation:none}
 }
+
+/* WORK 4 · 19:00 · Second pass compared with approved artwork 03/04.
+   Built entirely with scalable original SVG/CSS so all game controls remain live. */
+.w4-screen .w4-tabs{gap:5px;margin-top:3px}
+.w4-screen .w4-tabs button{
+  position:relative;min-height:47px;
+  border:2px solid #d6a36c;
+  background:linear-gradient(180deg,#6288a1 0%,#193c5b 12%,#0a223d 80%,#061a33);
+  box-shadow:inset 0 2px #d9f4f29c,0 2px #4c301d,0 4px 5px #05182ea6;
+  font-size:clamp(11px,3.45vw,17px);
+}
+.w4-screen .w4-tabs button[aria-selected=true]{
+  border:3px solid #f8d898;
+  background:linear-gradient(180deg,#8ee6fa 0%,#39a9d0 17%,#0577a5 70%,#075074);
+  box-shadow:0 0 0 2px #74431d,0 4px #512f18,inset 0 2px #e9ffffc7,0 0 13px #a9f7ff8c;
+}
+.w4-fleet .w4-harbour-stage,
+.w4-forge .w4-forge-stage{isolation:isolate}
+.w4-fleet .w4-island{display:none}
+.w4-fleet .w4-tropical-art{
+  display:block;position:absolute;z-index:0;inset:0;width:100%;height:100%;
+  pointer-events:none;filter:drop-shadow(0 3px 1px #083f6880);
+}
+.w4-fleet .w4-harbour-stage{
+  min-height:clamp(260px,37dvh,345px);
+  background:
+    radial-gradient(ellipse 67% 26% at 46% 15%,#fff8d392,transparent),
+    linear-gradient(180deg,#0d96d1 0%,#1183c0 36%,#0f9ab5 60%,#07759e 70%,#05436e 100%);
+}
+.w4-fleet .w4-harbour-stage:after{
+  height:23%;background:repeating-linear-gradient(-6deg,transparent 0 17px,#8ef4fc42 19px,#08739c26 22px);
+}
+.w4-fleet .w4-harbour-stage>.w4-ship-art{
+  left:-9%;bottom:1%;width:89%;
+  transform:scale(1.07) rotate(-2deg);
+  filter:drop-shadow(0 14px 4px #012740c2) drop-shadow(0 0 5px #ffd19c7a);
+}
+.w4-fleet .w4-stage-label{
+  right:1.5%;top:7%;width:41%;padding:10px 9px 10px;
+  border-radius:13px;border:3px solid #d5b372;
+  background:linear-gradient(160deg,#103f68eb 0%,#061c36ef 98%);
+  box-shadow:0 0 0 1px #4d2a17,0 5px 12px #07243cb9,inset 0 2px #d0f3ff66;
+}
+.w4-fleet .w4-stage-label:before{
+  content:"♛";position:absolute;right:7px;top:5px;
+  font:900 24px/1 Georgia,serif;color:#ffd373;text-shadow:0 2px #5e351b;
+  opacity:.7;pointer-events:none;
+}
+.w4-fleet .w4-stage-label>span{font-size:12px;color:#ffe29c;padding-right:15px}
+.w4-fleet .w4-stage-label>strong{
+  color:#ffe59f;max-width:100%;font-size:clamp(21px,5.7vw,29px);
+  -webkit-text-stroke:.25px #503015;
+}
+.w4-fleet .w4-stage-label>small{font-size:10px;line-height:1.3}
+.w4-fleet .w4-stage-stats{border-top:1px solid #f3c98152;padding-top:6px;margin-top:5px}
+.w4-fleet .w4-stage-stats>span{min-height:26px;border-bottom:1px solid #f7db9e2a}
+.w4-fleet .w4-stage-stats>span>strong:before{
+  content:"✦";color:#fbd478;margin-right:3px;font-size:11px;
+}
+.w4-fleet .w4-stage-stats em{color:#b9faff}
+.w4-fleet .w4-stage-label>b{
+  color:#fff8c9;letter-spacing:.3px;border:2px solid #c5f293;
+  background:linear-gradient(#85df40,#178f2f 67%,#0b6627);
+  box-shadow:inset 0 2px #fff8b68a,0 2px 4px #071b2d;
+}
+.w4-fleet .w4-cards-caption{margin-top:3px;font-size:19px}
+.w4-fleet .w4-ship-slot{
+  min-height:116px;border-radius:12px;
+  background:radial-gradient(ellipse 115% 80% at 50% 6%,#2b9ac9 0%,#115078 55%,#061e3d);
+  border:3px solid #c3a16d;box-shadow:inset 0 2px #c2f4ff71,0 4px 5px #041d37;
+}
+.w4-fleet .w4-ship-slot.is-active{
+  border:3px solid #ffe9a5;
+  box-shadow:0 0 0 2px #8d591e,0 0 18px #ffc948d4,inset 0 2px #f7f9c5b2;
+}
+.w4-fleet .w4-ship-slot.is-active:before{
+  content:"♛";position:absolute;top:2px;left:5px;z-index:3;
+  font:900 16px Georgia,serif;color:#ffe58c;text-shadow:0 2px #6e452b;
+}
+.w4-fleet .w4-ship-slot.is-active strong{color:#ffdf74}
+.w4-fleet .w4-ship-slot .w4-slot-art{height:69px}
+.w4-fleet .w4-ship-small{width:137px;height:98px;transform:translate(-14%,-19px) scale(.97)}
+.w4-fleet .w4-action-pair button.w4-primary{
+  border:3px solid #f8d285;background:linear-gradient(#ffefae,#eab35f 37%,#ba7426);
+  box-shadow:0 3px #75441e,inset 0 2px #fff9da;
+}
+/* Forge: visible timber, stone forge and glow behind an oversized cannon. */
+.w4-forge .w4-forge-stage{
+  min-height:clamp(246px,34dvh,320px);
+  background:
+    radial-gradient(ellipse 75% 75% at 22% 70%,#ee833eaf,transparent 80%),
+    linear-gradient(130deg,#533f36,#372c32 37%,#203246 75%,#071b38);
+}
+.w4-forge .w4-forge-stage::before{opacity:.34}
+.w4-forge .w4-forge-art{
+  position:absolute;z-index:0;inset:0;width:100%;height:100%;display:block;
+  pointer-events:none;filter:drop-shadow(0 5px 3px #100b1899);
+}
+.w4-forge .w4-forge-glow{z-index:0;opacity:.64}
+.w4-forge .w4-cannon-art{
+  left:-8%;bottom:-3%;width:83%;
+  filter:drop-shadow(0 13px 7px #170a0adb) drop-shadow(0 0 11px #ffa852b3);
+}
+.w4-forge .w4-forge-stage>.w4-ship-art{
+  left:-8%;bottom:-3%;width:80%;
+}
+.w4-forge .w4-forge-description{
+  right:2%;top:9%;width:43%;min-height:150px;padding:12px 8px;
+  border:3px solid #dcb36e;border-radius:12px;
+  background:linear-gradient(155deg,#123f60ef,#051b36f0);
+  box-shadow:0 0 0 1px #59351e,0 7px 10px #030e22b0,inset 0 2px #d2eff579;
+}
+.w4-forge .w4-forge-description:before{
+  content:"⚒";position:absolute;right:5px;top:7px;font-size:23px;
+  color:#f9d07e;opacity:.8;pointer-events:none;
+}
+.w4-forge .w4-forge-description span{padding-right:21px;color:#f8d793}
+.w4-forge .w4-forge-description h3{font-size:clamp(22px,5.9vw,31px);color:#ffe4a7;margin:12px 0 9px}
+.w4-forge .w4-forge-description strong{
+  display:inline-block;white-space:nowrap;font-size:clamp(16px,4.5vw,22px);
+}
+.w4-forge .w4-forge-description em{color:#8af165}
+.w4-forge .w4-attributes,
+.w4-forge .w4-materials{
+  border:3px solid #c9a46e;background:linear-gradient(160deg,#1d4769,#092741);
+  box-shadow:0 3px #4a321e,0 6px 10px #071c36ba,inset 0 2px #d0ebf45c;
+}
+.w4-forge .w4-attributes h3,
+.w4-forge .w4-materials h3{
+  color:#f5da9b;text-transform:uppercase;letter-spacing:.35px;
+}
+.w4-forge .w4-resource-grid>div{
+  border:2px solid #bc9156;border-radius:12px;
+  background:radial-gradient(ellipse at 45% 15%,#346b88,#123957 56%,#09253f);
+  box-shadow:inset 0 2px #d7ebd77a,0 3px #071f39;
+}
+.w4-forge .w4-resource-grid>div>span{
+  font-size:30px;color:#ffdf7f;text-shadow:0 2px #664022;
+}
+.w4-forge .w4-resource-grid strong{font-size:19px;color:#fff1ca}
+.w4-forge .w4-improve-button:not(:disabled){
+  transform:translateY(-1px);
+  background:linear-gradient(180deg,#b5ff7b,#59e23a 23%,#0aa036 72%,#07732a);
+  box-shadow:0 0 0 3px #624323,0 5px #473021,0 10px 20px #061d32c9,inset 0 3px #ebffc0;
+}
+@media(max-width:390px){
+ .w4-fleet .w4-harbour-stage{min-height:252px}
+ .w4-fleet .w4-harbour-stage>.w4-ship-art{left:-14%;width:94%}
+ .w4-fleet .w4-stage-label{right:1%;width:43%;padding:7px 5px}
+ .w4-fleet .w4-stage-label>strong{font-size:21px}
+ .w4-fleet .w4-ship-slot{min-height:100px}
+ .w4-fleet .w4-ship-slot .w4-slot-art{height:57px}
+ .w4-forge .w4-forge-stage{min-height:242px}
+ .w4-forge .w4-forge-description{width:44%;min-height:137px;padding:8px 5px}
+ .w4-forge .w4-cannon-art{width:87%;left:-10%}
+}
+@media(max-width:345px){
+ .w4-fleet .w4-harbour-stage{min-height:226px}
+ .w4-fleet .w4-stage-label{width:45%}
+ .w4-fleet .w4-stage-stats>span{min-height:22px}
+ .w4-fleet .w4-stage-label>strong{font-size:19px}
+ .w4-forge .w4-forge-description{min-height:128px}
+}
