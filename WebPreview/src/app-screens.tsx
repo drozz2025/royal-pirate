@@ -72,7 +72,7 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onInspect
             {Array.from({length:7},(_,n)=>n+1).map(n=>{
               const claimed=n<=visibleStreak;
               const next=day&&n===nextDailyDay;
-              return <li key={n} className={'app-week-day '+(claimed?'is-claimed':next?'is-next':'')}>
+              return <li key={n} className={['app-week-day',claimed?'is-claimed':next?'is-next':''].filter(Boolean).join(' ')}>
                 <span className="app-week-day-label">DAY {n}</span>
                 <span className="app-week-day-icon" aria-hidden="true">{claimed?'✓':n===7?'♛':'◆'}</span>
                 <strong>{15+n*5} <span aria-hidden="true">●</span></strong>
