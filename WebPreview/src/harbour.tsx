@@ -1,5 +1,6 @@
 import React from 'react';
 import { PirateIcon, type PirateIconName } from './app-icons';
+import { PortoArt } from './porto-art';
 import type { AppScreenId } from './app-screens';
 import { canClaimDaily, CREW, levelFor, missionProgress, MISSIONS, nextDailyStreak, UPGRADES, upgradeCost, type LocalProfile } from './progression';
 
@@ -49,7 +50,7 @@ export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=
           ?(dailyAvailable?'Daily supply ready: claim '+dailyCoins+' local coins in Missions':'Daily supply collected today, streak '+profile.dailyStreak+' of 7')
           :item.screen==='missions'&&readyMissions?'Missions: '+readyMissions+' reward claims ready':item.label;
         return <button type="button" key={item.screen} className={'harbour-flank-button'+(ready?' is-ready':'')} onClick={()=>onAction(item.screen)} aria-label={label}>
-          <span className="harbour-flank-icon" aria-hidden="true"><PirateIcon name={item.icon} size={33}/></span>
+          <span className="harbour-flank-icon" aria-hidden="true"><PortoArt name={item.icon} size={48}/></span>
           <strong>{item.title}</strong>
           {item.screen==='battle'&&<small className="harbour-training-mode">TREINO LOCAL</small>}
           {item.screen==='battle'&&<small className="harbour-local-wins" aria-label={profile.wins+' local battle victories'}>★ {profile.wins} VITÓRIAS</small>}
@@ -81,7 +82,7 @@ export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=
     {side(leftActions,'left')}
     {side(rightActions,'right')}
     <button type="button" className="harbour-battle-button" onClick={onBattle} aria-label="Batalha: iniciar combate naval jogável">
-      <span className="harbour-crossed" aria-hidden="true"><PirateIcon name="battle" size={42}/></span><strong>BATALHA!</strong>
+      <span className="harbour-crossed" aria-hidden="true"><PortoArt name="battle" size={52}/></span><strong>BATALHA!</strong>
     </button>
     <nav className="harbour-nav" aria-label="Main game navigation">
       {nav.map(item=>{
@@ -91,7 +92,7 @@ export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=
           disabled={item.screen===null} aria-current={item.screen===null?'page':undefined}
           onClick={item.screen?()=>onAction(item.screen!):undefined}
           aria-label={item.screen===null?'Porto, current screen':item.title+(actionable?', melhoria disponível':'')}>
-          <span className="harbour-nav-icon" aria-hidden="true"><PirateIcon name={item.icon} size={30}/></span>
+          <span className="harbour-nav-icon" aria-hidden="true"><PortoArt name={item.icon} size={42}/></span>
           <strong>{item.title}</strong>
           {actionable&&<span className="harbour-nav-alert" aria-hidden="true">!</span>}
         </button>;
