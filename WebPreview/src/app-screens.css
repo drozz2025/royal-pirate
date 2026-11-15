@@ -1,0 +1,93 @@
+/* ROYAL PIRATE app-first mobile shell. Original responsive navy/gold UI over live ocean. */
+.app-sheet{--gold:#ffe0a0;position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;
+  color:#fff3dd;background:radial-gradient(ellipse 90% 35% at 50% 12%,#3b83b28a,transparent 95%),
+  linear-gradient(165deg,rgba(4,22,51,.96),rgba(10,47,81,.965) 45%,rgba(4,21,45,.98));
+  isolation:isolate;text-shadow:0 2px 3px #020e1b88}
+.app-sheet button{transition:filter .15s,transform .1s}
+.app-sheet button:active:not(:disabled){transform:translateY(2px)}
+.app-sheet button:focus-visible{outline:3px solid #fff4b8;outline-offset:2px}
+.app-sheet button:disabled{opacity:.5;cursor:not-allowed}
+.app-sheet-header{display:flex;align-items:center;gap:10px;padding:max(16px,env(safe-area-inset-top)) 14px 11px;
+  border-bottom:2px solid #c6a16088;background:linear-gradient(#071b35a8,#102e4a60);min-height:86px}
+.app-back{display:grid;place-items:center;flex:none;width:46px;height:46px;border:2px solid #e7bd72;border-radius:14px;
+  background:linear-gradient(#2b6389,#103052);font:bold 35px 'Barlow Condensed',sans-serif;color:#fff5df;box-shadow:0 3px #4c2b1d}
+.app-sheet-brand{min-width:0;flex:1}
+.app-sheet-brand small{display:block;font:800 9px 'Barlow',sans-serif;letter-spacing:1.2px;color:#c6d6e9}
+.app-sheet-brand h1{margin:2px 0 0;font:900 clamp(25px,6.5vw,38px) 'Barlow Condensed',sans-serif;text-transform:uppercase;line-height:1;letter-spacing:.5px}
+.app-sheet-brand h1 span{color:var(--gold);font-size:.85em}
+.app-wallet{border:2px solid #ca9a50;border-radius:12px;padding:7px 10px;background:linear-gradient(#305074,#112c53);
+  display:flex;align-items:center;gap:4px;flex:none;box-shadow:inset 0 1px #ffe7a044}
+.app-wallet span{color:#ffd45a}.app-wallet strong{font:900 21px 'Barlow Condensed',sans-serif}.app-wallet small{font:700 8px 'Barlow',sans-serif;color:#d9c18e}
+.app-shortcuts{display:flex;justify-content:center;gap:7px;padding:11px 14px 3px;flex-shrink:0}
+.app-shortcuts button{flex:1;max-width:165px;min-height:43px;border:1px solid #9cbdd067;border-radius:9px;
+  background:#1a4973;color:#f4e5c2;font:800 13px 'Barlow Condensed',sans-serif;letter-spacing:.3px}
+.app-shortcuts button[aria-current=page]{background:linear-gradient(#f4d07f,#bf8538);color:#28283f;border-color:#fff0b2}
+.app-sheet-content{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  padding:18px max(15px,calc((100% - 620px)/2)) 28px}
+.app-sheet-content h2{margin:0 0 15px;font:900 clamp(28px,7.2vw,44px) 'Barlow Condensed',sans-serif;color:#fff2d0}
+.app-sheet-content h3{font:800 22px 'Barlow Condensed',sans-serif;margin:22px 0 10px}
+.app-sheet-content p{line-height:1.5}
+.app-stack{display:flex;flex-direction:column;gap:13px}
+.app-kicker{color:#f4c978;font:800 10px 'Barlow',sans-serif;letter-spacing:1.4px;text-transform:uppercase}
+.app-fine{font:600 12px 'Barlow',sans-serif;color:#b6d0de;line-height:1.55;margin:2px 0 14px}
+.app-item{border:2px solid #c39d5bb5;border-radius:15px;padding:14px 11px;display:flex;align-items:center;gap:11px;
+  background:linear-gradient(120deg,#1a476ccf,#102d4de9);box-shadow:inset 0 1px #ffeaba2a,0 4px 12px #07142666}
+.app-item-symbol{display:grid;place-items:center;flex:0 0 61px;height:64px;border:2px solid #e3b96c;border-radius:13px;
+  background:linear-gradient(135deg,#875c3f,#332536);color:#ffe3a5;font-size:34px}
+.app-item-text{flex:1;min-width:0}.app-item-text strong{display:block;font:800 20px 'Barlow Condensed',sans-serif}
+.app-item-text small{display:block;color:#e8c88d;font:700 10px 'Barlow',sans-serif;letter-spacing:.4px}
+.app-item-text p{font:500 11px 'Barlow',sans-serif;line-height:1.4;color:#bdd2e0;margin:6px 0 0}
+.app-item>button,.app-daily>button,.app-offer button,.app-row-muted button{flex:0 0 auto;min-width:65px;
+  min-height:44px;border:2px solid #f6d08a;border-radius:10px;padding:7px 10px;background:linear-gradient(#f5d98c,#c48f4a);
+  color:#272c37;font:900 13px 'Barlow Condensed',sans-serif;letter-spacing:.5px;text-shadow:none}
+.app-equipped{border-color:#f7e59c;box-shadow:0 0 0 2px #f4cd7233,inset 0 1px #fff8}
+.app-ship-card{display:flex;align-items:center;gap:16px;padding:21px 14px;border-radius:20px;border:2px solid #d8ad6c;
+  background:linear-gradient(115deg,#1c5377bb,#3a3549b3);min-height:172px;box-shadow:0 7px 19px #08172699}
+.app-ship-card>span{font-size:77px;line-height:1;color:#eed39c;text-shadow:0 4px #77502d}
+.app-ship-card strong{display:block;font:900 26px 'Barlow Condensed',sans-serif}
+.app-ship-card small{display:block;font:600 11px 'Barlow',sans-serif;color:#f1cf95}
+.app-ship-card p{font-size:13px;color:#d6ddeb}
+.app-cta{width:100%;padding:17px;border:3px solid #ffe7a1;border-radius:15px;background:linear-gradient(#ffea91,#f4b845 56%,#d77d2a);
+  color:#3b2718;font:900 23px 'Barlow Condensed',sans-serif;letter-spacing:.8px;text-shadow:0 1px #fff2d0;
+  box-shadow:inset 0 2px #fff8bb,0 5px #87501d}
+.app-row-muted{padding:15px;display:flex;gap:8px;align-items:center;justify-content:space-between;border:1px solid #728ba680;
+  border-radius:12px;background:#112c4e;color:#b5cfdd;font:600 12px 'Barlow',sans-serif}
+.app-row-muted>span:last-child{font:900 10px 'Barlow',sans-serif;color:#efc685}
+.app-offer{display:flex;align-items:center;gap:12px;padding:15px;border:1px solid #9bb9c777;border-radius:14px;background:#193d61cb}
+.app-offer>span{font-size:38px;color:#ffd98d}.app-offer>div{flex:1;min-width:0}
+.app-offer strong{font:800 17px 'Barlow Condensed',sans-serif}
+.app-offer>strong{font-size:10px;color:#ebcc8d;white-space:nowrap}
+.app-offer p{font:500 12px 'Barlow',sans-serif;color:#bcd4e1;margin:5px 0 0}
+.app-intro{text-align:center}.app-crest{font-size:66px;color:#ffdc81;display:block;margin:12px auto 8px;text-shadow:0 7px #47362a}
+.app-intro p{max-width:440px;margin:12px auto 18px;color:#bed3e4;font-size:13px}
+.app-versus{display:flex;align-items:center;justify-content:space-around;gap:8px;margin:22px 0;padding:20px 12px;border-radius:18px;
+  background:linear-gradient(130deg,#13466c,#5c3037);border:2px solid #b18e56}
+.app-versus>div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}.app-versus>div>strong{font-size:53px;color:#ffde8c}
+.app-versus b{font:900 19px 'Barlow Condensed',sans-serif}.app-versus small{font:700 9px 'Barlow',sans-serif;color:#bcd2d9}
+.app-versus>span{font:900 28px 'Barlow Condensed',sans-serif;color:#ffe9b1}
+.app-daily{display:flex;align-items:center;gap:12px;border:2px solid #ecc478;padding:15px;border-radius:16px;
+  background:linear-gradient(135deg,#614c3b,#1c4564);box-shadow:inset 0 1px #fff6a866}
+.app-daily>span{font-size:42px}.app-daily>div{flex:1}.app-daily strong{font:800 18px 'Barlow Condensed',sans-serif}
+.app-daily p{font-size:11px;margin:4px 0}.app-daily small{font-size:10px;color:#f2d3a0}
+.app-mission .app-item-text{padding:3px}.app-track{height:7px;border-radius:8px;background:#071d31;margin-top:9px;overflow:hidden}
+.app-track>span{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#7fd4c3,#ffe2a0)}
+.app-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.app-stat-grid>div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  padding:16px 5px;border-radius:13px;border:1px solid #c99e5a;background:linear-gradient(#2a4e74,#132e50)}
+.app-stat-grid small{font:800 10px 'Barlow',sans-serif;color:#e9cd8d}.app-stat-grid strong{font:900 30px 'Barlow Condensed',sans-serif}
+.app-dock{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));flex-shrink:0;min-height:74px;
+  padding:5px 7px max(7px,env(safe-area-inset-bottom));gap:4px;background:linear-gradient(#153b69,#061f46);
+  border-top:3px solid #d3ae64;box-shadow:0 -4px 15px #030e1bc0}
+.app-dock button{min-width:0;padding:3px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1px;border-radius:11px;background:transparent;color:#d7e7f6}
+.app-dock button span{font-size:24px;line-height:1.1;color:#f5cc75}.app-dock button strong{font:800 12px 'Barlow Condensed',sans-serif;letter-spacing:.2px}
+.app-dock button[aria-current=page]{border:2px solid #f6dc90;background:linear-gradient(#edce89,#b9813c);color:#272d40;box-shadow:0 2px #5b3c28}
+.app-dock button[aria-current=page] span{color:#4b3427}
+@media(min-width:660px){.app-sheet{max-width:600px;margin:auto;border-left:2px solid #ad895d;border-right:2px solid #ad895d;box-shadow:0 0 70px #020d19b3}}
+@media(max-width:370px){.app-sheet-header{padding-left:8px;padding-right:8px;gap:6px}.app-wallet small{display:none}.app-back{width:40px;height:40px}
+  .app-item{gap:6px;padding:10px 7px}.app-item-symbol{flex-basis:49px;height:57px;font-size:28px}
+  .app-item-text strong{font-size:17px}.app-item>button{min-width:57px;padding:5px}.app-dock button strong{font-size:10px}}
+@media(max-height:650px){.app-sheet-header{min-height:67px;padding-top:max(7px,env(safe-area-inset-top));padding-bottom:6px}
+  .app-shortcuts{padding:5px 10px 2px}.app-shortcuts button{min-height:38px}.app-sheet-content{padding-top:8px}
+  .app-dock{min-height:65px}.app-crest{font-size:42px;margin:2px auto}}
+@media(prefers-reduced-motion:reduce){.app-sheet button{transition:none}}
