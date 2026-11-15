@@ -1,0 +1,10 @@
+/* WORK 8: compact, accessible tabs on the existing navy-and-gold mobile shell. */
+.work8-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px;border:1px solid #a78651;border-radius:12px;background:linear-gradient(#071d35,#103456)}
+.work8-tabs button{min-width:0;min-height:47px;padding:8px 3px;border:1px solid transparent;border-radius:8px;color:#f4dfac;background:transparent;font:900 clamp(11px,3.1vw,14px) 'Barlow Condensed',sans-serif;letter-spacing:.45px}
+.work8-tabs button[aria-pressed="true"]{color:#302a24;background:linear-gradient(#ffeab3,#d2a052);border-color:#ffe3a5;box-shadow:0 2px #74502b}
+.work8-tabs button:focus-visible,.work8-unavailable button:focus-visible{outline:3px solid white;outline-offset:2px}
+.work8-unavailable{padding:25px 15px;min-height:225px;text-align:center;border:1px solid #bd9a65;border-radius:13px;background:linear-gradient(145deg,#15385b,#091f3b);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.work8-unavailable strong{font:900 26px/1 'Barlow Condensed',sans-serif;color:#ffdf9f}
+.work8-unavailable p{max-width:340px;margin:0;color:#dce8ee;font:600 13px/1.5 'Barlow',sans-serif}
+.work8-unavailable button{min-height:45px;padding:10px 16px;border:2px solid #f0d499;border-radius:10px;background:linear-gradient(#f9dda0,#ca934e);color:#2c2a29;font:900 13px 'Barlow Condensed',sans-serif}
+@media(max-width:345px){.work8-tabs button{font-size:10px;letter-spacing:0}}
