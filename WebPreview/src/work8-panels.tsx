@@ -70,6 +70,50 @@ function W8Art({kind}:{kind:W8ArtKind}){
   </svg>;
 }
 
+
+/** Decorative maritime panorama drawn in SVG, not a screenshot or gameplay layer. */
+function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
+  return <svg className={'w8-seascape w8-seascape-'+variant} viewBox="0 0 420 176" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="w8-sea-sky" x1="0" y1="0" x2="0" y2="1">
+        <stop stopColor="#2D94B8"/><stop offset=".58" stopColor="#19638A"/><stop offset="1" stopColor="#0A3156"/>
+      </linearGradient>
+      <linearGradient id="w8-sea-waves" x1="0" y1="0" x2="0" y2="1">
+        <stop stopColor="#2A88A5"/><stop offset="1" stopColor="#072B4B"/>
+      </linearGradient>
+    </defs>
+    <rect width="420" height="176" fill="url(#w8-sea-sky)"/>
+    <circle cx="341" cy="38" r="28" fill="#FFE6A1" opacity=".36"/>
+    <circle cx="341" cy="38" r="41" fill="none" stroke="#FFE6A1" strokeWidth="1.5" opacity=".19"/>
+    <path d="M0 111L42 91L70 101L101 75L142 103L177 93L214 113L256 99L291 104L329 85L368 101L420 82V176H0Z" fill="#164D67"/>
+    <path d="M0 124Q55 115 104 125T212 125T318 121T420 127V176H0Z" fill="url(#w8-sea-waves)"/>
+    <g fill="none" stroke="#84D7DE" strokeWidth="2.2" opacity=".32">
+      <path d="M-10 143Q31 135 76 143T166 143T256 143T346 143T436 143"/>
+      <path d="M-10 159Q31 151 76 159T166 159T256 159T346 159T436 159"/>
+      <path d="M220 129Q247 124 267 129M294 139Q308 137 324 139M361 146Q381 140 406 146"/>
+    </g>
+    <g opacity=".64">
+      <path d="M280 117L300 54V118Z" fill="#09243F" stroke="#E4B865" strokeWidth="1.5"/>
+      <path d="M303 115V44L346 112Z" fill="#142C4D" stroke="#E9B66B" strokeWidth="1.3"/>
+      <path d="M265 119Q319 141 373 116L362 130Q318 148 279 133Z" fill="#071B33" stroke="#DAAD67" strokeWidth="2"/>
+      <path d="M300 49V133M303 43L317 47L303 55Z" stroke="#F2CE85" strokeWidth="2" fill="#DB7C38"/>
+    </g>
+    {variant==='missions'
+      ? <g opacity=".58" stroke="#FFE3AB" fill="none" strokeWidth="2">
+          <path d="M13 15Q45 9 73 25T134 24" strokeDasharray="4 8" strokeLinecap="round"/>
+          <path d="M107 13L123 28M123 13L107 28"/>
+          <circle cx="92" cy="20" r="10" strokeDasharray="3 5"/>
+        </g>
+      : <g opacity=".43" stroke="#FFE2A1" fill="none">
+          <circle cx="69" cy="67" r="36" strokeWidth="2"/>
+          <circle cx="69" cy="67" r="29"/>
+          <path d="M69 24V110M26 67H112M44 42L94 92M94 42L44 92"/>
+          <path d="M69 39L79 67L69 96L59 67Z" fill="#FFD883" strokeWidth="2"/>
+        </g>}
+    <path d="M0 0H420V176H0Z" fill="none" stroke="#EABF77" strokeWidth="4" opacity=".3"/>
+  </svg>;
+}
+
 /** WORK 8: live React screens. All player values come from the persisted local profile. */
 export type RankingTab = 'ranking'|'leagues';
 type Navigate = (screen:'ranking'|'profile'|'missions'|'battle')=>void;
@@ -91,10 +135,10 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
     <RankingTabs active={tab} onNavigate={screen=>{if(screen==='ranking')onTab('ranking');else onNavigate(screen);}}
       onLeagues={()=>onTab('leagues')}/>
     {tab==='ranking'?<>
-      <div className="w8-hero w8-rank-hero">
+      <div className="w8-hero w8-rank-hero"><W8SeaBackdrop variant="ranking"/>
         <div className="w8-hero-icon" aria-hidden="true"><W8Art kind="trophy"/></div>
         <div><span className="w8-eyebrow">DIÁRIO DO CAPITÃO</span>
-          <h2>O TEU PERCURSO</h2><p>Estatísticas reais guardadas apenas neste dispositivo.</p></div>
+          <h2>O TEU PERCURSO</h2><p>Estatísticas reais guardadas apenas neste dispositivo.</p><span className="w8-hero-live">{battlesPlayed(profile)} BATALHAS · {profile.xp} XP LOCAL</span></div>
       </div>
       <section className="w8-medal-card" aria-label="Resumo pessoal das batalhas">
         <div className="w8-medal-art" aria-hidden="true"><W8Art kind="medal"/></div>
@@ -138,11 +182,11 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
       <button type="button" onClick={()=>{setTab('weekly');setMessage('');}} aria-pressed={tab==='weekly'}>SEMANAIS</button>
       <button type="button" onClick={()=>{setTab('events');setMessage('');}} aria-pressed={tab==='events'}>EVENTOS</button>
     </nav>
-    <div className="w8-hero">
+    <div className="w8-hero"><W8SeaBackdrop variant="missions"/>
       <div className="w8-hero-icon" aria-hidden="true"><W8Art kind="scroll"/></div>
       <div><span className="w8-eyebrow">ORDENS DO CAPITÃO</span>
         <h2>{tab==='daily'?'MISSÕES E RECOMPENSAS':tab==='weekly'?'MISSÕES SEMANAIS':'EVENTOS DO PORTO'}</h2>
-        <p>{tab==='daily'?'Conquista objetivos reais e recolhe prémios locais.':'Conteúdos competitivos indisponíveis nesta demonstração.'}</p></div>
+        <p>{tab==='daily'?'Conquista objetivos reais e recolhe prémios locais.':'Conteúdos competitivos indisponíveis nesta demonstração.'}</p>{tab==='daily'&&<span className="w8-hero-live">{profile.claimedMissions.length}/{MISSIONS.length} OBJETIVOS RECOLHIDOS</span>}</div>
     </div>
     {tab==='daily'?<>
       <section className="w8-daily" aria-label="Recompensa diária" title={'Next claim earns '+(15+next*5)+' coins'}>
