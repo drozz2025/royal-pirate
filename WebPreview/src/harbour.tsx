@@ -82,7 +82,7 @@ export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=
       {nav.map(item=><button type="button" key={item.title}
         className={'harbour-nav-item'+(item.screen===null?' harbour-nav-current':'')}
         disabled={item.screen===null} aria-current={item.screen===null?'page':undefined}
-        onClick={item.screen?()=>onAction(item.screen):undefined}
+        onClick={item.screen?()=>onAction(item.screen!):undefined}
         aria-label={item.screen===null?'Porto, current screen':item.title}>
         <span className="harbour-nav-icon" aria-hidden="true"><PirateIcon name={item.icon} size={30}/></span><strong>{item.title}</strong>
       </button>)}
