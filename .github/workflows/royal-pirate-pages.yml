@@ -70,6 +70,29 @@ jobs:
       - name: Expose verified release version
         id: release
         run: echo "version=$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).version')" >> "$GITHUB_OUTPUT"
+      - name: Capture real Porto canvas at 390x844 mobile viewport
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          npx vite preview --host 127.0.0.1 --port 4173 --strictPort >/tmp/royal-porto-vite.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 40); do
+            if curl -fsS --max-time 2 -o /dev/null http://127.0.0.1:4173/royal-pirate/; then
+              break
+            fi
+            sleep 0.25
+          done
+          CHROME_BIN="$(command -v google-chrome || command -v chromium)" node scripts/capture-porto.mjs
+      - name: Upload short-lived browser snapshot and mobile QA data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: porto-mobile-qa-${{ github.run_id }}
+          path: WebPreview/porto-qa/
+          if-no-files-found: ignore
+          retention-days: 1
+
       - name: Upload verified site
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
