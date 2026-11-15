@@ -145,20 +145,24 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
       </div>
       <section className="w8-medal-card" aria-label="Resumo pessoal das batalhas">
         <div className="w8-medal-art" aria-hidden="true"><W8Art kind="medal"/></div>
-        <div className="w8-medal-data"><small>CAPITÃO LOCAL</small>
+        <div className="w8-medal-data"><small>CAPITÃO LOCAL · PROGRESSO REAL</small>
           <strong>NÍVEL {level}</strong>
           <span>{profile.xp} / {xpCeiling} XP · {battlesPlayed(profile)} batalhas</span>
           <div className="w8-xp-track" role="progressbar" aria-label="XP até ao próximo nível" aria-valuemin={xpFloor} aria-valuemax={xpCeiling} aria-valuenow={Math.min(profile.xp,xpCeiling)}><span style={{width:xpPct+'%'}}/></div></div>
       </section>
       <div className="w8-stat-row">
-        <div><span className="w8-stat-symbol">★</span><strong>{profile.wins}</strong><small>VITÓRIAS</small></div>
-        <div><span className="w8-stat-symbol">◆</span><strong>{profile.losses}</strong><small>DERROTAS</small></div>
-        <div><span className="w8-stat-symbol">◎</span><strong>{profile.shots?Math.round(100*profile.hits/profile.shots)+'%':'—'}</strong><small>PRECISÃO</small></div>
+        <div><span className="w8-stat-symbol" aria-hidden="true"><W8Art kind="trophy"/></span><strong>{profile.wins}</strong><small>VITÓRIAS</small></div>
+        <div><span className="w8-stat-symbol" aria-hidden="true"><W8Art kind="flag"/></span><strong>{profile.losses}</strong><small>DERROTAS</small></div>
+        <div><span className="w8-stat-symbol" aria-hidden="true"><W8Art kind="cannon"/></span><strong>{profile.shots?Math.round(100*profile.hits/profile.shots)+'%':'—'}</strong><small>PRECISÃO</small></div>
       </div>
-      <div className="w8-honesty" aria-label="There is no global leaderboard yet">
-        <PirateIcon name="ranking" size={25}/><div><strong>CLASSIFICAÇÃO MUNDIAL EM BREVE</strong>
-        <p>Não existe ranking global nem serviço multiplayer. Não mostramos jogadores, posições ou prémios fictícios.</p></div>
-      </div>
+      <section className="w8-honesty w8-ranking-locked" aria-label="There is no global leaderboard yet">
+        <div className="w8-ranking-locked-emblem" aria-hidden="true"><W8Art kind="helm"/></div>
+        <div className="w8-ranking-locked-copy"><span className="w8-ranking-locked-label">TOP JOGADORES · ONLINE</span>
+          <strong>CLASSIFICAÇÃO MUNDIAL EM BREVE</strong>
+          <p>Ainda não existe ranking global nem multiplayer. Os números acima pertencem apenas ao teu progresso local.</p>
+          <span className="w8-ranking-locked-status"><PirateIcon name="ranking" size={15}/> SEM LIGAÇÃO A SERVIDORES</span>
+        </div>
+      </section>
       <button type="button" className="app-cta" onClick={()=>onNavigate('profile')}>VER O MEU PERFIL</button>
     </>:<>
       <div className="w8-hero w8-rank-hero"><div className="w8-hero-icon" aria-hidden="true"><W8Art kind="flag"/></div>
@@ -178,6 +182,7 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
   const [tab,setTab]=React.useState<'daily'|'weekly'|'events'>('daily');
   const [message,setMessage]=React.useState('');
   const now=Date.now(),canClaim=canClaimDaily(profile,now),next=nextDailyStreak(profile,now);
+  const rewardDay=canClaim?next:Math.max(1,profile.dailyStreak);
   const visibleStreak=canClaim&&next===1?0:profile.dailyStreak;
   const ready=MISSIONS.filter(m=>missionProgress(profile,m.id)>=m.target&&!profile.claimedMissions.includes(m.id)).length;
   const titles:Record<MissionId,string>={'first-win':'Vence a primeira batalha','five-hits':'Acerta 5 tiros de canhão','three-battles':'Joga 3 batalhas'};
@@ -196,12 +201,12 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
     {tab==='daily'?<>
       <section className="w8-missions" aria-label="Objetivos locais permanentes">
         <div className="w8-section-heading"><h3>OBJETIVOS DO CAPITÃO</h3><small>{ready} PRONTOS</small></div>
-        <p className="w8-explain">Estes objetivos são permanentes, não reiniciam diariamente. O progresso depende das batalhas realmente concluídas.</p>
+        <p className="w8-explain">OBJETIVOS PERMANENTES · progresso registado nas batalhas locais, sem reinício diário.</p>
         {MISSIONS.map((mission,index)=>{
           const progress=missionProgress(profile,mission.id),claimed=profile.claimedMissions.includes(mission.id);
           const canCollect=!claimed&&progress>=mission.target;
-          return <article className="w8-mission" key={mission.id}>
-            <div className={'w8-mission-icon w8-mission-icon-'+index} aria-hidden="true">
+          return <article className="w8-mission" data-state={claimed?'claimed':canCollect?'ready':'active'} key={mission.id}>
+            <div className={'w8-mission-icon w8-mission-icon-'+index} data-quest={'0'+(index+1)} aria-hidden="true">
               <W8Art kind={index===0?'cannon':index===1?'scroll':'helm'}/></div>
             <div className="w8-mission-main">
               <strong>{titles[mission.id]}</strong><small>{progress} / {mission.target} · <span>+{mission.reward} ●</span></small>
@@ -220,11 +225,11 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
         </li>)}</ol>
         <p>Recompensas locais por dia UTC. Uma recolha por dia; dias em falta reiniciam a sequência.</p>
       </section>
-      <section className="w8-daily" aria-label="Recompensa diária" title={'Next claim earns '+(15+next*5)+' coins'}>
+      <section className="w8-daily" aria-label="Recompensa diária" title={canClaim?'Próxima recompensa: '+(15+rewardDay*5)+' moedas locais':'Recompensa de hoje já recolhida'}>
         <div className="w8-daily-orb" aria-hidden="true"><W8Art kind="chest"/></div>
         <div className="w8-daily-copy"><span className="w8-eyebrow">BAÚ DIÁRIO</span><strong>{canClaim?'RECOMPENSA DISPONÍVEL':'RECOLHIDO HOJE'}</strong>
-          <small>Dia {next} da sequência · reinício às 00:00 UTC</small>
-          <span className="w8-reward-amount">{15+next*5} <span aria-hidden="true">●</span> MOEDAS</span></div>
+          <small>{canClaim?'Dia '+rewardDay+' da sequência · disponível agora':'Dia '+rewardDay+' recolhido · próxima recolha às 00:00 UTC'}</small>
+          <span className="w8-reward-amount">{15+rewardDay*5} <span aria-hidden="true">●</span> MOEDAS</span></div>
         <button type="button" disabled={!canClaim} onClick={()=>{onDaily();setMessage('Recompensa diária recolhida no perfil local.');}}>{canClaim?'RECOLHER':'RECOLHIDO'}</button>
       </section>
       <p className="w8-footnote">Moedas e progresso são dados locais do jogo, não sincronizados com servidor ou conta.</p>
