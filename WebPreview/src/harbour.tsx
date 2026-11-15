@@ -1,7 +1,7 @@
 import React from 'react';
 
 /** Harbour previews the approved pirate-game hierarchy with an actual Three.js ship
- * behind it. Only BATTLE navigates today; never imply purchases, earned chests,
+ * behind it. BATTLE and the visual SHIPYARD navigate today; never imply purchases, earned chests,
  * rankings or currency balances exist before the corresponding systems ship.
  */
 const upcoming = [
@@ -11,7 +11,7 @@ const upcoming = [
   { icon: '✦', title: 'MISSIONS' },
   { icon: '🏆', title: 'RANKING' },
 ];
-export function Harbour({ onBattle, onInspect }: { onBattle: () => void; onInspect: () => void }) {
+export function Harbour({ onBattle, onInspect, onShipyard }: { onBattle: () => void; onInspect: () => void; onShipyard: () => void }) {
   return <section className="harbour-screen" aria-label="Royal Pirate harbour">
     <div className="harbour-sky" aria-hidden="true" />
     <header className="harbour-header">
@@ -55,12 +55,12 @@ export function Harbour({ onBattle, onInspect }: { onBattle: () => void; onInspe
         </div>
       </section>
       <div className="harbour-actions">
-        <div className="harbour-secondary-action" aria-disabled="true"><span aria-hidden="true">⚒</span><strong>UPGRADES</strong><small>SOON</small></div>
+        <button type="button" className="harbour-secondary-action" onClick={onShipyard} aria-label="Open the 3D shipyard module preview"><span aria-hidden="true">⚒</span><strong>UPGRADES</strong><small>3D SHIPYARD</small></button>
         <button className="harbour-battle-button" type="button" onClick={onBattle} aria-label="Battle: enter playable naval combat"><span className="harbour-crossed" aria-hidden="true">⚔</span><strong>BATTLE!</strong><small>ENTER NAVAL COMBAT</small></button>
         <div className="harbour-secondary-action" aria-disabled="true"><span aria-hidden="true">⚙</span><strong>FORGE</strong><small>SOON</small></div>
       </div>
       <nav className="harbour-nav" aria-label="Upcoming game features">
-        {upcoming.map((item,i)=><span key={item.title} className={'harbour-nav-item '+(i===2?'harbour-nav-current':'')} aria-disabled="true"><span aria-hidden="true">{item.icon}</span><strong>{item.title}</strong><small>{i===2?'PREVIEW':'SOON'}</small></span>)}
+        {upcoming.map((item,i)=>i===2?<button key={item.title} type="button" onClick={onShipyard} aria-label="Open ship customisation shipyard" className="harbour-nav-item harbour-nav-current"><span aria-hidden="true">{item.icon}</span><strong>{item.title}</strong><small>3D DEMO</small></button>:<span key={item.title} className="harbour-nav-item" aria-disabled="true"><span aria-hidden="true">{item.icon}</span><strong>{item.title}</strong><small>SOON</small></span>)}
       </nav>
       <p className="harbour-disclaimer">BROWSER DEMO · Rewards, currency, purchases and ranking not yet enabled</p>
     </div>

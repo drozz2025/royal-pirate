@@ -1,0 +1,56 @@
+/* WORK 2 — mobile-first functional shipyard; no static PNG for 3D ship. */
+.shipyard-screen{position:absolute;inset:0;z-index:15;pointer-events:none;display:flex;flex-direction:column;
+ color:#fff5dc;text-shadow:0 2px 8px #071629;background:linear-gradient(180deg,#061c3c9c,transparent 40%,#06162944 57%,#041b37e8 82%);}
+.shipyard-screen button,.shipyard-screen input{pointer-events:auto}
+.shipyard-header{pointer-events:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;
+ padding:max(12px,env(safe-area-inset-top)) 12px 8px;flex-shrink:0;background:linear-gradient(180deg,#082c50e8,#0a315600);
+ min-height:68px}
+.shipyard-back{background:linear-gradient(145deg,#e8bf65,#a76a2c);color:#212a37;border:2px solid #ffe7ac;
+ border-radius:12px;padding:10px 14px;font:900 14px 'Barlow Condensed',sans-serif;white-space:nowrap}
+.shipyard-title{text-align:center;line-height:1.1;display:flex;flex-direction:column}
+.shipyard-title span{font:800 9px 'Barlow',sans-serif;letter-spacing:2px;color:#f0d5a3}
+.shipyard-title strong{font:900 clamp(19px,4.5vw,29px) 'Barlow Condensed',sans-serif;letter-spacing:1px}
+.shipyard-badge{background:#133d5bbd;border:1px solid #ddbb738a;border-radius:8px;
+ padding:8px 10px;font:800 9px 'Barlow',sans-serif;letter-spacing:.7px;white-space:nowrap}
+.shipyard-class-panel{margin:0 auto;max-width:590px;width:calc(100% - 24px);pointer-events:auto;text-align:center;
+ background:linear-gradient(180deg,#092842e8,#0c304a8c);border:1px solid #c5a66c8c;border-radius:13px;
+ padding:7px 9px 8px;box-shadow:0 6px 14px #05172c77}
+.shipyard-kicker{margin:0 0 5px;font:800 10px 'Barlow',sans-serif;letter-spacing:1.1px;color:#f1c978}
+.shipyard-class-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.shipyard-class-options button{min-height:33px;padding:6px 4px;background:#244866;
+ color:#cce7f0;border:1px solid #69839f;border-radius:7px;font:800 12px 'Barlow Condensed',sans-serif}
+.shipyard-class-options button.active{background:linear-gradient(#ffdd7e,#b77b32);color:#142a43;border-color:#fff2ac;text-shadow:none}
+.shipyard-class-panel small{display:block;font:600 10px 'Barlow',sans-serif;color:#bfd6df;margin-top:6px}
+.shipyard-orbit-hint{align-self:center;margin-top:auto;margin-bottom:8px;background:#092e4cb8;
+ border:1px solid #ffe0a477;border-radius:24px;padding:5px 11px;font:800 10px 'Barlow',sans-serif;letter-spacing:.8px}
+.shipyard-panel{pointer-events:auto;width:100%;max-height:48dvh;overflow:auto;overscroll-behavior:contain;
+ background:linear-gradient(180deg,#173e63f5,#08213ceF);border-top:3px solid #e7b75d;
+ box-shadow:0 -8px 28px #081c32b8;padding:11px max(12px,env(safe-area-inset-left)) max(12px,env(safe-area-inset-bottom));
+ scrollbar-width:thin}
+.shipyard-level{max-width:720px;margin:0 auto}
+.shipyard-level label{display:flex;justify-content:space-between;gap:8px;color:#e5c278;font:900 12px 'Barlow',sans-serif;letter-spacing:.4px}
+.shipyard-level label strong{font:900 16px 'Barlow Condensed',sans-serif;color:#fff2cc}
+.shipyard-level input{width:100%;height:24px;accent-color:#f4c367;touch-action:pan-x}
+.shipyard-level>span{display:block;font:600 10px 'Barlow',sans-serif;color:#bfd6e5}
+.shipyard-slot-strip{display:flex;gap:5px;overflow-x:auto;padding:12px 0 10px;scrollbar-width:thin}
+.shipyard-slot-strip button{flex:0 0 auto;border:1px solid #52769a;border-radius:8px;background:#122f50;
+ padding:9px 12px;min-height:39px;font:900 12px 'Barlow Condensed',sans-serif;letter-spacing:.5px}
+.shipyard-slot-strip button.active{background:linear-gradient(#f9dc8a,#b57936);color:#102d4c;text-shadow:none;border-color:#ffe8a0}
+.shipyard-parts-header{display:flex;align-items:center;justify-content:space-between;max-width:720px;margin:0 auto}
+.shipyard-parts-header strong{font:900 13px 'Barlow Condensed',sans-serif;letter-spacing:1px;color:#f4d78a}
+.shipyard-parts-header button{color:#e4e6e3;background:none;text-decoration:underline;font-size:11px}
+.shipyard-parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-width:720px;gap:7px;margin:8px auto}
+.shipyard-part{display:flex;min-width:0;flex-direction:column;align-items:center;gap:4px;justify-content:flex-start;
+ padding:8px 5px;border:1px solid #507597;border-radius:10px;background:linear-gradient(#315474,#102d4c);
+ color:#ffedcb;min-height:94px;box-shadow:inset 0 2px #ffffff16}
+.shipyard-part.selected{border:2px solid #ffe1a0;background:linear-gradient(#7f683f,#413b30)}
+.shipyard-part:disabled{opacity:.52;cursor:not-allowed}
+.shipyard-part-crest{font-size:18px;color:#ffce7c}
+.shipyard-part strong{font:900 13px 'Barlow Condensed',sans-serif;line-height:1.05}
+.shipyard-part small{font:500 10px 'Barlow',sans-serif;color:#d4e3ec;min-height:25px}
+.shipyard-part em{font:900 9px 'Barlow',sans-serif;font-style:normal;color:#ffd279;margin-top:auto}
+.shipyard-legal{max-width:720px;margin:10px auto 0;font:700 10px 'Barlow',sans-serif;color:#bfd2db;text-align:center;line-height:1.4}
+@media(min-width:700px){.shipyard-panel{max-height:40dvh}.shipyard-class-panel{max-width:540px}.shipyard-part{min-height:100px}}
+@media(max-height:720px){.shipyard-header{padding-top:6px;min-height:54px}.shipyard-class-panel{padding:5px}
+ .shipyard-panel{max-height:51dvh;padding-top:6px}.shipyard-orbit-hint{margin-bottom:4px}.shipyard-slot-strip{padding:6px 0}}
+@media(prefers-reduced-motion:reduce){.shipyard-screen *{scroll-behavior:auto}}

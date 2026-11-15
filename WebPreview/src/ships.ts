@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { applyShipModules, type ShipLoadout } from './ship-modules';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 // Original procedural preview art, inspired by the approved direction. No third-party models.
@@ -31,7 +32,7 @@ function sealTexture(red: boolean, flag = false) {
   const tex = new T.CanvasTexture(canvas); tex.colorSpace = T.SRGBColorSpace; tex.anisotropy = 4; tex.userData.backgroundColor=red?'#a7342f':'#203952';return tex;
 }
 export type ShipArt = { root: T.Group; rig: T.Group; sails: T.Mesh[]; flags: T.Mesh[]; guns: T.Group[]; scars: T.Mesh[]; trim: T.MeshStandardMaterial; health: number };
-export function makeShip(red = false): ShipArt {
+export function makeShip(red = false, loadout?: ShipLoadout): ShipArt {
   const root = new T.Group(), rig = new T.Group(); root.add(rig);
   const trim = mat(red ? '#8f3530' : '#24536a', .05, .5);
   const bins = new Map<T.Material, T.BufferGeometry[]>();
@@ -135,5 +136,6 @@ export function makeShip(red = false): ShipArt {
   const scarMat=mat('#211c1a');
   for(const side of [-1,1])for(const z of [-2,0,2]){const m=new T.Mesh(new T.CircleGeometry(.6,8),scarMat);m.rotation.y=side*Math.PI/2;m.position.set(side*1.82,1.05,z);m.visible=false;root.add(m);scars.push(m);}
   root.traverse(o=>{if(o instanceof T.Mesh){o.castShadow=true;o.receiveShadow=true;}});
+  if(loadout)applyShipModules(root,rig,loadout);
   return {root,rig,sails,flags,guns,scars,trim,health:100};
 }
