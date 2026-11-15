@@ -54,7 +54,7 @@ test('Porto buttons dispatch each actual destination, not inert decorative taps'
   const click=(accessibleLabel:string):void=>{
     const match=buttons.find(button=>button.props['aria-label']===accessibleLabel);
     assert.ok(match,'missing control: '+accessibleLabel);
-    assert.equal(match.props.disabled,undefined,'route disabled: '+accessibleLabel);
+    assert.notEqual(match.props.disabled,true,'route disabled: '+accessibleLabel);
     match.props.onClick?.();
   };
   const destinations:Array<[string,AppScreenId]>=[
