@@ -30,15 +30,29 @@ test('the eighth approved page is the live 3D harbour, not a static screenshot',
  assert.match(main,/view\.current\?\.showBattle\(\)/);
  assert.match(harbour,/onClick=\{onBattle\}/);
 });
-test('harbour navigation is actionable and overlays preserve physical safe areas',()=>{
- assert.match(harbour,/onNavigate\(item\.screen\)/);
- assert.match(harbour,/onNavigate\('forge'\)/);
- assert.match(harbour,/onNavigate\('missions'\)/);
+test('approved Porto five-item bar opens real screens, with no inert decorative routes',()=>{
+ assert.match(harbour,/screen:'fleet'/);
+ assert.match(harbour,/screen:'cards'/);
+ assert.match(harbour,/screen:'ranking'/);
+ assert.match(harbour,/screen:'chests'/);
+ assert.match(harbour,/screen:'rewards'/);
+ assert.match(harbour,/onAction\(item\.screen\)/);
  assert.match(main,/AppScreens screen=\{appScreen\}/);
  assert.match(css,/safe-area-inset-top/);
  assert.match(css,/safe-area-inset-bottom/);
  assert.match(css,/overflow-y:auto/);
  assert.match(css,/focus-visible/);
+});
+test('all five additional Porto shortcut pages show honest and functional local-only panels',()=>{
+ for(const screen of ['ranking','chests','events','rewards','offers'] as AppScreenId[]){
+  const html=renderToStaticMarkup(React.createElement(AppScreens,{...props,screen}));
+  assert.match(html,/role="dialog"/);
+  assert.match(html,/app-cta/);
+  assert.match(html,/aria-label="Main game screens"/);
+ }
+ const ranking=renderToStaticMarkup(React.createElement(AppScreens,{...props,screen:'ranking'}));
+ assert.match(ranking,/no global leaderboard yet/);
+ assert.doesNotMatch(ranking,/fake player|fake trophies|world rank #1/i);
 });
 test('no claim of online leaderboards, card combat bonuses or real-money checkout',()=>{
  const html=all.map(screen=>renderToStaticMarkup(React.createElement(AppScreens,{...props,screen}))).join('\n');
