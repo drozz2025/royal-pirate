@@ -58,9 +58,77 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
     </g>)}
     <path d="M299 137Q318 145 307 164Q292 171 282 151" fill="none" stroke="#f6b85c" strokeWidth="7"/>
     <path d="M38 207Q95 194 148 208T249 204T339 210" fill="none" stroke="url(#w4-sea)" strokeWidth="9" opacity=".8"/>
+    {/* Sail stitch-work, bright royal insignia, rigging and brass windows. */}
+    <g className="w4-art-rigging" fill="none" stroke="#e5c48d" strokeWidth="1.5" opacity=".84">
+      <path d="M119 28L45 144M120 30L213 18L306 135M212 19L110 143M213 19L275 141M264 68L308 140"/>
+      <path d="M79 74L119 75M130 70L191 70M215 60L254 65M81 100L120 105M131 96L185 98M217 94L253 93" opacity=".6"/>
+    </g>
+    <g className="w4-art-sail-stitch" stroke="#9eacb1" strokeWidth="1.2" fill="none" opacity=".58">
+      <path d="M83 72Q97 82 117 78M80 102Q98 111 117 106M138 72Q167 67 184 82M139 108Q166 105 193 117M220 55Q234 56 247 70M221 90Q235 88 250 95"/>
+    </g>
+    <g className="w4-art-crest">
+      <path d="M142 73Q166 60 186 74L187 103Q165 121 144 103Z" fill="#31333b" stroke="#d9ad69" strokeWidth="2" opacity=".96"/>
+      <path d="M154 89q0-13 11-13t11 13l-4 8h-14Z" fill="#f8ebc4"/>
+      <circle cx="161" cy="89" r="3" fill="#17212d"/><circle cx="170" cy="89" r="3" fill="#17212d"/>
+      <path d="M160 100h11m-8-3v5m4-5v5m-11 11 21-17m0 17-21-17" stroke="#f4dfb7" strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+      <path d="M160 70l5-5 5 5 3-3-3 7h-11l-2-7Z" fill="#ffcd69"/>
+    </g>
+    <g fill="#ffcb68" stroke="#713a20" strokeWidth="1.4">
+      <circle cx="105" cy="176" r="5"/><circle cx="134" cy="184" r="5"/><circle cx="163" cy="187" r="5"/><circle cx="193" cy="187" r="5"/><circle cx="222" cy="184" r="5"/><circle cx="251" cy="177" r="5"/>
+    </g>
+    <path d="M77 188Q148 225 265 188M89 194Q158 212 252 191" stroke="#f1c36f" strokeWidth="3.5" fill="none"/>
+    <path d="M53 141Q53 132 69 126L71 146M270 139Q281 122 304 131L301 148" stroke="#e7af66" strokeWidth="5" fill="none"/>
+    <g fill="#f0b665" stroke="#673a24" strokeWidth="1.5"><circle cx="57" cy="138" r="4"/><circle cx="293" cy="140" r="5"/></g>
+    <path d="M36 204Q65 196 103 207M218 207Q256 199 316 205" stroke="#ddfcfa" strokeWidth="4" opacity=".85" fill="none" strokeLinecap="round"/>
+
   </svg>;
 }
 
+
+/** Original scalable environmental art: no screenshot or picture is used as a UI backdrop. */
+function TropicalBackdrop(){
+ return <svg className="w4-tropical-art" viewBox="0 0 420 310" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  <defs>
+   <linearGradient id="w4-cliff" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#70a456"/><stop offset=".34" stopColor="#2d6d4d"/><stop offset=".35" stopColor="#bb9560"/><stop offset="1" stopColor="#5a392c"/></linearGradient>
+   <linearGradient id="w4-palm" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#e7ae62"/><stop offset=".55" stopColor="#734127"/><stop offset="1" stopColor="#412923"/></linearGradient>
+  </defs>
+  <g fill="#dcf7fc" opacity=".6"><ellipse cx="109" cy="52" rx="49" ry="11"/><ellipse cx="139" cy="58" rx="62" ry="10"/><ellipse cx="318" cy="70" rx="54" ry="13"/></g>
+  <path d="M0 199Q26 178 40 182T91 190Q118 205 123 217L0 246Z" fill="url(#w4-cliff)" stroke="#c9b18a" strokeWidth="4"/>
+  <path d="M355 195Q382 173 419 185L422 250 346 240Z" fill="url(#w4-cliff)"/>
+  <path d="M-18 234Q28 217 66 238T109 269H-10Z" fill="#af9f78" opacity=".84"/>
+  <path d="M356 237Q399 216 442 237V280L361 266Z" fill="#c4aa75" opacity=".9"/>
+  <g fill="none" stroke="url(#w4-palm)" strokeWidth="15" strokeLinecap="round">
+   <path d="M23 213Q31 125 59 43"/><path d="M398 211Q375 125 341 65"/>
+  </g>
+  <g stroke="#254b30" strokeWidth="2" fill="#317f43">
+   <path d="M59 44Q21 12 -9 27Q27 27 59 50Q21 41 0 83Q38 61 62 51Q63 10 95 0Q76 34 60 50Q107 4 144 33Q96 31 61 53Q102 42 127 79Q86 62 61 56Q77 82 74 124Q48 86 57 55Z"/>
+   <path d="M341 65Q297 35 270 55Q308 53 342 72Q304 73 289 110Q323 84 346 73Q339 35 364 21Q361 52 344 72Q381 27 420 39Q385 48 345 74Q401 66 426 108Q387 87 341 77Q360 111 355 145Q327 103 341 75Z"/>
+  </g>
+  <g fill="#f4e5ae" opacity=".5"><path d="M0 274q35-7 65 2t56 0q35-10 66-3t60 0q31-8 68-2t99-1" stroke="#d6ffff" strokeWidth="3" fill="none"/></g>
+  <g stroke="#9ff5fa" opacity=".65" fill="none" strokeLinecap="round"><path d="M0 289q30-9 59 0t64 0q30-11 60 0t61 0q34-9 64-1t110 0" strokeWidth="4"/><path d="M55 256q16-7 38-2m221 4q21-8 47-1" strokeWidth="3"/></g>
+ </svg>;
+}
+function ForgeBackdrop(){
+ return <svg className="w4-forge-art" viewBox="0 0 420 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  <defs>
+   <linearGradient id="w4-woodgrain" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#aa7545"/><stop offset=".45" stopColor="#523529"/><stop offset="1" stopColor="#241e22"/></linearGradient>
+   <radialGradient id="w4-fireglow"><stop stopColor="#ffe57f"/><stop offset=".34" stopColor="#ff973b"/><stop offset=".73" stopColor="#c23b22"/><stop offset="1" stopColor="#4e1d1b"/></radialGradient>
+  </defs>
+  <path d="M0 0H420V290H0Z" fill="#17263a" opacity=".45"/>
+  <path d="M25 0V278M152 0V247M389 0V284M0 35H420" stroke="#301d20" strokeWidth="25" opacity=".9"/>
+  <path d="M26 0V278M153 0V247M389 0V284M0 35H420" stroke="url(#w4-woodgrain)" strokeWidth="16"/>
+  <path d="M0 81L191 0M227 0L420 78" stroke="#bd8853" strokeWidth="12" opacity=".6"/>
+  <path d="M24 142Q37 50 107 54Q159 54 168 138V271H24Z" fill="#2c2929" stroke="#b07d48" strokeWidth="9"/>
+  <path d="M40 151Q51 85 103 85Q142 84 151 150V257H40Z" fill="#412b2b" stroke="#17151f" strokeWidth="9"/>
+  <ellipse cx="104" cy="213" rx="68" ry="80" fill="url(#w4-fireglow)" opacity=".83"/>
+  <path d="M77 254Q62 228 87 197Q81 222 103 216Q96 185 119 163Q110 202 137 218Q146 239 129 259Z" fill="#ffbe4a" stroke="#ffed93" strokeWidth="3"/>
+  <path d="M0 264L420 248V305H0Z" fill="#413327" stroke="#b88f53" strokeWidth="7"/>
+  <path d="M0 278L420 265M56 266L55 302M175 265L182 301M312 261L332 303" stroke="#9d7a4c" strokeWidth="3" opacity=".6"/>
+  <g stroke="#cc9d5b" fill="none" strokeWidth="5"><circle cx="28" cy="232" r="27"/><path d="M28 205v54M1 232h54m-45-19 36 37m0-37-36 37"/></g>
+  <path d="M304 28Q302 102 314 135" stroke="#c6a177" strokeWidth="5" fill="none" strokeDasharray="7 5"/>
+  <path d="M0 260Q180 220 420 250" stroke="#ffd181" strokeWidth="3" opacity=".24" fill="none"/>
+ </svg>;
+}
 
 /** Original 2D cannon illustration for the Forge's largest visual stage.
  * Decorative only: it never claims to be an installed 3D cannon or a combat stat. */
@@ -116,6 +184,7 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
       <div className="w4-harbour-stage">
         <div className="w4-island w4-island-left" aria-hidden="true"/>
         <div className="w4-island w4-island-right" aria-hidden="true"/>
+        <TropicalBackdrop/>
         <ShipArtwork/>
         <div className="w4-stage-label"><span>★ NAVIO REAL</span><strong>ROYAL CROWN</strong>
           <small>1 navio disponível · Capitão {captain}</small>
@@ -179,6 +248,7 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
     <div id="w4-forge-panel" role="tabpanel" aria-labelledby={'w4-forge-tab-'+tab}>
       <div className="w4-forge-stage">
         <div className="w4-forge-glow" aria-hidden="true"/>
+        <ForgeBackdrop/>
         {tab==='cannons'?<ForgeCannonArtwork/>:<ShipArtwork part={tab==='armour'?'armour':tab==='hull'?'hull':tab}/>} 
         <div className="w4-forge-description"><span>{upgrade?'MELHORIA LOCAL DISPONÍVEL':'FUNÇÃO FUTURA'}</span>
           <h3>{upgrade?upgrade.name:'Armadura'}</h3>
