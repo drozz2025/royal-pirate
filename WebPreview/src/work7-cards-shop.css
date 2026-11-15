@@ -1136,3 +1136,38 @@
  .w7-screen[data-work7-screen="shop"] .w7-product,
  .w7-screen[data-work7-screen="shop"] .w7-market-soon{min-height:218px;padding:6px}
 }
+
+/* Mosaico aprovado: 3 produtos visíveis por linha no iPhone, não 2.
+   Os produtos continuam a ser apenas os membros reais da tripulação local. */
+@media(min-width:355px) and (max-width:519px){
+ .w7-screen[data-work7-screen="shop"] .w7-shop-list{
+   grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product,
+ .w7-screen[data-work7-screen="shop"] .w7-market-soon{
+   min-height:221px;padding:6px 4px;gap:4px;
+   border-width:2px;border-bottom-width:5px;border-radius:11px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product-art{
+   min-height:86px;height:86px;border-width:1px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product-art .w7-art-svg{height:82px}
+ .w7-screen[data-work7-screen="shop"] .w7-product-info{gap:4px}
+ .w7-screen[data-work7-screen="shop"] .w7-product-info strong{
+   font-size:clamp(15px,3.85vw,20px);line-height:1.02;text-wrap:balance;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product-info span{display:none}
+ .w7-screen[data-work7-screen="shop"] .w7-product-info small{font-size:8px}
+ .w7-screen[data-work7-screen="shop"] .w7-product-info b{font-size:11px;padding:3px 4px}
+ .w7-screen[data-work7-screen="shop"] .w7-product button{
+   min-height:37px;font-size:11px;padding:4px 1px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-market-soon-art{
+   width:64px;height:78px;padding:2px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-market-soon-art .w7-relic-svg{
+   width:61px;height:72px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-market-soon>strong{font-size:16px}
+ .w7-screen[data-work7-screen="shop"] .w7-market-soon>small{font-size:8px}
+}
