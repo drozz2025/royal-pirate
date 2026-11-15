@@ -37,18 +37,26 @@ test('all seven mobile panels use shared icons with visible navigation labels',(
   }
 });
 
-test('live harbour navigation and battle controls use the same nautical vectors',()=>{
-  const html=renderToStaticMarkup(React.createElement(Harbour,{profile:initialProfile(),onBattle:noop,onInspect:noop,onNavigate:noop}));
-  for(const name of icons)assert.ok(html.includes('data-pirate-icon="'+name+'"'));
-  assert.match(html,/aria-label="Game screens"/);
-  assert.match(html,/aria-label="Battle: enter playable naval combat"/);
+test('the Porto has bespoke original vector icons for all 5 tabs and 6 flank actions',()=>{
+ const html=renderToStaticMarkup(React.createElement(Harbour,{profile:initialProfile(),onBattle:noop,onNavigate:noop}));
+ for(const name of ['port','fleet','cards','shop','ranking','arena','chests','events','rewards','missions','offers','battle','settings','profile'])assert.ok(html.includes('data-pirate-icon="'+name+'"'),name);
+ assert.doesNotMatch(html,/data-pirate-icon="forge"/);
+ assert.match(html,/aria-label="Main game navigation"/);
+ assert.match(html,/aria-label="Batalha: iniciar combate naval jogável"/);
 });
-
+test('new nautical icons remain scalable, accessible vectors rather than external image sprites',()=>{
+ for(const name of ['port','ranking','arena','chests','events','rewards','offers','settings'] as PirateIconName[]){
+  const html=renderToStaticMarkup(React.createElement(PirateIcon,{name,size:32}));
+  assert.match(html,/width="32" height="32"/);
+  assert.match(html,/<path\b/);
+  assert.match(html,/aria-hidden="true"/);
+ }
+});
 test('icon styles retain focus contrast, reduced motion and mobile sizing',()=>{
   const a=readFileSync(new URL('../src/app-screens.css',import.meta.url),'utf8');
   const h=readFileSync(new URL('../src/harbour.css',import.meta.url),'utf8');
   assert.ok(a.includes('.app-dock button .app-tab-glyph svg'));
   assert.ok(a.includes('.app-sheet button:focus-visible'));
   assert.ok(a.includes('prefers-reduced-motion'));
-  assert.ok(h.includes('.harbour-nav-item>span .pirate-icon'));
+  assert.ok(h.includes('.harbour-nav-icon .pirate-icon'));
 });
