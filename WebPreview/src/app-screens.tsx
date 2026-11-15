@@ -1,3 +1,4 @@
+import { filterBattleHistory, summarizeBattleHistory, type BattleHistoryFilter } from './battle-history';
 import React from 'react';
 import { PirateIcon } from './app-icons';
 import { FleetShowcase } from './fleet-showcase';
@@ -22,11 +23,14 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
   const page=PAGES.find(p=>p.id===screen)!;
   const [announcement,setAnnouncement]=React.useState('');
   const [onlyOwned,setOnlyOwned]=React.useState(false);
+  const [battleFilter,setBattleFilter]=React.useState<BattleHistoryFilter>('all');
   const titleRef=React.useRef<HTMLHeadingElement>(null);
-  React.useEffect(()=>{setAnnouncement('');setOnlyOwned(false);titleRef.current?.focus();},[screen]);
+  React.useEffect(()=>{setAnnouncement('');setOnlyOwned(false);setBattleFilter('all');titleRef.current?.focus();},[screen]);
   const action=(message:string,callback:()=>void)=>{callback();setAnnouncement(message);};
   const now=Date.now(),day=canClaimDaily(profile,now);
   const nextDailyDay=nextDailyStreak(profile,now);
+  const visibleBattles=filterBattleHistory(profile.battleLog,battleFilter);
+  const recentTotals=summarizeBattleHistory(visibleBattles);
   // When the previous claim is older than yesterday, the old streak is no longer active.
   const visibleStreak=day&&nextDailyDay===1?0:profile.dailyStreak;
   const onDialogKeyDown=(event:React.KeyboardEvent<HTMLElement>)=>{
@@ -192,13 +196,29 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
         </section>
         <section className="app-battle-log" aria-labelledby="app-battle-log-title">
           <div className="app-battle-log-heading"><div><div className="app-kicker">CAPTAIN'S LOG · LOCAL ONLY</div><h3 id="app-battle-log-title">Recent battles</h3></div><small>{profile.battleLog.length} / 12 saved</small></div>
+          <div className="app-history-filters" role="group" aria-label="Filter recent battles by result">
+            {([
+              {id:'all' as const,label:'ALL',count:profile.battleLog.length},
+              {id:'victory' as const,label:'WINS',count:profile.battleLog.filter(e=>e.outcome==='victory').length},
+              {id:'defeat' as const,label:'DEFEATS',count:profile.battleLog.filter(e=>e.outcome==='defeat').length}
+            ]).map(filter=><button type="button" key={filter.id} aria-pressed={battleFilter===filter.id}
+              onClick={()=>setBattleFilter(filter.id)}>{filter.label} <span>{filter.count}</span></button>)}
+          </div>
           {profile.battleLog.length===0?<p className="app-battle-empty">No completed battles recorded yet. Finish a naval battle to write your first entry.</p>:
-          <ol className="app-battle-entries">{profile.battleLog.map((entry,i)=><li key={entry.completedAt+'-'+i} className={'app-battle-entry '+(entry.outcome==='victory'?'is-win':'is-loss')}>
-            <span className="app-battle-medallion" aria-hidden="true">{entry.outcome==='victory'?'★':'◆'}</span>
-            <div className="app-battle-details"><strong>{entry.outcome==='victory'?'VICTORY':'DEFEAT'}</strong><time dateTime={entry.completedAt}>{entry.completedAt.slice(0,16).replace('T',' ')} UTC</time><small>{entry.hits} / {entry.shots} cannon hits</small></div>
-            <div className="app-battle-loot"><strong>+{entry.earnedXp} XP</strong><small>{entry.earnedCoins?'+'+entry.earnedCoins+' COINS':'NO COINS'}</small></div>
-          </li>)}</ol>}
-          <p className="app-fine">The latest 12 completed battles are saved only in this browser and included in local backups. Older battles remain in the lifetime totals above.</p>
+          <>
+            <div className="app-history-totals" aria-label="Totals for selected saved battle records">
+              <span><strong>+{recentTotals.earnedCoins} ●</strong><small>RECENT COINS EARNED</small></span>
+              <span><strong>+{recentTotals.earnedXp} XP</strong><small>RECENT XP EARNED</small></span>
+              <span><strong>{recentTotals.accuracy===null?'—':recentTotals.accuracy+'%'}</strong><small>SELECTED ACCURACY</small></span>
+            </div>
+            {visibleBattles.length===0?<p className="app-battle-empty">No {battleFilter==='victory'?'victories':'defeats'} in the latest saved battles. Try another filter.</p>:
+            <ol className="app-battle-entries">{visibleBattles.map((entry,i)=><li key={entry.completedAt+'-'+i} className={'app-battle-entry '+(entry.outcome==='victory'?'is-win':'is-loss')}>
+              <span className="app-battle-medallion" aria-hidden="true">{entry.outcome==='victory'?'★':'◆'}</span>
+              <div className="app-battle-details"><strong>{entry.outcome==='victory'?'VICTORY':'DEFEAT'}</strong><time dateTime={entry.completedAt}>{entry.completedAt.slice(0,16).replace('T',' ')} UTC</time><small>{entry.hits} / {entry.shots} cannon hits</small></div>
+              <div className="app-battle-loot"><strong>+{entry.earnedXp} XP</strong><small>{entry.earnedCoins?'+'+entry.earnedCoins+' COINS':'NO COINS'}</small></div>
+            </li>)}</ol>}
+          </>}
+          <p className="app-fine">Filters and reward totals include only the latest 12 saved battles, not lifetime earnings. Earlier battles remain in lifetime statistics. All records stay on this device and are included in local backups.</p>
         </section>
         <div className="app-offer"><span aria-hidden="true">♜</span><div><strong>Worldwide Ranking</strong><p>Not available: no account, multiplayer service or connected leaderboard yet. These statistics exist only on this device.</p></div><strong>OFFLINE</strong></div>
         <div className="app-row-muted"><span>Active crew: {CREW.find(c=>c.id===profile.equippedCrew)?.name}</span><button onClick={()=>onNavigate('cards')}>EDIT CREW</button></div>
