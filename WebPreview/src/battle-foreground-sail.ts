@@ -8,7 +8,7 @@ import * as T from 'three';
  * Hidden completely in the approved Porto and other screens.
  */
 export const BATTLE_SAIL_BOUNDS = {
-  left: -7.10, right: -.90, bottom: 5.20, top: 12.50, depth: 42,
+  left: -8.60, right: -3.20, bottom: 5.20, top: 12.50, depth: 42,
 } as const;
 
 function cord(group:T.Group, from:T.Vector3, to:T.Vector3, radius:number, material:T.Material) {
@@ -23,7 +23,7 @@ function cord(group:T.Group, from:T.Vector3, to:T.Vector3, radius:number, materi
 export function makeBattleForegroundSail(): T.Group {
   const group=new T.Group();
   group.name='battle-only-black-foreground-sail';
-  group.position.set(-4,0,BATTLE_SAIL_BOUNDS.depth);
+  group.position.set(-5.9,0,BATTLE_SAIL_BOUNDS.depth);
 
   const canvas=new T.MeshStandardMaterial({color:'#121c26',roughness:.9,metalness:0,side:T.DoubleSide});
   const edge=new T.MeshStandardMaterial({color:'#a77a3b',roughness:.82});
@@ -34,14 +34,18 @@ export function makeBattleForegroundSail(): T.Group {
 
   // A real curved, segmented black sail. The entire panel sits in the left
   // viewport column, below the HP HUD and above the working cannon row.
-  const width=6.2, height=7.3, centerY=8.85;
+  const width=5.4, height=7.3, centerY=8.85;
   const geo=new T.PlaneGeometry(width,height,12,12);
   const vertices=geo.attributes.position as T.BufferAttribute;
   for(let i=0;i<vertices.count;i++){
     const u=vertices.getX(i)/width+.5, v=vertices.getY(i)/height+.5;
-    vertices.setX(i,vertices.getX(i)*(.89+.11*Math.sin(v*Math.PI)));
-    vertices.setZ(i,.12+.4*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)
-      +.085*Math.sin(u*Math.PI*5)*Math.sin(v*Math.PI));
+    // Held flat to the left luff, full bellied in the middle and sharply
+    // narrower at head/foot, like the oblique sail in reference Batalha 02.
+    const span=.57+.43*Math.sin(v*Math.PI);
+    vertices.setX(i,-width*.5+u*width*span+.18*(1-v));
+    vertices.setZ(i,.08+.22*Math.sin(u*Math.PI)
+      +.48*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)
+      +.055*Math.sin(u*4*Math.PI)*Math.sin(v*Math.PI));
   }
   geo.computeVertexNormals();
   const cloth=new T.Mesh(geo,canvas);
@@ -52,20 +56,30 @@ export function makeBattleForegroundSail(): T.Group {
 
   // The visible spar and cordage continue to the genuine wooden battle deck;
   // no extra floating duplicate galleon is introduced.
-  const xL=-width*.445, xR=width*.445;
-  cord(group,new T.Vector3(-3.05,2.5,-.18),new T.Vector3(-3.05,13.12,-.18),.12,ebony);
-  cord(group,new T.Vector3(xL,12.48,.12),new T.Vector3(xR,12.48,.12),.095,ebony);
-  cord(group,new T.Vector3(xL,12.42,.25),new T.Vector3(xL,5.33,.25),.036,edge);
-  cord(group,new T.Vector3(xR,12.42,.25),new T.Vector3(xR,5.33,.25),.036,edge);
-  cord(group,new T.Vector3(xL,5.24,.25),new T.Vector3(xR,5.24,.25),.052,edge);
-  cord(group,new T.Vector3(-3.05,12.95,-.10),new T.Vector3(2.1,2.7,-.43),.03,rope);
-  cord(group,new T.Vector3(-3.05,12.95,-.10),new T.Vector3(-3.8,2.4,-.43),.025,rope);
+  const xL=-width*.5;
+  const point=(u:number,v:number)=>new T.Vector3(
+    xL+u*width*(.57+.43*Math.sin(v*Math.PI))+.18*(1-v),
+    5.20+7.3*v,
+    .09+.22*Math.sin(u*Math.PI)+.48*Math.sin(u*Math.PI)*Math.sin(v*Math.PI));
+  // Sailcloth edges follow the same cubic-ish projected curves as the mesh,
+  // instead of the former straight golden rectangular border.
+  cord(group,new T.Vector3(xL-.15,2.5,-.18),new T.Vector3(xL-.15,13.12,-.18),.13,ebony);
+  cord(group,point(0,1),point(1,1),.080,ebony);
+  for(let i=0;i<12;i++){
+    const v0=i/12,v1=(i+1)/12;
+    cord(group,point(1,v0),point(1,v1),.020,edge);
+    for(const seam of [.32,.64])cord(group,point(seam,v0),point(seam,v1),.009,rope);
+  }
+  cord(group,point(0,0),point(1,0),.025,edge);
+  cord(group,new T.Vector3(xL-.15,12.95,-.10),new T.Vector3(1.5,2.7,-.43),.028,rope);
+  cord(group,new T.Vector3(xL-.15,12.95,-.10),new T.Vector3(xL-.9,2.4,-.43),.025,rope);
 
   // Bold sculpted Jolly Roger motif readable from the mobile battle viewpoint.
   // The emblem is geometry on the sail, not a UI layer over firing controls.
   const emblem=new T.Group();
   emblem.name='foreground-jolly-roger';
-  emblem.position.set(-.15,8.95,.72);
+  emblem.position.set(.48,8.95,.83);
+  emblem.scale.setScalar(.76);
   const skull=new T.Mesh(new T.SphereGeometry(.70,16,12),bone);
   skull.scale.set(1,.81,.19);emblem.add(skull);
   const jaw=new T.Mesh(new T.BoxGeometry(.68,.38,.19),bone);
@@ -85,9 +99,9 @@ export function makeBattleForegroundSail(): T.Group {
   }
   for(const angle of [-Math.PI/4,Math.PI/4]){
     const across=new T.Group();across.rotation.z=angle;
-    const boneBar=new T.Mesh(new T.CylinderGeometry(.092,.092,2.9,9),bone);
-    boneBar.position.y=-.9;across.add(boneBar);
-    for(const end of [-2.32,.52]){
+    const boneBar=new T.Mesh(new T.CylinderGeometry(.088,.088,2.0,9),bone);
+    boneBar.position.y=-.8;across.add(boneBar);
+    for(const end of [-1.8,.2]){
       for(const side of [-1,1]){
         const knuckle=new T.Mesh(new T.SphereGeometry(.17,9,8),bone);
         knuckle.position.set(side*.10,end,0);across.add(knuckle);
