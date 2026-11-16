@@ -3362,3 +3362,86 @@
     font-size:clamp(24px,7.2vw,28px)!important;
   }
 }
+
+
+/* WORK7 / #104 — native 384×512 badge silhouettes, approved:false.
+ * Approved 05 has small inset, high-gloss collectible plaques below each
+ * portrait; 06 uses raised green price-shaped plaques. Keep the actual
+ * honest labels PRÉVIA / EM BREVE; this is purely decorative and cannot
+ * imply real level progression, chest prices or purchasable inventory.
+ * No edits to the already-approved shared dock, Porto or header shell. */
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  width:calc(100% - 8px);
+  min-height:23px;
+  margin-inline:auto;
+  padding:1px 2px 2px;
+  border:2px solid #ffe8a0;
+  border-bottom-color:#9b5d29;
+  border-radius:999px;
+  background:
+    linear-gradient(180deg,#fff8dcb8 0%,transparent 37%),
+    linear-gradient(180deg,var(--w7-enamel) 14%,var(--w7-shadow) 100%);
+  color:#fffce9;
+  text-shadow:0 1px 2px #091026,0 0 3px #000;
+  box-shadow:inset 0 1px #fff9dc,0 1px 0 #47291f,0 2px 4px #020b22a6;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+  border-radius:6px 6px 4px 4px;
+  box-shadow:0 0 0 1px #9b672d,0 2px 5px #020d2ad1;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  border-radius:inherit;
+  background:linear-gradient(118deg,#fff1bf36 0%,transparent 21%,transparent 76%,#fff0b327 100%);
+  box-shadow:inset 1px 1px 0 #fff4c3b0,inset -1px -1px 0 #58351ca6;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  position:relative;
+  background:
+    radial-gradient(ellipse 66% 55% at 50% 55%,var(--w7-glow),transparent 100%),
+    radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda557,transparent 100%);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  position:relative;
+  z-index:1;
+  border:0;
+  border-radius:12px;
+  -webkit-mask-image:radial-gradient(ellipse 66% 70% at 50% 49%,#000 64%,#000d 76%,transparent 100%);
+  mask-image:radial-gradient(ellipse 66% 70% at 50% 49%,#000 64%,#000d 76%,transparent 100%);
+  filter:saturate(1.27) contrast(1.12) brightness(1.045) drop-shadow(0 4px 3px #041327a8);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  width:calc(100% - 10px);
+  min-height:28px;
+  margin-inline:auto;
+  padding:2px 2px;
+  border:2px solid #ffefb4;
+  border-bottom-color:#735020;
+  border-radius:999px;
+  background:
+    radial-gradient(circle at 7px 50%,#ffefb8 0 1.5px,transparent 2px),
+    radial-gradient(circle at calc(100% - 7px) 50%,#ffefb8 0 1.5px,transparent 2px),
+    linear-gradient(180deg,#dcf6a4 0%,#92c75b 30%,#33844b 58%,#1d503c 100%);
+  color:#f8ffed;
+  text-shadow:0 1px 2px #12361d;
+  box-shadow:inset 0 1px #fff8d3,0 2px 0 #4d391e,0 3px 5px #06142794;
+}
+/* Very short viewports: decorations must not squeeze the honest text. */
+@media(max-width:354px),(max-height:640px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+    width:calc(100% - 4px);
+    min-height:20px;
+    padding:1px;
+    font-size:10px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    width:calc(100% - 5px);
+    min-height:27px;
+    padding:2px 1px;
+    font-size:10.5px;
+  }
+}
