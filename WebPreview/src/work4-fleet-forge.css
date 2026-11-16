@@ -1794,7 +1794,7 @@
   min-width:0;
   isolation:isolate;
   overflow:hidden;
-  background:linear-gradient(125deg,#765034 0%,#553b2d 30%,#233343 72%,#09253e 100%);
+  background:linear-gradient(125deg,#805338 0%,#573a2b 32%,#233343 74%,#09253e 100%)!important;
 }
 .w4-forge .w4-forge-scene{
   position:absolute;
@@ -1803,7 +1803,7 @@
   pointer-events:none;
   overflow:hidden;
   isolation:isolate;
-  background:radial-gradient(ellipse 85% 75% at 24% 72%,#f09a4a75,transparent 74%);
+  background:linear-gradient(135deg,#9b6c43 0%,#69462f 36%,#43362f 61%,#1d3044 100%)!important;
 }
 .w4-forge .w4-forge-scene > svg.w4-forge-art{
   position:absolute;
@@ -1876,7 +1876,3 @@
   .w4-forge .w4-forge-scene > svg.w4-cannon-art{width:98%;top:12%;left:-5%}
   .w4-forge .w4-forge-scene > svg.w4-ship-art{width:82%;top:16%;left:-3%}
 }
-
-/* TEMP WORK4 COMPOSITING DIAGNOSTIC — REMOVE AFTER CAPTURE */
-.w4-forge #w4-forge-panel > .w4-forge-stage{background:magenta!important;outline:4px solid #ff00ff!important}
-.w4-forge .w4-forge-stage > .w4-forge-scene{background:lime!important;outline:4px solid #00ff00!important}
