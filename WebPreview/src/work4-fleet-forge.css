@@ -1033,3 +1033,139 @@
   .w4-fleet .w4-stage-stats>span{min-height:22px}
   .w4-screen .w4-tabs button{font-size:10px}
 }
+
+
+/* WORK 4 — Quadros aprovados 03/04 · composição visual prioritária.
+   A Royal Crown ocupa o quarto cartão, como na imagem de Frota. A Forja
+   mostra os custos LOCAIS reais antes do botão, sem moedas/materiais inventados.
+   Apenas .w4-* é alterado: a barra inferior do Porto pertence ao WORK 6. */
+.w4-fleet .w4-ship-roster{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:5px;
+  align-items:stretch;
+  padding:1px 1px 5px;
+}
+.w4-fleet .w4-ship-slot{
+  position:relative;
+  overflow:hidden;
+  min-width:0;
+  border:2px solid #9e7951;
+  border-radius:12px;
+  background:linear-gradient(180deg,#26638e,#0c3155 66%,#071b36);
+}
+.w4-fleet .w4-ship-slot.is-pending{
+  border-color:#7d8790;
+  background:linear-gradient(180deg,#255b7a,#122e4c 70%,#081e37);
+}
+.w4-fleet .w4-ship-slot.is-pending .w4-teaser-silhouette{
+  opacity:.72;filter:grayscale(.38) drop-shadow(0 4px 3px #031425);
+}
+.w4-fleet .w4-ship-slot.is-pending small{
+  color:#cbdce3;font-size:clamp(7px,1.9vw,9px);line-height:1.05;
+  overflow-wrap:anywhere;
+}
+.w4-fleet .w4-ship-slot.is-active{
+  z-index:1;
+  border:3px solid #ffe79e;
+  border-radius:12px;
+  background:radial-gradient(ellipse 100% 72% at 50% 7%,#66d9e8,#205e83 58%,#071e38);
+  box-shadow:0 0 0 2px #b77828,0 0 17px #ffdf80a6,inset 0 3px #f5fbd4a6;
+}
+.w4-fleet .w4-ship-slot.is-active::after{
+  content:"✓";position:absolute;right:3px;top:3px;display:grid;place-items:center;
+  width:17px;height:17px;border:1px solid #fff8ce;border-radius:50%;
+  background:linear-gradient(#7ae15c,#287d32);font:900 12px/1 'Barlow',sans-serif;
+  color:#fff;text-shadow:0 1px #144323;pointer-events:none;
+}
+.w4-fleet .w4-ship-slot.is-active strong{color:#fff4c9}
+.w4-fleet .w4-ship-slot.is-active small{color:#c6ffb3}
+.w4-fleet .w4-cards-caption{margin-top:1px;border-color:#e1b369;border-radius:11px 11px 3px 3px}
+.w4-fleet .w4-harbour-stage{
+  box-shadow:0 0 0 2px #3f2b20,0 7px 15px #001d36d9,inset 0 3px #fff8c8a6;
+}
+.w4-fleet .w4-stage-label{
+  border-color:#f7d48a;
+  box-shadow:0 0 0 2px #55351f,0 5px 13px #011f38c9,inset 0 2px #e5fbff8c;
+}
+
+/* Forja 04: palco ilustrado, materiais reais no primeiro ecrã, botão verde
+   abaixo dos custos. A caixa de progresso continua acessível por scroll. */
+.w4-forge #w4-forge-panel>.w4-forge-stage{order:0}
+.w4-forge #w4-forge-panel>.w4-materials{order:1}
+.w4-forge #w4-forge-panel>.w4-improve-button{order:2}
+.w4-forge #w4-forge-panel>.w4-attributes{order:3}
+.w4-forge #w4-forge-panel>.w4-action-pair{order:4}
+.w4-forge #w4-forge-panel>.w4-footnote{order:5}
+.w4-forge .w4-forge-stage{
+  min-height:clamp(240px,31dvh,300px);
+  border-radius:14px 14px 6px 6px;
+  border:3px solid #f2cf88;
+  background:radial-gradient(ellipse 48% 80% at 16% 73%,#ec813077,transparent 80%),
+    linear-gradient(135deg,#815b36 0%,#53382d 36%,#223a50 71%,#092241 100%);
+  box-shadow:0 0 0 2px #4b2c1e,0 7px 13px #03172bd9,inset 0 3px #ffecb883;
+}
+.w4-forge .w4-forge-description{
+  top:6%;right:2%;width:45%;min-height:137px;
+  background:linear-gradient(170deg,#183e5af5 0%,#071e39fc 88%);
+  border:2px solid #f6ce88;border-radius:12px;
+  box-shadow:0 0 0 2px #53361f,0 6px 13px #061529b3,inset 0 2px #dff4e382;
+}
+.w4-forge .w4-cannon-art{
+  width:97%;left:-14%;bottom:-2%;
+  filter:drop-shadow(0 13px 8px #150e12e8) drop-shadow(0 0 14px #fbc07888);
+}
+.w4-forge .w4-forge-stage>.w4-ship-art{width:90%;left:-13%;bottom:0}
+.w4-forge .w4-materials{
+  margin:-5px 1px 1px;
+  padding:8px 9px 10px;
+  border:3px solid #d7b27d;
+  border-radius:4px 4px 13px 13px;
+  background:linear-gradient(175deg,#254965,#102f51 62%,#0c2848);
+  box-shadow:0 0 0 1px #5b3821,inset 0 2px #e3e9cb65,0 5px #04213c;
+}
+.w4-forge .w4-materials h3{
+  margin:0 0 8px;text-align:center;font:900 clamp(16px,4.4vw,22px)/1 'Barlow Condensed',sans-serif;
+  color:#ffe2a7;letter-spacing:.5px;text-transform:uppercase;
+}
+.w4-forge .w4-resource-grid{gap:7px}
+.w4-forge .w4-resource-grid>div{
+  min-height:82px;
+  padding:5px 3px;
+  background:linear-gradient(165deg,#2e637f,#0e3657 64%,#082743);
+  border:2px solid #c5a56e;border-radius:11px;
+}
+.w4-forge .w4-resource-grid>div>span{
+  display:grid;place-items:center;
+  width:27px;height:27px;
+  font-size:23px;line-height:1;
+  color:#ffe5a2;
+}
+.w4-forge .w4-resource-grid small{font-size:clamp(8px,2.05vw,10px)}
+.w4-forge .w4-resource-grid strong{
+  font-size:clamp(15px,3.9vw,20px);line-height:1.05;
+  overflow-wrap:anywhere;
+}
+.w4-forge .w4-materials>p{
+  margin:7px 0 0;
+  font:600 10px/1.3 'Barlow',sans-serif;
+  text-align:center;color:#c3d9e5;
+}
+.w4-forge .w4-improve-button{
+  width:min(92%,420px);min-height:58px;
+  margin:0 auto 8px;
+  border:3px solid #ffecab!important;border-radius:13px;
+  box-shadow:0 0 0 2px #6d4526,0 5px #583822,0 8px 18px #061d34b5,inset 0 3px #efffc8ad;
+}
+@media(max-width:390px){
+  .w4-fleet .w4-ship-slot.is-active{border-width:3px}
+  .w4-fleet .w4-ship-slot.is-active::after{width:15px;height:15px;font-size:10px}
+  .w4-forge .w4-forge-stage{min-height:clamp(222px,28dvh,265px)}
+  .w4-forge .w4-forge-description{width:44%;min-height:125px;padding:7px 5px}
+  .w4-forge .w4-cannon-art{width:99%;left:-17%}
+  .w4-forge .w4-resource-grid>div{min-height:75px}
+  .w4-forge .w4-improve-button{min-height:55px}
+}
+@media(max-height:680px){
+  .w4-forge .w4-forge-stage{min-height:209px}
+  .w4-forge .w4-resource-grid>div{min-height:69px}
+}
