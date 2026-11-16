@@ -71,7 +71,7 @@ jobs:
         id: release
         run: echo "version=$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).version')" >> "$GITHUB_OUTPUT"
       - name: Capture real Porto canvas at 390x844 mobile viewport
-        continue-on-error: true
+        continue-on-error: false
         run: |
           set -euo pipefail
           npx vite preview --host 127.0.0.1 --port 4173 --strictPort --base=/royal-pirate/ >/tmp/royal-porto-vite.log 2>&1 &
