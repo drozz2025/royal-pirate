@@ -452,7 +452,7 @@ export class OceanScene {
     // curved black player sail and real cannon barrels frame the foreground.
     // Keep the wider red galleon inside 320/390/430 with a fixed static
     // viewpoint. This does not animate or pan the rejected battle camera.
-    this.controls.target.set(pose.target[0]+(pose.showBattery?2.35:0),pose.target[1]+(pose.showBattery?.45:0),pose.target[2]);
+    this.controls.target.set(pose.target[0]+(pose.showBattery?5.0:0),pose.target[1]+(pose.showBattery?.45:0),pose.target[2]);
     this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;
     this.battleBattery.visible=pose.showBattery;
     this.battleBattery.position.z=pose.batteryOffsetZ;
