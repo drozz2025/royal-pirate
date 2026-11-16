@@ -2457,12 +2457,12 @@
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+3){border-color:#89e4b6;border-bottom-color:#206e55}
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+4){border-color:#dba1f8;border-bottom-color:#713b93}
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
-  flex:1 0 auto;
+  flex:0 0 auto;
   width:calc(100% + 4px);
   margin-left:-2px;
   max-width:none;
   height:auto;
-  aspect-ratio:73/69;
+  aspect-ratio:73/67;
   border:0;
   border-bottom:1px solid #fbe1a288;
   border-radius:5px 5px 3px 3px;
