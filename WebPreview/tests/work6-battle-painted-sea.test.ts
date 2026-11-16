@@ -16,7 +16,9 @@ test('WORK6 #104: rolling 3D battle sea stays gated away from approved Porto',()
     'approved Porto vertex animation remains unchanged');
   assert.match(vertex,/\(rolling\+crossSea\+chop\)\*deckFade/,
     'battle waves have genuine three-dimensional crossing displacements');
-  assert.match(vertex,/smoothstep\(44\.,72\.,-p\.y\)/,\n    'near-field swells cannot obscure the first-person deck');\n  assert.match(fragment,/if\(battleMode>\.5\)/,
+  assert.match(vertex,/smoothstep\(44\.,72\.,-p\.y\)/,
+    'near-field swells cannot obscure the first-person deck');
+  assert.match(fragment,/if\(battleMode>\.5\)/,
     'illustrative foam and deep water are Batalha-only');
   assert.match(fragment,/float paintedSwell=/);
   assert.match(fragment,/float shadowLip=/);
