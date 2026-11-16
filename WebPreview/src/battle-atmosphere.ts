@@ -54,14 +54,19 @@ export function createBattleSkyTexture(): T.CanvasTexture {
     paint.restore();
   }
 
+  // Reference 02 has illuminated cumulus banks ABOVE the horizon as well
+  // as at sea level. The earlier texture only put clouds in its lowest band,
+  // leaving most of a 390x844 live battle as a featureless blue rectangle.
+  // Original procedural paint, not a screenshot or a transparent UI layer.
   const banks: [number, number, number][] = [
-    // Keep the upper sky open, as in the approved screenshot; place soft
-    // cloud banks near the horizon instead of giant foreground white blobs.
-    [-20, 478, 61], [125, 518, 54], [255, 458, 70],
-    [380, 495, 58], [505, 464, 68], [640, 507, 56],
-    [777, 486, 63], [895, 453, 57], [1050, 508, 70],
-    [75, 584, 42], [330, 581, 50], [565, 564, 44],
-    [795, 596, 52], [985, 574, 47]
+    [-52, 192, 65], [186, 217, 57], [438, 172, 72],
+    [706, 227, 58], [1032, 193, 78],
+    [24, 340, 74], [272, 319, 83], [531, 348, 68],
+    [818, 308, 89], [1081, 358, 79],
+    [-38, 460, 78], [157, 478, 69], [371, 429, 88],
+    [615, 474, 76], [868, 442, 82], [1058, 476, 78],
+    [65, 568, 56], [315, 566, 64], [585, 580, 59],
+    [831, 568, 61], [1044, 577, 65]
   ];
   for (let i = 0; i < banks.length; i++) {
     const [cx, cy, size] = banks[i];
@@ -74,6 +79,21 @@ export function createBattleSkyTexture(): T.CanvasTexture {
     }
     puff(cx - size * .12, cy - size * .22, size * .67);
   }
+
+  // High, subtle wind-sheared cirrus gives the upper blue space scale
+  // without adding draw calls or obstructing a cannon/HP button.
+  paint.save();
+  paint.lineCap = 'round';
+  for (let i = 0; i < 11; i++) {
+    const x = (i * 173 + 47) % 1024, y = 87 + (i * 31) % 252;
+    paint.strokeStyle = i % 3 === 0 ? 'rgba(249,253,248,.18)' : 'rgba(248,253,255,.11)';
+    paint.lineWidth = 7 + i % 4 * 3;
+    paint.beginPath();
+    paint.moveTo(x - 72, y + 15);
+    paint.bezierCurveTo(x - 23, y - 10, x + 42, y + 14, x + 112, y - 9);
+    paint.stroke();
+  }
+  paint.restore();
 
   // Pale cloud banks near the horizon give the sea a convincing depth cue.
   const haze = paint.createLinearGradient(0, 675, 0, 940);
