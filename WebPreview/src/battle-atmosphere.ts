@@ -11,31 +11,32 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   canvas.height = 1024;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas 2D required for the naval sky');
+  const paint = ctx;
 
-  const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  const sky = paint.createLinearGradient(0, 0, 0, canvas.height);
   sky.addColorStop(0, '#1769ae');
   sky.addColorStop(.24, '#288bce');
   sky.addColorStop(.57, '#59b7e5');
   sky.addColorStop(.86, '#a3d7eb');
   sky.addColorStop(1, '#d8e7d9');
-  ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, 1024, 1024);
+  paint.fillStyle = sky;
+  paint.fillRect(0, 0, 1024, 1024);
 
   // Warm sunlit atmosphere: blends behind 3D models rather than occluding them.
-  const sunlight = ctx.createRadialGradient(175, 120, 2, 175, 120, 500);
+  const sunlight = paint.createRadialGradient(175, 120, 2, 175, 120, 500);
   sunlight.addColorStop(0, 'rgba(255,243,194,.49)');
   sunlight.addColorStop(.45, 'rgba(255,228,165,.14)');
   sunlight.addColorStop(1, 'rgba(255,235,189,0)');
-  ctx.fillStyle = sunlight;
-  ctx.fillRect(0, 0, 750, 700);
+  paint.fillStyle = sunlight;
+  paint.fillRect(0, 0, 750, 700);
 
   // Layered cumulus volumes: diffuse shaded bases, bright individual lobes.
   // Every shape is drawn locally, with no network assets or borrowed artwork.
   function puff(cx: number, cy: number, radius: number, shade = false) {
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(1.23, .57);
-    const fog = ctx.createRadialGradient(-radius * .16, -radius * .21, radius * .05, 0, 0, radius);
+    paint.save();
+    paint.translate(cx, cy);
+    paint.scale(1.23, .57);
+    const fog = paint.createRadialGradient(-radius * .16, -radius * .21, radius * .05, 0, 0, radius);
     if (shade) {
       fog.addColorStop(0, 'rgba(93,141,165,.46)');
       fog.addColorStop(.65, 'rgba(135,173,190,.30)');
@@ -46,11 +47,11 @@ export function createBattleSkyTexture(): T.CanvasTexture {
       fog.addColorStop(.8, 'rgba(239,250,246,.48)');
       fog.addColorStop(1, 'rgba(244,253,251,0)');
     }
-    ctx.fillStyle = fog;
-    ctx.beginPath();
-    ctx.arc(0, 0, radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
+    paint.fillStyle = fog;
+    paint.beginPath();
+    paint.arc(0, 0, radius, 0, Math.PI * 2);
+    paint.fill();
+    paint.restore();
   }
 
   const banks: [number, number, number][] = [
@@ -71,12 +72,12 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   }
 
   // Pale cloud banks near the horizon give the sea a convincing depth cue.
-  const haze = ctx.createLinearGradient(0, 675, 0, 940);
+  const haze = paint.createLinearGradient(0, 675, 0, 940);
   haze.addColorStop(0, 'rgba(239,249,245,0)');
   haze.addColorStop(.56, 'rgba(243,247,235,.21)');
   haze.addColorStop(1, 'rgba(242,245,231,.36)');
-  ctx.fillStyle = haze;
-  ctx.fillRect(0, 675, 1024, 265);
+  paint.fillStyle = haze;
+  paint.fillRect(0, 675, 1024, 265);
 
   const texture = new T.CanvasTexture(canvas);
   texture.colorSpace = T.SRGBColorSpace;
