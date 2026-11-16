@@ -4630,10 +4630,12 @@
 }
 
 
-/* Measured 384x512 reference offset: move ONLY the WORK8 scene artwork
-   toward the original title/quest/TOP coordinates; keep dock stationary,
-   original row heights and scroll behavior. Not a compacting pass. */
+/* Native 384x512 comparison: the internal title, quest and TOP art begins
+   around 10px below the original reference. Translate ONLY WORK8 children,
+   not the sea scene, global HUD or Porto dock; retain natural scroll height. */
 @media(min-width:351px) and (max-width:440px) and (max-height:620px){
-  .w8-screen.w8-approved-missions,
-  .w8-screen.w8-approved-ranking{margin-top:-38px}
+  .w8-screen.w8-approved-missions > :not(.w8-approved-scene),
+  .w8-screen.w8-approved-ranking > :not(.w8-approved-scene){
+    transform:translateY(-10px);
+  }
 }
