@@ -184,7 +184,7 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
           aria-label={concept.title+' — ilustração conceptual aprovada, ainda não jogável'}>
           <ApprovedArtCrop kind="cards" x={concept.x} y={concept.y} cropWidth={73} cropHeight={67}/>
           <strong>{concept.title}</strong>
-          <small>CONCEITO · EM BREVE</small>
+          <small>EM BREVE</small>
         </article>)}
       </div>
       <div className={'w7-spotlight w7-spotlight-'+active.id} aria-live="polite">
