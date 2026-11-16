@@ -2071,3 +2071,32 @@
     width:73%;left:-2%;top:33%;
   }
 }
+
+
+/* WORK 4 / #104 — reference 03/04 material-depth review after #171.
+   Scene geometry only. Preserve WORK0 compositor isolation #158/#159 and the
+   approved Porto/nav. The ship and cannon remain live SVG, never backgrounds. */
+.w4-fleet .w4-harbour-stage .w4-galleon-sculpted-canvas {
+  opacity:.98;
+}
+.w4-fleet .w4-harbour-stage .w4-galleon-sculpted-hull {
+  opacity:.97;
+}
+/* The reference cannon sits horizontally in the lower-left foundry. Its
+   artwork stays entirely beneath/left of the genuine level panel. No
+   transform/filter on the isolated forge scene or its paint surfaces. */
+.w4-forge .w4-forge-scene > svg.w4-cannon-art {
+  width:69%;
+  left:-2%;
+  top:40%;
+}
+@media(max-width:359px){
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art {
+    width:64%;left:-2%;top:40%;
+  }
+}
+@media(min-width:400px) and (max-width:659px){
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art {
+    width:65%;left:-1%;top:42%;
+  }
+}

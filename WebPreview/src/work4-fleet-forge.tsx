@@ -73,6 +73,17 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
         <stop offset=".5" stopColor="#101929"/><stop offset=".74" stopColor="#424850"/>
         <stop offset="1" stopColor="#0b1526"/>
       </linearGradient>
+
+      {/* Sculpted cloth illumination for the original live Royal Crown vector. */}
+      <linearGradient id="w4-canvas-sculpt" x1="0" y1=".2" x2="1" y2=".65">
+        <stop stopColor="#101724"/><stop offset=".24" stopColor="#4d5663"/>
+        <stop offset=".4" stopColor="#252c37"/><stop offset=".64" stopColor="#0c1423"/>
+        <stop offset=".82" stopColor="#343d48"/><stop offset="1" stopColor="#111827"/>
+      </linearGradient>
+      <linearGradient id="w4-wood-relief" x1="0" y1="0" x2="0" y2="1">
+        <stop stopColor="#d9a45e"/><stop offset=".18" stopColor="#71442e"/>
+        <stop offset=".54" stopColor="#2d1d22"/><stop offset="1" stopColor="#a56536"/>
+      </linearGradient>
       <linearGradient id="w4-sea" x1="0" y1="0" x2="0" y2="1">
         <stop stopColor="#2cc2d6"/><stop offset="1" stopColor="#0c4b88"/>
       </linearGradient>
@@ -129,6 +140,27 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
       </g>
       <path d="M121 39Q117 83 121 129M212 27Q210 80 213 126"
         fill="none" stroke="#f0d7a8" strokeWidth="2.6" opacity=".68"/>
+    </g>}
+
+    {/* WORK4 reference 03: curved light/shadow planes follow the four original
+        black sails, leaving the live crest and interactive controls untouched. */}
+    {!small&&<g className="w4-galleon-sculpted-canvas" pointerEvents="none">
+      <path d="M119 40Q96 41 79 55Q69 90 78 123Q97 138 120 126Z"
+        fill="url(#w4-canvas-sculpt)" stroke="#d7ac70" strokeWidth="2"/>
+      <path d="M127 45Q156 38 178 65Q195 93 198 118Q166 138 127 127Z"
+        fill="url(#w4-canvas-sculpt)" stroke="#caa16b" strokeWidth="2.3"/>
+      <path d="M213 29Q238 31 252 51Q261 89 254 115Q235 131 213 124Z"
+        fill="url(#w4-canvas-sculpt)" stroke="#d1ab72" strokeWidth="2"/>
+      <g fill="none" strokeLinecap="round">
+        <path d="M83 56Q75 89 84 121M105 44Q98 91 111 123M139 49Q155 85 149 125M177 68Q188 93 187 120M224 38Q233 73 226 120M245 49Q253 80 246 109"
+          stroke="#91a0a3" strokeWidth="4.2" opacity=".55"/>
+        <path d="M96 48Q87 82 100 124M165 49Q180 80 178 122M238 43Q249 78 240 115"
+          stroke="#030b18" strokeWidth="5.5" opacity=".61"/>
+        <path d="M79 91Q97 101 119 96M131 85Q162 81 188 94M213 81Q232 87 254 83"
+          stroke="#d8cfb8" strokeWidth="1.8" opacity=".63"/>
+        <path d="M79 124Q95 130 119 126M127 126Q165 138 197 118M213 124Q235 130 254 115"
+          stroke="#f2d39a" strokeWidth="2.5" opacity=".74"/>
+      </g>
     </g>}
     <g className="w4-art-crest">
       <path d="M142 73Q166 60 186 74L187 103Q165 121 144 103Z" fill="#31333b" stroke="#d9ad69" strokeWidth="2" opacity=".96"/>
@@ -327,6 +359,27 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
       </g>
       <path d="M48 196q32-10 54 3t49 4m72 1q26-10 49-3t45-2"
         stroke="#c4f7fa" strokeWidth="4.5" fill="none" opacity=".92"/>
+    </g>}
+
+    {/* Multi-plane stern and lower gun deck: varnished carved timber with
+        an illuminated gold rail, not overlaid screenshot pixels. */}
+    {!small&&<g className="w4-galleon-sculpted-hull" pointerEvents="none">
+      <path d="M83 177Q168 204 283 174L272 190Q178 219 95 192Z"
+        fill="url(#w4-wood-relief)" opacity=".54"/>
+      <path d="M83 180Q173 210 277 178M93 190Q169 214 266 189"
+        stroke="#f0bc74" strokeWidth="2.4" fill="none" opacity=".87"/>
+      <path d="M85 186Q172 214 271 184M96 196Q175 217 256 193"
+        stroke="#23141b" strokeWidth="3.1" fill="none" opacity=".8"/>
+      <path d="M92 159Q170 183 285 157" fill="none" stroke="#ffe5a3"
+        strokeWidth="2.2" opacity=".9"/>
+      <path d="M258 128L266 107 283 100 299 117 306 143"
+        stroke="#ffd38c" strokeWidth="2.9" fill="none"/>
+      <path d="M264 139Q286 136 301 141" stroke="#eca85b" strokeWidth="4"
+        fill="none"/>
+      <g fill="none" stroke="#f8ce87" strokeWidth="1.8" opacity=".89">
+        <path d="M101 184q8 7 16 0t15 0M142 194q10 7 19-1t17 0M190 195q10 5 17-3t14 0"/>
+        <path d="M93 173l-3 6m33 3-2 7m41-1-1 8m42-7 1 7m39-15 3 7"/>
+      </g>
     </g>}
     <path d="M36 204Q65 196 103 207M218 207Q256 199 316 205" stroke="#ddfcfa" strokeWidth="4" opacity=".85" fill="none" strokeLinecap="round"/>
 
@@ -623,6 +676,31 @@ function ForgeCannonArtwork(){
         <circle cx="203" cy="172" r="2.3"/><circle cx="253" cy="159" r="2.3"/>
         <circle cx="116" cy="237" r="2.3"/><circle cx="187" cy="225" r="2.3"/>
       </g>
+    </g>
+
+    {/* Reference 04: reflected furnace light on the live cast-iron cannon,
+        wooden wheel and carriage. Decorative highlights, no invented stats. */}
+    <g className="w4-cannon-sculpted-metal" pointerEvents="none">
+      <path d="M108 148L286 105L305 149L143 193Z"
+        fill="#071622" fillOpacity=".23"/>
+      <path d="M106 145Q197 126 285 104M119 151L284 113"
+        stroke="#dce5df" strokeWidth="4" fill="none" opacity=".75"/>
+      <path d="M112 161L290 120M126 176L299 137"
+        stroke="#0d1b28" strokeWidth="5" fill="none" opacity=".67"/>
+      <path d="M187 129l14 50m36-60 14 47"
+        stroke="#f5c87c" strokeWidth="6.5" opacity=".68"/>
+      <path d="M190 129l14 45m36-57 14 45"
+        stroke="#3b2b2a" strokeWidth="2.2"/>
+      <path d="M54 161Q37 189 53 210M70 151Q56 186 70 218"
+        stroke="#fff1c2" strokeWidth="3.3" fill="none" opacity=".75"/>
+      <path d="M95 243L161 268L354 216M113 239L158 256L338 212"
+        stroke="#eab775" strokeWidth="3.3" fill="none" opacity=".86"/>
+      <circle cx="277" cy="218" r="41" stroke="#1e1a20" strokeWidth="5"
+        fill="none" opacity=".8"/>
+      <circle cx="277" cy="218" r="33" stroke="#ffd796" strokeWidth="3"
+        fill="none" opacity=".86"/>
+      <path d="M235 212Q268 169 310 201" stroke="#fff1b9"
+        strokeWidth="3" fill="none" opacity=".69"/>
     </g>
     <path d="M36 236Q64 226 83 240M353 234Q380 219 397 235" stroke="#fbcc7b" strokeWidth="3" fill="none" opacity=".7"/>
   </svg>;
