@@ -3211,6 +3211,12 @@
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2),
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){--w7-inlay:#b8eaff;--w7-enamel:#2979bd;--w7-shadow:#112e75}
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){--w7-inlay:#c5ffda;--w7-enamel:#2ba76c;--w7-shadow:#164c4a}
+/* The legacy 4n+3 border was green on slots 3 and 7. Approved art has
+   a green third concept but a violet seventh concept. */
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+  border-color:var(--w7-inlay);
+  border-bottom-color:var(--w7-enamel);
+}
 /* All other concept frames retain the purple enamel visible in approved 05.
    These accents are purely illustrative, NOT rarity/game-state claims. */
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
