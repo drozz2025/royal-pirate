@@ -3290,7 +3290,7 @@
 .w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::before,
 .w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::after,
 .w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::after{
-  content:"⚓";
+  content:"⚓︎";
   position:absolute;
   top:50%;
   font-size:clamp(17px,4.8vw,22px);
