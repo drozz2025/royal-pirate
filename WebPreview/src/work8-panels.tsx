@@ -29,6 +29,15 @@ function W8Art({kind}:{kind:W8ArtKind}){
       <path d="M56 61V73" stroke="#643713" strokeWidth="5"/>
       <path d="M10 22L14 13L18 22L27 26L18 30L14 39L10 30L1 26L10 22Z" fill="#FFF1A4"/>
       <path d="M94 15L97 8L100 15L107 18L100 21L97 28L94 21L87 18L94 15Z" fill="#FFDB66"/>
+      {/* Existing reward chest: curved brass ribs, cut wood grain and lock relief. */}
+      <path d="M22 47Q30 32 45 31M67 31Q83 34 90 47" stroke="#FFF2B6" strokeWidth="2.5" opacity=".8"/>
+      <path d="M21 66H39M72 66H90M20 83H39M72 83H91" stroke="#522822" strokeWidth="2.5" opacity=".57"/>
+      <path d="M31 62V85M81 62V85" stroke="#FFD98B" strokeWidth="2" opacity=".74"/>
+      <rect x="49" y="57" width="14" height="6" rx="2" fill="#FFF0AD" opacity=".72"/>
+      <circle cx="56" cy="69" r="3" fill="#6E381C"/>
+      <path d="M56 71V76" stroke="#FFF0B4" strokeWidth="1.6"/>
+      <path d="M15 58H96M20 92Q56 103 91 92" stroke="#FFE5A3" strokeWidth="1.3" opacity=".66"/>
+      <circle cx="25" cy="57" r="2" fill="#FFE4A2"/><circle cx="87" cy="57" r="2" fill="#FFE4A2"/>
     </g>}
     {kind==='scroll'&&<g strokeLinejoin="round" strokeLinecap="round">
       <path d="M20 14Q36 18 52 14L81 18V92Q57 88 32 94L24 88V27Q14 28 16 20Z" fill="#F6D9A0" stroke="#8B5631" strokeWidth="5"/>
@@ -46,6 +55,13 @@ function W8Art({kind}:{kind:W8ArtKind}){
       <path d="M33 44L49 60M63 60L79 44" stroke="url(#w8-gold-metal)" strokeWidth="9"/>
       <path d="M80 85L92 97M32 85L20 97" stroke="#734125" strokeWidth="12"/>
       <circle cx="56" cy="56" r="8" fill="url(#w8-gold-metal)" stroke="#9C642F" strokeWidth="3"/>
+      {/* Blades retain their exact icon silhouette; extra beveled metal and hilts. */}
+      <path d="M20 18L39 30L47 43M92 18L73 30L65 43" stroke="#FFFFFF" strokeWidth="2.4" opacity=".88"/>
+      <path d="M20 34L37 42M92 34L75 42" stroke="#7FAAC3" strokeWidth="2.5" opacity=".72"/>
+      <path d="M38 53L47 62M74 53L65 62" stroke="#FFF0A9" strokeWidth="2.5" opacity=".9"/>
+      <path d="M29 77L36 84M83 77L76 84" stroke="#E7B96F" strokeWidth="2.5"/>
+      <circle cx="56" cy="56" r="3.5" fill="#FFF2BB" stroke="#A36B2E" strokeWidth="1.4"/>
+      <circle cx="25" cy="92" r="3" fill="#F4C56B"/><circle cx="87" cy="92" r="3" fill="#F4C56B"/>
     </g>}
     {kind==='ship'&&<g strokeLinejoin="round" strokeLinecap="round">
       <path d="M13 71Q55 87 99 69L86 90Q55 104 25 89Z" fill="#9D4C34" stroke="#F4D28C" strokeWidth="5"/>
@@ -56,6 +72,14 @@ function W8Art({kind}:{kind:W8ArtKind}){
       <circle cx="43" cy="83" r="4" fill="#132C49" stroke="#F3D184" strokeWidth="2"/>
       <circle cx="65" cy="84" r="4" fill="#132C49" stroke="#F3D184" strokeWidth="2"/>
       <path d="M8 99Q21 93 34 99T59 99T84 99T108 99" stroke="#5CDBE6" strokeWidth="4"/>
+      {/* Planked hull, mast rigging and folds give the existing ship icon depth. */}
+      <path d="M20 77Q56 90 94 76M27 87Q56 95 85 87" stroke="#F8D7A0" strokeWidth="2" opacity=".78"/>
+      <path d="M30 75L34 89M82 75L78 89" stroke="#713622" strokeWidth="2"/>
+      <path d="M26 62L56 14L88 65" stroke="#E8D49F" strokeWidth="1.7" opacity=".88"/>
+      <path d="M45 33L48 58M68 35L68 60" stroke="#C69D64" strokeWidth="2" opacity=".8"/>
+      <path d="M29 60L44 62M70 64L83 62" stroke="#FFF1C8" strokeWidth="2.5" opacity=".8"/>
+      <path d="M24 93Q56 103 88 92" stroke="#5DE3E5" strokeWidth="2" opacity=".82"/>
+      <circle cx="55" cy="85" r="2.4" fill="#FFDB91"/><circle cx="77" cy="82" r="2.4" fill="#FFDB91"/>
     </g>}
     {kind==='target'&&<g strokeLinejoin="round" strokeLinecap="round">
       <circle cx="54" cy="59" r="39" fill="#F6E5C0" stroke="url(#w8-gold-metal)" strokeWidth="7"/>
@@ -66,6 +90,14 @@ function W8Art({kind}:{kind:W8ArtKind}){
       <path d="M94 14L103 19L93 29" fill="#F4D68F" stroke="#83512D" strokeWidth="3"/>
       <path d="M95 14L87 8L87 22Z" fill="#59BDE1" stroke="#174D78" strokeWidth="2"/>
       <path d="M56 56L42 72" stroke="#F2F5EB" strokeWidth="5"/>
+      {/* Carved target rim and glints: a richer illustration of the same objective. */}
+      <circle cx="54" cy="59" r="35" stroke="#9F653B" strokeWidth="1.7" strokeDasharray="3 7" opacity=".95"/>
+      <circle cx="54" cy="59" r="23" stroke="#FFE9B8" strokeWidth="2" opacity=".88"/>
+      <circle cx="54" cy="59" r="10" stroke="#A96A37" strokeWidth="1.5"/>
+      <path d="M26 44Q32 31 44 29" stroke="#FFF8D8" strokeWidth="3" opacity=".76"/>
+      <path d="M84 75Q77 87 66 89" stroke="#F9D49B" strokeWidth="2.8" opacity=".85"/>
+      <path d="M91 15L58 52" stroke="#C3E9F0" strokeWidth="1.6"/>
+      <path d="M58 52L62 46" stroke="#FCE2B0" strokeWidth="2"/>
     </g>}
     {kind==='cannon'&&<g strokeLinejoin="round" strokeLinecap="round">
       <path d="M22 73L78 73L85 85L20 85Z" fill="url(#w8-wood)" stroke="#693823" strokeWidth="5"/>
@@ -89,6 +121,12 @@ function W8Art({kind}:{kind:W8ArtKind}){
       <path d="M55 73V86M37 89H75L81 100H31Z" fill="url(#w8-gold-metal)" stroke="#894C20" strokeWidth="6"/>
       <path d="M42 41L49 37L56 24L63 37L70 41L64 48L66 59L56 53L46 59L48 48Z" fill="#FDF5B5" stroke="#C98528" strokeWidth="3"/>
       <path d="M16 62L9 57M15 74L5 73M96 62L103 57M97 74L107 73" stroke="#6DD9BB" strokeWidth="5"/>
+      {/* Trophies already in the screen receive metal relief, not a new reward. */}
+      <path d="M39 26H73M42 34H70" stroke="#FFF3BA" strokeWidth="2.3" opacity=".76"/>
+      <path d="M43 64Q56 71 69 64" stroke="#9D622D" strokeWidth="2" opacity=".75"/>
+      <path d="M47 80H65M40 92H72" stroke="#FFF0B0" strokeWidth="2.5" opacity=".84"/>
+      <path d="M11 42Q20 59 30 64M101 42Q92 59 82 64" stroke="#B4D9A4" strokeWidth="2.2" opacity=".7"/>
+      <circle cx="56" cy="45" r="2.5" fill="#FFF6C5"/>
     </g>}
     {kind==='flag'&&<g strokeLinejoin="round" strokeLinecap="round">
       <path d="M26 13V104" stroke="url(#w8-gold-metal)" strokeWidth="9"/>
@@ -326,6 +364,13 @@ function W8CaptainPortrait(){
       <path d="M16 100L24 96L31 104M84 100L76 96L69 104" stroke="#C08A45" strokeWidth="1.5"/>
       <circle cx="22" cy="93" r="2" fill="#FBE1A2" stroke="#86502E" strokeWidth="1"/>
       <circle cx="78" cy="93" r="2" fill="#FBE1A2" stroke="#86502E" strokeWidth="1"/>
+      {/* Fine painted highlights retain the same single local captain portrait. */}
+      <path d="M25 27Q35 17 48 17M52 17Q65 15 76 27" stroke="#FFF5C5" strokeWidth="1" opacity=".83"/>
+      <path d="M32 42L43 42M57 42L68 42" stroke="#AB693E" strokeWidth="1.25" opacity=".84"/>
+      <path d="M34 54Q39 57 44 55M56 55Q61 57 66 54" stroke="#F7C48C" strokeWidth="1" opacity=".75"/>
+      <path d="M41 77Q50 83 59 77" stroke="#9B5A3B" strokeWidth="1.25"/>
+      <path d="M23 104L35 92M77 104L65 92" stroke="#FFF0BA" strokeWidth="1.4" opacity=".85"/>
+      <path d="M18 99L28 91M82 99L72 91" stroke="#6BA2B8" strokeWidth="1.5" opacity=".63"/>
     </g>
 
 
