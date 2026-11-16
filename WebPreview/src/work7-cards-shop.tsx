@@ -176,8 +176,8 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
     <TabBar value={tab==='fusion'?'upgrade':tab} onSelect={setTab} label="Cartas" tabs={[['collection','A MINHA COLEÇÃO'],['upgrade','EVOLUIR']]}/>
     {tab==='collection'&&<section className="w7-content w7-collection-content" role="tabpanel" aria-label="A minha coleção">
       <div className="w7-collection-status">
-        <strong>GALERIA · 8 ILUSTRAÇÕES APROVADAS</strong>
-        <span>{profile.ownedCrew.length}/{CREW.length} tripulantes reais</span>
+        <strong>CARTAS: {profile.ownedCrew.length}/{CREW.length}</strong>
+        <span>8 ARTES · PRÉ-VISUALIZAÇÃO</span>
       </div>
       <div className="w7-approved-grid" role="group" aria-label="Oito ilustrações conceptuais aprovadas, ainda sem cartas jogáveis">
         {approvedConcepts.map((concept,slot)=><article key={concept.title} className={'w7-approved-slot w7-approved-slot-'+slot}
@@ -267,7 +267,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
           <small>Preço e conteúdo por definir · sem pagamentos</small>
         </div>
       </section>
-      <div className="w7-chests-heading"><strong>BAÚS DO TESOURO</strong><span>PRÉ-VISUALIZAÇÃO</span></div>
+      <div className="w7-chests-heading"><strong>BAÚS DO TESOURO</strong><span>SEM COMPRAS</span></div>
       <div className="w7-chest-grid" aria-label="Baús ainda indisponíveis">
         {([['rare','BAÚ RARO'],['epic','BAÚ ÉPICO'],['legend','BAÚ LENDÁRIO']] as const).map(([rarity,title])=>
           <article className={'w7-chest w7-chest-'+rarity} key={rarity}>
@@ -292,7 +292,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
       </div>
       <div className="w7-shop-actions"><button type="button" onClick={onBattle} aria-label="EARN COINS IN BATTLE">GANHAR MOEDAS</button><button type="button" onClick={onCards} aria-label="MANAGE CREW">VER CARTAS</button></div>
       </details>
-      <p className="w7-disclaimer">No real-money checkout is available; secure payments não estão integrados. Baús e packs não têm preços, pagamentos ou entregas. Apenas o recrutamento com moedas locais está funcional; dados saved on this device only.</p>
+      <p className="w7-disclaimer">Os packs e baús são apenas uma pré-visualização: não têm preços, compras nem entregas disponíveis. Apenas o recrutamento com moedas ganhas no jogo funciona. O progresso fica guardado neste dispositivo.</p>
     </section>}
     {pending&&<section className="w7-content w7-feature w7-pending" role="tabpanel" aria-label={pending.title}>
       <span className="w7-pending-relic"><ShopRelic kind={tab==='coins'?'coins':tab==='gems'?'gems':'special'}/></span>
@@ -305,6 +305,6 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
       <div className="w7-feature-row"><span aria-hidden="true">◇</span><strong>Sem pagamentos ou entregas nesta versão</strong><b>EM BREVE</b></div>
       <button type="button" onClick={()=>setTab('offers')}>VER OFERTAS LOCAIS</button>
     </section>}
-    <div className="w7-foot"><span>COMPRA COM MOEDAS LOCAIS</span><span>SEM PAGAMENTOS REAIS</span></div>
+    <div className="w7-foot"><span>RECRUTAMENTO COM MOEDAS DO JOGO</span><span>SEM PAGAMENTOS REAIS</span></div>
   </div>;
 }
