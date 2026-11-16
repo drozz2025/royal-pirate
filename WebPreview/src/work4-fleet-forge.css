@@ -1876,3 +1876,16 @@
   .w4-forge .w4-forge-scene > svg.w4-cannon-art{width:98%;top:12%;left:-5%}
   .w4-forge .w4-forge-scene > svg.w4-ship-art{width:82%;top:16%;left:-3%}
 }
+
+
+/* WORK4 #104: same element-specific paint contract verified by the 390px
+   diagnostic. The actual CSS screenshot renderer must see *opaque* stage and
+   illustration surfaces; do not reintroduce gradients or transparent layers. */
+.w4-forge #w4-forge-panel > .w4-forge-stage {
+  background:#765038 !important;
+  background-image:none !important;
+}
+.w4-forge .w4-forge-stage > .w4-forge-scene {
+  background:#72503d !important;
+  background-image:none !important;
+}
