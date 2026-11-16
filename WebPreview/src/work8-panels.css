@@ -4177,8 +4177,8 @@
     radial-gradient(ellipse 85% 44% at 50% 0%,#74b7b650,transparent 86%),
     linear-gradient(165deg,#1b4a66,#102f50 64%,#081c35);
 }
-.w8-approved-ranking .w8-approved-avatar .w8-art,
-.w8-approved-ranking .w8-approved-mini-avatar .w8-art{
+.w8-approved-ranking .w8-approved-avatar .w8-captain-portrait,
+.w8-approved-ranking .w8-approved-mini-avatar .w8-captain-portrait{
   filter:drop-shadow(0 2px 2px #07152cbf) drop-shadow(-1px -1px 1px #ffe0a45c);
 }
 .w8-approved-ranking .w8-approved-captain{
