@@ -201,6 +201,49 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
         <circle cx="282" cy="215" r="2.5"/><circle cx="299" cy="207" r="1.8"/>
       </g>
     </g>
+    {/* WORK4 / screen 03: original hand-drawn wood, rigging and sail relief.
+        Only vector pigment and linework: ownership, ship statistics and hit
+        targets stay unchanged. The approved reference is NOT rendered as art. */}
+    <g className="w4-royal-finish" pointerEvents="none">
+      {/* Three curved varnished planks catch a warm edge-light beneath the gunports. */}
+      <path d="M79 169Q161 193 280 166L269 184Q177 206 89 183Z"
+        fill="#150f1b" opacity=".22"/>
+      <path d="M81 173Q162 198 276 170M88 181Q164 204 267 182"
+        fill="none" stroke="#f2b96b" strokeWidth="2.4" opacity=".92"/>
+      <path d="M92 188Q168 213 256 187" fill="none" stroke="#fff0bf"
+        strokeWidth="1.5" opacity=".74"/>
+      <path d="M83 160Q173 180 282 153" fill="none" stroke="#211825"
+        strokeWidth="3.5" opacity=".84"/>
+      {/* Raised carved stern transom and real brass-framed windows. */}
+      <path d="M258 111L284 102 306 126 304 147 259 150Z"
+        fill="none" stroke="#ffe1a0" strokeWidth="2.6" opacity=".92"/>
+      <path d="M269 117h9v10h-9Zm14 1h9v10h-9Z"
+        fill="#eaa851" fillOpacity=".42" stroke="#ffe3a4" strokeWidth="1.6"/>
+      <path d="M266 137q14-5 31-1M266 143q15-4 30-1"
+        stroke="#f4c47d" strokeWidth="2" fill="none"/>
+      {/* Rope-ladder rungs between shrouds; curves follow the existing sails. */}
+      <g stroke="#ead1a3" strokeWidth="1.45" fill="none" opacity=".82">
+        <path d="M116 36L89 134M213 22L188 139M212 22L243 139"/>
+        <path d="M110 55l-14 2m11 9-15 2m13 9-15 2m12 9-15 2m12 9-15 2m13 11-20 3"/>
+        <path d="M206 47l18 1m-20 9 23 2m-25 8 27 3m-29 7 31 4m-32 8 35 5m-35 7 37 6"/>
+      </g>
+      {/* Canvas seams, folds and the softer cream highlights in reference 03. */}
+      <g stroke="#f8edd0" strokeWidth="1.7" fill="none" opacity=".52">
+        <path d="M91 61Q84 96 91 117M106 52Q106 88 111 118"/>
+        <path d="M141 54Q168 83 179 111M157 48Q182 66 192 110"/>
+        <path d="M226 39Q241 68 240 108M244 47Q253 75 251 104"/>
+      </g>
+      <g stroke="#815b42" strokeWidth="1.35" fill="none" opacity=".65">
+        <path d="M85 85q16 8 33 3M131 83q26 5 48 14M219 72q17 5 32 4"/>
+      </g>
+      {/* Light glints and sea foam make the hull read as three-dimensional. */}
+      <path d="M35 197q17-8 33 2t32 3m131 3q23-8 43-2t41-1"
+        stroke="#edffff" strokeWidth="4" strokeLinecap="round" fill="none" opacity=".9"/>
+      <g fill="#fff9dd" opacity=".8">
+        <circle cx="63" cy="196" r="1.8"/><circle cx="91" cy="201" r="1.5"/>
+        <circle cx="296" cy="197" r="2"/><circle cx="315" cy="201" r="1.4"/>
+      </g>
+    </g>
     <path d="M36 204Q65 196 103 207M218 207Q256 199 316 205" stroke="#ddfcfa" strokeWidth="4" opacity=".85" fill="none" strokeLinecap="round"/>
 
   </svg>;
@@ -313,6 +356,31 @@ function ForgeBackdrop(){
         <path d="M49 230q23 7 42 4m141 10 60 1"/>
       </g>
     </g>
+    {/* WORK4 / reference 04: secondary warm masonry, hammered fittings and
+        sparks. This is behind the cannon and the real upgrade controls. */}
+    <g className="w4-forge-warm-materials" pointerEvents="none">
+      <path d="M25 142Q35 49 107 46Q169 44 180 144"
+        stroke="#f3c087" strokeWidth="2.5" fill="none" opacity=".92"/>
+      <path d="M39 114l18 6m-10-27 22 9m10-27 16 10m27-12-6 11m30-1-13 12m24 17-20 4"
+        stroke="#ffdb9c" strokeWidth="2.6" opacity=".72"/>
+      <path d="M33 153h141m-136 19h131m-126 19h129m-128 20h132"
+        stroke="#291b1c" strokeWidth="2.5" opacity=".55"/>
+      <path d="M50 152v20m45-19v19m45-20v19M67 174v17m57-17v17M48 194v17m46-18v18m51-19v18"
+        stroke="#e6a66b" strokeWidth="2.8" opacity=".62"/>
+      <path d="M0 253L420 245M0 272L420 265"
+        stroke="#f7b66e" strokeWidth="2.5" opacity=".62"/>
+      <path d="M204 22h166m-164 31h161m-159 32h156"
+        stroke="#f3b978" strokeWidth="2.1" opacity=".52"/>
+      <g fill="#ffdb89">
+        <circle cx="81" cy="164" r="2"/><circle cx="102" cy="141" r="1.5"/>
+        <circle cx="119" cy="172" r="2.3"/><circle cx="144" cy="202" r="1.4"/>
+      </g>
+      <g stroke="#fff0b3" strokeWidth="2" fill="none" opacity=".83">
+        <path d="M96 185l5-8m11 15 8-12m-29 32-4-9m39-14 4-8"/>
+      </g>
+      <path d="M16 224q13-6 22 0m313 20q31-8 53-2"
+        fill="none" stroke="#3a2525" strokeWidth="5" opacity=".78"/>
+    </g>
  </svg>;
 }
 
@@ -393,6 +461,30 @@ function ForgeCannonArtwork(){
         <circle cx="120" cy="244" r="3"/><circle cx="149" cy="255" r="3"/>
         <circle cx="207" cy="231" r="3"/><circle cx="316" cy="207" r="3"/>
         <circle cx="280" cy="172" r="3"/>
+      </g>
+    </g>
+    {/* Ref. 04 material pass: cold gunmetal reflections vs. forged gold
+        trim, highlights follow the existing perspective; decorative SVG only. */}
+    <g className="w4-cannon-metal-patina" pointerEvents="none">
+      <path d="M108 158L284 113M110 166l173-43"
+        fill="none" stroke="#e1eff0" strokeWidth="3" opacity=".59"/>
+      <path d="M123 191l169-44M132 197l171-45"
+        fill="none" stroke="#030e1c" strokeWidth="4" opacity=".48"/>
+      <path d="M176 125l15 52M221 114l17 49M271 103l14 52"
+        stroke="#fff0bd" strokeWidth="2" opacity=".84"/>
+      <path d="M94 147q-16 13-19 54"
+        fill="none" stroke="#fff4c8" strokeWidth="3.7" opacity=".85"/>
+      <path d="M42 172q-9 21 3 36M53 147q-15 10-19 28"
+        fill="none" stroke="#fff1c0" strokeWidth="2" opacity=".68"/>
+      <path d="M100 242l50 23 174-54M128 248l44 11"
+        stroke="#f5c37a" strokeWidth="2.8" fill="none" opacity=".83"/>
+      <path d="M255 193q21-9 39 0M243 210q36-16 68 1"
+        stroke="#ffdf9d" strokeWidth="2" fill="none" opacity=".75"/>
+      <g fill="#f9d28c" stroke="#8d5b32" strokeWidth="1">
+        <circle cx="155" cy="135" r="2.3"/><circle cx="198" cy="124" r="2.3"/>
+        <circle cx="247" cy="111" r="2.3"/><circle cx="148" cy="189" r="2.3"/>
+        <circle cx="203" cy="172" r="2.3"/><circle cx="253" cy="159" r="2.3"/>
+        <circle cx="116" cy="237" r="2.3"/><circle cx="187" cy="225" r="2.3"/>
       </g>
     </g>
     <path d="M36 236Q64 226 83 240M353 234Q380 219 397 235" stroke="#fbcc7b" strokeWidth="3" fill="none" opacity=".7"/>
