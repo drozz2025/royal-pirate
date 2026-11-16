@@ -102,7 +102,7 @@ function W8Art({kind}:{kind:W8ArtKind}){
 
 /** Decorative maritime panorama drawn in SVG, not a screenshot or gameplay layer. */
 function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
-  return <svg className={'w8-seascape w8-seascape-'+variant} viewBox="0 0 420 176" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  return <svg className={'w8-seascape w8-seascape-'+variant} viewBox="0 0 420 176" preserveAspectRatio="none" aria-hidden="true" focusable="false">
     <defs>
       <linearGradient id="w8-sea-sky" x1="0" y1="0" x2="0" y2="1">
         <stop stopColor="#2D94B8"/><stop offset=".58" stopColor="#19638A"/><stop offset="1" stopColor="#0A3156"/>
@@ -300,13 +300,18 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
         {[2,3,4,5].map(slot=><div className="w8-approved-empty-rank" key={slot} aria-label={'Lugar '+slot+' indisponível'}>
           <span>{slot}</span>
           <span className="w8-approved-empty-portrait" aria-hidden="true">
-            <svg viewBox="0 0 32 32" focusable="false">
-              <circle cx="16" cy="12" r="6.5" fill="#7C9BA6" stroke="#BCD0CA" strokeWidth="1.5"/>
-              <path d="M5 29q0-12 11-12t11 12Z" fill="#527890" stroke="#ACC6CD" strokeWidth="1.5"/>
-              <path d="M10 8q5-7 12 0" fill="none" stroke="#D8BB78" strokeWidth="2"/>
+            <svg viewBox="0 0 40 44" focusable="false" aria-hidden="true">
+              {/* An unoccupied pirate-portrait silhouette, never a fictional player. */}
+              <path d="M3 42q2-13 12-14l5 4 5-4q10 1 12 14Z" fill="#274A64" stroke="#86ADBD" strokeWidth="1.8"/>
+              <path d="M13 27q1 12 7 13 6-1 7-13" fill="#365970"/>
+              <path d="M10 17q0-11 10-11t10 11l-4 11-6 4-6-4Z" fill="#6C8B9B" stroke="#A1B8C0" strokeWidth="1.5"/>
+              <path d="M11 23l5 9 4 3 4-3 5-9-6 3h-6Z" fill="#32536A"/>
+              <path d="M5 16Q8 3 17 8Q20 0 24 8Q33 3 36 16Q28 20 20 17Q12 20 5 16Z" fill="#203F58" stroke="#D5BF81" strokeWidth="1.7"/>
+              <path d="M5 16Q20 22 35 16M14 11h12" fill="none" stroke="#D2B276" strokeWidth="1.7"/>
+              <path d="M15 22h2M23 22h2" stroke="#25465B" strokeWidth="1.6" strokeLinecap="round"/>
             </svg>
           </span>
-          <strong>{slot===2?'SEM CLASSIFICAÇÃO ONLINE':'LUGAR AGUARDA JOGADOR'}</strong>
+          <strong>{'POSIÇÃO INDISPONÍVEL'}</strong>
           <small className="w8-approved-empty-score" aria-hidden="true">—</small>
         </div>)}
         <p>Ranking online indisponível. Apenas o teu progresso local é apresentado, sem adversários ou prémios fictícios.</p>
