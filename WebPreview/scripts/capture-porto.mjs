@@ -283,14 +283,20 @@ try {
       "const [ref,live]=await Promise.all([load("+JSON.stringify(nativeRefURL)+"),load("+JSON.stringify(nativeShotURL)+")]);"+
       "if(ref.naturalWidth!==384||ref.naturalHeight!==512||live.naturalWidth!==384||live.naturalHeight!==512)throw Error('Native dimensions mismatch');"+
       "const c=document.createElement('canvas');c.width=1152;c.height=512;const g=c.getContext('2d');"+
-      "g.drawImage(ref,0,0);g.drawImage(live,384,0);g.drawImage(ref,768,0);g.globalAlpha=.5;g.drawImage(live,768,0);"+
-      "return c.toDataURL('image/png').slice(22)})()");
+      "g.drawImage(ref,0,0);g.drawImage(live,384,0);"+
+      "const a=g.getImageData(0,0,384,512).data;const b=g.getImageData(384,0,384,512).data;"+
+      "let sum=0,over32=0;for(let p=0;p<a.length;p+=4){const dr=Math.abs(a[p]-b[p]),dg=Math.abs(a[p+1]-b[p+1]),db=Math.abs(a[p+2]-b[p+2]);sum+=dr+dg+db;if(Math.max(dr,dg,db)>32)over32++;}"+
+      "g.drawImage(ref,768,0);g.globalAlpha=.5;g.drawImage(live,768,0);"+
+      "return {png:c.toDataURL('image/png').slice(22),meanAbsoluteRgbError:Math.round(sum/(384*512*3)*100)/100,pixelsOver32Fraction:Math.round(over32/(384*512)*10000)/10000}})()");
     const compareFile='compare-exact-'+key+'-384x512.png';
-    await writeFile(join(out,compareFile),Buffer.from(composite,'base64'));
+    await writeFile(join(out,compareFile),Buffer.from(composite.png,'base64'));
     report.nativeReferenceComparisons.push({screen:key,
       reference:referenceFiles[key],referenceSize:[384,512],screenshotSize:[384,512],
       screenshotFile:key+'-mobile-384x512.png',comparisonFile:compareFile,
       method:'unscaled reference | unscaled live Chromium | 50 percent overlay',
+      pixelError:{meanAbsoluteRgbError:composite.meanAbsoluteRgbError,
+        pixelsOver32Fraction:composite.pixelsOver32Fraction,
+        note:'Diagnostics only: lower pixel error is not automatic artistic approval'},
       approved:false,geometry});
   }
   if(report.nativeReferenceComparisons.length!==8)throw new Error('Incomplete native-size references');
