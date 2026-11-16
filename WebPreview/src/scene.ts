@@ -479,7 +479,11 @@ export class OceanScene {
   home(){this.cameraMode='battle';this.scene.background=this.battleSky;this.water.uniforms.battleMode.value=1;
     // Cinematic battle-only art scale; the genuine physics ships and hit logic stay live.
     // Reset to the original size in Porto so its approved composition/touch remain identical.
-    this.ships.player.root.scale.setScalar(1.25);this.ships.enemy.root.scale.setScalar(1.72);
+    // Slightly enlarge ONLY the enemy's existing live render mesh in Batalha.
+    // Its world position, actual hull collision, HP and projectile origins remain unchanged.
+    const compactBattle=this.host.clientWidth/Math.max(1,this.host.clientHeight)>=.50;
+    this.ships.player.root.scale.setScalar(1.25);
+    this.ships.enemy.root.scale.setScalar(compactBattle?1.88:1.82);
     // Battle-only broadside: reveal the enemy's three-dimensional port flank
     // instead of aiming its narrow bow straight at the camera. No camera
     // movement, hit-point changes, altered controls or Porto composition.
@@ -494,6 +498,10 @@ export class OceanScene {
     this.camera.fov=42;this.camera.updateProjectionMatrix();
     const pose=battleCameraPose(this.host.clientWidth/Math.max(1,this.host.clientHeight));
     this.camera.position.set(...pose.position);
+    // Native 384x512 artwork: the player's large black sail is cropped by the
+    // LEFT edge, not parked in the center. Tall phone framing stays unchanged.
+    // This is one existing battle-only sail, never a third ship or a new jib.
+    this.battleForegroundSail.position.x=compactBattle?-5.25:-3.6;
     // A fixed forward-looking viewpoint, not the rejected moving camera.
     // The battle-only camera targets the actual fixed pose in battle-framing.ts.
     // On 320/384 the starboard enemy is closer, right-of-centre and framed
