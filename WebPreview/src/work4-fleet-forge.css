@@ -1169,3 +1169,120 @@
   .w4-forge .w4-forge-stage{min-height:209px}
   .w4-forge .w4-resource-grid>div{min-height:69px}
 }
+
+
+/* WORK 4 — frame 04: one readable illustrated forge with the real local
+   progression displayed beside the active part. The screenshot's combat
+   attributes are NOT reproduced: the game does not yet supply those values.
+   These rules never touch the Porto header/dock or another Work's screens. */
+.w4-forge .w4-forge-stage{
+  min-height:clamp(278px,36dvh,328px);
+  border-color:#ffdb91;
+  background:
+    radial-gradient(ellipse 60% 74% at 27% 73%,#e68537aa,transparent 79%),
+    linear-gradient(135deg,#765032,#50362d 33%,#243c51 69%,#09213c 100%);
+  box-shadow:0 0 0 2px #56321f,0 8px 17px #061729d9,inset 0 3px #fff6b69c;
+}
+.w4-forge .w4-forge-stage .w4-forge-art{
+  opacity:1;
+  filter:drop-shadow(0 5px 4px #271313a3);
+}
+.w4-forge .w4-forge-stage .w4-cannon-art{
+  left:-14%;bottom:-3%;width:95%;
+  filter:drop-shadow(0 13px 9px #160b11ef) drop-shadow(0 0 12px #ffd4838c);
+}
+.w4-forge .w4-forge-stage>.w4-ship-art{left:-12%;bottom:-1%;width:87%}
+.w4-forge .w4-forge-description{
+  top:5%;right:2%;width:46%;min-height:0;max-height:91%;
+  padding:7px 8px 9px;gap:3px;overflow:hidden;
+  border:2px solid #ffe0a0;border-radius:13px;
+  background:linear-gradient(160deg,#235270f2,#0b2a49fa 56%,#071a34fb);
+  box-shadow:0 0 0 2px #613d20,0 7px 14px #07172dcd,inset 0 2px #eafaff93;
+}
+.w4-forge .w4-forge-medallion{
+  width:42px;height:42px;border-radius:8px;
+  border:2px solid #fff0b3;
+  background:radial-gradient(circle at 30% 21%,#fff6c7,#dba756 54%,#784820);
+}
+.w4-forge .w4-forge-medallion .w4-tab-symbol{
+  width:27px;height:27px;stroke-width:2.1;
+}
+.w4-forge .w4-forge-description>span{
+  font:800 9px/1.1 'Barlow',sans-serif;letter-spacing:.25px;color:#f2cf91;
+}
+.w4-forge .w4-forge-description h3{
+  font:900 clamp(19px,5.25vw,25px)/1 'Barlow Condensed',sans-serif;
+  margin:1px 0;color:#fff0bb;
+}
+.w4-forge .w4-forge-description>strong{
+  font:900 clamp(15px,4.2vw,19px)/1 'Barlow Condensed',sans-serif;
+  color:#fffdf4;white-space:normal;
+}
+.w4-forge .w4-forge-live-levels{
+  display:grid;gap:2px;width:100%;min-width:0;
+  margin-top:5px;padding-top:5px;
+  border-top:1px solid #d7b77b88;
+}
+.w4-forge .w4-forge-live-level{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:4px;
+  align-items:center;min-height:25px;padding:3px 5px 2px;
+  border:1px solid #6e92a5a8;border-radius:5px;
+  background:linear-gradient(100deg,#153c59,#0b2946);
+}
+.w4-forge .w4-forge-live-level.is-current{
+  border-color:#f9d383;
+  background:linear-gradient(100deg,#35576d,#133957);
+}
+.w4-forge .w4-forge-live-level>span{
+  display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  padding:0;font:800 10px/1 'Barlow Condensed',sans-serif;
+  color:#f5e4c0;white-space:nowrap;
+}
+.w4-forge .w4-forge-live-level>b{
+  font:900 12px/1 'Barlow Condensed',sans-serif;
+  color:#fff4c9;white-space:nowrap;
+}
+.w4-forge .w4-forge-live-level>i{
+  grid-column:1/-1;display:block;height:4px;margin-top:3px;
+  border-radius:10px;overflow:hidden;background:#071b2d;
+  box-shadow:inset 0 1px #030e1ab8;
+}
+.w4-forge .w4-forge-live-level>i>span{
+  display:block;height:100%;padding:0;border-radius:10px;
+  background:linear-gradient(90deg,#62c58e,#b4e66e);
+  box-shadow:0 0 4px #a8e9858c;
+}
+.w4-forge .w4-materials{
+  margin-top:-5px;
+  border:3px solid #efc883;
+  background:linear-gradient(180deg,#325674,#153451 44%,#0c2b49);
+}
+.w4-forge .w4-resource-grid>div{
+  border-color:#e0c08a;
+  background:radial-gradient(ellipse at 50% 0%,#426b83,#153b5d 70%,#0b2748);
+}
+.w4-forge .w4-resource-grid strong{color:#fff5cf}
+.w4-forge .w4-improve-button{
+  width:min(92%,420px);min-height:60px;
+  margin:-2px auto 8px;position:relative;z-index:1;
+  letter-spacing:.35px;
+}
+@media(max-width:390px){
+  .w4-forge .w4-forge-stage{min-height:clamp(248px,33dvh,292px)}
+  .w4-forge .w4-forge-description{width:46%;top:4%;padding:6px 5px 7px;gap:2px}
+  .w4-forge .w4-forge-medallion{width:36px;height:36px}
+  .w4-forge .w4-forge-medallion .w4-tab-symbol{width:23px;height:23px}
+  .w4-forge .w4-forge-description h3{font-size:clamp(18px,5.1vw,22px)}
+  .w4-forge .w4-forge-live-levels{gap:2px;margin-top:3px;padding-top:4px}
+  .w4-forge .w4-forge-live-level{min-height:22px;padding:2px 4px}
+  .w4-forge .w4-forge-live-level>span{font-size:9px}
+  .w4-forge .w4-forge-live-level>b{font-size:11px}
+}
+@media(max-width:345px){
+  .w4-forge .w4-forge-description{width:47%;padding:5px 4px}
+  .w4-forge .w4-forge-description>span{font-size:8px}
+  .w4-forge .w4-forge-stage .w4-cannon-art{left:-16%;width:99%}
+}
+@media(max-height:680px){
+  .w4-forge .w4-forge-stage{min-height:242px}
+}
