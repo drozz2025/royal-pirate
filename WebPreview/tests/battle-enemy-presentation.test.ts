@@ -67,3 +67,29 @@ test('enemy battle-only presentation leaves the tested camera and Porto intact',
     }
   }
 });
+
+
+test('red enemy broadside is sculpted three-dimensional material, without changing the royal Porto ship',()=>{
+  withFakeCanvas(()=>{
+    const opponent=makeShip(true), royal=makeShip(false);
+    const findOxblood=(ship:T.Group)=> {
+      const matches:T.Mesh[]=[];
+      ship.traverse(part=>{
+        if(part instanceof T.Mesh && part.material instanceof T.MeshStandardMaterial
+          && part.material.color.getHexString()==='802b36') matches.push(part);
+      });
+      return matches;
+    };
+    const redDetail=findOxblood(opponent.root);
+    assert.equal(redDetail.length,1,'red gallery, hull strakes and gunport edging are batched into a single material draw');
+    assert.equal(findOxblood(royal.root).length,0,'Porto royal ship must not receive battle-only red sculpture');
+    const hull=redDetail[0].geometry;
+    assert.ok(hull.getAttribute('position').count>400,'real flared stern and broadside geometry, not a UI picture');
+    const bounds=new T.Box3().setFromObject(redDetail[0]);
+    assert.ok(bounds.max.x>1.5&&bounds.min.x< -1.5,'galleon decoration spans both flanks');
+    assert.ok(bounds.max.z>4.2&&bounds.min.z< -4.3,'carving runs from stern gallery to prow');
+    assert.equal(opponent.guns.length,6,'all three live cannons on each side are preserved');
+    assert.equal(opponent.sails.length,5,'existing three-mast enemy sail geometry is not recreated');
+    assert.equal(royal.sails.length,6,'approved royal ship and jib remain intact');
+  });
+});

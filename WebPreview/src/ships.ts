@@ -229,6 +229,85 @@ export function makeShip(red = false): ShipArt {
     beam(new T.Vector3(-1.32,4.10,-4.35),
       new T.Vector3(1.32,4.10,-4.35),.062,gold);
   }
+  // WORK6 Batalha 02: sculpt the opposing red galleon as a heavily built
+  // broadside, rather than flat geometric timber. All pieces are REAL 3D
+  // geometry merged into material bins; none affect the battle hitboxes,
+  // the existing cannons, Porto, sails, or the first-person camera.
+  if(red){
+    const oxblood=mat('#802b36',.07,.54);
+    const soot=mat('#241a1d',.18,.65);
+    // The gun deck has curved wine-red strakes and a continuous bright
+    // rubbing strip following its tapered hull from transom to raised prow.
+    // Two independent longitudinal bands make the vessel read as a galleon
+    // even when most of the ship is visible from its port quarter.
+    const flank:[number,number][]=[
+      [-4.25,.73],[-3.35,1.17],[-2.25,1.49],[-1.10,1.61],
+      [.10,1.65],[1.25,1.58],[2.50,1.37],[3.55,1.07],[4.50,.56]
+    ];
+    for(const side of [-1,1]){
+      for(let i=0;i<flank.length-1;i++){
+        const [z0,w0]=flank[i],[z1,w1]=flank[i+1];
+        beam(new T.Vector3(side*w0,.86,z0),
+          new T.Vector3(side*w1,.86,z1),.12,oxblood);
+        beam(new T.Vector3(side*(w0+.035),1.09,z0),
+          new T.Vector3(side*(w1+.035),1.09,z1),.049,gold);
+        beam(new T.Vector3(side*w0,1.90,z0),
+          new T.Vector3(side*w1,1.90,z1),.055,oxblood);
+      }
+      // Raised outer ribs follow the hull's flare. These segmented sculpted
+      // timbers break the long straight side into substantial curved bays.
+      for(const [z,w] of flank.slice(1,-1)){
+        beam(new T.Vector3(side*w*.72,-.29,z),
+          new T.Vector3(side*(w+.045),1.12,z),.062,darkWood);
+        beam(new T.Vector3(side*(w+.035),1.13,z),
+          new T.Vector3(side*(w+.12),2.32,z),.055,gold);
+        put(sphere,gold,side*(w+.13),2.32,z,.10,.11,.10);
+      }
+      // Cannons and their live recoil remain completely untouched: these
+      // oversized recessed frames surround the EXISTING three gun muzzles.
+      for(const [z,w] of [[-1.8,1.79],[0,1.84],[1.8,1.68]]){
+        const x=side*(w+.18);
+        for(const dy of [-.35,.35])
+          put(cube,oxblood,x,1.55+dy,z,.085,.15,.92);
+        for(const dz of [-.48,.48])
+          put(cube,gold,x,1.55,z+dz,.11,.91,.10);
+        for(const dy of [-.40,.40])for(const dz of [-.49,.49])
+          put(sphere,gold,x+side*.035,1.55+dy,z+dz,.073,.074,.073);
+        put(cube,soot,side*(w+.12),1.53,z,.036,.41,.56);
+      }
+    }
+    // Three-dimensional stepped stern gallery: broad timber decks, arched
+    // lit windows, buttresses and a high curving gold taffrail. Unlike a
+    // billboard, both the transom and the lateral faces have real volume.
+    for(const [y,width,depth] of [[3.62,2.94,.54],[4.04,2.78,.45],[4.37,2.56,.33]]){
+      put(cube,oxblood,0,y,-4.48,width,.18,depth);
+      put(cube,gold,0,y+.11,-4.50,width+.16,.055,depth+.10);
+    }
+    for(const side of [-1,1]){
+      beam(new T.Vector3(side*1.34,2.89,-4.67),
+        new T.Vector3(side*1.46,4.23,-4.57),.09,gold);
+      beam(new T.Vector3(side*1.46,4.23,-4.57),
+        new T.Vector3(side*.98,4.70,-4.53),.065,gold);
+      const volute=cached('enemy-stern-volute',
+        ()=>new T.TorusGeometry(.27,.054,7,18,Math.PI*1.68));
+      put(volute,gold,side*1.35,3.43,-4.42,1,1,1,
+        new T.Euler(0,side*Math.PI/2,side*.21));
+      for(const z of [-4.20,-3.67])
+        put(cube,light,side*1.42,3.31,z,.035,.29,.27);
+    }
+    for(const x of [-1.02,-.52,0,.52,1.02]){
+      put(cube,gold,x,4.61,-4.55,.072,.41,.085);
+      put(sphere,gold,x,4.85,-4.55,.097,.098,.097);
+    }
+    beam(new T.Vector3(-1.25,4.73,-4.55),
+      new T.Vector3(1.25,4.73,-4.55),.070,gold);
+    // A substantial carved prow knee ties the gunwale to the existing
+    // bowsprit/anchor, without adding a fake sail or changing hit geometry.
+    beam(new T.Vector3(0,1.52,4.45),
+      new T.Vector3(0,2.82,5.63),.19,darkWood);
+    beam(new T.Vector3(0,2.82,5.63),
+      new T.Vector3(0,3.21,6.04),.115,gold);
+  }
   // Royal galleon detailing is real 3D geometry, merged by material with the
   // existing hull. The enemy remains lightweight and visually distinct.
   if(!red){
