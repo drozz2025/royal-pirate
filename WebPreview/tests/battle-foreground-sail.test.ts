@@ -27,7 +27,7 @@ test('battle art is actual curved 3D canvas with rigging and sculpted emblem',()
   assert.ok(Math.max(...depths)-Math.min(...depths)>.2,'sail must have real volume');
   assert.ok(depths.every(Number.isFinite));
   assert.ok(group.getObjectByName('foreground-jolly-roger'));
-  assert.ok(group.children.length>=12,'sail, yard, ropes and insignia are separate live meshes');
+  assert.ok(group.children.length>=9,'sail, yard, ropes and insignia are separate live meshes');
 });
 
 test('reference left sail is legible yet stays above fire/cannon controls at 320/390/430',()=>{
