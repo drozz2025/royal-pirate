@@ -300,9 +300,11 @@ export function makeShip(red = false): ShipArt {
       const v=upperPositions.getY(i)/1.55+.5;
       // Taper the hem while leaving the yard full-width. Layered folds and
       // canvas bulge read as cloth rather than a rigid rectangular billboard.
-      upperPositions.setZ(i,.12+Math.sin(u*Math.PI)*(.24+.35*Math.sin(v*Math.PI))
-        +.045*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
-      upperPositions.setX(i,upperPositions.getX(i)*(.77+.19*Math.sin(v*Math.PI)+.04*v));
+      upperPositions.setZ(i,red
+        ? .045+.11*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)+.017*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI)
+        : .12+Math.sin(u*Math.PI)*(.24+.35*Math.sin(v*Math.PI))
+          +.045*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
+      upperPositions.setX(i,upperPositions.getX(i)*(red ? (.96+.035*Math.sin(v*Math.PI)) : (.77+.19*Math.sin(v*Math.PI)+.04*v)));
     }
     upperGeometry.computeVertexNormals();
     const upperSail=new T.Mesh(upperGeometry,topsailMat);
@@ -383,7 +385,10 @@ export function makeShip(red = false): ShipArt {
         +.045*Math.sin(u*5*Math.PI)*Math.sin(v*Math.PI));
     }
     redForeGeometry.computeVertexNormals();
-    const redForesail=new T.Mesh(redForeGeometry,topsailMat);
+    // Put the existing Jolly Roger cloth on the *visible* forward canvas.
+    // The old unmarked brown foresail obscured the skull on the main canvas
+    // in portrait; no new image, mesh, draw call or hit region is introduced.
+    const redForesail=new T.Mesh(redForeGeometry,sailMat);
     redForesail.name='enemy-billowed-foresail';
     redForesail.position.set(0,5.45,3.42);
     rig.add(redForesail);sails.push(redForesail);
