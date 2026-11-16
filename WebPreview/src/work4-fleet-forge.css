@@ -2222,3 +2222,23 @@
 @media(min-width:360px) and (max-width:399px) and (max-height:640px){
   .w4-forge .w4-forge-scene>svg.w4-cannon-art{width:63%;left:-2%;top:24%}
 }
+
+
+/* WORK4 / #104 — reference 03/04 pictorial silhouette correction, 23h.
+   Single live ship and cannon only. Never change the shared Porto/nav shell,
+   the protected Forja contain:paint / translateZ(0) isolation or real values.
+   Deep velvet timber and slightly less synthetic tropical colour; the taller
+   canvas at original 384×512 reveals a complete sail without raising the keel. */
+.w4-fleet .w4-harbour-stage > svg.w4-ship-art {
+  filter:brightness(.88) saturate(.94) contrast(1.17)
+    drop-shadow(0 10px 7px #061b2fe6);
+}
+.w4-fleet .w4-harbour-stage > svg.w4-tropical-art {
+  filter:saturate(1.07) contrast(1.10);
+}
+@media (max-height:640px) and (max-width:659px) {
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art {
+    transform:scaleX(.94) scaleY(1.11) rotate(-1deg);
+    transform-origin:43% 92%;
+  }
+}
