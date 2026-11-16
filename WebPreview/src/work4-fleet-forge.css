@@ -1891,27 +1891,27 @@
 }
 
 
-/* WORK4 #104: full-width workshop paint-plane recovery.
-   Remove the stage pseudo-element and nested isolated compositing contexts:
-   the approved forge artwork remains individual SVG DOM nodes, not a static
-   screenshot. Scope exclusively to the WORK4 forge stage. */
-.w4-forge #w4-forge-panel > .w4-forge-stage {
-  isolation:auto!important;
-  background:#845536!important;
+/* WORK4 #104: keep real responsive workshop SVGs above the canvas-backed
+   global background in Chromium. The panel stays above the cannon so all
+   local costs and working controls remain unobstructed. */
+.w4-forge #w4-forge-panel > .w4-forge-stage{
+  position:relative;
+  isolation:isolate!important;
+  background-color:#805436!important;
   background-image:none!important;
   outline:none!important;
 }
-.w4-forge #w4-forge-panel > .w4-forge-stage::before {
+.w4-forge #w4-forge-panel > .w4-forge-stage::before{
   content:none!important;
   display:none!important;
 }
-.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene {
+.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene{
   isolation:auto!important;
-  background:#b77f4c!important;
+  background-color:#ab744a!important;
   background-image:none!important;
-  outline:none!important;
-  z-index:0;
+  z-index:20!important;
+  pointer-events:none;
 }
 .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description{
-  z-index:3;
+  z-index:30!important;
 }
