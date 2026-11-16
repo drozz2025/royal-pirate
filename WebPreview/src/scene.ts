@@ -68,7 +68,17 @@ export class OceanScene {
           float whiteCap=smoothstep(.30,.88,crest*.72+flecks*.28)*ridge;
           float distanceToEye=length(cameraPosition.xz-vWorld.xz);
           float proximity=1.-smoothstep(20.,88.,distanceToEye);
-          float foam=clamp(ridge*.36+whiteCap*.81,0.,1.)*(.67+.33*proximity);
+          // Long translucent breakers replace part of the old regularly-spaced
+          // white pattern. Everything is in the existing battle shader: no
+          // new meshes, texture downloads, gameplay state or touch overlays.
+          float rolling=sin(vWorld.z*1.14-time*1.24+
+                           sin(vWorld.x*.41+time*.23)*1.5);
+          float breaker=smoothstep(.58,.93,rolling)*
+                        smoothstep(.10,.62,ridge);
+          float crestShine=smoothstep(.63,.95,
+            sin(vWorld.x*2.5+vWorld.z*1.25-time*2.3))*breaker;
+          float foam=clamp(ridge*.27+whiteCap*.56+
+            breaker*.37+crestShine*.29,0.,1.)*(.73+.27*proximity);
           // Animated surf around the actual battle hull locations. These white
           // wakes live in the water shader, not in an image over the controls.
           vec2 playerShip=vec2(-10.,3.);
@@ -82,10 +92,10 @@ export class OceanScene {
             *smoothstep(1.5,6.5,-3.-vWorld.z)*(1.-smoothstep(12.,38.,-3.-vWorld.z));
           float streamRipples=.54+.46*sin(vWorld.z*2.5-time*3.4+sin(vWorld.x*.92));
           foam=max(foam,clamp(hullSurf*.68+(streamA+streamB)*streamRipples*.33,0.,.83));
-          vec3 deep=mix(vec3(.014,.20,.39),vec3(.012,.43,.63),
-                        clamp(.52+vWave*1.7+swell*.22+cross*.09,0.,1.));
+          vec3 deep=mix(vec3(.012,.19,.37),vec3(.014,.49,.69),
+                        clamp(.48+vWave*1.7+swell*.25+cross*.08,0.,1.));
           deep=mix(deep,vec3(.27,.72,.83),fres*.34);
-          col=mix(deep,vec3(.80,.95,.95),foam);
+          col=mix(deep,vec3(.82,.96,.97),foam);
           col+=vec3(.89,.96,.82)*spec*.4;
           col=mix(col,vec3(.30,.66,.84),fog*.42);
         }
