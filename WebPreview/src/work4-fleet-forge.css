@@ -2127,3 +2127,21 @@
     top:45%;
   }
 }
+
+
+/* WORK4 / #104 — mobile contrast of Royal Crown painted canvas.
+   This affects only the SVG fleet scene; no Porto/nav or Forge compositor. */
+.w4-fleet .w4-harbour-stage .w4-art-rigging {opacity:.27}
+.w4-fleet .w4-harbour-stage .w4-art-sail-stitch {opacity:.33}
+.w4-fleet .w4-harbour-stage .w4-sail-deep-canvas {opacity:.98}
+
+/* WORK4 18h / #104 — carved high-relief & furnace bounce light.
+   Scoped art materials ONLY: no changes to the #158 compositor isolation,
+   app shell, Porto, shared nav, economics or selected tabs. */
+.w4-fleet .w4-harbour-stage .w4-hero-polish{opacity:.94}
+.w4-forge .w4-forge-scene .w4-foundry-amber-bounce{opacity:.85}
+.w4-forge .w4-forge-scene .w4-cannon-forged-sheen{opacity:.93}
+@media(max-width:359px){
+ .w4-fleet .w4-harbour-stage .w4-hero-polish{opacity:.88}
+ .w4-forge .w4-forge-scene .w4-foundry-amber-bounce{opacity:.76}
+}
