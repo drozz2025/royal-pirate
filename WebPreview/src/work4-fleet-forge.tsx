@@ -335,18 +335,6 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
   const max=Boolean(upgrade)&&level>=5;
   const cost=upgrade&&!max?upgradeCost(upgrade.id,level):0;
   const shortfall=Math.max(0,cost-profile.coins);
-  // TEMP WORK4 VISUAL STACK PROBE — REMOVE AFTER CHROMIUM SNAPSHOT
-  React.useEffect(()=>{
-    const timer=setTimeout(()=>{
-      const stage=document.querySelector('.w4-forge-stage');
-      if(!stage)return;
-      const desc=(node:Element)=>{const s=getComputedStyle(node);const b=node.getBoundingClientRect();return [node.tagName.toLowerCase(),String(node.getAttribute('class')||'').slice(0,19),'z'+s.zIndex,'bg'+s.backgroundColor.replace(/\\s/g,''),'@'+Math.round(b.x)+','+Math.round(b.y)+','+Math.round(b.width)+','+Math.round(b.height)].join(' ');};
-      const pts=[[80,185],[80,250],[200,190],[250,270],[80,350],[230,390]];
-      const txt=pts.map(([x,y])=>'POINT '+x+','+y+'\\n'+document.elementsFromPoint(x,y).slice(0,5).map(desc).join('\\n')).join('\\n');
-      const p=document.createElement('pre');p.className='w4-debug-probe';p.style.cssText='position:fixed;top:443px;left:0;width:390px;height:218px;overflow:auto;z-index:999999;background:#000e;color:#b9ff9a;font:9px/1.08 monospace;white-space:pre-wrap;margin:0;padding:2px;pointer-events:none';p.textContent=txt;document.body.append(p);
-    },120);
-    return ()=>clearTimeout(timer);
-  },[tab]);
   return <section className="w4-screen w4-forge" aria-label="Melhorias e forja">
     <div className="w4-title"><div className="w4-kicker">ESTALEIRO · ROYAL CROWN</div>
       <h2><PirateIcon name="forge" size={26}/> MELHORIAS</h2></div>
