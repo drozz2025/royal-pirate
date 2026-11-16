@@ -14,9 +14,14 @@ test('WORK6 #104: real 3D gun barrels keep two firing silhouettes and two live f
   });
   assert.equal(counts.get('first-person-broadside-cannon'),2);
   assert.equal(counts.get('first-person-broadside-muzzle'),2);
-  assert.equal(counts.get('first-person-cannon-bronze-collar'),4);
-  assert.equal(counts.get('first-person-cannon-breeching-rope'),4);
-  assert.equal(counts.get('first-person-carriage-cheek'),4);
+  // GPU-instanced decorative elements: one draw call, four visible copies.
+  for(const name of ['first-person-cannon-bronze-collar',
+    'first-person-cannon-breeching-rope','first-person-carriage-cheek']){
+    const batched=group.getObjectByName(name);
+    assert.ok(batched instanceof T.InstancedMesh,name+' is actually instanced geometry');
+    assert.equal(batched.count,4,name+' has four real decorative copies');
+  }
+  assert.ok(group.children.length<60,'existing mobile mesh/draw-call guard must remain green');
   assert.equal(flashes.length,2);
   assert.equal(group.name,'battle-foreground-cannons');
   assert.ok(flashes.every(f=>!f.visible),'new sculptural details do not simulate shots');
