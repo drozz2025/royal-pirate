@@ -54,8 +54,10 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     flash.position.set(x,1.85,65.75);flash.visible=false;group.add(flash);flashes.push(flash);
   }
   fire.dispose();
-  // Bring the muzzles into the lower third without hiding the playable ships.
-  // The responsive HUD remains HTML above this real 3D foreground.
-  group.position.z=-8;
+  // Rebalance the foreground after moving the portrait camera toward the ships.
+  // Keep both real muzzles inside the lower third, rather than letting them
+  // swell over the ships or the five functional touch controls.
+  // This group is never visible in Porto.
+  group.position.z=-15;
   return {group,flashes};
 }
