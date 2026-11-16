@@ -94,10 +94,11 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
   const flashes: T.Mesh[] = [];
   const axisUp=new T.Vector3(0,1,0);
   const axisFace=new T.Vector3(0,0,1);
-  // Batch repeating, real 3D relief pieces in five InstancedMesh draw calls.
+  // Batch repeating, real 3D relief pieces in six InstancedMesh draw calls.
   // The original strict mobile mesh budget remains intact (<60 root children).
   const collarMatrices:T.Matrix4[]=[],shadowMatrices:T.Matrix4[]=[];
-  const cheekMatrices:T.Matrix4[]=[],boltMatrices:T.Matrix4[]=[],ropeMatrices:T.Matrix4[]=[];
+  const cheekMatrices:T.Matrix4[]=[],boltMatrices:T.Matrix4[]=[];
+  const portRopeMatrices:T.Matrix4[]=[],starboardRopeMatrices:T.Matrix4[]=[];
   const identity=new T.Quaternion();
   const matrix=(point:T.Vector3,rotation:T.Quaternion,scale:T.Vector3)=>
     new T.Matrix4().compose(point,rotation,scale);
@@ -106,6 +107,12 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     new T.Vector3(1.00,1.45,77.30),
     new T.Vector3(1.58,1.02,76.35),
     new T.Vector3(2.17,.77,76.00)
+  ]);
+  const portRecoilCurve=new T.CatmullRomCurve3([
+    new T.Vector3(-.48,1.96,78.05),
+    new T.Vector3(-1.00,1.45,77.30),
+    new T.Vector3(-1.58,1.02,76.35),
+    new T.Vector3(-2.17,.77,76.00)
   ]);
   const addBatched=(name:string,geometry:T.BufferGeometry,material:T.Material,matrices:T.Matrix4[])=>{
     const mesh=new T.InstancedMesh(geometry,material,matrices.length);
@@ -169,8 +176,10 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
       for(const z of [73.05,75.75])
         boltMatrices.push(matrix(new T.Vector3(x+side*1.15,1.52,z),
           identity,new T.Vector3(.35,1,1)));
-      ropeMatrices.push(matrix(new T.Vector3(x,0,0),
-        identity,new T.Vector3(side,1,1)));
+      // A mirrored tube is separate real geometry: InstancedMesh does not
+      // support negative-determinant per-instance matrices in Three.js.
+      (side<0?portRopeMatrices:starboardRopeMatrices).push(
+        matrix(new T.Vector3(x,0,0),identity,new T.Vector3(1,1,1)));
     }
     const breech=new T.Mesh(new T.SphereGeometry(1.40,16,12),metal);
     breech.position.copy(breechPoint);group.add(breech);
@@ -179,7 +188,7 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     flash.visible=false;group.add(flash);flashes.push(flash);
   }
   // GPU-instanced geometry restores the existing battle-deck mesh budget:
-  // visually carved guns without 24 independent mobile draw calls.
+  // six low-cost batches instead of 24 independent mobile draw calls.
   addBatched('first-person-cannon-bronze-collar',
     new T.CylinderGeometry(1,1,.31,24),bronze,collarMatrices);
   addBatched('first-person-cannon-collar-shadow',
@@ -188,8 +197,10 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     new T.BoxGeometry(.23,.72,3.7),cheekOak,cheekMatrices);
   addBatched('first-person-carriage-bolt',
     new T.SphereGeometry(.14,10,8),bronze,boltMatrices);
-  addBatched('first-person-cannon-breeching-rope',
-    new T.TubeGeometry(recoilCurve,16,.088,7,false),gunRope,ropeMatrices);
+  addBatched('first-person-cannon-breeching-rope-port',
+    new T.TubeGeometry(portRecoilCurve,16,.088,7,false),gunRope,portRopeMatrices);
+  addBatched('first-person-cannon-breeching-rope-starboard',
+    new T.TubeGeometry(recoilCurve,16,.088,7,false),gunRope,starboardRopeMatrices);
   fire.dispose();
   // Rebalance the foreground after moving the portrait camera toward the ships.
   // Keep both real muzzles inside the lower third, rather than letting them
