@@ -1958,3 +1958,63 @@
 .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
   z-index:30 !important;
 }
+
+/* WORK 4 / #104 — 16 Nov 11h: visual density at the real phone viewports.
+   390x844 and 430x932 left a large empty navy band below the four fleet
+   cards: use the available vertical stage space for the live Royal Crown and
+   the selectable roster. Small 320x568 screens retain their compact layout.
+   Forja uses a complete, slightly smaller vector cannon to reveal more of
+   the approved warm workshop, without moving the actionable upgrade card.
+   These overrides NEVER target Porto, global HUD, app shell or bottom nav;
+   keep the separate Forge compositor/paint isolation fix (#158) intact. */
+@media (min-width:360px) and (max-width:399px) and (min-height:700px) {
+  .w4-fleet .w4-harbour-stage {
+    min-height:clamp(324px,42dvh,360px);
+  }
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art {
+    width:93%;
+    left:-4%;
+    bottom:2%;
+    transform:scaleX(.94) scaleY(1.38) rotate(-1.2deg);
+    transform-origin:43% 86%;
+  }
+  .w4-fleet .w4-stage-label {top:18%;}
+  .w4-fleet .w4-ship-slot {min-height:clamp(116px,15dvh,139px);}
+  .w4-fleet .w4-ship-slot .w4-slot-art,
+  .w4-fleet .w4-ship-slot.is-active .w4-slot-art {
+    height:clamp(68px,9.1dvh,91px);
+  }
+}
+@media (min-width:400px) and (max-width:659px) and (min-height:760px) {
+  .w4-fleet .w4-harbour-stage {
+    min-height:clamp(348px,42dvh,398px);
+  }
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art {
+    width:91%;
+    left:-3%;
+    bottom:2%;
+    transform:scaleX(.94) scaleY(1.36) rotate(-1.2deg);
+    transform-origin:43% 86%;
+  }
+  .w4-fleet .w4-stage-label {top:18%;}
+  .w4-fleet .w4-ship-slot {min-height:clamp(143px,16dvh,164px);}
+  .w4-fleet .w4-ship-slot .w4-slot-art,
+  .w4-fleet .w4-ship-slot.is-active .w4-slot-art {
+    height:clamp(79px,10dvh,100px);
+  }
+}
+/* Keep the fixed #158 paint layer unchanged; only arrange its live cannon SVG. */
+@media (min-width:360px) and (max-width:659px) and (min-height:700px) {
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art {
+    width:92%;
+    left:-3%;
+    top:12%;
+  }
+}
+@media (max-width:359px) {
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art {
+    width:88%;
+    left:-4%;
+    top:7%;
+  }
+}

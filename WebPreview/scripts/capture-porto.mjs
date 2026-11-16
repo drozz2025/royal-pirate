@@ -280,6 +280,38 @@ try {
       if(!fits)throw new Error('Navigation overflow/misalignment at '+viewport.width+'px / '+screen+': '+JSON.stringify(geometry));
     }
 
+    // WORK 0 / #104: capture REAL Forja at both responsive phone sizes.
+    // The 390x844 visibility gate alone cannot validate the 320/430 artwork.
+    // Record DOM geometry without treating a captured image as human approval.
+    const openFleetForForge=await evaluate("(()=>{const b=document.querySelector('.app-sheet > .harbour-nav .harbour-nav-item:nth-child(2)');if(!b)return false;b.click();return true})()");
+    if(!openFleetForForge)throw new Error('Could not enter Fleet for responsive Forge at '+viewport.width+'px');
+    await delay(300);
+    const openForge=await evaluate("(()=>{const b=[...document.querySelectorAll('.w4-fleet button')].find(x=>x.textContent?.includes('ABRIR MELHORIAS'));if(!b)return false;b.click();return true})()");
+    if(!openForge)throw new Error('Could not enter responsive Forge at '+viewport.width+'px');
+    await delay(500);
+    const forgeGeometry=await evaluate(`(()=>{
+      const box=e=>{const r=e?.getBoundingClientRect();return r?{left:Math.round(r.left),top:Math.round(r.top),right:Math.round(r.right),bottom:Math.round(r.bottom),width:Math.round(r.width),height:Math.round(r.height)}:null};
+      const nav=document.querySelector('.app-sheet > .harbour-nav');
+      const stage=document.querySelector('.w4-forge .w4-forge-stage');
+      const scene=document.querySelector('.w4-forge .w4-forge-scene');
+      const cannon=document.querySelector('.w4-forge .w4-forge-scene > svg.w4-cannon-art');
+      return {viewportWidth:innerWidth,viewportHeight:innerHeight,documentWidth:document.documentElement.scrollWidth,
+        nav:box(nav),stage:box(stage),scene:box(scene),cannon:box(cannon),
+        cannonVisible:cannon?getComputedStyle(cannon).visibility!=='hidden'&&getComputedStyle(cannon).display!=='none':false,
+        error:document.querySelector('.error-panel')?.textContent||null};
+    })()`);
+    const forgeFits=forgeGeometry?.nav&&forgeGeometry?.stage&&forgeGeometry?.scene&&forgeGeometry?.cannon&&
+      forgeGeometry.cannon.width>20&&forgeGeometry.cannon.height>20&&forgeGeometry.cannonVisible&&
+      !forgeGeometry.error&&forgeGeometry.documentWidth<=viewport.width+2&&
+      Math.abs(forgeGeometry.nav.left)<=2&&Math.abs(forgeGeometry.nav.right-viewport.width)<=2&&
+      Math.abs(forgeGeometry.nav.bottom-viewport.height)<=2;
+    report.responsiveForge??=[];
+    report.responsiveForge.push({viewport,...forgeGeometry,matched:Boolean(forgeFits),
+      artworkApproved:false,screenshot:'forge-mobile-'+viewport.width+'x'+viewport.height+'.png'});
+    const responsiveForgeShot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+    await writeFile(join(out,'forge-mobile-'+viewport.width+'x'+viewport.height+'.png'),Buffer.from(responsiveForgeShot.data,'base64'));
+    if(!forgeFits)throw new Error('Forja missing/clipped at '+viewport.width+'px: '+JSON.stringify(forgeGeometry));
+
     // WORK 6: separately inspect the actual playable Batalha at 320 and 430.
     // The mobile cannon deck is real scene geometry, and UI hit targets must stay
     // in the viewport; a screenshot is evidence, not a claim of visual approval.
