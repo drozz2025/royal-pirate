@@ -1913,3 +1913,250 @@
 @media(prefers-reduced-motion:reduce){
   .w8-approved-scene .w8-seascape{filter:none}
 }
+
+
+/* WORK 8 | 16 Nov 03:22 — approved 07/08 composition pass.
+   Keep exactly three real quests + seven day rewards, and a five-place
+   OFFLINE-only ranking silhouette. All styling is isolated to WORK 8.
+   Earlier 390x844 screenshots left a large dead area above Porto's fixed
+   bottom menu. Distribute existing live panels without changing that menu. */
+.w8-screen.w8-approved.w8-approved-missions,
+.w8-screen.w8-approved.w8-approved-ranking {
+  width:100%;
+  min-height:100%;
+  margin:0;
+  gap:clamp(7px,1.1dvh,11px);
+  padding-bottom:clamp(8px,1.5dvh,14px);
+}
+.w8-approved-scene {
+  height:100%;
+  opacity:1;
+  -webkit-mask-image:none;
+  mask-image:none;
+}
+.w8-approved-scene .w8-seascape {
+  height:min(31dvh,265px);
+}
+.w8-approved-scene::after {
+  content:"";
+  position:absolute;inset:195px 0 0;
+  background:
+    radial-gradient(ellipse 85% 19px at 14% 17%,#68b7bf29,transparent 86%),
+    radial-gradient(ellipse 78% 16px at 85% 32%,#75c5d024,transparent 90%),
+    radial-gradient(ellipse 80% 18px at 25% 58%,#a1d6cb12,transparent 90%),
+    linear-gradient(180deg,#226c8e22,#0c476b1c 38%,#09294000 90%);
+  pointer-events:none;
+}
+.w8-approved-title {
+  flex:0 0 60px;
+}
+.w8-approved-tabs {flex:0 0 auto}
+.w8-approved-tabs button {min-height:42px}
+
+/* Missions: the three prominent task rows take the central stage.
+   Rewards remain one continuous seven-day strip, as in approved frame 07. */
+.w8-approved-missions .w8-approved-quest-list {
+  flex:1 1 240px;
+  min-height:230px;
+  max-height:310px;
+  grid-template-rows:repeat(3,minmax(71px,1fr));
+  gap:clamp(6px,1dvh,10px);
+}
+.w8-approved-missions .w8-approved-quest {
+  min-height:0;
+  padding:clamp(6px,1.1dvh,10px) 7px;
+  border-radius:12px;
+  border-color:#e4bc7d;
+  background:
+    radial-gradient(ellipse at 0% 50%,#3985a94d,transparent 52%),
+    linear-gradient(105deg,#205c7de8,#104167f7 60%,#082c4dfc);
+  box-shadow:inset 0 2px #d3eff0a1,0 3px #543b22,0 5px 7px #0014278c;
+}
+.w8-approved-missions .w8-approved-quest-art {
+  width:100%;
+  height:clamp(47px,6.8dvh,60px);
+}
+.w8-approved-missions .w8-approved-quest-art .w8-art {
+  width:100%;
+  height:100%;
+  filter:drop-shadow(0 3px 2px #021324);
+}
+.w8-approved-missions .w8-approved-quest-core {
+  gap:clamp(7px,1.1dvh,11px);
+}
+.w8-approved-missions .w8-approved-quest-core>strong {
+  font-size:clamp(15px,3.9vw,19px);
+  line-height:1.1;
+}
+.w8-approved-missions .w8-approved-meter {
+  height:clamp(16px,2.2dvh,20px);
+  border-color:#d7bf73;
+}
+.w8-approved-missions .w8-approved-quest>button {
+  min-height:44px;
+  border-radius:10px;
+}
+.w8-approved-missions .w8-approved-quest[data-state=ready]>button {
+  background:linear-gradient(180deg,#b7f47d,#39c137 55%,#0e7d1c);
+  border-color:#e7ffad;
+}
+.w8-approved-missions .w8-approved-daily {
+  flex:0 0 auto;
+  padding:clamp(10px,1.6dvh,14px) 7px 10px;
+  border-width:2px;
+  border-radius:12px;
+  border-color:#e7bb78;
+  background:linear-gradient(180deg,#205d7cfa,#0d3556fc 35%,#071c36ff);
+}
+.w8-approved-missions .w8-approved-daily h3 {
+  margin-bottom:clamp(9px,1.4dvh,13px)!important;
+  font-size:clamp(21px,5.5vw,26px);
+}
+.w8-approved-missions .w8-approved-days li {
+  min-height:clamp(76px,10dvh,90px);
+  border-radius:8px;
+  border-color:#ddc182;
+}
+.w8-approved-missions .w8-approved-chest {
+  height:clamp(48px,6.5dvh,58px);
+}
+.w8-approved-missions .w8-approved-chest .w8-art {
+  height:100%;
+}
+.w8-approved-missions .w8-approved-claim-row {
+  margin-top:clamp(8px,1.3dvh,12px);
+}
+.w8-approved-missions .w8-approved-disclaimer {
+  flex:0 0 auto;
+}
+
+/* Ranking: five clearly separated places (one real local captain, four
+   explicitly unavailable slots). Never claim these are online players. */
+.w8-approved-ranking .w8-approved-captain {
+  flex:0 0 auto;
+  min-height:clamp(112px,15dvh,133px);
+  border-color:#e8bf7e;
+  background:radial-gradient(ellipse at 9% 35%,#4583a177,transparent 48%),linear-gradient(110deg,#255a7af8,#103b61fa 62%,#092842);
+}
+.w8-approved-ranking .w8-approved-avatar {
+  border-color:#ffdb81;
+  box-shadow:inset 0 2px #fff1bb,0 0 0 2px #6b431d,0 3px 4px #021326;
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline) {
+  display:flex;
+  flex:1 1 270px;
+  flex-direction:column;
+  justify-content:space-between;
+  min-height:264px;
+  max-height:375px;
+  padding:12px 10px;
+  border:2px solid #e1b77a;
+  border-radius:12px;
+}
+.w8-approved-ranking .w8-approved-leaderboard h3 {
+  flex:0 0 auto;
+  margin:0 0 7px!important;
+  font-size:clamp(23px,6.1vw,27px);
+}
+.w8-approved-ranking .w8-approved-local-row {
+  min-height:clamp(52px,7.1dvh,64px);
+  border:1px solid #ecc97c;
+  background:linear-gradient(90deg,#396e8c,#16466d 60%,#0a3152);
+}
+.w8-approved-ranking .w8-approved-empty-rank {
+  flex:1 1 auto;
+  min-height:33px;
+  padding:4px 7px;
+  grid-template-columns:33px 36px minmax(0,1fr);
+  border-bottom:1px solid #6d8eaa70;
+}
+.w8-approved-ranking .w8-approved-empty-rank>span:first-child {
+  display:grid;place-items:center;
+  width:25px;height:25px;
+  border:2px solid #a9bfca;
+  border-radius:50%;
+  background:linear-gradient(145deg,#53738c,#223e5c);
+  color:#d8e8f0;
+  font-size:17px;
+  box-shadow:0 1px 2px #031628;
+}
+.w8-approved-ranking .w8-approved-empty-rank:nth-of-type(2)>span:first-child {
+  border-color:#e3e9ee;
+  background:linear-gradient(#9cb5c3,#3b5e7d);
+  color:#072340;
+}
+.w8-approved-ranking .w8-approved-empty-rank:nth-of-type(3)>span:first-child {
+  border-color:#cb936c;
+  background:linear-gradient(#be8961,#603e33);
+  color:#fff1de;
+}
+.w8-approved-ranking .w8-approved-empty-portrait {
+  border:2px solid #809eb8;
+  border-radius:7px;
+  height:30px;
+  background:radial-gradient(circle at 50% 35%,#577b95,#183858);
+  color:#a7c5d5;
+}
+.w8-approved-ranking .w8-approved-leaderboard p {
+  flex:0 0 auto;
+  margin-top:8px;
+  font-size:10px;
+  line-height:1.3;
+}
+.w8-approved-ranking .w8-approved-personal-stat {
+  flex:0 0 auto;
+}
+.w8-approved-ranking .w8-approved-profile-button {
+  flex:0 0 46px;
+  min-height:46px;
+}
+
+/* 320px screens must stay usable without clipping text or reward buttons. */
+@media(max-width:350px){
+  .w8-approved-missions .w8-approved-quest-list {
+    min-height:220px;
+    max-height:294px;
+  }
+  .w8-approved-missions .w8-approved-quest {
+    grid-template-columns:34px minmax(0,1fr) 43px 60px;
+    gap:3px;
+    padding:5px 4px;
+  }
+  .w8-approved-missions .w8-approved-quest-core>strong {font-size:14px}
+  .w8-approved-missions .w8-approved-quest-rewards {gap:3px}
+  .w8-approved-missions .w8-approved-quest-rewards>span {font-size:14px}
+  .w8-approved-missions .w8-approved-quest-rewards strong {font-size:10px}
+  .w8-approved-missions .w8-approved-quest>button {
+    min-height:40px;
+    padding:3px 1px;
+    font-size:11px;
+  }
+  .w8-approved-missions .w8-approved-days {gap:2px}
+  .w8-approved-missions .w8-approved-days li {min-height:68px}
+  .w8-approved-missions .w8-approved-chest {height:42px}
+  .w8-approved-ranking .w8-approved-leaderboard {padding:8px 6px}
+  .w8-approved-ranking .w8-approved-empty-rank {
+    grid-template-columns:28px 29px minmax(0,1fr);gap:5px;
+    padding:3px 4px;
+  }
+  .w8-approved-ranking .w8-approved-empty-rank strong {font-size:10px}
+  .w8-approved-ranking .w8-approved-identity>strong {font-size:15px}
+  .w8-approved-ranking .w8-approved-identity>span {font-size:10px}
+}
+@media(min-width:420px){
+  .w8-approved-missions .w8-approved-quest-list {max-height:328px}
+  .w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline) {max-height:392px}
+}
+/* On short-height phones keep normal scrolling, rather than squeezing inputs. */
+@media(max-height:690px){
+  .w8-approved-missions .w8-approved-quest-list {
+    flex:0 0 auto;
+    min-height:0;
+    max-height:none;
+    grid-template-rows:repeat(3,minmax(68px,auto));
+  }
+  .w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline) {
+    flex:0 0 auto;
+    min-height:255px;
+  }
+}
