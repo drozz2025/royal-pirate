@@ -150,6 +150,27 @@ function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
           <path d="M69 24V110M26 67H112M44 42L94 92M94 42L44 92"/>
           <path d="M69 39L79 67L69 96L59 67Z" fill="#FFD883" strokeWidth="2"/>
         </g>}
+    {/* Extra original coastal details: illustrated landscape, not the approved screenshot as a background. */}
+    <g className="w8-coastal-trees" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
+      <path d="M0 108Q30 84 55 99Q82 89 105 112V137H0Z" fill="#28765E" opacity=".85"/>
+      <path d="M0 115Q18 103 40 109Q66 98 97 121L105 137H0Z" fill="#123F51" opacity=".87"/>
+      <path d="M0 101L13 94L22 96L33 88L40 94L49 93L58 104" fill="none" stroke="#85B986" strokeWidth="3" opacity=".65"/>
+      <path d="M358 109Q385 77 420 99V141H354Z" fill="#267257" opacity=".92"/>
+      <path d="M364 116Q385 98 420 110V142H350Z" fill="#0F4250" opacity=".92"/>
+      <path d="M380 100L386 88L392 99L404 91L417 103" fill="none" stroke="#75B88B" strokeWidth="3" opacity=".65"/>
+      <path d="M15 116L15 77M24 116L24 86M15 77L7 86L24 86ZM24 86L19 94L29 94Z" fill="#D8B879" stroke="#704F32" strokeWidth="2" opacity=".75"/>
+      <path d="M389 111V73L407 81V110Z" fill="#AE7951" stroke="#553C2C" strokeWidth="2" opacity=".65"/>
+      <path d="M394 75V67L398 63L402 68V75Z" fill="#E4CE91" opacity=".73"/>
+      <path d="M394 89H400M394 97H400" stroke="#FFE0A3" strokeWidth="2" opacity=".6"/>
+    </g>
+    <g fill="none" stroke="#D7FAF5" strokeWidth="2" opacity=".68" strokeLinecap="round" aria-hidden="true">
+      <path d="M134 56q7-6 14 0q7-6 14 0M182 35q7-5 13 0q7-5 13 0"/>
+      <path d="M38 151q13-3 25 0M95 164q12-4 30 0M324 157q14-3 25 0"/>
+    </g>
+    <g fill="#FFD98A" opacity=".42" aria-hidden="true">
+      <path d="M118 117l2-9 2 9 8 2-8 2-2 8-2-8-8-2Z"/>
+      <path d="M387 145l2-6 2 6 5 2-5 2-2 6-2-6-5-2Z"/>
+    </g>
     <path d="M0 0H420V176H0Z" fill="none" stroke="#EABF77" strokeWidth="4" opacity=".3"/>
   </svg>;
 }
@@ -215,9 +236,17 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
           <div className="w8-approved-player-detail"><strong>{localName}</strong><small>O TEU PERFIL LOCAL</small></div>
           <span className="w8-approved-player-score"><PirateIcon name="ranking" size={17}/>{profile.xp} XP</span>
         </div>
-        {[2,3,4,5].map(slot=><div className="w8-approved-empty-rank" key={slot} aria-label={'Lugar '+slot+' indisponível'}>
-          <span>{slot}</span><span className="w8-approved-empty-portrait" aria-hidden="true">—</span>
-          <strong>{slot===2?'CLASSIFICAÇÃO ONLINE INDISPONÍVEL':'AGUARDA JOGADORES ONLINE'}</strong>
+        {[2,3,4,5].map(slot=><div className="w8-approved-empty-rank" key={slot} aria-label={'Lugar '+slot+' sem jogador classificado; ranking online indisponível'}>
+          <span>{slot}</span>
+          <span className="w8-approved-empty-portrait" aria-hidden="true">
+            <svg viewBox="0 0 32 32" focusable="false">
+              <circle cx="16" cy="12" r="6.5" fill="#7C9BA6" stroke="#BCD0CA" strokeWidth="1.5"/>
+              <path d="M5 29q0-12 11-12t11 12Z" fill="#527890" stroke="#ACC6CD" strokeWidth="1.5"/>
+              <path d="M10 8q5-7 12 0" fill="none" stroke="#D8BB78" strokeWidth="2"/>
+            </svg>
+          </span>
+          <strong>{slot===2?'SEM CLASSIFICAÇÃO ONLINE':'LUGAR AGUARDA JOGADOR'}</strong>
+          <small className="w8-approved-empty-score" aria-hidden="true">—</small>
         </div>)}
         <p>Ranking online indisponível. Apenas o teu progresso local é apresentado, sem adversários ou prémios fictícios.</p>
       </section>
