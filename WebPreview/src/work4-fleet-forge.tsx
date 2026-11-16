@@ -718,15 +718,16 @@ function ForgeBackdrop(){
        stroke="#4e3428" strokeWidth="10" opacity=".75"/>
      <path d="M35 106l18 14m9-41 17 18m29-32-2 22m29-14-11 20m27 9-17 13"
        fill="none" stroke="#f6d09a" strokeWidth="3.2" opacity=".9"/>
+     {/* Only the masonry arch jambs are solid: the hearth opening must
+         stay visible across its FULL width (reference 04). */}
      <g fill="#6e4432" stroke="#dea16c" strokeWidth="2">
-       <path d="M35 149h28v24H34Z"/><path d="M64 150h32v23H64Z"/>
-       <path d="M98 151h34v22H98Z"/><path d="M134 150h31v23h-31Z"/>
-       <path d="M41 176h33v20H40Z"/><path d="M76 176h32v20H76Z"/>
-       <path d="M111 175h34v21h-34Z"/>
+       <path d="M17 154h26v24H17Z"/><path d="M17 180h28v21H17Z"/>
+       <path d="M17 205h27v23H17Z"/><path d="M166 154h23v24h-23Z"/>
+       <path d="M166 180h26v21h-26Z"/><path d="M167 205h25v23h-25Z"/>
      </g>
      <g fill="none" stroke="#ffe1a2" strokeWidth="2.1" opacity=".65">
-       <path d="M38 150h23m7 1h26m9 1h24m11-1h23"/>
-       <path d="M45 178h26m8-1h27m8-1h29"/>
+       <path d="M19 157h22m-21 25h23m-21 25h20"/>
+       <path d="M168 158h19m-18 25h20m-19 25h20"/>
      </g>
      <path d="M10 265Q145 233 284 250" fill="none"
        stroke="#ffc47a" strokeWidth="4" opacity=".54"/>
