@@ -3021,3 +3021,197 @@
     letter-spacing:0;
   }
 }
+
+
+/* WORK8 16 Nov 12:33 — visual fidelity 07/08, new changes only.
+   Sea/portrait/frame lighting and spacing are confined to the two WORK8
+   panels. No extra players, fabricated rewards, shared navigation or HUD. */
+.w8-screen.w8-approved .w8-approved-scene .w8-seascape{
+  filter:saturate(1.38) contrast(1.13) brightness(1.09);
+}
+.w8-screen.w8-approved .w8-approved-scene{
+  opacity:1;
+  background:radial-gradient(ellipse 90% 45% at 49% 8%,#a9e3f72d,transparent 78%);
+}
+.w8-screen.w8-approved .w8-approved-title::before{
+  border:3px solid #ffdb8e;
+  border-bottom-color:#8e4f22;
+  background:linear-gradient(96deg,#b87733 0%,#4c361f 9%,#09223b 17%,#133a57 50%,#09223b 83%,#5d3821 91%,#b57533);
+  box-shadow:inset 0 2px 0 #fff4b7b8,inset 0 -3px 0 #5e311a,0 3px 0 #a16f36,0 7px 10px #021427ad;
+}
+.w8-screen.w8-approved .w8-approved-title h2{
+  color:#fff8df!important;
+  text-shadow:0 2px #1c0c05,0 0 7px #ffd78b96;
+}
+.w8-screen.w8-approved .w8-approved-title-flourish{
+  filter:drop-shadow(0 1px 0 #fff0ae) drop-shadow(0 3px 2px #05213c);
+}
+.w8-screen.w8-approved .w8-approved-tabs button{
+  background:linear-gradient(180deg,#397b98,#123c5e 42%,#08243e 90%);
+  border-color:#daae6b;border-bottom-color:#7d4d29;
+  box-shadow:inset 0 2px #c4eff3a6,0 3px #102537,0 5px 5px #04172a77;
+  text-shadow:0 2px 2px #001727;
+}
+.w8-screen.w8-approved .w8-approved-tabs button[aria-pressed=true]{
+  background:linear-gradient(180deg,#80cfe7,#177db0 53%,#075078);
+  border-color:#ffe2a5;
+  box-shadow:inset 0 2px #efffffaa,0 3px #945a2f,0 0 8px #e6c58055;
+}
+
+/* The three *existing* live missions form three deeper, readable frames. */
+.w8-approved-missions .w8-approved-quest{
+  position:relative;
+  border:3px solid #e5b46d;
+  border-top-color:#ffe9aa;
+  border-bottom-color:#855025;
+  border-radius:13px;
+  background:radial-gradient(ellipse 56% 100% at 8% 26%,#75cadc61,transparent 90%),
+    linear-gradient(177deg,#296783ed 0%,#154567f8 42%,#082843fc 100%);
+  box-shadow:inset 0 2px #eaf8eeb3,inset 0 -3px #061f38,0 3px #55321b,0 8px 11px #01182dae;
+}
+.w8-approved-missions .w8-approved-quest::before{
+  content:"";position:absolute;inset:4px;pointer-events:none;
+  border:1px solid #c7e5d438;border-radius:8px;
+  box-shadow:inset 0 1px #fff8cb22;
+}
+.w8-approved-missions .w8-approved-quest-art{
+  background:radial-gradient(ellipse at 48% 43%,#ffe3a14f,#1d60704b 54%,transparent 80%);
+}
+.w8-approved-missions .w8-approved-quest-art .w8-art{
+  filter:drop-shadow(0 4px 2px #031528cc) drop-shadow(0 0 6px #ffdb8a80);
+}
+.w8-approved-missions .w8-approved-quest-core>strong{
+  color:#fff9ed;letter-spacing:.08px;
+  text-shadow:0 2px #001529,0 0 6px #001b2b90;
+}
+.w8-approved-missions .w8-approved-meter{
+  border:2px solid #e5c67b;background:#031b30;
+  box-shadow:inset 0 2px #011222,0 1px 0 #d0e8cd94;
+}
+.w8-approved-missions .w8-approved-quest-rewards>span{
+  text-shadow:0 2px #041b30,0 0 8px #ffe3a061;
+}
+.w8-approved-missions .w8-approved-quest>button{
+  border-color:#8cceef;border-bottom-color:#075078;
+  background:linear-gradient(180deg,#62c8ef,#058fca 53%,#07517c);
+  box-shadow:inset 0 2px #ecffffbc,0 3px #07314b;
+}
+.w8-approved-missions .w8-approved-quest[data-state=ready]>button{
+  border-color:#c4f6ae;background:linear-gradient(#b2f583,#31b724 65%,#168b13);
+}
+.w8-approved-missions .w8-approved-quest[data-state=claimed]>button{
+  border-color:#78ba93;background:linear-gradient(#427660,#19573d);
+}
+.w8-approved-missions .w8-approved-daily{
+  position:relative;
+  border:3px solid #ecc680;
+  border-top-color:#ffedb5;border-bottom-color:#855125;
+  border-radius:13px;
+  background:radial-gradient(ellipse 75% 60% at 50% 0%,#2b6f8d60,transparent 86%),
+    linear-gradient(180deg,#1c4e6e,#0b2e51 68%,#071c36);
+  box-shadow:inset 0 2px #fff4c69e,0 3px #67421e,0 8px 12px #021429ba;
+}
+.w8-approved-missions .w8-approved-daily h3{
+  color:#ffe4a3;text-shadow:0 2px #402818,0 0 9px #f4bd5e6e;
+}
+.w8-approved-missions .w8-approved-days li{
+  border-top-color:#ffe0a1;
+  background-blend-mode:normal;
+  box-shadow:inset 0 2px #fff7c286,0 3px #091a2d,0 5px 6px #04142681;
+}
+.w8-approved-missions .w8-approved-chest .w8-art{
+  filter:drop-shadow(0 5px 2px #00192e) drop-shadow(0 0 4px #ffdf997c);
+}
+.w8-approved-missions .w8-approved-days li small{
+  color:#fff2dd;text-shadow:0 2px #00182e;
+}
+
+/* Portraits and frames replace flat icons with layered original SVG artwork.
+   Vacant slots remain recognisably unavailable; no fictional faces or XP. */
+.w8-approved-ranking .w8-approved-captain{
+  border:3px solid #f0c17b;border-top-color:#ffebaf;
+  background:radial-gradient(ellipse 33% 110% at 15% 52%,#e0ad6e52,transparent 96%),
+    linear-gradient(115deg,#316d85,#1a4b6c 47%,#08273f);
+  box-shadow:inset 0 2px #fff8cead,inset 0 -3px #0a2740,0 4px #714c28,0 8px 11px #021529a0;
+}
+.w8-approved-ranking .w8-approved-avatar{
+  background:radial-gradient(circle at 37% 23%,#ffeba6,#b77d3c 57%,#11243b 91%);
+  border:4px ridge #ffe0a0;
+  outline:2px solid #7b4c28;outline-offset:1px;
+  box-shadow:inset 0 2px #fff8c6,0 3px 8px #041324,0 0 17px #f7cb7a40;
+}
+.w8-approved-ranking .w8-approved-avatar .w8-captain-portrait{
+  transform:scale(1.13) translateY(3%);
+  filter:drop-shadow(0 2px 2px #021429);
+}
+.w8-approved-ranking .w8-approved-identity>strong{
+  color:#fff7e3;text-shadow:0 2px 2px #081c2c,0 0 8px #ffe0a053;
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+  border:3px solid #e6bc79;border-top-color:#ffe5a2;border-bottom-color:#8e5126;
+  background:radial-gradient(ellipse 75% 29% at 50% 0%,#397e9871,transparent 92%),
+    linear-gradient(180deg,#174969 0%,#103755 32%,#062139 100%);
+  box-shadow:inset 0 2px #f6edc777,0 4px #6c4126,0 8px 15px #00182cbb;
+}
+.w8-approved-ranking .w8-approved-leaderboard h3{
+  color:#ffe8ad;letter-spacing:.3px;
+  text-shadow:0 2px #533018,0 0 10px #f4cc8570;
+}
+.w8-approved-ranking .w8-approved-local-row{
+  border:2px solid #f9d68a;border-bottom-color:#8b582c;
+  background:radial-gradient(ellipse at 17% 22%,#519bbc80,transparent 67%),
+    linear-gradient(90deg,#2f7089,#205373 63%,#0a2f4c);
+  box-shadow:inset 0 2px #eff7cf8c,0 3px 4px #06192b9e;
+}
+.w8-approved-ranking .w8-approved-mini-avatar{
+  border:2px ridge #ffe4aa;
+  box-shadow:0 0 0 1px #9b6c37,0 2px 4px #031a31;
+}
+.w8-approved-ranking .w8-approved-empty-rank{
+  border-bottom:1px solid #abbbba5c;
+  background:linear-gradient(90deg,#3a708559,#173c582d 60%,transparent);
+}
+.w8-approved-ranking .w8-approved-empty-portrait{
+  overflow:hidden;
+  border:2px ridge #d0b588;
+  border-radius:8px;
+  outline:1px solid #254661;
+  background:radial-gradient(circle at 39% 19%,#86a7af,#325873 50%,#09273e 89%);
+  box-shadow:inset 0 1px #fff9c37c,0 2px 4px #001828;
+}
+.w8-approved-ranking .w8-approved-empty-portrait svg{
+  opacity:.92;filter:drop-shadow(0 2px 1px #031627);
+}
+.w8-approved-ranking .w8-approved-empty-rank strong{
+  color:#dce9e6;letter-spacing:.12px;text-shadow:0 1px 1px #021a2b;
+}
+.w8-approved-ranking .w8-approved-leaderboard p{
+  color:#d6e3e2;
+}
+/* Space stewardship: no global selectors, no Porto dock edits. */
+@media(min-width:351px) and (max-width:419px){
+  .w8-approved-missions .w8-approved-quest{min-height:79px}
+  .w8-approved-missions .w8-approved-quest-art .w8-art{width:56px;height:59px}
+  .w8-approved-missions .w8-approved-daily h3{font-size:25px}
+  .w8-approved-ranking .w8-approved-captain{min-height:123px}
+  .w8-approved-ranking .w8-approved-local-row{min-height:59px}
+  .w8-approved-ranking .w8-approved-empty-rank{min-height:48px}
+}
+@media(max-width:350px){
+  .w8-screen.w8-approved .w8-approved-title h2{font-size:23px!important}
+  .w8-approved-missions .w8-approved-quest{
+    border-width:2px;min-height:70px;
+  }
+  .w8-approved-missions .w8-approved-quest-art .w8-art{max-width:39px}
+  .w8-approved-missions .w8-approved-quest-core>strong{font-size:13px}
+  .w8-approved-missions .w8-approved-days li{border-width:1px}
+  .w8-approved-ranking .w8-approved-captain{border-width:2px}
+  .w8-approved-ranking .w8-approved-avatar{outline:none;border-width:3px}
+  .w8-approved-ranking .w8-approved-empty-rank{min-height:44px}
+  .w8-approved-ranking .w8-approved-empty-portrait{border-width:1px}
+}
+@media(min-width:420px){
+  .w8-approved-missions .w8-approved-quest{min-height:84px}
+  .w8-approved-missions .w8-approved-quest-core>strong{font-size:19px}
+  .w8-approved-ranking .w8-approved-empty-rank{min-height:51px}
+}
