@@ -140,74 +140,11 @@
 .w4-mini-track i{display:block;height:100%;background:linear-gradient(#c5e69b,#3e9c55)}
 
 
-/* WORK 4 · 15 NOV 2026 — major visual alignment with approved frames 03/04.
-   These overrides are limited to Fleet/Forge. All balances/levels remain real.
-   :has() affects only the app shell while one of our two screens is visible. */
-.app-sheet:has(.w4-screen){
-  background:radial-gradient(ellipse 110% 55% at 50% 20%,#2385b5 0%,#0d547d 32%,transparent 78%),
-    linear-gradient(165deg,#022f61,#051b38 65%,#07152b);
-}
-.app-sheet:has(.w4-screen) .app-sheet-header{
-  flex:0 0 calc(125px + env(safe-area-inset-top));min-height:calc(125px + env(safe-area-inset-top));max-height:none;box-sizing:border-box;
-  position:relative;isolation:isolate;padding:0 9px;
-  background:radial-gradient(ellipse 55% 100% at 50% 0%,#1187cf88,transparent),
-    linear-gradient(180deg,#0657a0 0%,#10699c 48%,#0a3967 100%);
-  border:0;box-shadow:inset 0 -7px 12px #051c3d55;
-}
-.app-sheet:has(.w4-screen) .app-sheet-header::after{
-  content:"";position:absolute;left:0;right:0;bottom:0;height:9px;pointer-events:none;
-  background:linear-gradient(transparent,#0c2b47cc)
-}
-.app-sheet:has(.w4-screen) .app-back{
-  position:absolute;left:10px;top:max(12px,env(safe-area-inset-top));z-index:3;
-  width:49px;height:49px;border-radius:50%;border:3px solid #f8d88f;
-  background:radial-gradient(circle at 32% 25%,#b68c63,#7b5035 49%,#25293e 55%,#0b2847 90%);
-  color:#fff8dc;font-size:35px;line-height:1;box-shadow:0 0 0 2px #754322,0 5px 8px #041e41a8,inset 0 3px #fff5c299;
-}
-.app-sheet:has(.w4-screen) .app-sheet-brand{
-  position:absolute;left:50%;top:max(0px,env(safe-area-inset-top));z-index:2;
-  transform:translateX(-50%);min-width:0;width:57%;height:110px;
-  display:flex;flex-direction:column;align-items:center;pointer-events:none;text-align:center;
-}
-.app-sheet:has(.w4-screen) .app-sheet-brand>small{
-  font-size:0;line-height:0;display:block;position:relative;width:100%;height:49px;overflow:visible;
-}
-.app-sheet:has(.w4-screen) .app-sheet-brand>small::after{
-  content:"ROYAL PIRATE";position:absolute;top:4px;left:50%;transform:translateX(-50%);
-  white-space:nowrap;font:900 clamp(21px,6.2vw,34px)/1 'Barlow Condensed',Georgia,serif;
-  letter-spacing:-.5px;color:#ffe79b;-webkit-text-stroke:.85px #6a3417;
-  text-shadow:0 2px #3e261c,0 4px #201a22,0 5px 7px #021d3c;
-}
-.app-sheet:has(.w4-screen) .app-sheet-brand h1{
-  position:absolute;top:55px;left:50%;transform:translateX(-50%);
-  width:max-content;min-width:152px;max-width:83vw;min-height:43px;
-  margin:0;padding:7px 25px;border:3px solid #e7bd72;border-radius:17px 17px 12px 12px;
-  background:linear-gradient(180deg,#7c4d28 0%,#1a293a 23%,#0d2a45 75%,#7b481e 100%);
-  box-shadow:0 3px #412917,0 5px 8px #031a2eb5,inset 0 2px #ffe9a66b;
-  font-size:0;line-height:1;color:transparent;display:grid;place-items:center;
-}
-.app-sheet:has(.w4-screen) .app-sheet-brand h1 .app-page-glyph{display:none}
-.app-sheet:has(.w4-fleet) .app-sheet-brand h1::after{content:"FROTA"}
-.app-sheet:has(.w4-forge) .app-sheet-brand h1::after{content:"MELHORIAS"}
-.app-sheet:has(.w4-screen) .app-sheet-brand h1::after{
-  display:block;color:#fff5cb;font:900 clamp(22px,6.7vw,31px)/1 'Barlow Condensed',system-ui,sans-serif;
-  text-shadow:0 2px #030f24,0 0 3px #c08549;letter-spacing:.7px;
-}
-.app-sheet:has(.w4-screen) .app-wallet{
-  position:absolute;top:max(13px,env(safe-area-inset-top));right:8px;z-index:3;min-width:85px;max-width:29%;
-  min-height:40px;padding:5px 8px;border:2px solid #dcb86f;border-radius:13px;
-  background:linear-gradient(175deg,#164f78,#092b52);box-shadow:0 3px 5px #07203caa,inset 0 2px #e3f5ff33;
-}
-.app-sheet:has(.w4-screen) .app-wallet span{color:#ffd34e;text-shadow:0 1px #824717;font-size:20px}
-.app-sheet:has(.w4-screen) .app-wallet strong{font:900 clamp(17px,4vw,23px)/1 'Barlow Condensed',sans-serif}
-.app-sheet:has(.w4-screen) .app-wallet small{font-size:8px}
-.app-sheet:has(.w4-screen) .app-shortcuts{display:none}
-.app-sheet:has(.w4-screen) .app-sheet-content{
-  padding:1px max(8px,calc((100% - 665px)/2)) 18px;scrollbar-color:#d7a258 #082944;
-}
-/* A navegação inferior é exclusivamente do WORK 6.
-   Não aplicar estilos locais ao .app-dock: Porto é a referência visual aprovada.
-   Este ecrã apenas define a sua própria interface de Frota/Forja. */
+/* WORK 4 / issue #104 — Frota & Forja inherit WORK 6's shared app shell.
+   The old page-specific 125px header, repositioned wallet, synthetic title
+   and content paddings made these screens change scale when leaving Porto.
+   Do not style .app-sheet, .app-sheet-header, .app-wallet, .harbour-nav or
+   .porto-bottom-nav here. Their ownership remains with WORK 6. */
 
 /* Shared gold/navy game-control language within WORK 4 only. */
 .w4-screen{max-width:660px;gap:7px;text-shadow:0 2px 3px #061b37b5}
@@ -399,10 +336,6 @@
 
 /* Small iPhones: protect labels, tap targets and horizontal layout. */
 @media(max-width:390px){
- .app-sheet:has(.w4-screen) .app-sheet-header{flex-basis:calc(116px + env(safe-area-inset-top));min-height:calc(116px + env(safe-area-inset-top));max-height:none}
- .app-sheet:has(.w4-screen) .app-sheet-brand h1{top:54px;padding:6px 22px}
- .app-sheet:has(.w4-screen) .app-wallet{max-width:30%;min-width:72px;padding:5px}
- .app-sheet:has(.w4-screen) .app-wallet small{display:none}
  .w4-fleet .w4-harbour-stage{min-height:224px}
  .w4-fleet .w4-harbour-stage>.w4-ship-art{width:85%;left:-10%}
  .w4-fleet .w4-stage-label{top:7%;right:1.5%;width:42%;padding:7px 5px}
@@ -416,9 +349,6 @@
  .w4-forge .w4-improve-button{width:94%;font-size:22px}
 }
 @media(max-width:345px){
- .app-sheet:has(.w4-screen) .app-sheet-brand>small::after{font-size:20px}
- .app-sheet:has(.w4-screen) .app-back{width:42px;height:42px;left:5px}
- .app-sheet:has(.w4-screen) .app-wallet{min-width:69px;right:4px}
  .w4-fleet .w4-stage-label>span{font-size:9px}
  .w4-fleet .w4-stage-label>small{font-size:9px}
  .w4-fleet .w4-stage-stats{gap:1px}
@@ -1285,4 +1215,25 @@
 }
 @media(max-height:680px){
   .w4-forge .w4-forge-stage{min-height:242px}
+}
+
+/* WORK 4 / issue #104: internal Fleet/Forge sections use the SAME available
+   content width as the other pages. Only own artwork and controls are styled.
+   The Porto bottom bar is never touched. */
+.w4-fleet, .w4-forge {
+  width:100%;
+  min-width:0;
+  max-width:none;
+  margin:0;
+  box-sizing:border-box;
+}
+.w4-fleet > [role="tabpanel"], .w4-forge > [role="tabpanel"]{
+  min-width:0;
+  width:100%;
+  box-sizing:border-box;
+}
+.w4-fleet .w4-harbour-stage,
+.w4-forge .w4-forge-stage {
+  width:100%;
+  box-sizing:border-box;
 }
