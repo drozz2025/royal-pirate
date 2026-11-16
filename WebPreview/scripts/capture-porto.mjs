@@ -227,7 +227,7 @@ try {
   report.referenceComparisons=referenceComparisons.sort((a,b)=>Object.keys(referenceFiles).indexOf(a.screen)-Object.keys(referenceFiles).indexOf(b.screen));
   report.referenceStatus='Visual diff artefacts for all 8 screens; not a claim of pixel-exact approval';
   if(referenceComparisons.length!==8)throw new Error('Not all 8 approved reference comparisons were generated');
-  await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\\n');
+  await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
 
   if(report.bodyOverflow)throw new Error('Porto viewport scrolls horizontally');
   if(!report.webgl2||report.contextLost)console.warn('No confirmed WebGL2 context: screenshot is not proof of 3D performance');
