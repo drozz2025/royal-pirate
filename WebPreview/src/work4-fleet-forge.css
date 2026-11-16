@@ -1878,40 +1878,29 @@
 }
 
 
-/* WORK4 #104: same element-specific paint contract verified by the 390px
-   diagnostic. The actual CSS screenshot renderer must see *opaque* stage and
-   illustration surfaces; do not reintroduce gradients or transparent layers. */
+/* WORK4 #104 / PR #136: opaque workshop paint surface.
+   Transparent one-pixel outlines force an independent Chromium paint pass
+   without visible debugging borders. Keep the cannon/workshop SVGs live.
+   Scoped strictly to Forja: never affect Porto or the global dock. */
 .w4-forge #w4-forge-panel > .w4-forge-stage {
-  background:#765038 !important;
-  background-image:none !important;
-}
-.w4-forge .w4-forge-stage > .w4-forge-scene {
-  background:#72503d !important;
-  background-image:none !important;
-}
-
-
-/* WORK4 #104: keep real responsive workshop SVGs above the canvas-backed
-   global background in Chromium. The panel stays above the cannon so all
-   local costs and working controls remain unobstructed. */
-.w4-forge #w4-forge-panel > .w4-forge-stage{
   position:relative;
-  isolation:isolate!important;
-  background-color:#805436!important;
-  background-image:none!important;
-  outline:none!important;
+  isolation:isolate !important;
+  background-color:#795035 !important;
+  background-image:none !important;
+  outline:1px solid transparent !important;
 }
-.w4-forge #w4-forge-panel > .w4-forge-stage::before{
-  content:none!important;
-  display:none!important;
+.w4-forge #w4-forge-panel > .w4-forge-stage::before {
+  content:none !important;
+  display:none !important;
 }
-.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene{
-  isolation:auto!important;
-  background-color:#ab744a!important;
-  background-image:none!important;
-  z-index:20!important;
+.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene {
+  isolation:auto !important;
+  z-index:20 !important;
+  background-color:#b77f4c !important;
+  background-image:none !important;
+  outline:1px solid transparent !important;
   pointer-events:none;
 }
-.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description{
-  z-index:30!important;
+.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+  z-index:30 !important;
 }
