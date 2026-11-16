@@ -245,9 +245,12 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
       </div>}
       <div className="w4-cards-caption"><strong>NAVIOS DA FROTA</strong><small>1 disponível · restantes em desenvolvimento</small></div>
       <div className="w4-ship-roster" role="group" aria-label="Selecionar navio da frota">
-        {[2,3,4].map(n=><div key={n} className="w4-ship-slot is-pending" aria-label={'Espaço '+n+' indisponível'}>
-          <span className="w4-slot-art w4-slot-unavailable" aria-hidden="true"><FleetShadow variant={n}/></span>
-          <strong>ESPAÇO {n}</strong><small>EM DESENVOLVIMENTO</small></div>)}
+        {[2,3,4].map((n)=><div key={n} className="w4-ship-slot is-pending"
+          aria-label={['FRAGATA — ESPAÇO 2','BRIGANTINA — ESPAÇO 3','GALEÃO — ESPAÇO 4'][n-2]+' — navio indisponível'}>
+          <span className="w4-slot-art w4-slot-unavailable" aria-hidden="true">
+            <span className={'w4-approved-thumb w4-approved-thumb-'+n}><FleetShadow variant={n}/></span>
+          </span>
+          <strong>{['FRAGATA','BRIGANTINA','GALEÃO'][n-2]}</strong><small>EM DESENVOLVIMENTO</small></div>)}
         <button type="button" className="w4-ship-slot is-active" aria-pressed={details}
           onClick={()=>setDetails(v=>!v)} aria-label="Royal Crown, navio ativo, alternar detalhes">
           <span className="w4-slot-art"><ShipArtwork small/></span><strong>ROYAL CROWN</strong><small>✓ DISPONÍVEL</small>
