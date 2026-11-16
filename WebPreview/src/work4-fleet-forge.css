@@ -1568,6 +1568,93 @@
   .w4-forge .w4-forge-stage .w4-cannon-art{transition:none;animation:none}
 }
 
+
+/* WORK 4 / 16 Nov 05:00 — composition correction against approved 03/04.
+   A compact illustrated stage preserves room for ship cards / working costs,
+   brings the real ship/cannon into the visual foreground and NEVER styles
+   the Porto dock, shared app shell or another Work's page. */
+.w4-fleet #w4-fleet-panel,
+.w4-forge #w4-forge-panel { gap:5px; }
+.w4-fleet .w4-harbour-stage {
+  min-height:clamp(225px,34dvh,336px);
+  background:
+    radial-gradient(ellipse 50% 22% at 46% 12%,#e3fcffbb,transparent 95%),
+    linear-gradient(180deg,#0877c1 0%,#109bc7 39%,#10b2bf 53%,#095989 83%,#052a4d);
+}
+.w4-fleet .w4-harbour-stage>.w4-ship-art {
+  left:-5%;bottom:1%;width:96%;transform:scale(1.025) rotate(-1deg);
+  filter:saturate(1.24) contrast(1.15) drop-shadow(0 13px 6px #00182ce9) drop-shadow(0 0 5px #ffdd8d75);
+}
+.w4-fleet .w4-stage-label {
+  top:22%;right:1.5%;width:34%;padding:8px 5px 8px 8px;
+  background:linear-gradient(90deg,#0a2943bd,#051f39f2);
+  border-left:2px solid #d6b67d;border-radius:3px 8px 8px 3px;
+}
+.w4-fleet .w4-stage-label>strong { font-size:clamp(18px,4.65vw,27px); }
+.w4-fleet .w4-stage-stats>span { min-height:20px;padding:2px 0; }
+.w4-fleet .w4-stage-stats>span>strong,
+.w4-fleet .w4-stage-stats em { font-size:clamp(9px,2.5vw,12px); }
+.w4-fleet .w4-tropical-art { filter:saturate(1.06) contrast(1.07); }
+.w4-fleet .w4-ship-slot {
+  min-height:clamp(102px,14.4dvh,138px);
+  background:linear-gradient(#205476,#0d3456 63%,#071c37);
+}
+.w4-fleet .w4-ship-slot .w4-slot-art,
+.w4-fleet .w4-ship-slot.is-active .w4-slot-art {
+  height:clamp(62px,9.2dvh,89px);
+}
+.w4-fleet .w4-ship-roster { gap:4px; }
+.w4-fleet .w4-ship-slot strong { font-size:clamp(10px,2.75vw,14px); }
+.w4-forge .w4-forge-stage {
+  min-height:clamp(240px,35dvh,337px);
+  background:
+    radial-gradient(ellipse 60% 75% at 22% 64%,#dc6d2b91,transparent 81%),
+    linear-gradient(120deg,#785135 0%,#553729 39%,#322c2b 71%,#0d2942);
+}
+.w4-forge .w4-forge-stage::before { opacity:.18; }
+.w4-forge .w4-forge-art {
+  opacity:1;
+  filter:saturate(1.35) contrast(1.13) drop-shadow(0 4px 3px #1b1016b0);
+}
+.w4-forge .w4-forge-glow { opacity:.88; }
+.w4-forge .w4-forge-stage .w4-cannon-art {
+  left:-4%;bottom:0;width:94%;
+  transform:rotate(-2deg) scale(1.01);
+  filter:saturate(1.2) contrast(1.16) drop-shadow(0 14px 7px #130b14d9);
+}
+.w4-forge .w4-forge-description {
+  top:8%;right:1.5%;width:41%;padding:7px 6px 8px;
+  border-color:#e9ba7c;background:linear-gradient(160deg,#123c53ed,#061b33fa);
+}
+.w4-forge .w4-forge-description h3 { font-size:clamp(20px,5.1vw,27px); }
+.w4-forge .w4-forge-live-levels { margin-top:3px;padding-top:3px; }
+.w4-forge .w4-forge-live-level { min-height:19px;padding:2px 3px; }
+.w4-forge .w4-materials {
+  background:linear-gradient(145deg,#25475d,#0b2743 67%,#081d38);
+}
+.w4-forge .w4-improve-button { min-height:53px; }
+@media(max-width:359px) {
+  .w4-fleet .w4-harbour-stage { min-height:208px; }
+  .w4-fleet .w4-harbour-stage>.w4-ship-art { left:-5%;width:96%; }
+  .w4-fleet .w4-stage-label { top:17%;right:1%;width:38%;padding:5px 3px 5px 6px; }
+  .w4-fleet .w4-stage-label>strong { font-size:16px; }
+  .w4-fleet .w4-ship-slot { min-height:87px; }
+  .w4-fleet .w4-ship-slot .w4-slot-art,
+  .w4-fleet .w4-ship-slot.is-active .w4-slot-art { height:47px; }
+  .w4-forge .w4-forge-stage { min-height:218px; }
+  .w4-forge .w4-forge-stage .w4-cannon-art { left:-5%;width:94%; }
+  .w4-forge .w4-forge-description { width:43%;top:5%;padding:5px 4px; }
+  .w4-forge .w4-forge-live-level { min-height:18px; }
+}
+@media(min-width:400px) and (max-width:659px) {
+  .w4-fleet .w4-harbour-stage { min-height:clamp(293px,35dvh,356px); }
+  .w4-forge .w4-forge-stage { min-height:clamp(299px,35dvh,366px); }
+}
+@media(max-height:650px) {
+  .w4-fleet .w4-harbour-stage { min-height:206px; }
+  .w4-forge .w4-forge-stage { min-height:217px; }
+}
+
 /* WORK 0 / #104 — visually close the empty upper third of Forja's cannon stage.
    The artwork stays live SVG, never the approved image as a fake UI background.
    Keep the right-hand upgrade card fully usable; do not touch Porto/nav. */
