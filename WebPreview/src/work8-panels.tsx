@@ -122,9 +122,9 @@ export function RankingTabs({active,onNavigate,onLeagues}:{
   active:'ranking'|'profile'|'leagues';onNavigate:Navigate;onLeagues:()=>void;
 }) {
   return <nav className="w8-tabs" aria-label="Secções de ranking e perfil">
-    <button type="button" aria-pressed={active==='ranking'} onClick={()=>onNavigate('ranking')}>RANKING</button>
-    <button type="button" aria-pressed={active==='profile'} onClick={()=>onNavigate('profile')}>O MEU PERFIL</button>
-    <button type="button" aria-pressed={active==='leagues'} onClick={onLeagues}>LIGAS</button>
+    <button type="button" aria-pressed={active==='ranking'} onClick={()=>onNavigate('ranking')}><span className="w8-tab-label"><PirateIcon name="ranking" size={17}/>RANKING</span></button>
+    <button type="button" aria-pressed={active==='profile'} onClick={()=>onNavigate('profile')}><span className="w8-tab-label"><PirateIcon name="profile" size={17}/>O MEU PERFIL</span></button>
+    <button type="button" aria-pressed={active==='leagues'} onClick={onLeagues}><span className="w8-tab-label"><PirateIcon name="rewards" size={17}/>LIGAS</span></button>
   </nav>;
 }
 
@@ -160,7 +160,7 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
       <section className="w8-honesty w8-ranking-locked" aria-label="There is no global leaderboard yet">
         <div className="w8-top-board-heading"><span>TOP GLOBAL</span><small>CLASSIFICAÇÃO ONLINE</small></div>
         <div className="w8-ranking-offline-board">
-          <div className="w8-ranking-locked-emblem" aria-hidden="true"><W8Art kind="helm"/></div>
+          <div className="w8-ranking-locked-emblem" aria-hidden="true"><div className="w8-sealed-podium"><span/><span/><span/></div></div>
           <div className="w8-ranking-locked-copy">
             <strong>RANKING GLOBAL INDISPONÍVEL</strong>
             <p>Sem servidor competitivo nem adversários online. Os números acima são apenas os teus resultados locais.</p>
@@ -193,9 +193,9 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
   const titles:Record<MissionId,string>={'first-win':'Vence a primeira batalha','five-hits':'Acerta 5 tiros de canhão','three-battles':'Joga 3 batalhas'};
   return <div className="w8-screen w8-missions-scene">
     <nav className="w8-tabs" aria-label="Categorias de missões">
-      <button type="button" onClick={()=>{setTab('daily');setMessage('');}} aria-pressed={tab==='daily'}>DIÁRIAS</button>
-      <button type="button" onClick={()=>{setTab('weekly');setMessage('');}} aria-pressed={tab==='weekly'}>SEMANAIS</button>
-      <button type="button" onClick={()=>{setTab('events');setMessage('');}} aria-pressed={tab==='events'}>EVENTOS</button>
+      <button type="button" onClick={()=>{setTab('daily');setMessage('');}} aria-pressed={tab==='daily'}><span className="w8-tab-label"><PirateIcon name="missions" size={17}/>DIÁRIAS</span></button>
+      <button type="button" onClick={()=>{setTab('weekly');setMessage('');}} aria-pressed={tab==='weekly'}><span className="w8-tab-label"><PirateIcon name="events" size={17}/>SEMANAIS</span></button>
+      <button type="button" onClick={()=>{setTab('events');setMessage('');}} aria-pressed={tab==='events'}><span className="w8-tab-label"><PirateIcon name="offers" size={17}/>EVENTOS</span></button>
     </nav>
     <div className="w8-hero"><W8SeaBackdrop variant="missions"/>
       <div className="w8-hero-icon" aria-hidden="true"><W8Art kind="scroll"/></div>
@@ -204,6 +204,21 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
         <p>{tab==='daily'?'Objetivos locais e recompensa de hoje.':'Esta categoria ainda não tem atividades.'}</p>{tab==='daily'&&<span className="w8-hero-live">{profile.claimedMissions.length}/{MISSIONS.length} OBJETIVOS RECOLHIDOS</span>}</div>
     </div>
     {tab==='daily'?<>
+      <section className="w8-map-ribbon" aria-label="Mapa do progresso real nas três missões">
+        <div className="w8-map-heading"><strong>MAPA DE CONQUISTAS</strong><small>{MISSIONS.filter(m=>missionProgress(profile,m.id)>=m.target).length} / {MISSIONS.length} OBJETIVOS ATINGIDOS</small></div>
+        <div className="w8-map-track">
+          {MISSIONS.map((mission,index)=>{
+            const current=missionProgress(profile,mission.id),done=current>=mission.target;
+            const icon: 'ranking'|'battle'|'fleet'=index===0?'ranking':index===1?'battle':'fleet';
+            const milestone=index===0?'1ª VITÓRIA':index===1?'5 ACERTOS':'3 BATALHAS';
+            return <div key={mission.id} className={'w8-map-stop'+(done?' is-complete':'')}>
+              <span className="w8-map-node" aria-hidden="true"><PirateIcon name={icon} size={19}/></span>
+              <span className="w8-map-title">{milestone}</span>
+              <small>{current} / {mission.target}</small>
+            </div>;
+          })}
+        </div>
+      </section>
       <section className="w8-daily" aria-label="Recompensa diária" title={canClaim?'Next claim earns '+(15+rewardDay*5)+' coins · Próxima recompensa local':'Recompensa de hoje já recolhida'}>
         <div className="w8-daily-orb" aria-hidden="true"><W8Art kind="chest"/></div>
         <div className="w8-daily-copy"><span className="w8-eyebrow">BAÚ DIÁRIO</span><strong>{canClaim?'RECOMPENSA DISPONÍVEL':'RECOLHIDO HOJE'}</strong>
