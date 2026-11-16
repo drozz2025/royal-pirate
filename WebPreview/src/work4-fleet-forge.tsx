@@ -62,6 +62,17 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
       <linearGradient id="w4-sail" x1="0" y1="0" x2=".9" y2="1">
         <stop stopColor="#404b57"/><stop offset=".6" stopColor="#111c2e"/><stop offset="1" stopColor="#111524"/>
       </linearGradient>
+
+      <linearGradient id="w4-galleon-darkwood" x1=".12" y1=".12" x2=".9" y2="1">
+        <stop stopColor="#8e4b2a"/><stop offset=".2" stopColor="#552e24"/>
+        <stop offset=".58" stopColor="#241a22"/><stop offset=".83" stopColor="#3e2626"/>
+        <stop offset="1" stopColor="#a46232"/>
+      </linearGradient>
+      <linearGradient id="w4-galleon-canvas" x1="0" y1="0" x2="1" y2=".35">
+        <stop stopColor="#0c1424"/><stop offset=".24" stopColor="#39414b"/>
+        <stop offset=".5" stopColor="#101929"/><stop offset=".74" stopColor="#424850"/>
+        <stop offset="1" stopColor="#0b1526"/>
+      </linearGradient>
       <linearGradient id="w4-sea" x1="0" y1="0" x2="0" y2="1">
         <stop stopColor="#2cc2d6"/><stop offset="1" stopColor="#0c4b88"/>
       </linearGradient>
@@ -96,6 +107,29 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
     <g className="w4-art-sail-stitch" stroke="#9eacb1" strokeWidth="1.2" fill="none" opacity=".58">
       <path d="M83 72Q97 82 117 78M80 102Q98 111 117 106M138 72Q167 67 184 82M139 108Q166 105 193 117M220 55Q234 56 247 70M221 90Q235 88 250 95"/>
     </g>
+
+    {/* WORK4/03: individually curved dark canvas with specular seams, not a
+        flat light mesh. Drawn under the already-real skull crest and rigging. */}
+    {!small&&<g className="w4-galleon-sail-volume" pointerEvents="none">
+      <path d="M120 40Q98 45 80 56Q71 83 78 123Q98 134 120 127Z"
+        fill="url(#w4-galleon-canvas)" fillOpacity=".81"/>
+      <path d="M129 46Q166 42 193 92L197 119Q162 132 127 127Z"
+        fill="url(#w4-galleon-canvas)" fillOpacity=".83"/>
+      <path d="M214 30Q252 40 255 70Q257 95 254 115Q235 125 213 124Z"
+        fill="url(#w4-galleon-canvas)" fillOpacity=".82"/>
+      <g stroke="#909598" fill="none" opacity=".53" strokeWidth="2.5">
+        <path d="M88 56Q79 91 88 121M107 47Q101 85 112 122"/>
+        <path d="M140 49Q156 77 158 125M176 66Q188 95 186 120"/>
+        <path d="M227 37Q237 72 227 119M245 50Q252 81 247 111"/>
+      </g>
+      <g stroke="#c7b38e" fill="none" strokeWidth="1.8" opacity=".68">
+        <path d="M81 65Q101 73 118 70M79 95Q97 102 119 99"/>
+        <path d="M130 75Q161 69 181 93M134 112Q164 119 193 113"/>
+        <path d="M217 60Q235 66 253 67M215 95Q236 98 252 94"/>
+      </g>
+      <path d="M121 39Q117 83 121 129M212 27Q210 80 213 126"
+        fill="none" stroke="#f0d7a8" strokeWidth="2.6" opacity=".68"/>
+    </g>}
     <g className="w4-art-crest">
       <path d="M142 73Q166 60 186 74L187 103Q165 121 144 103Z" fill="#31333b" stroke="#d9ad69" strokeWidth="2" opacity=".96"/>
       <path d="M154 89q0-13 11-13t11 13l-4 8h-14Z" fill="#f8ebc4"/>
@@ -244,6 +278,56 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
         <circle cx="296" cy="197" r="2"/><circle cx="315" cy="201" r="1.4"/>
       </g>
     </g>
+
+    {/* WORK4/03: deep carved broadside, lit gunports and stepped stern. These
+        are original vector planes; no fake boats, interactions or combat data. */}
+    {!small&&<g className="w4-galleon-hull-volume" pointerEvents="none">
+      <path d="M64 150Q167 169 301 139L285 177Q235 200 176 205Q127 205 91 188L69 173Z"
+        fill="url(#w4-galleon-darkwood)" stroke="#8d542d" strokeWidth="3"/>
+      <path d="M74 156Q173 181 291 151L285 169Q170 199 85 178Z"
+        fill="#1d1a24" opacity=".75"/>
+      <path d="M83 183Q166 218 274 183Q227 211 171 213Q118 208 91 195Z"
+        fill="#2e2123" stroke="#bc7d43" strokeWidth="2.3"/>
+      <path d="M68 151Q174 174 300 141M77 162Q176 187 290 156"
+        fill="none" stroke="#e6aa62" strokeWidth="3.3" opacity=".9"/>
+      <path d="M83 178Q172 207 281 175M89 191Q173 215 267 188"
+        fill="none" stroke="#bf814c" strokeWidth="2.1" opacity=".93"/>
+      <path d="M87 173Q183 200 282 171" fill="none" stroke="#4b2d27" strokeWidth="3"/>
+      {Array.from({length:7},(_,i)=>{
+        const x=99+i*25;
+        const y=173+Math.round(8*Math.sin((i+1)*Math.PI/8));
+        return <g key={'depth-port-'+i}>
+          <path d={`M${x-8} ${y-6}q8-4 16 0v13q-8 5-16 0Z`}
+            fill="#0b1420" stroke="#dbaa5e" strokeWidth="2.2"/>
+          <ellipse cx={x} cy={y} rx="4.6" ry="4" fill="#121925" stroke="#e8bb72" strokeWidth="1.5"/>
+          <path d={`M${x-7} ${y+10}l13 1`} stroke="#f8d391" strokeWidth="1.3"/>
+        </g>;
+      })}
+      <path d="M75 166Q167 191 287 161" fill="none" stroke="#f6cb7b" strokeWidth="1.8"/>
+      <path d="M82 185Q169 212 275 180" fill="none" stroke="#eabb78" strokeWidth="2.4"/>
+      {/* Raised aft cabin with shuttered brass galleries. */}
+      <path d="M252 129L265 103 285 100 303 116 311 144 289 151 254 149Z"
+        fill="#322124" stroke="#e0a559" strokeWidth="3.5"/>
+      <path d="M264 114L282 108 298 122 299 140 264 143Z"
+        fill="#533126" stroke="#f5c77d" strokeWidth="2"/>
+      <path d="M269 118h10v11h-10Zm15 0h10v11h-10Z"
+        fill="#e6b865" stroke="#422824" strokeWidth="2.2"/>
+      <path d="M269 118v11m15-11v11M261 136q20-7 41 0"
+        fill="none" stroke="#fff0b0" strokeWidth="2.2"/>
+      <path d="M259 143q21-10 47-3" fill="none" stroke="#ffda8e" strokeWidth="4"/>
+      {/* Three-dimensional carved bow, warm amber lit timber ribs. */}
+      <path d="M69 156Q57 160 57 176L80 190M289 163l15-17 10 7"
+        fill="none" stroke="#f9cb77" strokeWidth="5" strokeLinecap="round"/>
+      <path d="M49 151q-11 0-17 12m25-9q-3 10 5 17"
+        fill="none" stroke="#a96730" strokeWidth="4" opacity=".93"/>
+      <g fill="#ffe1a4" stroke="#6b4226" strokeWidth="1">
+        <circle cx="89" cy="160" r="2"/><circle cx="131" cy="170" r="2"/>
+        <circle cx="178" cy="174" r="2"/><circle cx="227" cy="170" r="2"/>
+        <circle cx="272" cy="159" r="2"/>
+      </g>
+      <path d="M48 196q32-10 54 3t49 4m72 1q26-10 49-3t45-2"
+        stroke="#c4f7fa" strokeWidth="4.5" fill="none" opacity=".92"/>
+    </g>}
     <path d="M36 204Q65 196 103 207M218 207Q256 199 316 205" stroke="#ddfcfa" strokeWidth="4" opacity=".85" fill="none" strokeLinecap="round"/>
 
   </svg>;
@@ -356,6 +440,30 @@ function ForgeBackdrop(){
         <path d="M49 230q23 7 42 4m141 10 60 1"/>
       </g>
     </g>
+
+    {/* Reference 04: additional foreground masonry joints, firelight and
+        workshop timber. This is behind the real foreground cannon and card. */}
+    <g className="w4-forge-lit-materials" pointerEvents="none">
+      <path d="M20 147Q27 51 108 45Q181 47 184 149"
+        fill="none" stroke="#f6bb77" strokeWidth="3.5" opacity=".75"/>
+      <path d="M41 89l22 13m21-32 13 14m31-10-7 14m26 9-17 10"
+        stroke="#ffdc98" strokeWidth="3" opacity=".6"/>
+      <path d="M13 168h34m-33 22h34m-34 22h34m101-41h38m-37 21h36m-36 23h39"
+        stroke="#dfa264" strokeWidth="3" opacity=".64"/>
+      <path d="M17 143v26m30-22v22m31-82v23m29-50v26m35 8v24"
+        stroke="#54352a" strokeWidth="5" opacity=".5"/>
+      <path d="M0 279L420 264M0 286L420 274"
+        stroke="#f0b573" strokeWidth="3" opacity=".6"/>
+      <path d="M174 3l-38 32M214 7l-42 39"
+        stroke="#e2ae6d" strokeWidth="4" opacity=".59"/>
+      <path d="M11 55h14l7 24-10 16-13-8Z"
+        fill="#82552c" stroke="#ffc27c" strokeWidth="2.5"/>
+      <path d="M17 65h6v13h-6Z" fill="#ffdd95"/>
+      <g fill="#ffe8aa" opacity=".83">
+        <circle cx="82" cy="181" r="2.5"/><circle cx="103" cy="152" r="2.2"/>
+        <circle cx="129" cy="206" r="1.9"/><circle cx="72" cy="225" r="2.3"/>
+      </g>
+    </g>
     {/* WORK4 / reference 04: secondary warm masonry, hammered fittings and
         sparks. This is behind the cannon and the real upgrade controls. */}
     <g className="w4-forge-warm-materials" pointerEvents="none">
@@ -436,6 +544,35 @@ function ForgeCannonArtwork(){
       <g fill="#ffe8ad" opacity=".88">
        <circle cx="151" cy="143" r="2"/><circle cx="198" cy="130" r="2.2"/><circle cx="250" cy="116" r="2"/>
        <circle cx="151" cy="180" r="2"/><circle cx="201" cy="164" r="2"/><circle cx="263" cy="147" r="2"/>
+      </g>
+    </g>
+
+    {/* WORK4/04: cooler cast-iron barrel, warm foundry highlights and the
+        heavy timber/carriage read in perspective; all artwork, no new stats. */}
+    <g className="w4-cannon-cast-depth" pointerEvents="none">
+      <path d="M119 143L285 104 309 152 147 194Z"
+        fill="#132635" opacity=".55"/>
+      <path d="M122 139L281 105M143 182L309 148"
+        fill="none" stroke="#cadce0" strokeWidth="4" opacity=".7"/>
+      <path d="M137 146L280 113M160 183L299 145"
+        fill="none" stroke="#020f1e" strokeWidth="4.4" opacity=".76"/>
+      <path d="M180 129l15 53m44-63 14 49" stroke="#d2a266"
+        strokeWidth="8" opacity=".9"/>
+      <path d="M183 127l15 51m43-63 15 50" stroke="#513826"
+        strokeWidth="2.5" opacity=".95"/>
+      <path d="M88 228L289 181 351 209 158 260"
+        fill="none" stroke="#8b603b" strokeWidth="7" opacity=".84"/>
+      <path d="M103 235L285 193 341 211 157 254"
+        fill="none" stroke="#f7cc86" strokeWidth="3.2" opacity=".87"/>
+      <path d="M244 221a33 33 0 0 1 66-1" fill="none"
+        stroke="#f3c77b" strokeWidth="3" opacity=".81"/>
+      <g stroke="#ffe9a8" strokeWidth="1.6" opacity=".67">
+        <path d="M63 151q-27 36-12 63M83 146q-8 37-3 73"/>
+        <path d="M105 180l153-41M111 191l160-41"/>
+      </g>
+      <g fill="#ffe0a5">
+        <circle cx="133" cy="144" r="2.2"/><circle cx="171" cy="134" r="2.2"/>
+        <circle cx="213" cy="124" r="2.2"/><circle cx="254" cy="115" r="2.2"/>
       </g>
     </g>
     {/* WORK4 / reference 04: original engraved ironwork and brass/carriage
