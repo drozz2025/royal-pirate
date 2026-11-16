@@ -2671,3 +2671,17 @@
   .w8-approved-missions .w8-approved-quest-list{min-height:0;max-height:none;grid-template-rows:repeat(3,minmax(74px,auto))}
   .w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){min-height:290px}
 }
+
+/* 320px QA: oversized decorative imagery may extend 3px beyond the app sheet.
+   Clip only horizontal decorative overflow within WORK8; vertical content must
+   remain scrollable on short devices. Porto/nav and touch targets untouched. */
+.w8-screen.w8-approved{overflow-x:clip;max-width:100%;min-width:0}
+.w8-screen.w8-approved .w8-approved-quest-list,
+.w8-screen.w8-approved .w8-approved-daily,
+.w8-screen.w8-approved .w8-approved-leaderboard{min-width:0;max-width:100%}
+@media(max-width:350px){
+  .w8-approved-missions .w8-approved-days li{min-width:0;overflow:hidden}
+  .w8-approved-missions .w8-approved-chest .w8-art{
+    width:100%;max-width:100%;transform:none;
+  }
+}
