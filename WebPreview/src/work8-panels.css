@@ -1811,3 +1811,105 @@
   .w8-approved-identity>strong{font-size:16px}
 }
 @media(prefers-reduced-motion:reduce){.w8-approved *{animation:none!important;transition:none!important}}
+
+
+/* WORK 8 — second fidelity pass, approved 07/08.
+   Original vector tropical sky and island silhouettes (never a screenshot
+   background); retain the live React controls, data and shared Porto nav. */
+.app-sheet:has(.w8-screen.w8-approved) > .app-sheet-content{
+  background:linear-gradient(180deg,#3f9dc5 0%,#256e92 21%,#103e62 53%,#061e3b 100%);
+}
+.w8-screen.w8-approved{
+  position:relative;isolation:isolate;min-height:100%;
+  padding:1px 0 12px;overflow:visible;
+  background:linear-gradient(180deg,#12669516 0%,#082c4a21 30%,#08213d 84%);
+}
+.w8-approved-scene{
+  position:absolute;z-index:0;top:-8px;left:-8px;right:-8px;height:315px;
+  overflow:hidden;pointer-events:none;opacity:.98;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 48%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 48%,transparent 100%);
+}
+.w8-approved-scene .w8-seascape{
+  inset:0;width:100%;height:245px;opacity:1;filter:saturate(1.22) contrast(1.03);
+}
+.w8-screen.w8-approved > :not(.w8-approved-scene){position:relative;z-index:1}
+.w8-approved-title{
+  height:60px;min-height:60px;margin:2px 0 1px;
+  filter:drop-shadow(0 3px 3px #06182f80)
+}
+.w8-approved-title:before{
+  left:19%;right:19%;top:9px;bottom:8px;
+  border-color:#ffde80;border-width:3px;
+  background:linear-gradient(135deg,#8c572f,#0c2b49 20%,#091e38 80%,#8c572f);
+  box-shadow:inset 0 2px #fff6d48c,0 3px #563018,0 5px 7px #031326c9;
+}
+.w8-approved-title h2{font-size:clamp(23px,6vw,33px)!important;color:#ffefd2}
+.w8-approved-title-flourish{left:13%;width:48px;height:47px;top:4px}
+.w8-approved-title-flourish .w8-art{width:46px;height:46px}
+.w8-approved-title:after{right:12%;top:11px;font-size:26px;color:#ffda78}
+.w8-approved-tabs{gap:4px;margin:0 1px 2px}
+.w8-approved-tabs button{
+  min-height:42px;border:2px solid #e1b875;border-bottom-color:#5e391e;
+  border-radius:11px 11px 8px 8px;
+  background:linear-gradient(180deg,#3c6c8d,#143d64 52%,#0a284b);
+  box-shadow:inset 0 2px #bfe0f27d,0 3px 3px #03172c9e;
+  color:#fff0cb;
+}
+.w8-approved-tabs button[aria-pressed=true]{
+  border-color:#ffe1a0;
+  background:linear-gradient(180deg,#68d0e5,#137ba7 55%,#0b496c);
+  box-shadow:inset 0 2px #e0fdffbd,0 3px 6px #031930;
+}
+.w8-approved-quest-list{gap:6px}
+.w8-approved-quest{
+  min-height:69px;
+  border:2px solid #d3b17b;
+  background:linear-gradient(115deg,#236381f2,#113c61f5 64%,#082b4afa);
+  box-shadow:inset 0 1px #cbf1f6a0,0 2px 5px #00182fa6;
+}
+.w8-approved-quest-core>strong{color:#fff9e8}
+.w8-approved-quest .w8-approved-meter{border-color:#9ca66a;background:#072a44}
+.w8-approved-quest-rewards>span{filter:drop-shadow(0 1px 1px #0009)}
+.w8-approved-daily{
+  border-color:#d6b27a;
+  background:linear-gradient(180deg,#1e5876f5,#0a2c4af8 36%,#071c36f9);
+  box-shadow:inset 0 1px #ffe1a06e,0 5px 8px #00192e99;
+}
+.w8-approved-days li{min-height:76px;border-color:#caa96e;box-shadow:inset 0 1px #fff6c066,0 2px 3px #041126}
+.w8-approved-chest .w8-art{filter:drop-shadow(0 3px 2px #091627)}
+.w8-approved-captain{
+  min-height:119px;border-color:#dfb572;
+  background:linear-gradient(135deg,#2e708ef7,#133f64fb 54%,#0a2848fc);
+  box-shadow:inset 0 2px #fff0c365,0 4px 6px #00182f;
+}
+.w8-approved-avatar{width:70px;height:70px;border-width:3px;box-shadow:inset 0 2px #ffe9b3,0 3px 5px #09263c}
+.w8-approved-leaderboard{
+  min-height:257px;border-color:#d4b378;
+  background:linear-gradient(180deg,#1a5175f4,#0e3459f8 32%,#072444fa);
+  box-shadow:inset 0 2px #bbe5ed69,0 4px 8px #031a2e9c;
+}
+.w8-approved-leaderboard h3{font-size:23px;color:#ffe2a2}
+.w8-approved-empty-rank{min-height:32px;border-bottom-color:#729bb15e}
+.w8-approved-empty-rank strong{font-size:11px;color:#c1d7df}
+.w8-approved-local-row{
+  border-color:#c6a569;
+  background:linear-gradient(90deg,#254f72,#123457);
+}
+.w8-approved-leaderboard p{font-size:10px;line-height:1.28;margin-top:8px}
+.w8-approved-personal-stat>*{
+  background:linear-gradient(180deg,#254c70,#0b2c4e);
+  border-color:#d4ac6b;
+}
+@media(max-width:375px){
+  .w8-approved-title-flourish{left:11%}
+  .w8-approved-title:after{right:10%}
+  .w8-approved-quest{min-height:66px}
+  .w8-approved-captain{grid-template-columns:54px minmax(0,1fr) 72px;min-height:105px}
+  .w8-approved-avatar{width:53px;height:53px}
+  .w8-approved-days li{min-height:72px}
+  .w8-approved-leaderboard{min-height:244px}
+}
+@media(prefers-reduced-motion:reduce){
+  .w8-approved-scene .w8-seascape{filter:none}
+}
