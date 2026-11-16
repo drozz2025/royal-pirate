@@ -334,6 +334,12 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
               <path d="M9 12Q20 0 31 12M9 16Q20 21 31 16" fill="none" stroke="#E8C994" strokeWidth="1.1" opacity=".75"/>
               <path d="M12 37l7-5 2 5 6-5" fill="none" stroke="#B5C8CA" strokeWidth="1.25" opacity=".75"/>
               <path d="M6 40Q20 33 34 40" fill="none" stroke="#F3D7A2" strokeWidth="1" opacity=".62"/>
+              {/* Unoccupied costume foil and lit frame: decorative only; no added players. */}
+              <path d="M7 15Q18 8 31 15" fill="none" stroke="#FFF0BB" strokeWidth="1.15" opacity=".7"/>
+              <path d="M7 18Q20 25 33 18" fill="none" stroke="#916A47" strokeWidth=".9" opacity=".85"/>
+              <path d="M10 34L17 29L20 34L24 29L30 34" fill="none" stroke="#C8D9D8" strokeWidth="1.5" opacity=".75"/>
+              <path d="M13 39L18 35M22 35L28 39" stroke="#E7C788" strokeWidth="1.25" opacity=".7"/>
+
 
             </svg>
           </span>
