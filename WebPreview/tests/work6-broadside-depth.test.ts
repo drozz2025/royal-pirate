@@ -36,12 +36,12 @@ test('battle-only rails never change physics, HP, cannon flashes or Porto/nav',(
   const source=readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
   const dressing=source.split('private dressBattleDeck(){')[1]?.split('private environment(){')[0]??'';
   assert.ok(dressing.length>0);
-  assert.doesNotMatch(dressing,/this\\.battle\\.|this\\.controls\\.|this\\.ships\\.|this\\.harbourDock/);
-  assert.match(dressing,/this\\.battleBattery\\.add\\(dressing\\)/);
-  assert.match(source,/this\\.battleBattery\\.visible=false;this\\.battleForegroundSail\\.visible=false/);
-  assert.match(source,/this\\.ships\\.player\\.root\\.visible=false/,
+  assert.doesNotMatch(dressing,/this\.battle\.|this\.controls\.|this\.ships\.|this\.harbourDock/);
+  assert.match(dressing,/this\.battleBattery\.add\(dressing\)/);
+  assert.match(source,/this\.battleBattery\.visible=false;this\.battleForegroundSail\.visible=false/);
+  assert.match(source,/this\.ships\.player\.root\.visible=false/,
     'first-person battle must not reintroduce two exterior ships');
-  assert.match(source,/this\\.ships\\.player\\.root\\.visible=true/,
+  assert.match(source,/this\.ships\.player\.root\.visible=true/,
     'approved Porto still displays its live ship');
-  assert.match(source,/this\\.battleBattery\\.visible=pose\\.showBattery/);
+  assert.match(source,/this\.battleBattery\.visible=pose\.showBattery/);
 });
