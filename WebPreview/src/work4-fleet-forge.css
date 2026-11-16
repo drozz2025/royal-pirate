@@ -2040,3 +2040,34 @@
     top:27%;
   }
 }
+
+
+/* WORK 4 — #104, fidelity pass after merged #165–#169.
+   Only the live SVG art in screens 03/04 is rescaled; WORK0 #158's
+   contain:paint / translateZ(0), the warm opaque paint surface,
+   the shared Porto navigation and the local economy remain untouched. */
+.w4-fleet .w4-harbour-stage > svg.w4-ship-art {
+  filter:saturate(1.07) contrast(1.09)
+    drop-shadow(0 13px 9px #03182bdc)
+    drop-shadow(0 -2px 3px #eab56c55);
+}
+.w4-fleet .w4-harbour-stage .w4-art-rigging { opacity:.62; }
+.w4-fleet .w4-harbour-stage .w4-galleon-sail-volume { opacity:.98; }
+.w4-fleet .w4-harbour-stage .w4-galleon-hull-volume { opacity:1; }
+/* The cannon belongs to the left foreground of frame 04: show its full
+   wheels and muzzle while keeping the right-hand *real* levels card clear. */
+.w4-forge .w4-forge-scene > svg.w4-cannon-art {
+  width:74%;
+  left:-3%;
+  top:32%;
+}
+@media(max-width:359px){
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art {
+    width:78%;left:-5%;top:32%;
+  }
+}
+@media(min-width:400px) and (max-width:659px){
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art {
+    width:73%;left:-2%;top:33%;
+  }
+}
