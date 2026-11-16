@@ -428,3 +428,121 @@
 .app-player-name-edit button{min-height:43px;border:2px solid #ffe1a1;border-radius:9px;background:linear-gradient(#f7df9b,#c69048);color:#2c251d;padding:8px 12px;font:900 13px 'Barlow Condensed',sans-serif;text-shadow:none}
 .app-player-name-edit button:disabled{opacity:.55;cursor:not-allowed}
 .app-player-name-edit small{color:#c8dce9;font:600 11px/1.35 'Barlow',sans-serif}
+
+
+/* WORK 6 · Internal HUD rhythm (16 Nov 2026).
+   Apply only inside the app sheets: the approved Porto screen and its
+   harbour-nav (including the five shared tabs) are deliberately untouched.
+   Stable one-line titles and a compact coin badge stop the header jumping
+   between Frota, Forja, Cartas, Loja, Missões, Ranking and Perfil. */
+.app-sheet > .app-sheet-header{
+  position:relative;
+  flex:0 0 auto;
+  min-height:76px;
+  padding:max(11px,env(safe-area-inset-top)) 12px 10px;
+  gap:9px;
+  border-bottom:2px solid #d5af6c;
+  background:linear-gradient(180deg,#194364f5 0%,#092746f9 100%);
+  box-shadow:0 4px 14px #000d2366;
+}
+.app-sheet > .app-sheet-header::after{
+  content:"";
+  position:absolute;
+  left:12px;
+  right:12px;
+  bottom:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#fff3c47d,transparent);
+  pointer-events:none;
+}
+.app-sheet-header .app-back{
+  flex:0 0 40px;
+  width:40px;
+  height:40px;
+  border-width:1px;
+  border-radius:10px;
+  font-size:29px;
+  line-height:1;
+  box-shadow:inset 0 1px #ffdfa477,0 2px 4px #00132699;
+}
+.app-sheet-header .app-sheet-brand{
+  flex:1 1 auto;
+  min-width:0;
+  overflow:hidden;
+}
+.app-sheet-header .app-sheet-brand small{
+  display:block;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  font-size:clamp(9px,2.5vw,11px);
+  line-height:1.3;
+}
+.app-sheet-header .app-sheet-brand h1{
+  margin-top:4px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:clamp(22px,5.8vw,31px);
+  line-height:1.1;
+  letter-spacing:.25px;
+}
+.app-sheet-header .app-page-glyph{
+  display:inline-grid;
+  place-items:center;
+  width:22px;
+  height:22px;
+  margin-right:3px;
+  vertical-align:middle;
+}
+.app-sheet-header .app-page-glyph svg{
+  width:19px;
+  height:19px;
+}
+.app-sheet-header .app-wallet{
+  min-width:0;
+  max-width:35%;
+  gap:5px;
+  padding:6px 8px;
+  border-width:1px;
+  border-radius:10px;
+  background:linear-gradient(180deg,#315e7e,#123150);
+  box-shadow:inset 0 1px #ffedaa66,0 2px 6px #00172d6b;
+}
+.app-sheet-header .app-wallet > span{
+  display:grid;
+  place-items:center;
+  flex:0 0 19px;
+  width:19px;
+  height:19px;
+  border:1px solid #fff0b6;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff2ac,#f1c357 55%,#ac762b);
+  box-shadow:0 1px 3px #00152e8c;
+  font-size:0;
+  line-height:1;
+}
+.app-sheet-header .app-wallet > span::after{
+  content:"✦";
+  color:#895b24;
+  font-size:11px;
+  text-shadow:none;
+}
+.app-sheet-header .app-wallet strong{
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  font-size:clamp(17px,4.5vw,21px);
+  line-height:1;
+}
+.app-sheet-header .app-wallet small{
+  white-space:nowrap;
+  font-size:8px;
+}
+@media(max-width:360px){
+  .app-sheet > .app-sheet-header{gap:6px;padding-left:8px;padding-right:8px}
+  .app-sheet-header .app-back{flex-basis:36px;width:36px;height:36px}
+  .app-sheet-header .app-wallet{max-width:32%;padding:5px 6px;gap:4px}
+  .app-sheet-header .app-wallet small{display:none}
+}
