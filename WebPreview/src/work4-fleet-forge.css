@@ -1778,3 +1778,101 @@
 @media(min-width:400px) and (max-width:659px){
   .w4-forge .w4-forge-stage > svg.w4-cannon-art {left:-3%;width:95%;bottom:0}
 }
+
+
+/* WORK4 #104: real mobile screenshot review (43812284716): the scene broke into
+   an empty left rectangle and a clipped right strip despite earlier z-index
+   rules. A single full-bleed illustration plane now carries the live SVG
+   artwork. The operational upgrade card remains a separate foreground sibling.
+   These are strictly .w4-forge selectors; Porto and its dock are untouched. */
+.w4-forge #w4-forge-panel > .w4-forge-stage{
+  box-sizing:border-box;
+  display:block;
+  position:relative;
+  flex:0 0 auto;
+  width:100%;
+  min-width:0;
+  isolation:isolate;
+  overflow:hidden;
+  background:linear-gradient(125deg,#765034 0%,#553b2d 30%,#233343 72%,#09253e 100%);
+}
+.w4-forge .w4-forge-scene{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  overflow:hidden;
+  isolation:isolate;
+  background:radial-gradient(ellipse 85% 75% at 24% 72%,#f09a4a75,transparent 74%);
+}
+.w4-forge .w4-forge-scene > svg.w4-forge-art{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  opacity:1;
+  z-index:0;
+  filter:none!important;
+  transform:none!important;
+}
+.w4-forge .w4-forge-scene > .w4-forge-glow{
+  position:absolute;
+  z-index:1;
+  left:0;
+  right:auto;
+  top:18%;
+  bottom:auto;
+  width:58%;
+  height:78%;
+  opacity:.76;
+  background:radial-gradient(ellipse at 40% 68%,#ffba537a,#e860293b 44%,transparent 73%);
+  filter:none!important;
+  transform:none!important;
+}
+.w4-forge .w4-forge-scene > svg.w4-cannon-art{
+  position:absolute;
+  display:block;
+  z-index:2;
+  width:100%;
+  height:auto;
+  max-height:none;
+  top:11%;
+  bottom:auto;
+  left:-7%;
+  right:auto;
+  opacity:1;
+  overflow:visible;
+  filter:none!important;
+  transform:none!important;
+}
+.w4-forge .w4-forge-scene > svg.w4-ship-art{
+  position:absolute;
+  z-index:2;
+  width:85%;
+  height:auto;
+  min-height:0;
+  top:15%;
+  bottom:auto;
+  left:-5%;
+  margin:0;
+  filter:none!important;
+  transform:none!important;
+}
+.w4-forge .w4-forge-stage > .w4-forge-description{
+  position:absolute;
+  z-index:3;
+  top:7%;
+  right:2%;
+  width:40%;
+  box-sizing:border-box;
+}
+@media(max-width:359px){
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art{width:104%;top:12%;left:-9%}
+  .w4-forge .w4-forge-scene > svg.w4-ship-art{width:92%;top:16%;left:-8%}
+  .w4-forge .w4-forge-stage > .w4-forge-description{top:4%;right:1%;width:44%}
+}
+@media(min-width:400px) and (max-width:659px){
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art{width:98%;top:12%;left:-5%}
+  .w4-forge .w4-forge-scene > svg.w4-ship-art{width:82%;top:16%;left:-3%}
+}
