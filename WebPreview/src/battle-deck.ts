@@ -58,7 +58,12 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
   const wood = paintedDeckTimber('#91522f',73);
   const plank = paintedDeckTimber('#bc8250',39);
   const darkWood = new T.MeshStandardMaterial({color:'#392b28',roughness:.88});
-  const metal = new T.MeshStandardMaterial({color:'#1b2734',metalness:.76,roughness:.30});
+  // The approved guns read as blue-black forged steel with sunlit facets, not
+  // pitch-black tubes against a dark rectangle. Geometry and shot origins stay
+  // untouched: this material belongs only to the decorative first-person deck.
+  const metal = new T.MeshStandardMaterial({color:'#354b5d',metalness:.64,roughness:.30});
+  const gunRope = new T.MeshStandardMaterial({color:'#d2b585',roughness:.92});
+  const cheekOak = new T.MeshStandardMaterial({color:'#744022',roughness:.83});
   const bronze = new T.MeshStandardMaterial({color:'#e0ae61',metalness:.74,roughness:.27});
   const bore = new T.MeshBasicMaterial({color:'#071019',side:T.DoubleSide});
   const fire = new T.MeshBasicMaterial({color:'#ffe09b',transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending});
@@ -125,6 +130,45 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
       hoop.position.copy(breechPoint).lerp(muzzlePoint,t);
       hoop.quaternion.copy(rimOrientation);
       group.add(hoop);
+    }
+    // Two broad cast-bronze reinforcement collars show the tube's tapered
+    // volume at 384x512, rather than another small 2D stripe on a black mesh.
+    // They run along the SAME real decorative gun axis.
+    for(const t of [.30,.67]){
+      const radius=1.48-t*.34;
+      const collar=new T.Mesh(new T.CylinderGeometry(radius+.055,radius+.095,.31,24),bronze);
+      collar.name='first-person-cannon-bronze-collar';
+      collar.quaternion.copy(axisOrientation);
+      collar.position.copy(breechPoint).lerp(muzzlePoint,t);
+      group.add(collar);
+      const shadowRing=new T.Mesh(new T.TorusGeometry(radius+.065,.055,8,24),metal);
+      shadowRing.quaternion.copy(rimOrientation);
+      shadowRing.position.copy(breechPoint).lerp(muzzlePoint,t+.014);
+      group.add(shadowRing);
+    }
+    // Recessed, timber cheek-plates and diagonal recoil breeching ropes follow
+    // the cannon carriage into the deck. These are sculptural, never colliders,
+    // game controls, projectiles or interactive overlays.
+    for(const side of [-1,1]){
+      const cheek=new T.Mesh(new T.BoxGeometry(.23,.72,3.7),cheekOak);
+      cheek.name='first-person-carriage-cheek';
+      cheek.position.set(x+side*1.01,1.44,74.36);
+      group.add(cheek);
+      for(const z of [73.05,75.75]){
+        const bolt=new T.Mesh(new T.SphereGeometry(.14,10,8),bronze);
+        bolt.scale.set(.35,1,1);
+        bolt.position.set(x+side*1.15,1.52,z);
+        group.add(bolt);
+      }
+      const cable=new T.CatmullRomCurve3([
+        new T.Vector3(x+side*.48,1.96,78.05),
+        new T.Vector3(x+side*1.00,1.45,77.30),
+        new T.Vector3(x+side*1.58,1.02,76.35),
+        new T.Vector3(x+side*2.17,.77,76.00)
+      ]);
+      const breeching=new T.Mesh(new T.TubeGeometry(cable,16,.088,7,false),gunRope);
+      breeching.name='first-person-cannon-breeching-rope';
+      group.add(breeching);
     }
     const breech=new T.Mesh(new T.SphereGeometry(1.40,16,12),metal);
     breech.position.copy(breechPoint);group.add(breech);
