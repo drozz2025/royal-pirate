@@ -2334,3 +2334,131 @@
 @media(max-height:690px){
   .w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){min-height:257px}
 }
+
+/* WORK 8 | 16 Nov 05:27 — third artwork/composition pass, mosaic 07/08.
+   Only these two work8 screens. Five leaderboard places are visual slots:
+   exactly one local player; no invented people, online data or awards.
+   The approved Porto shell, HUD and bottom menu must remain unchanged. */
+.w8-screen.w8-approved .w8-approved-scene .w8-seascape{
+  filter:saturate(1.37) contrast(1.08);
+}
+.w8-screen.w8-approved .w8-approved-scene{
+  background:
+    radial-gradient(ellipse 24% 14% at 11% 5%,#e4fdff45,transparent),
+    radial-gradient(ellipse 25% 17% at 87% 9%,#fedc9b3b,transparent);
+}
+.w8-screen.w8-approved .w8-approved-title::before{
+  border-radius:43% 43% 20% 20%/42% 42% 18% 18%;
+  outline:1px solid #ffd69345;
+  outline-offset:2px;
+}
+.w8-approved-missions .w8-approved-quest{
+  position:relative;
+  overflow:hidden;
+  border-left-width:3px;
+  border-right-width:3px;
+  background:
+    radial-gradient(ellipse 53% 65% at 0% 20%,#9ed7c12f,transparent 86%),
+    linear-gradient(175deg,#25678cf9 0%,#0e4163fa 55%,#081f3dfb 100%);
+}
+.w8-approved-missions .w8-approved-quest::after{
+  content:"";
+  position:absolute;
+  left:3px;right:3px;top:3px;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#fff5b771,transparent);
+  pointer-events:none;
+}
+.w8-approved-missions .w8-approved-quest-core>strong{
+  color:#fff4dc;
+  text-shadow:0 2px 2px #021b32;
+}
+.w8-approved-missions .w8-approved-days li{
+  background-image:linear-gradient(155deg,#1a633c,#092e2b);
+  outline:1px solid #06172d5e;
+  outline-offset:-3px;
+}
+.w8-approved-missions .w8-approved-days li:nth-child(4){
+  background-image:linear-gradient(155deg,#547a95,#142d4c);
+}
+.w8-approved-missions .w8-approved-days li:nth-child(5){
+  background-image:linear-gradient(155deg,#a67630,#452713);
+}
+.w8-approved-missions .w8-approved-days li:nth-child(6){
+  background-image:linear-gradient(155deg,#68458a,#241644);
+}
+.w8-approved-missions .w8-approved-days li:nth-child(7){
+  background-image:linear-gradient(155deg,#cb9439,#4d290c);
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+  border-color:#f0c77d;
+  background:
+    radial-gradient(ellipse 65% 55% at 50% 1%,#2b71966b,transparent 85%),
+    linear-gradient(180deg,#174c73f8,#0c3155fa 60%,#071f3dfe);
+}
+.w8-approved-ranking .w8-approved-empty-rank{
+  display:grid;
+  grid-template-columns:31px 34px minmax(0,1fr) 34px;
+  gap:7px;
+  align-items:center;
+  min-height:43px;
+  padding:4px 6px;
+  border-bottom:1px solid #b8d0c53d;
+}
+.w8-approved-ranking .w8-approved-empty-portrait{
+  display:grid;place-items:center;
+  overflow:hidden;
+  width:32px;height:34px;
+  border:2px solid #b89b68;
+  border-radius:6px;
+  background:radial-gradient(circle at 40% 27%,#567c94,#183958 76%,#071b35);
+  opacity:.8;
+}
+.w8-approved-ranking .w8-approved-empty-portrait svg{
+  width:28px;height:29px;
+  filter:saturate(.65);
+}
+.w8-approved-ranking .w8-approved-empty-rank strong{
+  min-width:0;
+  color:#e6edf0;
+  font-size:clamp(10px,2.85vw,12px);
+  line-height:1.08;
+  text-transform:uppercase;
+  letter-spacing:.15px;
+}
+.w8-approved-ranking .w8-approved-empty-score{
+  text-align:right;
+  font:900 15px/1 'Barlow Condensed',sans-serif;
+  color:#e3cc96;
+}
+.w8-approved-ranking .w8-approved-local-row{
+  border-color:#f9d489;
+  box-shadow:inset 0 1px #e3f6ff91,0 0 0 1px #8c642b;
+}
+@media(max-width:350px){
+  .w8-approved-ranking .w8-approved-empty-rank{
+    grid-template-columns:25px 27px minmax(0,1fr) 16px;
+    gap:4px;
+    padding:3px 4px;
+    min-height:38px;
+  }
+  .w8-approved-ranking .w8-approved-empty-portrait{
+    width:27px;height:29px;
+  }
+  .w8-approved-ranking .w8-approved-empty-portrait svg{
+    width:24px;height:25px;
+  }
+  .w8-approved-ranking .w8-approved-empty-rank strong{font-size:9px}
+  .w8-approved-ranking .w8-approved-empty-score{font-size:12px}
+}
+@media(min-width:420px){
+  .w8-approved-ranking .w8-approved-empty-rank{
+    grid-template-columns:34px 38px minmax(0,1fr) 40px;
+    min-height:47px;
+    gap:8px;
+  }
+  .w8-approved-ranking .w8-approved-empty-portrait{width:36px;height:38px}
+}
+@media(max-height:690px){
+  .w8-approved-ranking .w8-approved-empty-rank{min-height:35px}
+}
