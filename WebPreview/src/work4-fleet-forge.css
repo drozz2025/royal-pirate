@@ -2018,3 +2018,25 @@
     top:7%;
   }
 }
+
+
+/* WORK 4 / approved frames 03 and 04, 16 Nov midday: the vector material
+   detail above is easier to read with the vessel's stern and gunports kept
+   away from the live status column, and the cannon lower in the masonry
+   workshop (reference 04). Only reposition the artwork inside WORK4 screens.
+   The opaque Forge scene and its #158 contain:paint/translateZ(0) compositor
+   protection MUST remain unchanged. Never style harbour, shell, nav or QA. */
+@media (min-width:360px) and (max-width:659px) and (min-height:700px) {
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art {
+    width:90%;
+    left:-3%;
+    bottom:2%;
+    transform:scaleX(.89) scaleY(1.29) rotate(-1.2deg);
+    transform-origin:42% 86%;
+  }
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art {
+    width:83%;
+    left:0;
+    top:27%;
+  }
+}
