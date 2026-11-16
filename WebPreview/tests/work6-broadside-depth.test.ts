@@ -45,3 +45,34 @@ test('battle-only rails never change physics, HP, cannon flashes or Porto/nav',(
     'approved Porto still displays its live ship');
   assert.match(source,/this\.battleBattery\.visible=pose\.showBattery/);
 });
+
+test('both existing visual cannons have long iron barrels and legible mouths on 320/384/390/430',async ()=>{
+  const {makeBattleDeck}=await import('../src/battle-deck');
+  const {battleCameraPose}=await import('../src/battle-framing');
+  const {group,flashes}=makeBattleDeck();
+  assert.equal(flashes.length,2,'never add a third firing weapon');
+  const barrels:T.Mesh[]=[],muzzles:T.Mesh[]=[];
+  group.traverse(child=>{
+    if(child instanceof T.Mesh && child.name==='first-person-broadside-cannon') barrels.push(child);
+    if(child instanceof T.Mesh && child.name==='first-person-broadside-muzzle') muzzles.push(child);
+  });
+  assert.equal(barrels.length,2);
+  assert.equal(muzzles.length,2);
+  for(const barrel of barrels){
+    assert.ok(barrel.geometry instanceof T.CylinderGeometry);
+    assert.ok(barrel.geometry.parameters.height>12,
+      'a long tapered 3D barrel must read as an actual naval cannon');
+    assert.ok(barrel.geometry.parameters.radiusBottom>barrel.geometry.parameters.radiusTop);
+  }
+  for(const [w,h] of [[320,568],[384,512],[390,844],[430,932]]){
+    const pose=battleCameraPose(w/h);
+    const camera=new T.PerspectiveCamera(42,w/h,.1,220);
+    camera.position.set(...pose.position);camera.lookAt(...pose.target);camera.updateMatrixWorld();
+    for(const muzzle of muzzles){
+      const ndc=muzzle.position.clone().add(new T.Vector3(0,0,pose.batteryOffsetZ)).project(camera);
+      const x=(1+ndc.x)*w/2,y=(1-ndc.y)*h/2;
+      assert.ok(x>w*.08&&x<w*.92,`muzzle inside phone width ${w}x${h}: ${x}`);
+      assert.ok(y>h*.50&&y<h*.68,`first-person muzzle above controls ${w}x${h}: ${y}`);
+    }
+  }
+});
