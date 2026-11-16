@@ -1744,3 +1744,185 @@
   .w7-screen[data-work7-screen="cards"] .w7-future-seal .w7-approved-crop{width:min(100%,67px)}
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{width:min(100%,118px)}
 }
+
+/* WORK 7 — 16 Nov 03h visual QA: honest eight-artwork atlas from approved
+ * reference 05. No drawn/borrowed replacement images, no fake inventory.
+ * All selectors remain scoped to WORK 7; shared HUD/nav are untouched. */
+.w7-screen[data-work7-screen="cards"] .w7-collection-content{
+  gap:7px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  padding:8px 10px;min-height:34px;
+  border:2px solid #cda96e;border-radius:10px;
+  background:linear-gradient(180deg,#1c3857,#071b36);
+  box-shadow:inset 0 1px #ffe8b65c;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status strong{
+  color:#ffe2a5;font:900 clamp(11px,3.1vw,14px)/1.1 'Barlow Condensed',sans-serif;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status span{
+  flex:0 0 auto;color:#bfd3e6;
+  font:800 clamp(8px,2.15vw,10px) 'Barlow',sans-serif;text-align:right;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;
+  padding:2px 1px 5px;align-items:stretch;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+  display:flex;flex-direction:column;align-items:center;min-width:0;
+  gap:3px;padding:4px 3px 5px;overflow:hidden;
+  border:2px solid #f0b75d;border-bottom:4px solid #8f4e27;
+  border-radius:9px;
+  background:radial-gradient(ellipse at 50% 20%,#f3aa5c83,transparent 65%),
+    linear-gradient(#74435b,#1d1e43 90%);
+  box-shadow:inset 0 1px #fff0c07c,0 3px 0 #06142b;
+  color:#fff7dc;text-align:center;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+2){
+  border-color:#70c7ed;border-bottom-color:#295992;
+  background:radial-gradient(ellipse at 50% 22%,#62caff75,transparent 65%),linear-gradient(#244b9c,#141d53);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+3){
+  border-color:#89e4b6;border-bottom-color:#206e55;
+  background:radial-gradient(ellipse at 50% 22%,#78ddb08c,transparent 65%),linear-gradient(#256e61,#142d43);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+4){
+  border-color:#c887f6;border-bottom-color:#71408b;
+  background:radial-gradient(ellipse at 50% 22%,#af8aff8c,transparent 65%),linear-gradient(#57307d,#211b47);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+  width:100%;height:auto;border:1px solid #ffe7b7;
+  border-radius:6px;box-shadow:0 2px 6px #0008;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+  min-height:25px;display:grid;align-content:center;max-width:100%;
+  color:#fff7d7;font:900 clamp(10px,2.65vw,13px)/1.04 'Barlow Condensed',sans-serif;
+  overflow-wrap:anywhere;text-shadow:0 2px 2px #07132d;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  display:grid;place-items:center;min-height:19px;width:100%;
+  padding:2px 1px;border:1px solid #e1b98499;border-radius:5px;
+  background:linear-gradient(#152e4f,#071932);
+  color:#f4daa8;font:900 clamp(7px,1.92vw,9px)/1.06 'Barlow Condensed',sans-serif;
+  letter-spacing:0;overflow-wrap:anywhere;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight{
+  min-height:127px;grid-template-columns:minmax(76px,27%) minmax(0,1fr);
+  gap:8px;padding:7px;border-width:2px;border-bottom-width:5px;border-radius:14px;
+  margin-top:4px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-portrait{
+  min-height:110px;border-width:2px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info{gap:4px}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info h3{
+  font-size:clamp(20px,5.7vw,29px);line-height:1;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info p{
+  font-size:11px;line-height:1.2;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info button{
+  min-height:38px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details{
+  overflow:hidden;border:1px solid #bf955f;border-radius:10px;
+  background:linear-gradient(#153d63,#0a2747);
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details > summary{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  list-style:none;min-height:37px;padding:7px 11px;
+  color:#ffe4aa;font:900 13px 'Barlow Condensed',sans-serif;
+  cursor:pointer;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details > summary::-webkit-details-marker{display:none}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details > summary:after{
+  content:'⌄';font-size:20px;line-height:1;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details[open] > summary:after{
+  transform:rotate(180deg);
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details[open]{padding-bottom:10px}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details[open] > summary{
+  border-bottom:1px solid #b89259;margin-bottom:8px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-tools{
+  margin:0 8px 8px;padding:5px;min-height:40px;
+  background:transparent;border:0;box-shadow:none;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-tools strong{
+  font:900 12px 'Barlow Condensed',sans-serif;
+}
+.w7-screen[data-work7-screen="cards"] .w7-roster-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;margin:0 8px 4px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-roster-grid .w7-card{
+  min-height:150px;max-width:none;
+}
+.w7-screen[data-work7-screen="cards"] .w7-disclaimer{
+  margin:0;color:#b9cedd;font:600 10px/1.4 'Barlow',sans-serif;
+}
+.w7-screen[data-work7-screen="cards"] .w7-fusion-access{
+  justify-self:end;min-height:33px;padding:5px 12px;
+  border:1px solid #cba66c;border-radius:8px;
+  background:#173d60;color:#efd9ad;
+  font:900 11px 'Barlow Condensed',sans-serif;
+}
+/* Approved shop 06: larger original illustrations, offer hierarchy, real
+ * commerce disabled. Prevent local crew management from taking over viewport. */
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+  grid-template-columns:minmax(120px,46%) minmax(0,1fr);
+  min-height:166px;
+  background:radial-gradient(ellipse at 26% 42%,#d25c96a0,transparent 56%),
+    linear-gradient(120deg,#55205d,#231240 67%,#211c53);
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+  min-width:0;height:139px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+  width:min(100%,152px);
+  border:0;border-radius:10px;
+  box-shadow:0 6px 10px #10082799;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{
+  gap:7px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+  margin-top:6px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest{
+  min-height:151px;gap:4px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  min-height:86px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  width:min(100%,102px);border:0;background:transparent;
+  box-shadow:none;
+}
+.w7-screen[data-work7-screen="shop"] .w7-recruit-details{
+  margin-top:12px;
+}
+@media(max-width:390px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{gap:4px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{padding:3px 2px 5px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{font-size:10px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    grid-template-columns:minmax(104px,43%) minmax(0,1fr);
+    min-height:148px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{height:119px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{width:min(100%,138px)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest{min-height:145px}
+}
+@media(max-width:350px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{font-size:9px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{font-size:7px}
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status span{font-size:8px}
+  .w7-screen[data-work7-screen="cards"] .w7-crew-tools{flex-wrap:wrap}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    grid-template-columns:40% 1fr;padding:7px;
+  }
+}
