@@ -44,7 +44,7 @@ test('enemy galleon is red, three-masted and billowed geometry, not an overlay',
 
 test('enemy battle-only presentation leaves the tested camera and Porto intact',()=>{
   const source=readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
-  assert.match(source,/this\.ships\.enemy\.root\.rotation\.y=-\.48/);
+  assert.match(source,/this\.ships\.enemy\.root\.rotation\.y=-\.95/);
   assert.match(source,/this\.ships\.enemy\.root\.scale\.setScalar\(1\.72\)/);
   assert.match(source,/this\.ships\.player\.root\.scale\.setScalar\(1\);this\.ships\.enemy\.root\.scale\.setScalar\(1\)/);
   assert.match(source,/this\.battleForegroundSail\.visible=false;this\.worldScenery\.visible=true/);
@@ -92,4 +92,18 @@ test('red enemy broadside is sculpted three-dimensional material, without changi
     assert.equal(opponent.sails.length,5,'existing three-mast enemy sail geometry is not recreated');
     assert.equal(royal.sails.length,6,'approved royal ship and jib remain intact');
   });
+});
+
+test('live first-person Batalha has a 3D deck rail and keeps Porto styling isolated',()=>{
+  const scene=readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
+  assert.match(scene,/private dressBattleDeck\(\)/,
+    'battle-only bulwark is built from real Three.js deck geometry');
+  assert.match(scene,/this\.battleBattery\.add\(dressing\)/,
+    'the dressing must be a child of the Porto-hidden cannon deck');
+  assert.match(scene,/this\.dressBattleDeck\(\)/,
+    'the live deck has actual railing geometry, not unused code');
+  assert.match(scene,/this\.ships\.player\.root\.visible=false/,
+    'only the external playable hull is hidden while firing stays live');
+  assert.match(scene,/this\.ships\.player\.root\.visible=true/,
+    'royal ship must become visible on return to Porto');
 });
