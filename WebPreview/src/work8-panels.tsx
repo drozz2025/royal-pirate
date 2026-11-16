@@ -239,6 +239,19 @@ function W8Title({children,kind}:{children:string;kind:'flag'|'trophy'|'scroll'}
 /* Distinct original pirate portrait drawn as vector art; not cropped from the approved UI. */
 function W8CaptainPortrait(){
   return <svg className="w8-captain-portrait" viewBox="0 0 100 108" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    {/* A lit illustrated portrait, not a fabricated account or photo. */}
+    <defs>
+      <radialGradient id="w8-portrait-halo" cx=".36" cy=".24" r=".87">
+        <stop stopColor="#F7D99B"/><stop offset=".4" stopColor="#A96B35"/><stop offset="1" stopColor="#09253C"/>
+      </radialGradient>
+      <linearGradient id="w8-portrait-coat" x1=".05" y1="0" x2=".95" y2="1">
+        <stop stopColor="#3D7191"/><stop offset=".48" stopColor="#102E4D"/><stop offset="1" stopColor="#061D38"/>
+      </linearGradient>
+    </defs>
+    <circle cx="50" cy="54" r="49" fill="url(#w8-portrait-halo)" opacity=".76"/>
+    <path d="M5 76Q20 57 14 25M84 19Q90 49 97 77" stroke="#FFE4A6" strokeWidth="2" opacity=".35"/>
+    <path d="M7 92Q18 72 30 78L50 94L72 78Q87 79 94 98V108H7Z" fill="url(#w8-portrait-coat)" stroke="#E9AF5D" strokeWidth="1.8"/>
+
     <path d="M4 106Q7 83 26 78L41 70H59L74 78Q93 83 96 106Z" fill="#0A345A" stroke="#F0BF6C" strokeWidth="3"/>
     <path d="M18 96L33 77L50 94L67 77L82 96V108H18Z" fill="#173E62"/>
     <path d="M36 76L50 87L64 76L59 67H41Z" fill="#D88C5C" stroke="#773C2C" strokeWidth="2"/>
@@ -256,6 +269,15 @@ function W8CaptainPortrait(){
     <path d="M21 59Q15 62 22 70" stroke="#F5C66C" strokeWidth="3" strokeLinecap="round"/>
     <circle cx="22" cy="72" r="3" stroke="#E5BA64" strokeWidth="2"/>
     <path d="M23 101L33 84M77 101L67 84" stroke="#D8A658" strokeWidth="3"/>
+    <path d="M14 105L33 79L44 94M86 105L67 79L56 94" stroke="#F9D392" strokeWidth="2.4" strokeLinecap="round" opacity=".96"/>
+    <path d="M23 94L33 86L40 97M77 94L67 86L60 97" stroke="#C98539" strokeWidth="1.4"/>
+    <path d="M48 90L50 94L52 90L50 98Z" fill="#FCE4A5" stroke="#88521F" strokeWidth="1"/>
+    <circle cx="50" cy="103" r="2.5" fill="#F8D77C"/>
+    <path d="M31 34Q49 40 69 33" stroke="#FFEBAB" strokeWidth="1.4" opacity=".75"/>
+    <path d="M25 31Q28 23 35 22M76 31Q73 23 66 22" stroke="#FFE5A6" strokeWidth="1.5" strokeLinecap="round" opacity=".85"/>
+    <path d="M29 43Q34 40 38 40M62 40Q66 40 71 43" stroke="#FFE4B9" strokeWidth="1.2" opacity=".48"/>
+    <path d="M27 62Q28 72 38 79M73 62Q72 72 62 79" stroke="#BF7545" strokeWidth="1.1" opacity=".8"/>
+
   </svg>;
 }
 
@@ -309,6 +331,10 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
               <path d="M5 16Q8 3 17 8Q20 0 24 8Q33 3 36 16Q28 20 20 17Q12 20 5 16Z" fill="#203F58" stroke="#D5BF81" strokeWidth="1.7"/>
               <path d="M5 16Q20 22 35 16M14 11h12" fill="none" stroke="#D2B276" strokeWidth="1.7"/>
               <path d="M15 22h2M23 22h2" stroke="#25465B" strokeWidth="1.6" strokeLinecap="round"/>
+              <path d="M9 12Q20 0 31 12M9 16Q20 21 31 16" fill="none" stroke="#E8C994" strokeWidth="1.1" opacity=".75"/>
+              <path d="M12 37l7-5 2 5 6-5" fill="none" stroke="#B5C8CA" strokeWidth="1.25" opacity=".75"/>
+              <path d="M6 40Q20 33 34 40" fill="none" stroke="#F3D7A2" strokeWidth="1" opacity=".62"/>
+
             </svg>
           </span>
           <strong>{'POSIÇÃO INDISPONÍVEL'}</strong>
