@@ -2932,3 +2932,92 @@
   .w8-approved-ranking .w8-approved-local-row{min-height:49px}
   .w8-approved-ranking .w8-approved-empty-rank{min-height:39px}
 }
+
+
+/* WORK8 visual density pass 10:41, 16 Nov 2026 — issue #104.
+ * Compare 07/08 at 390x844: fit all three live quest cards and the
+ * seven-day chest strip into the same visual rhythm as the approved
+ * artwork; keep local-only player data and unchanged Porto/navigation.
+ * At 320px preserve the existing 40px+ controls and allow scrolling. */
+@media (min-width:351px){
+  .w8-approved-missions .w8-approved-quest-list{
+    min-height:0;
+    max-height:none;
+    grid-template-rows:repeat(3,minmax(76px,auto));
+    gap:7px;
+  }
+  .w8-approved-missions .w8-approved-quest{
+    min-height:76px;
+    padding:5px 6px;
+  }
+  .w8-approved-missions .w8-approved-quest-core{gap:5px}
+  .w8-approved-missions .w8-approved-daily{
+    padding:9px 7px 10px;
+  }
+  .w8-approved-missions .w8-approved-daily h3{
+    margin-bottom:8px!important;
+  }
+  .w8-approved-missions .w8-approved-days li{
+    min-height:84px;
+    padding:4px 1px 5px;
+    gap:3px;
+  }
+  .w8-approved-missions .w8-approved-chest{height:52px}
+  .w8-approved-missions .w8-approved-chest .w8-art{
+    width:100%;height:52px;max-width:100%;
+  }
+  .w8-approved-missions .w8-approved-claim-row{
+    margin-top:7px;
+  }
+
+  /* Five distinct framed positions, with only the local player filled. */
+  .w8-approved-ranking .w8-approved-captain{
+    min-height:114px;
+    grid-template-columns:76px minmax(0,1fr) 80px;
+    padding:7px 8px;
+  }
+  .w8-approved-ranking .w8-approved-avatar{
+    width:75px;height:80px;
+  }
+  .w8-approved-ranking .w8-approved-league-status .w8-art{
+    width:53px;height:54px;
+  }
+  .w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+    min-height:303px;
+    max-height:none;
+    flex:0 0 auto;
+    padding:10px 9px;
+  }
+  .w8-approved-ranking .w8-approved-leaderboard h3{
+    margin-bottom:7px!important;
+  }
+  .w8-approved-ranking .w8-approved-local-row{
+    min-height:55px;
+    padding:4px 7px;
+  }
+  .w8-approved-ranking .w8-approved-empty-rank{
+    min-height:46px;
+    flex:0 0 auto;
+    padding:3px 6px;
+    background:linear-gradient(90deg,#25506b96,#0a294500);
+    border-bottom:1px solid #6b98b17a;
+  }
+  .w8-approved-ranking .w8-approved-empty-rank:nth-of-type(2)>span:first-child{
+    border-color:#d0dce3;
+    background:linear-gradient(#89b1c8,#294861);
+    color:#fff;
+  }
+  .w8-approved-ranking .w8-approved-empty-rank:nth-of-type(3)>span:first-child{
+    border-color:#e1b38b;
+    background:linear-gradient(#a76d51,#45333c);
+    color:#fff0e3;
+  }
+}
+@media (max-width:350px){
+  .w8-approved-missions .w8-approved-claim-row small{
+    font-size:10px;line-height:1.3;
+  }
+  .w8-approved-ranking .w8-approved-empty-rank strong{
+    letter-spacing:0;
+  }
+}
