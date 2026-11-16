@@ -4,7 +4,7 @@ import { MISSIONS, battlesPlayed, canClaimDaily, nextDailyStreak, levelFor, miss
 
 
 /* Original vector artwork for the mobile mosaic. Decorative only; player values remain local. */
-type W8ArtKind='chest'|'scroll'|'cannon'|'helm'|'trophy'|'medal'|'flag';
+type W8ArtKind='chest'|'scroll'|'cannon'|'helm'|'trophy'|'medal'|'flag'|'swords'|'ship'|'target';
 function W8Art({kind}:{kind:W8ArtKind}){
   return <svg className={'w8-art w8-art-'+kind} width="92" height="92" viewBox="0 0 112 112" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
@@ -37,6 +37,35 @@ function W8Art({kind}:{kind:W8ArtKind}){
       <path d="M34 49H69M34 59H67M34 69H57" stroke="#956539" strokeWidth="5"/>
       <circle cx="76" cy="69" r="18" fill="url(#w8-royal-blue)" stroke="#FBE099" strokeWidth="5"/>
       <path d="M66 69L73 77L86 61" stroke="#FBE099" strokeWidth="6"/>
+    </g>}
+    {kind==='swords'&&<g strokeLinejoin="round" strokeLinecap="round">
+      <path d="M19 19L48 48M93 19L64 48" stroke="#D1E9F1" strokeWidth="9"/>
+      <path d="M16 13L36 18L52 45L45 52L18 36Z" fill="#EAF7FF" stroke="#6E93AB" strokeWidth="4"/>
+      <path d="M96 13L76 18L60 45L67 52L94 36Z" fill="#EAF7FF" stroke="#6E93AB" strokeWidth="4"/>
+      <path d="M42 47L86 91M70 47L26 91" stroke="#D2A052" strokeWidth="12"/>
+      <path d="M33 44L49 60M63 60L79 44" stroke="url(#w8-gold-metal)" strokeWidth="9"/>
+      <path d="M80 85L92 97M32 85L20 97" stroke="#734125" strokeWidth="12"/>
+      <circle cx="56" cy="56" r="8" fill="url(#w8-gold-metal)" stroke="#9C642F" strokeWidth="3"/>
+    </g>}
+    {kind==='ship'&&<g strokeLinejoin="round" strokeLinecap="round">
+      <path d="M13 71Q55 87 99 69L86 90Q55 104 25 89Z" fill="#9D4C34" stroke="#F4D28C" strokeWidth="5"/>
+      <path d="M56 13V83" stroke="#8B5A38" strokeWidth="7"/>
+      <path d="M51 20L24 62L50 62Z" fill="#F2E2BD" stroke="#CBA460" strokeWidth="3"/>
+      <path d="M61 22L88 64L61 64Z" fill="#E4B975" stroke="#B7803E" strokeWidth="3"/>
+      <path d="M56 16L79 21L56 28Z" fill="#C84D44" stroke="#F0C780" strokeWidth="2"/>
+      <circle cx="43" cy="83" r="4" fill="#132C49" stroke="#F3D184" strokeWidth="2"/>
+      <circle cx="65" cy="84" r="4" fill="#132C49" stroke="#F3D184" strokeWidth="2"/>
+      <path d="M8 99Q21 93 34 99T59 99T84 99T108 99" stroke="#5CDBE6" strokeWidth="4"/>
+    </g>}
+    {kind==='target'&&<g strokeLinejoin="round" strokeLinecap="round">
+      <circle cx="54" cy="59" r="39" fill="#F6E5C0" stroke="url(#w8-gold-metal)" strokeWidth="7"/>
+      <circle cx="54" cy="59" r="27" fill="#CB513F" stroke="#FFEFBC" strokeWidth="5"/>
+      <circle cx="54" cy="59" r="15" fill="#F4DA9D" stroke="#F3D78D" strokeWidth="3"/>
+      <circle cx="54" cy="59" r="6" fill="#C93D32"/>
+      <path d="M95 14L57 56" stroke="#164269" strokeWidth="7"/>
+      <path d="M94 14L103 19L93 29" fill="#F4D68F" stroke="#83512D" strokeWidth="3"/>
+      <path d="M95 14L87 8L87 22Z" fill="#59BDE1" stroke="#174D78" strokeWidth="2"/>
+      <path d="M56 56L42 72" stroke="#F2F5EB" strokeWidth="5"/>
     </g>}
     {kind==='cannon'&&<g strokeLinejoin="round" strokeLinecap="round">
       <path d="M22 73L78 73L85 85L20 85Z" fill="url(#w8-wood)" stroke="#693823" strokeWidth="5"/>
@@ -234,7 +263,7 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
           const progress=missionProgress(profile,id);
           const claimed=profile.claimedMissions.includes(id);
           const canCollect=!claimed&&progress>=mission.target;
-          const kind:W8ArtKind=index===0?'cannon':index===1?'helm':'scroll';
+          const kind:W8ArtKind=index===0?'swords':index===1?'ship':'target';
           return <article className="w8-approved-quest" key={id} data-state={claimed?'claimed':canCollect?'ready':'active'}>
             <div className="w8-approved-quest-art" aria-hidden="true"><W8Art kind={kind}/></div>
             <div className="w8-approved-quest-core">
