@@ -42,7 +42,7 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright@1.56.1
           npx playwright install --with-deps chromium
-      - name: Capture actual 320/390/430 Porto and Batalha
+      - name: Capture actual 320/384/390/430 Porto and Batalha
         working-directory: WebPreview
         run: |
           npm run dev -- --host 127.0.0.1 > /tmp/royal-work6-vite.log 2>&1 &
@@ -63,7 +63,7 @@ jobs:
                 'battle':Path('../assets/design-approved/02-batalha.webp')}
           for screen, refpath in refs.items():
               source=Image.open(refpath).convert('RGB')
-              for w,h in [(320,568),(390,844),(430,932)]:
+              for w,h in [(320,568),(384,512),(390,844),(430,932)]:
                   render=Image.open(root/f'{screen}-{w}x{h}.png').convert('RGB')
                   assert render.size==(w,h),f'{screen} screenshot is not {w}x{h}'
                   scaled=ImageOps.contain(source,(w,h),Image.Resampling.LANCZOS)
