@@ -70,7 +70,7 @@ function App(){
        <span className="battle-approved-gems" aria-label="Diamantes indisponíveis nesta versão"><i aria-hidden="true">◆</i>— <small>GEMAS INDISPONÍVEIS</small></span>
      </div>
      <h1 className="battle-approved-banner"><Icon name="anchor" size={22}/> BATALHA <Icon name="anchor" size={22}/></h1>
-   </section>
+   </section>}
    <header className="topbar"><a className="brand" href="#" aria-label="Royal Pirate"><span className="brand-emblem"><Icon name="anchor" size={28}/></span><span>ROYAL <b>PIRATE</b><small>THE FIRST BROADSIDE</small></span></a><span className="preview-pill"><i/> {compatibility?'3D COMPATIBILITY MODE':'LIVE 3D PREVIEW'}</span><button className="progress-button" aria-label="Development Progress" onClick={()=>setProgress(true)}><Icon name="chart" size={19}/><span>Development Progress</span></button></header>
    <section className="battle-hud" aria-label="Battle health"><Health name={profile.playerName||"ROYAL PIRATE"} label="CAPITÃO" value={state.player}/><div className="round"><strong className="battle-versus">VS</strong><span>RONDA {state.round.toString().padStart(2,"0")}</span></div><Health name="CAPITÃO NERO" label="INIMIGO" value={state.enemy} enemy/></section>
    <div className="scene-caption"><span className="eyebrow">THE SHATTERED ISLES</span><h1>Fortune favours<br/>the bold.</h1><p>Two captains. One open sea.</p><span className="chapter">01 <span/> FIRST ENCOUNTER</span></div>
