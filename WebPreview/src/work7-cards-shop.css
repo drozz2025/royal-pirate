@@ -1391,3 +1391,84 @@
  .w7-chest>strong{font-size:11px}
  .w7-chest-art .w7-relic-svg{height:65px}
 }
+
+
+/* WORK 7 · 16 Nov 2026 · Screens 05/06 illustrated cardbacks and chests.
+   The five shields are NON-ITEM decorative placeholders; three treasure
+   chests are preview-only. No global HUD, Porto, or shared nav selectors. */
+.w7-screen[data-work7-screen="cards"] .w7-future-card{
+  isolation:isolate;
+  background:radial-gradient(ellipse at 50% 30%,#5087a085,transparent 64%),
+    linear-gradient(155deg,#233f5d,#07182f 84%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card:before{
+  content:"";position:absolute;inset:5px;border:1px solid #ffe1a544;
+  border-radius:8px;pointer-events:none;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-seal{
+  position:relative;width:100%;height:auto;min-height:68px;
+  border:0;border-radius:0;background:none;box-shadow:none;
+  filter:drop-shadow(0 5px 2px #020f23c7);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-icon{
+  display:block;width:min(100%,82px);height:75px;overflow:visible;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>strong{
+  font-size:clamp(10px,2.7vw,15px);line-height:1.06;letter-spacing:.15px;
+  text-shadow:0 2px #041021;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>small{
+  display:inline-grid;place-items:center;min-height:19px;
+  width:min(100%,76px);padding:3px 2px;
+  border:1px solid #d6b57b99;border-radius:4px;
+  background:#071b34a6;color:#ffe5a9;font-size:clamp(8px,2.2vw,10px);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card.w7-upcoming-1{
+  background:radial-gradient(ellipse at 50% 30%,#8c5aae77,transparent 64%),linear-gradient(#3b2d60,#101833);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card.w7-upcoming-2{
+  background:radial-gradient(ellipse at 50% 30%,#58ac8b80,transparent 64%),linear-gradient(#204c50,#091f37);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card.w7-upcoming-3{
+  background:radial-gradient(ellipse at 50% 30%,#b8844f80,transparent 64%),linear-gradient(#594044,#18243a);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card.w7-upcoming-4{
+  background:radial-gradient(ellipse at 50% 30%,#a7607f80,transparent 64%),linear-gradient(#50334e,#162038);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest{
+  position:relative;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 28%,#6bdcf3a6,transparent 66%),linear-gradient(#307aab,#102a53);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-epic{
+  background:radial-gradient(ellipse at 50% 28%,#daa3ffc0,transparent 66%),linear-gradient(#723e9c,#251445);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-legend{
+  background:radial-gradient(ellipse at 50% 28%,#ffe09bc4,transparent 66%),linear-gradient(#b68743,#4c2e2c);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  position:relative;min-width:0;min-height:75px;overflow:visible;
+}
+.w7-screen[data-work7-screen="shop"] .w7-preview-chest{
+  display:block;width:100%;max-width:120px;height:90px;
+  filter:drop-shadow(0 6px 2px #061428a8);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-preview-chest,
+.w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-preview-chest{
+  filter:drop-shadow(0 6px 2px #061428a8);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  position:relative;z-index:1;
+  min-height:29px;border-width:2px;border-radius:6px;
+  background:linear-gradient(#e5dfa9,#a7a078);color:#282d2d;
+  border-color:#fff3c6;box-shadow:0 2px #514f3b;
+  font-size:clamp(10px,2.7vw,12px);letter-spacing:.15px;
+}
+@media(min-width:355px) and (max-width:519px){
+  .w7-screen[data-work7-screen="cards"] .w7-future-card{gap:2px;justify-content:space-evenly}
+  .w7-screen[data-work7-screen="cards"] .w7-future-icon{height:69px}
+  .w7-screen[data-work7-screen="shop"] .w7-preview-chest{height:83px}
+}
+@media(max-width:354px){
+  .w7-screen[data-work7-screen="cards"] .w7-future-icon{height:77px}
+  .w7-screen[data-work7-screen="shop"] .w7-preview-chest{height:75px}
+}
