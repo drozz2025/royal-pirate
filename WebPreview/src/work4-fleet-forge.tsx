@@ -502,12 +502,12 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
           <stop offset=".76" stopColor="#394858"/><stop offset="1" stopColor="#081320"/>
         </linearGradient>
         <linearGradient id="w4-r03-hull" x1="0%" y1="0%" x2="20%" y2="100%">
-          <stop stopColor="#ffe0a2"/><stop offset=".13" stopColor="#ad6734"/>
-          <stop offset=".23" stopColor="#493027"/><stop offset=".52" stopColor="#151924"/>
-          <stop offset=".85" stopColor="#432b26"/><stop offset="1" stopColor="#d18b46"/>
+          <stop stopColor="#b99569"/><stop offset=".13" stopColor="#81502f"/>
+          <stop offset=".23" stopColor="#38282a"/><stop offset=".52" stopColor="#121721"/>
+          <stop offset=".85" stopColor="#352329"/><stop offset="1" stopColor="#9c6138"/>
         </linearGradient>
         <linearGradient id="w4-r03-metal" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop stopColor="#ffefaf"/><stop offset=".48" stopColor="#b87b36"/><stop offset="1" stopColor="#60351f"/>
+          <stop stopColor="#ffe1a6"/><stop offset=".48" stopColor="#ac773d"/><stop offset="1" stopColor="#583722"/>
         </linearGradient>
       </defs>
       <g className="w4-reference-galleon-volume" pointerEvents="none">
@@ -631,8 +631,10 @@ function ForgeBackdrop(){
   <path d="M0 81L191 0M227 0L420 78" stroke="#bd8853" strokeWidth="12" opacity=".6"/>
   <path d="M24 142Q37 50 107 54Q159 54 168 138V271H24Z" fill="#2c2929" stroke="#b07d48" strokeWidth="9"/>
   <path d="M40 151Q51 85 103 85Q142 84 151 150V257H40Z" fill="#412b2b" stroke="#17151f" strokeWidth="9"/>
-  <ellipse cx="104" cy="213" rx="68" ry="80" fill="url(#w4-fireglow)" opacity=".83"/>
+  <ellipse cx="104" cy="213" rx="68" ry="80" fill="url(#w4-fireglow)" opacity=".92"/>
   <path d="M77 254Q62 228 87 197Q81 222 103 216Q96 185 119 163Q110 202 137 218Q146 239 129 259Z" fill="#ffbe4a" stroke="#ffed93" strokeWidth="3"/>
+   <path d="M90 252Q80 234 96 220Q91 237 108 233Q101 209 121 197Q113 225 129 238L122 258Z" fill="#ffe6a1" opacity=".94"/>
+   <path d="M102 252Q96 238 108 232Q105 243 114 244L118 257Z" fill="#fff9d2" opacity=".92"/>
   <path d="M0 264L420 248V305H0Z" fill="#413327" stroke="#b88f53" strokeWidth="7"/>
   <path d="M0 278L420 265M56 266L55 302M175 265L182 301M312 261L332 303" stroke="#9d7a4c" strokeWidth="3" opacity=".6"/>
   <g stroke="#cc9d5b" fill="none" strokeWidth="5"><circle cx="28" cy="232" r="27"/><path d="M28 205v54M1 232h54m-45-19 36 37m0-37-36 37"/></g>
