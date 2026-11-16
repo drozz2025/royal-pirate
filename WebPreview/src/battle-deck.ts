@@ -12,7 +12,7 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
   const darkWood = new T.MeshStandardMaterial({color:'#392b28',roughness:.88});
   const metal = new T.MeshStandardMaterial({color:'#1b2734',metalness:.76,roughness:.30});
   const bronze = new T.MeshStandardMaterial({color:'#e0ae61',metalness:.74,roughness:.27});
-  const bore = new T.MeshBasicMaterial({color:'#071019'});
+  const bore = new T.MeshBasicMaterial({color:'#071019',side:T.DoubleSide});
   const fire = new T.MeshBasicMaterial({color:'#ffe09b',transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending});
   const box = new T.BoxGeometry(1,1,1);
   const addBox = (x:number,y:number,z:number,sx:number,sy:number,sz:number,material:T.Material) => {
@@ -41,7 +41,6 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
   const flashes: T.Mesh[] = [];
   const axisUp=new T.Vector3(0,1,0);
   const axisFace=new T.Vector3(0,0,1);
-  const boreFace=new T.MeshBasicMaterial({color:'#050d13',side:T.DoubleSide});
   for(const x of [-3.15,3.15]){
     // Reuse the original two gun carriages and four spoked wheels.
     addBox(x,1.0,74.2,2.3,.62,5.3,wood);
@@ -70,7 +69,7 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     muzzle.name='first-person-broadside-muzzle';
     muzzle.position.copy(muzzlePoint);
     muzzle.quaternion.copy(rimOrientation);group.add(muzzle);
-    const darkMuzzle=new T.Mesh(new T.CircleGeometry(1.10,32),boreFace);
+    const darkMuzzle=new T.Mesh(new T.CircleGeometry(1.10,32),bore);
     darkMuzzle.position.copy(muzzlePoint).addScaledVector(direction,.045);
     darkMuzzle.quaternion.copy(rimOrientation);group.add(darkMuzzle);
     for(const t of [.20,.48,.75]){
@@ -85,7 +84,6 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     flash.position.copy(muzzlePoint).addScaledVector(direction,.22);
     flash.visible=false;group.add(flash);flashes.push(flash);
   }
-  boreFace.dispose();
   fire.dispose();
   // Rebalance the foreground after moving the portrait camera toward the ships.
   // Keep both real muzzles inside the lower third, rather than letting them
