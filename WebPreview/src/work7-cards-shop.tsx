@@ -106,47 +106,40 @@ function ShopRelic({kind}:{kind:'coins'|'gems'|'special'}) {
 
 /** Decorative SVG panorama. All game state remains in LocalProfile. */
 function MastheadScene({kind}:{kind:'cards'|'shop'}) {
-  const shop=kind==='shop';
-  const sky='w7-scene-sky-'+kind,water='w7-scene-water-'+kind;
-  return <svg className="w7-masthead-art" viewBox="0 0 380 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  // Local decorative sky/shore illustration. Labels, wallet and tabs remain
+  // live HTML: never render the approved whole-page screenshot as a background.
+  const sky='w7-scene-sky-'+kind;
+  return <svg className="w7-masthead-art" viewBox="0 0 380 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
     <defs>
-      <linearGradient id={sky} x1="0" y1="0" x2="0" y2="1">
-        <stop stopColor="#377ea2"/><stop offset=".53" stopColor="#164465"/><stop offset="1" stopColor="#071f41"/>
-      </linearGradient>
-      <linearGradient id={water} x1="0" y1="0" x2="0" y2="1">
-        <stop stopColor="#51aab7"/><stop offset="1" stopColor="#092d50"/>
+      <linearGradient id={sky} x1="0" x2="0" y1="0" y2="1">
+        <stop stopColor="#247ca9"/><stop offset=".42" stopColor="#55b4d7"/>
+        <stop offset=".74" stopColor="#98dcf1"/><stop offset="1" stopColor="#3187b9"/>
       </linearGradient>
     </defs>
-    <rect width="380" height="150" fill={'url(#'+sky+')'}/>
-    <circle cx="296" cy="39" r="31" fill="#ffdda0" opacity=".66"/>
-    <path d="M100 83Q141 59 188 82L220 67 259 81 301 68 347 82 380 72V150H90Z" fill="#0a2c48" opacity=".75"/>
-    <path d="M140 102Q210 93 263 99T380 96V150H120Z" fill={'url(#'+water+')'}/>
-    <path d="M100 118Q169 109 224 119T380 117M112 136Q199 124 280 135T380 131" fill="none" stroke="#8be0df" strokeWidth="2.5" opacity=".44"/>
-    {shop ? <g transform="translate(224 18)">
-      <ellipse cx="79" cy="121" rx="85" ry="11" fill="#031225" opacity=".6"/>
-      <path d="M15 79H139V122H15Z" fill="#5d3826" stroke="#dfb467" strokeWidth="4"/>
-      <path d="M3 73L18 35H138L154 73Z" fill="#b54139" stroke="#ffe19c" strokeWidth="4"/>
-      <path d="M18 36H138L131 51H25Z" fill="#e7ba66"/>
-      <path d="M3 73L18 35 35 73M51 73L58 35 66 73M84 73L93 35 102 73M118 73L138 35 154 73" fill="#8e2936" stroke="#f3c67b" strokeWidth="2"/>
-      <path d="M24 79V122M130 79V122" stroke="#f7cb77" strokeWidth="9"/>
-      <rect x="43" y="78" width="68" height="34" rx="6" fill="#152c48" stroke="#f5cd81" strokeWidth="3"/>
-      <path d="M52 90H103M56 100H99" stroke="#ffe3a6" strokeWidth="3" strokeLinecap="round"/>
-      <circle cx="78" cy="31" r="8" fill="#fbe9ad" stroke="#bd7b31" strokeWidth="3"/>
-      <path d="M78 23V10M69 11H87" stroke="#ffebaa" strokeWidth="4" strokeLinecap="round"/>
-      <circle cx="8" cy="116" r="8" fill="#edb95c"/><circle cx="153" cy="118" r="8" fill="#eec86b"/>
-    </g> : <g transform="translate(218 12)">
-      <ellipse cx="78" cy="126" rx="88" ry="10" fill="#031225" opacity=".7"/>
-      <path d="M3 103L153 103 126 124H35Z" fill="#7f4c2f" stroke="#f4c57c" strokeWidth="5"/>
-      <path d="M29 101L52 55H119L143 101Z" fill="#251e34" stroke="#eebf79" strokeWidth="3"/>
-      <path d="M75 104V5M114 103V19" stroke="#e6b46e" strokeWidth="5"/>
-      <path d="M72 12L19 79H72Z" fill="#e8d8b5" stroke="#fff3d5" strokeWidth="3"/>
-      <path d="M80 14L127 72H80Z" fill="#252d44" stroke="#dfba72" strokeWidth="3"/>
-      <path d="M111 24L143 76H111Z" fill="#20283e" stroke="#dfba72" strokeWidth="3"/>
-      <path d="M75 5L98 11 75 19Z" fill="#bc4b3d"/>
-      <path d="M43 105V117M62 105V120M84 105V121M108 105V119" stroke="#f4b965" strokeWidth="3"/>
-      <path d="M9 108Q77 118 146 109" fill="none" stroke="#faf0c6" strokeWidth="3" opacity=".7"/>
-    </g>}
-    <path d="M200 33l7 -3 7 3M178 46l6 -2 5 2" fill="none" stroke="#fff1cb" strokeWidth="2" strokeLinecap="round" opacity=".75"/>
+    <rect width="380" height="100" fill={'url(#'+sky+')'}/>
+    <circle cx="281" cy="30" r="23" fill="#ffe7ad" opacity=".85"/>
+    <path d="M68 21q20 -15 37 -3 20 -9 34 5-32 5-71-2ZM236 51q22-17 43-3 26-13 47 5-46 7-90-2Z" fill="#f8ffff" opacity=".72"/>
+    <path d="M0 74q38 -9 74 0 38 -11 80-1 42 -10 77 0 46 -12 75-2 34 -7 74 0v29H0Z" fill="#1a83aa" opacity=".7"/>
+    <path d="M0 81q79 -7 153 0t132-1 95 0M0 89q70 -5 135 0t119 0 126 0" stroke="#c3faff" strokeWidth="2" fill="none" opacity=".55"/>
+    <path d="M0 76q34 -24 63-4L0 87ZM380 76q-30 -23 -66-2L380 89Z" fill="#2b815b"/>
+    <g fill="#1f7756" stroke="#124d43" strokeWidth="1.3" strokeLinejoin="round">
+      <path d="M10 101Q21 65 37 30" fill="none" stroke="#795535" strokeWidth="8"/>
+      <path d="M37 30Q16 13 -11 29 16 26 37 35Z"/>
+      <path d="M37 30Q30 2 9-9 27 16 39 34Z"/>
+      <path d="M37 30Q61 8 83 18 58 21 39 35Z"/>
+      <path d="M37 30Q68 31 80 57 55 37 36 34Z"/>
+      <path d="M37 30Q5 42 -4 63 17 47 39 34Z"/>
+      <path d="M37 30Q51 8 53-7 37 9 35 33Z"/>
+    </g>
+    <g transform="translate(380 0) scale(-1 1)" fill="#277e55" stroke="#145846" strokeWidth="1.3" strokeLinejoin="round">
+      <path d="M10 101Q21 65 37 30" fill="none" stroke="#88603b" strokeWidth="8"/>
+      <path d="M37 30Q16 13 -11 29 16 26 37 35Z"/>
+      <path d="M37 30Q30 2 9-9 27 16 39 34Z"/>
+      <path d="M37 30Q61 8 83 18 58 21 39 35Z"/>
+      <path d="M37 30Q68 31 80 57 55 37 36 34Z"/>
+      <path d="M37 30Q5 42 -4 63 17 47 39 34Z"/>
+      <path d="M37 30Q51 8 53-7 37 9 35 33Z"/>
+    </g>
   </svg>;
 }
 

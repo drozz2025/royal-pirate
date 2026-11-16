@@ -3257,3 +3257,80 @@
     background-size:9px 9px,9px 9px,8px 8px,8px 8px;
   }
 }
+
+
+/* WORK7 / #104 — narrow illustrated title plaque, native 384×512 comparison.
+ * The approved 05/06 wood medallion occupies about half of the art width,
+ * while the previous live banner ran over two-thirds and concealed the
+ * tropical backdrop. Only the 05/06 LOCAL masthead is affected.
+ * Existing HTML titles/tabs remain selectable and readable. Never replace
+ * live UI with a static approved screenshot. approved:false.
+ */
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type{
+  width:clamp(185px,56%,220px);
+  max-width:calc(100% - 32px);
+  height:44px;
+  padding:1px 23px 3px;
+  border:3px ridge #ffe1a0;
+  border-radius:38% 38% 22% 22% / 29% 29% 36% 36%;
+  background:
+    radial-gradient(ellipse 66% 38% at 50% 0%,#f0bf6b52,transparent 95%),
+    repeating-linear-gradient(0deg,#ffdda30c 0 1px,transparent 1px 6px),
+    linear-gradient(90deg,#89512c 0%,#392017 14%,#5a321e 48%,#392017 86%,#89512c 100%);
+  box-shadow:
+    inset 0 2px 0 #ffefc2,
+    inset 0 -4px 0 #170d0b,
+    inset 0 0 0 2px #8d5827,
+    0 2px 0 #f4cf81,
+    0 5px 0 #74411d,
+    0 8px 10px #071a30a8;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::after,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::after{
+  content:"⚓︎";
+  position:absolute;
+  top:50%;
+  font-size:clamp(17px,4.8vw,22px);
+  line-height:1;
+  color:#ffe4a0;
+  text-shadow:0 1px 0 #442314,0 0 4px #ffde9673;
+  pointer-events:none;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::before{
+  left:6px;
+  transform:translateY(-52%) rotate(-16deg);
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::after,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::after{
+  left:auto;
+  right:6px;
+  transform:translateY(-52%) rotate(16deg);
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero .w7-masthead-art,
+.w7-screen[data-work7-screen="shop"] .w7-hero .w7-masthead-art{
+  opacity:1;
+  filter:saturate(1.22) brightness(1.12);
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero h2,
+.w7-screen[data-work7-screen="shop"] .w7-hero h2{
+  font-size:clamp(25px,7.15vw,31px)!important;
+  letter-spacing:.35px;
+  line-height:1.02!important;
+  white-space:nowrap;
+}
+@media (max-width:354px), (max-height:640px){
+  .w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type,
+  .w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type{
+    width:clamp(180px,58%,205px);
+    height:40px;
+    padding-inline:22px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-hero h2,
+  .w7-screen[data-work7-screen="shop"] .w7-hero h2{
+    font-size:clamp(24px,7.2vw,28px)!important;
+  }
+}
