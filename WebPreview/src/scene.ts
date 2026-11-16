@@ -448,11 +448,11 @@ export class OceanScene {
     const pose=battleCameraPose(this.host.clientWidth/Math.max(1,this.host.clientHeight));
     this.camera.position.set(...pose.position);
     // A fixed forward-looking viewpoint, not the rejected moving camera.
-    // Aim just starboard of the centreline: the red galleon is ahead, the
-    // curved black player sail and real cannon barrels frame the foreground.
-    // Keep the wider red galleon inside 320/390/430 with a fixed static
-    // viewpoint. This does not animate or pan the rejected battle camera.
-    this.controls.target.set(pose.target[0]+(pose.showBattery?5.0:0),pose.target[1]+(pose.showBattery?.45:0),pose.target[2]);
+    // The battle-only camera targets the actual fixed pose in battle-framing.ts.
+    // On 320/384 the starboard enemy is closer, right-of-centre and framed
+    // above both real foreground cannon muzzles. 390/430 retain their prior
+    // fixed pose; this never moves the camera while the battle runs.
+    this.controls.target.set(...pose.target);
     this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;
     this.battleBattery.visible=pose.showBattery;
     this.battleBattery.position.z=pose.batteryOffsetZ;
