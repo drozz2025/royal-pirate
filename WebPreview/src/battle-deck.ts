@@ -1,5 +1,53 @@
 import * as T from 'three';
 
+/**
+ * Deterministic, battle-only painted teak. Real UV texture on the existing
+ * deck meshes: no screenshot overlay, network fetch or new interaction.
+ * In Node's headless geometry tests the original flat material remains valid.
+ */
+function paintedDeckTimber(base:string, seed:number): T.MeshStandardMaterial {
+  const material=new T.MeshStandardMaterial({color:base,roughness:.82,metalness:0});
+  material.userData.battleTimber=true;
+  if(typeof document==='undefined')return material;
+  const canvas=document.createElement('canvas');
+  canvas.width=512;canvas.height=512;
+  const ctx=canvas.getContext('2d');
+  if(!ctx)return material;
+  let state=seed>>>0;
+  const random=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};
+  ctx.fillStyle=base;ctx.fillRect(0,0,512,512);
+  // Alternating warm oak light and tarred seams follow the LENGTH of each plank.
+  const glaze=ctx.createLinearGradient(0,0,512,0);
+  glaze.addColorStop(0,'#24130c6b');glaze.addColorStop(.10,'#ffdda034');
+  glaze.addColorStop(.49,'#f6c07818');glaze.addColorStop(.88,'#23120935');
+  glaze.addColorStop(1,'#21110a70');
+  ctx.fillStyle=glaze;ctx.fillRect(0,0,512,512);
+  for(let i=0;i<195;i++){
+    const x=random()*512, swing=(random()-.5)*13;
+    ctx.strokeStyle=random()>.52?'rgba(47,23,14,.18)':'rgba(255,222,153,.13)';
+    ctx.lineWidth=.6+random()*3.2;
+    ctx.beginPath();ctx.moveTo(x,0);
+    ctx.bezierCurveTo(x+swing,120,x-swing*.7,360,x+(random()-.5)*12,512);
+    ctx.stroke();
+  }
+  // Small hand-painted knots, never a repeated generic wood-gradient rectangle.
+  for(let i=0;i<7;i++){
+    const x=25+random()*460,y=36+random()*438;
+    ctx.strokeStyle='rgba(48,22,13,.20)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.ellipse(x,y,4+random()*8,13+random()*19,random()*.24,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle='rgba(255,218,152,.14)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.ellipse(x+4,y,7+random()*8,17+random()*15,.1,0,Math.PI*2);ctx.stroke();
+  }
+  const tex=new T.CanvasTexture(canvas);
+  tex.colorSpace=T.SRGBColorSpace;
+  tex.anisotropy=4;
+  tex.userData.backgroundColor=base;
+  material.map=tex;
+  material.color.set('#ffffff');
+  return material;
+}
+
+
 /** Original live Three.js cannon deck for the Batalha portrait camera.
  * Decorative geometry only: aiming, damage and shots remain in Battle.
  * Never displayed in Porto, never replaces the real moving ships.
@@ -7,8 +55,8 @@ import * as T from 'three';
 export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
   const group = new T.Group();
   group.name = 'battle-foreground-cannons';
-  const wood = new T.MeshStandardMaterial({color:'#834823',roughness:.87});
-  const plank = new T.MeshStandardMaterial({color:'#b27740',roughness:.89});
+  const wood = paintedDeckTimber('#91522f',73);
+  const plank = paintedDeckTimber('#bc8250',39);
   const darkWood = new T.MeshStandardMaterial({color:'#392b28',roughness:.88});
   const metal = new T.MeshStandardMaterial({color:'#1b2734',metalness:.76,roughness:.30});
   const bronze = new T.MeshStandardMaterial({color:'#e0ae61',metalness:.74,roughness:.27});
