@@ -1287,3 +1287,283 @@
   .w4-fleet .w4-approved-thumb-3::before{background-position:-101px -314px}
   .w4-fleet .w4-approved-thumb-4::before{background-position:-182px -314px}
 }
+
+
+
+/* WORK 4 / 16 Nov 04:00 — responsive fidelity pass 03-04
+   Reference: assets/design-approved/03-frota.webp and 04-melhorias-forja.webp.
+   Keep the actual SVG ship/cannon and interactive DOM. Never use a whole
+   reference screenshot as the stage/background. No global nav or Porto rules.
+   Short phones scroll the content; the shared bottom dock remains untouched. */
+.w4-fleet,.w4-forge{--w4-stage-border:#dfb26b;--w4-panel-navy:#0a253f}
+.w4-screen .w4-tabs{
+  gap:4px;
+  padding:0 2px 5px;
+}
+.w4-screen .w4-tabs button{
+  min-height:47px;
+  border:2px solid #bc9159;
+  border-radius:8px;
+  padding:5px 3px 4px;
+  background:linear-gradient(180deg,#225372,#0a2949 48%,#071a30);
+  box-shadow:inset 0 2px #bfe9fc5c,0 2px #4b2c1a;
+  color:#fff2d4;
+}
+.w4-screen .w4-tabs button[aria-selected=true]{
+  background:linear-gradient(#52b6df,#167fae 42%,#064266);
+  box-shadow:inset 0 2px #ecfcffbd,0 0 0 1px #684124,0 3px #39271d;
+}
+.w4-screen .w4-tabs .w4-tab-symbol{width:19px;height:19px}
+
+/* FROTA: use the artwork as an actual illustrated object, much closer to
+   the reference silhouette, with the real ownership data placed to its right. */
+.w4-fleet #w4-fleet-panel{gap:5px}
+.w4-fleet .w4-harbour-stage{
+  min-height:clamp(285px,42dvh,388px);
+  border:3px solid var(--w4-stage-border);
+  border-radius:12px;
+  background:
+    radial-gradient(ellipse 52% 26% at 49% 12%,#d9faffbb,transparent 95%),
+    linear-gradient(180deg,#1679bd 0%,#1599ca 34%,#1fbdc6 56%,#075d89 81%,#08304c);
+  box-shadow:0 0 0 2px #50321e,0 5px 13px #041d36dc,inset 0 2px #ffedc4ad;
+}
+.w4-fleet .w4-tropical-art{
+  position:absolute;
+  inset:0;width:100%;height:100%;
+  opacity:.98;filter:saturate(1.3) drop-shadow(0 3px 3px #062d40a6);
+}
+.w4-fleet .w4-harbour-stage>.w4-ship-art{
+  position:absolute;
+  width:91%;
+  max-width:none;
+  height:auto;
+  left:-6%;
+  bottom:4%;
+  margin:0;
+  transform:scale(1.08) rotate(-2deg);
+  transform-origin:28% 90%;
+  filter:saturate(1.19) contrast(1.09) drop-shadow(0 15px 5px #052536c9) drop-shadow(0 1px 4px #e6d18d99);
+}
+.w4-fleet .w4-stage-label{
+  right:2.3%;top:27%;width:36%;max-width:none;
+  padding:7px 5px 8px 9px;gap:1px;min-height:0;
+  border:0;border-left:2px solid #e7c27b8c;
+  border-radius:0 9px 9px 0;
+  background:linear-gradient(90deg,#051f39a8,#062949e9);
+  box-shadow:5px 3px 10px #05223a85;
+  text-align:left;
+}
+.w4-fleet .w4-stage-label:before{display:none}
+.w4-fleet .w4-stage-label>span{
+  font:900 clamp(10px,2.8vw,13px)/1.08 'Barlow Condensed',sans-serif;
+  color:#ffdb8d;
+}
+.w4-fleet .w4-stage-label>strong{
+  margin-top:1px;
+  color:#fff7d8;
+  font:900 clamp(18px,5vw,27px)/1 'Barlow Condensed',sans-serif;
+  letter-spacing:.1px;
+}
+.w4-fleet .w4-stage-label>small{
+  font:700 clamp(8px,2.3vw,11px)/1.16 'Barlow',sans-serif;
+  color:#d1eefa;
+}
+.w4-fleet .w4-stage-stats{margin-top:5px;padding-top:4px;gap:2px}
+.w4-fleet .w4-stage-stats>span{
+  min-height:22px;
+  border-bottom:1px solid #e8d1a634;
+  padding:3px 1px;
+}
+.w4-fleet .w4-stage-stats>span>strong,.w4-fleet .w4-stage-stats em{
+  font-size:clamp(10px,2.65vw,13px);line-height:1;
+}
+.w4-fleet .w4-stage-label>b{
+  align-self:flex-end;margin-top:5px;
+  padding:3px 11px;
+  background:linear-gradient(#8ce561,#23983c 55%,#0a6f2d);
+  border:2px solid #d5eeb4;
+  font:900 clamp(12px,3.1vw,17px)/1 'Barlow Condensed',sans-serif;
+  box-shadow:0 2px #173b28,0 0 6px #a3f47c8c;
+}
+.w4-fleet .w4-cards-caption{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;
+}
+.w4-fleet .w4-ship-roster{margin-top:0;gap:5px;padding:0 1px 3px}
+.w4-fleet .w4-ship-slot{
+  min-height:clamp(112px,16dvh,147px);
+  padding:4px 1px 6px;
+  gap:2px;
+  border:2px solid #c08f54;border-radius:9px;
+  background:linear-gradient(160deg,#28638b 0%,#104063 52%,#071b37);
+  box-shadow:inset 0 2px #c0eafa7d,0 3px 6px #061d32bf;
+}
+.w4-fleet .w4-ship-slot.is-pending{
+  opacity:1;border-style:solid;border-color:#7f9aa0;
+  background:linear-gradient(155deg,#255776,#0c2d4a 74%,#071e38);
+}
+.w4-fleet .w4-ship-slot.is-active{
+  border:3px solid #ffecaa;
+  background:linear-gradient(#1e81ae,#14567b 52%,#071f3b);
+  box-shadow:0 0 0 1px #af7439,0 0 12px #f6c65ba6,inset 0 2px #efffff9c;
+}
+.w4-fleet .w4-ship-slot .w4-slot-art,
+.w4-fleet .w4-ship-slot.is-active .w4-slot-art{
+  height:clamp(67px,10.6dvh,96px);
+}
+.w4-fleet .w4-ship-small{
+  width:135px;height:95px;transform:translate(-13%,-12px) scale(.97);
+}
+.w4-fleet .w4-ship-slot strong{
+  font-size:clamp(11px,2.8vw,14px);
+  letter-spacing:0;
+}
+.w4-fleet .w4-ship-slot small{
+  font-size:clamp(7px,1.8vw,9px);
+  letter-spacing:0;
+  line-height:1.08;
+}
+.w4-fleet #w4-fleet-panel>.w4-fleet-state{margin-top:3px}
+.w4-fleet .w4-action-pair button{min-height:44px}
+.w4-fleet .w4-footnote{font-size:10px;line-height:1.3}
+
+/* FORJA: stronger timber/fire backdrop, a complete left-facing cannon, a
+   restrained upgrade panel and a single resources area before the real action. */
+.w4-forge #w4-forge-panel{gap:5px}
+.w4-forge .w4-forge-stage{
+  min-height:clamp(300px,42dvh,378px);
+  border:3px solid #d7a86b;
+  border-radius:12px 12px 4px 4px;
+  background:radial-gradient(ellipse 48% 71% at 18% 76%,#f39e4baa,transparent 95%),
+             linear-gradient(130deg,#6f482d 0%,#53332b 38%,#2c292f 66%,#08243e);
+  box-shadow:0 0 0 2px #54321c,0 5px 12px #041c30e3,inset 0 2px #f1e0b190;
+}
+.w4-forge .w4-forge-art{
+  position:absolute;
+  inset:0;width:100%;height:100%;
+  opacity:1;filter:saturate(1.25) contrast(1.09);
+}
+.w4-forge .w4-forge-glow{
+  opacity:1;inset:auto 35% 4% 3%;height:145px;
+  background:radial-gradient(ellipse,#ffa83d80,#e4612640 40%,transparent 72%);
+}
+.w4-forge .w4-forge-stage .w4-cannon-art{
+  position:absolute;
+  left:-2%;bottom:1%;width:82%;height:auto;
+  transform:rotate(-3deg) scale(1.03);
+  transform-origin:46% 80%;
+  filter:saturate(1.17) contrast(1.07) drop-shadow(0 12px 7px #190e13e8);
+}
+.w4-forge .w4-forge-stage>.w4-ship-art{width:78%;left:0;bottom:5%}
+.w4-forge .w4-forge-description{
+  top:8%;right:2%;width:47%;max-width:none;
+  min-height:0;max-height:82%;
+  padding:9px 8px;gap:3px;overflow:hidden;
+  border:2px solid #c79c64;border-radius:9px;
+  background:linear-gradient(170deg,#183b51d9,#071e35f4 70%,#071728f4);
+  box-shadow:0 5px 10px #071a29b8,inset 0 1px #e4e0c777;
+}
+.w4-forge .w4-forge-medallion{
+  width:42px;height:42px;
+  border:2px solid #f6db9b;border-radius:6px;
+  background:radial-gradient(circle at 32% 25%,#ffe5a3,#be8747 76%);
+}
+.w4-forge .w4-forge-medallion .w4-tab-symbol{width:28px;height:28px}
+.w4-forge .w4-forge-description>span{font-size:9px;line-height:1.05}
+.w4-forge .w4-forge-description h3{
+  margin:2px 0;
+  color:#ffebbd;
+  font:900 clamp(20px,5.4vw,28px)/1 'Barlow Condensed',sans-serif;
+}
+.w4-forge .w4-forge-description>strong{
+  font:900 clamp(15px,4.15vw,22px)/1.03 'Barlow Condensed',sans-serif;
+}
+.w4-forge .w4-forge-live-levels{margin-top:5px;padding-top:4px}
+.w4-forge .w4-forge-live-level{min-height:22px;padding:2px 4px}
+.w4-forge .w4-forge-live-level>i{height:3px;margin-top:2px}
+.w4-forge .w4-materials{
+  margin:-5px 1px 0;padding:7px 8px 5px;
+  border:2px solid #d1aa70;border-radius:3px 3px 11px 11px;
+  background:linear-gradient(160deg,#204a68,#0b2845 65%,#081f3b);
+  box-shadow:0 0 0 1px #46301d,inset 0 2px #d5f4fb54;
+}
+.w4-forge .w4-materials h3{
+  font-size:clamp(16px,4.3vw,21px);
+  text-align:center;
+  margin:0 0 6px;
+}
+.w4-forge .w4-resource-grid{gap:0}
+.w4-forge .w4-resource-grid>div{
+  min-height:65px;padding:3px 4px 4px;
+  border:0;border-radius:0;
+  border-right:1px solid #a5aeb16b;
+  background:transparent;box-shadow:none;
+}
+.w4-forge .w4-resource-grid>div:last-child{border-right:0}
+.w4-forge .w4-resource-grid>div>span{width:100%;height:25px;font-size:23px}
+.w4-forge .w4-resource-grid small{font-size:clamp(8px,2.13vw,10px)}
+.w4-forge .w4-resource-grid strong{font-size:clamp(16px,4.4vw,22px)}
+.w4-forge .w4-materials>p{
+  margin:1px auto 0;max-width:33em;
+  font-size:9px;line-height:1.15;color:#b9d1e0;
+}
+.w4-forge .w4-improve-button{
+  display:block;width:min(90%,360px);
+  min-height:55px;margin:-2px auto 2px;
+  border:3px solid #ffdc8d!important;border-radius:11px;
+  font-size:clamp(18px,5.1vw,24px);line-height:1.08;
+  box-shadow:0 0 0 2px #624021,0 4px #583a1f,0 6px 10px #071b2baf,inset 0 2px #eeffdb7f;
+}
+.w4-forge .w4-improve-button:disabled{
+  border-color:#b4bba9!important;
+  background:linear-gradient(#69837a,#294e50);
+}
+.w4-forge .w4-attributes{margin-top:7px}
+
+/* 320×568: never compress the Porto dock; only internal panels adapt and
+   remain vertically scrollable behind the fixed common navigation. */
+@media(max-width:359px){
+  .w4-screen .w4-tabs{gap:3px}
+  .w4-screen .w4-tabs button{min-height:43px;padding:3px 1px;font-size:10px}
+  .w4-screen .w4-tabs .w4-tab-symbol{width:17px;height:17px}
+  .w4-fleet .w4-harbour-stage{min-height:clamp(197px,39dvh,236px)}
+  .w4-fleet .w4-harbour-stage>.w4-ship-art{width:91%;left:-8%;bottom:3%}
+  .w4-fleet .w4-stage-label{top:18%;width:39%;right:1%;padding:5px}
+  .w4-fleet .w4-stage-label>strong{font-size:17px}
+  .w4-fleet .w4-stage-label>small{font-size:8px}
+  .w4-fleet .w4-stage-stats{gap:0;padding-top:2px;margin-top:2px}
+  .w4-fleet .w4-stage-stats>span{min-height:18px;padding:2px 0}
+  .w4-fleet .w4-stage-stats>span>strong,.w4-fleet .w4-stage-stats em{font-size:9px}
+  .w4-fleet .w4-stage-label>b{margin-top:2px;font-size:12px;padding:2px 7px}
+  .w4-fleet .w4-ship-slot{min-height:88px}
+  .w4-fleet .w4-ship-slot .w4-slot-art,.w4-fleet .w4-ship-slot.is-active .w4-slot-art{height:47px}
+  .w4-fleet .w4-approved-thumb::before{background-size:345px 460px}
+  .w4-forge .w4-forge-stage{min-height:clamp(207px,40dvh,255px)}
+  .w4-forge .w4-forge-description{top:4%;right:1%;width:47%;padding:5px}
+  .w4-forge .w4-forge-description h3{font-size:18px}
+  .w4-forge .w4-forge-description>span{font-size:8px}
+  .w4-forge .w4-forge-live-level{min-height:18px;padding:1px 3px}
+  .w4-forge .w4-forge-medallion{width:32px;height:32px}
+  .w4-forge .w4-forge-medallion .w4-tab-symbol{width:21px;height:21px}
+  .w4-forge .w4-forge-stage .w4-cannon-art{left:-4%;width:85%}
+  .w4-forge .w4-resource-grid>div{min-height:57px}
+  .w4-forge .w4-improve-button{min-height:48px}
+}
+@media(min-width:400px) and (max-width:659px){
+  .w4-fleet .w4-harbour-stage{min-height:clamp(325px,42dvh,410px)}
+  .w4-fleet .w4-harbour-stage>.w4-ship-art{width:93%;left:-6%;bottom:3%}
+  .w4-fleet .w4-ship-slot{min-height:clamp(125px,16dvh,159px)}
+  .w4-fleet .w4-ship-slot .w4-slot-art,.w4-fleet .w4-ship-slot.is-active .w4-slot-art{height:clamp(78px,10.6dvh,103px)}
+  .w4-forge .w4-forge-stage{min-height:clamp(335px,42dvh,402px)}
+  .w4-forge .w4-forge-stage .w4-cannon-art{width:85%;left:-2%}
+}
+@media(max-height:650px){
+  .w4-fleet .w4-harbour-stage{min-height:193px}
+  .w4-fleet .w4-ship-slot{min-height:89px}
+  .w4-forge .w4-forge-stage{min-height:208px}
+  .w4-forge .w4-materials>p{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  .w4-fleet .w4-harbour-stage>.w4-ship-art,
+  .w4-forge .w4-forge-stage .w4-cannon-art{transition:none;animation:none}
+}

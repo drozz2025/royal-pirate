@@ -62,7 +62,7 @@ test('forge overview reflects only purchased levels and explicitly disclaims bat
  const upgraded=improve({...initialProfile(),coins:500},'hull');
  assert.equal(upgraded.upgrades.hull,1);
  const changed=renderForge(upgraded);
- assert.match(changed,/Hull<\/strong><small>NÍVEL 1 \/ 5/);
+ assert.match(changed,/Casco<\/strong><small>NÍVEL 1 \/ 5/);
  assert.equal((changed.match(/NÍVEL 0 \/ 5/g)||[]).length,2);
  assert.match(changed,/MELHORAR/);
 });

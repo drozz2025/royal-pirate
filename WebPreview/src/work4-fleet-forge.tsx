@@ -10,6 +10,8 @@ import {CREW, UPGRADES, upgradeCost, type LocalProfile, type UpgradeId} from './
  */
 type FleetTab='mine'|'obtain'|'customize';
 type ForgeTab=UpgradeId|'armour';
+// Portuguese visual labels; underlying upgrade IDs, prices and persistence never change.
+const upgradeLabel:Record<UpgradeId,string>={hull:'Casco',cannons:'Canhões',sails:'Velas'};
 const fleetTabs:ReadonlyArray<{id:FleetTab;title:string}>=[
   {id:'mine',title:'A MINHA FROTA'},
   {id:'obtain',title:'OBTER NAVIOS'},
@@ -217,14 +219,14 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
         <div className="w4-stage-label"><span>★ NAVIO REAL</span><strong>ROYAL CROWN</strong>
           <small>1 navio disponível · Capitão {captain}</small>
           <div className="w4-stage-stats" aria-label="Níveis reais da frota">
-            {UPGRADES.map(u=><span key={u.id}><strong>{u.name}</strong><em>{profile.upgrades[u.id]} / 5</em></span>)}
+            {UPGRADES.map(u=><span key={u.id}><strong>{upgradeLabel[u.id]}</strong><em>{profile.upgrades[u.id]} / 5</em></span>)}
           </div>
           <b>✓ ATIVO</b>
         </div>
       </div>
       {tab==='mine'&&<div className="w4-fleet-state">
         <div className="w4-fleet-stats" aria-label="Melhorias locais guardadas">
-          {UPGRADES.map(u=><span key={u.id}><b>{u.name}</b><strong>{profile.upgrades[u.id]} / 5</strong></span>)}
+          {UPGRADES.map(u=><span key={u.id}><b>{upgradeLabel[u.id]}</b><strong>{profile.upgrades[u.id]} / 5</strong></span>)}
           <span><b>PROGRESSO TOTAL</b><strong>{total} / 15</strong></span>
         </div>
         <div className="w4-action-pair">
@@ -282,11 +284,11 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
         <ForgeBackdrop/>
         {tab==='cannons'?<ForgeCannonArtwork/>:<ShipArtwork part={tab==='armour'?'armour':tab==='hull'?'hull':tab}/>} 
         <div className="w4-forge-description"><div className="w4-forge-medallion"><FleetForgeSymbol id={tab}/></div><span>{upgrade?'MELHORIA LOCAL DISPONÍVEL':'FUNÇÃO FUTURA'}</span>
-          <h3>{upgrade?upgrade.name:'Armadura'}</h3>
+          <h3>{upgrade?upgradeLabel[upgrade.id]:'Armadura'}</h3>
           {upgrade?<strong>NÍVEL {level} <em>→ {max?'MAX':level+1}</em></strong>:<strong>INDISPONÍVEL</strong>}
           <div className="w4-forge-live-levels" aria-label="Níveis reais guardados no estaleiro">
             {UPGRADES.map(system=><div key={system.id} className={'w4-forge-live-level'+(tab===system.id?' is-current':'')}>
-              <span>{system.name}</span>
+              <span>{upgradeLabel[system.id]}</span>
               <b>{profile.upgrades[system.id]}/5</b>
               <i aria-hidden="true"><span style={{width:(profile.upgrades[system.id]*20)+'%'}}/></i>
             </div>)}
@@ -296,15 +298,15 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
       <div className="w4-attributes" aria-label="Atributos guardados">
         <h3>PROGRESSO DO ESTALEIRO</h3>
         {upgrade?
-          <div className="w4-level-track" role="progressbar" aria-label={'Nível de '+upgrade.name}
+          <div className="w4-level-track" role="progressbar" aria-label={'Nível de '+upgradeLabel[upgrade.id]}
             aria-valuemin={0} aria-valuemax={5} aria-valuenow={level}>
             {[1,2,3,4,5].map(i=><span key={i} className={i<=level?'is-filled':''}/>)}
           </div>:
           <p>Não existe um sistema de armadura no progresso local. Não há níveis, preços ou benefícios para apresentar.</p>}
         <div className="w4-system-levels" aria-label="Níveis locais dos sistemas do navio">
           {UPGRADES.map(u=><div key={u.id}>
-            <strong>{u.name}</strong><small>NÍVEL {profile.upgrades[u.id]} / 5</small>
-            <span role="progressbar" aria-label={u.name+' shipyard upgrade progress'} aria-valuemin={0} aria-valuemax={5}
+            <strong>{upgradeLabel[u.id]}</strong><small>NÍVEL {profile.upgrades[u.id]} / 5</small>
+            <span role="progressbar" aria-label={upgradeLabel[u.id]+' shipyard upgrade progress'} aria-valuemin={0} aria-valuemax={5}
               aria-valuenow={profile.upgrades[u.id]} className="w4-mini-track">
               <i style={{width:profile.upgrades[u.id]*20+'%'}}/>
             </span>
@@ -322,7 +324,7 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
         <p>{upgrade?'Não existe inventário de madeira, ferro ou gemas nesta versão: apenas moedas locais são usadas.':'A armadura e os respetivos materiais ainda não estão implementados.'}</p>
       </div>
       {upgrade?<button type="button" className="w4-improve-button" disabled={max||shortfall>0}
-        onClick={()=>onUpgrade(upgrade.id)} aria-label={max?'Melhoria no máximo':shortfall>0?'Moedas insuficientes, faltam '+shortfall:'Melhorar '+upgrade.name+' por '+cost+' moedas'}>
+        onClick={()=>onUpgrade(upgrade.id)} aria-label={max?'Melhoria no máximo':shortfall>0?'Moedas insuficientes, faltam '+shortfall:'Melhorar '+upgradeLabel[upgrade.id]+' por '+cost+' moedas'}>
         {max?'MELHORIA MÁXIMA':shortfall>0?'MOEDAS INSUFICIENTES':'MELHORAR · '+cost.toLocaleString('pt-PT')+' ●'}
       </button>:<button type="button" className="w4-improve-button" disabled>ARMADURA INDISPONÍVEL</button>}
       <div className="w4-action-pair"><button type="button" onClick={onFleet}>← VOLTAR À FROTA</button></div>
