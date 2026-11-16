@@ -306,7 +306,12 @@ try {
     const battleFits=battleGeometry?.canvas&&battleGeometry.ready&&!battleGeometry.error&&!battleGeometry.overflow&&
       inside(battleGeometry.fire)&&inside(battleGeometry.hud)&&inside(battleGeometry.deck)&&
       battleGeometry.views.length===5&&battleGeometry.views.every(inside)&&
-      Math.max(...battleGeometry.views.map(r=>r.bottom))<=battleGeometry.deck.top-5;
+      // Approved Battle 02 has four circular utility controls ON the timber deck,
+      // not above it. Keep FIRE centered, with tools clearly outside its hit area.
+      battleGeometry.views.slice(0,4).every(r=>r.top>=battleGeometry.deck.top-5&&r.bottom<=battleGeometry.deck.bottom+2)&&
+      battleGeometry.views[4].bottom<battleGeometry.hud.top+10&&
+      Math.abs((battleGeometry.fire.left+battleGeometry.fire.right)/2-viewport.width/2)<=4&&
+      battleGeometry.views.slice(0,4).every(r=>r.right<=battleGeometry.fire.left-3||r.left>=battleGeometry.fire.right+3);
     report.responsiveBattle??=[];
     report.responsiveBattle.push({viewport,...battleGeometry,matched:Boolean(battleFits)});
     const battleShot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
