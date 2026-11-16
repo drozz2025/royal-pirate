@@ -1692,3 +1692,20 @@
     transform-origin:46% 80%;
   }
 }
+
+
+/* WORK4 / preserve the Forge's category selector as a local sticky section tab
+   when arriving from a scrollable Fleet page. Nothing global is repositioned. */
+.w4-forge .w4-forge-tabs {
+  position:sticky;
+  top:0;
+  z-index:8;
+  isolation:isolate;
+  padding:5px 2px 7px;
+  background:linear-gradient(180deg,#092f51f8,#071e38f0);
+  box-shadow:0 4px 10px #021c32b3;
+}
+.w4-forge .w4-forge-tabs button {min-height:46px;}
+@media(max-width:359px){
+  .w4-forge .w4-forge-tabs button{min-height:42px;}
+}
