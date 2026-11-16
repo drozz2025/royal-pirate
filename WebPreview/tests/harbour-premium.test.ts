@@ -10,14 +10,15 @@ const no=()=>{};
 const render=(profile:LocalProfile)=>renderToStaticMarkup(React.createElement(Harbour,{profile,onBattle:no,onNavigate:no}));
 const css=readFileSync(new URL('../src/harbour.css',import.meta.url),'utf8');
 
-test('top bar has only actual earned coins and local wins; premium balances are not fabricated',()=>{
+test('Porto shows earned gold and a clearly unavailable diamond indicator without a fake balance',()=>{
  const html=render({...initialProfile(),coins:175,wins:3});
  assert.match(html,/175 locally earned coins/);
- assert.match(html,/3 victories from real battles/);
+ assert.match(html,/Diamantes indisponíveis/);
  assert.match(html,/aria-label="Local captain statistics"/);
- assert.doesNotMatch(html,/GEMS|PREMIUM|<strong>—<\/strong>/);
+ assert.match(html,/data-pirate-icon="ranking"|3 VITÓRIAS/);
  assert.match(html,/175<\/strong>/);
- assert.match(html,/3<\/strong>/);
+ assert.match(html,/<strong>—<\/strong>/);
+ assert.doesNotMatch(html,/PREMIUM|2\.860/);
 });
 test('level/experience bar comes directly from saved XP and honours the 20-level limit',()=>{
  const initial=render(initialProfile());
