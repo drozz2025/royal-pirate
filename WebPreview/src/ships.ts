@@ -295,6 +295,26 @@ export function makeShip(red = false): ShipArt {
     for(let i=0;i<12;i++){const y=2.7+i*.36;beam(new T.Vector3(-.28,y,z+.12),new T.Vector3(.28,y,z+.12),.014,rope);}
     for(const x of [-.28,.28])beam(new T.Vector3(x,2.5,z+.12),new T.Vector3(x,h,z+.12),.014,rope);
   }
+  // Small third foremast with batched timber, a single animated dark sail,
+  // and genuine stays. Only ONE extra mesh/draw call on the flagship, preserving
+  // the mobile geometry budget and the approved ship collision dimensions.
+  if(!red){
+    put(cylinder,honey,0,4.45,3.45,.10,4.7,.10);
+    put(cylinder,darkWood,0,6.04,3.45,.075,3.1,.075,new T.Euler(0,0,Math.PI/2));
+    const foreGeo=new T.PlaneGeometry(2.8,2.35,6,5);
+    const points=foreGeo.attributes.position;
+    for(let i=0;i<points.count;i++){
+      const ux=points.getX(i)/2.8+.5,vy=points.getY(i)/2.35+.5;
+      points.setZ(i,Math.sin(ux*Math.PI)*Math.sin(vy*Math.PI)*.42);
+    }
+    foreGeo.computeVertexNormals();
+    const foresail=new T.Mesh(foreGeo,topsailMat);
+    foresail.position.set(0,4.85,3.45);rig.add(foresail);sails.push(foresail);
+    for(const side of [-1,1]){
+      beam(new T.Vector3(side*1.4,2.65,3.15),new T.Vector3(0,6.7,3.45),.018,rope);
+      beam(new T.Vector3(side*1.35,6.0,3.45),new T.Vector3(side*1.6,2.65,4.2),.018,rope);
+    }
+  }
   // Warm lanterns at bow and stern, an original anchor-shaped bow ornament.
   for(const [x,z] of [[-1.18,-4.15],[1.18,-4.15],[0,4.95]]){put(cube,metal,x,3.1,z,.30,.50,.30);put(cube,light,x,3.12,z,.23,.34,.23);put(cylinder,gold,x,3.43,z,.23,.1,.23);}
   // Tiny crew silhouettes give the deck a sense of scale.
