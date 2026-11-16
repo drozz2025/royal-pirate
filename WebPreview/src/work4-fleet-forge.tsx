@@ -346,7 +346,6 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
     <div id="w4-forge-panel" role="tabpanel" aria-labelledby={'w4-forge-tab-'+tab}>
       <div className="w4-forge-stage">
         <div className="w4-forge-scene">
-          <div className="w4-forge-glow" aria-hidden="true"/>
           <ForgeBackdrop/>
           {tab==='cannons'?<ForgeCannonArtwork/>:<ShipArtwork part={tab==='armour'?'armour':tab==='hull'?'hull':tab}/>}
         </div>
