@@ -345,9 +345,10 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
     </div>
     <div id="w4-forge-panel" role="tabpanel" aria-labelledby={'w4-forge-tab-'+tab}>
       <div className="w4-forge-stage">
-        <div className="w4-forge-glow" aria-hidden="true"/>
-        <ForgeBackdrop/>
-        {tab==='cannons'?<ForgeCannonArtwork/>:<ShipArtwork part={tab==='armour'?'armour':tab==='hull'?'hull':tab}/>} 
+        <div className="w4-forge-scene">
+          <ForgeBackdrop/>
+          {tab==='cannons'?<ForgeCannonArtwork/>:<ShipArtwork part={tab==='armour'?'armour':tab==='hull'?'hull':tab}/>}
+        </div>
         <div className="w4-forge-description"><div className="w4-forge-medallion"><FleetForgeSymbol id={tab}/></div><span>{upgrade?'MELHORIA LOCAL DISPONÍVEL':'FUNÇÃO FUTURA'}</span>
           <h3>{upgrade?upgradeLabel[upgrade.id]:'Armadura'}</h3>
           {upgrade?<strong>NÍVEL {level} <em>→ {max?'MAX':level+1}</em></strong>:<strong>INDISPONÍVEL</strong>}
