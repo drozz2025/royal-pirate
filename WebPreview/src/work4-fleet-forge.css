@@ -2139,8 +2139,8 @@
    Scoped art materials ONLY: no changes to the #158 compositor isolation,
    app shell, Porto, shared nav, economics or selected tabs. */
 .w4-fleet .w4-harbour-stage .w4-hero-polish{opacity:.94}
-.w4-forge .w4-forge-scene .w4-foundry-amber-bounce{opacity:.85}
-.w4-forge .w4-forge-scene .w4-cannon-forged-sheen{opacity:.93}
+.w4-forge .w4-forge-scene .w4-foundry-amber-bounce{opacity:.97}
+.w4-forge .w4-forge-scene .w4-cannon-forged-sheen{opacity:.78}
 @media(max-width:359px){
  .w4-fleet .w4-harbour-stage .w4-hero-polish{opacity:.88}
  .w4-forge .w4-forge-scene .w4-foundry-amber-bounce{opacity:.76}
@@ -2149,9 +2149,9 @@
 /* WORK4 / #104 / 16 Nov: increase material depth of live reference 03/04 SVG.
    No changes to shell, Porto, shared navigation or WORK0 paint isolation. */
 .w4-fleet .w4-harbour-stage .w4-reference-galleon-volume{opacity:1}
-.w4-fleet .w4-harbour-stage .w4-art-rigging{opacity:.16}
-.w4-fleet .w4-harbour-stage .w4-art-sail-stitch{opacity:.25}
-.w4-fleet .w4-harbour-stage .w4-hero-polish{opacity:.64}
+.w4-fleet .w4-harbour-stage .w4-art-rigging{opacity:.3}
+.w4-fleet .w4-harbour-stage .w4-art-sail-stitch{opacity:.4}
+.w4-fleet .w4-harbour-stage .w4-hero-polish{opacity:.48}
 .w4-forge .w4-forge-scene .w4-reference-forge-barrel{opacity:1}
 @media(max-width:359px){
   .w4-fleet .w4-harbour-stage .w4-reference-galleon-volume{opacity:.96}

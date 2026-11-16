@@ -497,9 +497,9 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
     {!small&&<>
       <defs>
         <linearGradient id="w4-r03-canvas" x1="0%" y1="0%" x2="100%" y2="48%">
-          <stop stopColor="#070f1c"/><stop offset=".17" stopColor="#626777"/>
-          <stop offset=".3" stopColor="#1b2434"/><stop offset=".54" stopColor="#111727"/>
-          <stop offset=".76" stopColor="#394453"/><stop offset="1" stopColor="#070e1d"/>
+          <stop stopColor="#060e1d"/><stop offset=".16" stopColor="#525c6a"/>
+          <stop offset=".3" stopColor="#26303d"/><stop offset=".54" stopColor="#0b1525"/>
+          <stop offset=".76" stopColor="#394858"/><stop offset="1" stopColor="#081320"/>
         </linearGradient>
         <linearGradient id="w4-r03-hull" x1="0%" y1="0%" x2="20%" y2="100%">
           <stop stopColor="#ffe0a2"/><stop offset=".13" stopColor="#ad6734"/>
@@ -511,8 +511,8 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
         </linearGradient>
       </defs>
       <g className="w4-reference-galleon-volume" pointerEvents="none">
-        <path d="M121 41Q163 36 184 61Q203 85 201 131Q172 147 124 132Z"
-          fill="url(#w4-r03-canvas)" stroke="#d4af76" strokeWidth="2.7"/>
+        <path d="M121 41Q155 30 180 55Q210 89 198 136Q160 152 124 131Q137 90 121 41Z"
+          fill="url(#w4-r03-canvas)" stroke="#c7a36e" strokeWidth="2.3"/>
         <path d="M127 49Q151 49 164 69Q180 97 177 131"
           fill="none" stroke="#d6d1c1" strokeWidth="3.2" opacity=".52"/>
         <path d="M187 67Q197 91 193 121Q182 130 167 136"
@@ -536,12 +536,14 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
           strokeWidth="4.4" strokeLinecap="round" opacity=".88"/>
         <g fill="#eee3c9"><circle cx="139" cy="110" r="3.6"/><circle cx="185" cy="135" r="3.6"/>
           <circle cx="183" cy="110" r="3.6"/><circle cx="141" cy="136" r="3.6"/></g>
-        <path d="M65 147Q169 168 299 137L282 187Q180 219 88 193Z"
-          fill="url(#w4-r03-hull)" stroke="#f3c47a" strokeWidth="3.8"/>
+        <path d="M65 147Q174 169 299 137Q297 170 273 194Q180 226 86 196Q70 176 65 147Z"
+          fill="url(#w4-r03-hull)" stroke="#d9a968" strokeWidth="3.4"/>
         <path d="M67 149Q185 175 300 140M77 160Q180 187 292 154"
           fill="none" stroke="#ffcf79" strokeWidth="3.8"/>
-        <path d="M86 183Q179 208 282 177M94 195Q185 224 270 190"
-          fill="none" stroke="#d49a58" strokeWidth="3" opacity=".9"/>
+        <path d="M84 181Q172 209 282 177M92 195Q181 224 270 190"
+          fill="none" stroke="#986038" strokeWidth="4.2" opacity=".94"/>
+        <path d="M83 185Q176 215 280 184M96 198Q183 224 267 194"
+          fill="none" stroke="#e7a95e" strokeWidth="1.7" opacity=".8"/>
         <path d="M80 168Q176 196 292 165" fill="none" stroke="#121821"
           strokeWidth="7" opacity=".72"/>
         {[[95,169],[122,175],[150,179],[179,181],[209,177],[239,172],[267,166]].map(([x,y],i)=>
@@ -756,8 +758,8 @@ function ForgeBackdrop(){
        fill="#1d181b" opacity=".38"/>
      <path d="M55 248V158Q67 102 108 101Q148 105 152 158V249Z"
        fill="#c44d28" opacity=".28"/>
-     <path d="M61 245q7-43 30-44 2-18 16-19 0 34 21 34 8-22 13-29 13 41 1 58Z"
-       fill="#fc7b31" opacity=".64"/>
+     <path d="M61 245q7-48 30-46 2-25 16-36-1 48 21 48 8-28 13-36 15 46 1 70Z"
+       fill="#ff8736" opacity=".82"/>
      <path d="M72 245q4-25 17-34-2 24 17 25 8-29 17-38-5 30 10 44Z"
        fill="#ffda7c" opacity=".78"/>
      <path d="M45 148Q57 71 108 72Q169 76 177 150"
@@ -1014,10 +1016,10 @@ function ForgeCannonArtwork(){
         flat grille reading with real curved planes and a recessed muzzle. */}
     <defs>
       <linearGradient id="w4-r04-iron" x1="0%" y1="0%" x2="34%" y2="100%">
-        <stop stopColor="#e8e8dc"/><stop offset=".12" stopColor="#73818b"/>
-        <stop offset=".29" stopColor="#253b48"/><stop offset=".53" stopColor="#061927"/>
-        <stop offset=".79" stopColor="#152937"/><stop offset=".94" stopColor="#81776c"/>
-        <stop offset="1" stopColor="#c99656"/>
+        <stop stopColor="#e8e1d1"/><stop offset=".1" stopColor="#8a8d8b"/>
+        <stop offset=".26" stopColor="#3b4a50"/><stop offset=".49" stopColor="#0b1b28"/>
+        <stop offset=".71" stopColor="#192a35"/><stop offset=".9" stopColor="#70665a"/>
+        <stop offset="1" stopColor="#d7a365"/>
       </linearGradient>
       <radialGradient id="w4-r04-mouth">
         <stop stopColor="#030b12"/><stop offset=".72" stopColor="#07151c"/>
@@ -1027,10 +1029,12 @@ function ForgeCannonArtwork(){
     <g className="w4-reference-forge-barrel" pointerEvents="none">
       <path d="M91 225L280 175L351 210L162 268Z" fill="#2c211e"
         stroke="#d8a765" strokeWidth="6" opacity=".92"/>
-      <path d="M80 143Q192 118 293 93Q311 113 322 151Q206 185 91 225Z"
-        fill="url(#w4-r04-iron)" stroke="#e6bc7c" strokeWidth="5.2"/>
-      <path d="M92 151Q198 120 289 103" stroke="#f5f1d7"
-        strokeWidth="4.4" opacity=".9" fill="none"/>
+      <path d="M80 143Q194 113 293 93Q314 113 322 151Q206 191 91 225Q73 182 80 143Z"
+        fill="url(#w4-r04-iron)" stroke="#cda36d" strokeWidth="4.5"/>
+      <path d="M91 152Q196 120 289 103" stroke="#e9e1c7"
+        strokeWidth="3.8" opacity=".84" fill="none"/>
+      <path d="M93 158Q191 128 294 109" fill="none"
+        stroke="#a9b0a8" strokeWidth="1.6" opacity=".65"/>
       <path d="M100 167Q197 138 298 112M102 206Q211 177 317 144"
         stroke="#0a141e" strokeWidth="6" opacity=".78" fill="none"/>
       <path d="M144 130l16 66m59-82 18 62m46-70 18 53"
