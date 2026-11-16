@@ -126,7 +126,7 @@ try {
     scope:'WORK8 approved 07/08; real responsive screenshots and visual comparisons; human approval still required',
     viewportChecks:report,approved:false
   },null,2));
-  console.log('WORK8: 8 mobile captures and 4 reference comparisons (including exact unscaled 384x512) passed structural/overflow gates.');
+  console.log('WORK8: 8 screenshots, exact 384x512 references, full nav and visible page checks passed.');
 } finally {
   if(ws){try{ws.close()}catch{}}
   chrome.kill('SIGTERM');
