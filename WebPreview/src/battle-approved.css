@@ -311,11 +311,11 @@ body:has(.in-battle) > .rp-version{top:auto!important;left:7px!important;bottom:
   .in-battle .command-deck .sliders .scale{font-size:7px;line-height:1.1}
 }
 
-/* WORK6 #104 — ORIGINAL 384x512 / compact 320x568 battle layout only.
+/* WORK6 #104 — ORIGINAL 384x512 battle layout, preserving original 320px control layout.
    The approved short portrait art shows real timber under floating controls,
    not a full-width navy plate. Every original control stays present and
    tappable. Tall phones retain the previously integrated layout. */
-@media (max-height:650px){
+@media (min-width:360px) and (max-height:650px){
   .in-battle .command-deck{
     height:180px;
     background:linear-gradient(180deg,transparent 0%,rgba(26,24,28,.05) 50%,rgba(32,22,20,.19) 100%);
