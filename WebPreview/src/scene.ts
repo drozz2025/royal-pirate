@@ -148,39 +148,88 @@ export class OceanScene {
   /** A first-person three-dimensional bulwark, not a second playable ship.
    * All parts are descendants of the battle-only cannon deck: Porto and the
    * existing five-item nav can never render or interact with them. */
+  /** Battle-only sculpted gunwale: the player looks past TWO tapering side
+   * rails into the sea, rather than across a horizontal wooden fence.
+   * Geometry is a child of the existing cannon battery, never the Porto ship,
+   * projectile system, DOM/HUD or navigation. */
   private dressBattleDeck(){
     const dressing=new T.Group();
     dressing.name='battle-only-wooden-bulwark';
-    const oak=new T.MeshStandardMaterial({color:'#9e6739',roughness:.86});
-    const goldRail=new T.MeshStandardMaterial({color:'#d8a65b',metalness:.58,roughness:.39});
-    const tarredRope=new T.MeshStandardMaterial({color:'#b78d58',roughness:.94});
-    const timber=new T.Mesh(new T.BoxGeometry(11.5,.32,.37),oak);
-    timber.name='first-person-rail';timber.position.set(0,2.67,64.9);
-    const lower=new T.Mesh(new T.BoxGeometry(11.4,.20,.30),oak);
-    lower.position.set(0,1.31,64.95);
-    const gilt=new T.Mesh(new T.BoxGeometry(11.6,.075,.43),goldRail);
-    gilt.position.set(0,2.88,64.9);
-    dressing.add(timber,lower,gilt);
-    // Instanced solid timber balusters and gilded finials: two draw calls,
-    // with genuine depth even on 320x568 rather than thin CSS silhouettes.
-    const count=7;
-    const balusters=new T.InstancedMesh(new T.CylinderGeometry(.11,.14,1.27,8),oak,count);
-    const finials=new T.InstancedMesh(new T.SphereGeometry(.15,8,7),goldRail,count);
-    for(let i=0;i<count;i++){
-      const x=-5.04+i*1.68;
-      balusters.setMatrixAt(i,new T.Matrix4().makeTranslation(x,1.99,64.95));
-      finials.setMatrixAt(i,new T.Matrix4().makeTranslation(x,2.99,64.95));
+    const oak=new T.MeshStandardMaterial({color:'#945a2f',roughness:.77,metalness:.03});
+    const darkOak=new T.MeshStandardMaterial({color:'#4c2d23',roughness:.91});
+    const sunlit=new T.MeshStandardMaterial({color:'#c88c4b',roughness:.7});
+    const gold=new T.MeshStandardMaterial({color:'#e5b76b',metalness:.58,roughness:.36});
+    const rope=new T.MeshStandardMaterial({color:'#c6a474',roughness:.91});
+    const iron=new T.MeshStandardMaterial({color:'#26303c',metalness:.69,roughness:.38});
+    const box=new T.BoxGeometry(1,1,1);
+    const sphere=new T.SphereGeometry(1,9,7);
+    const add=(g:T.BufferGeometry,m:T.Material,x:number,y:number,z:number,sx=1,sy=1,sz=1)=>{
+      const part=new T.Mesh(g,m);part.position.set(x,y,z);part.scale.set(sx,sy,sz);
+      dressing.add(part);return part;
+    };
+    // Hand-laid near-field planks run toward the opponent; alternate caulk
+    // lines and copper nail heads give depth without replacing the live deck.
+    for(let i=-4;i<=4;i++){
+      add(box,darkOak,i*1.27+.60,.535,73.9,.055,.018,17.4);
+      if(i%2===0)for(const z of [66.4,72.0,78.0]){
+        add(sphere,gold,i*1.27+.22,.555,z,.055,.018,.055);
+      }
     }
-    balusters.instanceMatrix.needsUpdate=true;
-    finials.instanceMatrix.needsUpdate=true;
-    dressing.add(balusters,finials);
-    // Two restrained, physically coiled mooring lines flank the actual
-    // working guns. No new weapon, targeting system or touch area.
-    const coilGeometry=new T.TorusGeometry(.48,.075,7,28,Math.PI*1.9);
-    for(const x of [-4.75,4.75]){
-      const coil=new T.Mesh(coilGeometry,tarredRope);
-      coil.rotation.x=-Math.PI/2;coil.position.set(x,.61,67.9);
-      dressing.add(coil);
+    // The original straight, full-width transverse rail concealed much of the
+    // red ship. Open the centre and follow the port and starboard gunwales in
+    // perspective instead: near shoulders are broader, far ends converge.
+    for(const side of [-1,1]){
+      const edge=(z:number,y:number)=>new T.Vector3(
+        side*(6.12-(81-z)*.062),y,z);
+      const topCurve=new T.CatmullRomCurve3([
+        edge(81.3,3.12),edge(76.3,3.08),
+        edge(70.1,2.96),edge(64.0,2.81)
+      ]);
+      const brightCurve=new T.CatmullRomCurve3([
+        edge(81.0,3.19),edge(76.1,3.15),
+        edge(70.0,3.03),edge(64.1,2.88)
+      ]);
+      const lowerCurve=new T.CatmullRomCurve3([
+        edge(80.8,1.47),edge(75.8,1.48),
+        edge(69.9,1.48),edge(64.2,1.52)
+      ]);
+      const rail=new T.Mesh(new T.TubeGeometry(topCurve,30,.22,9,false),oak);
+      rail.name=side<0?'first-person-rail-port':'first-person-rail-starboard';
+      dressing.add(rail);
+      dressing.add(new T.Mesh(new T.TubeGeometry(brightCurve,30,.058,8,false),gold));
+      dressing.add(new T.Mesh(new T.TubeGeometry(lowerCurve,28,.13,8,false),darkOak));
+      for(const z of [65.2,68.7,72.2,75.7,79.2]){
+        const x=side*(6.12-(81-z)*.062),top=3.10-(81-z)*.013;
+        const height=top-1.46;
+        add(box,oak,x,(1.46+top)/2,z,.32,height,.34);
+        add(box,sunlit,x,1.54,z,.42,.16,.40);
+        add(sphere,gold,x,top+.055,z,.18,.17,.18);
+        add(sphere,iron,x-side*.018,2.22,z+.20,.08,.08,.065);
+      }
+      // Carved outside rubbing strakes run away from the spectator, framing
+      // the broadside like the approved first-person painting.
+      for(const z of [69.3,75.4]){
+        const x=side*(6.12-(81-z)*.062);
+        const line=add(box,gold,x,1.93,z,.12,.075,4.9);
+        line.rotation.y=side*.062;
+      }
+      // Coiled real rope sits beside each cannon, below the live controls.
+      const coil=new T.Mesh(new T.TorusGeometry(.48,.078,7,32,Math.PI*1.95),rope);
+      coil.rotation.x=-Math.PI/2;coil.rotation.z=side*.15;
+      coil.position.set(side*4.66,.65,77.7);dressing.add(coil);
+      const cleat=add(box,darkOak,side*4.95,.77,76.4,.64,.19,.22);
+      cleat.rotation.y=side*.3;
+    }
+    // Two sculpted cannon-port lips align with the EXISTING functional guns.
+    // No duplicate weapons, barrels or projectile launch locations are added.
+    for(const x of [-2.65,2.65]){
+      add(box,oak,x,2.00,65.63,1.92,.30,.42);
+      add(box,sunlit,x,3.25,65.70,2.01,.24,.40);
+      for(const dx of [-.89,.89]){
+        add(box,oak,x+dx,2.65,65.63,.21,1.20,.39);
+        add(sphere,gold,x+dx,3.37,65.70,.14,.13,.15);
+      }
+      add(box,gold,x,3.08,65.49,1.89,.085,.12);
     }
     dressing.traverse(part=>{
       if(part instanceof T.Mesh){part.castShadow=true;part.receiveShadow=true;}
