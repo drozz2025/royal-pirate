@@ -87,6 +87,11 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
       <linearGradient id="w4-sea" x1="0" y1="0" x2="0" y2="1">
         <stop stopColor="#2cc2d6"/><stop offset="1" stopColor="#0c4b88"/>
       </linearGradient>
+      <linearGradient id="w4-hero-wood-sheen" x1="0" y1="0" x2=".1" y2="1">
+        <stop stopColor="#fce0a2"/><stop offset=".16" stopColor="#aa6035"/>
+        <stop offset=".42" stopColor="#312125"/><stop offset=".74" stopColor="#1a171f"/>
+        <stop offset="1" stopColor="#d0914b"/>
+      </linearGradient>
     </defs>
     <ellipse cx="179" cy="203" rx="140" ry="17" fill="#06314f" opacity=".65"/>
     <path d="M19 205Q59 195 99 207T178 204T255 208T330 202" stroke="#66e6ff" strokeWidth="5" fill="none" opacity=".7"/>
@@ -450,6 +455,42 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
     </g>}
     <path d="M36 204Q65 196 103 207M218 207Q256 199 316 205" stroke="#ddfcfa" strokeWidth="4" opacity=".85" fill="none" strokeLinecap="round"/>
 
+
+    {/* WORK4 18h / #104 — carved high-relief & furnace bounce light. Foreground carved prow and gun deck provide real
+        perspective, not a screenshot or an additional selectable ship. */}
+    {!small&&<g className="w4-hero-polish" pointerEvents="none">
+      <path d="M58 145Q165 167 302 138L290 158Q182 183 77 163Z"
+        fill="url(#w4-hero-wood-sheen)" stroke="#f1c57d" strokeWidth="2.7"/>
+      <path d="M72 159Q169 183 291 155M79 168Q174 193 280 166"
+        fill="none" stroke="#f4c37e" strokeWidth="2.5" opacity=".89"/>
+      <path d="M82 178Q170 201 276 176L267 185Q173 210 92 185Z"
+        fill="#211823" opacity=".8"/>
+      <path d="M93 191Q172 216 265 188" fill="none"
+        stroke="#e3a763" strokeWidth="3.2" opacity=".88"/>
+      <g fill="#0c1721" stroke="#f8ca80" strokeWidth="2.3">
+        <path d="M94 163q7-5 15 1v11q-8 4-15-1Z"/>
+        <path d="M122 169q7-5 15 1v11q-8 4-15-1Z"/>
+        <path d="M151 173q7-5 15 1v11q-8 4-15-1Z"/>
+        <path d="M181 173q7-5 15 1v11q-8 4-15-1Z"/>
+        <path d="M211 170q7-5 15 1v11q-8 4-15-1Z"/>
+        <path d="M239 164q7-5 15 1v11q-8 4-15-1Z"/>
+      </g>
+      <path d="M71 151Q175 178 293 147" fill="none"
+        stroke="#fff1ba" strokeWidth="2.7" opacity=".95"/>
+      <path d="M47 147q-15-2-18 14 11-9 19-4l15 30m-8-37q2-19 12-23"
+        fill="none" stroke="#e5ad62" strokeWidth="5" strokeLinecap="round"/>
+      <path d="M35 167q16 6 25 26M49 145l11-15" fill="none"
+        stroke="#ffe2a0" strokeWidth="2.1" opacity=".93"/>
+      <path d="M252 127L263 109 283 104 305 126 306 145"
+        fill="none" stroke="#ffe1a4" strokeWidth="3"/>
+      <g fill="#ffd98b" stroke="#6c402b" strokeWidth="1.2">
+        <circle cx="96" cy="151" r="2.2"/><circle cx="128" cy="158" r="2.2"/>
+        <circle cx="161" cy="160" r="2.2"/><circle cx="196" cy="161" r="2.2"/>
+        <circle cx="230" cy="157" r="2.2"/><circle cx="269" cy="151" r="2.2"/>
+      </g>
+      <path d="M35 201q15-8 31-2t33 5m115 0q22-6 43-1t50-3"
+        fill="none" stroke="#f2ffff" strokeWidth="4" opacity=".82" strokeLinecap="round"/>
+    </g>}
   </svg>;
 }
 
@@ -509,6 +550,11 @@ function ForgeBackdrop(){
   <defs>
    <linearGradient id="w4-woodgrain" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#aa7545"/><stop offset=".45" stopColor="#523529"/><stop offset="1" stopColor="#241e22"/></linearGradient>
    <radialGradient id="w4-fireglow"><stop stopColor="#ffe57f"/><stop offset=".34" stopColor="#ff973b"/><stop offset=".73" stopColor="#c23b22"/><stop offset="1" stopColor="#4e1d1b"/></radialGradient>
+   <radialGradient id="w4-foundry-amber-falloff" cx=".45" cy=".58" r=".68">
+     <stop stopColor="#ffdc83" stopOpacity=".56"/>
+     <stop offset=".32" stopColor="#fa883b" stopOpacity=".36"/>
+     <stop offset="1" stopColor="#c24426" stopOpacity="0"/>
+   </radialGradient>
   </defs>
   <path d="M0 0H420V290H0Z" fill="#17263a" opacity=".45"/>
   <path d="M25 0V278M152 0V247M389 0V284M0 35H420" stroke="#301d20" strokeWidth="25" opacity=".9"/>
@@ -660,6 +706,34 @@ function ForgeBackdrop(){
      <g fill="#fff0b3" opacity=".86"><circle cx="82" cy="172" r="2"/>
        <circle cx="101" cy="159" r="1.9"/><circle cx="134" cy="174" r="2.4"/>
        <circle cx="118" cy="199" r="1.7"/><circle cx="150" cy="207" r="2.4"/></g>
+   </g>
+
+   {/* WORK4 18h / #104 — carved high-relief & furnace bounce light. Arch stones pick up furnace light while the cannon
+       remains separate, scalable artwork and the status card remains live. */}
+   <g className="w4-foundry-amber-bounce" pointerEvents="none">
+     <ellipse cx="106" cy="204" rx="105" ry="105" fill="url(#w4-foundry-amber-falloff)"/>
+     <path d="M25 140Q36 53 107 52Q167 54 178 146" fill="none"
+       stroke="#f4bb75" strokeWidth="5" opacity=".85"/>
+     <path d="M28 144Q43 63 106 61Q161 61 173 147" fill="none"
+       stroke="#4e3428" strokeWidth="10" opacity=".75"/>
+     <path d="M35 106l18 14m9-41 17 18m29-32-2 22m29-14-11 20m27 9-17 13"
+       fill="none" stroke="#f6d09a" strokeWidth="3.2" opacity=".9"/>
+     <g fill="#6e4432" stroke="#dea16c" strokeWidth="2">
+       <path d="M35 149h28v24H34Z"/><path d="M64 150h32v23H64Z"/>
+       <path d="M98 151h34v22H98Z"/><path d="M134 150h31v23h-31Z"/>
+       <path d="M41 176h33v20H40Z"/><path d="M76 176h32v20H76Z"/>
+       <path d="M111 175h34v21h-34Z"/>
+     </g>
+     <g fill="none" stroke="#ffe1a2" strokeWidth="2.1" opacity=".65">
+       <path d="M38 150h23m7 1h26m9 1h24m11-1h23"/>
+       <path d="M45 178h26m8-1h27m8-1h29"/>
+     </g>
+     <path d="M10 265Q145 233 284 250" fill="none"
+       stroke="#ffc47a" strokeWidth="4" opacity=".54"/>
+     <g fill="#ffdc93" opacity=".89">
+       <circle cx="84" cy="163" r="2"/><circle cx="117" cy="181" r="2.7"/>
+       <circle cx="95" cy="143" r="1.8"/><circle cx="138" cy="193" r="2"/>
+     </g>
    </g>
  </svg>;
 }
@@ -852,6 +926,21 @@ function ForgeCannonArtwork(){
         fill="none" stroke="#493023" strokeWidth="3.1" opacity=".7"/>
     </g>
     <path d="M36 236Q64 226 83 240M353 234Q380 219 397 235" stroke="#fbcc7b" strokeWidth="3" fill="none" opacity=".7"/>
+
+    {/* Final forged-metal light band: perspective follows the existing
+        live cannon shape, without increasing its physical bounding box. */}
+    <g className="w4-cannon-forged-sheen" pointerEvents="none">
+      <path d="M114 145L280 105M128 153L295 115"
+        fill="none" stroke="#fff0c7" strokeWidth="2.8" opacity=".75"/>
+      <path d="M148 183L307 147" fill="none" stroke="#090f1a"
+        strokeWidth="4.3" opacity=".67"/>
+      <path d="M182 128l15 47m40-58 14 51"
+        fill="none" stroke="#edb96c" strokeWidth="7.5" opacity=".77"/>
+      <path d="M183 130l14 44m40-57 14 49"
+        fill="none" stroke="#ffe5ab" strokeWidth="1.9" opacity=".83"/>
+      <path d="M49 167q-10 15-5 33m15-40q-11 23-4 44"
+        fill="none" stroke="#f9e6b0" strokeWidth="2.3" opacity=".9"/>
+    </g>
   </svg>;
 }
 
