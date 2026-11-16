@@ -1249,3 +1249,41 @@
     transform:rotate(-1deg);
   }
 }
+
+
+/* WORK 4 / #104 — Fleet approved art, restricted to three non-ownable card
+   thumbnails (never use the whole design screenshot as a page backdrop).
+   The SVGs remain fallbacks if this build asset cannot be loaded.
+   Bottom navigation/Porto and all real prices, levels and actions stay intact. */
+.w4-fleet .w4-approved-thumb{
+  position:relative;display:block;width:100%;height:100%;overflow:hidden;
+  border-radius:5px;
+}
+.w4-fleet .w4-approved-thumb .w4-teaser-silhouette{
+  width:100%;height:100%;opacity:.4;
+}
+.w4-fleet .w4-approved-thumb::before{
+  position:absolute;content:"";z-index:1;inset:0;
+  background-image:url('../../assets/design-approved/03-frota.webp');
+  background-repeat:no-repeat;background-size:384px 512px;
+  filter:saturate(1.1) contrast(1.05);
+  pointer-events:none;
+}
+.w4-fleet .w4-approved-thumb-2::before{background-position:-24px -350px}
+.w4-fleet .w4-approved-thumb-3::before{background-position:-112px -350px}
+.w4-fleet .w4-approved-thumb-4::before{background-position:-202px -350px}
+.w4-fleet .w4-ship-slot.is-pending .w4-slot-unavailable{
+  opacity:1;filter:none;
+}
+.w4-fleet .w4-ship-slot.is-pending strong{
+  color:#fff0bb;letter-spacing:.15px;
+}
+.w4-fleet .w4-ship-slot.is-pending small{
+  color:#c3d7e4;letter-spacing:.1px;
+}
+@media(max-width:345px){
+  .w4-fleet .w4-approved-thumb::before{background-size:345px 460px}
+  .w4-fleet .w4-approved-thumb-2::before{background-position:-22px -314px}
+  .w4-fleet .w4-approved-thumb-3::before{background-position:-101px -314px}
+  .w4-fleet .w4-approved-thumb-4::before{background-position:-182px -314px}
+}
