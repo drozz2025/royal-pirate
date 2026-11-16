@@ -31,7 +31,7 @@ test('enemy galleon is red, three-masted and billowed geometry, not an overlay',
       'the visible red forecanvas must bear the same original Jolly Roger as the main canvas');
     const redTop=enemy.sails[0].geometry.getAttribute('position') as T.BufferAttribute;
     const topDepth=Array.from({length:redTop.count},(_,i)=>redTop.getZ(i));
-    assert.ok(Math.max(...topDepth)-Math.min(...topDepth)<.48,
+    assert.ok(Math.max(...topDepth)-Math.min(...topDepth)<.22,
       'enemy topsail remains cloth-shaped, not the old inflated spherical silhouette');
     const positions=foresail.geometry.getAttribute('position') as T.BufferAttribute;
     assert.ok(positions.count>=60);
