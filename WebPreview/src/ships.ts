@@ -264,7 +264,13 @@ export function makeShip(red = false): ShipArt {
   // The smaller topsails are dark woven cloth. Keep the crowned skull emblem
   // on the two full main sails and on the flags, not repeated four times.
   const topsailMat=new T.MeshStandardMaterial({color:red?'#713331':'#19232d',side:T.DoubleSide,roughness:.88});
-  for(const [z,h,w] of [[.9,8.3,4.5],[-2.1,7.1,3.5]]){
+  // A shorter third foremast gives the flagship a layered three-masted
+  // silhouette at Porto's existing camera angle. Enemy retains its lighter rig.
+  // All sails are genuine meshes that can still sway and take damage.
+  const mastSpecs: [number,number,number][] = red
+    ? [[.9,8.3,4.5],[-2.1,7.1,3.5]]
+    : [[3.35,6.05,2.65],[.9,8.3,4.5],[-2.1,7.1,3.5]];
+  for(const [z,h,w] of mastSpecs){
     // Rig is a separate group for damage. Static ropes stay attached to the hull.
     const mast=new T.Mesh(new T.CylinderGeometry(.07,.16,h-.6,10),honey);
     mast.position.set(0,(h+2.6)/2,z);rig.add(mast);
