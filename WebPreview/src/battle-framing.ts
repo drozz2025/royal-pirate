@@ -16,12 +16,12 @@ export function battleCameraPose(aspect: number): CameraPose {
     // above the live foreground cannon deck. The battery follows the camera,
     // so both original muzzle meshes sit ABOVE the utility row, visible
     // against the ocean rather than hidden by their buttons.
-    return { position: [0, 11, 78], target: [0, 4.5, 0], showBattery: true, batteryOffsetZ: -35 };
+    return { position: [-12, 11, 78], target: [0, 4.5, 0], showBattery: true, batteryOffsetZ: -35 };
   }
   if (aspect < .75) {
     // The short 320x568 viewport has less room between HP and touch controls.
     // Retain its previously tested framing rather than clipping the hulls.
-    return { position: [0, 10, 90], target: [0, 2, 0], showBattery: true, batteryOffsetZ: -15 };
+    return { position: [-8, 10, 90], target: [0, 2, 0], showBattery: true, batteryOffsetZ: -15 };
   }
   const distance = aspect < 1.2 ? 43 : 34;
   return { position: [distance * .20, distance * .56, distance * .88], target: [0, 2, 0], showBattery: false, batteryOffsetZ: -15 };
