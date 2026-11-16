@@ -138,7 +138,7 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   // Battle-only cloudfront: broad overlapping volumes instead of featureless
   // upper sky. Painted once at texture creation (zero new frame draw calls).
   // The richer shadow/light contrast is independent of Porto and controls.
-  const stormBlue = 'rgba(35,80,116,.68)';
+  const stormBlue = 'rgba(35,80,116,.40)';
   function cloudFront(x: number, y: number, width: number, rise: number, phase: number) {
     paint.save();
     const underside = paint.createLinearGradient(0, y - rise, 0, y + rise * .70);
@@ -165,9 +165,9 @@ export function createBattleSkyTexture(): T.CanvasTexture {
       const cy = y - rise * (.10 + uplift * (.60 + .13 * Math.sin(i * 2.17 + phase)));
       const size = rise * (.27 + uplift * .21 + (i % 3) * .055);
       const shade = paint.createRadialGradient(cx - size * .23, cy - size * .30, size * .06, cx, cy, size * 1.3);
-      shade.addColorStop(0, 'rgba(255,255,242,.65)');
-      shade.addColorStop(.38, 'rgba(240,249,248,.49)');
-      shade.addColorStop(.76, 'rgba(129,176,195,.25)');
+      shade.addColorStop(0, 'rgba(255,255,242,.39)');
+      shade.addColorStop(.38, 'rgba(240,249,248,.31)');
+      shade.addColorStop(.76, 'rgba(129,176,195,.17)');
       shade.addColorStop(1, 'rgba(86,138,170,0)');
       paint.fillStyle = shade;
       paint.beginPath();
@@ -176,7 +176,7 @@ export function createBattleSkyTexture(): T.CanvasTexture {
     }
     const shadow = paint.createLinearGradient(0, y - rise * .15, 0, y + rise * .62);
     shadow.addColorStop(0, 'rgba(33,85,121,0)');
-    shadow.addColorStop(.50, 'rgba(41,94,128,.33)');
+    shadow.addColorStop(.50, 'rgba(41,94,128,.19)');
     shadow.addColorStop(1, 'rgba(68,130,157,0)');
     paint.fillStyle = shadow;
     paint.fillRect(x - width * .56, y - rise * .15, width * 1.12, rise * .77);
@@ -188,23 +188,15 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   cloudFront(956, 272, 555, 198, 1.8);
   cloudFront(535, 544, 580, 110, 3.2);
 
-  // Sun breaking through the cloud ceiling, with irregular soft rays rather
-  // than a flat opaque overlay. All light stays behind the Three.js ships.
+  // A broad warm glow, not geometric beams: the live galleon remains the
+  // visual focus and the approved HUD stays fully legible at 320 pixels.
   paint.save();
-  const shaft = paint.createLinearGradient(0, 200, 0, 855);
-  shaft.addColorStop(0, 'rgba(255,244,200,.20)');
-  shaft.addColorStop(.5, 'rgba(255,238,175,.085)');
-  shaft.addColorStop(1, 'rgba(255,246,209,0)');
-  paint.fillStyle = shaft;
-  for (const [top, left, right] of [[205, -10, 155], [264, 208, 405], [312, 446, 548]] as const) {
-    paint.beginPath();
-    paint.moveTo(top - 7, 185);
-    paint.lineTo(top + 10, 185);
-    paint.lineTo(right, 855);
-    paint.lineTo(left, 855);
-    paint.closePath();
-    paint.fill();
-  }
+  const warmBreak = paint.createRadialGradient(312, 165, 28, 355, 260, 590);
+  warmBreak.addColorStop(0, 'rgba(255,247,210,.15)');
+  warmBreak.addColorStop(.48, 'rgba(255,242,199,.055)');
+  warmBreak.addColorStop(1, 'rgba(255,246,209,0)');
+  paint.fillStyle = warmBreak;
+  paint.fillRect(0, 0, 1024, 820);
   paint.restore();
 
   const texture = new T.CanvasTexture(canvas);
