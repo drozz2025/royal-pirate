@@ -1794,7 +1794,7 @@
   min-width:0;
   isolation:isolate;
   overflow:hidden;
-  background:linear-gradient(125deg,#805338 0%,#573a2b 32%,#233343 74%,#09253e 100%)!important;
+  background:#765038!important;background-image:none!important;
 }
 .w4-forge .w4-forge-scene{
   position:absolute;
@@ -1803,7 +1803,7 @@
   pointer-events:none;
   overflow:hidden;
   isolation:isolate;
-  background:linear-gradient(135deg,#9b6c43 0%,#69462f 36%,#43362f 61%,#1d3044 100%)!important;
+  background:#553b2d!important;background-image:none!important;
 }
 .w4-forge .w4-forge-scene > svg.w4-forge-art{
   position:absolute;
