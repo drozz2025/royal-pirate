@@ -1,0 +1,150 @@
+/* WORK 6 — functional Batalha composition based on assets/design-approved/02-batalha.webp.
+   Deliberately scoped to .in-battle. Porto, its approved harbour-nav and all app sheets
+   remain untouched. The sea and ship are still a live WebGL/Canvas scene, not a screenshot. */
+.in-battle .topbar,
+.in-battle .scene-caption,
+.in-battle .scene-hint{display:none}
+.in-battle .vignette{
+  background:linear-gradient(180deg,rgba(9,66,115,.08) 0%,transparent 22%,transparent 53%,rgba(5,24,48,.22) 74%,rgba(19,29,38,.55) 100%);
+}
+.in-battle .battle-approved-top{position:absolute;top:0;left:0;right:0;z-index:6;pointer-events:none;
+  height:134px;padding-top:max(4px,env(safe-area-inset-top));font-family:'Barlow Condensed','Barlow',sans-serif;
+  text-align:center;color:#fff2be;text-shadow:0 2px 1px #26160d,0 4px 3px #051730}
+.in-battle .battle-approved-logo{font:900 clamp(26px,5.9vw,36px)/1 'Barlow Condensed',sans-serif;
+  letter-spacing:.3px;filter:drop-shadow(0 2px 2px #0b2b55)}
+.in-battle .battle-approved-logo b{color:#f7c765;
+  -webkit-text-stroke:.5px #74471b;text-shadow:0 1px #fff0b4,0 3px #633e20}
+.in-battle .battle-approved-currencies{display:flex;justify-content:center;align-items:center;gap:10px;
+  padding:7px 68px 0;white-space:nowrap}
+.in-battle .battle-approved-currencies>span{display:flex;align-items:center;justify-content:center;gap:5px;
+  min-height:28px;padding:2px 8px;border:2px solid #e4b65d;border-radius:19px;
+  background:linear-gradient(180deg,#264e76f0,#092b51f7);box-shadow:inset 0 1px #fff1a776,0 3px #082044d8;
+  font:900 clamp(12px,3.6vw,19px)/1 'Barlow Condensed',sans-serif;color:#fff4d2}
+.in-battle .battle-approved-currencies i{font-style:normal;display:grid;place-items:center;
+  width:23px;height:23px;flex:0 0 23px;font-size:16px}
+.in-battle .battle-approved-gold i{border:2px solid #ffecab;border-radius:50%;font-size:12px;color:#a56a20;
+  background:radial-gradient(circle at 36% 28%,#fff4a4 10%,#f4bc35 60%,#986026 100%);}
+.in-battle .battle-approved-gems i{color:#f66aff;text-shadow:0 1px #501263,0 0 5px #ed8dff}
+.in-battle .battle-approved-currencies small{font:800 8px 'Barlow',sans-serif;letter-spacing:.2px;color:#e8d1a3}
+.in-battle .battle-approved-banner{display:flex;align-items:center;justify-content:center;gap:12px;
+  width:min(275px,56vw);height:43px;margin:8px auto 0;border:3px ridge #ffdc87;border-radius:11px 11px 20px 20px;
+  background:linear-gradient(180deg,#6d3d20 0%,#301d1b 55%,#0b1e37 100%);
+  box-shadow:inset 0 1px #fff0bb99,0 4px #6e481f,0 7px 9px #04152d99;
+  font:900 clamp(24px,6vw,37px)/1 'Barlow Condensed',sans-serif;letter-spacing:.8px;color:#fff3cf}
+.in-battle .battle-approved-banner svg{width:20px;height:20px;color:#f5c46b}
+.in-battle .return-harbour{display:block!important;position:absolute;top:max(82px,calc(env(safe-area-inset-top) + 78px));
+  left:10px;z-index:8;min-height:41px;padding:6px 11px;border:2px solid #edc476;border-radius:12px;
+  font:900 15px 'Barlow Condensed',sans-serif;color:#ffe9b3;letter-spacing:.6px;
+  background:linear-gradient(#315c84,#102f58);box-shadow:0 3px #493120,0 5px 10px #0b203c8c}
+.in-battle .battle-hud{top:max(142px,calc(env(safe-area-inset-top) + 135px));z-index:5;
+  width:min(660px,calc(100% - 16px));gap:6px;align-items:stretch}
+.in-battle .health-card{min-height:59px;min-width:0;padding:7px 8px;border:2px solid #d7a55d;
+  border-radius:12px;background:linear-gradient(#214f78e9,#102f58ed);
+  box-shadow:inset 0 1px #fff7c73a,0 3px #543723,0 6px 12px #09223fa3}
+.in-battle .health-crest{width:34px;height:34px;display:grid;flex:0 0 34px;border:2px solid #dfb76b;
+  background:linear-gradient(#396a8a,#102745);color:#ffe9a1}
+.in-battle .enemy .health-crest{color:#ffc5b5;border-color:#d7ac71;background:#623b37}
+.in-battle .ship-label{font:700 10px 'Barlow',sans-serif;letter-spacing:.2px;color:#d7eaf2}
+.in-battle .ship-label strong{font:900 11px 'Barlow Condensed',sans-serif;color:#fff5d2}
+.in-battle .health-detail h2{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  margin:2px 0 5px;color:#fff0ca;font:900 clamp(14px,3.8vw,21px)/1 'Barlow Condensed',sans-serif;letter-spacing:.1px}
+.in-battle .health-track{height:9px;border:1px solid #cda362;background:#091f3c;border-radius:7px}
+.in-battle .health-track>span{background:linear-gradient(#88f388,#21ac57);border-radius:5px}
+.in-battle .enemy .health-track>span{background:linear-gradient(#ff908b,#dc2535)}
+.in-battle .round{align-self:center;flex:0 0 43px;gap:0;justify-content:center;
+  font-family:'Barlow Condensed',sans-serif}
+.in-battle .round .battle-versus{font:900 27px/.9 'Barlow Condensed',sans-serif;color:#ffd068;
+  -webkit-text-stroke:.65px #53301d;text-shadow:0 2px #683916,0 4px #061628}
+.in-battle .round span{margin-top:6px;font:800 9px 'Barlow Condensed',sans-serif;color:#ffe8af;letter-spacing:0}
+.in-battle .view-controls{z-index:5;position:absolute;top:auto;bottom:max(265px,calc(env(safe-area-inset-bottom) + 245px));
+  left:50%;right:auto;transform:translateX(-50%);width:min(385px,calc(100% - 24px));
+  display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:6px}
+.in-battle .view-controls button{flex:0 0 auto;display:grid;place-items:center;
+  width:clamp(47px,12.6vw,62px);height:clamp(47px,12.6vw,62px);border:3px solid #e6b763;
+  border-radius:50%;color:#ffe7a2;background:radial-gradient(circle at 35% 20%,#316c9a,#07395d 64%,#08223d);
+  box-shadow:inset 0 0 0 2px #62401f,inset 0 1px #fff7c077,0 3px #452914,0 6px 11px #041326aa}
+.in-battle .view-controls button svg{width:25px;height:25px;filter:drop-shadow(0 2px 1px #02142d)}
+.in-battle .view-controls button.active{border-color:#fff4a8;background:radial-gradient(#b3772a,#5b311e)}
+.in-battle .command-deck{z-index:5;bottom:max(27px,calc(env(safe-area-inset-bottom) + 13px));
+  width:min(650px,calc(100% - 16px));border:3px solid #8e602e;border-radius:15px;
+  background:repeating-linear-gradient(90deg,#8b502d 0 41px,#a46c3d 43px 46px,#623d2d 48px 53px);
+  box-shadow:inset 0 0 0 2px #edc3808c,0 7px 0 #3d2c23,0 12px 24px #001025b3;
+  backdrop-filter:none}
+.in-battle .command-deck .turn-line{min-height:35px;padding:8px 13px;border-bottom:2px solid #ad7747;
+  background:linear-gradient(#103962f5,#0d3156ed)}
+.in-battle .command-deck .turn-line strong{font:900 13px 'Barlow Condensed',sans-serif;color:#ffe9a7}
+.in-battle .command-deck .message{max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:#e7f0e7;font:700 11px 'Barlow',sans-serif}
+.in-battle .command-deck .controls-body{min-height:109px;gap:8px;padding:10px 10px 13px;align-items:center}
+.in-battle .command-deck .sliders{gap:7px;min-width:0;flex-direction:column;padding:8px;
+  border:2px solid #d9b070;border-radius:13px;background:#123b5bdd;box-shadow:inset 0 1px #ffe2a044}
+.in-battle .sliders label>span{font:900 11px 'Barlow Condensed',sans-serif;letter-spacing:.25px;color:#fff0c9}
+.in-battle .sliders label>span svg{width:14px;height:14px}
+.in-battle .sliders b{font:900 19px 'Barlow Condensed',sans-serif;color:#ffe5ac}
+.in-battle .sliders input{margin:0;height:21px}
+.in-battle .sliders .scale{font:700 8px 'Barlow',sans-serif;letter-spacing:0;color:#d3e6ed}
+.in-battle .command-deck .fire-button{flex:0 0 clamp(108px,28vw,145px);
+  width:clamp(108px,28vw,145px);height:clamp(108px,28vw,145px);
+  border:6px double #ffe0a0;border-radius:50%;color:#fff7e0;
+  background:radial-gradient(circle at 42% 22%,#f36b4a,#d4222e 56%,#710c25);
+  box-shadow:0 0 0 3px #7b4f26,0 3px 0 5px #d29c4b,inset 0 2px #ffe5bd,0 8px 15px #1b1718}
+.in-battle .fire-button svg{color:#ffdda0}
+.in-battle .fire-button>span{font:900 clamp(19px,5.2vw,30px)/1 'Barlow Condensed',sans-serif;letter-spacing:0;text-shadow:0 2px #710b20}
+.in-battle .fire-button>small{font:900 10px 'Barlow Condensed',sans-serif;letter-spacing:.5px;color:#ffeeb4}
+.in-battle .deck-footer{padding:6px 10px;background:#173b5bdb;color:#f0d6a7;
+  font:700 9px 'Barlow Condensed',sans-serif;letter-spacing:.3px}
+.in-battle .result{z-index:11;border:3px solid #d1a25e;background:#092647ed}
+.in-battle .loading,.in-battle .error-panel{z-index:12}
+@media (max-width:600px){
+  .in-battle .battle-approved-currencies{gap:6px;padding:7px 8px 0}
+  .in-battle .battle-approved-currencies>span{min-height:26px;padding:2px 6px}
+  .in-battle .battle-approved-currencies small{font-size:7px}
+  .in-battle .health-card{padding:7px 5px;gap:5px}
+  .in-battle .health-crest{display:none}
+  .in-battle .battle-hud{gap:3px}
+  .in-battle .round{flex-basis:37px}
+  .in-battle .view-controls{bottom:max(235px,calc(env(safe-area-inset-bottom) + 219px))}
+  .in-battle .command-deck{bottom:max(19px,calc(env(safe-area-inset-bottom) + 13px))}
+  .in-battle .command-deck .controls-body{min-height:103px;padding:8px;gap:8px}
+  .in-battle .command-deck .fire-button{flex-basis:106px;width:106px;height:106px}
+  .in-battle .command-deck .turn-line{padding:7px 9px}
+  .in-battle .command-deck .message{font-size:9px}
+  .in-battle .command-deck .deck-footer{display:none}
+}
+@media (max-width:350px){
+  .in-battle .battle-approved-logo{font-size:25px}
+  .in-battle .battle-approved-currencies>span{font-size:12px}
+  .in-battle .battle-approved-currencies small{font-size:6px}
+  .in-battle .battle-approved-banner{width:58vw;font-size:23px}
+  .in-battle .round{flex-basis:32px}
+  .in-battle .round .battle-versus{font-size:22px}
+  .in-battle .health-detail h2{font-size:13px}
+  .in-battle .ship-label{font-size:8px}
+  .in-battle .ship-label strong{font-size:9px}
+  .in-battle .view-controls{width:calc(100% - 14px)}
+  .in-battle .view-controls button{width:48px;height:48px}
+  .in-battle .command-deck .fire-button{flex-basis:94px;width:94px;height:94px}
+  .in-battle .command-deck .controls-body{padding:6px}
+  .in-battle .sliders label>span{font-size:9px}
+  .in-battle .command-deck .deck-footer{display:none}
+}
+@media (max-height:650px){
+  .in-battle .battle-approved-top{height:113px}
+  .in-battle .battle-approved-logo{font-size:23px}
+  .in-battle .battle-approved-currencies{padding-top:3px}
+  .in-battle .battle-approved-banner{height:35px;margin-top:4px}
+  .in-battle .battle-hud{top:117px}
+  .in-battle .return-harbour{top:70px}
+  .in-battle .view-controls{bottom:205px}
+  .in-battle .command-deck .deck-footer{display:none}
+  .in-battle .command-deck .fire-button{width:94px;height:94px;flex-basis:94px}
+}
+@media (prefers-reduced-motion:reduce){
+ .in-battle .view-controls button,.in-battle .command-deck button{transition:none}
+}
+
+/* Preserve the developer FPS toggle and visible release number without blocking controls. */
+.in-battle .bottom-note{z-index:7;bottom:2px;left:auto;right:9px;display:flex;pointer-events:none}
+.in-battle .bottom-note>span{display:none}
+.in-battle .bottom-note button{pointer-events:auto;color:#f4dba8;font-size:9px}
+body:has(.in-battle) > .rp-version{top:auto!important;left:7px!important;bottom:2px!important;padding:2px 5px;font-size:9px;opacity:.86}
