@@ -305,7 +305,8 @@ try {
     const inside=r=>r&&r.left>=-2&&r.right<=viewport.width+2&&r.top>=0&&r.bottom<=viewport.height+2;
     const battleFits=battleGeometry?.canvas&&battleGeometry.ready&&!battleGeometry.error&&!battleGeometry.overflow&&
       inside(battleGeometry.fire)&&inside(battleGeometry.hud)&&inside(battleGeometry.deck)&&
-      battleGeometry.views.length===5&&battleGeometry.views.every(inside);
+      battleGeometry.views.length===5&&battleGeometry.views.every(inside)&&
+      Math.max(...battleGeometry.views.map(r=>r.bottom))<=battleGeometry.deck.top-5;
     report.responsiveBattle??=[];
     report.responsiveBattle.push({viewport,...battleGeometry,matched:Boolean(battleFits)});
     const battleShot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
