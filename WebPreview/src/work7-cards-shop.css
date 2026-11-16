@@ -2946,3 +2946,80 @@
     font-size:10.5px;
   }
 }
+
+
+/* WORK7 / #104 — reference-led density correction, 16 Nov 17h.
+ * In the approved 06 artwork the captain pack is ~160/512px high and
+ * all three offers are ~120/512px high. The 390x844 render before this
+ * pass gave the pack ~199px and the offers ~177px, creating an over-tall
+ * opaque merchant deck. Shorter local picture frames recover vertical
+ * rhythm; this is NOT a redesign of the shared HUD/nav, tropical sky,
+ * gold accents, product definitions, or any payment mechanics.
+ * Keep the 8x 4x2 conceptual Cards and 3 unavailable shop chests. 
+ * approved:false until human inspects CI reference/render/overlay. */
+@media (min-width:355px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    min-height:171px;
+    grid-template-columns:minmax(0,49%) minmax(0,1fr);
+    gap:8px;
+    padding:8px 9px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+    height:148px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    max-width:165px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{
+    gap:4px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    min-height:26px;
+    margin-top:3px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest{
+    min-height:154px;
+    padding:5px 3px 6px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{
+    min-height:88px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+    max-width:108px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    min-height:28px;
+  }
+}
+/* On 320x568, retain legible real labels while revealing more of all
+ * three chest illustrations before the fixed Porto bottom navigation. */
+@media(max-width:354px),(max-height:640px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    min-height:156px;
+    padding:6px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+    height:126px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    max-width:136px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    min-height:22px;
+    margin-top:0;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest{
+    min-height:136px;
+    padding:4px 2px 5px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{
+    min-height:75px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+    max-width:91px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    min-height:27px;
+    font-size:10.5px;
+  }
+}
