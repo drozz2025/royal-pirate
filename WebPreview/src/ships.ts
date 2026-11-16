@@ -279,15 +279,30 @@ export function makeShip(red = false): ShipArt {
     for(let i=0;i<upperPositions.count;i++){
       const u=upperPositions.getX(i)/(w*.70)+.5;
       const v=upperPositions.getY(i)/1.55+.5;
-      upperPositions.setZ(i,.21+Math.sin(u*Math.PI)*Math.sin(v*Math.PI)*.45);
-      upperPositions.setX(i,upperPositions.getX(i)*(1-.08*Math.cos(v*Math.PI*2)));
+      // Taper the hem while leaving the yard full-width. Layered folds and
+      // canvas bulge read as cloth rather than a rigid rectangular billboard.
+      upperPositions.setZ(i,.12+Math.sin(u*Math.PI)*(.24+.35*Math.sin(v*Math.PI))
+        +.045*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
+      upperPositions.setX(i,upperPositions.getX(i)*(.77+.19*Math.sin(v*Math.PI)+.04*v));
     }
     upperGeometry.computeVertexNormals();
     const upperSail=new T.Mesh(upperGeometry,topsailMat);
     upperSail.position.set(0,h+.28,z);rig.add(upperSail);sails.push(upperSail);
     const g=new T.PlaneGeometry(w,3.6,7,7);const p=g.attributes.position;
-    for(let i=0;i<p.count;i++){const x=p.getX(i)/w+.5,y=p.getY(i)/3.6+.5;p.setZ(i,Math.sin(x*Math.PI)*Math.sin(y*Math.PI)*.8);p.setX(i,p.getX(i)*(1-.13*Math.cos(y*Math.PI*2)));}
+    for(let i=0;i<p.count;i++){
+      const u=p.getX(i)/w+.5,v=p.getY(i)/3.6+.5;
+      const belly=Math.sin(u*Math.PI)*Math.sin(v*Math.PI);
+      // Rounded shoulders, narrowed foot and alternating curved canvas
+      // panels create a three-dimensional galleon silhouette from either side.
+      p.setX(i,p.getX(i)*(.84+.13*Math.sin(v*Math.PI)+.03*v));
+      p.setZ(i,.05+.74*belly+.10*Math.sin(u*Math.PI)
+        +.065*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
+    }
     g.computeVertexNormals();const sail=new T.Mesh(g,sailMat);sail.position.set(0,h-2.3,z);rig.add(sail);sails.push(sail);
+    // A slender rope along the lower canvas edge gives a readable curved
+    // silhouette without creating a HUD overlay or changing the hit boxes.
+    beam(new T.Vector3(-w*.42,h-4.10,z+.06),
+      new T.Vector3(w*.42,h-4.10,z+.06),.029,rope);
     const crow=new T.Mesh(new T.CylinderGeometry(.52,.3,.4,12),gold);crow.position.set(0,h-.05,z);rig.add(crow);
     const flag=new T.Mesh(new T.PlaneGeometry(1.4,.8,4,2),flagMat);flag.position.set(.7,h+1.93,z);rig.add(flag);flags.push(flag);
     for(const side of [-1,1])for(const az of [z-1.3,z+1.3])beam(new T.Vector3(side*1.55,2.6,az),new T.Vector3(0,h-.1,z),.016,rope);
@@ -310,6 +325,22 @@ export function makeShip(red = false): ShipArt {
     foreGeo.computeVertexNormals();
     const foresail=new T.Mesh(foreGeo,topsailMat);
     foresail.position.set(0,4.85,3.45);rig.add(foresail);sails.push(foresail);
+    // A live, wind-filled triangular jib connects the third foremast to the
+    // bowsprit. Its real 3D mesh stays on the same ship; no flat screenshot,
+    // extra collider, camera movement or touch interception is introduced.
+    const jibGeo=new T.BufferGeometry();
+    jibGeo.setAttribute('position',new T.Float32BufferAttribute([
+      -.08,6.45,3.40, // mast stay
+      -.05,3.07,6.05, // bowsprit attachment
+      -.08,3.47,3.78, // aft lower corner
+      -.38,4.45,4.65  // billowed cloth centre
+    ],3));
+    jibGeo.setIndex([0,1,3,1,2,3,2,0,3]);
+    jibGeo.computeVertexNormals();
+    const jib=new T.Mesh(jibGeo,topsailMat);
+    rig.add(jib);sails.push(jib);
+    beam(new T.Vector3(-.08,6.45,3.40),new T.Vector3(-.05,3.07,6.05),.020,rope);
+    beam(new T.Vector3(-.05,3.07,6.05),new T.Vector3(-.08,3.47,3.78),.016,rope);
     for(const side of [-1,1]){
       beam(new T.Vector3(side*1.4,2.65,3.15),new T.Vector3(0,6.7,3.45),.018,rope);
       beam(new T.Vector3(side*1.35,6.0,3.45),new T.Vector3(side*1.6,2.65,4.2),.018,rope);
