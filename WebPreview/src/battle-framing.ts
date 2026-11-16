@@ -1,8 +1,11 @@
-/** Battle camera positions are deliberately independent from the approved Porto
- * camera. A tall phone has extra vertical canvas but very little horizontal space:
- * bringing the camera closer makes the ships recognisable without moving their
- * physics positions, swapping the genuine 3D scene for a screenshot, or clipping
- * the foreground cannons.
+/** Static battle-only portrait composition. Camera/target coordinates here are
+ * the ACTUAL OrbitControls pose, not values to which scene.ts adds offsets.
+ * We do not alter the genuine ship/shot physics, Porto camera or game controls.
+ *
+ * 384x512 exposed a framing bug: the short-phone branch kept the galleon tiny,
+ * central and behind an expanse of empty ocean. Bringing the camera 12 units
+ * forward, aiming slightly to port and moving only the decorative gun deck back
+ * places the opponent in the right-hand broadside without enlarging buttons.
  */
 export type CameraPose = {
   position: [number, number, number];
@@ -12,16 +15,15 @@ export type CameraPose = {
 };
 export function battleCameraPose(aspect: number): CameraPose {
   if (aspect < .50) {
-    // 390x844 and 430x932: enlarge ship silhouettes and compose them just
-    // above the live foreground cannon deck. The battery follows the camera,
-    // so both original muzzle meshes sit ABOVE the utility row, visible
-    // against the ocean rather than hidden by their buttons.
-    return { position: [0, 11, 78], target: [0, 4.5, 0], showBattery: true, batteryOffsetZ: -35 };
+    // Keep the already-tested tall portrait 390x844/430x932 composition
+    // pixel-equivalent to the previous scene.ts target offsets.
+    return { position: [0, 11, 78], target: [5, 4.95, 0], showBattery: true, batteryOffsetZ: -35 };
   }
-  if (aspect < .75) {
-    // The short 320x568 viewport has less room between HP and touch controls.
-    // Retain its previously tested framing rather than clipping the hulls.
-    return { position: [0, 10, 90], target: [0, 2, 0], showBattery: true, batteryOffsetZ: -15 };
+  if (aspect < .80) {
+    // 320x568 and native-reference 384x512: closer enemy broadside, starboard
+    // focal point and the SAME near-field cannon size/depth as before.
+    // Battery is decorative; its offset never changes cannon firing origins.
+    return { position: [0, 10.3, 78], target: [1, 4.2, 0], showBattery: true, batteryOffsetZ: -26 };
   }
   const distance = aspect < 1.2 ? 43 : 34;
   return { position: [distance * .20, distance * .56, distance * .88], target: [0, 2, 0], showBattery: false, batteryOffsetZ: -15 };

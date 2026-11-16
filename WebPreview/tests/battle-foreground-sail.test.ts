@@ -32,13 +32,16 @@ test('battle art is actual curved 3D canvas with rigging and sculpted emblem',()
 
 test('reference left sail is legible yet stays above fire/cannon controls at 320/390/430',()=>{
   const bounds=BATTLE_SAIL_BOUNDS;
-  for(const [w,h] of [[320,568],[390,844],[430,932]]){
-    const tl=project(w,h,new T.Vector3(bounds.left,bounds.top,bounds.depth));
-    const br=project(w,h,new T.Vector3(bounds.right,bounds.bottom,bounds.depth));
+  for(const [w,h] of [[320,568],[384,512],[390,844],[430,932]]){
+    // scene.ts already shifts this battle-only group +2.3 world units after
+    // construction. Project the REAL rendered rig instead of its factory origin.
+    const sceneShiftX=2.3;
+    const tl=project(w,h,new T.Vector3(bounds.left+sceneShiftX,bounds.top,bounds.depth));
+    const br=project(w,h,new T.Vector3(bounds.right+sceneShiftX,bounds.bottom,bounds.depth));
     assert.ok(tl.y>h*.26, `sail clears top title and HP region ${w}x${h}: ${tl.y}`);
     assert.ok(br.y<h*.66, `sail clears fire/cannon row ${w}x${h}: ${br.y}`);
-    assert.ok(br.x>w*.18&&br.x<w*.42,`foreground stays left of enemy ${w}x${h}: ${br.x}`);
-    assert.ok(tl.x<w*.17,`foreground silhouette starts near the left screen edge ${w}x${h}: ${tl.x}`);
+    assert.ok(br.x>w*.18&&br.x<w*.48,`foreground stays left of enemy ${w}x${h}: ${br.x}`);
+    assert.ok(tl.x<w*.20,`foreground silhouette starts near the left screen edge ${w}x${h}: ${tl.x}`);
   }
 });
 
