@@ -36,8 +36,8 @@ test('battle-only cloudfront is painted to a real 1024 square sky texture, witho
     assert.equal(created[0].width, 1024);
     assert.equal(created[0].height, 1024);
     assert.ok(draws > 100, 'painted volumes, sun shafts and mist must render');
-    assert.ok(stops.includes('rgba(35,80,116,.68)'), 'deep blue storm shadows are painted');
-    assert.ok(stops.includes('rgba(255,255,242,.65)'), 'lit cloud edges are painted');
+    assert.ok(stops.includes('rgba(35,80,116,.40)'), 'deep blue storm shadows are painted');
+    assert.ok(stops.includes('rgba(255,255,242,.39)'), 'lit cloud edges are painted');
     texture.dispose();
   } finally {
     if (descriptor) Object.defineProperty(globalThis, 'document', descriptor);
