@@ -3215,3 +3215,148 @@
   .w8-approved-missions .w8-approved-quest-core>strong{font-size:19px}
   .w8-approved-ranking .w8-approved-empty-rank{min-height:51px}
 }
+
+
+/* WORK8 16 Nov 13:41 — 07/08 depth/portrait-scale pass after merged #168.
+   This is decorative framing of already-functional data.  No shared HUD,
+   Porto dock, fabricated opponent, gem balance, reward or gameplay change. */
+.w8-screen.w8-approved .w8-approved-title::before{
+  left:17%;right:17%;
+  border-radius:42% 42% 18% 18% / 34% 34% 22% 22%;
+  background:linear-gradient(90deg,#9a5c27 0%,#edc680 2%,#5e361d 6%,#081b32 13%,#163f5a 50%,#081b32 87%,#5e361d 94%,#edc680 98%,#9a5c27);
+  box-shadow:inset 0 3px 1px #fff5c1b5,inset 0 -4px 0 #5f331b,0 3px 0 #8c5527,0 8px 12px #001327b8;
+}
+.w8-screen.w8-approved .w8-approved-title h2{
+  text-shadow:0 2px 0 #1a170e,0 4px 2px #04172c,0 0 10px #ffe2a98c;
+}
+.w8-screen.w8-approved .w8-approved-title h2::before,
+.w8-screen.w8-approved .w8-approved-title h2::after{
+  content:"✦";display:inline-block;position:relative;top:-2px;
+  color:#eabf71;font-size:13px;margin:0 7px;
+  text-shadow:0 1px #3e2418;
+}
+.w8-screen.w8-approved .w8-approved-scene .w8-seascape{
+  filter:saturate(1.28) contrast(1.12) brightness(1.05);
+}
+
+/* Mission reference 07: three substantial inset panels and vivid, readable
+   seven-day chests. Keep every real claim control and progress indicator. */
+.w8-approved-missions .w8-approved-quest{
+  background:
+    radial-gradient(ellipse 45% 115% at 3% 22%,#7fd0d448,transparent 92%),
+    linear-gradient(180deg,#2e6d86ed 0%,#154365fa 48%,#062744fd 100%);
+  box-shadow:inset 0 2px 0 #f2f9dfa6,inset 0 0 0 2px #133c55a8,
+    inset 0 -3px 0 #03172c,0 3px 0 #79502c,0 7px 12px #00162dc2;
+}
+.w8-approved-missions .w8-approved-quest-core>strong{
+  line-height:1.12;word-break:normal;
+  text-shadow:0 2px 2px #001a2f,0 0 8px #051e2c;
+}
+.w8-approved-missions .w8-approved-quest-art .w8-art{
+  filter:drop-shadow(0 4px 2px #031a2de8) drop-shadow(0 0 7px #fbdc8b97);
+}
+.w8-approved-missions .w8-approved-daily{
+  box-shadow:inset 0 2px #fff7d4ab,inset 0 -3px #061d34,0 3px #9a6b32,0 9px 13px #01182dc2;
+}
+.w8-approved-missions .w8-approved-days li{
+  border-radius:8px;
+  box-shadow:inset 0 2px 1px #fff5c595,inset 0 -3px #021c309c,0 3px 5px #00172b88;
+}
+.w8-approved-missions .w8-approved-chest .w8-art{
+  transform:scale(1.1);
+  transform-origin:50% 60%;
+  filter:drop-shadow(0 5px 2px #001629) drop-shadow(0 0 6px #ffdd9aaa);
+}
+
+/* Ranking reference 08: an important captain portrait above a denser
+   five-place framed list. Vacant places remain labelled unavailable. */
+.w8-approved-ranking .w8-approved-captain{
+  position:relative;
+  background:
+    radial-gradient(ellipse 60% 120% at 12% 31%,#e4ba7352,transparent 91%),
+    linear-gradient(105deg,#367e94,#184866 46%,#09283f);
+  box-shadow:inset 0 3px #fff0bdba,inset 0 -4px #071e32,0 3px #8a5d31,0 9px 13px #011626b4;
+}
+.w8-approved-ranking .w8-approved-captain::before{
+  content:"";position:absolute;inset:5px;
+  border:1px solid #ffdfa13f;border-radius:9px;
+  pointer-events:none;
+}
+.w8-approved-ranking .w8-approved-avatar{
+  box-shadow:0 0 0 2px #5b371e,inset 0 2px #fff9d0,0 4px 10px #001325,0 0 16px #ffdc8659;
+}
+.w8-approved-ranking .w8-approved-avatar .w8-captain-portrait{
+  transform:scale(1.19) translateY(2%);
+  filter:drop-shadow(0 3px 2px #001526);
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+  position:relative;
+  box-shadow:inset 0 3px #f5e9bb96,inset 0 -3px #06192e,0 3px #8e5a2c,0 9px 13px #01162fbd;
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline)::before{
+  content:"";position:absolute;inset:5px;
+  border:1px solid #dfc68b36;border-radius:7px;
+  pointer-events:none;
+}
+.w8-approved-ranking .w8-approved-leaderboard h3{
+  font-size:clamp(23px,6vw,28px);
+  text-shadow:0 3px #422c1b,0 0 12px #f8d28c5e;
+}
+.w8-approved-ranking .w8-approved-local-row{
+  background:linear-gradient(95deg,#357b95 0%,#1c4b6c 58%,#0b2e4d);
+  box-shadow:inset 0 2px #f6ead1a1,inset 0 -2px #031d37,0 3px 5px #00172ec4;
+}
+.w8-approved-ranking .w8-approved-empty-rank{
+  background:linear-gradient(90deg,#275d797c,#0e365456 71%,#071f3500);
+  border-bottom:1px solid #9ca99f80;
+}
+.w8-approved-ranking .w8-approved-empty-portrait{
+  border:2px ridge #dfc18c;
+  background:radial-gradient(circle at 28% 17%,#9cbac7,#33546b 51%,#092239 92%);
+  box-shadow:inset 0 2px #fff7cc8c,0 0 0 1px #173a50,0 3px 6px #00152bd0;
+}
+.w8-approved-ranking .w8-approved-empty-portrait svg{
+  filter:drop-shadow(0 2px 1px #02162a) contrast(1.13);
+}
+.w8-approved-ranking .w8-approved-empty-rank strong{
+  color:#e8efeb;text-shadow:0 2px #071d32;
+}
+@media (min-width:351px){
+  .w8-approved-ranking .w8-approved-captain{
+    min-height:129px;grid-template-columns:87px minmax(0,1fr) 74px;
+  }
+  .w8-approved-ranking .w8-approved-avatar{width:85px;height:91px}
+  .w8-approved-ranking .w8-approved-empty-rank{
+    min-height:51px;grid-template-columns:30px 48px minmax(0,1fr) 15px;
+    gap:7px;padding:3px 7px;
+  }
+  .w8-approved-ranking .w8-approved-empty-portrait{width:46px;height:46px}
+  .w8-approved-ranking .w8-approved-empty-portrait svg{width:42px;height:43px}
+  .w8-approved-ranking .w8-approved-empty-rank strong{font-size:13px;line-height:1.12}
+  .w8-approved-ranking .w8-approved-local-row{min-height:60px}
+  .w8-approved-ranking .w8-approved-mini-avatar{width:46px;height:46px;flex-basis:46px}
+}
+@media (max-width:350px){
+  /* The narrow viewport scrolls through the seven chests and claim button;
+     do not clamp/hide the reward rail to squeeze it under the Porto dock. */
+  .w8-approved-missions .w8-approved-quest-list,
+  .w8-approved-missions .w8-approved-daily{
+    max-height:none;overflow:visible;flex-shrink:0;
+  }
+  .w8-approved-missions .w8-approved-days li{min-height:68px}
+  .w8-approved-missions .w8-approved-chest .w8-art{transform:scale(1.04)}
+  .w8-approved-ranking .w8-approved-captain{
+    grid-template-columns:57px minmax(0,1fr) 65px;gap:5px;
+    min-height:100px;
+  }
+  .w8-approved-ranking .w8-approved-avatar{width:56px;height:58px}
+  .w8-approved-ranking .w8-approved-empty-rank{
+    grid-template-columns:24px 34px minmax(0,1fr) 10px;
+    min-height:43px;gap:3px;
+  }
+  .w8-approved-ranking .w8-approved-empty-portrait{width:33px;height:34px}
+  .w8-approved-ranking .w8-approved-empty-portrait svg{width:31px;height:32px}
+  .w8-approved-ranking .w8-approved-empty-rank strong{font-size:10.5px}
+  .w8-screen.w8-approved .w8-approved-title h2::before,
+  .w8-screen.w8-approved .w8-approved-title h2::after{margin:0 3px;font-size:9px}
+}
