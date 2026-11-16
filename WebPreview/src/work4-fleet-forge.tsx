@@ -109,6 +109,30 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
     <path d="M77 188Q148 225 265 188M89 194Q158 212 252 191" stroke="#f1c36f" strokeWidth="3.5" fill="none"/>
     <path d="M53 141Q53 132 69 126L71 146M270 139Q281 122 304 131L301 148" stroke="#e7af66" strokeWidth="5" fill="none"/>
     <g fill="#f0b665" stroke="#673a24" strokeWidth="1.5"><circle cx="57" cy="138" r="4"/><circle cx="293" cy="140" r="5"/></g>
+
+    {/* Depth pass: raised sterncastle, timber grain, ornate gunports and rigging.
+        All shapes remain independent SVG geometry, never a screenshot backdrop. */}
+    <g className="w4-ship-detail" pointerEvents="none">
+      <path d="M253 133L258 111 284 100 305 118 316 143 295 152Z" fill="#452a22" stroke="#e7ad61" strokeWidth="4"/>
+      <path d="M260 119L278 111 291 121 293 143 257 147Z" fill="#694028" stroke="#ecbd72" strokeWidth="2"/>
+      <path d="M269 117v23m14-24v25m-23-14h34" stroke="#d59b52" strokeWidth="3"/>
+      <path d="M262 144q18-9 39 0" fill="none" stroke="#fbd681" strokeWidth="5"/>
+      <path d="M88 167Q170 191 288 163M89 176Q168 200 278 175M94 183Q173 204 270 184" fill="none" stroke="#150e14" strokeWidth="2.5" opacity=".72"/>
+      <path d="M86 170Q174 192 285 168M105 193Q181 205 259 186" fill="none" stroke="#ffd082" strokeWidth="2" opacity=".8"/>
+      <path d="M51 149Q43 157 55 178L76 194 93 202M282 181l18-25 17 6" fill="none" stroke="#e8a64c" strokeWidth="5" strokeLinecap="round"/>
+      <path d="M316 149q19 2 14 14l-13 4 3-10-10-4" fill="#e4a54b" stroke="#ffdb89" strokeWidth="2"/>
+      <path d="M85 136Q177 146 282 130" fill="none" stroke="#f9d88c" strokeWidth="5"/>
+      <path d="M81 136v11m16-12v12m16-11v11m16-9v11m16-12v11m16-11v11m16-11v11m16-12v10m16-12v11m16-13v12m16-14v12m16-14v11" stroke="#f6c77b" strokeWidth="2.4"/>
+      <g fill="#fff1b4" opacity=".75">
+        <circle cx="108" cy="157" r="1.8"/><circle cx="133" cy="161" r="1.8"/><circle cx="161" cy="164" r="1.8"/>
+        <circle cx="192" cy="165" r="1.8"/><circle cx="221" cy="163" r="1.8"/><circle cx="251" cy="160" r="1.8"/>
+      </g>
+      <path d="M81 72Q94 54 119 41L119 120Q96 116 78 125" fill="none" stroke="#e5ddd0" strokeWidth="2" opacity=".52"/>
+      <path d="M130 48Q164 49 189 111M220 35Q247 50 249 107" fill="none" stroke="#f5dfb6" strokeWidth="2.2" opacity=".55"/>
+      <path d="M120 31L28 148M210 20L311 144M120 32L261 137" fill="none" stroke="#f8dc9d" strokeWidth="1.3" opacity=".65"/>
+      <path d="M143 92l-15-26m64 33 10-32M223 81l-12-25" stroke="#ba8b55" strokeWidth="1.3" opacity=".8"/>
+      <path d="M103 188q45 15 99 12" fill="none" stroke="#c68c50" strokeWidth="2" opacity=".7"/>
+    </g>
     <path d="M36 204Q65 196 103 207M218 207Q256 199 316 205" stroke="#ddfcfa" strokeWidth="4" opacity=".85" fill="none" strokeLinecap="round"/>
 
   </svg>;
@@ -157,6 +181,24 @@ function ForgeBackdrop(){
   <g stroke="#cc9d5b" fill="none" strokeWidth="5"><circle cx="28" cy="232" r="27"/><path d="M28 205v54M1 232h54m-45-19 36 37m0-37-36 37"/></g>
   <path d="M304 28Q302 102 314 135" stroke="#c6a177" strokeWidth="5" fill="none" strokeDasharray="7 5"/>
   <path d="M0 260Q180 220 420 250" stroke="#ffd181" strokeWidth="3" opacity=".24" fill="none"/>
+
+    {/* Architectural depth for the workshop: masonry blocks, timber lattice,
+        ember light and brass fittings rather than the flat navy void. */}
+    <g className="w4-forge-environment-detail" pointerEvents="none">
+      <path d="M23 139Q36 51 109 47Q170 52 179 148" stroke="#5e3728" strokeWidth="18" fill="none"/>
+      <path d="M23 139Q36 51 109 47Q170 52 179 148" stroke="#e9ac65" strokeWidth="5" fill="none"/>
+      <path d="M30 146h136M36 104h130M58 74h97M35 183h127M32 220h132" stroke="#c4804b" strokeWidth="3" opacity=".8"/>
+      <path d="M76 76v28m49-29v29M48 110v34m56-34v37m45-34v37M69 149v34m58-34v34M48 186v36m65-36v36" stroke="#a26342" strokeWidth="2.6" opacity=".74"/>
+      <path d="M201 34H378M202 42H382M195 60h204M201 89h194" stroke="#d2a36b" strokeWidth="4" opacity=".32"/>
+      <path d="M207 21v205m175-201v212m-160-200v206m146-205v200" stroke="#875934" strokeWidth="10" opacity=".44"/>
+      <path d="M210 25l164 176m-165 0L376 26" stroke="#a77849" strokeWidth="7" opacity=".24"/>
+      <g fill="#fff2b1" opacity=".88">
+       <circle cx="67" cy="176" r="2.2"/><circle cx="136" cy="155" r="3"/><circle cx="154" cy="187" r="1.8"/>
+       <circle cx="87" cy="140" r="2"/><circle cx="127" cy="196" r="2.8"/>
+      </g>
+      <path d="M10 253L397 242M12 267L411 260M33 279L421 274" stroke="#daa365" strokeWidth="2" opacity=".55"/>
+      <path d="M226 235v39m89-42v41m70-45v38" stroke="#241d22" strokeWidth="5" opacity=".5"/>
+    </g>
  </svg>;
 }
 
@@ -191,6 +233,29 @@ function ForgeCannonArtwork(){
     <ellipse cx="64" cy="187" rx="24" ry="31" transform="rotate(-12 64 187)" fill="url(#w4-cannon-muzzle)" stroke="#8f7046" strokeWidth="5"/>
     <path d="M301 107 L339 106 L355 135 L331 155 L312 155Z" fill="url(#w4-cannon-brass)" stroke="#fbd88e" strokeWidth="5"/>
     <circle cx="344" cy="129" r="10" fill="#8d5124" stroke="#fce5a0" strokeWidth="3"/>
+
+    {/* Bronze reinforcement hoops, shaded timber carriage, and raised metal
+        details give the hero cannon visual weight without new game logic. */}
+    <g className="w4-cannon-detail" pointerEvents="none">
+      <path d="M94 210L285 157 325 184 137 251Z" fill="#865535" opacity=".65"/>
+      <path d="M117 221L308 171M142 247L330 190" stroke="#f6cc86" strokeWidth="5" opacity=".85"/>
+      <path d="M172 215l12 27m62-45 15 29" stroke="#41281e" strokeWidth="9"/>
+      <path d="M111 138L282 100 311 151 139 190Z" fill="#132e43" opacity=".63"/>
+      <path d="M119 133L280 97M151 192L314 151" stroke="#f4d496" strokeWidth="3" opacity=".85"/>
+      <path d="M180 123L196 179M234 109L251 168" stroke="#e4b870" strokeWidth="13" opacity=".95"/>
+      <path d="M180 123L196 179M234 109L251 168" stroke="#64452e" strokeWidth="3"/>
+      <path d="M143 135l31-7M204 116l29-7M260 101l31-7" stroke="#fff2bf" strokeWidth="4" opacity=".7"/>
+      <path d="M102 162L274 117" stroke="#c5d8db" strokeWidth="5" opacity=".48"/>
+      <ellipse cx="64" cy="186" rx="36" ry="42" transform="rotate(-12 64 186)" fill="none" stroke="#ffecad" strokeWidth="3"/>
+      <ellipse cx="64" cy="186" rx="28" ry="34" transform="rotate(-12 64 186)" fill="none" stroke="#ab793e" strokeWidth="5"/>
+      <path d="M51 158q-21 25-4 52" stroke="#fff8cc" strokeWidth="4" opacity=".82" fill="none"/>
+      <circle cx="275" cy="217" r="36" fill="none" stroke="#fce2a2" strokeWidth="3" opacity=".8"/>
+      <circle cx="275" cy="217" r="13" fill="none" stroke="#8d582c" strokeWidth="4"/>
+      <g fill="#ffe8ad" opacity=".88">
+       <circle cx="151" cy="143" r="2"/><circle cx="198" cy="130" r="2.2"/><circle cx="250" cy="116" r="2"/>
+       <circle cx="151" cy="180" r="2"/><circle cx="201" cy="164" r="2"/><circle cx="263" cy="147" r="2"/>
+      </g>
+    </g>
     <path d="M36 236Q64 226 83 240M353 234Q380 219 397 235" stroke="#fbcc7b" strokeWidth="3" fill="none" opacity=".7"/>
   </svg>;
 }
