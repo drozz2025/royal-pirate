@@ -300,9 +300,11 @@ export function makeShip(red = false): ShipArt {
       const v=upperPositions.getY(i)/1.55+.5;
       // Taper the hem while leaving the yard full-width. Layered folds and
       // canvas bulge read as cloth rather than a rigid rectangular billboard.
-      upperPositions.setZ(i,.12+Math.sin(u*Math.PI)*(red ? (.13+.17*Math.sin(v*Math.PI)) : (.24+.35*Math.sin(v*Math.PI)))
-        +.045*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
-      upperPositions.setX(i,upperPositions.getX(i)*(red ? (.85+.12*Math.sin(v*Math.PI)+.03*v) : (.77+.19*Math.sin(v*Math.PI)+.04*v)));
+      upperPositions.setZ(i,red
+        ? .045+.11*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)+.017*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI)
+        : .12+Math.sin(u*Math.PI)*(.24+.35*Math.sin(v*Math.PI))
+          +.045*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
+      upperPositions.setX(i,upperPositions.getX(i)*(red ? (.96+.035*Math.sin(v*Math.PI)) : (.77+.19*Math.sin(v*Math.PI)+.04*v)));
     }
     upperGeometry.computeVertexNormals();
     const upperSail=new T.Mesh(upperGeometry,topsailMat);
