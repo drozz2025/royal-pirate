@@ -370,14 +370,13 @@ export class OceanScene {
   home(){this.cameraMode='battle';this.scene.background=this.battleSky;this.water.uniforms.battleMode.value=1;
     // Cinematic battle-only art scale; the genuine physics ships and hit logic stay live.
     // Reset to the original size in Porto so its approved composition/touch remain identical.
-    this.ships.player.root.scale.setScalar(1.18);this.ships.enemy.root.scale.setScalar(1.30);
-    // A slightly tighter portrait lens restores the large dramatic hulls
-    // without moving world-space hitboxes, adding overlays or changing Porto.
-    this.camera.fov=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.75?40:42;
-    this.camera.updateProjectionMatrix();
-    const pose=battleCameraPose(this.host.clientWidth/Math.max(1,this.host.clientHeight));const cinematicOffset=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.75?2.3:0;
-    this.camera.position.set(pose.position[0]+cinematicOffset,pose.position[1],pose.position[2]);
-    this.controls.target.set(pose.target[0]+cinematicOffset,pose.target[1],pose.target[2]);this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;this.battleBattery.visible=pose.showBattery;this.battleBattery.position.z=pose.batteryOffsetZ;this.controls.update();}
+    this.ships.player.root.scale.setScalar(1.25);this.ships.enemy.root.scale.setScalar(1.38);
+    // Comparison at 390x844 showed that the tighter off-axis lens clips the
+    // live player ship. Restore both hulls fully inside the playable viewport.
+    this.camera.fov=42;this.camera.updateProjectionMatrix();
+    const pose=battleCameraPose(this.host.clientWidth/Math.max(1,this.host.clientHeight));
+    this.camera.position.set(...pose.position);
+    this.controls.target.set(...pose.target);this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;this.battleBattery.visible=pose.showBattery;this.battleBattery.position.z=pose.batteryOffsetZ;this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
   /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
   showHarbour(){
