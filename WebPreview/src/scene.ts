@@ -36,13 +36,46 @@ export class OceanScene {
     const hemi=new T.HemisphereLight('#e7f8ff','#497f8b',2.6);this.scene.add(hemi);
     const sun=new T.DirectionalLight('#ffe3af',3.6);sun.position.set(-24,40,15);this.scene.add(sun);
     const rim=new T.DirectionalLight('#97deff',1.4);rim.position.set(16,12,-18);this.scene.add(rim);
-    this.water=new T.ShaderMaterial({uniforms:{time:{value:0},sun:{value:new T.Vector3(-24,40,15).normalize()}},vertexShader:`
+    this.water=new T.ShaderMaterial({uniforms:{time:{value:0},sun:{value:new T.Vector3(-24,40,15).normalize()},battleMode:{value:1}},vertexShader:`
       uniform float time; varying vec3 vWorld; varying vec3 vNormal; varying float vWave;
       float wave(vec2 p){return sin(p.x*.47+time*1.15)*.12+sin(p.y*.68-time*1.3)*.08+sin((p.x+p.y)*1.3-time*1.7)*.035;}
       void main(){vec3 p=position;p.z=wave(p.xy);float dx=(wave(p.xy+vec2(.05,0.))-p.z)/.05;float dy=(wave(p.xy+vec2(0.,.05))-p.z)/.05;vNormal=normalize(mat3(modelMatrix)*vec3(-dx,-dy,1.));vec4 world=modelMatrix*vec4(p,1.);vWorld=world.xyz;vWave=p.z;gl_Position=projectionMatrix*viewMatrix*world;}
     `,fragmentShader:`
-      uniform float time;uniform vec3 sun;varying vec3 vWorld;varying vec3 vNormal;varying float vWave;
-      void main(){vec3 view=normalize(cameraPosition-vWorld);vec3 n=normalize(vNormal);float fres=pow(1.-max(dot(view,n),0.),3.);float spec=pow(max(dot(n,normalize(sun+view)),0.),95.);float pattern=sin(vWorld.x*2.4+sin(vWorld.z*1.7+time)*1.5)*sin(vWorld.z*2.8-time*1.4);float chop=sin(vWorld.x*5.1+time*3.2)*sin(vWorld.z*4.7-time*2.4);float foam=smoothstep(.86,1.,pattern)*.16+smoothstep(.91,1.,chop+vWave*.28)*.07;vec3 col=mix(vec3(.009,.30,.50),vec3(.025,.66,.86),clamp(.5+vWave*2.,0.,1.));col=mix(col,vec3(.38,.78,.83),fres*.7);col+=vec3(.72,.93,.91)*foam+vec3(1.,.86,.55)*spec*.85;float fog=1.-exp(-length(cameraPosition-vWorld)*.008);gl_FragColor=vec4(mix(col,vec3(.6,.85,.87),fog),1.);}
+      uniform float time;uniform vec3 sun;uniform float battleMode;
+      varying vec3 vWorld;varying vec3 vNormal;varying float vWave;
+      void main(){
+        vec3 view=normalize(cameraPosition-vWorld);
+        vec3 n=normalize(vNormal);
+        float fres=pow(1.-max(dot(view,n),0.),3.);
+        float spec=pow(max(dot(n,normalize(sun+view)),0.),95.);
+        float pattern=sin(vWorld.x*2.4+sin(vWorld.z*1.7+time)*1.5)*sin(vWorld.z*2.8-time*1.4);
+        float chop=sin(vWorld.x*5.1+time*3.2)*sin(vWorld.z*4.7-time*2.4);
+        float oldFoam=smoothstep(.86,1.,pattern)*.16+smoothstep(.91,1.,chop+vWave*.28)*.07;
+        vec3 col=mix(vec3(.009,.30,.50),vec3(.025,.66,.86),clamp(.5+vWave*2.,0.,1.));
+        col=mix(col,vec3(.38,.78,.83),fres*.7);
+        col+=vec3(.72,.93,.91)*oldFoam+vec3(1.,.86,.55)*spec*.85;
+        float fog=1.-exp(-length(cameraPosition-vWorld)*.008);
+        col=mix(col,vec3(.6,.85,.87),fog);
+        // Battle-only whitecaps: waves remain animated and ship collisions untouched.
+        if(battleMode>.5){
+          float swell=sin(vWorld.z*.51+sin(vWorld.x*.26+time*.37)*1.65-time*.87);
+          float cross=sin(vWorld.x*.97-vWorld.z*.24+time*.68);
+          float crest=sin(vWorld.x*3.6+vWorld.z*1.8+sin(vWorld.z*2.2-time)*.9-time*3.1);
+          float flecks=sin(vWorld.x*8.2-vWorld.z*5.1+time*4.0);
+          float ridge=smoothstep(.18,.78,swell*.56+cross*.29+crest*.38);
+          float whiteCap=smoothstep(.30,.88,crest*.72+flecks*.28)*ridge;
+          float distanceToEye=length(cameraPosition.xz-vWorld.xz);
+          float proximity=1.-smoothstep(20.,88.,distanceToEye);
+          float foam=clamp(ridge*.36+whiteCap*.81,0.,1.)*(.67+.33*proximity);
+          vec3 deep=mix(vec3(.014,.20,.39),vec3(.012,.43,.63),
+                        clamp(.52+vWave*1.7+swell*.22+cross*.09,0.,1.));
+          deep=mix(deep,vec3(.27,.72,.83),fres*.34);
+          col=mix(deep,vec3(.80,.95,.95),foam);
+          col+=vec3(.89,.96,.82)*spec*.4;
+          col=mix(col,vec3(.30,.66,.84),fog*.42);
+        }
+        gl_FragColor=vec4(col,1.);
+      }
     `});
     const ocean=new T.Mesh(new T.PlaneGeometry(210,210,190,190),this.water);ocean.rotation.x=-Math.PI/2;ocean.position.y=-.05;this.scene.add(ocean);
     this.ships={player:makeShip(false),enemy:makeShip(true)};
@@ -319,11 +352,11 @@ export class OceanScene {
   }
 
   private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();}
-  home(){this.cameraMode='battle';const pose=battleCameraPose(this.host.clientWidth/Math.max(1,this.host.clientHeight));this.camera.position.set(...pose.position);this.controls.target.set(...pose.target);this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;this.battleBattery.visible=pose.showBattery;this.battleBattery.position.z=pose.batteryOffsetZ;this.controls.update();}
+  home(){this.cameraMode='battle';this.water.uniforms.battleMode.value=1;const pose=battleCameraPose(this.host.clientWidth/Math.max(1,this.host.clientHeight));this.camera.position.set(...pose.position);this.controls.target.set(...pose.target);this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;this.battleBattery.visible=pose.showBattery;this.battleBattery.position.z=pose.batteryOffsetZ;this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
   /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
   showHarbour(){
-    this.cameraMode='harbour';this.shipPointers.clear();this.shipStart=null;this.battleBattery.visible=false;this.worldScenery.visible=true;this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
+    this.cameraMode='harbour';this.water.uniforms.battleMode.value=0;this.shipPointers.clear();this.shipStart=null;this.battleBattery.visible=false;this.worldScenery.visible=true;this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
     this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
     this.controls.enableRotate=false;this.controls.enableZoom=false;this.controls.maxPolarAngle=1.28;
     const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
@@ -360,7 +393,7 @@ export class OceanScene {
     if(this.shipPointers.size===0){this.shipStart=null;this.controls.enableRotate=false;this.controls.enableZoom=false;}
   };
   /** Returns to the existing working battle camera, with both ships visible. */
-  showBattle(){this.shipPointers.clear();this.shipStart=null;this.ships.enemy.root.visible=true;this.foam[1].visible=true;this.harbourDock.visible=false;this.worldScenery.visible=false;this.controls.enableRotate=true;this.controls.enableZoom=true;this.controls.minDistance=18;this.controls.maxDistance=110;this.home();}
+  showBattle(){this.water.uniforms.battleMode.value=1;this.shipPointers.clear();this.shipStart=null;this.ships.enemy.root.visible=true;this.foam[1].visible=true;this.harbourDock.visible=false;this.worldScenery.visible=false;this.controls.enableRotate=true;this.controls.enableZoom=true;this.controls.minDistance=18;this.controls.maxDistance=110;this.home();}
   toggleMusic(){return this.pirateAudio.toggleMusic();}
   toggleEffects(){return this.pirateAudio.toggleEffects();}
   private effect(event:BattleEvent){
