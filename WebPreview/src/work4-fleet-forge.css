@@ -1891,19 +1891,27 @@
 }
 
 
-/* WORK4 PAINT FIX 2026-11-16 — opaque, warm workshop paint.
-   The 390px capture 43821385899 showed that a transparent outline is NOT
-   sufficient for Chromium's painting boundary. Use a visible warm border
-   over the full scene, no diagnostic colours, no layout changes outside W4. */
+/* WORK4 #104: full-width workshop paint-plane recovery.
+   Remove the stage pseudo-element and nested isolated compositing contexts:
+   the approved forge artwork remains individual SVG DOM nodes, not a static
+   screenshot. Scope exclusively to the WORK4 forge stage. */
 .w4-forge #w4-forge-panel > .w4-forge-stage {
-  background:#885632!important;
+  isolation:auto!important;
+  background:#845536!important;
   background-image:none!important;
-  outline:4px solid #b77f4c!important;
-  outline-offset:0;
+  outline:none!important;
 }
-.w4-forge .w4-forge-stage > .w4-forge-scene {
-  background:#c98a4c!important;
+.w4-forge #w4-forge-panel > .w4-forge-stage::before {
+  content:none!important;
+  display:none!important;
+}
+.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene {
+  isolation:auto!important;
+  background:#b77f4c!important;
   background-image:none!important;
-  outline:4px solid #d9a66e!important;
-  outline-offset:0;
+  outline:none!important;
+  z-index:0;
+}
+.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description{
+  z-index:3;
 }
