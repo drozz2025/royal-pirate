@@ -236,7 +236,7 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
           <div className="w8-approved-player-detail"><strong>{localName}</strong><small>O TEU PERFIL LOCAL</small></div>
           <span className="w8-approved-player-score"><PirateIcon name="ranking" size={17}/>{profile.xp} XP</span>
         </div>
-        {[2,3,4,5].map(slot=><div className="w8-approved-empty-rank" key={slot} aria-label={'Lugar '+slot+' sem jogador classificado; ranking online indisponível'}>
+        {[2,3,4,5].map(slot=><div className="w8-approved-empty-rank" key={slot} aria-label={'Lugar '+slot+' indisponível'}>
           <span>{slot}</span>
           <span className="w8-approved-empty-portrait" aria-hidden="true">
             <svg viewBox="0 0 32 32" focusable="false">
