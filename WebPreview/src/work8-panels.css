@@ -3881,3 +3881,120 @@
   .w8-approved-missions .w8-approved-quest{min-height:87px}
   .w8-approved-ranking .w8-approved-empty-rank{min-height:52px}
 }
+
+
+/* WORK8 2026-11-16 17:27 — engraved quest board and leaderboard depth */
+/* Original frame 07 groups its three quests into one navy/gilt board.
+   This treatment only frames existing real missions and preserves every
+   mission button, progress meter and local reward. */
+.w8-approved-missions .w8-approved-quest-list{
+  position:relative;isolation:isolate;
+  gap:7px;padding:9px 7px;
+  border:2px solid #e1b571;border-bottom-color:#81502b;
+  border-radius:15px;
+  background:
+    radial-gradient(ellipse 84% 25% at 50% 0%,#5b96a45e,transparent),
+    repeating-linear-gradient(90deg,transparent 0 21px,#d3ba8238 22px,transparent 23px) 0 0/100% 3px no-repeat,
+    linear-gradient(170deg,#173e5c 0%,#09283f 60%,#061c30 100%);
+  box-shadow:inset 0 2px #fff3bb92,inset 0 -3px #071626,0 4px 0 #61401f,0 8px 12px #001224a8;
+}
+.w8-approved-missions .w8-approved-quest-list::before{
+  content:"";position:absolute;inset:5px;border:1px solid #e9c28656;
+  border-radius:10px;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(circle at 2px 2px,#ffe19c 0 1.5px,transparent 2.5px) top left/18px 18px no-repeat,
+    radial-gradient(circle at calc(100% - 2px) 2px,#ffe19c 0 1.5px,transparent 2.5px) top right/18px 18px no-repeat,
+    radial-gradient(circle at 2px calc(100% - 2px),#ffe19c 0 1.5px,transparent 2.5px) bottom left/18px 18px no-repeat,
+    radial-gradient(circle at calc(100% - 2px) calc(100% - 2px),#ffe19c 0 1.5px,transparent 2.5px) bottom right/18px 18px no-repeat;
+}
+.w8-approved-missions .w8-approved-quest{
+  position:relative;z-index:1;
+  border-top-color:#ffe1a1;border-bottom-color:#85532d;
+  background:
+    radial-gradient(ellipse 54% 120% at 2% 50%,#4da0b048,transparent 90%),
+    linear-gradient(100deg,#1c5877 0%,#17415f 37%,#092c49 100%);
+  box-shadow:inset 0 2px #b6e2e370,inset 0 -2px #07182d,0 2px 5px #0012268c;
+}
+.w8-approved-missions .w8-approved-quest-core>strong{
+  color:#fff0c6;text-shadow:0 2px 2px #031526,0 0 6px #e2b96e35;
+}
+.w8-approved-missions .w8-approved-daily{
+  border-left-color:#f1c984;border-right-color:#e1ad5e;
+  box-shadow:inset 0 2px #fff3bf9e,inset 0 -3px #071c31,0 4px 0 #59371d,0 7px 10px #041427bb;
+}
+.w8-approved-missions .w8-approved-days li{
+  position:relative;isolation:isolate;
+  box-shadow:inset 0 2px #fff3c8a1,inset 0 -2px #07182e,0 3px 3px #011224a5;
+}
+.w8-approved-missions .w8-approved-days li::before{
+  content:"";pointer-events:none;position:absolute;z-index:1;
+  inset:3px 3px auto;height:7px;border-radius:5px;
+  background:linear-gradient(180deg,#fff8d45e,transparent);
+}
+
+/* Frame 08 is an engraved five-place navy board. Keep one actual local
+   profile and four explicitly unavailable positions; visual-only relief. */
+.w8-approved-ranking .w8-approved-captain{
+  border-top-color:#fff0bc;border-bottom-color:#80451f;
+  background:
+    radial-gradient(ellipse 40% 110% at 10% 40%,#ffe0a057,transparent 90%),
+    linear-gradient(110deg,#326c85 0%,#1b506d 43%,#0a2c49 100%);
+  box-shadow:inset 0 2px #ffe4aaac,inset 0 -3px #081c30,0 4px 0 #694222,0 8px 12px #001629a8;
+}
+.w8-approved-ranking .w8-approved-avatar{
+  outline:2px solid #f4cc7e;outline-offset:2px;
+  box-shadow:0 0 0 4px #633a22,inset 0 3px #fff3c8,0 4px 9px #021426bc;
+}
+.w8-approved-ranking .w8-approved-identity .w8-approved-meter{
+  border-color:#cca667;
+  box-shadow:inset 0 1px #051726,0 1px #e1bd7766;
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+  position:relative;isolation:isolate;
+  border-top-color:#ffebae;border-bottom-color:#79502f;
+  background:
+    radial-gradient(ellipse 73% 20% at 50% 0%,#6eb6c551,transparent 90%),
+    linear-gradient(180deg,#1d526d 0%,#0e3855 39%,#071d35 100%);
+  box-shadow:inset 0 2px #fff2b576,inset 0 -4px #05172a,0 4px 0 #614022,0 8px 12px #00152cb5;
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline)::after{
+  content:"";position:absolute;inset:4px;border-radius:8px;
+  border:1px solid #e5c0804f;pointer-events:none;z-index:0;
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline)>*{
+  position:relative;z-index:1;
+}
+.w8-approved-ranking .w8-approved-local-row{
+  border-top-color:#fff2bc;
+  box-shadow:inset 0 2px #ffe4ba94,inset 0 -2px #0a2b43,0 3px 4px #01182baf;
+}
+.w8-approved-ranking .w8-approved-empty-rank{
+  position:relative;
+  border-bottom-color:#d0b37e80;
+  background:
+    linear-gradient(90deg,#9cd5d516 0%,transparent 42%),
+    linear-gradient(180deg,#29526b84,#0c2e488c);
+}
+.w8-approved-ranking .w8-approved-empty-rank::after{
+  content:"";position:absolute;pointer-events:none;
+  right:3px;top:4px;bottom:4px;width:2px;
+  background:linear-gradient(transparent,#cda66b8f,transparent);
+}
+.w8-approved-ranking .w8-approved-empty-portrait{
+  border-color:#c4a67a;
+  box-shadow:inset 0 1px #fff3c193,0 2px 3px #02152a9c;
+}
+@media(max-width:350px){
+  .w8-approved-missions .w8-approved-quest-list{
+    padding:6px 4px;gap:6px;max-height:none!important;overflow:visible!important;
+  }
+  .w8-approved-missions .w8-approved-quest{
+    grid-template-columns:31px minmax(0,1fr) 38px 55px;
+    column-gap:3px;padding:4px 3px;
+  }
+  .w8-approved-missions .w8-approved-quest-core>strong{font-size:12.5px}
+  .w8-approved-missions .w8-approved-days{
+    overflow-x:auto;max-height:none;scrollbar-width:thin;
+  }
+  .w8-approved-ranking .w8-approved-avatar{outline-width:1px;outline-offset:0}
+}
