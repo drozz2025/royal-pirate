@@ -162,6 +162,33 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
           stroke="#f2d39a" strokeWidth="2.5" opacity=".74"/>
       </g>
     </g>}
+    {/* Oilcloth over the previously exposed rigging lattice: deep curved
+        canvas stays on the same SVG ship while the real crest is drawn on top. */}
+    {!small&&<g className="w4-sail-deep-canvas" pointerEvents="none">
+      <path d="M117 44Q99 44 80 57Q70 88 78 123Q98 135 120 127Z"
+        fill="url(#w4-canvas-sculpt)" stroke="#be995f" strokeWidth="2.6"/>
+      <path d="M130 46Q166 38 186 73Q195 89 198 118Q162 137 128 127Z"
+        fill="url(#w4-galleon-canvas)" stroke="#d1b07a" strokeWidth="2.7"/>
+      <path d="M213 30Q237 31 254 52Q262 85 254 116Q236 132 214 123Z"
+        fill="url(#w4-canvas-sculpt)" stroke="#c7a773" strokeWidth="2.5"/>
+      <path d="M265 72Q286 75 292 89Q299 112 290 128L266 130Z"
+        fill="#172334" stroke="#caa975" strokeWidth="1.8"/>
+      <g fill="none" strokeLinecap="round">
+        <path d="M92 49Q80 90 88 123M108 45Q100 86 114 123
+          M143 47Q164 84 159 127M179 69Q194 97 188 121
+          M226 38Q240 77 229 119M245 47Q259 88 249 113"
+          stroke="#64727c" strokeWidth="5.5" opacity=".51"/>
+        <path d="M100 46Q94 77 104 119M158 48Q183 85 176 120
+          M235 43Q253 80 239 116" stroke="#090e1b"
+          strokeWidth="6.5" opacity=".65"/>
+        <path d="M80 87Q99 98 118 92M130 79Q159 76 185 91
+          M216 79Q237 88 255 82" stroke="#d7d4bd" strokeWidth="1.7"
+          opacity=".65"/>
+        <path d="M78 122Q96 133 119 125M129 127Q164 139 197 117
+          M214 124Q236 132 254 114" stroke="#f2d39c"
+          strokeWidth="2.5" opacity=".83"/>
+      </g>
+    </g>}
     <g className="w4-art-crest" transform={small?undefined:'translate(-33 -20) scale(1.2)'}>
       <path d="M142 73Q166 60 186 74L187 103Q165 121 144 103Z" fill="#31333b" stroke="#d9ad69" strokeWidth="2" opacity=".96"/>
       <path d="M154 89q0-13 11-13t11 13l-4 8h-14Z" fill="#f8ebc4"/>
