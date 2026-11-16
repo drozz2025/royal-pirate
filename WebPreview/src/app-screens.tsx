@@ -39,14 +39,20 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
     else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
   };
   return <section className="app-sheet" role="dialog" aria-modal="true" onKeyDown={onDialogKeyDown} aria-labelledby="app-screen-title">
-    <header className="app-sheet-header">
-      <button type="button" className="app-back" onClick={onClose} aria-label="Back to harbour">‹</button>
-      <div className="app-sheet-brand" title="ROYAL PIRATE"><small title={profile.playerName}>{profile.playerName} · NV. {levelFor(profile.xp)} · PROGRESSO LOCAL</small><h1 ref={titleRef} tabIndex={-1} id="app-screen-title"><span className="app-page-glyph" aria-hidden="true"><PirateIcon name={page.id} size={23}/></span> {page.title}</h1></div>
+    <header className="app-sheet-header app-approved-hud">
+      <button type="button" className="app-back app-captain-return" onClick={onClose} aria-label="Voltar ao Porto" title="Voltar ao Porto">
+        <PirateIcon name="profile" size={31}/>
+        <span className="app-captain-badge" aria-hidden="true">{levelFor(profile.xp)}</span>
+      </button>
+      <div className="app-sheet-brand" title="ROYAL PIRATE">
+        <span className="app-royal-wordmark" aria-hidden="true">Royal Pirate</span>
+        <h1 ref={titleRef} tabIndex={-1} id="app-screen-title" className="app-screen-title-accessible">{page.title}</h1>
+      </div>
       <div className="app-resource-counters" role="group" aria-label="Recursos do capitão">
-        <div className="app-wallet app-wallet-gold" aria-label={profile.coins+' locally earned gold coins / moedas de ouro ganhas localmente'}><span aria-hidden="true">●</span><strong>{new Intl.NumberFormat('pt-PT').format(profile.coins)}</strong><small>OURO</small></div>
+        <div className="app-wallet app-wallet-gold" aria-label={profile.coins+' moedas de ouro ganhas localmente'}><span aria-hidden="true">●</span><strong>{new Intl.NumberFormat('pt-PT').format(profile.coins)}</strong></div>
         <div className="app-wallet app-wallet-gems" aria-label="Diamantes indisponíveis nesta versão; economia de gemas não implementada" title="Diamantes indisponíveis nesta versão">
           <svg viewBox="0 0 28 28" width="19" height="19" focusable="false" aria-hidden="true"><path d="M7 6h14l5 6-12 13L2 12z" fill="#77bce0" stroke="#d4eeff" strokeWidth="1.4"/><path d="M2 12h24M7 6l7 19L21 6M14 6l-4 6h8z" fill="none" stroke="#e5f5ff" strokeWidth="1.2"/></svg>
-          <strong>—</strong><small>GEMAS</small>
+          <strong>—</strong>
         </div>
       </div>
     </header>
