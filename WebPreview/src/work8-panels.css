@@ -3508,3 +3508,140 @@
   }
   .w8-approved-ranking .w8-approved-avatar{width:97px;height:102px}
 }
+
+
+/* WORK8 15:30 — 07/08 illustration/composition, after merged #174.
+   This pass improves the reference's vivid island scenery, seven chest
+   silhouettes and dense gold-framed rank table. No changes to the shared
+   bottom dock, game data, claim state, HUD, routes or other workers. */
+.w8-approved-missions .w8-approved-scene .w8-seascape,
+.w8-approved-ranking .w8-approved-scene .w8-seascape{
+  height:min(36dvh,294px);
+  filter:saturate(1.3) contrast(1.08) brightness(1.08);
+}
+.w8-approved-missions .w8-approved-quest{
+  border-left-color:#ffe3a2;
+  border-right-color:#daaa65;
+  background:
+    radial-gradient(ellipse 46% 90% at 11% 12%,#8fd6d154,transparent 95%),
+    linear-gradient(166deg,#34728aea,#144769f7 58%,#061e37fc);
+}
+.w8-approved-missions .w8-approved-quest-art{
+  filter:drop-shadow(0 2px 1px #092039);
+}
+.w8-approved-missions .w8-approved-quest-core>strong{
+  letter-spacing:.08px;
+  text-wrap:balance;
+}
+.w8-approved-missions .w8-approved-daily{
+  border-top-color:#ffe7aa;
+  background:
+    radial-gradient(ellipse 82% 44% at 50% 0%,#5c9aa978,transparent 97%),
+    linear-gradient(180deg,#285e79 0%,#103b5d 50%,#061b34);
+}
+.w8-approved-missions .w8-approved-daily h3::before,
+.w8-approved-missions .w8-approved-daily h3::after{
+  background:linear-gradient(90deg,transparent,#fee6b2 70%,#bd7d2e);
+  height:2px;opacity:.85;
+}
+.w8-approved-missions .w8-approved-days li{
+  border-top-color:#ffebae;
+  border-bottom-color:#604127;
+  box-shadow:inset 0 2px #fff6cf9a,inset 0 -2px #071a32,0 3px 4px #021425a9;
+}
+.w8-approved-missions .w8-approved-chest{
+  isolation:isolate;
+  filter:drop-shadow(0 2px 1px #001629);
+}
+.w8-approved-missions .w8-approved-chest::before{
+  content:"";position:absolute;z-index:-1;
+  bottom:3px;left:11%;width:78%;height:10px;border-radius:50%;
+  background:radial-gradient(ellipse,#ffd99e77,transparent 75%);
+}
+.w8-approved-missions .w8-approved-days li:nth-child(7){
+  box-shadow:inset 0 2px #fff5c6,inset 0 0 0 1px #efb963,0 3px #624019,0 0 9px #ffc36e78;
+}
+.w8-approved-missions .w8-approved-days li:nth-child(7) .w8-art{
+  transform:scale(1.15);
+  transform-origin:center center;
+}
+
+/* Reference 08 emphasises the portrait as a character illustration, not
+   a generic app icon. The decorative rim remains outside the crop. */
+.w8-approved-ranking .w8-approved-captain{
+  border-top-color:#fff0b7;
+  background:
+    radial-gradient(ellipse 37% 96% at 13% 36%,#e7bf847c,transparent 92%),
+    linear-gradient(111deg,#397e94 0%,#1a506e 45%,#08273e);
+}
+.w8-approved-ranking .w8-approved-avatar{
+  border-radius:46% 48% 45% 46%;
+  outline:2px solid #78451f;
+  outline-offset:2px;
+  background:radial-gradient(circle at 28% 20%,#ffe1a0,#bf8243 51%,#193149 93%);
+}
+.w8-approved-ranking .w8-approved-avatar::before{
+  content:"";position:absolute;inset:5px;border-radius:inherit;
+  border:1px solid #fbe1a38f;z-index:1;pointer-events:none;
+}
+.w8-approved-ranking .w8-approved-league-status .w8-art{
+  filter:drop-shadow(0 2px 2px #081b2f) drop-shadow(0 0 6px #ffcd72a6);
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+  border-top-color:#ffe8ad;
+  background:
+    radial-gradient(ellipse 62% 16% at 50% 0%,#7bb0bb7a,transparent 100%),
+    linear-gradient(180deg,#205675,#123e59 31%,#061f37);
+}
+.w8-approved-ranking .w8-approved-leaderboard h3{
+  position:relative;
+  padding-bottom:5px;
+  border-bottom:1px solid #e7c0837d;
+}
+.w8-approved-ranking .w8-approved-leaderboard h3::before,
+.w8-approved-ranking .w8-approved-leaderboard h3::after{
+  content:"✦";display:inline-block;vertical-align:middle;
+  margin:0 9px;color:#f8d285;font-size:12px;
+  text-shadow:0 1px #5b321a,0 0 6px #fff0b37a;
+}
+.w8-approved-ranking .w8-approved-local-row{
+  border:2px solid #f3d28d;
+  border-bottom-color:#9e6638;
+  border-radius:9px;
+  background:radial-gradient(ellipse at 16% 28%,#62a6b161,transparent 73%),
+    linear-gradient(95deg,#285e7a,#124565 68%,#08263f);
+}
+.w8-approved-ranking .w8-approved-mini-avatar{
+  border:2px solid #ffe0a1;
+  outline:1px solid #86542e;outline-offset:1px;
+  box-shadow:0 3px 5px #001829a1;
+}
+.w8-approved-ranking .w8-approved-empty-rank{
+  background:linear-gradient(90deg,#32677e70,#163d587a 65%,#0c2a420e);
+  border-bottom-color:#c3a77b72;
+}
+.w8-approved-ranking .w8-approved-empty-rank>span:first-child{
+  box-shadow:inset 0 1px #fff3c1a5,0 2px 4px #0016298f;
+}
+.w8-approved-ranking .w8-approved-empty-portrait{
+  border-radius:7px;
+  outline:1px solid #7c5737;outline-offset:0;
+  filter:contrast(1.12);
+}
+.w8-approved-ranking .w8-approved-empty-rank strong{
+  color:#e9efe8;
+  text-shadow:0 2px 1px #031728;
+}
+/* Keep seven fully interactive daily chests and all five rows readable on
+   320px handsets: scrolling is preferable to hidden rewards or buttons. */
+@media(max-width:350px){
+  .w8-approved-missions .w8-approved-days{
+    grid-template-columns:repeat(7,minmax(38px,1fr));
+    overflow-x:auto;overscroll-behavior-inline:contain;
+  }
+  .w8-approved-missions .w8-approved-days li{min-width:38px}
+  .w8-approved-missions .w8-approved-days li:nth-child(7) .w8-art{transform:scale(1.04)}
+  .w8-approved-ranking .w8-approved-leaderboard h3::before,
+  .w8-approved-ranking .w8-approved-leaderboard h3::after{margin:0 5px;font-size:9px}
+  .w8-approved-ranking .w8-approved-avatar{outline-offset:0}
+}
