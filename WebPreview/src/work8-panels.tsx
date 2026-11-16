@@ -240,10 +240,10 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
           </article>;
         })}
       </section>
-      <section className="w8-approved-daily" aria-label="Recompensa diária">
+      <section className="w8-approved-daily" aria-label="7-day supply route" title={canClaim?'Next claim earns '+(15+next*5)+' coins':'Recompensa de hoje já recolhida'}>
         <h3>Recompensa Diária</h3>
-        <ol className="w8-approved-days" aria-label="Sete dias de prémios locais">
-          {Array.from({length:7},(_,i)=>i+1).map(n=><li key={n} className={(n<=visibleStreak?'is-claimed ':canClaim&&n===next?'is-next ':'')+(n===7?'is-grand':'')}>
+        <ol className="w8-approved-days" aria-label="Seven consecutive daily rewards">
+          {Array.from({length:7},(_,i)=>i+1).map(n=><li key={n} aria-label={'DAY '+n} className={'app-week-day'+(n<=visibleStreak?' is-claimed':canClaim&&n===next?' is-next':'')}>
             <span className="w8-approved-chest" aria-hidden="true"><W8Art kind="chest"/>{n<=visibleStreak&&<b>✓</b>}</span>
             <small>Dia {n}</small>
           </li>)}
