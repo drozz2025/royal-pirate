@@ -295,6 +295,22 @@ try {
       report.nativeNavigation.push({screen:key,...dock,fits,matchesPorto});
       if(!fits||!matchesPorto)throw new Error('Approved 384x512 five-tab dock clipped/covered/inconsistent on '+key+': '+JSON.stringify(dock));
       if(key==='porto')nativePortoDock=dock;
+      // Composition guard, not fake screenshot parity. The approved 05/06
+      // artwork shows all eight portraits and all three chest status plaques
+      // without the Porto dock covering the lower row at 384x512.
+      if(key==='cards'||key==='shop'){
+        const items=await evaluate("(()=>{"+
+          "const nav=document.querySelector('.app-sheet > .harbour-nav');"+
+          "const selectors={cards:'.w7-approved-slot small',shop:'.w7-chest-status'};"+
+          "const which="+JSON.stringify(key)+";"+
+          "return {dockTop:nav?.getBoundingClientRect().top??null,items:[...document.querySelectorAll(selectors[which])].map(el=>{const r=el.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),height:Math.round(r.height),text:el.textContent?.trim()}})}"+
+        "})()");
+        const expected=key==='cards'?8:3;
+        const allVisible=items.items.length===expected&&items.dockTop!==null&&
+          items.items.every(i=>i.height>=15&&i.top>=0&&i.bottom<=items.dockTop+2);
+        report.nativeNavigation[report.nativeNavigation.length-1].illustratedItemVisibility={...items,expected,allVisible};
+        if(!allVisible)throw new Error('Approved '+key+' lower row hidden by five-tab dock: '+JSON.stringify(items));
+      }
     }
     const nativeShot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
     await writeFile(join(out,key+'-mobile-384x512.png'),Buffer.from(nativeShot.data,'base64'));
