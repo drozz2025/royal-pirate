@@ -87,7 +87,8 @@
 .app-dock button span{font-size:24px;line-height:1.1;color:#f5cc75}.app-dock button strong{font:800 12px 'Barlow Condensed',sans-serif;letter-spacing:.2px}
 .app-dock button[aria-current=page]{border:2px solid #f6dc90;background:linear-gradient(#edce89,#b9813c);color:#272d40;box-shadow:0 2px #5b3c28}
 .app-dock button[aria-current=page] span{color:#4b3427}
-@media(min-width:660px){.app-sheet{max-width:600px;margin:auto;border-left:2px solid #ad895d;border-right:2px solid #ad895d;box-shadow:0 0 70px #020d19b3}}
+/* Keep all app pages in the same viewport as the approved full-bleed Porto. */
+@media(min-width:660px){.app-sheet{width:100%;max-width:none;margin:0;border-left:0;border-right:0;box-shadow:none}}
 @media(max-width:370px){.app-sheet-header{padding-left:8px;padding-right:8px;gap:6px}.app-wallet small{display:none}.app-back{width:40px;height:40px}
   .app-item{gap:6px;padding:10px 7px}.app-item-symbol{flex-basis:49px;height:57px;font-size:28px}
   .app-item-text strong{font-size:17px}.app-item>button{min-width:57px;padding:5px}.app-dock button strong{font-size:10px}}
