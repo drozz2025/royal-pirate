@@ -1891,20 +1891,19 @@
 }
 
 
-/* WORK4 PAINT FIX 2026-11-16 — screenshot-driven compositor workaround.
-   #136 diagnostic 43814452766 only restored the full workshop/cannon when
-   BOTH stage and illustration plane had an outline. Retain that paint-boundary
-   trigger invisibly with an opaque warm timber colour, not the magenta/lime
-   diagnostic. No change to Porto or the global navigation. */
+/* WORK4 PAINT FIX 2026-11-16 — opaque, warm workshop paint.
+   The 390px capture 43821385899 showed that a transparent outline is NOT
+   sufficient for Chromium's painting boundary. Use a visible warm border
+   over the full scene, no diagnostic colours, no layout changes outside W4. */
 .w4-forge #w4-forge-panel > .w4-forge-stage {
-  background-color:#765038!important;
+  background:#885632!important;
   background-image:none!important;
-  outline:4px solid transparent!important;
+  outline:4px solid #b77f4c!important;
   outline-offset:0;
 }
 .w4-forge .w4-forge-stage > .w4-forge-scene {
-  background-color:#b77f4c!important;
+  background:#c98a4c!important;
   background-image:none!important;
-  outline:4px solid transparent!important;
+  outline:4px solid #d9a66e!important;
   outline-offset:0;
 }
