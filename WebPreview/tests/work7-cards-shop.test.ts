@@ -18,9 +18,13 @@ function shop(profile=initialProfile()){
  }));
 }
 
-test('Cards screen presents approved three tabs and three original, individually illustrated crew cards',()=>{
+test('Cards screen shows the approved two-tab 4x2 conceptual atlas and preserves real crew management',()=>{
  const html=cards();
- for(const label of ['A MINHA COLEÇÃO','MELHORAR','FUSÃO'])assert.ok(html.includes(label));
+ for(const label of ['A MINHA COLEÇÃO','EVOLUIR','FUSÃO'])assert.ok(html.includes(label));
+ assert.equal((html.match(/class="w7-approved-slot w7-approved-slot-/g)||[]).length,8);
+ assert.equal((html.match(/CONCEITO · EM BREVE/g)||[]).length,8);
+ assert.match(html,/GERIR TRIPULAÇÃO REAL/);
+ assert.match(html,/ainda sem cartas jogáveis/);
  for(const crew of CREW)assert.ok(html.includes(crew.name));
  assert.equal((html.match(/class="w7-card w7-/g)||[]).length,3);
  assert.equal((html.match(/class="w7-art-svg"/g)||[]).length,3);
