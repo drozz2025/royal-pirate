@@ -2825,3 +2825,124 @@
     right:5%;font-size:24px;top:10px;
   }
 }
+
+/* WORK 7 / #104 — 16 Nov 16h: NEW local ornamental relief pass after merged
+ * #180. Do not repeat the tropical-sky/translucent-panel work: this pass
+ * enriches the already-approved concept crops and decorative wooden/gold
+ * framing. No shared shell, HUD, navigation, balances or purchases touched.
+ * Artwork remains cropped reference *illustrations*, not a page screenshot.
+ * Visual approval: false pending human reference | render | overlay review. */
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type{
+  border-color:#ffe2a0;
+  background:
+    radial-gradient(ellipse 50% 38% at 50% 0%,#a7743e80,transparent),
+    repeating-linear-gradient(0deg,#ffdf8b08 0 2px,transparent 2px 7px),
+    linear-gradient(90deg,#764323,#241511 18%,#57321e 50%,#241511 83%,#764323);
+  box-shadow:inset 0 2px #fff6cf,inset 0 -4px #170b0c,
+    inset 0 0 0 2px #a37139,0 2px 0 #c9934c,0 5px 0 #633815,0 8px 12px #051627a8;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::after,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::after{
+  color:#ffe6a5;
+  text-shadow:0 1px #643d20,0 0 5px #ffe89a8c;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero h2,
+.w7-screen[data-work7-screen="shop"] .w7-hero h2{
+  font-size:clamp(27px,7.75vw,34px)!important;
+  text-shadow:0 1px #120b0b,0 3px #75461e,0 0 8px #ffdf8170;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs button,
+.w7-screen[data-work7-screen="shop"] .w7-tabs button{
+  font-size:clamp(11.5px,3.1vw,14px);
+  letter-spacing:.1px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-content{
+  border-color:#f2d69a;
+  background:
+    radial-gradient(ellipse 92% 95px at 50% 0%,#d3fff23d,transparent),
+    linear-gradient(180deg,#339abea6 0%,#175781df 44%,#082b50f4 70%,#061a33 100%);
+  box-shadow:inset 0 2px #fff5ca99,inset 0 0 0 1px #56391888,0 5px 12px #02132494;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+  isolation:isolate;
+  box-shadow:0 0 0 1px #593b24,inset 0 0 0 1px #ffedb3,
+    inset 0 2px #fff8d0aa,0 4px 0 #06192f,0 8px 12px #0007;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot::before,
+.w7-screen[data-work7-screen="shop"] .w7-chest::before{
+  content:"";
+  position:absolute;inset:3px;
+  z-index:2;pointer-events:none;
+  border:1px solid #ffe3a6b8;border-radius:6px;
+  box-shadow:inset 0 0 0 1px #55301370;
+  background:
+    radial-gradient(circle,#ffe7ac 0 2px,#795126 2.5px,transparent 3.5px) left 1px top 1px/8px 8px no-repeat,
+    radial-gradient(circle,#ffe7ac 0 2px,#795126 2.5px,transparent 3.5px) right 1px top 1px/8px 8px no-repeat,
+    radial-gradient(circle,#ffe7ac 0 2px,#795126 2.5px,transparent 3.5px) left 1px bottom 1px/8px 8px no-repeat,
+    radial-gradient(circle,#ffe7ac 0 2px,#795126 2.5px,transparent 3.5px) right 1px bottom 1px/8px 8px no-repeat;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+  filter:saturate(1.25) contrast(1.13) brightness(1.04);
+  border-bottom:2px solid #ffe5aa;
+  box-shadow:0 3px 7px #020e2ac4;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+  min-height:29px;
+  font-size:clamp(11px,3.05vw,14.5px);
+  line-height:1.03;
+  text-shadow:0 2px 3px #000,0 0 5px #000;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  min-height:23px;
+  font-size:clamp(10px,2.65vw,12px);
+  border-color:#ffefc2;
+  background:linear-gradient(#406a87,#142c4b 65%,#0b1b37);
+  box-shadow:inset 0 1px #fff8d1ab;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+  background:
+    radial-gradient(ellipse 40% 55% at 23% 30%,#ffd9957a,transparent),
+    radial-gradient(ellipse 55% 70% at 75% 12%,#e6a5fb50,transparent),
+    linear-gradient(120deg,#7d3975,#49225f 55%,#122b51);
+  box-shadow:inset 0 2px #fff2b7aa,inset 0 0 0 2px #f1c77663,
+    0 4px 0 #624021,0 9px 15px #06132b9c;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest{
+  position:relative;
+  isolation:isolate;
+  box-shadow:inset 0 0 0 1px #fff0baa8,inset 0 2px #fff7d1b0,
+    0 0 0 1px #57331f,0 4px 0 #07172d,0 9px 11px #0008;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  border-radius:8px;
+  background:radial-gradient(ellipse at 50% 52%,#ffdf9670,transparent 69%);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  border:1px solid #ffe6a5b5;
+  border-radius:6px;
+  filter:saturate(1.28) contrast(1.15) brightness(1.04) drop-shadow(0 5px 3px #071b33a8);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest>strong{
+  font-size:clamp(12px,3.35vw,16px);
+  color:#fff2c9;text-shadow:0 2px 2px #061126;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  font-size:clamp(12px,3vw,14px);
+  box-shadow:inset 0 1px #fff8c3b8,0 2px #3b3426;
+}
+@media(max-width:354px),(max-height:640px){
+  .w7-screen[data-work7-screen="cards"] .w7-hero h2,
+  .w7-screen[data-work7-screen="shop"] .w7-hero h2{font-size:clamp(25px,8vw,29px)!important}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+    font-size:10.5px;min-height:25px;line-height:1;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+    font-size:10px;min-height:20px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    font-size:10.5px;
+  }
+}
