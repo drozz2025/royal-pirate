@@ -56,7 +56,7 @@
 .in-battle .round .battle-versus{font:900 27px/.9 'Barlow Condensed',sans-serif;color:#ffd068;
   -webkit-text-stroke:.65px #53301d;text-shadow:0 2px #683916,0 4px #061628}
 .in-battle .round span{margin-top:6px;font:800 9px 'Barlow Condensed',sans-serif;color:#ffe8af;letter-spacing:0}
-.in-battle .view-controls{z-index:5;position:absolute;top:auto;bottom:max(225px,calc(env(safe-area-inset-bottom) + 210px));
+.in-battle .view-controls{z-index:5;position:absolute;top:auto;bottom:max(265px,calc(env(safe-area-inset-bottom) + 245px));
   left:50%;right:auto;transform:translateX(-50%);width:min(385px,calc(100% - 24px));
   display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:6px}
 .in-battle .view-controls button{flex:0 0 auto;display:grid;place-items:center;
@@ -103,12 +103,13 @@
   .in-battle .health-crest{display:none}
   .in-battle .battle-hud{gap:3px}
   .in-battle .round{flex-basis:37px}
-  .in-battle .view-controls{bottom:max(208px,calc(env(safe-area-inset-bottom) + 192px))}
+  .in-battle .view-controls{bottom:max(235px,calc(env(safe-area-inset-bottom) + 219px))}
   .in-battle .command-deck{bottom:max(19px,calc(env(safe-area-inset-bottom) + 13px))}
   .in-battle .command-deck .controls-body{min-height:103px;padding:8px;gap:8px}
   .in-battle .command-deck .fire-button{flex-basis:106px;width:106px;height:106px}
   .in-battle .command-deck .turn-line{padding:7px 9px}
   .in-battle .command-deck .message{font-size:9px}
+  .in-battle .command-deck .deck-footer{display:none}
 }
 @media (max-width:350px){
   .in-battle .battle-approved-logo{font-size:25px}
@@ -134,7 +135,7 @@
   .in-battle .battle-approved-banner{height:35px;margin-top:4px}
   .in-battle .battle-hud{top:117px}
   .in-battle .return-harbour{top:70px}
-  .in-battle .view-controls{bottom:195px}
+  .in-battle .view-controls{bottom:205px}
   .in-battle .command-deck .deck-footer{display:none}
   .in-battle .command-deck .fire-button{width:94px;height:94px;flex-basis:94px}
 }
