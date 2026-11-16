@@ -2100,3 +2100,30 @@
     width:65%;left:-1%;top:42%;
   }
 }
+
+/* WORK 4 / PR #176 / final proportion pass: simplify bright rigging so the
+   black sculpted canvas and its enlarged Jolly Roger are legible on 03.
+   Forja's cannon sits lower within the same isolated warm workshop scene.
+   No selectors touch shell, Porto, nav, gameplay or shared QA rules. */
+.w4-fleet .w4-harbour-stage .w4-art-rigging {opacity:.44}
+.w4-fleet .w4-harbour-stage .w4-art-sail-stitch {opacity:.49}
+.w4-fleet .w4-harbour-stage .w4-galleon-relief-finish {opacity:.98}
+.w4-forge .w4-forge-scene > svg.w4-cannon-art {
+  width:67%;
+  left:-2%;
+  top:43%;
+}
+@media(max-width:359px){
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art {
+    width:63%;
+    left:-2%;
+    top:43%;
+  }
+}
+@media(min-width:400px) and (max-width:659px){
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art {
+    width:64%;
+    left:-1%;
+    top:45%;
+  }
+}
