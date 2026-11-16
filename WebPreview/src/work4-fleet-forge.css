@@ -2127,3 +2127,10 @@
     top:45%;
   }
 }
+
+
+/* WORK4 / #104 — mobile contrast of Royal Crown painted canvas.
+   This affects only the SVG fleet scene; no Porto/nav or Forge compositor. */
+.w4-fleet .w4-harbour-stage .w4-art-rigging {opacity:.27}
+.w4-fleet .w4-harbour-stage .w4-art-sail-stitch {opacity:.33}
+.w4-fleet .w4-harbour-stage .w4-sail-deep-canvas {opacity:.98}
