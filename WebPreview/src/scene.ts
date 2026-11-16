@@ -52,10 +52,14 @@ export class OceanScene {
         // Three crossing wavelengths build actual 3D illustrated swells;
         // only visual vertices move, never the physical ship/shot coordinates.
         float rolling=sin(p.y*.275-time*.76+
-          sin(p.x*.145+time*.20)*1.14)*.295;
-        float crossSea=sin(p.x*.47+p.y*.29+time*.96)*.185;
-        float chop=sin(p.y*1.12-p.x*.32-time*1.74)*.060;
-        return rolling+crossSea+chop;
+          sin(p.x*.145+time*.20)*1.14)*.66;
+        float crossSea=sin(p.x*.47+p.y*.29+time*.96)*.30;
+        float chop=sin(p.y*1.12-p.x*.32-time*1.74)*.095;
+        // Waves grow around the distant broadside, but ease off as the
+        // spectator's real wooden deck approaches the screen. The plane's
+        // local -Y axis becomes world +Z after its -90 degree rotation.
+        float deckFade=1.-.55*smoothstep(44.,72.,-p.y);
+        return (rolling+crossSea+chop)*deckFade;
       }
       void main(){vec3 p=position;p.z=wave(p.xy);float dx=(wave(p.xy+vec2(.05,0.))-p.z)/.05;float dy=(wave(p.xy+vec2(0.,.05))-p.z)/.05;vNormal=normalize(mat3(modelMatrix)*vec3(-dx,-dy,1.));vec4 world=modelMatrix*vec4(p,1.);vWorld=world.xyz;vWave=p.z;gl_Position=projectionMatrix*viewMatrix*world;}
     `,fragmentShader:`
