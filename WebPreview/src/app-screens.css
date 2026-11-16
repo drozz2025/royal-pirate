@@ -548,3 +548,40 @@
   .app-sheet-header .app-wallet{max-width:32%;padding:5px 6px;gap:4px}
   .app-sheet-header .app-wallet small{display:none}
 }
+
+
+/* WORK 6 — approved two-resource HUD on inner screens only. Porto and
+ * its bottom navigation are untouched. The diamond is unavailable until
+ * a real gem ledger and purchase validation exist; never mint a balance. */
+.app-sheet-header .app-resource-counters{
+  flex:0 0 auto;display:flex;align-items:center;gap:5px;
+  min-width:0;max-width:47%;
+}
+.app-sheet-header .app-resource-counters .app-wallet{
+  min-width:0;max-width:none;gap:4px;padding:6px 7px;
+  border-radius:10px;white-space:nowrap;
+}
+.app-sheet-header .app-resource-counters .app-wallet strong{
+  font-size:clamp(16px,4vw,20px);line-height:1;
+  min-width:0;overflow:hidden;text-overflow:ellipsis;
+}
+.app-sheet-header .app-resource-counters .app-wallet small{
+  font-size:8px;letter-spacing:.2px;
+}
+.app-sheet-header .app-wallet-gems{
+  opacity:.78;border-color:#75a3bf;background:linear-gradient(180deg,#244861,#112e48);
+}
+.app-sheet-header .app-wallet-gems svg{width:19px;height:19px;flex:0 0 19px;filter:drop-shadow(0 1px 3px #021324)}
+.app-sheet-header .app-wallet-gems strong{color:#c4deed}
+@media(max-width:420px){
+  .app-sheet-header .app-resource-counters{max-width:46%;gap:3px}
+  .app-sheet-header .app-resource-counters .app-wallet{padding:5px 5px;gap:3px}
+  .app-sheet-header .app-resource-counters .app-wallet small{display:none}
+  .app-sheet-header .app-resource-counters .app-wallet strong{max-width:67px}
+}
+@media(max-width:350px){
+  .app-sheet-header .app-resource-counters{max-width:43%}
+  .app-sheet-header .app-resource-counters .app-wallet{padding:4px 3px}
+  .app-sheet-header .app-resource-counters .app-wallet strong{font-size:14px;max-width:42px}
+  .app-sheet-header .app-wallet-gems svg{width:15px;height:15px;flex-basis:15px}
+}
