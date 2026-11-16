@@ -124,6 +124,7 @@ export class OceanScene {
     // A real low-poly teak deck and pair of cannons frame the battle in portrait.
     // This geometry is never shown over the already-approved Porto scene.
     const battery=makeBattleDeck();this.battleBattery=battery.group;this.batteryFlashes=battery.flashes;this.battleBattery.visible=false;this.scene.add(this.battleBattery);
+    this.dressBattleDeck();
     // The black near-field player sail matches the approved Batalha composition;
     // it is never part of Porto or the physics ships, and cannot block DOM HUD.
     this.battleForegroundSail=makeBattleForegroundSail();
@@ -144,6 +145,49 @@ export class OceanScene {
     for(let i=0;i<8;i++){const ring=new T.Mesh(rippleGeometry,rippleMaterial.clone());ring.rotation.x=-Math.PI/2;ring.visible=false;this.scene.add(ring);this.ripplePool.push(ring);}
     this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(host);this.resize();this.home();document.addEventListener('visibilitychange',this.onVisibility);this.raf=requestAnimationFrame(this.animate);
   }
+  /** A first-person three-dimensional bulwark, not a second playable ship.
+   * All parts are descendants of the battle-only cannon deck: Porto and the
+   * existing five-item nav can never render or interact with them. */
+  private dressBattleDeck(){
+    const dressing=new T.Group();
+    dressing.name='battle-only-wooden-bulwark';
+    const oak=new T.MeshStandardMaterial({color:'#9e6739',roughness:.86});
+    const goldRail=new T.MeshStandardMaterial({color:'#d8a65b',metalness:.58,roughness:.39});
+    const tarredRope=new T.MeshStandardMaterial({color:'#b78d58',roughness:.94});
+    const timber=new T.Mesh(new T.BoxGeometry(11.5,.32,.37),oak);
+    timber.name='first-person-rail';timber.position.set(0,2.67,64.9);
+    const lower=new T.Mesh(new T.BoxGeometry(11.4,.20,.30),oak);
+    lower.position.set(0,1.31,64.95);
+    const gilt=new T.Mesh(new T.BoxGeometry(11.6,.075,.43),goldRail);
+    gilt.position.set(0,2.88,64.9);
+    dressing.add(timber,lower,gilt);
+    // Instanced solid timber balusters and gilded finials: two draw calls,
+    // with genuine depth even on 320x568 rather than thin CSS silhouettes.
+    const count=7;
+    const balusters=new T.InstancedMesh(new T.CylinderGeometry(.11,.14,1.27,8),oak,count);
+    const finials=new T.InstancedMesh(new T.SphereGeometry(.15,8,7),goldRail,count);
+    for(let i=0;i<count;i++){
+      const x=-5.04+i*1.68;
+      balusters.setMatrixAt(i,new T.Matrix4().makeTranslation(x,1.99,64.95));
+      finials.setMatrixAt(i,new T.Matrix4().makeTranslation(x,2.99,64.95));
+    }
+    balusters.instanceMatrix.needsUpdate=true;
+    finials.instanceMatrix.needsUpdate=true;
+    dressing.add(balusters,finials);
+    // Two restrained, physically coiled mooring lines flank the actual
+    // working guns. No new weapon, targeting system or touch area.
+    const coilGeometry=new T.TorusGeometry(.48,.075,7,28,Math.PI*1.9);
+    for(const x of [-4.75,4.75]){
+      const coil=new T.Mesh(coilGeometry,tarredRope);
+      coil.rotation.x=-Math.PI/2;coil.position.set(x,.61,67.9);
+      dressing.add(coil);
+    }
+    dressing.traverse(part=>{
+      if(part instanceof T.Mesh){part.castShadow=true;part.receiveShadow=true;}
+    });
+    this.battleBattery.add(dressing);
+  }
+
   private environment(){
     const stone=new T.MeshStandardMaterial({color:'#7c9291',flatShading:true}),green=new T.MeshStandardMaterial({color:'#427e55',flatShading:true}),sand=new T.MeshStandardMaterial({color:'#d4c28a'});
     const rockGeo=new T.IcosahedronGeometry(1,1), trunkMat=new T.MeshStandardMaterial({color:'#805431'}), leafGeo=new T.SphereGeometry(1,6,4);
@@ -392,7 +436,7 @@ export class OceanScene {
     // Battle-only broadside: reveal the enemy's three-dimensional port flank
     // instead of aiming its narrow bow straight at the camera. No camera
     // movement, hit-point changes, altered controls or Porto composition.
-    this.ships.enemy.root.rotation.y=-.48;
+    this.ships.enemy.root.rotation.y=-.95;
     // First-person broadside: the player is standing behind the live gun deck.
     // Keep the player's physics ship active for HP, firing, collisions and scars;
     // hide only its exterior hull from this camera (never from Porto).
@@ -406,7 +450,9 @@ export class OceanScene {
     // A fixed forward-looking viewpoint, not the rejected moving camera.
     // Aim just starboard of the centreline: the red galleon is ahead, the
     // curved black player sail and real cannon barrels frame the foreground.
-    this.controls.target.set(pose.target[0]+(pose.showBattery?1.05:0),pose.target[1]+(pose.showBattery?.45:0),pose.target[2]);
+    // Keep the wider red galleon inside 320/390/430 with a fixed static
+    // viewpoint. This does not animate or pan the rejected battle camera.
+    this.controls.target.set(pose.target[0]+(pose.showBattery?2.35:0),pose.target[1]+(pose.showBattery?.45:0),pose.target[2]);
     this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;
     this.battleBattery.visible=pose.showBattery;
     this.battleBattery.position.z=pose.batteryOffsetZ;
