@@ -3362,3 +3362,189 @@
     font-size:clamp(24px,7.2vw,28px)!important;
   }
 }
+
+
+/* WORK7 / #104 — native 384×512 badge silhouettes, approved:false.
+ * Approved 05 has small inset, high-gloss collectible plaques below each
+ * portrait; 06 uses raised green price-shaped plaques. Keep the actual
+ * honest labels PRÉVIA / EM BREVE; this is purely decorative and cannot
+ * imply real level progression, chest prices or purchasable inventory.
+ * No edits to the already-approved shared dock, Porto or header shell. */
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  width:calc(100% - 8px);
+  min-height:23px;
+  margin-inline:auto;
+  padding:1px 2px 2px;
+  border:2px solid #ffe8a0;
+  border-bottom-color:#9b5d29;
+  border-radius:999px;
+  background:
+    linear-gradient(180deg,#fff8dcb8 0%,transparent 37%),
+    linear-gradient(180deg,var(--w7-enamel) 14%,var(--w7-shadow) 100%);
+  color:#fffce9;
+  text-shadow:0 1px 2px #091026,0 0 3px #000;
+  box-shadow:inset 0 1px #fff9dc,0 1px 0 #47291f,0 2px 4px #020b22a6;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+  border-radius:6px 6px 4px 4px;
+  box-shadow:0 0 0 1px #9b672d,0 2px 5px #020d2ad1;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  border-radius:inherit;
+  background:linear-gradient(118deg,#fff1bf36 0%,transparent 21%,transparent 76%,#fff0b327 100%);
+  box-shadow:inset 1px 1px 0 #fff4c3b0,inset -1px -1px 0 #58351ca6;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  position:relative;
+  background:
+    radial-gradient(ellipse 66% 55% at 50% 55%,var(--w7-glow),transparent 100%),
+    radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda557,transparent 100%);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  position:relative;
+  z-index:1;
+  border:0;
+  border-radius:12px;
+  -webkit-mask-image:radial-gradient(ellipse 66% 70% at 50% 49%,#000 64%,#000d 76%,transparent 100%);
+  mask-image:radial-gradient(ellipse 66% 70% at 50% 49%,#000 64%,#000d 76%,transparent 100%);
+  filter:saturate(1.27) contrast(1.12) brightness(1.045) drop-shadow(0 4px 3px #041327a8);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  width:calc(100% - 10px);
+  min-height:28px;
+  margin-inline:auto;
+  padding:2px 2px;
+  border:2px solid #ffefb4;
+  border-bottom-color:#735020;
+  border-radius:999px;
+  background:
+    radial-gradient(circle at 7px 50%,#ffefb8 0 1.5px,transparent 2px),
+    radial-gradient(circle at calc(100% - 7px) 50%,#ffefb8 0 1.5px,transparent 2px),
+    linear-gradient(180deg,#dcf6a4 0%,#92c75b 30%,#33844b 58%,#1d503c 100%);
+  color:#f8ffed;
+  text-shadow:0 1px 2px #12361d;
+  box-shadow:inset 0 1px #fff8d3,0 2px 0 #4d391e,0 3px 5px #06142794;
+}
+/* Very short viewports: decorations must not squeeze the honest text. */
+@media(max-width:354px),(max-height:640px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+    width:calc(100% - 4px);
+    min-height:20px;
+    padding:1px;
+    font-size:10px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    width:calc(100% - 5px);
+    min-height:27px;
+    padding:2px 1px;
+    font-size:10.5px;
+  }
+}
+
+
+/* PR #223 QA correction: at native 384×512 the approved Porto dock starts
+ * at y=430, versus y=453 in the original artwork. The first Chromium
+ * capture exposed clipped second-row labels on 05 and chest labels on 06.
+ * Compress ONLY local upper gutters and offer frames in short 355–430px
+ * viewports. Keep every portrait, all three chests and honest statuses. */
+@media (min-width:355px) and (max-height:560px) and (max-width:430px){
+  .w7-screen[data-work7-screen="cards"] .w7-hero,
+  .w7-screen[data-work7-screen="shop"] .w7-hero{
+    height:42px;
+    min-height:42px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-tabs,
+  .w7-screen[data-work7-screen="shop"] .w7-tabs{
+    min-height:31px;
+    padding:1px 3px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-tabs button,
+  .w7-screen[data-work7-screen="shop"] .w7-tabs button{
+    min-height:26px;
+    padding:2px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-collection-content{
+    padding-top:3px;
+    gap:3px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+    min-height:24px;
+    padding:2px 6px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    row-gap:4px;
+    padding-block:0;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-content{
+    gap:4px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    min-height:137px;
+    padding:5px 7px;
+    gap:5px;
+    grid-template-columns:minmax(0,43%) minmax(0,1fr);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+    height:114px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    max-width:124px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{
+    gap:3px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info h3{
+    font-size:clamp(20px,5.5vw,23px);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info p{
+    font-size:10.5px;
+    line-height:1.14;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info small{
+    font-size:9.5px;
+    line-height:1.12;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-pack-unavailable{
+    min-height:28px;
+    font-size:12px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    min-height:19px;
+    margin-top:0;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest{
+    min-height:104px;
+    padding:3px 2px;
+    gap:1px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest>strong{
+    font-size:11px;
+    line-height:1;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{
+    min-height:57px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+    max-width:74px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    min-height:21px;
+    font-size:10px;
+    padding:1px;
+  }
+}
+
+/* Native 384×512 screenshot after the gutter fix: the chest plaque was
+ * still six pixels behind the approved Porto dock (top at y=430).
+ * Raise the local plaque over the frame's lower emboss, without changing
+ * the three illustrated chests' dimensions or the shared bottom dock. */
+@media (min-width:355px) and (max-width:430px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    transform:translateY(-7px);
+  }
+}
