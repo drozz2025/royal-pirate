@@ -66,7 +66,7 @@ const approvedConcepts=[
 ] as const;
 function ApprovedArtCrop({kind,x,y,cropWidth,cropHeight=cropWidth}:{kind:'cards'|'shop';x:number;y:number;cropWidth:number;cropHeight?:number}) {
   const scale=100/cropWidth;
-  const imageStyle:React.CSSProperties={width:(384*scale)+'%',left:(-x*scale)+'%',top:(-y*scale)+'%'};
+  const imageStyle:React.CSSProperties={width:(384*scale)+'%',left:(-x*scale)+'%',top:(-y*100/cropHeight)+'%'};
   return <span className="w7-approved-crop" style={{aspectRatio:cropWidth+'/'+cropHeight}} aria-hidden="true">
     <img src={approvedArt[kind]} alt="" width={384} height={512} style={imageStyle} draggable={false}/>
   </span>;
