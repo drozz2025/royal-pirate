@@ -198,6 +198,29 @@ function W8Title({children,kind}:{children:string;kind:'flag'|'trophy'|'scroll'}
   </div>;
 }
 
+/* Distinct original pirate portrait drawn as vector art; not cropped from the approved UI. */
+function W8CaptainPortrait(){
+  return <svg className="w8-captain-portrait" viewBox="0 0 100 108" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <path d="M4 106Q7 83 26 78L41 70H59L74 78Q93 83 96 106Z" fill="#0A345A" stroke="#F0BF6C" strokeWidth="3"/>
+    <path d="M18 96L33 77L50 94L67 77L82 96V108H18Z" fill="#173E62"/>
+    <path d="M36 76L50 87L64 76L59 67H41Z" fill="#D88C5C" stroke="#773C2C" strokeWidth="2"/>
+    <path d="M28 46Q19 43 23 62Q25 69 32 68L37 80L50 90L63 80L68 68Q76 70 77 59Q80 44 71 46L68 35H33Z" fill="#38251E" stroke="#160F15" strokeWidth="3"/>
+    <path d="M33 38Q24 46 31 64Q38 77 50 74Q62 77 69 63Q76 44 67 37Z" fill="#E6A268" stroke="#723C2C" strokeWidth="2"/>
+    <path d="M28 60Q29 76 40 79Q45 90 50 91Q55 90 60 79Q72 75 73 60L64 72L59 68L50 73L41 68L36 72Z" fill="#321D1C"/>
+    <path d="M33 57Q40 51 48 58L50 61L52 58Q60 51 67 57Q61 68 50 65Q39 68 33 57Z" fill="#4C2B24"/>
+    <path d="M35 48L46 46M54 46L65 48" stroke="#44291F" strokeWidth="3" strokeLinecap="round"/>
+    <circle cx="41" cy="51" r="2.4" fill="#132332"/><circle cx="59" cy="51" r="2.4" fill="#132332"/>
+    <path d="M50 49L47 58H53" stroke="#A96341" strokeWidth="2" strokeLinecap="round"/>
+    <path d="M23 38Q11 31 9 27Q25 6 37 18Q50 5 63 18Q75 5 91 27Q89 35 77 38L68 34H32Z" fill="#17283B" stroke="#F5C771" strokeWidth="4" strokeLinejoin="round"/>
+    <path d="M15 28Q25 19 34 24Q50 10 66 24Q75 19 85 28Q72 37 50 35Q28 37 15 28Z" fill="#26394B" stroke="#B9853D" strokeWidth="2"/>
+    <path d="M34 26Q50 31 66 26" stroke="#F6D98D" strokeWidth="3" strokeLinecap="round"/>
+    <path d="M46 22L50 17L54 22L50 27Z" fill="#F5D98B" stroke="#89592B" strokeWidth="1.5"/>
+    <path d="M21 59Q15 62 22 70" stroke="#F5C66C" strokeWidth="3" strokeLinecap="round"/>
+    <circle cx="22" cy="72" r="3" stroke="#E5BA64" strokeWidth="2"/>
+    <path d="M23 101L33 84M77 101L67 84" stroke="#D8A658" strokeWidth="3"/>
+  </svg>;
+}
+
 export function RankingPanel({profile,tab,onTab,onNavigate}:{
   profile:LocalProfile;tab:RankingTab;onTab:(tab:RankingTab)=>void;onNavigate:Navigate;
 }) {
@@ -213,7 +236,7 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
       onLeagues={()=>onTab('leagues')}/>
     {tab==='ranking'?<>
       <section className="w8-approved-captain" aria-label="Progresso real do capitão local">
-        <div className="w8-approved-avatar" aria-hidden="true"><PirateIcon name="profile" size={46}/></div>
+        <div className="w8-approved-avatar" aria-hidden="true"><W8CaptainPortrait/></div>
         <div className="w8-approved-identity">
           <strong>{localName}</strong>
           <span>Nível {level} · {total} batalhas</span>
@@ -232,7 +255,7 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
         <h3>TOP JOGADORES</h3>
         <div className="w8-approved-local-row">
           <span className="w8-approved-place" aria-hidden="true"><W8Art kind="trophy"/></span>
-          <div className="w8-approved-mini-avatar" aria-hidden="true"><PirateIcon name="profile" size={25}/></div>
+          <div className="w8-approved-mini-avatar" aria-hidden="true"><W8CaptainPortrait/></div>
           <div className="w8-approved-player-detail"><strong>{localName}</strong><small>O TEU PERFIL LOCAL</small></div>
           <span className="w8-approved-player-score"><PirateIcon name="ranking" size={17}/>{profile.xp} XP</span>
         </div>
