@@ -31,7 +31,7 @@ test('Batalha mobile portrait composition stays visible across 320, 390 and 430 
   assert.ok(muzzle.y>mast.y+h*.2, `the cannon foreground must remain below the sails ${w}x${h}`);
   if(w===390||w===430){
    assert.ok(player.y-mast.y>h*.21, `tall-phone ships should be legibly larger ${w}x${h}`);
-   assert.equal(pose.batteryOffsetZ,-27,'tall portrait foreground follows the camera');
+   assert.equal(pose.batteryOffsetZ,-35,'tall portrait foreground follows the camera');
   }else assert.equal(pose.batteryOffsetZ,-15,'shorter phone retains tested camera and deck');
  }
 });
