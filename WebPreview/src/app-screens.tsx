@@ -1,10 +1,11 @@
 import React from 'react';
 import { PirateIcon } from './app-icons';
 import { PortoBottomNav } from './porto-bottom-nav';
+import { PortSidePanel } from './app-port-side';
 import { MissionsPanel, RankingPanel, RankingTabs, type RankingTab } from './work8-panels';
 import { FleetPanel, ForgePanel } from './work4-fleet-forge';
 import { CardsCollection, ShopMarket } from './work7-cards-shop';
-import { CREW, MISSIONS, battlesPlayed, canClaimDaily, nextDailyStreak, levelFor, missionProgress, type CrewId, type LocalProfile, type MissionId, type UpgradeId } from './progression';
+import { CREW, battlesPlayed, levelFor, type CrewId, type LocalProfile, type MissionId, type UpgradeId } from './progression';
 
 export type AppScreenId = 'battle'|'fleet'|'forge'|'cards'|'shop'|'missions'|'profile'|'ranking'|'chests'|'events'|'rewards'|'offers';
 const PAGES:ReadonlyArray<{id:AppScreenId;title:string}>=[
@@ -28,10 +29,6 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
   const titleRef=React.useRef<HTMLHeadingElement>(null);
   React.useEffect(()=>{setAnnouncement('');titleRef.current?.focus();},[screen]);
   const action=(message:string,callback:()=>void)=>{callback();setAnnouncement(message);};
-  const now=Date.now(),day=canClaimDaily(profile,now);
-  const nextDailyDay=nextDailyStreak(profile,now);
-  // When the previous claim is older than yesterday, the old streak is no longer active.
-  const visibleStreak=day&&nextDailyDay===1?0:profile.dailyStreak;
   const onDialogKeyDown=(event:React.KeyboardEvent<HTMLElement>)=>{
     if(event.key!=='Tab')return;
     const items=Array.from(event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled),a[href],input:not(:disabled)'))
@@ -53,27 +50,8 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
     <div className="app-sheet-announcement" role="status" aria-live="polite" aria-atomic="true">{announcement}</div>
     <div className="app-sheet-content" key={screen}>
       {screen==='ranking'&&<RankingPanel profile={profile} tab={rankingTab} onTab={setRankingTab} onNavigate={onNavigate}/>}
-      {screen==='chests'&&<div className="app-stack">
-        <div className="app-kicker">BAÚS · 7-DAY LOCAL SUPPLY ROUTE</div><h2>Daily reward chest</h2>
-        <p className="app-fine">{day?`Your next daily claim is ready: ${15+nextDailyDay*5} local coins.`:'Today’s daily reward was already claimed.'} The complete seven-day calendar and the claim button are in Missions.</p>
-        <button type="button" className="app-cta" onClick={()=>onNavigate('missions')}>OPEN DAILY REWARDS</button>
-      </div>}
-      {screen==='events'&&<div className="app-stack">
-        <div className="app-kicker">EVENTOS · CURRENT STATUS</div><h2>Events at sea</h2>
-        <p className="app-fine">Timed online events are not active in this offline demo. You can still complete the real local mission objectives and collect their rewards.</p>
-        <button type="button" className="app-cta" onClick={()=>onNavigate('missions')}>VIEW LOCAL MISSIONS</button>
-      </div>}
-      {screen==='rewards'&&<div className="app-stack">
-        <div className="app-kicker">RECOMPENSAS · VERIFIED LOCAL PROGRESS</div><h2>Your collected rewards</h2>
-        <div className="app-summary-strip"><span><strong>{profile.coins}</strong><small>AVAILABLE COINS</small></span><span><strong>{profile.claimedMissions.length}</strong><small>MISSIONS CLAIMED</small></span></div>
-        <p className="app-fine">{day?'Today’s daily supply is available.':'Today’s daily supply has been claimed.'} Rewards and balances are saved on this device only.</p>
-        <button type="button" className="app-cta" onClick={()=>onNavigate('missions')}>OPEN CLAIMS & CALENDAR</button>
-      </div>}
-      {screen==='offers'&&<div className="app-stack">
-        <div className="app-kicker">OFERTAS · SHOP STATUS</div><h2>Special offers</h2>
-        <p className="app-fine">No real-money offers or in-app purchases are available in this demo. The local store is available without payment services.</p>
-        <button type="button" className="app-cta" onClick={()=>onNavigate('shop')}>VIEW LOCAL STORE</button>
-      </div>}
+      {(screen==='chests'||screen==='events'||screen==='rewards'||screen==='offers')&&
+        <PortSidePanel screen={screen} profile={profile} onNavigate={onNavigate}/>}
       {screen==='battle'&&<div className="app-intro">
         <span className="app-crest" aria-hidden="true">⚔</span><div className="app-kicker">ARENA 01 · TRAINING WATERS</div>
         <h2>The First Broadside</h2><p>Your ship against the computer-controlled Crimson Tide. The existing 3D battle uses real trajectory, damage and turns.</p>
