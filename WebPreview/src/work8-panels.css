@@ -4285,3 +4285,133 @@
     min-height:34px;
   }
 }
+
+
+/* WORK8 #104 — 16 Nov 22:28: engraved artwork and tropical contrast.
+   All selectors stay inside the two owned React panels. Never change
+   the Porto dock, economics, ranking, or rewards. */
+.w8-approved-missions .w8-approved-quest-list{
+  background:
+    radial-gradient(ellipse 115% 46% at 50% -4%,rgba(123,199,193,.33),transparent 74%),
+    repeating-linear-gradient(180deg,transparent 0 8px,rgba(248,212,148,.025) 9px,transparent 10px),
+    linear-gradient(165deg,#1b4663 0%,#0e334f 46%,#061c32 100%);
+  border-color:#f3cd82;
+  box-shadow:inset 0 2px rgba(255,239,179,.85),inset 0 -3px #06192d,0 4px 0 #56361f,0 8px 13px rgba(0,15,32,.72);
+}
+.w8-approved-missions .w8-approved-quest{
+  background:
+    radial-gradient(ellipse 95% 110% at 0% 32%,rgba(112,204,212,.32),transparent 60%),
+    linear-gradient(175deg,#225674 0%,#103b59 48%,#09243d 100%);
+  border-color:#d7b378;
+  border-top-color:#ffe7ad;
+  box-shadow:inset 0 2px rgba(242,249,222,.55),inset 0 -2px #0b243d,0 2px 4px #041426;
+}
+.w8-approved-missions .w8-approved-quest-art{
+  position:relative;isolation:isolate;
+  background:radial-gradient(ellipse at 48% 52%,rgba(245,202,119,.3),rgba(46,118,130,.15) 44%,transparent 78%);
+}
+.w8-approved-missions .w8-approved-quest-art .w8-art{
+  position:relative;z-index:1;
+  filter:drop-shadow(0 3px 1px rgba(4,17,32,.88)) drop-shadow(-1px -1px 1px rgba(255,237,178,.82));
+}
+.w8-approved-missions .w8-approved-quest-core>strong{
+  color:#fff2cd;
+  text-shadow:0 1px #061a2d,0 0 5px rgba(255,211,122,.25);
+}
+.w8-approved-missions .w8-approved-quest-rewards{
+  border-left:1px solid rgba(252,208,133,.25);
+  padding-left:3px;
+}
+.w8-approved-missions .w8-approved-coin{
+  filter:drop-shadow(0 1px 1px #09233a) drop-shadow(0 0 2px rgba(255,216,126,.64));
+}
+.w8-approved-missions .w8-approved-gem{
+  filter:drop-shadow(0 1px 1px #09233a) drop-shadow(0 0 2px rgba(242,118,237,.35));
+}
+.w8-approved-missions .w8-approved-daily{
+  border-color:#e5c07a;
+  background:
+    radial-gradient(ellipse at 50% -8%,rgba(136,207,185,.37),transparent 68%),
+    linear-gradient(170deg,#1c4c67,#102f4f 62%,#081d34);
+}
+.w8-approved-missions .w8-approved-days li{
+  border-color:#c9a66e;
+  box-shadow:inset 0 2px rgba(255,242,185,.65),inset 0 -3px rgba(6,22,37,.75),0 2px 3px rgba(1,17,31,.78);
+}
+.w8-approved-missions .w8-approved-chest{
+  background:radial-gradient(ellipse at 50% 52%,rgba(255,226,133,.25),transparent 76%);
+}
+.w8-approved-missions .w8-approved-days li:nth-child(7){
+  border-color:#ffe39b;
+  box-shadow:inset 0 2px rgba(255,247,189,.95),0 0 8px rgba(255,183,48,.5),0 3px 3px #061626;
+}
+.w8-approved-missions .w8-approved-chest .w8-art{
+  filter:drop-shadow(0 3px 1px #041a2b) drop-shadow(0 -1px 1px rgba(255,241,185,.82));
+}
+.w8-approved-ranking .w8-approved-captain{
+  border-top-color:#ffe4a3;
+  background:
+    radial-gradient(ellipse 50% 110% at 8% 30%,rgba(243,184,104,.36),transparent 84%),
+    repeating-linear-gradient(0deg,transparent 0 12px,rgba(238,213,152,.025) 13px,transparent 14px),
+    linear-gradient(115deg,#326b81,#184863 44%,#092b47);
+}
+.w8-approved-ranking .w8-approved-avatar{
+  border:3px solid #ffe5a2;
+  background:radial-gradient(circle at 32% 21%,#ffe6af,#a66e34 58%,#342722 89%);
+  box-shadow:0 0 0 2px #6d411e,inset 0 2px #fff3c4,0 3px 7px #05192b;
+}
+.w8-approved-ranking .w8-approved-avatar .w8-captain-portrait{
+  filter:drop-shadow(0 3px 2px #071322) contrast(1.07) saturate(1.15);
+}
+.w8-approved-ranking .w8-approved-league-status .w8-art{
+  filter:drop-shadow(0 3px 2px #05192c) drop-shadow(0 0 3px rgba(247,210,117,.52));
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+  border-color:#d5ab6a;
+  border-top-color:#f9db96;
+  background:
+    radial-gradient(ellipse 82% 25% at 50% -2%,rgba(117,184,193,.3),transparent 88%),
+    linear-gradient(165deg,#204b65 0%,#0f3450 42%,#071e38 100%);
+}
+.w8-approved-ranking .w8-approved-leaderboard h3{
+  color:#ffe6a7;
+  text-shadow:0 2px #2d261c,0 0 5px rgba(248,207,135,.34);
+}
+.w8-approved-ranking .w8-approved-local-row{
+  border-color:#dfb97b;
+  background:linear-gradient(175deg,#27566d,#103753 60%,#092b49);
+}
+.w8-approved-ranking .w8-approved-mini-avatar{
+  background:radial-gradient(circle at 40% 20%,#ffeba8,#b87a3b 65%,#573d25);
+  box-shadow:inset 0 1px #fff3b5,0 2px 3px #061b2a;
+}
+.w8-approved-ranking .w8-approved-empty-rank{
+  background:
+    linear-gradient(90deg,rgba(132,180,181,.18),transparent 55%),
+    linear-gradient(180deg,#244d65,#0c2b46);
+}
+.w8-approved-ranking .w8-approved-empty-portrait{
+  background:radial-gradient(circle at 35% 20%,#426c7f,#173950 70%,#091f37);
+  box-shadow:inset 0 2px rgba(250,225,175,.4),0 2px 3px rgba(0,13,29,.8);
+}
+.w8-approved-ranking .w8-approved-empty-rank strong{
+  color:#e9f0e6;
+  text-shadow:0 1px #031628;
+}
+/* The original reference is 384×512. Preserve the existing compact rows,
+   retain the complete seven-day strip and five TOP slots via page scrolling. */
+@media (max-height:620px) and (min-width:351px) and (max-width:440px){
+  .w8-approved-missions .w8-approved-quest-list{border-radius:10px}
+  .w8-approved-missions .w8-approved-quest{border-radius:7px}
+  .w8-approved-missions .w8-approved-quest-rewards{padding-left:2px}
+  .w8-approved-missions .w8-approved-days li{border-radius:6px}
+  .w8-approved-ranking .w8-approved-avatar{border-width:2px}
+  .w8-approved-ranking .w8-approved-empty-portrait{box-shadow:inset 0 1px rgba(250,225,175,.4),0 1px 2px #061526}
+}
+@media (max-width:350px){
+  .w8-approved-missions .w8-approved-quest-rewards{padding-left:0;border-left:0}
+  .w8-approved-missions .w8-approved-days{
+    overflow-x:auto;overflow-y:visible;scrollbar-width:thin;
+  }
+  .w8-approved-ranking .w8-approved-avatar{border-width:2px}
+}
