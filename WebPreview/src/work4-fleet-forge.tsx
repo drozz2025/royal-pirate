@@ -281,6 +281,13 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
         <div className="w4-forge-description"><div className="w4-forge-medallion"><FleetForgeSymbol id={tab}/></div><span>{upgrade?'MELHORIA LOCAL DISPONÍVEL':'FUNÇÃO FUTURA'}</span>
           <h3>{upgrade?upgrade.name:'Armadura'}</h3>
           {upgrade?<strong>NÍVEL {level} <em>→ {max?'MAX':level+1}</em></strong>:<strong>INDISPONÍVEL</strong>}
+          <div className="w4-forge-live-levels" aria-label="Níveis reais guardados no estaleiro">
+            {UPGRADES.map(system=><div key={system.id} className={'w4-forge-live-level'+(tab===system.id?' is-current':'')}>
+              <span>{system.name}</span>
+              <b>{profile.upgrades[system.id]}/5</b>
+              <i aria-hidden="true"><span style={{width:(profile.upgrades[system.id]*20)+'%'}}/></i>
+            </div>)}
+          </div>
         </div>
       </div>
       <div className="w4-attributes" aria-label="Atributos guardados">
