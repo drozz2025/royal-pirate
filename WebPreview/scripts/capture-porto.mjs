@@ -4,7 +4,7 @@
  * A failed WebGL context is recorded, never claimed as real-device QA.
  */
 import { spawn } from 'node:child_process';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, rm, writeFile, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -79,6 +79,50 @@ try {
     if(v.exceptionDetails)throw new Error(v.exceptionDetails.text || 'Runtime evaluation failed');
     return v.result?.value;
   };
+  // WORK 6 — compare every actual mobile render against the owner's exact
+  // approved artwork. Side-by-side + transparent overlay, never a fake UI.
+  // The reference can have a different aspect ratio; each panel is contained
+  // without distortion. A mismatch is evidence for inspection, not a pass.
+  const referenceFiles={
+    porto:'01-porto.webp',battle:'02-batalha.webp',fleet:'03-frota.webp',
+    forge:'04-melhorias-forja.webp',cards:'05-cartas.webp',shop:'06-loja.webp',
+    missions:'07-missoes.webp',ranking:'08-ranking-perfil.webp'
+  };
+  const referenceComparisons=[];
+  const captureReferenceComparison=async (key,screenshot)=>{
+    const reference=await readFile(new URL('../../assets/design-approved/'+referenceFiles[key],import.meta.url));
+    const referenceUrl='data:image/webp;base64,'+reference.toString('base64');
+    const screenshotUrl='data:image/png;base64,'+screenshot.data;
+    const comparison=await evaluate(`(async()=>{
+      const load=src=>new Promise((resolve,reject)=>{
+        const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('Image failed to load'));
+        img.src=src;
+      });
+      const [target,actual]=await Promise.all([load(${JSON.stringify(referenceUrl)}),load(${JSON.stringify(screenshotUrl)})]);
+      const width=390,height=844;
+      const canvas=document.createElement('canvas');canvas.width=3*width;canvas.height=height;
+      const context=canvas.getContext('2d');if(!context)throw new Error('Missing 2D context');
+      context.fillStyle='#081c34';context.fillRect(0,0,canvas.width,canvas.height);
+      context.imageSmoothingEnabled=true;context.imageSmoothingQuality='high';
+      const drawContained=(img,column)=>{
+        const scale=Math.min(width/img.naturalWidth,height/img.naturalHeight);
+        const w=img.naturalWidth*scale,h=img.naturalHeight*scale;
+        context.drawImage(img,column*width+(width-w)/2,(height-h)/2,w,h);
+      };
+      drawContained(target,0);drawContained(actual,1);
+      drawContained(target,2);context.globalAlpha=.5;drawContained(actual,2);context.globalAlpha=1;
+      return {png:canvas.toDataURL('image/png').slice(22),
+        referenceWidth:target.naturalWidth,referenceHeight:target.naturalHeight,
+        liveWidth:actual.naturalWidth,liveHeight:actual.naturalHeight};
+    })()`);
+    await writeFile(join(out,'compare-'+key+'-390x844.png'),Buffer.from(comparison.png,'base64'));
+    referenceComparisons.push({screen:key,reference:referenceFiles[key],
+      referenceSize:[comparison.referenceWidth,comparison.referenceHeight],
+      screenshotSize:[comparison.liveWidth,comparison.liveHeight],
+      comparisonFile:'compare-'+key+'-390x844.png',
+      method:'reference | live | 50 percent overlay, contained without stretching',
+      approved:false});
+  };
   let ready=false;
   for(let i=0;i<40;i++){
     await delay(250);
@@ -109,6 +153,7 @@ try {
   const screen=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
   await mkdir(out,{recursive:true});
   await writeFile(join(out,'porto-mobile-390x844.png'),Buffer.from(screen.data,'base64'));
+  await captureReferenceComparison('porto',screen);
   await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify(report,null,2));
   if(report.navbarItems!==5||report.leftActions!==3||report.rightActions!==3)throw new Error('Porto navigation/layout mismatch');
@@ -141,6 +186,7 @@ try {
     report.navigationComparison.push({screen,...current,matched:same&&labelsMatch});
     const capture=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
     await writeFile(join(out,screen+'-mobile-390x844.png'),Buffer.from(capture.data,'base64'));
+    await captureReferenceComparison(screen,capture);
     if(!same||!labelsMatch)throw new Error(screen+' navigation diverges from approved Porto sizing');
   }
   // WORK 8 visual evidence: reach the live Missions screen via Porto.
@@ -156,7 +202,32 @@ try {
   if(missionLayout.quests!==3||missionLayout.days!==7||!missionLayout.nav)throw new Error('WORK 8 Missions layout missing real panels');
   const missionCapture=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
   await writeFile(join(out,'missions-mobile-390x844.png'),Buffer.from(missionCapture.data,'base64'));
-  await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
+  await captureReferenceComparison('missions',missionCapture);
+  // Complete the 8/8 reference set. Forge is reached through the genuine
+  // fleet action; battle is the live playable 3D scene, not its intro panel.
+  const toFleet=await evaluate("(()=>{const b=document.querySelector('.app-sheet > .harbour-nav .harbour-nav-item:nth-child(2)');if(!b)return false;b.click();return true})()");
+  if(!toFleet)throw new Error('Could not open Fleet for Forge evidence');
+  await delay(450);
+  const toForge=await evaluate("(()=>{const b=[...document.querySelectorAll('.w4-fleet button')].find(x=>x.textContent?.includes('ABRIR MELHORIAS'));if(!b)return false;b.click();return true})()");
+  if(!toForge)throw new Error('Could not navigate from Fleet to Forge');
+  await delay(500);
+  if(!await evaluate("!!document.querySelector('.w4-forge')"))throw new Error('Forge did not mount');
+  const forgeCapture=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+  await writeFile(join(out,'forge-mobile-390x844.png'),Buffer.from(forgeCapture.data,'base64'));
+  await captureReferenceComparison('forge',forgeCapture);
+  const returnToPorto=await evaluate("(()=>{const b=document.querySelector('.app-sheet > .harbour-nav .harbour-nav-item:first-child');if(!b)return false;b.click();return true})()");
+  if(!returnToPorto)throw new Error('Could not return to Porto after Forge');
+  await delay(450);
+  const startRealBattle=await evaluate("(()=>{const b=document.querySelector('.harbour-screen .harbour-battle-button');if(!b)return false;b.click();return true})()");
+  if(!startRealBattle)throw new Error('Could not start real battle from Porto');
+  await delay(1300);
+  const battleCapture=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+  await writeFile(join(out,'battle-mobile-390x844.png'),Buffer.from(battleCapture.data,'base64'));
+  await captureReferenceComparison('battle',battleCapture);
+  report.referenceComparisons=referenceComparisons.sort((a,b)=>Object.keys(referenceFiles).indexOf(a.screen)-Object.keys(referenceFiles).indexOf(b.screen));
+  report.referenceStatus='Visual diff artefacts for all 8 screens; not a claim of pixel-exact approval';
+  if(referenceComparisons.length!==8)throw new Error('Not all 8 approved reference comparisons were generated');
+  await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\\n');
 
   if(report.bodyOverflow)throw new Error('Porto viewport scrolls horizontally');
   if(!report.webgl2||report.contextLost)console.warn('No confirmed WebGL2 context: screenshot is not proof of 3D performance');
