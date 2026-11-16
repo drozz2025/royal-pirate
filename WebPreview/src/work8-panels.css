@@ -3645,3 +3645,239 @@
   .w8-approved-ranking .w8-approved-leaderboard h3::after{margin:0 5px;font-size:9px}
   .w8-approved-ranking .w8-approved-avatar{outline-offset:0}
 }
+
+
+/* WORK8 16 Nov 16:31 — frame 07/08 proportion and hierarchy, from merged #179.
+   Bring the three-quest board, seven-day chest rail and five-place leaderboard
+   closer to the approved 384×512 composition without inventing any data.
+   This CSS is scoped to WORK8. Shared Porto dock, HUD and routes stay untouched. */
+.w8-approved-missions .w8-approved-quest-list{
+  gap:8px;
+}
+.w8-approved-missions .w8-approved-quest{
+  grid-template-columns:clamp(45px,13vw,56px) minmax(0,1fr) 53px clamp(70px,19.5vw,81px);
+  column-gap:6px;
+  padding:6px 6px;
+  min-height:84px;
+  border-radius:12px;
+}
+.w8-approved-missions .w8-approved-quest-art{
+  width:100%;height:63px;
+  border-radius:50%;
+  background:radial-gradient(ellipse at 48% 43%,#ffdb9d64 0%,#17647a51 43%,transparent 74%);
+  filter:drop-shadow(0 2px 2px #04182b);
+}
+.w8-approved-missions .w8-approved-quest-art .w8-art{
+  width:100%;height:60px;max-width:59px;
+}
+.w8-approved-missions .w8-approved-quest-core{
+  gap:7px;
+}
+.w8-approved-missions .w8-approved-quest-core>strong{
+  font-size:clamp(15px,4.15vw,18px);
+  line-height:1.07;
+}
+.w8-approved-missions .w8-approved-quest-rewards{
+  gap:5px;
+}
+.w8-approved-missions .w8-approved-quest-rewards>span{
+  position:relative;
+  min-width:21px;
+  font-size:20px;
+  line-height:21px;
+  filter:drop-shadow(0 2px 1px #061b30);
+}
+.w8-approved-missions .w8-approved-quest-rewards strong{
+  font-size:12px;
+  line-height:1;
+}
+.w8-approved-missions .w8-approved-coin::before{
+  content:"";position:absolute;pointer-events:none;
+  left:50%;top:2px;transform:translateX(-50%);
+  width:14px;height:14px;border-radius:50%;
+  border:2px solid #fff0a8;
+  box-shadow:inset 0 1px #a66a23,0 0 5px #ffd87e7d;
+}
+.w8-approved-missions .w8-approved-gem{
+  text-shadow:0 1px #ffe9fd,0 2px #682064,0 0 5px #ff7ff4;
+}
+.w8-approved-missions .w8-approved-quest>button{
+  width:100%;min-width:0;
+  font-size:12px;
+}
+.w8-approved-missions .w8-approved-daily{
+  padding:9px 8px 9px;
+  border-radius:13px;
+}
+.w8-approved-missions .w8-approved-daily h3{
+  font-size:clamp(22px,5.9vw,26px);
+  line-height:1;
+  margin:1px 0 8px!important;
+}
+.w8-approved-missions .w8-approved-days{
+  gap:4px;
+}
+.w8-approved-missions .w8-approved-days li{
+  min-height:81px;
+  padding:3px 0 5px;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.w8-approved-missions .w8-approved-chest{
+  height:51px;
+  display:grid;place-items:center;
+}
+.w8-approved-missions .w8-approved-chest .w8-art{
+  height:53px;
+  max-width:100%;
+}
+.w8-approved-missions .w8-approved-days li small{
+  line-height:1.15;
+  white-space:nowrap;
+  text-align:center;
+  font-size:11px;
+}
+.w8-approved-missions .w8-approved-claim-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;gap:6px;
+  margin-top:10px;
+}
+.w8-approved-missions .w8-approved-claim-row small{
+  font-size:11px;line-height:1.25;
+}
+.w8-approved-missions .w8-approved-claim-row button{
+  min-width:80px;
+}
+/* The approved Ranking has one prominent captain tile and a compact,
+   engraved TOP board. The only occupied row is the genuine local profile. */
+.w8-approved-ranking .w8-approved-captain{
+  grid-template-columns:clamp(78px,23vw,96px) minmax(0,1fr) clamp(65px,18vw,77px);
+  column-gap:8px;
+  padding:9px 8px;
+}
+.w8-approved-ranking .w8-approved-avatar{
+  width:100%;height:auto;aspect-ratio:1 / 1.07;
+}
+.w8-approved-ranking .w8-approved-identity{
+  gap:5px;
+  align-self:center;
+}
+.w8-approved-ranking .w8-approved-identity>strong{
+  font-size:clamp(17px,5vw,23px);
+  line-height:1.04;
+}
+.w8-approved-ranking .w8-approved-league-status{
+  align-self:center;gap:4px;
+}
+.w8-approved-ranking .w8-approved-league-status .w8-art{
+  width:63px;height:64px;max-width:100%;
+}
+.w8-approved-ranking .w8-approved-league-status small{
+  font-size:10px;color:#fce8bb;
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+  padding:10px 9px 10px;
+  gap:0;
+}
+.w8-approved-ranking .w8-approved-leaderboard h3{
+  margin:0 0 7px!important;
+  padding:2px 0 8px;
+  font-size:clamp(24px,6.5vw,28px);
+  background:linear-gradient(90deg,transparent,#ffd89017 23%,#ffedaf22 50%,#ffd89017 77%,transparent);
+  border-bottom:2px solid #e6b76e9c;
+}
+.w8-approved-ranking .w8-approved-local-row{
+  min-height:61px;gap:7px;padding:5px 7px;
+  border-radius:8px;
+}
+.w8-approved-ranking .w8-approved-mini-avatar{
+  width:48px;height:48px;flex:0 0 48px;
+}
+.w8-approved-ranking .w8-approved-player-detail strong{
+  font-size:clamp(16px,4.5vw,19px);
+}
+.w8-approved-ranking .w8-approved-player-detail small{
+  font-size:10px;
+}
+.w8-approved-ranking .w8-approved-empty-rank{
+  min-height:50px;
+  grid-template-columns:30px 47px minmax(0,1fr) 11px;
+  gap:7px;
+  padding:3px 7px;
+  box-shadow:inset 0 1px #a4dbe525;
+}
+.w8-approved-ranking .w8-approved-empty-rank>span:first-child{
+  width:29px;height:29px;font-size:18px;
+}
+.w8-approved-ranking .w8-approved-empty-portrait{
+  width:45px;height:43px;
+  border-radius:5px;
+}
+.w8-approved-ranking .w8-approved-empty-portrait svg{
+  width:39px;height:40px;
+}
+.w8-approved-ranking .w8-approved-empty-rank strong{
+  font-size:clamp(11px,3.25vw,13px);
+  line-height:1.1;
+}
+/* A short 320×568 phone scrolls its content; neither the seven-day strip
+   nor action buttons are hidden behind new max-height constraints. */
+@media(max-width:350px){
+  .w8-approved-missions .w8-approved-quest-list{
+    gap:6px;max-height:none!important;overflow:visible!important;
+  }
+  .w8-approved-missions .w8-approved-quest{
+    grid-template-columns:34px minmax(0,1fr) 40px 57px;
+    column-gap:4px;min-height:73px;padding:5px 3px;
+  }
+  .w8-approved-missions .w8-approved-quest-art{
+    width:34px;height:46px;
+  }
+  .w8-approved-missions .w8-approved-quest-art .w8-art{
+    width:36px;height:44px;
+  }
+  .w8-approved-missions .w8-approved-quest-core>strong{font-size:13px}
+  .w8-approved-missions .w8-approved-quest-rewards{gap:2px}
+  .w8-approved-missions .w8-approved-quest-rewards>span{font-size:16px;min-width:16px}
+  .w8-approved-missions .w8-approved-quest-rewards strong{font-size:10px}
+  .w8-approved-missions .w8-approved-coin::before{width:11px;height:11px;top:3px}
+  .w8-approved-missions .w8-approved-quest>button{min-height:40px;font-size:10px}
+  .w8-approved-missions .w8-approved-daily{
+    padding:8px 6px 9px;max-height:none!important;overflow:visible!important;
+  }
+  .w8-approved-missions .w8-approved-days{
+    grid-template-columns:repeat(7,minmax(38px,1fr));
+    overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;
+  }
+  .w8-approved-missions .w8-approved-days li{min-width:38px;min-height:70px}
+  .w8-approved-missions .w8-approved-chest{height:43px}
+  .w8-approved-missions .w8-approved-chest .w8-art{height:44px}
+  .w8-approved-missions .w8-approved-days li small{font-size:10px}
+  .w8-approved-missions .w8-approved-claim-row small{font-size:10px}
+  .w8-approved-missions .w8-approved-claim-row button{min-width:73px}
+  .w8-approved-ranking .w8-approved-captain{
+    grid-template-columns:58px minmax(0,1fr) 58px;gap:5px;padding:6px 5px;
+  }
+  .w8-approved-ranking .w8-approved-avatar{width:56px;height:62px}
+  .w8-approved-ranking .w8-approved-identity>strong{font-size:15px}
+  .w8-approved-ranking .w8-approved-league-status .w8-art{width:49px;height:50px}
+  .w8-approved-ranking .w8-approved-empty-rank{
+    grid-template-columns:23px 32px minmax(0,1fr) 9px;
+    gap:4px;padding:3px 4px;min-height:44px;
+  }
+  .w8-approved-ranking .w8-approved-empty-rank>span:first-child{
+    width:23px;height:23px;font-size:14px;
+  }
+  .w8-approved-ranking .w8-approved-empty-portrait{width:31px;height:32px}
+  .w8-approved-ranking .w8-approved-empty-portrait svg{width:28px;height:30px}
+  .w8-approved-ranking .w8-approved-empty-rank strong{font-size:10px}
+}
+@media(min-width:420px){
+  .w8-approved-ranking .w8-approved-captain{
+    grid-template-columns:102px minmax(0,1fr) 78px;
+    min-height:143px;
+  }
+  .w8-approved-ranking .w8-approved-avatar{width:99px;height:106px}
+  .w8-approved-missions .w8-approved-quest{min-height:87px}
+  .w8-approved-ranking .w8-approved-empty-rank{min-height:52px}
+}
