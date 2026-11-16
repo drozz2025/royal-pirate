@@ -2685,3 +2685,12 @@
     width:100%;max-width:100%;transform:none;
   }
 }
+
+/* 390px screenshot review: retain larger seven-chest art without illustrations
+   spilling across neighbouring reward frames. */
+.w8-approved-missions .w8-approved-chest .w8-art{
+  display:block;width:100%;max-width:100%;height:100%;transform:scale(1.02);
+}
+.w8-approved-missions .w8-approved-days li:nth-child(7) .w8-art{
+  transform:scale(1.07);
+}
