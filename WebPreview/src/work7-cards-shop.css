@@ -2436,7 +2436,7 @@
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
   position:relative;
   min-width:0;
-  min-height:clamp(109px,14.3dvh,123px);
+  min-height:clamp(115px,14.6dvh,127px);
   gap:1px;
   padding:3px 2px 5px;
   border:2px solid #e5ba74;
@@ -2447,7 +2447,7 @@
 }
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
   width:100%;max-width:none;
-  aspect-ratio:73/67;
+  aspect-ratio:73/73;
   border:1px solid #fff0c3;
   border-radius:6px;
   filter:saturate(1.2) contrast(1.11);
@@ -2467,15 +2467,16 @@
   overflow-wrap:anywhere;
 }
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
-  position:absolute;top:6px;right:5px;z-index:3;
-  width:auto;min-height:0;min-width:0;
-  margin:0;padding:2px 4px;
-  border:1px solid #ffe1a4;border-radius:4px;
-  background:#081b39e8;
+  position:relative;top:auto;right:auto;z-index:3;
+  display:grid;place-items:center;align-self:stretch;
+  width:100%;min-width:0;min-height:22px;
+  margin-top:auto;padding:3px 2px;
+  border:1px solid #ffe1a4;border-radius:5px;
+  background:linear-gradient(#34547c,#0d2848);
   color:#fff2c5;
-  font:900 clamp(8px,2.15vw,10px)/1 'Barlow Condensed',sans-serif;
-  letter-spacing:.2px;white-space:nowrap;
-  box-shadow:0 2px 4px #0009;
+  font:900 clamp(10px,2.7vw,12px)/1 'Barlow Condensed',sans-serif;
+  letter-spacing:.25px;white-space:nowrap;
+  box-shadow:inset 0 1px #fff4bd77,0 2px 4px #0009;
 }
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+2){border-color:#64c8fa}
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+3){border-color:#84ecc0}
@@ -2565,13 +2566,14 @@
     grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 3px;
   }
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-    min-height:102px;padding:2px 1px 4px;
+    min-height:112px;padding:2px 1px 4px;
   }
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
     min-height:25px;margin-top:-20px;padding:3px 1px 2px;font-size:10.5px;
   }
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
-    top:4px;right:3px;padding:2px 3px;font-size:8px;
+    position:relative;top:auto;right:auto;
+    min-height:19px;padding:2px 1px;font-size:10px;
   }
   .w7-screen[data-work7-screen="cards"] .w7-collection-status span{font-size:9px}
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
