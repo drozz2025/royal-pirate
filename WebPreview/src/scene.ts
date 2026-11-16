@@ -389,7 +389,7 @@ export class OceanScene {
     // Battle-only broadside: reveal the enemy's three-dimensional port flank
     // instead of aiming its narrow bow straight at the camera. No camera
     // movement, hit-point changes, altered controls or Porto composition.
-    this.ships.enemy.root.rotation.y=.48;
+    this.ships.enemy.root.rotation.y=-.48;
     this.battleForegroundSail.visible=true;
     // Comparison at 390x844 showed that the tighter off-axis lens clips the
     // live player ship. Restore both hulls fully inside the playable viewport.
