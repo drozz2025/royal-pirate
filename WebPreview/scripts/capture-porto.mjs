@@ -229,6 +229,74 @@ try {
   if(referenceComparisons.length!==8)throw new Error('Not all 8 approved reference comparisons were generated');
   await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
 
+  // WORK 0 / #104: exact native-size evidence. Every approved individual
+  // artwork is 384x512. The 390x844 phone screenshots are kept separately:
+  // comparing them to 384x512 with "contain" is NOT a 1:1 visual check.
+  // These new real Chromium screenshots use the SAME 384x512 viewport as
+  // the reference, without scaling either image. Never auto-approve artwork.
+  report.nativeReferenceComparisons=[];
+  const nativeViewport={width:384,height:512};
+  await command('Emulation.setDeviceMetricsOverride',{
+    width:nativeViewport.width,height:nativeViewport.height,
+    screenWidth:nativeViewport.width,screenHeight:nativeViewport.height,
+    deviceScaleFactor:1,mobile:true
+  });
+  const clickExact=async (js,label)=>{
+    const ok=await evaluate(js);
+    if(!ok)throw new Error('Native-reference navigation failed: '+label);
+    await delay(420);
+  };
+  const nativeRoutes=['porto','battle','fleet','forge','cards','shop','missions','ranking'];
+  for(const key of nativeRoutes){
+    await command('Page.navigate',{url:origin});
+    let mounted=false;
+    for(let attempt=0;attempt<45;attempt++){
+      if(await evaluate("!!document.querySelector('.harbour-screen .harbour-nav-item')")){mounted=true;break;}
+      await delay(120);
+    }
+    if(!mounted)throw new Error('Native 384x512 Porto did not mount before '+key);
+    await delay(350);
+    if(key==='battle'){
+      await clickExact("(()=>{const b=document.querySelector('.harbour-screen .harbour-battle-button');if(!b)return false;b.click();return true})()",key);
+      await delay(950);
+      if(!await evaluate("!!document.querySelector('.in-battle')"))throw new Error('Native Batalha missing');
+    }else if(key==='missions'){
+      await clickExact("(()=>{const b=[...document.querySelectorAll('.harbour-screen .harbour-flank-right button')].find(x=>x.textContent?.includes('MISSÕES'));if(!b)return false;b.click();return true})()",key);
+    }else if(key==='forge'){
+      await clickExact("(()=>{const b=document.querySelector('.harbour-screen .harbour-nav-item:nth-child(2)');if(!b)return false;b.click();return true})()",'fleet for forge');
+      await clickExact("(()=>{const b=[...document.querySelectorAll('.w4-fleet button')].find(x=>x.textContent?.includes('ABRIR MELHORIAS'));if(!b)return false;b.click();return true})()",key);
+    }else if(key!=='porto'){
+      const tab={fleet:2,cards:3,shop:4,ranking:5}[key];
+      await clickExact("(()=>{const b=document.querySelector('.harbour-screen .harbour-nav-item:nth-child("+tab+")');if(!b)return false;b.click();return true})()",key);
+    }
+    const geometry=await evaluate("(()=>({width:innerWidth,height:innerHeight,documentWidth:document.documentElement.scrollWidth,hasNav:!!document.querySelector('.harbour-nav'),error:document.querySelector('.error-panel')?.textContent||null}))()");
+    if(geometry.width!==384||geometry.height!==512||geometry.documentWidth>386||geometry.error)
+      throw new Error('Native viewport failed on '+key+': '+JSON.stringify(geometry));
+    if(key!=='battle'&&!geometry.hasNav)throw new Error('Native nav missing on '+key);
+    const nativeShot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+    await writeFile(join(out,key+'-mobile-384x512.png'),Buffer.from(nativeShot.data,'base64'));
+    const nativeRef=await readFile(new URL('../../assets/design-approved/'+referenceFiles[key],import.meta.url));
+    const nativeRefURL='data:image/webp;base64,'+nativeRef.toString('base64');
+    const nativeShotURL='data:image/png;base64,'+nativeShot.data;
+    const composite=await evaluate("(async()=>{"+
+      "const load=s=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=s});"+
+      "const [ref,live]=await Promise.all([load("+JSON.stringify(nativeRefURL)+"),load("+JSON.stringify(nativeShotURL)+")]);"+
+      "if(ref.naturalWidth!==384||ref.naturalHeight!==512||live.naturalWidth!==384||live.naturalHeight!==512)throw Error('Native dimensions mismatch');"+
+      "const c=document.createElement('canvas');c.width=1152;c.height=512;const g=c.getContext('2d');"+
+      "g.drawImage(ref,0,0);g.drawImage(live,384,0);g.drawImage(ref,768,0);g.globalAlpha=.5;g.drawImage(live,768,0);"+
+      "return c.toDataURL('image/png').slice(22)})()");
+    const compareFile='compare-exact-'+key+'-384x512.png';
+    await writeFile(join(out,compareFile),Buffer.from(composite,'base64'));
+    report.nativeReferenceComparisons.push({screen:key,
+      reference:referenceFiles[key],referenceSize:[384,512],screenshotSize:[384,512],
+      screenshotFile:key+'-mobile-384x512.png',comparisonFile:compareFile,
+      method:'unscaled reference | unscaled live Chromium | 50 percent overlay',
+      approved:false,geometry});
+  }
+  if(report.nativeReferenceComparisons.length!==8)throw new Error('Incomplete native-size references');
+  // The existing 320/430 regression gate below restores its own device metrics.
+  await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
+
   // WORK 0 mobile consistency gate. Capture the same real five-tab navigation
   // at narrow (320) and wide (430) phone widths, not just the 390px reference.
   // These screenshots are extra layout diagnostics; approval still requires
