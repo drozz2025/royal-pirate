@@ -319,7 +319,7 @@ export class OceanScene {
   }
 
   private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();}
-  home(){this.cameraMode='battle';const pose=battleCameraPose(this.host.clientWidth/Math.max(1,this.host.clientHeight));this.camera.position.set(...pose.position);this.controls.target.set(...pose.target);this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;this.battleBattery.visible=pose.showBattery;this.controls.update();}
+  home(){this.cameraMode='battle';const pose=battleCameraPose(this.host.clientWidth/Math.max(1,this.host.clientHeight));this.camera.position.set(...pose.position);this.controls.target.set(...pose.target);this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;this.battleBattery.visible=pose.showBattery;this.battleBattery.position.z=pose.batteryOffsetZ;this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
   /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
   showHarbour(){

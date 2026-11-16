@@ -20,13 +20,19 @@ test('Batalha mobile portrait composition stays visible across 320, 390 and 430 
   const pose=battleCameraPose(w/h);
   assert.equal(pose.showBattery,true);
   const player=screen(w,h,[-10,0,3]),enemy=screen(w,h,[10,0,-3]);
-  const mast=screen(w,h,[-10,13,3]),muzzle=screen(w,h,[-2.45,1.85,66]);
+  const mast=screen(w,h,[-10,13,3]),muzzle=screen(w,h,[-2.45,1.85,66+pose.batteryOffsetZ]);
+  const secondMuzzle=screen(w,h,[2.45,1.85,66+pose.batteryOffsetZ]);
   assert.ok(player.x>15 && player.x<w*.45, `player visible ${w}x${h}: ${player.x}`);
   assert.ok(enemy.x>w*.55 && enemy.x<w-15, `enemy visible ${w}x${h}: ${enemy.x}`);
-  assert.ok(player.x>w*.15 && enemy.x<w*.85, `both hulls have side clearance ${w}x${h}`);
+  assert.ok(player.x>w*.08 && enemy.x<w*.92, `both hull centres have room for their silhouette ${w}x${h}`);
+  assert.ok(muzzle.x>w*.19 && secondMuzzle.x<w*.81, `both original cannon muzzles stay on screen ${w}x${h}`);
   assert.ok(mast.y>h*.20 && mast.y<h*.50, `sails clear HUD ${w}x${h}: ${mast.y}`);
   assert.ok(muzzle.y>h*.48 && muzzle.y<h*.82, `cannons below ships ${w}x${h}: ${muzzle.y}`);
   assert.ok(muzzle.y>mast.y+h*.2, `the cannon foreground must remain below the sails ${w}x${h}`);
+  if(w===390||w===430){
+   assert.ok(player.y-mast.y>h*.21, `tall-phone ships should be legibly larger ${w}x${h}`);
+   assert.equal(pose.batteryOffsetZ,-27,'tall portrait foreground follows the camera');
+  }else assert.equal(pose.batteryOffsetZ,-15,'shorter phone retains tested camera and deck');
  }
 });
 test('Desktop retains previous battle viewpoint and no foreground deck',()=>{
