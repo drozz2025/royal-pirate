@@ -127,6 +127,9 @@ export class OceanScene {
     // The black near-field player sail matches the approved Batalha composition;
     // it is never part of Porto or the physics ships, and cannot block DOM HUD.
     this.battleForegroundSail=makeBattleForegroundSail();
+    // The player's rig is beside the camera, not an opponent shown to the left.
+    // Shift only the battle-only sail into the safe left viewport edge.
+    this.battleForegroundSail.position.x+=1.0;
     this.battleForegroundSail.visible=false;this.scene.add(this.battleForegroundSail);
     this.controls=new OrbitControls(this.camera,this.canvas);this.controls.enableDamping=true;this.controls.enablePan=false;this.controls.minDistance=18;this.controls.maxDistance=110;this.controls.minPolarAngle=.32;this.controls.maxPolarAngle=1.28;this.controls.target.set(0,2,0);this.controls.rotateSpeed=.5;
     this.path=new T.Line(this.pathGeometry,new T.LineDashedMaterial({color:'#f9e5a4',dashSize:.35,gapSize:.2,transparent:true,opacity:.85}));this.scene.add(this.path);
@@ -390,19 +393,31 @@ export class OceanScene {
     // instead of aiming its narrow bow straight at the camera. No camera
     // movement, hit-point changes, altered controls or Porto composition.
     this.ships.enemy.root.rotation.y=-.48;
+    // First-person broadside: the player is standing behind the live gun deck.
+    // Keep the player's physics ship active for HP, firing, collisions and scars;
+    // hide only its exterior hull from this camera (never from Porto).
+    this.ships.player.root.visible=false;
     this.battleForegroundSail.visible=true;
     // Comparison at 390x844 showed that the tighter off-axis lens clips the
     // live player ship. Restore both hulls fully inside the playable viewport.
     this.camera.fov=42;this.camera.updateProjectionMatrix();
     const pose=battleCameraPose(this.host.clientWidth/Math.max(1,this.host.clientHeight));
     this.camera.position.set(...pose.position);
-    this.controls.target.set(...pose.target);this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;this.battleBattery.visible=pose.showBattery;this.battleBattery.position.z=pose.batteryOffsetZ;this.controls.update();}
+    // A fixed forward-looking viewpoint, not the rejected moving camera.
+    // Aim just starboard of the centreline: the red galleon is ahead, the
+    // curved black player sail and real cannon barrels frame the foreground.
+    this.controls.target.set(pose.target[0]+(pose.showBattery?1.05:0),pose.target[1]+(pose.showBattery?.45:0),pose.target[2]);
+    this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;
+    this.battleBattery.visible=pose.showBattery;
+    this.battleBattery.position.z=pose.batteryOffsetZ;
+    this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
   /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
   showHarbour(){
     this.cameraMode='harbour';this.camera.fov=42;this.camera.updateProjectionMatrix();
     this.scene.background=new T.Color('#58baf1');this.water.uniforms.battleMode.value=0;
     this.ships.player.root.scale.setScalar(1);this.ships.enemy.root.scale.setScalar(1);
+    this.ships.player.root.visible=true;
     this.shipPointers.clear();this.shipStart=null;this.battleBattery.visible=false;this.battleForegroundSail.visible=false;this.worldScenery.visible=true;this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
     this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
     this.controls.enableRotate=false;this.controls.enableZoom=false;this.controls.maxPolarAngle=1.28;
@@ -439,7 +454,7 @@ export class OceanScene {
     if(!this.shipMoved)this.onShipSelection(true);
     if(this.shipPointers.size===0){this.shipStart=null;this.controls.enableRotate=false;this.controls.enableZoom=false;}
   };
-  /** Returns to the existing working battle camera, with both ships visible. */
+  /** Return to the live first-person battle deck; never a two-ships side view. */
   showBattle(){this.water.uniforms.battleMode.value=1;this.shipPointers.clear();this.shipStart=null;this.ships.enemy.root.visible=true;this.foam[1].visible=true;this.harbourDock.visible=false;this.worldScenery.visible=false;this.controls.enableRotate=true;this.controls.enableZoom=true;this.controls.minDistance=18;this.controls.maxDistance=110;this.home();}
   toggleMusic(){return this.pirateAudio.toggleMusic();}
   toggleEffects(){return this.pirateAudio.toggleEffects();}

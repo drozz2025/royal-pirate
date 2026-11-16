@@ -103,6 +103,37 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   paint.fillStyle = haze;
   paint.fillRect(0, 675, 1024, 265);
 
+  // Distant, illuminated cloud shelf and scattered blue-grey weather layers.
+  // The approved illustration has depth behind the galleon, not an empty sky.
+  // All strokes are generated locally on the battle sky, never overlaying HUD.
+  paint.save();
+  const horizonShelf = paint.createLinearGradient(0, 610, 0, 850);
+  horizonShelf.addColorStop(0, 'rgba(52,114,150,0)');
+  horizonShelf.addColorStop(.47, 'rgba(45,109,147,.14)');
+  horizonShelf.addColorStop(.75, 'rgba(244,248,232,.30)');
+  horizonShelf.addColorStop(1, 'rgba(255,249,215,0)');
+  paint.fillStyle = horizonShelf;
+  paint.fillRect(0, 610, 1024, 240);
+  for (let i = 0; i < 13; i++) {
+    const cx = (i * 113 + 39) % 1130 - 50;
+    const cy = 672 + Math.sin(i * 1.9) * 45;
+    const width = 65 + (i % 4) * 28;
+    const cloud = paint.createRadialGradient(cx, cy, 5, cx, cy, width);
+    cloud.addColorStop(0, i % 3 === 0 ? 'rgba(251,252,231,.28)' : 'rgba(241,251,248,.33)');
+    cloud.addColorStop(.55, 'rgba(226,242,243,.20)');
+    cloud.addColorStop(1, 'rgba(222,246,250,0)');
+    paint.save();
+    paint.translate(cx, cy);
+    paint.scale(1.9, .48);
+    paint.translate(-cx, -cy);
+    paint.fillStyle = cloud;
+    paint.beginPath();
+    paint.arc(cx, cy, width, 0, Math.PI * 2);
+    paint.fill();
+    paint.restore();
+  }
+  paint.restore();
+
   const texture = new T.CanvasTexture(canvas);
   texture.colorSpace = T.SRGBColorSpace;
   texture.needsUpdate = true;
