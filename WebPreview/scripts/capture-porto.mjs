@@ -27,7 +27,7 @@ const events = [];
 let ws;
 try {
   let list;
-  for (let i=0; i<80; i++) {
+  for (let i=0; i<200; i++) {
     if (chrome.exitCode !== null) throw new Error('Chromium quit: '+chromeErrors);
     try {
       const response=await fetch('http://127.0.0.1:' + chromePort + '/json/list',{signal:AbortSignal.timeout(600)});
