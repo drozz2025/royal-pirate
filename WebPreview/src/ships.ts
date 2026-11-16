@@ -221,13 +221,13 @@ export function makeShip(red = false): ShipArt {
         put(cube,black,side*(halfWidth+.095),1.49,z,.06,.48,.59);
         put(sphere,gold,side*(halfWidth+.12),1.91,z,.11,.10,.12);
       }
-      // Tall carved stern rail and gold brackets, visible on the red vessel.
-      for(const x of [-.90,-.45,0,.45,.90]){
-        put(cube,gold,x,3.85,-4.34,.07,.43,.10);
-      }
-      beam(new T.Vector3(-1.32,4.10,-4.35),
-        new T.Vector3(1.32,4.10,-4.35),.062,gold);
     }
+    // Tall carved stern rail and gold brackets, visible on the red vessel.
+    for(const x of [-.90,-.45,0,.45,.90]){
+      put(cube,gold,x,3.85,-4.34,.07,.43,.10);
+    }
+    beam(new T.Vector3(-1.32,4.10,-4.35),
+      new T.Vector3(1.32,4.10,-4.35),.062,gold);
   }
   // Royal galleon detailing is real 3D geometry, merged by material with the
   // existing hull. The enemy remains lightweight and visually distinct.
