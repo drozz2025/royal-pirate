@@ -209,6 +209,20 @@ function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
       <path d="M118 117l2-9 2 9 8 2-8 2-2 8-2-8-8-2Z"/>
       <path d="M387 145l2-6 2 6 5 2-5 2-2 6-2-6-5-2Z"/>
     </g>
+    {/* Additional distant island architecture and sunlight; independent of cards and ranking. */}
+    <g className="w8-distant-port" strokeLinejoin="round" strokeLinecap="round">
+      <path d="M145 118Q180 111 213 121L215 131Q175 134 140 128Z" fill="#1C586B" opacity=".9"/>
+      <path d="M157 114V101L171 97V115Z" fill="#A58357" stroke="#385460" strokeWidth="1.5"/>
+      <path d="M153 100L164 91L176 99Z" fill="#E5BE7E" stroke="#6A5034" strokeWidth="1.5"/>
+      <path d="M188 117V94H200V120Z" fill="#C09A63" stroke="#4E5550" strokeWidth="1.5"/>
+      <path d="M186 94L194 85L203 94Z" fill="#E9C487" stroke="#67523B" strokeWidth="1.5"/>
+      <path d="M191 102H197V111H191Z" fill="#183D54"/>
+      <path d="M172 114Q185 105 198 115" stroke="#EFD4A1" strokeWidth="1.4" fill="none"/>
+    </g>
+    <g fill="none" stroke="#DFF6D8" strokeLinecap="round" opacity=".39">
+      <path d="M10 149Q42 141 73 149T138 149M234 150Q266 143 305 151T406 149" strokeWidth="1.7"/>
+      <path d="M37 169Q57 165 77 169M272 168Q302 163 328 168" strokeWidth="1.2"/>
+    </g>
     <path d="M0 0H420V176H0Z" fill="none" stroke="#EABF77" strokeWidth="4" opacity=".3"/>
   </svg>;
 }
@@ -296,6 +310,23 @@ function W8CaptainPortrait(){
     <path d="M44 95L50 100L56 95" fill="none" stroke="#AA6835" strokeWidth="1.4"/>
     <circle cx="50" cy="103" r="3.7" fill="#BD7330" stroke="#FFE1A0" strokeWidth="1.5"/>
     <path d="M48 103H52M50 101V105" stroke="#FFF4C1" strokeWidth=".85"/>
+    {/* WORK8: pictorial tricorne stitching, embossed coat and facial highlights.
+        Entirely decorative. Portrait represents the persisted local captain only. */}
+    <g aria-hidden="true" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M13 28Q26 10 50 13Q74 10 87 28" stroke="#482C21" strokeWidth="5"/>
+      <path d="M12 27Q28 13 49 16Q72 13 88 27" stroke="#F8D991" strokeWidth="2.4"/>
+      <path d="M17 30Q35 38 50 35Q67 38 83 30" stroke="#FFEAB0" strokeWidth="1.5"/>
+      <path d="M24 22Q30 18 37 21M63 21Q70 18 76 22" stroke="#FFEEBE" strokeWidth="1.45" opacity=".9"/>
+      <path d="M47 20L50 16L53 20L56 24L50 29L44 24Z" fill="#BF7E2D" stroke="#FFE6A0" strokeWidth="1.4"/>
+      <path d="M50 19V26M47 23H53" stroke="#FFF5C4" strokeWidth="1.05"/>
+      <path d="M35 49Q39 47 44 49M56 49Q61 47 65 49" stroke="#FCE2B2" strokeWidth=".9"/>
+      <path d="M35 61Q40 65 45 63M55 63Q60 65 65 61" stroke="#B7643C" strokeWidth="1.3" opacity=".85"/>
+      <path d="M35 70Q40 77 45 78M65 70Q60 77 55 78" stroke="#85513B" strokeWidth="1.5"/>
+      <path d="M16 94Q20 85 29 82L34 87L27 97M84 94Q80 85 71 82L66 87L73 97" stroke="#F1C373" strokeWidth="2.1"/>
+      <path d="M16 100L24 96L31 104M84 100L76 96L69 104" stroke="#C08A45" strokeWidth="1.5"/>
+      <circle cx="22" cy="93" r="2" fill="#FBE1A2" stroke="#86502E" strokeWidth="1"/>
+      <circle cx="78" cy="93" r="2" fill="#FBE1A2" stroke="#86502E" strokeWidth="1"/>
+    </g>
 
 
   </svg>;
