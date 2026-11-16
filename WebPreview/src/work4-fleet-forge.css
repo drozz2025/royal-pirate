@@ -2156,3 +2156,52 @@
 @media(max-width:359px){
   .w4-fleet .w4-harbour-stage .w4-reference-galleon-volume{opacity:.96}
 }
+
+
+/* WORK4 / #104 — 03/04 composition correction against approved 384×512
+   frame, after #203. Existing SVG artwork is merely re-framed: never create
+   a second hull or cannon. The small phone frame now leaves clear sky above
+   all sails, and the Forge carriage no longer falls below its painted stage.
+   No selector changes #158 compositor isolation, global shell or Porto/nav. */
+@media (max-height:640px) and (max-width:659px) {
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art {
+    width:76%;
+    left:-3%;
+    bottom:0;
+    transform:scaleX(.94) scaleY(1.02) rotate(-1deg);
+    transform-origin:43% 87%;
+  }
+  .w4-fleet .w4-stage-label {
+    top:12%;
+    right:1.5%;
+    width:35%;
+  }
+}
+/* Full forged-metal barrel, muzzle, wheel and carriage remain in one scene;
+   reserve the rightmost 38% for real locally stored levels. */
+.w4-forge .w4-forge-scene > svg.w4-cannon-art {
+  width:64%;
+  left:-2%;
+  top:23%;
+}
+@media (max-width:359px) {
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art {
+    width:66%;
+    left:-3%;
+    top:23%;
+  }
+}
+@media (min-width:360px) and (max-width:659px) and (min-height:700px) {
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art {
+    width:70%;
+    left:-2.5%;
+    top:28%;
+  }
+}
+@media (min-width:400px) and (max-width:659px) and (min-height:700px) {
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art {
+    width:69%;
+    left:-1.5%;
+    top:27%;
+  }
+}
