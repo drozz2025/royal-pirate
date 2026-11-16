@@ -2279,7 +2279,7 @@
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot {
   padding:3px 2px 5px;
   gap:3px;
-  min-height:clamp(112px,15.5dvh,132px);
+  min-height:clamp(120px,15.5dvh,132px);
   border-bottom-width:5px;
   border-radius:10px;
 }
@@ -2304,9 +2304,11 @@
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot small {
   margin-top:auto;
   width:100%;
-  min-height:22px;
-  padding:4px 1px 3px;
-  font:900 clamp(10px,2.6vw,12px)/1 'Barlow Condensed',sans-serif;
+  min-height:29px;
+  padding:3px 1px;
+  font:900 clamp(10px,2.6vw,12px)/1.12 'Barlow Condensed',sans-serif;
+  white-space:normal;
+  overflow-wrap:break-word;
   color:#fff2ca;
   border:1px solid #e9be80;
   background:linear-gradient(#344e70,#102642);
@@ -2402,9 +2404,9 @@
   .w7-screen[data-work7-screen="shop"] {padding-inline:1px;gap:5px}
   .w7-screen[data-work7-screen="cards"] .w7-collection-content {padding:6px 3px 9px;gap:6px}
   .w7-screen[data-work7-screen="cards"] .w7-approved-grid {grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 3px}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot {min-height:106px;padding:2px 1px 4px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot {min-height:116px;padding:2px 1px 4px}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong {min-height:24px;font-size:10.5px;margin-top:-16px;padding:3px 0 2px}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small {min-height:19px;font-size:10px;padding:3px 1px 2px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small {min-height:29px;font-size:10px;line-height:1.1;padding:3px 1px 2px}
   .w7-screen[data-work7-screen="cards"] .w7-collection-status span {font-size:9px}
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack {min-height:163px;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:7px;padding:8px 6px}
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art {height:133px}
