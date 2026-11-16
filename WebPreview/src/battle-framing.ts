@@ -14,8 +14,9 @@ export function battleCameraPose(aspect: number): CameraPose {
   if (aspect < .50) {
     // 390x844 and 430x932: enlarge ship silhouettes and compose them just
     // above the live foreground cannon deck. The battery follows the camera,
-    // so both original muzzle meshes keep their location in the viewport.
-    return { position: [0, 11, 78], target: [0, 4.5, 0], showBattery: true, batteryOffsetZ: -27 };
+    // so both original muzzle meshes sit ABOVE the utility row, visible
+    // against the ocean rather than hidden by their buttons.
+    return { position: [0, 11, 78], target: [0, 4.5, 0], showBattery: true, batteryOffsetZ: -35 };
   }
   if (aspect < .75) {
     // The short 320x568 viewport has less room between HP and touch controls.
