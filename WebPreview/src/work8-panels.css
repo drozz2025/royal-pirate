@@ -3360,3 +3360,151 @@
   .w8-screen.w8-approved .w8-approved-title h2::before,
   .w8-screen.w8-approved .w8-approved-title h2::after{margin:0 3px;font-size:9px}
 }
+
+/* WORK8 reference 07/08 — 16 Nov 2026, depth and lighting pass after #170.
+   Strictly local visual layers; no shared Porto, release, navigation, scores
+   or new missions. All content remains live React, not a static backdrop. */
+.w8-approved-missions .w8-approved-scene,
+.w8-approved-ranking .w8-approved-scene{
+  background:
+    radial-gradient(ellipse 45% 28% at 30% 9%,rgba(255,231,169,.18),transparent 90%),
+    linear-gradient(180deg,rgba(38,134,163,.13),transparent 62%);
+}
+.w8-approved-missions .w8-approved-scene .w8-seascape,
+.w8-approved-ranking .w8-approved-scene .w8-seascape{
+  filter:saturate(1.24) contrast(1.13) brightness(1.06)
+    drop-shadow(0 3px 2px rgba(2,25,45,.32));
+}
+.w8-approved-missions .w8-approved-quest{
+  isolation:isolate;
+  border-top-color:#ffe7a4;
+  background:
+    radial-gradient(ellipse 82% 91% at 5% 14%,#65b1bf69,transparent 87%),
+    linear-gradient(174deg,#286984f5 0%,#174b6df9 38%,#082a48ff 100%);
+  box-shadow:inset 0 2px #fff1c2b5,inset 0 0 0 1px #163c58,
+    inset 0 -4px #061b31,0 3px #704421,0 8px 12px #001427bf;
+}
+.w8-approved-missions .w8-approved-quest::after{
+  content:"";position:absolute;inset:7px;
+  border-radius:7px;
+  background:linear-gradient(115deg,#e9d09e29,transparent 23%,transparent 77%,#ffe0a313);
+  pointer-events:none;z-index:-1;
+}
+.w8-approved-missions .w8-approved-quest-core>strong{
+  font-weight:900;line-height:1.14;
+  color:#fffbea;
+  text-shadow:0 2px 2px #001425,0 0 8px #001627e6;
+}
+.w8-approved-missions .w8-approved-quest .w8-approved-meter{
+  box-shadow:inset 0 2px #021827,0 2px 0 #9ec7cb80;
+}
+.w8-approved-missions .w8-approved-daily{
+  background:radial-gradient(ellipse 85% 65% at 50% -10%,#4479949a,transparent 89%),
+    linear-gradient(180deg,#275570,#103b5c 48%,#081d36);
+}
+.w8-approved-missions .w8-approved-days li{
+  background-blend-mode:normal;
+  box-shadow:inset 0 2px #ffe6aa66,inset 0 -2px #081a2b,0 3px 5px #00182e9e;
+}
+.w8-approved-missions .w8-approved-days li small{
+  font-weight:900;letter-spacing:0;
+  color:#fff3de;text-shadow:0 2px #001728;
+}
+.w8-approved-ranking .w8-approved-captain{
+  isolation:isolate;
+  border-top-color:#ffedb9;
+  background:
+    radial-gradient(ellipse 50% 135% at 12% 25%,#e5bc776b,transparent 91%),
+    linear-gradient(108deg,#397b92,#1b4f6d 42%,#09283f);
+  box-shadow:inset 0 2px #fff4d2d1,inset 0 0 0 2px #0d3a55c9,
+    inset 0 -3px #071a31,0 4px #7a4b24,0 9px 14px #00192ed6;
+}
+.w8-approved-ranking .w8-approved-avatar{
+  position:relative;isolation:isolate;overflow:hidden;
+  border-color:#ffe5aa;
+  box-shadow:0 0 0 2px #57311e,inset 0 3px #fff4b0,
+    0 5px 12px #001324,0 0 20px #ffe09a6b;
+}
+.w8-approved-ranking .w8-approved-avatar::after{
+  content:"";position:absolute;inset:3px;border-radius:inherit;
+  background:linear-gradient(135deg,#fff8d13f,transparent 34%,#031a3333 84%);
+  box-shadow:inset 0 0 0 1px #fff1ae8c;
+  pointer-events:none;
+}
+.w8-approved-ranking .w8-approved-avatar .w8-captain-portrait{
+  width:100%;height:100%;max-width:none;
+  transform:scale(1.2) translateY(2%);
+  filter:contrast(1.11) saturate(1.12) drop-shadow(0 3px 2px #071a28);
+}
+.w8-approved-ranking .w8-approved-identity>strong{
+  font-size:clamp(18px,4.8vw,24px);
+  text-shadow:0 2px #06192a,0 0 9px #ffe6a680;
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+  background:
+    radial-gradient(ellipse 90% 33% at 50% 0%,#6396a86b,transparent 92%),
+    linear-gradient(180deg,#1b5676 0%,#113b59 34%,#071f39);
+  box-shadow:inset 0 3px #fff3c1ab,inset 0 -3px #071b30,
+    0 4px #9a6031,0 10px 15px #001327bd;
+}
+.w8-approved-ranking .w8-approved-leaderboard h3{
+  color:#ffedbc;
+  font-size:clamp(24px,6.4vw,30px);
+  line-height:1;
+  letter-spacing:.5px;
+  text-shadow:0 2px #60371c,0 0 10px #ffd27c85;
+}
+.w8-approved-ranking .w8-approved-local-row{
+  position:relative;
+  background:radial-gradient(ellipse at 15% 0%,#94d4df38,transparent 75%),
+    linear-gradient(90deg,#397b97,#20516f 62%,#0d304d);
+  box-shadow:inset 0 2px #fff7d3ae,inset 0 -2px #102c44,0 4px 7px #001a2fc9;
+}
+.w8-approved-ranking .w8-approved-empty-rank{
+  background:linear-gradient(90deg,#386f89a6,#1b46675c 65%,#10253e37);
+  border-bottom:1px solid #a3bfc08c;
+}
+.w8-approved-ranking .w8-approved-empty-portrait{
+  border-color:#f0d3a2;
+  box-shadow:inset 0 2px #fff5bdab,0 0 0 1px #633e26,0 3px 6px #001528;
+}
+.w8-approved-ranking .w8-approved-empty-rank strong{
+  color:#edf5ed;line-height:1.15;letter-spacing:.08px;
+  text-shadow:0 2px 2px #001627;
+}
+/* Maintain native scrolling under the unchanged Porto-sized shared dock. */
+@media (min-width:351px) and (max-width:419px){
+  .w8-approved-ranking .w8-approved-captain{
+    min-height:138px;
+    grid-template-columns:96px minmax(0,1fr) 67px;
+    padding:7px 7px;
+  }
+  .w8-approved-ranking .w8-approved-avatar{width:92px;height:101px}
+  .w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+    padding:11px 8px 12px;
+  }
+  .w8-approved-ranking .w8-approved-empty-rank{min-height:54px}
+  .w8-approved-missions .w8-approved-quest{min-height:82px}
+}
+@media (max-width:350px){
+  .w8-approved-missions .w8-approved-quest-list,
+  .w8-approved-missions .w8-approved-daily{
+    max-height:none!important;overflow:visible!important;
+    flex-shrink:0;
+  }
+  .w8-approved-missions .w8-approved-days li{min-height:70px}
+  .w8-approved-ranking .w8-approved-captain{
+    grid-template-columns:60px minmax(0,1fr) 60px;
+    gap:4px;padding:6px 5px;min-height:107px;
+  }
+  .w8-approved-ranking .w8-approved-avatar{width:58px;height:64px}
+  .w8-approved-ranking .w8-approved-empty-rank strong{font-size:10px}
+  .w8-approved-ranking .w8-approved-leaderboard h3{font-size:23px}
+}
+@media (min-width:420px){
+  .w8-approved-ranking .w8-approved-captain{
+    grid-template-columns:102px minmax(0,1fr) 78px;
+    min-height:142px;
+  }
+  .w8-approved-ranking .w8-approved-avatar{width:97px;height:102px}
+}

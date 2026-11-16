@@ -278,6 +278,26 @@ function W8CaptainPortrait(){
     <path d="M29 43Q34 40 38 40M62 40Q66 40 71 43" stroke="#FFE4B9" strokeWidth="1.2" opacity=".48"/>
     <path d="M27 62Q28 72 38 79M73 62Q72 72 62 79" stroke="#BF7545" strokeWidth="1.1" opacity=".8"/>
 
+    {/* Additional hand-drawn relief: fabric folds, cheek lighting and hammered brass.
+        Decorative shading only, independent of XP and player identity. */}
+    <path d="M8 102Q16 83 33 80L24 101L31 108H8ZM92 102Q84 83 67 80L76 101L69 108H92Z"
+      fill="#10283C" stroke="#CA9552" strokeWidth="1.5"/>
+    <path d="M13 105L31 86L37 97L31 106M87 105L69 86L63 97L69 106"
+      fill="none" stroke="#FFE3A2" strokeWidth="2.4" opacity=".93"/>
+    <path d="M23 99L33 91M77 99L67 91" stroke="#B56D3D" strokeWidth="3" strokeLinecap="round"/>
+    <path d="M35 41Q40 37 46 42M54 42Q61 37 66 42" fill="none" stroke="#563629" strokeWidth="2.1"/>
+    <path d="M31 47Q34 59 38 64M68 47Q66 60 62 64" stroke="#FFCD91" strokeWidth="1.7" opacity=".66"/>
+    <path d="M35 66Q43 72 50 69Q57 72 65 66" fill="none" stroke="#AF5A39" strokeWidth="1.4" opacity=".8"/>
+    <path d="M20 24Q37 11 50 18Q64 11 81 24" stroke="#FFE6A2" strokeWidth="1.6" opacity=".86"/>
+    <path d="M22 33Q50 43 78 33" stroke="#7E4D29" strokeWidth="3" opacity=".66"/>
+    <path d="M40 24H60" stroke="#F9DE95" strokeWidth="2.2" strokeLinecap="round"/>
+    <path d="M10 106Q15 94 22 91M90 106Q85 94 78 91" stroke="#E7B66D" strokeWidth="2" opacity=".72"/>
+    <path d="M42 90L50 98L58 90L55 105H45Z" fill="#FAE2B7" opacity=".9"/>
+    <path d="M44 95L50 100L56 95" fill="none" stroke="#AA6835" strokeWidth="1.4"/>
+    <circle cx="50" cy="103" r="3.7" fill="#BD7330" stroke="#FFE1A0" strokeWidth="1.5"/>
+    <path d="M48 103H52M50 101V105" stroke="#FFF4C1" strokeWidth=".85"/>
+
+
   </svg>;
 }
 
