@@ -55,9 +55,11 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   }
 
   const banks: [number, number, number][] = [
-    [-50, 280, 180], [185, 378, 142], [450, 250, 118],
-    [770, 322, 155], [1035, 212, 175], [85, 545, 115],
-    [380, 572, 150], [690, 544, 146], [980, 585, 185]
+    // Keep the upper sky open, as in the approved screenshot; place soft
+    // cloud banks near the horizon instead of giant foreground white blobs.
+    [-50, 420, 100], [185, 460, 95], [450, 395, 90],
+    [770, 440, 85], [1035, 415, 105], [85, 550, 75],
+    [380, 570, 95], [690, 540, 90], [980, 565, 110]
   ];
   for (let i = 0; i < banks.length; i++) {
     const [cx, cy, size] = banks[i];
