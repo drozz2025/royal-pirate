@@ -1904,3 +1904,33 @@
 .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
   z-index:30 !important;
 }
+
+
+/* WORK4 / Fleet 03 Royal Crown vector-detail pass — reference 03 and
+   Chromium 390×844 overlay, 16 Nov. Keep the real SVG and interaction.
+   Earlier wide ship made the sides look flat and crowded the real stats.
+   A slimmer, taller 3/4-style silhouette brings sails forward with room for
+   the title and selection card. No change to Porto/nav, Forge or shared UI. */
+.w4-fleet .w4-harbour-stage > svg.w4-ship-art {
+  width:88%;
+  left:-3%;
+  bottom:3%;
+  transform:scaleX(.92) scaleY(1.12) rotate(-1.2deg);
+  transform-origin:42% 86%;
+  filter:saturate(1.23) contrast(1.12)
+    drop-shadow(0 12px 7px #041a2de8)
+    drop-shadow(1px -2px 4px #f6c47766);
+}
+.w4-fleet .w4-ship-premium-surface {opacity:1}
+@media (max-width:359px) {
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art {
+    width:83%;left:-2%;bottom:2%;
+    transform:scaleX(.95) scaleY(1.07) rotate(-1.2deg);
+  }
+}
+@media (min-width:400px) and (max-width:659px) {
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art {
+    width:86%;left:-2%;bottom:3%;
+    transform:scaleX(.94) scaleY(1.16) rotate(-1.2deg);
+  }
+}
