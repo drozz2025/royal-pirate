@@ -55,16 +55,21 @@ const approvedArt={
   shop:new URL('../../assets/design-approved/06-loja.webp',import.meta.url).href
 };
 const approvedConcepts=[
-  {title:'TEMPESTADE',x:286,y:198},
-  {title:'BORDO LATERAL',x:22,y:323},
-  {title:'ESCUDO NAVAL',x:111,y:323},
-  {title:'TRIPULAÇÃO ÉLITE',x:198,y:323},
-  {title:'MINA EXPLOSIVA',x:286,y:323}
+  {title:'BOMBARDEIO',x:18,y:198},
+  {title:'VENTO FAVORÁVEL',x:109,y:198},
+  {title:'REPARAÇÃO',x:199,y:198},
+  {title:'TEMPESTADE',x:289,y:198},
+  {title:'BORDO LATERAL',x:18,y:326},
+  {title:'ESCUDO NAVAL',x:109,y:326},
+  {title:'TRIPULAÇÃO ÉLITE',x:199,y:326},
+  {title:'MINA EXPLOSIVA',x:289,y:326}
 ] as const;
-function ApprovedArtCrop({kind,x,y,cropWidth}:{kind:'cards'|'shop';x:number;y:number;cropWidth:number}) {
+function ApprovedArtCrop({kind,x,y,cropWidth,cropHeight=cropWidth}:{kind:'cards'|'shop';x:number;y:number;cropWidth:number;cropHeight?:number}) {
   const scale=100/cropWidth;
-  const style:React.CSSProperties={width:(384*scale)+'%',left:(-x*scale)+'%',top:(-y*scale)+'%'};
-  return <span className="w7-approved-crop" aria-hidden="true"><img src={approvedArt[kind]} alt="" width={384} height={512} style={style} draggable={false}/></span>;
+  const imageStyle:React.CSSProperties={width:(384*scale)+'%',left:(-x*scale)+'%',top:(-y*100/cropHeight)+'%'};
+  return <span className="w7-approved-crop" style={{aspectRatio:cropWidth+'/'+cropHeight}} aria-hidden="true">
+    <img src={approvedArt[kind]} alt="" width={384} height={512} style={imageStyle} draggable={false}/>
+  </span>;
 }
 
 function ShopRelic({kind}:{kind:'coins'|'gems'|'special'}) {
@@ -168,39 +173,25 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
     <header className="w7-hero"><MastheadScene kind="cards"/><div><span className="w7-eyebrow">ROYAL PIRATE · COLEÇÃO</span><h2>CARTAS</h2><p>Tripulação do teu navio</p></div>
       <div className="w7-medal" aria-label={profile.ownedCrew.length+' de '+CREW.length+' cartas adquiridas'}><strong>{profile.ownedCrew.length}/{CREW.length}</strong><small>CARTAS</small></div>
     </header>
-    <TabBar value={tab} onSelect={setTab} label="Cartas" tabs={[['collection','A MINHA COLEÇÃO'],['upgrade','MELHORAR'],['fusion','FUSÃO']]}/>
-    {tab==='collection'&&<section className="w7-content" role="tabpanel" aria-label="A minha coleção">
-      <div className="w7-line"><strong>ESCOLHE UMA CARTA</strong><div className="w7-filter" role="group" aria-label="Filter crew collection">
-        <button type="button" aria-pressed={!ownedOnly} onClick={()=>setOwnedOnly(false)}>TODAS</button>
-        <button type="button" aria-pressed={ownedOnly} onClick={()=>setOwnedOnly(true)}>MINHAS</button>
-      </div></div>
-      <div className="w7-collection-progress" role="progressbar" aria-label="Cartas da tripulação adquiridas" aria-valuemin={0} aria-valuemax={CREW.length} aria-valuenow={profile.ownedCrew.length}><span style={{width:(profile.ownedCrew.length/CREW.length*100)+"%"}}/></div>
-      <div className="w7-line w7-crew-caption"><strong>TRIPULAÇÃO DISPONÍVEL</strong><span>TOCA NUMA CARTA PARA VER</span></div>
-      <div className="w7-card-grid" role="group" aria-label="Escolher carta da tripulação">
-        {cards.map(c=>{
-          const isOwned=profile.ownedCrew.includes(c.id),isSelected=active.id===c.id,isEquipped=profile.equippedCrew===c.id;
-          return <button key={c.id} className={'w7-card w7-'+c.id+(isSelected?' is-selected':'')+(!isOwned?' is-locked':'')} type="button" aria-pressed={isSelected}
-              aria-label={'Ver '+c.name+(isOwned?', adquirido':', bloqueado')} onClick={()=>setSelected(c.id)}>
-            <span className="w7-card-top"><span>{visualTier[c.id]}</span><span aria-hidden="true">{isOwned?'◆':'◇'}</span></span>
-            <span className="w7-card-art"><CardArt id={c.id}/></span>
-            <span className="w7-card-level" title="Níveis de cartas ainda indisponíveis">NV. <span>—</span></span>
-            <strong title={c.name}>{compactCrewName[c.id]}</strong><small>{isEquipped?'★ EQUIPADO':isOwned?'✓ ADQUIRIDO':c.cost+' ● MOEDAS'}</small>
-          </button>;
-        })}
-        {!ownedOnly&&Array.from({length:5},(_,slot)=><div key={'upcoming-'+slot}
-          className={'w7-future-card w7-upcoming-'+slot}
-          aria-label={approvedConcepts[slot].title+' — arte conceptual aprovada, não jogável'}>
-          <div className="w7-future-seal" aria-hidden="true"><ApprovedArtCrop kind="cards" x={approvedConcepts[slot].x} y={approvedConcepts[slot].y} cropWidth={72}/></div>
-          <strong>{approvedConcepts[slot].title}</strong><small>CONCEITO · EM BREVE</small>
-          <span className="w7-future-note">Arte aprovada; sem carta jogável, custo ou nível</span>
-        </div>)}
+    <TabBar value={tab==='fusion'?'upgrade':tab} onSelect={setTab} label="Cartas" tabs={[['collection','A MINHA COLEÇÃO'],['upgrade','EVOLUIR']]}/>
+    {tab==='collection'&&<section className="w7-content w7-collection-content" role="tabpanel" aria-label="A minha coleção">
+      <div className="w7-collection-status">
+        <strong>GALERIA · 8 ILUSTRAÇÕES APROVADAS</strong>
+        <span>{profile.ownedCrew.length}/{CREW.length} tripulantes reais</span>
+      </div>
+      <div className="w7-approved-grid" role="group" aria-label="Oito ilustrações conceptuais aprovadas, ainda sem cartas jogáveis">
+        {approvedConcepts.map((concept,slot)=><article key={concept.title} className={'w7-approved-slot w7-approved-slot-'+slot}
+          aria-label={concept.title+' — ilustração conceptual aprovada, ainda não jogável'}>
+          <ApprovedArtCrop kind="cards" x={concept.x} y={concept.y} cropWidth={73} cropHeight={67}/>
+          <strong>{concept.title}</strong>
+          <small>CONCEITO · EM BREVE</small>
+        </article>)}
       </div>
       <div className={'w7-spotlight w7-spotlight-'+active.id} aria-live="polite">
         <div className="w7-spotlight-portrait"><CardArt id={active.id} featured/><span>{equipped?'EM SERVIÇO':owned?'ADQUIRIDA':'POR RECRUTAR'}</span></div>
         <div className="w7-spotlight-info">
-          <span className="w7-eyebrow">CARTA EM DESTAQUE</span>
-          <h3>{active.name}</h3>
-          <p>{active.role}</p>
+          <span className="w7-eyebrow">TRIPULAÇÃO REAL</span>
+          <h3>{active.name}</h3><p>{active.role}</p>
           <div className="w7-spotlight-tags"><span>{visualTier[active.id]}</span><span>{owned?'NO INVENTÁRIO':active.cost+' MOEDAS LOCAIS'}</span></div>
           <button type="button" disabled={equipped||(!owned&&!canRecruit)} onClick={press}
             aria-label={equipped?active.name+' já equipado':owned?'Equipar '+active.name:canRecruit?'Recrutar '+active.name+' por '+active.cost+' moedas locais':'Faltam '+Math.max(0,active.cost-profile.coins)+' moedas para '+active.name}>
@@ -208,10 +199,34 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
           </button>
         </div>
       </div>
-      <p className="w7-disclaimer">Coleção guardada neste dispositivo. Níveis ainda indisponíveis. Raridades visuais sem efeitos de jogo; personagens equipadas ainda não alteram o combate.</p>
+      <details className="w7-crew-details">
+        <summary>GERIR TRIPULAÇÃO REAL · {profile.ownedCrew.length}/{CREW.length}</summary>
+        <div className="w7-crew-tools">
+          <strong>SELECIONA UM TRIPULANTE</strong>
+          <div className="w7-filter" role="group" aria-label="Filter crew collection">
+            <button type="button" aria-pressed={!ownedOnly} onClick={()=>setOwnedOnly(false)}>TODAS</button>
+            <button type="button" aria-pressed={ownedOnly} onClick={()=>setOwnedOnly(true)}>MINHAS</button>
+          </div>
+        </div>
+        <div className="w7-card-grid w7-roster-grid" role="group" aria-label="Escolher carta da tripulação">
+          {cards.map(c=>{
+            const isOwned=profile.ownedCrew.includes(c.id),isSelected=active.id===c.id,isEquipped=profile.equippedCrew===c.id;
+            return <button key={c.id} className={'w7-card w7-'+c.id+(isSelected?' is-selected':'')+(!isOwned?' is-locked':'')} type="button" aria-pressed={isSelected}
+                aria-label={'Ver '+c.name+(isOwned?', adquirido':', bloqueado')} onClick={()=>setSelected(c.id)}>
+              <span className="w7-card-top"><span>{visualTier[c.id]}</span><span aria-hidden="true">{isOwned?'◆':'◇'}</span></span>
+              <span className="w7-card-art"><CardArt id={c.id}/></span>
+              <span className="w7-card-level" title="Níveis de cartas ainda indisponíveis">NV. <span>—</span></span>
+              <strong title={c.name}>{compactCrewName[c.id]}</strong>
+              <small>{isEquipped?'★ EQUIPADO':isOwned?'✓ ADQUIRIDO':c.cost+' ● MOEDAS'}</small>
+            </button>;
+          })}
+        </div>
+      </details>
+      <p className="w7-disclaimer">Arte conceptual da referência visual, sem níveis, custos nem efeitos jogáveis. Coleção real guardada neste dispositivo. Raridades visuais sem efeitos de jogo; personagens equipadas ainda não alteram o combate.</p>
+      <button className="w7-fusion-access" type="button" onClick={()=>setTab('fusion')}>FUSÃO · EM BREVE</button>
     </section>}
     {tab==='upgrade'&&<section className="w7-content w7-feature" role="tabpanel" aria-label="Melhorar cartas">
-      <span className="w7-feature-mark">✦</span><div className="w7-feature-deck" aria-hidden="true"><span className="w7-feature-art"><CardArt id={profile.equippedCrew}/></span><span className="w7-feature-spark">✦</span><span className="w7-feature-empty">?</span></div><span className="w7-eyebrow">EVOLUÇÃO DE CARTAS</span><h3>MELHORAR</h3>
+      <span className="w7-feature-mark">✦</span><div className="w7-feature-deck" aria-hidden="true"><span className="w7-feature-art"><CardArt id={profile.equippedCrew}/></span><span className="w7-feature-spark">✦</span><span className="w7-feature-empty">?</span></div><span className="w7-eyebrow">EVOLUÇÃO DE CARTAS</span><h3>EVOLUIR</h3>
       <p>A evolução de cartas ainda não tem níveis ou custos reais definidos. Nenhuma moeda será consumida.</p>
       <div className="w7-feature-row"><span>◆</span><strong>Melhorias em desenvolvimento</strong><b>EM BREVE</b></div>
       <button type="button" onClick={()=>setTab('collection')}>VOLTAR À COLEÇÃO</button>
@@ -243,7 +258,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
     {tab==='offers'&&<section className="w7-content" role="tabpanel" aria-label="Ofertas disponíveis">
       <section className="w7-captain-pack" aria-label="Pack do Capitão em desenvolvimento, indisponível">
         <span className="w7-pack-ribbon">EM BREVE</span>
-        <div className="w7-captain-pack-art" aria-hidden="true"><ApprovedArtCrop kind="shop" x={19} y={163} cropWidth={157}/></div>
+        <div className="w7-captain-pack-art" aria-hidden="true"><ApprovedArtCrop kind="shop" x={23} y={176} cropWidth={149} cropHeight={126}/></div>
         <div className="w7-captain-pack-info">
           <span className="w7-eyebrow">TESOUROS DO PORTO</span>
           <h3>PACK DO CAPITÃO</h3>
@@ -257,7 +272,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
         {([['rare','BAÚ RARO'],['epic','BAÚ ÉPICO'],['legend','BAÚ LENDÁRIO']] as const).map(([rarity,title])=>
           <article className={'w7-chest w7-chest-'+rarity} key={rarity}>
             <strong>{title}</strong>
-            <div className="w7-chest-art" aria-hidden="true"><ApprovedArtCrop kind="shop" x={rarity==='rare'?31:rarity==='epic'?154:277} y={342} cropWidth={82}/></div>
+            <div className="w7-chest-art" aria-hidden="true"><ApprovedArtCrop kind="shop" x={rarity==='rare'?35:rarity==='epic'?159:284} y={350} cropWidth={73} cropHeight={63}/></div>
             <span className="w7-chest-status">EM BREVE</span>
           </article>)}
       </div>
