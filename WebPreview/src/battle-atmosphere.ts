@@ -134,6 +134,71 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   }
   paint.restore();
 
+
+  // Battle-only cloudfront: broad overlapping volumes instead of featureless
+  // upper sky. Painted once at texture creation (zero new frame draw calls).
+  // The richer shadow/light contrast is independent of Porto and controls.
+  const stormBlue = 'rgba(35,80,116,.40)';
+  function cloudFront(x: number, y: number, width: number, rise: number, phase: number) {
+    paint.save();
+    const underside = paint.createLinearGradient(0, y - rise, 0, y + rise * .70);
+    underside.addColorStop(0, 'rgba(40,93,125,0)');
+    underside.addColorStop(.63, stormBlue);
+    underside.addColorStop(1, 'rgba(54,118,143,0)');
+    paint.fillStyle = underside;
+    paint.beginPath();
+    paint.moveTo(x - width * .59, y + rise * .40);
+    paint.bezierCurveTo(x - width * .45, y - rise * .18, x - width * .34, y - rise * .52, x - width * .20, y - rise * .39);
+    paint.bezierCurveTo(x - width * .08, y - rise * 1.32, x + width * .05, y - rise * 1.03, x + width * .15, y - rise * .38);
+    paint.bezierCurveTo(x + width * .32, y - rise * .80, x + width * .46, y - rise * .27, x + width * .57, y + rise * .35);
+    paint.lineTo(x + width * .51, y + rise * .58);
+    paint.lineTo(x - width * .52, y + rise * .58);
+    paint.closePath();
+    paint.fill();
+
+    // Layered lit lobes with shaded bases: the clouds have volume when the
+    // battle screen crops the artwork into a narrow portrait viewport.
+    for (let i = 0; i < 16; i++) {
+      const t = i / 15;
+      const cx = x + (t - .5) * width * .94;
+      const uplift = Math.pow(Math.max(0, 1 - Math.abs(t - .5) * 1.6), 1.4);
+      const cy = y - rise * (.10 + uplift * (.60 + .13 * Math.sin(i * 2.17 + phase)));
+      const size = rise * (.27 + uplift * .21 + (i % 3) * .055);
+      const shade = paint.createRadialGradient(cx - size * .23, cy - size * .30, size * .06, cx, cy, size * 1.3);
+      shade.addColorStop(0, 'rgba(255,255,242,.39)');
+      shade.addColorStop(.38, 'rgba(240,249,248,.31)');
+      shade.addColorStop(.76, 'rgba(129,176,195,.17)');
+      shade.addColorStop(1, 'rgba(86,138,170,0)');
+      paint.fillStyle = shade;
+      paint.beginPath();
+      paint.ellipse(cx, cy, size * 1.23, size * .72, -.10, 0, Math.PI * 2);
+      paint.fill();
+    }
+    const shadow = paint.createLinearGradient(0, y - rise * .15, 0, y + rise * .62);
+    shadow.addColorStop(0, 'rgba(33,85,121,0)');
+    shadow.addColorStop(.50, 'rgba(41,94,128,.19)');
+    shadow.addColorStop(1, 'rgba(68,130,157,0)');
+    paint.fillStyle = shadow;
+    paint.fillRect(x - width * .56, y - rise * .15, width * 1.12, rise * .77);
+    paint.restore();
+  }
+  // Opposing masses leave a warm opening behind the live enemy galleon.
+  // Each mass is purposefully asymmetric, so they do not read as tiled puffs.
+  cloudFront(-65, 315, 495, 170, .4);
+  cloudFront(956, 272, 555, 198, 1.8);
+  cloudFront(535, 544, 580, 110, 3.2);
+
+  // A broad warm glow, not geometric beams: the live galleon remains the
+  // visual focus and the approved HUD stays fully legible at 320 pixels.
+  paint.save();
+  const warmBreak = paint.createRadialGradient(312, 165, 28, 355, 260, 590);
+  warmBreak.addColorStop(0, 'rgba(255,247,210,.15)');
+  warmBreak.addColorStop(.48, 'rgba(255,242,199,.055)');
+  warmBreak.addColorStop(1, 'rgba(255,246,209,0)');
+  paint.fillStyle = warmBreak;
+  paint.fillRect(0, 0, 1024, 820);
+  paint.restore();
+
   const texture = new T.CanvasTexture(canvas);
   texture.colorSpace = T.SRGBColorSpace;
   texture.needsUpdate = true;
