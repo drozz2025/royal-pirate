@@ -1673,3 +1673,74 @@
     padding:7px;
   }
 }
+
+
+/* WORK 7, 16 Nov — approved art appears only in clipped illustrations, never
+ * as an inert full-screen screenshot. All labels/actions use live UI state.
+ * Screen 05/06 artwork source: ../../assets/design-approved/. */
+.w7-approved-crop{
+  display:block;position:relative;isolation:isolate;
+  width:100%;aspect-ratio:1;overflow:hidden;
+  border-radius:8px;background:#0a2445;
+}
+.w7-approved-crop img{
+  position:absolute;display:block;height:auto;max-width:none;
+  pointer-events:none;user-select:none;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card .w7-future-seal{
+  display:grid;place-items:center;
+  min-height:64px;width:100%;height:auto;padding:0;
+  background:transparent;border:0;box-shadow:none;
+  filter:drop-shadow(0 3px 2px #010f2a);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-seal .w7-approved-crop{
+  width:min(100%,76px);
+  border:2px solid #ffd99f;border-radius:7px;
+  box-shadow:0 2px 0 #513820,inset 0 1px #fff2c5;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>strong{
+  min-height:24px;display:grid;place-items:center;
+  font-size:clamp(10px,2.65vw,13px);
+  color:#fff1c7;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>small{
+  width:100%;font-size:clamp(7px,1.95vw,9px);letter-spacing:0;
+  text-align:center;white-space:normal;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+  width:min(100%,124px);height:auto;
+  border:2px solid #f4c06e;border-radius:11px;
+  box-shadow:0 4px 12px #10092bc9;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  width:min(100%,83px);
+  border:1px solid #fff5d27a;
+  box-shadow:0 3px 8px #021632bb;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  display:grid;place-items:center;
+}
+.w7-recruit-details{
+  margin-top:5px;padding:0;
+  border:1px solid #a88d6c;border-radius:9px;
+  background:linear-gradient(#174268,#0b2844);
+  color:#f4d79d;
+}
+.w7-recruit-details>summary{
+  list-style:none;cursor:pointer;min-height:35px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:6px;padding:7px 11px;
+  font:900 12px 'Barlow Condensed',sans-serif;
+}
+.w7-recruit-details>summary::-webkit-details-marker{display:none}
+.w7-recruit-details>summary::after{content:'⌄';font-size:21px;line-height:1}
+.w7-recruit-details[open]>summary::after{transform:rotate(180deg)}
+.w7-recruit-details[open]{padding:0 7px 9px}
+.w7-recruit-details[open]>summary{margin-bottom:8px;border-bottom:1px solid #b9905e}
+.w7-recruit-details .w7-shop-local-note{margin:0 0 5px}
+.w7-recruit-details .w7-shop-actions{margin-top:9px}
+.w7-recruit-details>summary:focus-visible{outline:3px solid #fff0b2;outline-offset:2px}
+@media(max-width:390px){
+  .w7-screen[data-work7-screen="cards"] .w7-future-seal .w7-approved-crop{width:min(100%,67px)}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{width:min(100%,118px)}
+}
