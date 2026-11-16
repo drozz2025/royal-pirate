@@ -27,7 +27,7 @@ const events = [];
 let ws;
 try {
   let list;
-  for (let i=0; i<80; i++) {
+  for (let i=0; i<200; i++) {
     if (chrome.exitCode !== null) throw new Error('Chromium quit: '+chromeErrors);
     try {
       const response=await fetch('http://127.0.0.1:' + chromePort + '/json/list',{signal:AbortSignal.timeout(600)});
@@ -279,6 +279,39 @@ try {
       await writeFile(join(out,screen+'-mobile-'+viewport.width+'x'+viewport.height+'.png'),Buffer.from(screenshot.data,'base64'));
       if(!fits)throw new Error('Navigation overflow/misalignment at '+viewport.width+'px / '+screen+': '+JSON.stringify(geometry));
     }
+
+    // WORK 6: separately inspect the actual playable Batalha at 320 and 430.
+    // The mobile cannon deck is real scene geometry, and UI hit targets must stay
+    // in the viewport; a screenshot is evidence, not a claim of visual approval.
+    await command('Page.navigate',{url:origin});
+    for(let i=0;i<40;i++){
+      if(await evaluate("!!document.querySelector('.harbour-screen .harbour-battle-button')"))break;
+      await delay(200);
+    }
+    const battleStarted=await evaluate("(()=>{const b=document.querySelector('.harbour-screen .harbour-battle-button');if(!b)return false;b.click();return true})()");
+    if(!battleStarted)throw new Error('Could not launch Batalha at '+viewport.width+'px');
+    await delay(950);
+    const battleGeometry=await evaluate(`(()=>{
+      const rect=e=>{const b=e?.getBoundingClientRect();return b?{left:b.left,right:b.right,top:b.top,bottom:b.bottom,width:b.width,height:b.height}:null};
+      const fire=document.querySelector('.in-battle .fire-button');
+      const hud=document.querySelector('.in-battle .battle-hud');
+      const deck=document.querySelector('.in-battle .command-deck');
+      const views=[...document.querySelectorAll('.in-battle .view-controls button')];
+      return {viewportWidth:innerWidth,viewportHeight:innerHeight,fire:rect(fire),hud:rect(hud),deck:rect(deck),
+        views:views.map(rect),ready:fire&&!fire.disabled,canvas:!!document.querySelector('.ocean canvas'),
+        error:document.querySelector('.error-panel')?.textContent||null,
+        overflow:document.documentElement.scrollWidth>innerWidth+2};
+    })()`);
+    const inside=r=>r&&r.left>=-2&&r.right<=viewport.width+2&&r.top>=0&&r.bottom<=viewport.height+2;
+    const battleFits=battleGeometry?.canvas&&battleGeometry.ready&&!battleGeometry.error&&!battleGeometry.overflow&&
+      inside(battleGeometry.fire)&&inside(battleGeometry.hud)&&inside(battleGeometry.deck)&&
+      battleGeometry.views.length===5&&battleGeometry.views.every(inside)&&
+      Math.max(...battleGeometry.views.map(r=>r.bottom))<=battleGeometry.deck.top-5;
+    report.responsiveBattle??=[];
+    report.responsiveBattle.push({viewport,...battleGeometry,matched:Boolean(battleFits)});
+    const battleShot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+    await writeFile(join(out,'battle-mobile-'+viewport.width+'x'+viewport.height+'.png'),Buffer.from(battleShot.data,'base64'));
+    if(!battleFits)throw new Error('Batalha UI clipped at '+viewport.width+'px: '+JSON.stringify(battleGeometry));
   }
   await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
 
