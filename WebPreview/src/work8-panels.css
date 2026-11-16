@@ -1506,3 +1506,117 @@
   .w8-missions-scene .w8-daily>button{width:71px;font-size:12px}
   .w8-ranking-scene .w8-ranking-locked-status{font-size:9px}
 }
+
+
+/* WORK 8 — mosaic 07/08 voyage map and sealed global podium.
+   Exclusively scoped to the mission/ranking panels. Porto HUD/nav untouched. */
+.w8-tabs .w8-tab-label{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  width:100%;white-space:nowrap;
+}
+.w8-tabs .w8-tab-label .pirate-icon{
+  flex:0 0 17px;width:17px;height:17px;
+  color:#f2d18b;filter:drop-shadow(0 1px 1px #021429);
+}
+.w8-tabs button[aria-pressed="true"] .w8-tab-label .pirate-icon{
+  color:#594020;filter:none;
+}
+.w8-missions-scene .w8-map-ribbon{
+  position:relative;isolation:isolate;overflow:hidden;
+  padding:8px 10px 10px;
+  border:2px solid #e2bb79;border-bottom-color:#80502c;
+  border-radius:12px;
+  color:#fff1cc;
+  background:
+    radial-gradient(ellipse at 50% -80%,#558aa288,transparent 74%),
+    linear-gradient(170deg,#1b4868,#082741 90%);
+  box-shadow:inset 0 1px #fff1bb71,0 3px #644329,0 6px 10px #00142780;
+}
+.w8-missions-scene .w8-map-ribbon::before{
+  content:'';position:absolute;z-index:-1;inset:3px;
+  border:1px solid #f6d18f3b;border-radius:8px;pointer-events:none;
+}
+.w8-missions-scene .w8-map-heading{
+  display:flex;align-items:center;justify-content:space-between;gap:5px;
+  margin:0 1px 5px;
+}
+.w8-missions-scene .w8-map-heading strong{
+  color:#ffe4a1;font:900 16px/1 'Barlow Condensed',sans-serif;
+  letter-spacing:.55px;text-shadow:0 2px #071a30;
+}
+.w8-missions-scene .w8-map-heading small{
+  color:#cde6e9;font:900 9px/1.1 'Barlow Condensed',sans-serif;
+  text-align:right;letter-spacing:.2px;
+}
+.w8-missions-scene .w8-map-track{
+  position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;
+}
+.w8-missions-scene .w8-map-track::before{
+  content:'';position:absolute;z-index:0;
+  top:20px;left:13%;right:13%;height:4px;border:1px solid #f7d483;
+  border-radius:4px;background:linear-gradient(90deg,#b67b39,#f4d083 50%,#b67b39);
+  box-shadow:0 2px 2px #031628;
+}
+.w8-missions-scene .w8-map-stop{
+  position:relative;z-index:1;min-width:0;display:flex;
+  align-items:center;justify-content:center;flex-direction:column;gap:3px;
+  padding:4px 2px 5px;border:1px solid #6790a2;
+  border-radius:8px;background:linear-gradient(#285575ee,#0c2947e9);
+}
+.w8-missions-scene .w8-map-node{
+  display:grid;place-items:center;width:33px;height:33px;border:2px solid #d9ab67;
+  border-radius:50%;color:#e8d6a4;background:radial-gradient(circle at 30% 25%,#507a91,#133852 73%);
+  box-shadow:inset 0 1px #ffffff65,0 2px 3px #001729;
+}
+.w8-missions-scene .w8-map-stop.is-complete .w8-map-node{
+  border-color:#fff0af;color:#195844;
+  background:radial-gradient(circle at 32% 18%,#f9f0ad,#57cf9d 68%,#218166);
+  box-shadow:0 0 8px #70dbae80,0 2px 3px #001729;
+}
+.w8-missions-scene .w8-map-title{
+  display:block;color:#fff0bf;font:900 clamp(10px,2.8vw,12px)/1.05 'Barlow Condensed',sans-serif;
+  letter-spacing:.1px;white-space:nowrap;text-align:center;
+}
+.w8-missions-scene .w8-map-stop small{
+  color:#b7dfeb;font:900 11px/1 'Barlow Condensed',sans-serif;
+}
+.w8-missions-scene .w8-map-stop.is-complete small{color:#a3edc8}
+.w8-ranking-scene .w8-ranking-locked-emblem{
+  flex:0 0 82px;width:82px;height:78px;background:none;
+}
+.w8-ranking-scene .w8-sealed-podium{
+  display:flex;align-items:flex-end;justify-content:center;gap:3px;
+  width:81px;height:66px;position:relative;
+  opacity:.85;filter:drop-shadow(0 3px 2px #00172e);
+}
+.w8-ranking-scene .w8-sealed-podium::before{
+  content:'';position:absolute;width:34px;height:30px;top:-2px;left:24px;
+  border:2px solid #e1bc7c;border-radius:50%;
+  background:linear-gradient(#3e617a,#102a48);
+  box-shadow:inset 0 0 0 3px #18344d;
+}
+.w8-ranking-scene .w8-sealed-podium::after{
+  content:'×';position:absolute;top:0;left:34px;
+  color:#ffdf9d;font:900 25px/1 'Barlow Condensed',sans-serif;
+}
+.w8-ranking-scene .w8-sealed-podium span{
+  display:block;position:relative;width:24px;
+  border:2px solid #d8b275;border-radius:4px 4px 1px 1px;
+  background:linear-gradient(#6f7e8a,#254960 55%,#0b2944);
+  box-shadow:inset 0 1px #ffebc38c;
+}
+.w8-ranking-scene .w8-sealed-podium span:nth-child(1){height:24px}
+.w8-ranking-scene .w8-sealed-podium span:nth-child(2){height:34px}
+.w8-ranking-scene .w8-sealed-podium span:nth-child(3){height:19px}
+@media(max-width:375px){
+  .w8-screen .w8-tabs .w8-tab-label{gap:3px}
+  .w8-screen .w8-tabs .w8-tab-label .pirate-icon{flex-basis:15px;width:15px;height:15px}
+  .w8-missions-scene .w8-map-ribbon{padding:7px 6px 9px}
+  .w8-missions-scene .w8-map-track{gap:4px}
+  .w8-missions-scene .w8-map-title{font-size:10px}
+  .w8-ranking-scene .w8-ranking-locked-emblem{flex-basis:65px;width:65px}
+  .w8-ranking-scene .w8-sealed-podium{transform:scale(.78);transform-origin:center left}
+}
+@media(prefers-reduced-motion:reduce){
+  .w8-missions-scene .w8-map-stop,.w8-ranking-scene .w8-sealed-podium{animation:none;transition:none}
+}
