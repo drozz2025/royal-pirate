@@ -385,7 +385,11 @@ export class OceanScene {
   home(){this.cameraMode='battle';this.scene.background=this.battleSky;this.water.uniforms.battleMode.value=1;
     // Cinematic battle-only art scale; the genuine physics ships and hit logic stay live.
     // Reset to the original size in Porto so its approved composition/touch remain identical.
-    this.ships.player.root.scale.setScalar(1.25);this.ships.enemy.root.scale.setScalar(1.64);
+    this.ships.player.root.scale.setScalar(1.25);this.ships.enemy.root.scale.setScalar(1.72);
+    // Battle-only broadside: reveal the enemy's three-dimensional port flank
+    // instead of aiming its narrow bow straight at the camera. No camera
+    // movement, hit-point changes, altered controls or Porto composition.
+    this.ships.enemy.root.rotation.y=.48;
     this.battleForegroundSail.visible=true;
     // Comparison at 390x844 showed that the tighter off-axis lens clips the
     // live player ship. Restore both hulls fully inside the playable viewport.
