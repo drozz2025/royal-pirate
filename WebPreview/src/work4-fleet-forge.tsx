@@ -502,7 +502,7 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
           <stop offset=".76" stopColor="#394858"/><stop offset="1" stopColor="#081320"/>
         </linearGradient>
         <linearGradient id="w4-r03-hull" x1="0%" y1="0%" x2="20%" y2="100%">
-          <stop stopColor="#b99569"/><stop offset=".13" stopColor="#81502f"/>
+          <stop stopColor="#ac7d4e"/><stop offset=".13" stopColor="#68422f"/>
           <stop offset=".23" stopColor="#38282a"/><stop offset=".52" stopColor="#121721"/>
           <stop offset=".85" stopColor="#352329"/><stop offset="1" stopColor="#9c6138"/>
         </linearGradient>
@@ -525,6 +525,20 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
           fill="url(#w4-r03-canvas)" stroke="#d7b47d" strokeWidth="2.1"/>
         <path d="M229 43Q240 80 228 117" stroke="#b6b8b4" strokeWidth="3.2"
           opacity=".42" fill="none"/>
+        
+        {/* One continuous raised canvas: directional folds beneath the actual crest. */}
+        <g className="w4-r03-canvas-folds" fill="none" strokeLinecap="round">
+          <path d="M88 61Q76 94 90 125M99 54Q91 90 107 123M112 48Q109 90 117 125"
+            stroke="#9a9f9c" strokeWidth="3.2" opacity=".50"/>
+          <path d="M139 52Q156 70 154 125M151 48Q177 77 174 130M164 53Q188 88 186 124"
+            stroke="#b8b9ae" strokeWidth="3.4" opacity=".54"/>
+          <path d="M225 41Q243 67 236 118M237 45Q257 81 246 112"
+            stroke="#a9a99e" strokeWidth="3" opacity=".53"/>
+          <path d="M130 99Q156 94 189 112M214 99Q235 105 250 94"
+            stroke="#020917" strokeWidth="7.5" opacity=".5"/>
+          <path d="M79 118Q99 136 119 125M129 127Q161 140 196 120M214 125Q235 132 254 115"
+            stroke="#efd5a5" strokeWidth="2.2" opacity=".78"/>
+        </g>
         <g transform="translate(162 92)" fill="#f7edd5" stroke="#352b2a" strokeWidth=".8">
           <path d="M-13-9Q-12-19 0-20Q14-19 15-8Q19 1 10 8L8 16H-8L-11 7Q-19 1-13-9Z"/>
           <path d="M-8 9H8V16H-8Z" fill="#e7d7b7"/>
@@ -572,6 +586,16 @@ function TropicalBackdrop(){
    <linearGradient id="w4-palm" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#e7ae62"/><stop offset=".55" stopColor="#734127"/><stop offset="1" stopColor="#412923"/></linearGradient>
   </defs>
   <g fill="#dcf7fc" opacity=".6"><ellipse cx="109" cy="52" rx="49" ry="11"/><ellipse cx="139" cy="58" rx="62" ry="10"/><ellipse cx="318" cy="70" rx="54" ry="13"/></g>
+  
+  {/* Warm haze and contrasting sea planes behind the SAME vessel. */}
+  <g className="w4-r03-coastal-depth" pointerEvents="none">
+    <path d="M0 170Q56 149 118 183Q189 170 243 176Q337 139 420 167V213H0Z"
+      fill="#89d8bf" opacity=".2"/>
+    <path d="M0 202Q49 182 87 203M131 201Q211 190 291 202M330 195Q382 182 420 198"
+      fill="none" stroke="#e6ffff" strokeWidth="5" opacity=".34"/>
+    <path d="M0 226Q65 209 126 224T272 223T420 223"
+      fill="none" stroke="#d5fff4" strokeWidth="2.6" opacity=".51"/>
+  </g>
   {/* Tropical horizon in several depth planes, behind the main live ship. */}
   <g className="w4-tropical-distance" pointerEvents="none">
     <path d="M125 188Q150 164 175 175Q196 157 215 172Q236 153 257 177
@@ -635,7 +659,20 @@ function ForgeBackdrop(){
   <path d="M77 254Q62 228 87 197Q81 222 103 216Q96 185 119 163Q110 202 137 218Q146 239 129 259Z" fill="#ffbe4a" stroke="#ffed93" strokeWidth="3"/>
    <path d="M90 252Q80 234 96 220Q91 237 108 233Q101 209 121 197Q113 225 129 238L122 258Z" fill="#ffe6a1" opacity=".94"/>
    <path d="M102 252Q96 238 108 232Q105 243 114 244L118 257Z" fill="#fff9d2" opacity=".92"/>
-  <path d="M0 264L420 248V305H0Z" fill="#413327" stroke="#b88f53" strokeWidth="7"/>
+  
+   {/* Added light to the existing hearth, without another furnace or flame. */}
+   <g className="w4-r04-hearth-core" pointerEvents="none">
+     <ellipse cx="105" cy="239" rx="51" ry="37" fill="#ff6d22" opacity=".36"/>
+     <path d="M73 253Q85 225 95 220Q87 241 105 238Q109 212 121 200Q115 230 131 239L137 253Z"
+       fill="#ffd66b" opacity=".68"/>
+     <path d="M88 252Q96 231 110 230Q107 244 119 250Z"
+       fill="#fff1bc" opacity=".86"/>
+     <g fill="#ffdf91">
+       <circle cx="76" cy="190" r="2.5"/><circle cx="88" cy="174" r="1.8"/>
+       <circle cx="116" cy="181" r="2.7"/><circle cx="141" cy="205" r="2"/>
+     </g>
+   </g>
+   <path d="M0 264L420 248V305H0Z" fill="#413327" stroke="#b88f53" strokeWidth="7"/>
   <path d="M0 278L420 265M56 266L55 302M175 265L182 301M312 261L332 303" stroke="#9d7a4c" strokeWidth="3" opacity=".6"/>
   <g stroke="#cc9d5b" fill="none" strokeWidth="5"><circle cx="28" cy="232" r="27"/><path d="M28 205v54M1 232h54m-45-19 36 37m0-37-36 37"/></g>
   <path d="M304 28Q302 102 314 135" stroke="#c6a177" strokeWidth="5" fill="none" strokeDasharray="7 5"/>
@@ -1060,6 +1097,20 @@ function ForgeCannonArtwork(){
       <circle cx="276" cy="218" r="9" fill="#e2ad63" stroke="#59412f" strokeWidth="3"/>
       <path d="M100 239L160 257 337 208" fill="none" stroke="#ffe1a2"
         strokeWidth="3.3" opacity=".86"/>
+      {/* Hammered iron finish on the existing barrel; one cannon only. */}
+      <g className="w4-r04-iron-finish" pointerEvents="none">
+        <path d="M118 151Q204 121 281 108" fill="none"
+          stroke="#fff2c5" strokeWidth="2.4" opacity=".64"/>
+        <path d="M114 197Q205 164 299 136" fill="none"
+          stroke="#080f19" strokeWidth="5.4" opacity=".58"/>
+        <path d="M169 135l14 58m52-78 15 58" fill="none"
+          stroke="#f5ca84" strokeWidth="2.4" opacity=".74"/>
+        <g fill="#c59c68" stroke="#2d2728" strokeWidth="1.2">
+          <circle cx="175" cy="145" r="2.5"/><circle cx="178" cy="177" r="2.1"/>
+          <circle cx="246" cy="126" r="2.6"/><circle cx="251" cy="155" r="2.3"/>
+        </g>
+      </g>
+
     </g>
   </svg>;
 }

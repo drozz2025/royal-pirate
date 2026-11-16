@@ -2205,3 +2205,20 @@
     top:27%;
   }
 }
+
+/* WORK4 / issue #104 / 22h: materials of the original single ship/cannon.
+   No change to WORK0 compositor isolation, Porto, shell or shared dock. */
+.w4-fleet .w4-harbour-stage .w4-r03-canvas-folds{opacity:.9}
+.w4-fleet .w4-harbour-stage .w4-r03-coastal-depth{opacity:.9}
+.w4-fleet .w4-harbour-stage .w4-reference-galleon-volume{
+  filter:drop-shadow(0 3px 3px #090e1c75)
+}
+.w4-forge .w4-forge-scene .w4-r04-hearth-core{opacity:1}
+.w4-forge .w4-forge-scene .w4-r04-iron-finish{opacity:.96}
+/* Whole muzzle/wheel/carriage clear; levels column untouched. */
+@media(max-width:359px){
+  .w4-forge .w4-forge-scene>svg.w4-cannon-art{width:64%;left:-2%;top:25%}
+}
+@media(min-width:360px) and (max-width:399px) and (max-height:640px){
+  .w4-forge .w4-forge-scene>svg.w4-cannon-art{width:63%;left:-2%;top:24%}
+}
