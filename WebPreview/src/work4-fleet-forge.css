@@ -1709,3 +1709,39 @@
 @media(max-width:359px){
   .w4-forge .w4-forge-tabs button{min-height:42px;}
 }
+
+
+/* WORK 4 / issue #104 — the actual 390x844 Chromium capture from PR #132
+   still shows a large unillustrated navy zone above the cannon carriage.
+   Keep the Forge's real SVG foreground independent of the decorative workshop
+   layer. These selectors do not affect Porto, the shared HUD/dock or other Works. */
+.w4-forge .w4-forge-stage{isolation:isolate}
+.w4-forge .w4-forge-stage > svg.w4-forge-art{z-index:0}
+.w4-forge .w4-forge-stage > .w4-forge-glow{z-index:1;pointer-events:none}
+.w4-forge .w4-forge-stage > svg.w4-cannon-art{
+  position:absolute;
+  z-index:3;
+  display:block;
+  top:7%;
+  bottom:auto;
+  left:-7%;
+  right:auto;
+  width:91%;
+  height:auto;
+  max-height:none;
+  transform:rotate(-3deg);
+  transform-origin:45% 67%;
+  pointer-events:none;
+  filter:saturate(1.22) contrast(1.14) drop-shadow(0 12px 8px #0c0d17dc);
+}
+.w4-forge .w4-forge-stage > .w4-forge-description{z-index:4}
+@media(max-width:359px){
+  .w4-forge .w4-forge-stage > svg.w4-cannon-art{
+    width:91%;left:-8%;top:3%;transform:rotate(-2deg);
+  }
+}
+@media(min-width:400px) and (max-width:659px){
+  .w4-forge .w4-forge-stage > svg.w4-cannon-art{
+    width:91%;left:-5%;top:9%;
+  }
+}
