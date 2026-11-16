@@ -392,7 +392,7 @@ export class OceanScene {
     // Battle-only broadside: reveal the enemy's three-dimensional port flank
     // instead of aiming its narrow bow straight at the camera. No camera
     // movement, hit-point changes, altered controls or Porto composition.
-    this.ships.enemy.root.rotation.y=-.48;
+    this.ships.enemy.root.rotation.y=-.95;
     // First-person broadside: the player is standing behind the live gun deck.
     // Keep the player's physics ship active for HP, firing, collisions and scars;
     // hide only its exterior hull from this camera (never from Porto).
@@ -406,7 +406,11 @@ export class OceanScene {
     // A fixed forward-looking viewpoint, not the rejected moving camera.
     // Aim just starboard of the centreline: the red galleon is ahead, the
     // curved black player sail and real cannon barrels frame the foreground.
-    this.controls.target.set(pose.target[0]+(pose.showBattery?1.05:0),pose.target[1]+(pose.showBattery?.45:0),pose.target[2]);
+    // WORK6: widen the opponent's true broadside silhouette while keeping its
+    // physical position, hitboxes and fixed first-person camera unchanged.
+    // A slight static rightward look offset keeps the wider stern in frame on
+    // narrow 320px devices; this is NOT the rejected moving camera.
+    this.controls.target.set(pose.target[0]+(pose.showBattery?2.35:0),pose.target[1]+(pose.showBattery?.45:0),pose.target[2]);
     this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;
     this.battleBattery.visible=pose.showBattery;
     this.battleBattery.position.z=pose.batteryOffsetZ;
