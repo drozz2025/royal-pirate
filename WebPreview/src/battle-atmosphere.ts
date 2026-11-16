@@ -42,9 +42,9 @@ export function createBattleSkyTexture(): T.CanvasTexture {
       fog.addColorStop(.65, 'rgba(135,173,190,.30)');
       fog.addColorStop(1, 'rgba(145,177,196,0)');
     } else {
-      fog.addColorStop(0, 'rgba(255,255,249,.97)');
-      fog.addColorStop(.51, 'rgba(247,251,247,.85)');
-      fog.addColorStop(.8, 'rgba(239,250,246,.48)');
+      fog.addColorStop(0, 'rgba(255,255,249,.81)');
+      fog.addColorStop(.51, 'rgba(247,251,247,.58)');
+      fog.addColorStop(.8, 'rgba(239,250,246,.24)');
       fog.addColorStop(1, 'rgba(244,253,251,0)');
     }
     paint.fillStyle = fog;
@@ -57,9 +57,11 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   const banks: [number, number, number][] = [
     // Keep the upper sky open, as in the approved screenshot; place soft
     // cloud banks near the horizon instead of giant foreground white blobs.
-    [-50, 420, 100], [185, 460, 95], [450, 395, 90],
-    [770, 440, 85], [1035, 415, 105], [85, 550, 75],
-    [380, 570, 95], [690, 540, 90], [980, 565, 110]
+    [-20, 478, 61], [125, 518, 54], [255, 458, 70],
+    [380, 495, 58], [505, 464, 68], [640, 507, 56],
+    [777, 486, 63], [895, 453, 57], [1050, 508, 70],
+    [75, 584, 42], [330, 581, 50], [565, 564, 44],
+    [795, 596, 52], [985, 574, 47]
   ];
   for (let i = 0; i < banks.length; i++) {
     const [cx, cy, size] = banks[i];
