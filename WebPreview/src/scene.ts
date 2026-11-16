@@ -130,7 +130,7 @@ export class OceanScene {
     this.battleForegroundSail=makeBattleForegroundSail();
     // The player's rig is beside the camera, not an opponent shown to the left.
     // Shift only the battle-only sail into the safe left viewport edge.
-    this.battleForegroundSail.position.x+=1.0;
+    this.battleForegroundSail.position.x+=2.3;
     this.battleForegroundSail.visible=false;this.scene.add(this.battleForegroundSail);
     this.controls=new OrbitControls(this.camera,this.canvas);this.controls.enableDamping=true;this.controls.enablePan=false;this.controls.minDistance=18;this.controls.maxDistance=110;this.controls.minPolarAngle=.32;this.controls.maxPolarAngle=1.28;this.controls.target.set(0,2,0);this.controls.rotateSpeed=.5;
     this.path=new T.Line(this.pathGeometry,new T.LineDashedMaterial({color:'#f9e5a4',dashSize:.35,gapSize:.2,transparent:true,opacity:.85}));this.scene.add(this.path);
