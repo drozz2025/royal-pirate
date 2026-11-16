@@ -330,6 +330,14 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
 
 export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onUpgrade:(id:UpgradeId)=>void;onFleet:()=>void}){
   const [tab,setTab]=React.useState<ForgeTab>('cannons');
+  // On entry from the Fleet action, return the local content scroller to
+  // the beginning so the actual Forge section tabs and cannon are visible.
+  // Never touch the shared Porto bottom navigation or the app shell styling.
+  React.useEffect(()=>{
+    const scrollArea=document.querySelector('.app-sheet-content');
+    if(scrollArea instanceof HTMLElement)scrollArea.scrollTop=0;
+  },[]);
+
   const upgrade=tab==='armour'?undefined:UPGRADES.find(u=>u.id===tab);
   const level=upgrade?profile.upgrades[upgrade.id]:0;
   const max=Boolean(upgrade)&&level>=5;
