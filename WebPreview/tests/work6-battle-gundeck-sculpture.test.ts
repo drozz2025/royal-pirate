@@ -16,10 +16,15 @@ test('WORK6 #104: real 3D gun barrels keep two firing silhouettes and two live f
   assert.equal(counts.get('first-person-broadside-muzzle'),2);
   // GPU-instanced decorative elements: one draw call, four visible copies.
   for(const name of ['first-person-cannon-bronze-collar',
-    'first-person-cannon-breeching-rope','first-person-carriage-cheek']){
+    'first-person-carriage-cheek']){
     const batched=group.getObjectByName(name);
     assert.ok(batched instanceof T.InstancedMesh,name+' is actually instanced geometry');
     assert.equal(batched.count,4,name+' has four real decorative copies');
+  }
+  for(const side of ['port','starboard']){
+    const rope=group.getObjectByName('first-person-cannon-breeching-rope-'+side);
+    assert.ok(rope instanceof T.InstancedMesh,side+' uses real batched tube geometry');
+    assert.equal(rope.count,2,side+' rope preserves two gun carriages');
   }
   assert.ok(group.children.length<60,'existing mobile mesh/draw-call guard must remain green');
   assert.equal(flashes.length,2);
@@ -31,7 +36,8 @@ test('WORK6 #104: sculptural decoration never changes shot physics or live contr
   const {group}=makeBattleDeck();
   const names:string[]=[];
   group.traverse(part=>{if(part.name)names.push(part.name);});
-  assert.ok(names.includes('first-person-cannon-breeching-rope'));
+  assert.ok(names.includes('first-person-cannon-breeching-rope-port'));
+  assert.ok(names.includes('first-person-cannon-breeching-rope-starboard'));
   assert.ok(names.includes('first-person-cannon-bronze-collar'));
   assert.doesNotMatch(scene,/this\.battle\.(yaw|power|health)\s*=/);
   assert.match(scene,/this\.battleBattery\.visible=false;this\.battleForegroundSail\.visible=false/);
