@@ -3036,3 +3036,148 @@
   font-size:9px;
   line-height:1.05;
 }
+
+/* WORK7 / #104 — 16 Nov 18h: compact LOCAL typography/hierarchy rhythm.
+ * Compared to 05-cartas.webp and 06-loja.webp at native 384x512 and mobile
+ * 390x844, the old work7 masthead+tabs+status used too much vertical space
+ * before the illustrated 4x2 collection / three-chest offer row. Bring live
+ * captions closer to their art, not by scaling down that art, but by trimming
+ * redundant gutters above it. All content remains genuine stateful HTML.
+ *
+ * No shell/HUD/Porto/nav overrides, no economy or payments, no release files.
+ * This is NOT an approval claim: approved:false until human review.
+ */
+.w7-screen[data-work7-screen="cards"],
+.w7-screen[data-work7-screen="shop"]{
+  gap:4px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero,
+.w7-screen[data-work7-screen="shop"] .w7-hero{
+  height:53px;
+  min-height:53px;
+  padding-block:1px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs,
+.w7-screen[data-work7-screen="shop"] .w7-tabs{
+  min-height:38px;
+  padding:2px 3px;
+  gap:3px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs button,
+.w7-screen[data-work7-screen="shop"] .w7-tabs button{
+  min-height:30px;
+  padding:4px 3px;
+  font-size:clamp(11.5px,3.12vw,13.5px);
+  line-height:1.04;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-content{
+  gap:6px;
+  padding-top:6px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status{
+  min-height:32px;
+  padding:3px 8px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status strong{
+  font-size:clamp(14px,3.75vw,17px);
+  line-height:1.08;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status span{
+  font-size:clamp(10px,2.62vw,11.5px);
+  line-height:1.12;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+  column-gap:5px;
+  row-gap:6px;
+  padding-top:1px;
+  padding-bottom:3px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+  font-size:clamp(11px,3.18vw,14px);
+  line-height:1.02;
+  min-height:26px;
+  padding:4px 1px 3px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  font-size:clamp(10.5px,2.72vw,12px);
+  line-height:1.03;
+  letter-spacing:.1px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-content{
+  gap:6px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+  margin-top:1px;
+  min-height:24px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading strong{
+  font-size:clamp(17px,4.4vw,21px);
+  line-height:1;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading span{
+  font-size:clamp(10px,2.65vw,12px);
+  font-weight:900;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest>strong{
+  font-size:clamp(12px,3.55vw,16px);
+  line-height:1.06;
+  letter-spacing:.05px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  font-size:clamp(11.5px,3.12vw,14px);
+  letter-spacing:.15px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info p{
+  line-height:1.28;
+}
+/* 384x512 reference and 320x568 regression: reclaim the SAME upper gutters
+ * without hiding any portrait, concept label, offer or legal disclosure. */
+@media (max-height:640px), (max-width:354px){
+  .w7-screen[data-work7-screen="cards"] .w7-hero,
+  .w7-screen[data-work7-screen="shop"] .w7-hero{
+    height:49px;
+    min-height:49px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-tabs,
+  .w7-screen[data-work7-screen="shop"] .w7-tabs{
+    min-height:35px;
+    padding:2px 3px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-tabs button,
+  .w7-screen[data-work7-screen="shop"] .w7-tabs button{
+    min-height:27px;
+    padding:3px 2px;
+    font-size:clamp(10.5px,3.05vw,12px);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-collection-content{
+    gap:5px;
+    padding-top:4px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+    min-height:29px;
+    padding:3px 6px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    row-gap:5px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+    font-size:clamp(10.5px,3vw,12px);
+    line-height:1.02;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+    font-size:clamp(10px,2.9vw,11px);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-content{
+    gap:5px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    margin-top:0;
+    min-height:22px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest>strong{
+    font-size:clamp(11px,3.55vw,13px);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    font-size:clamp(10.5px,3.25vw,12px);
+  }
+}
