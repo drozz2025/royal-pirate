@@ -118,14 +118,23 @@ function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
 export type RankingTab = 'ranking'|'leagues';
 type Navigate = (screen:'ranking'|'profile'|'missions'|'battle')=>void;
 
+/** Tabs follow the approved mobile mosaic; all actions still navigate real screens. */
 export function RankingTabs({active,onNavigate,onLeagues}:{
   active:'ranking'|'profile'|'leagues';onNavigate:Navigate;onLeagues:()=>void;
 }) {
-  return <nav className="w8-tabs" aria-label="Secções de ranking e perfil">
-    <button type="button" aria-pressed={active==='ranking'} onClick={()=>onNavigate('ranking')}><span className="w8-tab-label"><PirateIcon name="ranking" size={17}/>RANKING</span></button>
-    <button type="button" aria-pressed={active==='profile'} onClick={()=>onNavigate('profile')}><span className="w8-tab-label"><PirateIcon name="profile" size={17}/>O MEU PERFIL</span></button>
-    <button type="button" aria-pressed={active==='leagues'} onClick={onLeagues}><span className="w8-tab-label"><PirateIcon name="rewards" size={17}/>LIGAS</span></button>
+  return <nav className="w8-approved-tabs" aria-label="Secções de ranking e perfil">
+    <button type="button" aria-label="RANKING" aria-pressed={active==='ranking'} onClick={()=>onNavigate('ranking')}>RANKING GLOBAL</button>
+    <button type="button" aria-label="LIGAS" aria-pressed={active==='leagues'} onClick={onLeagues}>A MINHA LIGA</button>
+    <button type="button" aria-label="O MEU PERFIL" aria-pressed={active==='profile'} onClick={()=>onNavigate('profile')}>PERFIL</button>
   </nav>;
+}
+
+function W8Title({children,kind}:{children:string;kind:'flag'|'trophy'|'scroll'}) {
+  return <div className="w8-approved-title">
+    <div className="w8-approved-title-flourish" aria-hidden="true"><W8Art kind={kind}/></div>
+    <h2>{children}</h2>
+    <span className="w8-approved-title-curl" aria-hidden="true">❦</span>
+  </div>;
 }
 
 export function RankingPanel({profile,tab,onTab,onNavigate}:{
@@ -134,49 +143,51 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
   const level=levelFor(profile.xp);
   const xpFloor=80*(level-1)*(level-1),xpCeiling=80*level*level;
   const xpPct=level===20?100:Math.min(100,Math.max(0,100*(profile.xp-xpFloor)/(xpCeiling-xpFloor)));
-  const localName='playerName' in profile&&typeof profile.playerName==='string'&&profile.playerName.trim()?profile.playerName.trim():'O TEU CAPITÃO';
-  return <div className="w8-screen w8-ranking-scene">
+  const localName=profile.playerName.trim()||'O TEU CAPITÃO';
+  const total=battlesPlayed(profile);
+  return <div className="w8-screen w8-approved w8-approved-ranking w8-ranking-scene">
+    <W8Title kind="trophy">RANKING</W8Title>
     <RankingTabs active={tab} onNavigate={screen=>{if(screen==='ranking')onTab('ranking');else onNavigate(screen);}}
       onLeagues={()=>onTab('leagues')}/>
     {tab==='ranking'?<>
-      <div className="w8-hero w8-rank-hero"><W8SeaBackdrop variant="ranking"/>
-        <div className="w8-hero-icon" aria-hidden="true"><W8Art kind="trophy"/></div>
-        <div><span className="w8-eyebrow">DIÁRIO DO CAPITÃO</span>
-          <h2>RANKING</h2><p>O teu desempenho real nesta jornada.</p><span className="w8-hero-live">{battlesPlayed(profile)} BATALHAS · {profile.xp} XP LOCAL</span></div>
-      </div>
-      <section className="w8-medal-card w8-captain-showcase" aria-label="Resumo pessoal das batalhas">
-        <div className="w8-captain-portrait" aria-hidden="true"><PirateIcon name="profile" size={77}/></div>
-        <div className="w8-medal-data"><small>CAPITÃO · PERFIL LOCAL</small>
-          <strong className="w8-player-name">{localName}</strong>
-          <span>NÍVEL {level} · {profile.xp} / {xpCeiling} XP</span>
-          <div className="w8-xp-track" role="progressbar" aria-label="XP até ao próximo nível" aria-valuemin={xpFloor} aria-valuemax={xpCeiling} aria-valuenow={Math.min(profile.xp,xpCeiling)}><span style={{width:xpPct+'%'}}/></div>
-          <span className="w8-captain-battles">{battlesPlayed(profile)} BATALHAS REGISTADAS</span></div>
-      </section>
-      <div className="w8-stat-row">
-        <div><span className="w8-stat-symbol" aria-hidden="true"><W8Art kind="trophy"/></span><strong>{profile.wins}</strong><small>VITÓRIAS</small></div>
-        <div><span className="w8-stat-symbol" aria-hidden="true"><W8Art kind="flag"/></span><strong>{profile.losses}</strong><small>DERROTAS</small></div>
-        <div><span className="w8-stat-symbol" aria-hidden="true"><W8Art kind="cannon"/></span><strong>{profile.shots?Math.round(100*profile.hits/profile.shots)+'%':'—'}</strong><small>PRECISÃO</small></div>
-      </div>
-      <section className="w8-honesty w8-ranking-locked" aria-label="There is no global leaderboard yet">
-        <div className="w8-top-board-heading"><span>TOP GLOBAL</span><small>CLASSIFICAÇÃO ONLINE</small></div>
-        <div className="w8-ranking-offline-board">
-          <div className="w8-ranking-locked-emblem" aria-hidden="true"><div className="w8-sealed-podium"><span/><span/><span/></div></div>
-          <div className="w8-ranking-locked-copy">
-            <strong>RANKING GLOBAL INDISPONÍVEL</strong>
-            <p>Sem servidor competitivo nem adversários online. Os números acima são apenas os teus resultados locais.</p>
-            <span className="w8-ranking-locked-status"><PirateIcon name="ranking" size={15}/> SEM SERVIDOR COMPETITIVO</span>
+      <section className="w8-approved-captain" aria-label="Progresso real do capitão local">
+        <div className="w8-approved-avatar" aria-hidden="true"><PirateIcon name="profile" size={46}/></div>
+        <div className="w8-approved-identity">
+          <strong>{localName}</strong>
+          <span>Nível {level} · {total} batalhas</span>
+          <div className="w8-approved-meter" role="progressbar" aria-label="XP até ao próximo nível" aria-valuemin={xpFloor} aria-valuemax={xpCeiling} aria-valuenow={Math.min(profile.xp,xpCeiling)}>
+            <span style={{width:xpPct+'%'}}/>
           </div>
+          <small>{profile.xp.toLocaleString('pt-PT')} / {xpCeiling.toLocaleString('pt-PT')} XP</small>
+        </div>
+        <div className="w8-approved-league-status">
+          <W8Art kind="medal"/>
+          <small>LIGA OFFLINE</small>
+          <strong>{profile.wins} VITÓRIAS</strong>
         </div>
       </section>
-      <button type="button" className="app-cta" onClick={()=>onNavigate('profile')}>VER O MEU PERFIL</button>
+      <section className="w8-approved-leaderboard" aria-label="There is no global leaderboard yet">
+        <h3>TOP JOGADORES</h3>
+        <div className="w8-approved-local-row">
+          <span className="w8-approved-place" aria-hidden="true"><W8Art kind="trophy"/></span>
+          <div className="w8-approved-mini-avatar" aria-hidden="true"><PirateIcon name="profile" size={25}/></div>
+          <div className="w8-approved-player-detail"><strong>{localName}</strong><small>O TEU PERFIL LOCAL</small></div>
+          <span className="w8-approved-player-score"><PirateIcon name="ranking" size={17}/>{profile.xp} XP</span>
+        </div>
+        <div className="w8-approved-empty-rank"><span>2</span><span className="w8-approved-empty-portrait" aria-hidden="true">—</span><strong>CLASSIFICAÇÃO ONLINE INDISPONÍVEL</strong></div>
+        <div className="w8-approved-empty-rank"><span>3</span><span className="w8-approved-empty-portrait" aria-hidden="true">—</span><strong>SEM OUTROS JOGADORES REGISTADOS</strong></div>
+        <p>As posições online e as ligas só estarão disponíveis com um servidor competitivo. Não são simulados adversários nem prémios.</p>
+      </section>
+      <div className="w8-approved-personal-stat"><strong>{profile.wins} VITÓRIAS</strong><span>{profile.losses} DERROTAS</span><span>{profile.shots?Math.round(100*profile.hits/profile.shots)+'%':'—'} PRECISÃO</span></div>
+      <button type="button" className="app-cta w8-approved-profile-button" onClick={()=>onNavigate('profile')}>VER O MEU PERFIL</button>
     </>:<>
-      <div className="w8-hero w8-rank-hero"><div className="w8-hero-icon" aria-hidden="true"><W8Art kind="flag"/></div>
-        <div><span className="w8-eyebrow">ROYAL PIRATE · LIGAS</span><h2>LIGAS EM BREVE</h2><p>Sem classificação inventada.</p></div></div>
-      <div className="w8-honesty w8-honesty-large"><PirateIcon name="ranking" size={32}/><div>
-        <strong>AINDA NÃO EXISTEM LIGAS ONLINE</strong>
-        <p>Esta versão ainda não tem contas, servidor competitivo ou temporadas. Os teus resultados locais continuam guardados e podem ser consultados no perfil.</p>
-      </div></div>
-      <button type="button" className="app-cta" onClick={()=>onNavigate('profile')}>VER PROGRESSO LOCAL</button>
+      <section className="w8-approved-leaderboard w8-approved-leagues-offline">
+        <div className="w8-approved-league-large" aria-hidden="true"><W8Art kind="medal"/></div>
+        <h3>A MINHA LIGA</h3>
+        <strong>AINDA SEM LIGA ONLINE</strong>
+        <p>O jogo ainda não tem temporadas, ranking global ou servidor competitivo. O teu progresso neste dispositivo continua disponível no perfil.</p>
+        <button type="button" className="app-cta w8-approved-profile-button" onClick={()=>onNavigate('profile')}>VER O MEU PERFIL</button>
+      </section>
     </>}
   </div>;
 }
@@ -187,78 +198,68 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
   const [tab,setTab]=React.useState<'daily'|'weekly'|'events'>('daily');
   const [message,setMessage]=React.useState('');
   const now=Date.now(),canClaim=canClaimDaily(profile,now),next=nextDailyStreak(profile,now);
-  const rewardDay=canClaim?next:Math.max(1,profile.dailyStreak);
   const visibleStreak=canClaim&&next===1?0:profile.dailyStreak;
-  const ready=MISSIONS.filter(m=>missionProgress(profile,m.id)>=m.target&&!profile.claimedMissions.includes(m.id)).length;
-  const titles:Record<MissionId,string>={'first-win':'Vence a primeira batalha','five-hits':'Acerta 5 tiros de canhão','three-battles':'Joga 3 batalhas'};
-  return <div className="w8-screen w8-missions-scene">
-    <nav className="w8-tabs" aria-label="Categorias de missões">
-      <button type="button" onClick={()=>{setTab('daily');setMessage('');}} aria-pressed={tab==='daily'}><span className="w8-tab-label"><PirateIcon name="missions" size={17}/>DIÁRIAS</span></button>
-      <button type="button" onClick={()=>{setTab('weekly');setMessage('');}} aria-pressed={tab==='weekly'}><span className="w8-tab-label"><PirateIcon name="events" size={17}/>SEMANAIS</span></button>
-      <button type="button" onClick={()=>{setTab('events');setMessage('');}} aria-pressed={tab==='events'}><span className="w8-tab-label"><PirateIcon name="offers" size={17}/>EVENTOS</span></button>
+  const missionOrder:MissionId[]=['three-battles','five-hits','first-win'];
+  const titles:Record<MissionId,string>={
+    'three-battles':'Conclui 3 batalhas',
+    'five-hits':'Acerta 5 tiros de canhão',
+    'first-win':'Vence a primeira batalha'
+  };
+  return <div className="w8-screen w8-approved w8-approved-missions w8-missions-scene">
+    <W8Title kind="scroll">MISSÕES</W8Title>
+    <nav className="w8-approved-tabs" aria-label="Categorias de missões">
+      <button type="button" onClick={()=>{setTab('daily');setMessage('');}} aria-pressed={tab==='daily'}>DIÁRIAS</button>
+      <button type="button" onClick={()=>{setTab('weekly');setMessage('');}} aria-pressed={tab==='weekly'}>SEMANAIS</button>
+      <button type="button" onClick={()=>{setTab('events');setMessage('');}} aria-pressed={tab==='events'}>EVENTOS</button>
     </nav>
-    <div className="w8-hero"><W8SeaBackdrop variant="missions"/>
-      <div className="w8-hero-icon" aria-hidden="true"><W8Art kind="scroll"/></div>
-      <div><span className="w8-eyebrow">ORDENS DO CAPITÃO</span>
-        <h2>{tab==='daily'?'MISSÕES':tab==='weekly'?'SEMANAIS':'EVENTOS'}</h2>
-        <p>{tab==='daily'?'Objetivos locais e recompensa de hoje.':'Esta categoria ainda não tem atividades.'}</p>{tab==='daily'&&<span className="w8-hero-live">{profile.claimedMissions.length}/{MISSIONS.length} OBJETIVOS RECOLHIDOS</span>}</div>
-    </div>
     {tab==='daily'?<>
-      <section className="w8-map-ribbon" aria-label="Mapa do progresso real nas três missões">
-        <div className="w8-map-heading"><strong>MAPA DE CONQUISTAS</strong><small>{MISSIONS.filter(m=>missionProgress(profile,m.id)>=m.target).length} / {MISSIONS.length} OBJETIVOS ATINGIDOS</small></div>
-        <div className="w8-map-track">
-          {MISSIONS.map((mission,index)=>{
-            const current=missionProgress(profile,mission.id),done=current>=mission.target;
-            const icon: 'ranking'|'battle'|'fleet'=index===0?'ranking':index===1?'battle':'fleet';
-            const milestone=index===0?'1ª VITÓRIA':index===1?'5 ACERTOS':'3 BATALHAS';
-            return <div key={mission.id} className={'w8-map-stop'+(done?' is-complete':'')}>
-              <span className="w8-map-node" aria-hidden="true"><PirateIcon name={icon} size={19}/></span>
-              <span className="w8-map-title">{milestone}</span>
-              <small>{current} / {mission.target}</small>
-            </div>;
-          })}
-        </div>
-      </section>
-      <section className="w8-daily" aria-label="Recompensa diária" title={canClaim?'Next claim earns '+(15+rewardDay*5)+' coins · Próxima recompensa local':'Recompensa de hoje já recolhida'}>
-        <div className="w8-daily-orb" aria-hidden="true"><W8Art kind="chest"/></div>
-        <div className="w8-daily-copy"><span className="w8-eyebrow">BAÚ DIÁRIO</span><strong>{canClaim?'RECOMPENSA DISPONÍVEL':'RECOLHIDO HOJE'}</strong>
-          <small>{canClaim?'Dia '+rewardDay+' da sequência · disponível agora':'Dia '+rewardDay+' recolhido · próxima recolha às 00:00 UTC'}</small>
-          <span className="w8-reward-amount">{15+rewardDay*5} <span aria-hidden="true">●</span> MOEDAS</span></div>
-        <button type="button" disabled={!canClaim} onClick={()=>{onDaily();setMessage('Recompensa diária recolhida no perfil local.');}}>{canClaim?'RECOLHER':'RECOLHIDO'}</button>
-      </section>
-      <section className="w8-missions" aria-label="Objetivos locais permanentes">
-        <div className="w8-section-heading w8-quest-heading"><h3>OBJETIVOS DO CAPITÃO</h3><small>{ready} PARA RECOLHER</small></div>
-        <p className="w8-explain">Objetivos permanentes deste dispositivo. Não reiniciam diariamente.</p>
-        {MISSIONS.map((mission,index)=>{
-          const progress=missionProgress(profile,mission.id),claimed=profile.claimedMissions.includes(mission.id);
+      <section className="w8-approved-quest-list" aria-label="Missões com objetivos reais do jogador">
+        {missionOrder.map((id,index)=>{
+          const mission=MISSIONS.find(m=>m.id===id)!;
+          const progress=missionProgress(profile,id);
+          const claimed=profile.claimedMissions.includes(id);
           const canCollect=!claimed&&progress>=mission.target;
-          return <article className="w8-mission" data-state={claimed?'claimed':canCollect?'ready':'active'} key={mission.id}>
-            <div className={'w8-mission-icon w8-mission-icon-'+index} data-quest={'0'+(index+1)} aria-hidden="true">
-              <W8Art kind={index===0?'cannon':index===1?'scroll':'helm'}/></div>
-            <div className="w8-mission-main">
-              <strong>{titles[mission.id]}</strong><small><span>{progress} / {mission.target}</span> · <b>● {mission.reward} MOEDAS</b></small>
-              <div className="w8-progress" role="progressbar" aria-label={titles[mission.id]+' — progresso'} aria-valuemin={0} aria-valuemax={mission.target} aria-valuenow={progress}>
-                <span style={{width:(100*progress/mission.target)+'%'}}/></div>
+          const kind:W8ArtKind=index===0?'cannon':index===1?'helm':'scroll';
+          return <article className="w8-approved-quest" key={id} data-state={claimed?'claimed':canCollect?'ready':'active'}>
+            <div className="w8-approved-quest-art" aria-hidden="true"><W8Art kind={kind}/></div>
+            <div className="w8-approved-quest-core">
+              <strong>{titles[id]}</strong>
+              <div className="w8-approved-meter" role="progressbar" aria-label={titles[id]+' — progresso'} aria-valuemin={0} aria-valuemax={mission.target} aria-valuenow={progress}>
+                <span style={{width:100*progress/mission.target+'%'}}/>
+                <b>{progress}/{mission.target}</b>
+              </div>
             </div>
-            <button type="button" disabled={claimed} onClick={()=>{if(canCollect){onMission(mission.id);setMessage('Prémio do objetivo '+titles[mission.id]+' recolhido localmente.');}else onNavigate('battle');}}>
-              {claimed?'FEITO':canCollect?'RECOLHER':'JOGAR'}</button>
+            <div className="w8-approved-quest-rewards">
+              <span className="w8-approved-coin" title="Moedas locais">●<strong>{mission.reward}</strong></span>
+              <span className="w8-approved-gem" title="Gemas indisponíveis">◆<strong>—</strong></span>
+            </div>
+            <button type="button" disabled={claimed} onClick={()=>{
+              if(canCollect){onMission(id);setMessage('Recompensa de '+titles[id]+' recolhida neste dispositivo.');}
+              else onNavigate('battle');
+            }}>{claimed?'FEITO':canCollect?'RECOLHER':'JOGAR'}</button>
           </article>;
         })}
       </section>
-      <section className="w8-calendar" aria-label="7-day supply route">
-        <div className="w8-section-heading w8-daily-heading"><h3>RECOMPENSA DIÁRIA</h3><small>{visibleStreak}/7 DIAS</small></div>
-        <ol className="w8-days" aria-label="Seven consecutive daily rewards">{Array.from({length:7},(_,i)=>i+1).map(n=><li key={n} aria-label={'DAY '+n} className={'app-week-day'+(n<=visibleStreak?' is-claimed':canClaim&&n===next?' is-next':'')}>
-          <small>DIA {n}</small><span className="w8-day-token" aria-hidden="true"><W8Art kind="chest"/></span><strong>{15+n*5} ●</strong>
-        </li>)}</ol>
-        <p>Recompensas locais por dia UTC. Uma recolha por dia; dias em falta reiniciam a sequência.</p>
+      <section className="w8-approved-daily" aria-label="7-day supply route" title={canClaim?'Next claim earns '+(15+next*5)+' coins':'Recompensa de hoje já recolhida'}>
+        <h3>Recompensa Diária</h3>
+        <ol className="w8-approved-days" aria-label="Seven consecutive daily rewards">
+          {Array.from({length:7},(_,i)=>i+1).map(n=><li key={n} aria-label={'DAY '+n} className={'app-week-day'+(n<=visibleStreak?' is-claimed':canClaim&&n===next?' is-next':'')}>
+            <span className="w8-approved-chest" aria-hidden="true"><W8Art kind="chest"/>{n<=visibleStreak&&<b>✓</b>}</span>
+            <small>Dia {n}</small>
+          </li>)}
+        </ol>
+        <div className="w8-approved-claim-row">
+          <small>{canClaim?'Baú do dia '+next+': '+(15+next*5)+' moedas locais':'Baú de hoje recolhido · próxima recolha às 00:00 UTC'}</small>
+          <button type="button" disabled={!canClaim} onClick={()=>{onDaily();setMessage('Recompensa diária recolhida no teu perfil local.');}}>{canClaim?'RECOLHER':'RECOLHIDO'}</button>
+        </div>
       </section>
-      <p className="w8-footnote">Moedas e progresso são dados locais do jogo, não sincronizados com servidor ou conta.</p>
-    </>:<div className="w8-unavailable">
-      <div aria-hidden="true" className="w8-lock"><W8Art kind="flag"/></div>
-      <strong>{tab==='weekly'?'SEMANAIS EM BREVE':'SEM EVENTOS ATIVOS'}</strong>
-      <p>{tab==='weekly'?'Não existe calendário semanal ativo nem prémios semanais disponíveis. Os objetivos permanentes mantêm-se no separador Diárias.':'Não existem eventos online ativos nesta versão. Não são atribuídas recompensas ou posições fictícias.'}</p>
+      <p className="w8-approved-disclaimer">Missões permanentes e moedas guardadas apenas neste dispositivo. Gemas e eventos online ainda indisponíveis.</p>
+    </>:<section className="w8-approved-leaderboard w8-approved-other-missions">
+      <div className="w8-approved-league-large" aria-hidden="true"><W8Art kind="flag"/></div>
+      <strong>{tab==='weekly'?'MISSÕES SEMANAIS EM BREVE':'SEM EVENTOS ATIVOS'}</strong>
+      <p>{tab==='weekly'?'Ainda não existe calendário semanal ativo nem recompensas semanais.':'Não existem eventos online nem recompensas fictícias nesta versão.'}</p>
       <button type="button" onClick={()=>setTab('daily')}>VER MISSÕES DISPONÍVEIS</button>
-    </div>}
-    {message&&<div className="w8-feedback" role="status" aria-live="polite">{message}</div>}
+    </section>}
+    {message&&<div className="w8-approved-message" role="status" aria-live="polite">{message}</div>}
   </div>;
 }
