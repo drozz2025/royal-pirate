@@ -371,11 +371,16 @@ export class OceanScene {
     // Cinematic battle-only art scale; the genuine physics ships and hit logic stay live.
     // Reset to the original size in Porto so its approved composition/touch remain identical.
     this.ships.player.root.scale.setScalar(1.18);this.ships.enemy.root.scale.setScalar(1.30);
+    // A slightly tighter portrait lens restores the large dramatic hulls
+    // without moving world-space hitboxes, adding overlays or changing Porto.
+    this.camera.fov=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.75?36:42;
+    this.camera.updateProjectionMatrix();
     const pose=battleCameraPose(this.host.clientWidth/Math.max(1,this.host.clientHeight));this.camera.position.set(...pose.position);this.controls.target.set(...pose.target);this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;this.battleBattery.visible=pose.showBattery;this.battleBattery.position.z=pose.batteryOffsetZ;this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
   /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
   showHarbour(){
-    this.cameraMode='harbour';this.scene.background=new T.Color('#58baf1');this.water.uniforms.battleMode.value=0;
+    this.cameraMode='harbour';this.camera.fov=42;this.camera.updateProjectionMatrix();
+    this.scene.background=new T.Color('#58baf1');this.water.uniforms.battleMode.value=0;
     this.ships.player.root.scale.setScalar(1);this.ships.enemy.root.scale.setScalar(1);
     this.shipPointers.clear();this.shipStart=null;this.battleBattery.visible=false;this.worldScenery.visible=true;this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
     this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
