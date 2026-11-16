@@ -94,6 +94,27 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
   const flashes: T.Mesh[] = [];
   const axisUp=new T.Vector3(0,1,0);
   const axisFace=new T.Vector3(0,0,1);
+  // Batch repeating, real 3D relief pieces in five InstancedMesh draw calls.
+  // The original strict mobile mesh budget remains intact (<60 root children).
+  const collarMatrices:T.Matrix4[]=[],shadowMatrices:T.Matrix4[]=[];
+  const cheekMatrices:T.Matrix4[]=[],boltMatrices:T.Matrix4[]=[],ropeMatrices:T.Matrix4[]=[];
+  const identity=new T.Quaternion();
+  const matrix=(point:T.Vector3,rotation:T.Quaternion,scale:T.Vector3)=>
+    new T.Matrix4().compose(point,rotation,scale);
+  const recoilCurve=new T.CatmullRomCurve3([
+    new T.Vector3(.48,1.96,78.05),
+    new T.Vector3(1.00,1.45,77.30),
+    new T.Vector3(1.58,1.02,76.35),
+    new T.Vector3(2.17,.77,76.00)
+  ]);
+  const addBatched=(name:string,geometry:T.BufferGeometry,material:T.Material,matrices:T.Matrix4[])=>{
+    const mesh=new T.InstancedMesh(geometry,material,matrices.length);
+    mesh.name=name;
+    matrices.forEach((m,i)=>mesh.setMatrixAt(i,m));
+    mesh.instanceMatrix.needsUpdate=true;
+    mesh.computeBoundingSphere();
+    group.add(mesh);
+  };
   for(const x of [-3.15,3.15]){
     // Reuse the original two gun carriages and four spoked wheels.
     addBox(x,1.0,74.2,2.3,.62,5.3,wood);
@@ -131,44 +152,25 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
       hoop.quaternion.copy(rimOrientation);
       group.add(hoop);
     }
-    // Two broad cast-bronze reinforcement collars show the tube's tapered
-    // volume at 384x512, rather than another small 2D stripe on a black mesh.
-    // They run along the SAME real decorative gun axis.
+    // Large, sculpted cast collars and inset ring shadows are genuinely
+    // volumetric, but all four repetitions share one draw call per material.
     for(const t of [.30,.67]){
       const radius=1.48-t*.34;
-      const collar=new T.Mesh(new T.CylinderGeometry(radius+.055,radius+.095,.31,24),bronze);
-      collar.name='first-person-cannon-bronze-collar';
-      collar.quaternion.copy(axisOrientation);
-      collar.position.copy(breechPoint).lerp(muzzlePoint,t);
-      group.add(collar);
-      const shadowRing=new T.Mesh(new T.TorusGeometry(radius+.065,.055,8,24),metal);
-      shadowRing.quaternion.copy(rimOrientation);
-      shadowRing.position.copy(breechPoint).lerp(muzzlePoint,t+.014);
-      group.add(shadowRing);
+      const p=breechPoint.clone().lerp(muzzlePoint,t);
+      collarMatrices.push(matrix(p,axisOrientation,new T.Vector3(radius+.055,1,radius+.095)));
+      shadowMatrices.push(matrix(breechPoint.clone().lerp(muzzlePoint,t+.014),
+        rimOrientation,new T.Vector3(radius+.065,radius+.065,1)));
     }
-    // Recessed, timber cheek-plates and diagonal recoil breeching ropes follow
-    // the cannon carriage into the deck. These are sculptural, never colliders,
-    // game controls, projectiles or interactive overlays.
+    // Four timber carriage cheeks, eight bolts and four curved breeching
+    // ropes; all batched. No per-frame allocations, collisions or HUD overlay.
     for(const side of [-1,1]){
-      const cheek=new T.Mesh(new T.BoxGeometry(.23,.72,3.7),cheekOak);
-      cheek.name='first-person-carriage-cheek';
-      cheek.position.set(x+side*1.01,1.44,74.36);
-      group.add(cheek);
-      for(const z of [73.05,75.75]){
-        const bolt=new T.Mesh(new T.SphereGeometry(.14,10,8),bronze);
-        bolt.scale.set(.35,1,1);
-        bolt.position.set(x+side*1.15,1.52,z);
-        group.add(bolt);
-      }
-      const cable=new T.CatmullRomCurve3([
-        new T.Vector3(x+side*.48,1.96,78.05),
-        new T.Vector3(x+side*1.00,1.45,77.30),
-        new T.Vector3(x+side*1.58,1.02,76.35),
-        new T.Vector3(x+side*2.17,.77,76.00)
-      ]);
-      const breeching=new T.Mesh(new T.TubeGeometry(cable,16,.088,7,false),gunRope);
-      breeching.name='first-person-cannon-breeching-rope';
-      group.add(breeching);
+      cheekMatrices.push(matrix(new T.Vector3(x+side*1.01,1.44,74.36),
+        identity,new T.Vector3(1,1,1)));
+      for(const z of [73.05,75.75])
+        boltMatrices.push(matrix(new T.Vector3(x+side*1.15,1.52,z),
+          identity,new T.Vector3(.35,1,1)));
+      ropeMatrices.push(matrix(new T.Vector3(x,0,0),
+        identity,new T.Vector3(side,1,1)));
     }
     const breech=new T.Mesh(new T.SphereGeometry(1.40,16,12),metal);
     breech.position.copy(breechPoint);group.add(breech);
@@ -176,6 +178,18 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     flash.position.copy(muzzlePoint).addScaledVector(direction,.22);
     flash.visible=false;group.add(flash);flashes.push(flash);
   }
+  // GPU-instanced geometry restores the existing battle-deck mesh budget:
+  // visually carved guns without 24 independent mobile draw calls.
+  addBatched('first-person-cannon-bronze-collar',
+    new T.CylinderGeometry(1,1,.31,24),bronze,collarMatrices);
+  addBatched('first-person-cannon-collar-shadow',
+    new T.TorusGeometry(1,.055,8,24),metal,shadowMatrices);
+  addBatched('first-person-carriage-cheek',
+    new T.BoxGeometry(.23,.72,3.7),cheekOak,cheekMatrices);
+  addBatched('first-person-carriage-bolt',
+    new T.SphereGeometry(.14,10,8),bronze,boltMatrices);
+  addBatched('first-person-cannon-breeching-rope',
+    new T.TubeGeometry(recoilCurve,16,.088,7,false),gunRope,ropeMatrices);
   fire.dispose();
   // Rebalance the foreground after moving the portrait camera toward the ships.
   // Keep both real muzzles inside the lower third, rather than letting them
