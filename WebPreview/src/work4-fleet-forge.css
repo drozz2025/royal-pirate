@@ -1709,3 +1709,72 @@
 @media(max-width:359px){
   .w4-forge .w4-forge-tabs button{min-height:42px;}
 }
+
+
+/* WORK 4 / issue #104 — the actual 390x844 Chromium capture from PR #132
+   still shows a large unillustrated navy zone above the cannon carriage.
+   Keep the Forge's real SVG foreground independent of the decorative workshop
+   layer. These selectors do not affect Porto, the shared HUD/dock or other Works. */
+.w4-forge .w4-forge-stage{isolation:isolate}
+.w4-forge .w4-forge-stage > svg.w4-forge-art{z-index:0}
+.w4-forge .w4-forge-stage > .w4-forge-glow{z-index:1;pointer-events:none}
+.w4-forge .w4-forge-stage > svg.w4-cannon-art{
+  position:absolute;
+  z-index:50;
+  display:block;
+  top:auto;
+  bottom:-1%;
+  left:-6%;
+  right:auto;
+  width:98%;
+  height:auto;
+  max-height:none;
+  transform:rotate(-2deg) scale(1.02);
+  transform-origin:46% 80%;
+  pointer-events:none;
+  filter:saturate(1.22) contrast(1.14) drop-shadow(0 12px 8px #0c0d17dc);
+}
+.w4-forge .w4-forge-stage > .w4-forge-description{z-index:51}
+@media(max-width:359px){
+  .w4-forge .w4-forge-stage > svg.w4-cannon-art{
+    width:96%;left:-8%;top:auto;bottom:-1%;transform:rotate(-2deg);
+  }
+}
+@media(min-width:400px) and (max-width:659px){
+  .w4-forge .w4-forge-stage > svg.w4-cannon-art{
+    width:94%;left:-5%;top:auto;bottom:-1%;
+  }
+}
+
+
+/* WORK4 / Chromium + WebGL visual QA: eliminate GPU filter surfaces around
+   the actual SVG forge scenery and cannon. In the CI 390x844 screenshot those
+   surfaces left a rectangular hole revealing the underlying harbour canvas.
+   Keep scalable vectors and normal DOM stacking, without screenshots as art. */
+.w4-forge .w4-forge-stage > svg.w4-forge-art,
+.w4-forge .w4-forge-stage > svg.w4-cannon-art,
+.w4-forge .w4-forge-stage > .w4-forge-glow {
+  filter:none!important;
+  backdrop-filter:none!important;
+  transform:none!important;
+  will-change:auto!important;
+}
+.w4-forge .w4-forge-stage > svg.w4-forge-art {z-index:0}
+.w4-forge .w4-forge-stage > svg.w4-cannon-art {
+  position:absolute;
+  z-index:2;
+  left:-4%;
+  top:auto;
+  bottom:0;
+  width:96%;
+  height:auto;
+  max-height:none;
+  overflow:visible;
+}
+.w4-forge .w4-forge-stage > .w4-forge-description {z-index:3}
+@media(max-width:359px){
+  .w4-forge .w4-forge-stage > svg.w4-cannon-art {left:-5%;width:94%;bottom:0}
+}
+@media(min-width:400px) and (max-width:659px){
+  .w4-forge .w4-forge-stage > svg.w4-cannon-art {left:-3%;width:95%;bottom:0}
+}
