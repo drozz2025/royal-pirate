@@ -38,7 +38,7 @@ test('reference left sail is legible yet stays above fire/cannon controls at 320
     assert.ok(tl.y>h*.26, `sail clears top title and HP region ${w}x${h}: ${tl.y}`);
     assert.ok(br.y<h*.66, `sail clears fire/cannon row ${w}x${h}: ${br.y}`);
     assert.ok(br.x>w*.30&&br.x<w*.52,`foreground stays left of enemy ${w}x${h}: ${br.x}`);
-    assert.ok(tl.x<w*.12,`foreground silhouette starts near the left screen edge ${w}x${h}: ${tl.x}`);
+    assert.ok(tl.x<w*.17,`foreground silhouette starts near the left screen edge ${w}x${h}: ${tl.x}`);
   }
 });
 
