@@ -104,7 +104,7 @@ export function PortSidePanel({ screen, profile, onNavigate }: {
       <p className="app-side-hint">Não são apresentados preços, saldos premium, compras simuladas ou promessas de produtos disponíveis.</p>
     </>}
 
-    <button className="app-side-primary" type="button" onClick={() => onNavigate(data.destination)}>{data.button}</button>
+    <button className="app-cta app-side-primary" type="button" onClick={() => onNavigate(data.destination)}>{data.button}</button>
     <small className="app-side-footnote">DEMONSTRAÇÃO LOCAL · SEM CONTA ONLINE OU PAGAMENTOS</small>
   </section>;
 }
