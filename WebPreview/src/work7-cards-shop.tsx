@@ -179,7 +179,7 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
     {tab==='collection'&&<section className="w7-content w7-collection-content" role="tabpanel" aria-label="A minha coleção">
       <div className="w7-collection-status">
         <strong>CARTAS: {profile.ownedCrew.length}/{CREW.length}</strong>
-        <span>8 ARTES · PRÉ-VISUALIZAÇÃO</span>
+        <span>8 ARTES CONCEPTUAIS</span>
       </div>
       <div className="w7-approved-grid" role="group" aria-label="Oito ilustrações conceptuais aprovadas, ainda sem cartas jogáveis">
         {approvedConcepts.map((concept,slot)=><article key={concept.title} className={'w7-approved-slot w7-approved-slot-'+slot}
