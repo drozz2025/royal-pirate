@@ -115,7 +115,30 @@ function W8Art({kind}:{kind:W8ArtKind}){
       <circle cx="56" cy="56" r="14" fill="url(#w8-royal-blue)" stroke="#F9D681" strokeWidth="6"/>
       <path d="M51 57L56 47L61 57L56 65Z" fill="#FFD974" stroke="none"/>
     </g>}
-    {(kind==='trophy'||kind==='medal')&&<g strokeLinejoin="round" strokeLinecap="round">
+    {/* The existing league insignia is a wreath-and-shield, not a duplicate trophy.
+         Purely decorative: the local XP, wins and offline status remain untouched. */}
+    {kind==='medal'&&<g strokeLinejoin="round" strokeLinecap="round">
+      <path d="M36 85L28 107L46 98L56 109L66 98L84 107L76 85" fill="#16415C" stroke="#C5853F" strokeWidth="3"/>
+      <path d="M39 89L34 103L46 95L56 103L66 95L78 103L73 89" fill="#28748B" stroke="#F8D791" strokeWidth="1.7"/>
+      <path d="M18 69Q3 53 16 30Q27 10 50 10M94 69Q109 53 96 30Q85 10 62 10" fill="none" stroke="#8E541E" strokeWidth="7"/>
+      <path d="M19 70Q7 53 19 31Q31 14 49 12M93 70Q105 53 93 31Q81 14 63 12" fill="none" stroke="#FCE39A" strokeWidth="4.3"/>
+      <g fill="#EFC26F" stroke="#9A5B27" strokeWidth="1.5">
+        <path d="M16 68Q4 64 7 53Q19 55 19 66Z"/><path d="M14 53Q2 44 10 36Q22 44 19 54Z"/>
+        <path d="M19 37Q11 24 22 19Q30 29 24 39Z"/><path d="M30 24Q28 12 39 10Q43 19 35 26Z"/>
+        <path d="M96 68Q108 64 105 53Q93 55 93 66Z"/><path d="M98 53Q110 44 102 36Q90 44 93 54Z"/>
+        <path d="M93 37Q101 24 90 19Q82 29 88 39Z"/><path d="M82 24Q84 12 73 10Q69 19 77 26Z"/>
+      </g>
+      <circle cx="56" cy="55" r="40" fill="#57351F" stroke="#FFD787" strokeWidth="5"/>
+      <circle cx="56" cy="55" r="34" fill="url(#w8-gold-metal)" stroke="#8D4B20" strokeWidth="3"/>
+      <circle cx="56" cy="55" r="28" fill="#28465F" stroke="#FFF0B1" strokeWidth="2.5"/>
+      <path d="M56 28L77 39L75 64Q70 78 56 84Q42 78 37 64L35 39Z" fill="url(#w8-gold-metal)" stroke="#79451D" strokeWidth="3"/>
+      <path d="M56 35L70 43L68 62Q64 72 56 76Q48 72 44 62L42 43Z" fill="#A45D28" stroke="#FFE5A0" strokeWidth="1.6"/>
+      <path d="M56 39L61 49L72 51L64 59L66 70L56 64L46 70L48 59L40 51L51 49Z" fill="#FFF4C3" stroke="#A36B2A" strokeWidth="2"/>
+      <path d="M43 43L56 36L69 43M46 66Q56 74 66 66" fill="none" stroke="#FFF4C7" strokeWidth="1.6" opacity=".8"/>
+      <path d="M27 28L20 19M85 28L92 19" stroke="#FFF3BF" strokeWidth="2.4" strokeLinecap="round"/>
+      <circle cx="56" cy="55" r="38" fill="none" stroke="#FFF4C3" strokeWidth="1.3" strokeDasharray="1 5" opacity=".82"/>
+    </g>}
+    {kind==='trophy'&&<g strokeLinejoin="round" strokeLinecap="round">
       <path d="M29 26L19 17L10 23L17 37L29 44M83 26L93 17L102 23L95 37L83 44" stroke="#F3CA67" strokeWidth="7"/>
       <path d="M32 22H80L75 58Q71 70 56 74Q41 70 37 58Z" fill="url(#w8-gold-metal)" stroke="#894C20" strokeWidth="5"/>
       <path d="M55 73V86M37 89H75L81 100H31Z" fill="url(#w8-gold-metal)" stroke="#894C20" strokeWidth="6"/>
