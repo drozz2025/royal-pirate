@@ -343,7 +343,8 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
       if(!stage||!scene)return;
       const r=stage.getBoundingClientRect();
       const summarize=(el:Element)=>({name:el.tagName+'.'+el.getAttribute('class'),bg:getComputedStyle(el).backgroundColor,z:getComputedStyle(el).zIndex,opacity:getComputedStyle(el).opacity,rect:el.getBoundingClientRect().toJSON()});
-      console.info('W4_STAGE_DEBUG',JSON.stringify({stage:summarize(stage),scene:summarize(scene),points:[0.2,0.45,0.7].map(frac=>{const x=r.left+r.width*frac,y=r.top+r.height*.24;return {x,y,elements:document.elementsFromPoint(x,y).slice(0,9).map(summarize)};})}));
+      const probe={stage:summarize(stage),scene:summarize(scene),points:[0.2,0.45,0.7].map(frac=>{const x=r.left+r.width*frac,y=r.top+r.height*.24;return {x,y,elements:document.elementsFromPoint(x,y).slice(0,5).map(summarize)};})};
+      fetch('/royal-pirate/__w4_debug__.png?'+encodeURIComponent(JSON.stringify(probe))).catch(()=>{});
     });
   },[tab]);
   return <section className="w4-screen w4-forge" aria-label="Melhorias e forja">
