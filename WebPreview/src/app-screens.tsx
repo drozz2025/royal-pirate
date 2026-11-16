@@ -42,7 +42,13 @@ export function AppScreens({screen,profile,onNavigate,onClose,onBattle,onBuyCrew
     <header className="app-sheet-header">
       <button type="button" className="app-back" onClick={onClose} aria-label="Back to harbour">‹</button>
       <div className="app-sheet-brand" title="ROYAL PIRATE"><small title={profile.playerName}>{profile.playerName} · NV. {levelFor(profile.xp)} · PROGRESSO LOCAL</small><h1 ref={titleRef} tabIndex={-1} id="app-screen-title"><span className="app-page-glyph" aria-hidden="true"><PirateIcon name={page.id} size={23}/></span> {page.title}</h1></div>
-      <div className="app-wallet" aria-label={profile.coins+' locally earned coins'}><span aria-hidden="true">●</span><strong>{profile.coins}</strong><small>MOEDAS</small></div>
+      <div className="app-resource-counters" role="group" aria-label="Recursos do capitão">
+        <div className="app-wallet app-wallet-gold" aria-label={profile.coins+' moedas de ouro ganhas localmente'}><span aria-hidden="true">●</span><strong>{new Intl.NumberFormat('pt-PT').format(profile.coins)}</strong><small>OURO</small></div>
+        <div className="app-wallet app-wallet-gems" aria-label="Diamantes indisponíveis nesta versão; economia de gemas não implementada" title="Diamantes indisponíveis nesta versão">
+          <svg viewBox="0 0 28 28" width="19" height="19" focusable="false" aria-hidden="true"><path d="M7 6h14l5 6-12 13L2 12z" fill="#77bce0" stroke="#d4eeff" strokeWidth="1.4"/><path d="M2 12h24M7 6l7 19L21 6M14 6l-4 6h8z" fill="none" stroke="#e5f5ff" strokeWidth="1.2"/></svg>
+          <strong>—</strong><small>GEMAS</small>
+        </div>
+      </div>
     </header>
     <nav className="app-shortcuts" aria-label="Other screens">
       {PAGES.filter(p=>headerShortcuts.includes(p.id)&&p.id!==screen).map(p=><button type="button" key={p.id} onClick={()=>onNavigate(p.id)} aria-current={screen===p.id?'page':undefined}><PirateIcon name={p.id} size={18}/><span>{p.title}</span></button>)}
