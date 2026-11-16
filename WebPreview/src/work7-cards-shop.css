@@ -1926,3 +1926,192 @@
     grid-template-columns:40% 1fr;padding:7px;
   }
 }
+
+
+/* WORK 7 / #104 — 16 Nov, 04h: visual composition pass for approved 05/06.
+ * Scope strictly [data-work7-screen]; no shared HUD / Porto / nav rules.
+ * Illustration atlas supplies art ONLY. Labels and disabled commerce remain real.
+ * Target: same 4×2 visual rhythm and compact density on 320/390/430 mobile. */
+.w7-screen[data-work7-screen="cards"],
+.w7-screen[data-work7-screen="shop"]{
+  gap:5px;
+  padding:2px 6px 12px;
+  background:
+    radial-gradient(ellipse 86% 15% at 50% 5%,#5ca8d2a8 0%,#25659d77 69%,transparent 100%),
+    linear-gradient(180deg,#125488 0%,#103960 24%,#081d3e 49%,#051630 100%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero,
+.w7-screen[data-work7-screen="shop"] .w7-hero{
+  height:61px;min-height:61px;padding:2px 0;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type{
+  height:45px;width:min(72%,278px);
+  border:3px ridge #f1c884;
+  box-shadow:inset 0 2px #ffe6b5,inset 0 -5px #1b100d,
+    0 2px 0 #b88648,0 5px 0 #4b2b1c,0 7px 11px #0009;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::before{
+  content:"✦";position:absolute;left:14%;top:18px;
+  font:900 20px 'Barlow Condensed',sans-serif;color:#e4bd75;
+  text-shadow:0 2px #34211b;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::after,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::after{
+  content:"✦";position:absolute;right:14%;top:18px;
+  font:900 20px 'Barlow Condensed',sans-serif;color:#e4bd75;
+  text-shadow:0 2px #34211b;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero h2,
+.w7-screen[data-work7-screen="shop"] .w7-hero h2{
+  font-size:clamp(25px,7.1vw,31px)!important;letter-spacing:.1px;
+  text-shadow:0 2px #170f0b,0 3px 0 #80532c;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs,
+.w7-screen[data-work7-screen="shop"] .w7-tabs{
+  min-height:43px;padding:3px 4px;gap:4px;
+  border:2px solid #c89452;
+  box-shadow:inset 0 1px #ffe9b55c,0 3px #061529;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs button,
+.w7-screen[data-work7-screen="shop"] .w7-tabs button{
+  min-height:33px;border-width:1px;border-bottom-width:3px;
+  font-size:clamp(10px,2.8vw,13px);
+  letter-spacing:0;text-shadow:0 1px #031021;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs button[aria-selected="true"],
+.w7-screen[data-work7-screen="shop"] .w7-tabs button[aria-selected="true"]{
+  text-shadow:0 1px #fff2d3;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-content{
+  gap:6px;padding:8px 7px 9px;
+  border:2px solid #bfa070;border-radius:12px;
+  background:linear-gradient(180deg,#142d46f9,#081c35fc);
+  box-shadow:inset 0 1px #fff0ba42,0 4px 10px #031024a3;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status{
+  min-height:31px;padding:4px 7px;
+  border:1px solid #7c92a3;border-radius:7px;
+  background:linear-gradient(#264256,#142b41);
+  box-shadow:inset 0 1px #ffe4a133;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status strong{
+  color:#fff0bf;
+  font-size:clamp(11px,3.1vw,14px);
+  line-height:1.05;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status span{
+  color:#d2dfec;white-space:nowrap;font-size:clamp(8px,2.15vw,10px);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+  gap:5px;padding:2px 0 3px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+  position:relative;gap:2px;
+  padding:3px 2px 4px;border-radius:9px;
+  border-width:2px;border-bottom-width:4px;
+  background-image:linear-gradient(165deg,#78395e,#251d51 80%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+  width:100%;height:auto;aspect-ratio:73/70;
+  border:1px solid #f7deb1;border-radius:5px;
+  box-shadow:0 2px 5px #010f2488;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:2;
+  width:calc(100% + 1px);min-height:23px;
+  margin-top:-20px;padding:4px 1px 2px;
+  background:linear-gradient(180deg,transparent,#09102fe0 50%,#08112afa);
+  color:#fff5db;font:900 clamp(9px,2.6vw,13px)/.98 'Barlow Condensed',sans-serif;
+  overflow-wrap:normal;hyphens:auto;
+  text-shadow:0 2px 2px #020614;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  min-height:16px;padding:2px 1px 1px;
+  border:1px solid #d0a668;border-radius:5px;
+  font:900 clamp(7px,1.9vw,9px)/1 'Barlow Condensed',sans-serif;
+  background:linear-gradient(#3c4562,#152a48);
+  color:#fff0b4;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight{
+  margin-top:3px;min-height:115px;padding:7px;
+  grid-template-columns:minmax(70px,26%) minmax(0,1fr);
+  border:2px solid #f2cb84;border-radius:13px;
+  background:linear-gradient(110deg,#255f82,#0d2c56 73%);
+  box-shadow:inset 0 1px #fff3c479,0 4px #664322;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-portrait{
+  min-height:102px;border-radius:10px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info h3{
+  font-size:clamp(20px,5.6vw,28px);line-height:1;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info button{
+  min-height:36px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details{
+  margin-top:2px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-content{gap:7px}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+  min-height:174px;padding:9px 9px 10px;
+  grid-template-columns:minmax(115px,46%) minmax(0,1fr);
+  background:
+    radial-gradient(ellipse at 29% 36%,#b7698e95,transparent 59%),
+    linear-gradient(115deg,#54206b,#28174f 65%,#121c40);
+  border:2px solid #ffce7f;border-bottom:5px solid #996133;
+  box-shadow:inset 0 2px #fff0b881,0 4px #06152f;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+  height:146px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+  width:min(100%,160px);
+  border:0;box-shadow:0 5px 8px #1005269e;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info h3{
+  font-size:clamp(21px,6vw,28px);line-height:.98;
+}
+.w7-screen[data-work7-screen="shop"] .w7-pack-unavailable{
+  min-height:35px;font-size:clamp(13px,4vw,17px);
+  background:linear-gradient(#c9e887,#659c43);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+  min-height:20px;margin-top:3px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-grid{gap:6px}
+.w7-screen[data-work7-screen="shop"] .w7-chest{
+  min-height:157px;padding:5px 3px 7px;
+  border-radius:10px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{min-height:89px}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  width:min(100%,108px);border:0;box-shadow:none;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  min-height:28px;
+  color:#25351f;background:linear-gradient(#d9eb94,#86a34d);
+  border-color:#f7efb4;
+}
+.w7-screen[data-work7-screen="shop"] .w7-recruit-details{
+  margin-top:8px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-disclaimer{
+  font-size:10px;line-height:1.34;color:#a9c8d8;
+}
+@media(max-width:354px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+  .w7-screen[data-work7-screen="cards"] .w7-collection-content{padding:6px 4px 7px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{padding:2px 1px 3px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{font-size:8px;min-height:22px;margin-top:-17px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{font-size:7px;min-height:17px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    grid-template-columns:40% minmax(0,1fr);min-height:156px;padding:7px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{height:130px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{width:min(100%,135px)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest{min-height:145px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{min-height:77px}
+}
