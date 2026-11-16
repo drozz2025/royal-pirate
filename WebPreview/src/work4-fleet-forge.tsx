@@ -133,6 +133,74 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
       <path d="M143 92l-15-26m64 33 10-32M223 81l-12-25" stroke="#ba8b55" strokeWidth="1.3" opacity=".8"/>
       <path d="M103 188q45 15 99 12" fill="none" stroke="#c68c50" strokeWidth="2" opacity=".7"/>
     </g>
+    {/* Fleet 03 fidelity: layered carved timber, shaded sails, fittings and
+        wake are original vector geometry attached to the same live ship.
+        No screenshot, 3D model, ownership state or combat value is introduced. */}
+    <g className="w4-ship-premium-surface" pointerEvents="none">
+      {/* Three-dimensional-looking hull planking, raised gunwale and gold scrollwork. */}
+      <path d="M55 152Q165 169 298 141L278 179Q174 210 91 187L73 173Z"
+        fill="#1f1820" opacity=".34"/>
+      <path d="M67 158Q173 177 284 152M77 168Q183 190 277 164M84 180Q171 200 268 177"
+        stroke="#e6aa61" strokeWidth="2.2" fill="none" opacity=".94"/>
+      <path d="M78 174Q171 196 274 170M90 187Q172 207 255 185"
+        stroke="#291d22" strokeWidth="3.1" fill="none" opacity=".92"/>
+      <path d="M63 145Q165 159 294 140" stroke="#ffe0a0" strokeWidth="4.6"
+        fill="none" strokeLinecap="round"/>
+      <path d="M57 150Q67 170 86 187M299 141Q294 165 270 184"
+        fill="none" stroke="#d99a51" strokeWidth="5"/>
+      <path d="M76 181Q164 222 268 185" fill="none" stroke="#ffd08a"
+        strokeWidth="2.5" opacity=".95"/>
+      {/* Bow carving and a separate raised stern gallery. */}
+      <path d="M47 149q-13-7-21 1 10 0 10 13 12 4 23-9M39 155q-7 14 1 25"
+        fill="#bd7635" stroke="#ffe2a0" strokeWidth="2.6"/>
+      <path d="M42 148q-5-8 0-13 10-2 13 8" fill="none" stroke="#ffda8f" strokeWidth="3"/>
+      <path d="M249 127L263 102 289 102 309 125 310 147 269 157Z"
+        fill="#543424" stroke="#f6bd68" strokeWidth="3.3"/>
+      <path d="M262 112 281 108 295 123 296 143 264 148Z"
+        fill="#221e29" stroke="#c98b43" strokeWidth="2.6"/>
+      <path d="M262 118h33m-33 11h35m-28-19v39m15-39v38"
+        stroke="#e6b168" strokeWidth="2.3" opacity=".92"/>
+      <path d="M251 143q25-7 55-2" stroke="#ffe09a" strokeWidth="5" fill="none"/>
+      <path d="M271 121h9v10h-9Zm13 0h8v10h-8Z" fill="#ffd187"
+        stroke="#6b462f" strokeWidth="2"/>
+      <path d="M268 121h28M264 134h37" stroke="#dba055" strokeWidth="1.4"/>
+      {/* Fine brass rivets, gun-hatches and rope trim. */}
+      {Array.from({length:7},(_,i)=><g key={'royal-rivet-'+i}>
+        <path d={`M${91+i*24} ${148+Math.round(10*Math.sin(i*Math.PI/7))}
+          l-1 7`} stroke="#221923" strokeWidth="2.2" opacity=".86"/>
+        <circle cx={89+i*25} cy={179+Math.round(8*Math.sin(i*Math.PI/7))}
+          r="2.8" fill="#ffe0a1" stroke="#7c4b2e" strokeWidth="1"/>
+      </g>)}
+      <path d="M87 169q67 19 156 11" fill="none" stroke="#0e1421"
+        strokeWidth="3" strokeDasharray="1 10" strokeLinecap="round"/>
+      <path d="M79 135l11-13 15 13M145 137l10-17 17 18M210 136l14-18 15 18"
+        fill="none" stroke="#eac88b" strokeWidth="1.8"/>
+      {/* Furled canvas folds, gold-reinforced yardarms and a crow's nest. */}
+      <path d="M87 49q14 37 1 74M105 46q18 32 10 77M137 48q33 31 44 70M220 31q27 32 24 79"
+        stroke="#d7d7c8" strokeWidth="2" opacity=".42" fill="none"/>
+      <path d="M79 61Q100 68 119 65M79 85Q100 94 120 90M130 59Q159 61 177 85M215 45Q236 49 252 68"
+        stroke="#768995" strokeWidth="1.8" fill="none" opacity=".62"/>
+      <path d="M73 53L122 52M126 54L197 61M206 43L257 48M262 80L291 84"
+        stroke="#9d6c3e" strokeWidth="5" strokeLinecap="round"/>
+      <path d="M74 51L122 50M126 52L197 59M206 41L257 46"
+        stroke="#f8d88e" strokeWidth="1.8" strokeLinecap="round"/>
+      <path d="M196 36h31l-4 7h-23Z" fill="#643e26" stroke="#e9b778" strokeWidth="2"/>
+      <path d="M210 17v122M117 31v110M265 67v73" stroke="#f9d292" strokeWidth="1.6"
+        opacity=".72"/>
+      <path d="M118 34 36 146M210 18 311 143M266 66 314 137M120 34 208 19"
+        stroke="#ffdda2" strokeWidth="1.35" opacity=".72" fill="none"/>
+      <path d="M120 35 63 136M212 22 172 137M266 71 237 136"
+        stroke="#a5a4a0" strokeWidth="1.1" opacity=".78" fill="none"/>
+      {/* More natural foam at the bow and where the curved hull meets water. */}
+      <path d="M38 198q17-8 36 0t38 4q14-7 30-3m68 6q18-7 37 0t45-2"
+        stroke="#d9ffff" strokeWidth="5" fill="none" strokeLinecap="round" opacity=".94"/>
+      <path d="M22 211q26-6 43-2m198 2q27-5 52 2M60 221q20-4 40 0"
+        stroke="#52dff4" strokeWidth="3" fill="none" strokeLinecap="round" opacity=".85"/>
+      <g fill="#eefaff" opacity=".82">
+        <circle cx="46" cy="210" r="2"/><circle cx="65" cy="217" r="1.8"/>
+        <circle cx="282" cy="215" r="2.5"/><circle cx="299" cy="207" r="1.8"/>
+      </g>
+    </g>
     <path d="M36 204Q65 196 103 207M218 207Q256 199 316 205" stroke="#ddfcfa" strokeWidth="4" opacity=".85" fill="none" strokeLinecap="round"/>
 
   </svg>;
