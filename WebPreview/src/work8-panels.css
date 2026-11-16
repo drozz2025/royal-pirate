@@ -2694,3 +2694,56 @@
 .w8-approved-missions .w8-approved-days li:nth-child(7) .w8-art{
   transform:scale(1.07);
 }
+
+/* WORK8 16-Nov 08h — reference 07/08: illustrated tropical stage and
+   readable hierarchy only; Porto/nav untouched. The leaderboard's only
+   real entry is explicitly local and has no false global position. */
+.w8-screen.w8-approved .w8-approved-scene .w8-seascape{
+  height:318px;filter:saturate(1.32) contrast(1.1);
+}
+.w8-screen.w8-approved .w8-approved-scene{
+  height:385px;
+  -webkit-mask-image:linear-gradient(#000 0%,#000 63%,transparent 100%);
+  mask-image:linear-gradient(#000 0%,#000 63%,transparent 100%);
+}
+.w8-coastal-trees{filter:drop-shadow(0 3px 3px #041c3280)}
+.w8-approved-missions .w8-approved-quest-core>strong{
+  font-size:clamp(16px,4.25vw,20px);line-height:1.12;letter-spacing:.06px;
+}
+.w8-approved-missions .w8-approved-daily{
+  border-color:#F3D292;
+  box-shadow:inset 0 2px #FFF2BE90,0 4px #5B341D,0 7px 13px #001227a8;
+}
+.w8-approved-missions .w8-approved-chest .w8-art{
+  filter:drop-shadow(0 3px 2px #061528) drop-shadow(0 0 5px #FFD5849c);
+}
+.w8-approved-missions .w8-approved-days li small{
+  font-weight:900;font-size:clamp(10px,2.95vw,13px);
+  text-shadow:0 1px 2px #001326;
+}
+.w8-approved-ranking .w8-approved-avatar{
+  box-shadow:0 0 0 2px #6B3B17,inset 0 2px #FFF2BE,0 4px 11px #00172c;
+}
+.w8-approved-ranking .w8-approved-leaderboard h3{
+  text-shadow:0 2px #3D240D,0 0 9px #F8CC6B75;
+}
+.w8-approved-ranking .w8-approved-local-row{
+  border-color:#F7D48F;min-height:61px;
+  box-shadow:inset 0 1px #F8F4DD8a,0 0 0 1px #8A5B31;
+}
+.w8-approved-ranking .w8-local-indicator{
+  background:radial-gradient(circle,#3F7990,#173D5A 75%);
+  border-color:#D5B376;
+}
+.w8-approved-ranking .w8-approved-empty-rank strong{
+  font-size:clamp(11px,3.1vw,14px);
+}
+@media(max-width:350px){
+  .w8-screen.w8-approved .w8-approved-scene .w8-seascape{height:274px}
+  .w8-approved-missions .w8-approved-quest-core>strong{font-size:13px}
+  .w8-approved-missions .w8-approved-days li small{font-size:10px}
+  .w8-approved-ranking .w8-approved-empty-rank strong{font-size:10px}
+}
+@media(min-width:420px){
+  .w8-approved-missions .w8-approved-quest-core>strong{font-size:19px}
+}

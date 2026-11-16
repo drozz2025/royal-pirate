@@ -152,16 +152,54 @@ function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
         </g>}
     {/* Extra original coastal details: illustrated landscape, not the approved screenshot as a background. */}
     <g className="w8-coastal-trees" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
-      <path d="M0 108Q30 84 55 99Q82 89 105 112V137H0Z" fill="#28765E" opacity=".85"/>
-      <path d="M0 115Q18 103 40 109Q66 98 97 121L105 137H0Z" fill="#123F51" opacity=".87"/>
-      <path d="M0 101L13 94L22 96L33 88L40 94L49 93L58 104" fill="none" stroke="#85B986" strokeWidth="3" opacity=".65"/>
-      <path d="M358 109Q385 77 420 99V141H354Z" fill="#267257" opacity=".92"/>
-      <path d="M364 116Q385 98 420 110V142H350Z" fill="#0F4250" opacity=".92"/>
-      <path d="M380 100L386 88L392 99L404 91L417 103" fill="none" stroke="#75B88B" strokeWidth="3" opacity=".65"/>
-      <path d="M15 116L15 77M24 116L24 86M15 77L7 86L24 86ZM24 86L19 94L29 94Z" fill="#D8B879" stroke="#704F32" strokeWidth="2" opacity=".75"/>
-      <path d="M389 111V73L407 81V110Z" fill="#AE7951" stroke="#553C2C" strokeWidth="2" opacity=".65"/>
-      <path d="M394 75V67L398 63L402 68V75Z" fill="#E4CE91" opacity=".73"/>
-      <path d="M394 89H400M394 97H400" stroke="#FFE0A3" strokeWidth="2" opacity=".6"/>
+      {/* Hand-drawn tropical islands and palms: actual responsive SVG scenery,
+          kept underneath functional cards rather than using a flat screenshot. */}
+      <path d="M0 110Q22 82 50 91Q84 84 116 110L121 135H0Z" fill="#2A8066"/>
+      <path d="M0 122Q36 100 73 115Q95 113 120 129V149H0Z" fill="#11516A"/>
+      <path d="M316 128Q355 93 385 91Q405 94 420 102V149H320Z" fill="#26785B"/>
+      <path d="M316 136Q351 115 385 120Q405 114 420 125V153H316Z" fill="#104E61"/>
+      <path d="M0 132Q53 125 91 131T181 128T289 134T420 128" fill="none" stroke="#A4DECE" strokeWidth="3" opacity=".52"/>
+      <g className="w8-palm-left">
+        <path d="M7 146Q27 105 30 40L40 44Q39 107 23 153Z" fill="#7B5030" stroke="#C99B52" strokeWidth="3"/>
+        <path d="M20 126L33 119M25 107L37 101M29 86L40 81M30 66L41 61" stroke="#E1AC66" strokeWidth="2.8" opacity=".85"/>
+        <g fill="#258259" stroke="#103E43" strokeWidth="1.5">
+          <path d="M35 39Q57 10 99 19Q63 20 40 48Q67 24 117 40Q71 36 40 52Z"/>
+          <path d="M35 39Q8 4 -22 21Q7 18 33 48Q8 24 -21 46Q9 40 37 53Z"/>
+          <path d="M35 40Q60 48 78 86Q58 65 34 51Q58 77 55 100Q43 74 29 53Z"/>
+          <path d="M34 38Q37 4 54 -16Q46 12 40 42Q24 19 17 -12Q16 21 31 50Z"/>
+        </g>
+        <g fill="#69B578" opacity=".86">
+          <path d="M35 36Q68 17 93 22Q61 24 40 41Z"/>
+          <path d="M30 37Q4 20 -14 26Q13 27 35 45Z"/>
+          <path d="M41 49Q63 65 65 80Q50 64 36 53Z"/>
+        </g>
+        <circle cx="30" cy="47" r="6" fill="#8D572F" stroke="#F1C27E" strokeWidth="2"/>
+        <circle cx="39" cy="50" r="5" fill="#9B6139" stroke="#F1C27E" strokeWidth="1.5"/>
+      </g>
+      <g className="w8-palm-right">
+        <path d="M416 151Q385 106 381 37L370 42Q373 103 402 153Z" fill="#87532E" stroke="#D2A066" strokeWidth="3"/>
+        <path d="M401 130L388 120M393 110L380 101M387 85L375 79M384 64L372 59" stroke="#E6B477" strokeWidth="2.7"/>
+        <g fill="#247D59" stroke="#0B4549" strokeWidth="1.4">
+          <path d="M377 39Q344 4 305 20Q349 17 373 50Q337 27 293 43Q344 38 375 54Z"/>
+          <path d="M378 38Q410 3 445 23Q413 19 379 49Q406 30 450 49Q412 43 376 53Z"/>
+          <path d="M378 40Q353 53 336 89Q360 67 377 53Q355 81 356 101Q373 73 386 54Z"/>
+          <path d="M378 36Q378 4 360 -18Q365 12 372 42Q389 13 399 -13Q396 19 381 51Z"/>
+        </g>
+        <g fill="#77BA82" opacity=".8">
+          <path d="M374 38Q343 16 310 24Q348 24 374 44Z"/>
+          <path d="M382 40Q413 22 440 25Q410 26 381 46Z"/>
+          <path d="M371 52Q352 71 347 83Q363 68 380 52Z"/>
+        </g>
+        <circle cx="377" cy="48" r="6" fill="#8B522B" stroke="#E5B772" strokeWidth="1.6"/>
+      </g>
+      <g className="w8-island-port" opacity=".87">
+        <path d="M392 115V83L411 88V116Z" fill="#B7804E" stroke="#503925" strokeWidth="2"/>
+        <path d="M386 84L403 68L418 86Z" fill="#D69A55" stroke="#F3D492" strokeWidth="2"/>
+        <path d="M399 72V61L404 57L408 63V72Z" fill="#E2C78B"/>
+        <path d="M397 95H406V105H397Z" fill="#173F54" stroke="#E6C17D" strokeWidth="2"/>
+        <path d="M70 119V99L91 99V120" fill="#C39560" stroke="#765337" strokeWidth="2"/>
+        <path d="M65 100L79 88L98 100Z" fill="#E3B77B" stroke="#72462C" strokeWidth="2"/>
+      </g>
     </g>
     <g fill="none" stroke="#D7FAF5" strokeWidth="2" opacity=".68" strokeLinecap="round" aria-hidden="true">
       <path d="M134 56q7-6 14 0q7-6 14 0M182 35q7-5 13 0q7-5 13 0"/>
@@ -254,7 +292,7 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
       <section className="w8-approved-leaderboard" aria-label="There is no global leaderboard yet">
         <h3>TOP JOGADORES</h3>
         <div className="w8-approved-local-row">
-          <span className="w8-approved-place" aria-hidden="true"><W8Art kind="trophy"/></span>
+          <span className="w8-approved-place w8-local-indicator" title="Sem posição no ranking global" aria-hidden="true"><W8Art kind="flag"/></span>
           <div className="w8-approved-mini-avatar" aria-hidden="true"><W8CaptainPortrait/></div>
           <div className="w8-approved-player-detail"><strong>{localName}</strong><small>O TEU PERFIL LOCAL</small></div>
           <span className="w8-approved-player-score"><PirateIcon name="ranking" size={17}/>{profile.xp} XP</span>
