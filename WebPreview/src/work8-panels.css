@@ -2311,7 +2311,7 @@
   opacity:.85;
 }
 .w8-approved-ranking .w8-approved-personal-stat,
-.w8-approved-ranking .w8-approved-profile-button{
+.w8-approved-ranking > .w8-approved-profile-button{
   display:none;
 }
 /* The approved panel uses the full remaining mobile viewport for five places. */
