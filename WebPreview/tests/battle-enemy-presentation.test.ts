@@ -27,6 +27,12 @@ test('enemy galleon is red, three-masted and billowed geometry, not an overlay',
     assert.equal(enemy.sails.length,5,'two main sails, two topsails and a third foremast');
     const foresail=enemy.root.getObjectByName('enemy-billowed-foresail') as T.Mesh;
     assert.ok(foresail,'enemy has a genuine third red 3D sail');
+    assert.equal(foresail.material,enemy.sails[1].material,
+      'the visible red forecanvas must bear the same original Jolly Roger as the main canvas');
+    const redTop=enemy.sails[0].geometry.getAttribute('position') as T.BufferAttribute;
+    const topDepth=Array.from({length:redTop.count},(_,i)=>redTop.getZ(i));
+    assert.ok(Math.max(...topDepth)-Math.min(...topDepth)<.48,
+      'enemy topsail remains cloth-shaped, not the old inflated spherical silhouette');
     const positions=foresail.geometry.getAttribute('position') as T.BufferAttribute;
     assert.ok(positions.count>=60);
     const depths=Array.from({length:positions.count},(_,i)=>positions.getZ(i));
