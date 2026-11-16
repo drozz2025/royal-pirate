@@ -1654,3 +1654,17 @@
   .w4-fleet .w4-harbour-stage { min-height:206px; }
   .w4-forge .w4-forge-stage { min-height:217px; }
 }
+
+/* WORK 0 / #104 — visually close the empty upper third of Forja's cannon stage.
+   The artwork stays live SVG, never the approved image as a fake UI background.
+   Keep the right-hand upgrade card fully usable; do not touch Porto/nav. */
+@media (min-width:360px) and (max-width:659px) and (min-height:651px){
+  .w4-forge .w4-forge-stage .w4-cannon-art{
+    width:104%;
+    left:-11%;
+    bottom:9%;
+    transform:rotate(-3deg) scale(1.1);
+    transform-origin:42% 78%;
+  }
+  .w4-forge .w4-forge-description{z-index:2}
+}
