@@ -9,6 +9,7 @@ import { rippleState } from './water-vfx';
 import { cannonFxState, CANNON_FX_DURATION } from './cannon-vfx';
 import { battleCameraPose } from './battle-framing';
 import { makeBattleDeck } from './battle-deck';
+import { makeBattleForegroundSail } from './battle-foreground-sail';
 import { createBattleSkyTexture } from './battle-atmosphere';
 export type Metrics = { fps: number; renderMs: number; calls: number; triangles: number; geometries: number; textures: number; effects: number; heapMB?: number };
 export class OceanScene {
@@ -18,7 +19,7 @@ export class OceanScene {
   private pathGeometry=new T.BufferGeometry().setAttribute('position',new T.BufferAttribute(new Float32Array(240*3),3)); private path: T.Line; private marker: T.Mesh;
   private ball: T.Mesh; private particleGeometry=new T.IcosahedronGeometry(1,0); private particleMaterial=new T.MeshBasicMaterial({color:'#fff'});
   private particles: { mesh:T.Mesh;velocity:T.Vector3;age:number;life:number;size:number;smoke:boolean }[]=[];
-  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private muzzleFlash:Partial<Record<'player'|'enemy',T.Mesh>>={}; private recoilAge:Record<'player'|'enemy',number>={player:Infinity,enemy:Infinity}; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'='battle'; private harbourDock=new T.Group(); private worldScenery=new T.Group(); private battleBattery=new T.Group(); private batteryFlashes:T.Mesh[]=[]; private battleSky:T.CanvasTexture; private shake=0;
+  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private muzzleFlash:Partial<Record<'player'|'enemy',T.Mesh>>={}; private recoilAge:Record<'player'|'enemy',number>={player:Infinity,enemy:Infinity}; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'='battle'; private harbourDock=new T.Group(); private worldScenery=new T.Group(); private battleBattery=new T.Group(); private battleForegroundSail=new T.Group(); private batteryFlashes:T.Mesh[]=[]; private battleSky:T.CanvasTexture; private shake=0;
   private shipPointers=new Set<number>(); private shipStart: {x:number;y:number}|null=null; private shipMoved=false;
   private renderMs=0;private lastRender=0;private frameSamples:number[]=[];private metricsAt=0; private pirateAudio=new PirateAudio(); paused=false; disposed=false;
   private onContextLost=(event:Event)=>{event.preventDefault();this.paused=true;this.onError('The 3D view was interrupted. Reload to restore the ocean.');};
@@ -123,6 +124,10 @@ export class OceanScene {
     // A real low-poly teak deck and pair of cannons frame the battle in portrait.
     // This geometry is never shown over the already-approved Porto scene.
     const battery=makeBattleDeck();this.battleBattery=battery.group;this.batteryFlashes=battery.flashes;this.battleBattery.visible=false;this.scene.add(this.battleBattery);
+    // The black near-field player sail matches the approved Batalha composition;
+    // it is never part of Porto or the physics ships, and cannot block DOM HUD.
+    this.battleForegroundSail=makeBattleForegroundSail();
+    this.battleForegroundSail.visible=false;this.scene.add(this.battleForegroundSail);
     this.controls=new OrbitControls(this.camera,this.canvas);this.controls.enableDamping=true;this.controls.enablePan=false;this.controls.minDistance=18;this.controls.maxDistance=110;this.controls.minPolarAngle=.32;this.controls.maxPolarAngle=1.28;this.controls.target.set(0,2,0);this.controls.rotateSpeed=.5;
     this.path=new T.Line(this.pathGeometry,new T.LineDashedMaterial({color:'#f9e5a4',dashSize:.35,gapSize:.2,transparent:true,opacity:.85}));this.scene.add(this.path);
     this.marker=new T.Mesh(new T.RingGeometry(.48,.58,36),new T.MeshBasicMaterial({color:'#ffdf7e',side:T.DoubleSide,transparent:true,opacity:.9,depthTest:false}));this.marker.rotation.x=-Math.PI/2;this.scene.add(this.marker);
@@ -380,7 +385,8 @@ export class OceanScene {
   home(){this.cameraMode='battle';this.scene.background=this.battleSky;this.water.uniforms.battleMode.value=1;
     // Cinematic battle-only art scale; the genuine physics ships and hit logic stay live.
     // Reset to the original size in Porto so its approved composition/touch remain identical.
-    this.ships.player.root.scale.setScalar(1.25);this.ships.enemy.root.scale.setScalar(1.38);
+    this.ships.player.root.scale.setScalar(1.25);this.ships.enemy.root.scale.setScalar(1.64);
+    this.battleForegroundSail.visible=true;
     // Comparison at 390x844 showed that the tighter off-axis lens clips the
     // live player ship. Restore both hulls fully inside the playable viewport.
     this.camera.fov=42;this.camera.updateProjectionMatrix();
@@ -393,7 +399,7 @@ export class OceanScene {
     this.cameraMode='harbour';this.camera.fov=42;this.camera.updateProjectionMatrix();
     this.scene.background=new T.Color('#58baf1');this.water.uniforms.battleMode.value=0;
     this.ships.player.root.scale.setScalar(1);this.ships.enemy.root.scale.setScalar(1);
-    this.shipPointers.clear();this.shipStart=null;this.battleBattery.visible=false;this.worldScenery.visible=true;this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
+    this.shipPointers.clear();this.shipStart=null;this.battleBattery.visible=false;this.battleForegroundSail.visible=false;this.worldScenery.visible=true;this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
     this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
     this.controls.enableRotate=false;this.controls.enableZoom=false;this.controls.maxPolarAngle=1.28;
     const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
