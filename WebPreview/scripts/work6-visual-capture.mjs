@@ -8,7 +8,7 @@ const browser=await chromium.launch({headless:true,args:[
   '--no-sandbox','--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader'
 ]});
 try {
-  for(const [width,height] of [[320,568],[390,844],[430,932]]){
+  for(const [width,height] of [[320,568],[384,512],[390,844],[430,932]]){
     const ctx=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,reducedMotion:'reduce'});
     const page=await ctx.newPage();
     page.on('pageerror',error=>{throw error;});
