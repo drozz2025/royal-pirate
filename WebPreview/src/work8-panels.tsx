@@ -83,6 +83,17 @@ function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
       </linearGradient>
     </defs>
     <rect width="420" height="176" fill="url(#w8-sea-sky)"/>
+    <g fill="#E7FBFF" opacity=".68">
+      <path d="M25 30c8-12 21-15 31-8 11-17 31-14 39 0 14-6 26 1 29 11H25Z"/>
+      <path d="M254 21c13-12 24-10 30-4 12-11 27-6 31 3 12-3 20 4 22 11h-83Z"/>
+      <path d="M166 42c9-7 17-6 23-1 8-8 20-4 23 3h-46Z" opacity=".57"/>
+    </g>
+    <g stroke="#63492E" strokeLinecap="round" strokeLinejoin="round" opacity=".83">
+      <path d="M49 120Q64 76 48 33" strokeWidth="9" fill="none"/>
+      <path d="M48 36Q13 20 4 42Q30 40 48 36M48 36Q31 6 11 10Q28 30 48 36M48 36Q58 4 88 10Q62 25 48 36M48 36Q87 17 102 34Q73 29 48 36M48 36Q77 36 85 57Q64 48 48 36" fill="#23765E" stroke="#0A644B" strokeWidth="2"/>
+      <path d="M366 110Q346 62 364 29" strokeWidth="9" fill="none"/>
+      <path d="M363 30Q338 6 313 17Q337 29 363 30M363 30Q370 3 396 12Q379 26 363 30M363 30Q398 23 417 46Q385 41 363 30M363 30Q341 35 330 57Q353 45 363 30" fill="#338260" stroke="#0A644B" strokeWidth="2"/>
+    </g>
     <circle cx="341" cy="38" r="28" fill="#FFE6A1" opacity=".36"/>
     <circle cx="341" cy="38" r="41" fill="none" stroke="#FFE6A1" strokeWidth="1.5" opacity=".19"/>
     <path d="M0 111L42 91L70 101L101 75L142 103L177 93L214 113L256 99L291 104L329 85L368 101L420 82V176H0Z" fill="#164D67"/>
@@ -146,6 +157,7 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
   const localName=profile.playerName.trim()||'O TEU CAPITÃO';
   const total=battlesPlayed(profile);
   return <div className="w8-screen w8-approved w8-approved-ranking w8-ranking-scene">
+    <div className="w8-approved-scene" aria-hidden="true"><W8SeaBackdrop variant="ranking"/></div>
     <W8Title kind="trophy">RANKING</W8Title>
     <RankingTabs active={tab} onNavigate={screen=>{if(screen==='ranking')onTab('ranking');else onNavigate(screen);}}
       onLeagues={()=>onTab('leagues')}/>
@@ -174,9 +186,11 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
           <div className="w8-approved-player-detail"><strong>{localName}</strong><small>O TEU PERFIL LOCAL</small></div>
           <span className="w8-approved-player-score"><PirateIcon name="ranking" size={17}/>{profile.xp} XP</span>
         </div>
-        <div className="w8-approved-empty-rank"><span>2</span><span className="w8-approved-empty-portrait" aria-hidden="true">—</span><strong>CLASSIFICAÇÃO ONLINE INDISPONÍVEL</strong></div>
-        <div className="w8-approved-empty-rank"><span>3</span><span className="w8-approved-empty-portrait" aria-hidden="true">—</span><strong>SEM OUTROS JOGADORES REGISTADOS</strong></div>
-        <p>As posições online e as ligas só estarão disponíveis com um servidor competitivo. Não são simulados adversários nem prémios.</p>
+        {[2,3,4,5].map(slot=><div className="w8-approved-empty-rank" key={slot} aria-label={'Lugar '+slot+' indisponível'}>
+          <span>{slot}</span><span className="w8-approved-empty-portrait" aria-hidden="true">—</span>
+          <strong>{slot===2?'CLASSIFICAÇÃO ONLINE INDISPONÍVEL':'AGUARDA JOGADORES ONLINE'}</strong>
+        </div>)}
+        <p>Ranking online indisponível. Apenas o teu progresso local é apresentado, sem adversários ou prémios fictícios.</p>
       </section>
       <div className="w8-approved-personal-stat"><strong>{profile.wins} VITÓRIAS</strong><span>{profile.losses} DERROTAS</span><span>{profile.shots?Math.round(100*profile.hits/profile.shots)+'%':'—'} PRECISÃO</span></div>
       <button type="button" className="app-cta w8-approved-profile-button" onClick={()=>onNavigate('profile')}>VER O MEU PERFIL</button>
@@ -206,6 +220,7 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
     'first-win':'Vence a primeira batalha'
   };
   return <div className="w8-screen w8-approved w8-approved-missions w8-missions-scene">
+    <div className="w8-approved-scene" aria-hidden="true"><W8SeaBackdrop variant="missions"/></div>
     <W8Title kind="scroll">MISSÕES</W8Title>
     <nav className="w8-approved-tabs" aria-label="Categorias de missões">
       <button type="button" onClick={()=>{setTab('daily');setMessage('');}} aria-pressed={tab==='daily'}>DIÁRIAS</button>
