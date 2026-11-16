@@ -40,3 +40,13 @@
   font:800 11px 'Barlow',sans-serif;letter-spacing:.3px}
 .result .return-port-button{margin-top:12px;border:1px solid #d8b375;background:linear-gradient(#2c5870,#102f50);
   color:#ffe5ad;box-shadow:none}
+
+/* WORK0 / #104 — native approved 384×512 viewport.
+ * The legacy 570px mobile minimum pushed the five-item dock below the
+ * 512px screen (nav top 488, bottom 570), hiding four-fifths of navigation.
+ * Retain the existing full-size 570px minimum on normal 568px+ phones;
+ * only let genuinely short viewports use the actual device height.
+ * This corrects the containing app root, without restyling Porto or nav. */
+@media (max-width:600px) and (max-height:569px){
+  .app{min-height:0;height:100dvh}
+}
