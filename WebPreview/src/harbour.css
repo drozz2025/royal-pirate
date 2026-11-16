@@ -994,3 +994,12 @@ body:has(.harbour-screen:not([aria-hidden="true"])) .rp-version{display:none}
 /* Player name above the existing level, without resizing the Porto avatar or dock. */
 .harbour-player-name{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:900 clamp(11px,2.7vw,15px)/1.1 'Barlow Condensed',sans-serif;color:#fff3bc;text-shadow:0 2px 2px #071c38,0 0 5px #071c38;letter-spacing:.2px}
 .harbour-level{gap:2px}
+
+/* #104: second Porto resource is visually a diamond, not an unrelated win counter.
+   The balance remains unavailable until backed by a real local save model. */
+.harbour-stat:nth-child(2) .harbour-stat-gem{
+  background:radial-gradient(circle at 30% 24%,#e3faff,#5dbcf2 54%,#12678c);
+  border-color:#a6e9ff;
+  box-shadow:inset 0 1px #f2ffff,0 0 0 1px #3177a3,0 2px 4px #071e3899;
+}
+.harbour-stat-diamonds strong{color:#e7f7ff}

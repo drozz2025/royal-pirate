@@ -1,6 +1,7 @@
 import React from 'react';
 import { PirateIcon, type PirateIconName } from './app-icons';
 import { PortoArt } from './porto-art';
+import { CurrencyDiamond } from './currency-diamond';
 import type { AppScreenId } from './app-screens';
 import { canClaimDaily, CREW, levelFor, missionProgress, MISSIONS, nextDailyStreak, UPGRADES, upgradeCost, type LocalProfile } from './progression';
 
@@ -117,7 +118,7 @@ export function Harbour({ onBattle, onNavigate, profile, selected=false, hidden=
       <div className="harbour-wallet" role="group" aria-label="Local captain statistics">
         <div className="harbour-resources">
           <span className="harbour-stat" aria-label={profile.coins+' locally earned coins'}><span className="harbour-stat-glyph" aria-hidden="true"><svg className="harbour-coin" viewBox="0 0 32 32" focusable="false"><circle cx="16" cy="16" r="13.3" fill="#f6cf64" stroke="#855015" strokeWidth="2.3"/><circle cx="16" cy="16" r="9.5" fill="#e4ac38" stroke="#fff0b2" strokeWidth="1.4"/><path d="M16 8v16M11 11h7q4 0 4 3t-4 3h-5q-4 0-4 3t5 3h7" fill="none" stroke="#8e531a" strokeWidth="2.4" strokeLinecap="round"/><path d="M10 6l2-1m8 21 2-1" stroke="#fff7c7" strokeWidth="2" strokeLinecap="round"/></svg></span><strong>{coins}</strong></span>
-          <span className="harbour-stat" aria-label={profile.wins+' victories from real battles'}><span className="harbour-stat-glyph" aria-hidden="true"><PirateIcon name="ranking" size={20}/></span><strong>{profile.wins}</strong></span>
+          <span className="harbour-stat harbour-stat-diamonds" aria-label="Diamantes indisponíveis: economia de diamantes ainda não implementada" title="Diamantes indisponíveis"><span className="harbour-stat-glyph harbour-stat-gem" aria-hidden="true"><CurrencyDiamond size={20}/></span><strong>—</strong></span>
         </div>
         <button type="button" className="harbour-settings" onClick={()=>onAction('profile')} aria-label="Captain profile and local settings"><PirateIcon name="settings" size={27}/></button>
       </div>
