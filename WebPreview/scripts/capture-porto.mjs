@@ -143,6 +143,19 @@ try {
     await writeFile(join(out,screen+'-mobile-390x844.png'),Buffer.from(capture.data,'base64'));
     if(!same||!labelsMatch)throw new Error(screen+' navigation diverges from approved Porto sizing');
   }
+  // WORK 8 visual evidence: reach the live Missions screen via Porto.
+  // This only captures actual DOM rendering; it does not assert image parity.
+  const toPorto=await evaluate("(()=>{const b=document.querySelector('.app-sheet > .harbour-nav .harbour-nav-item:first-child');if(!b)return false;b.click();return true})()");
+  if(!toPorto)throw new Error('Could not return to Porto for Missions capture');
+  await delay(300);
+  const toMissions=await evaluate("(()=>{const b=[...document.querySelectorAll('.harbour-screen .harbour-flank-right button')].find(x=>x.textContent?.includes('MISSÕES'));if(!b)return false;b.click();return true})()");
+  if(!toMissions)throw new Error('Could not open Missions via Porto');
+  await delay(450);
+  const missionLayout=await evaluate("(()=>({quests:document.querySelectorAll('.w8-approved-missions .w8-approved-quest').length,days:document.querySelectorAll('.w8-approved-days li').length,buttons:[...document.querySelectorAll('.w8-approved-missions button')].length,nav:!!document.querySelector('.app-sheet > .harbour-nav')}))()");
+  report.work8Missions=missionLayout;
+  if(missionLayout.quests!==3||missionLayout.days!==7||!missionLayout.nav)throw new Error('WORK 8 Missions layout missing real panels');
+  const missionCapture=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+  await writeFile(join(out,'missions-mobile-390x844.png'),Buffer.from(missionCapture.data,'base64'));
   await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
 
   if(report.bodyOverflow)throw new Error('Porto viewport scrolls horizontally');
