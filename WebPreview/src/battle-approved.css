@@ -302,3 +302,10 @@ body:has(.in-battle) > .rp-version{top:auto!important;left:7px!important;bottom:
   .in-battle .view-controls{bottom:139px}
   .in-battle .command-deck .turn-line{top:-28px;height:26px;min-height:26px}
 }
+
+/* Short phones keep the angle/power captions fully above the bottom edge. */
+@media(max-height:650px){
+  .in-battle .command-deck .sliders{bottom:17px;min-height:64px;padding:4px 7px 5px}
+  .in-battle .command-deck .sliders input{height:20px}
+  .in-battle .command-deck .sliders .scale{font-size:7px;line-height:1.1}
+}
