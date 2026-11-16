@@ -162,7 +162,7 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
           stroke="#f2d39a" strokeWidth="2.5" opacity=".74"/>
       </g>
     </g>}
-    <g className="w4-art-crest">
+    <g className="w4-art-crest" transform={small?undefined:'translate(-33 -20) scale(1.2)'}>
       <path d="M142 73Q166 60 186 74L187 103Q165 121 144 103Z" fill="#31333b" stroke="#d9ad69" strokeWidth="2" opacity=".96"/>
       <path d="M154 89q0-13 11-13t11 13l-4 8h-14Z" fill="#f8ebc4"/>
       <circle cx="161" cy="89" r="3" fill="#17212d"/><circle cx="170" cy="89" r="3" fill="#17212d"/>
@@ -380,6 +380,29 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
         <path d="M101 184q8 7 16 0t15 0M142 194q10 7 19-1t17 0M190 195q10 5 17-3t14 0"/>
         <path d="M93 173l-3 6m33 3-2 7m41-1-1 8m42-7 1 7m39-15 3 7"/>
       </g>
+    </g>}
+    {/* Reference 03: sculpted broadside, timber shadows and cast brass bow. */}
+    {!small&&<g className="w4-galleon-relief-finish" pointerEvents="none">
+      <path d="M86 165Q169 189 279 163L271 182Q176 212 91 185Z"
+        fill="#120e17" opacity=".38"/>
+      <path d="M91 174Q168 201 271 176M97 185Q174 208 259 185"
+        fill="none" stroke="#bf7846" strokeWidth="5.5" opacity=".78"/>
+      <path d="M90 171Q165 198 274 169M95 183Q174 205 263 180"
+        fill="none" stroke="#ffcb80" strokeWidth="1.65" opacity=".94"/>
+      <path d="M101 194Q170 216 248 193"
+        fill="none" stroke="#0b0d17" strokeWidth="5" opacity=".66"/>
+      <path d="M99 192Q171 211 254 191"
+        fill="none" stroke="#f8ca80" strokeWidth="1.8" opacity=".82"/>
+      <g stroke="#deb477" strokeWidth="1.2" fill="none" opacity=".91">
+        <path d="M96 172q7 11 14 0m11 4q7 11 15 1m12 4q6 11 14 2m14 1q7 8 14 0m12-1q7 8 14-1m9-3q7 6 14-4"/>
+        <path d="M95 188l6-4m23 12 7-4m25 7 7-4m27 3 7-5m28-1 6-6"/>
+      </g>
+      <path d="M268 132q9-15 21-12l11 17-4 7-9-7-11 8"
+        fill="#2b1c20" stroke="#e2a75c" strokeWidth="3"/>
+      <path d="M270 128l11-19 10 9m-21 15 23 1m-15-20 1 28"
+        fill="none" stroke="#ffdd98" strokeWidth="2"/>
+      <path d="M55 161q-7-5-15 4l11 2 9 13m-6-24 4-13"
+        fill="none" stroke="#f4bc66" strokeWidth="4" strokeLinecap="round"/>
     </g>}
     <path d="M36 204Q65 196 103 207M218 207Q256 199 316 205" stroke="#ddfcfa" strokeWidth="4" opacity=".85" fill="none" strokeLinecap="round"/>
 
@@ -701,6 +724,21 @@ function ForgeCannonArtwork(){
         fill="none" opacity=".86"/>
       <path d="M235 212Q268 169 310 201" stroke="#fff1b9"
         strokeWidth="3" fill="none" opacity=".69"/>
+    </g>
+    {/* Ref. 04: worn cast-iron grooves, warm firelight and recessed carriage. */}
+    <g className="w4-cannon-rimlight" pointerEvents="none">
+      <path d="M119 144Q205 124 284 104" fill="none"
+        stroke="#eddbc0" strokeWidth="2.6" opacity=".8"/>
+      <path d="M131 169Q220 146 295 124" fill="none"
+        stroke="#0a1d2c" strokeWidth="3.5" opacity=".77"/>
+      <path d="M135 182Q219 159 304 138" fill="none"
+        stroke="#c39256" strokeWidth="2" opacity=".72"/>
+      <path d="M99 141Q81 156 82 174M43 169Q34 181 39 197"
+        fill="none" stroke="#ffe6ac" strokeWidth="2.8" opacity=".78"/>
+      <path d="M93 229L152 252L339 207M111 237L155 245L321 207"
+        fill="none" stroke="#f5bd77" strokeWidth="2.4" opacity=".83"/>
+      <path d="M248 207q24-21 49 0M247 220q26-21 58 0"
+        fill="none" stroke="#493023" strokeWidth="3.1" opacity=".7"/>
     </g>
     <path d="M36 236Q64 226 83 240M353 234Q380 219 397 235" stroke="#fbcc7b" strokeWidth="3" fill="none" opacity=".7"/>
   </svg>;
