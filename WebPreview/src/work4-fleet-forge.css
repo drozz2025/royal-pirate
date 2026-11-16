@@ -1889,3 +1889,22 @@
   background:#72503d !important;
   background-image:none !important;
 }
+
+
+/* WORK4 PAINT FIX 2026-11-16 — screenshot-driven compositor workaround.
+   #136 diagnostic 43814452766 only restored the full workshop/cannon when
+   BOTH stage and illustration plane had an outline. Retain that paint-boundary
+   trigger invisibly with an opaque warm timber colour, not the magenta/lime
+   diagnostic. No change to Porto or the global navigation. */
+.w4-forge #w4-forge-panel > .w4-forge-stage {
+  background-color:#765038!important;
+  background-image:none!important;
+  outline:4px solid transparent!important;
+  outline-offset:0;
+}
+.w4-forge .w4-forge-stage > .w4-forge-scene {
+  background-color:#b77f4c!important;
+  background-image:none!important;
+  outline:4px solid transparent!important;
+  outline-offset:0;
+}
