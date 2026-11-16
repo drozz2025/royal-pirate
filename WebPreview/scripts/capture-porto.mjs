@@ -229,6 +229,59 @@ try {
   if(referenceComparisons.length!==8)throw new Error('Not all 8 approved reference comparisons were generated');
   await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
 
+  // WORK 0 mobile consistency gate. Capture the same real five-tab navigation
+  // at narrow (320) and wide (430) phone widths, not just the 390px reference.
+  // These screenshots are extra layout diagnostics; approval still requires
+  // human inspection of the eight 390x844 reference overlays.
+  report.responsiveNavigation=[];
+  for(const viewport of [{width:320,height:568},{width:430,height:932}]){
+    await command('Emulation.setDeviceMetricsOverride',{
+      width:viewport.width,height:viewport.height,deviceScaleFactor:1,mobile:true,
+      screenWidth:viewport.width,screenHeight:viewport.height
+    });
+    await command('Page.navigate',{url:origin});
+    for(let i=0;i<40;i++){
+      if(await evaluate("!!document.querySelector('.harbour-screen .harbour-nav')"))break;
+      await delay(200);
+    }
+    await delay(400);
+    let targetNavigation;
+    for(const [screen,tab] of [['porto',1],['fleet',2],['cards',3],['shop',4],['ranking',5]]){
+      if(screen!=='porto'){
+        const selector=targetNavigation==='porto'
+          ? '.harbour-screen .harbour-nav-item:nth-child('+tab+')'
+          : '.app-sheet > .harbour-nav .harbour-nav-item:nth-child('+tab+')';
+        const opened=await evaluate("(()=>{const button=document.querySelector("+JSON.stringify(selector)+");if(!button)return false;button.click();return true})()");
+        if(!opened)throw new Error('Could not navigate to '+screen+' at '+viewport.width+'px');
+        await delay(250);
+      }
+      targetNavigation=screen;
+      const geometry=await evaluate(`(()=>{
+        const nav=document.querySelector('.app-sheet > .harbour-nav')||
+          document.querySelector('.harbour-screen .harbour-nav');
+        if(!nav)return null;
+        const r=nav.getBoundingClientRect();
+        return {x:Math.round(r.x),y:Math.round(r.y),width:Math.round(r.width),
+          height:Math.round(r.height),tabs:nav.querySelectorAll('.harbour-nav-item').length,
+          documentWidth:document.documentElement.scrollWidth,
+          viewportWidth:innerWidth,viewportHeight:innerHeight,
+          labels:[...nav.querySelectorAll('.harbour-nav-item strong')].map(x=>x.textContent)};
+      })()`);
+      if(!geometry)throw new Error('Missing navigation at '+viewport.width+'px / '+screen);
+      const fits=Math.abs(geometry.x)<=2&&
+        Math.abs(geometry.width-viewport.width)<=2&&
+        Math.abs(geometry.y+geometry.height-viewport.height)<=2&&
+        geometry.documentWidth<=viewport.width+2&&geometry.tabs===5;
+      report.responsiveNavigation.push({screen,viewport, ...geometry,matched:fits});
+      const screenshot=await command('Page.captureScreenshot',{
+        format:'png',fromSurface:true,captureBeyondViewport:false
+      });
+      await writeFile(join(out,screen+'-mobile-'+viewport.width+'x'+viewport.height+'.png'),Buffer.from(screenshot.data,'base64'));
+      if(!fits)throw new Error('Navigation overflow/misalignment at '+viewport.width+'px / '+screen+': '+JSON.stringify(geometry));
+    }
+  }
+  await writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');
+
   if(report.bodyOverflow)throw new Error('Porto viewport scrolls horizontally');
   if(!report.webgl2||report.contextLost)console.warn('No confirmed WebGL2 context: screenshot is not proof of 3D performance');
 } finally {
