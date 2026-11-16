@@ -1934,3 +1934,27 @@
     transform:scaleX(.94) scaleY(1.16) rotate(-1.2deg);
   }
 }
+
+
+/* WORK 0 / #104 — Chromium compositor regression visible after v0.1.36.
+   The same Forge SVG passes CI with a complete workshop on one render, yet a
+   later render replaces the left half with the blue underlying harbour canvas.
+   Restore an isolated, opaque composition surface for both live SVG layers;
+   do not change the interactive panel, prices, harbour or bottom navigation.
+   Avoid a filter/backdrop-filter on the stage to prevent intermediate tiles. */
+.w4-forge #w4-forge-panel > .w4-forge-stage {
+  isolation:isolate !important;
+  contain:paint;
+  transform:translateZ(0);
+  backface-visibility:hidden;
+}
+.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene {
+  isolation:isolate !important;
+  contain:paint;
+  transform:translateZ(0);
+  backface-visibility:hidden;
+  z-index:25 !important;
+}
+.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+  z-index:30 !important;
+}
