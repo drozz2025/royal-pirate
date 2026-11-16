@@ -8,6 +8,8 @@ const visualTier:Record<CrewId,string> = {
 /** Short captions preserve legibility in the approved four-column mobile grid. */
 const compactCrewName:Record<CrewId,string> = {captain:'Mara',gunner:'Iron Jack',navigator:'Northwind'};
 
+const crewRolePt:Record<CrewId,string> = {captain:'Capitã inicial · coleção local',gunner:'Artilheiro · coleção local',navigator:'Navegador · coleção local'};
+
 function CardArt({id,featured=false}:{id:CrewId;featured?:boolean}) {
   return <svg className={featured?'w7-featured-svg':'w7-art-svg'} viewBox="0 0 180 160" role="img" aria-label={id==='captain'?'Retrato ilustrado de capitã pirata':id==='gunner'?'Ilustração de canhão de bronze':'Rosa dos ventos ilustrada'}>
     <defs>
@@ -184,14 +186,14 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
           aria-label={concept.title+' — ilustração conceptual aprovada, ainda não jogável'}>
           <ApprovedArtCrop kind="cards" x={concept.x} y={concept.y} cropWidth={73} cropHeight={67}/>
           <strong>{concept.title}</strong>
-          <small>CONCEITO · EM BREVE</small>
+          <small title="Ilustração conceptual, ainda não jogável">PRÉVIA</small>
         </article>)}
       </div>
       <div className={'w7-spotlight w7-spotlight-'+active.id} aria-live="polite">
         <div className="w7-spotlight-portrait"><CardArt id={active.id} featured/><span>{equipped?'EM SERVIÇO':owned?'ADQUIRIDA':'POR RECRUTAR'}</span></div>
         <div className="w7-spotlight-info">
           <span className="w7-eyebrow">TRIPULAÇÃO REAL</span>
-          <h3>{active.name}</h3><p>{active.role}</p>
+          <h3>{active.name}</h3><p>{crewRolePt[active.id]}</p>
           <div className="w7-spotlight-tags"><span>{visualTier[active.id]}</span><span>{owned?'NO INVENTÁRIO':active.cost+' MOEDAS LOCAIS'}</span></div>
           <button type="button" disabled={equipped||(!owned&&!canRecruit)} onClick={press}
             aria-label={equipped?active.name+' já equipado':owned?'Equipar '+active.name:canRecruit?'Recrutar '+active.name+' por '+active.cost+' moedas locais':'Faltam '+Math.max(0,active.cost-profile.coins)+' moedas para '+active.name}>
@@ -262,7 +264,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
         <div className="w7-captain-pack-info">
           <span className="w7-eyebrow">TESOUROS DO PORTO</span>
           <h3>PACK DO CAPITÃO</h3>
-          <p>Baús e recompensas para futuras aventuras.</p>
+          <p>Baús e recompensas em preparação.</p>
           <strong className="w7-pack-unavailable">INDISPONÍVEL</strong>
           <small>Preço e conteúdo por definir · sem pagamentos</small>
         </div>
