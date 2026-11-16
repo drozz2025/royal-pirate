@@ -267,6 +267,52 @@ function ForgeBackdrop(){
       <path d="M10 253L397 242M12 267L411 260M33 279L421 274" stroke="#daa365" strokeWidth="2" opacity=".55"/>
       <path d="M226 235v39m89-42v41m70-45v38" stroke="#241d22" strokeWidth="5" opacity=".5"/>
     </g>
+    {/* WORK4 / approved 04: independent vector workshop detailing. This adds
+        dimensional timber, visible arch stones, hanging hardware and embers;
+        it never replaces the real interface with a reference screenshot. */}
+    <g className="w4-forge-approved-workshop-detail" pointerEvents="none">
+      <path d="M0 16h419M0 26h418" stroke="#392321" strokeWidth="8" opacity=".7"/>
+      <path d="M0 19h420" stroke="#e1a76b" strokeWidth="3" opacity=".83"/>
+      <path d="M171 2L23 95M191 0L28 111" stroke="#3f2925" strokeWidth="11" opacity=".82"/>
+      <path d="M170 2L24 95M190 0L29 110" stroke="#efb674" strokeWidth="2.8" opacity=".83"/>
+      <path d="M18 52l39 22M22 62l30 17M181 35l-33 21"
+        stroke="#c18b57" strokeWidth="5" opacity=".6"/>
+      <path d="M10 142Q23 45 109 38Q186 41 189 146"
+        fill="none" stroke="#342321" strokeWidth="14"/>
+      <path d="M12 142Q27 47 109 40Q181 43 187 146"
+        fill="none" stroke="#f5bb72" strokeWidth="4"/>
+      <path d="M23 143Q36 62 107 61Q160 62 171 147"
+        fill="none" stroke="#714831" strokeWidth="8"/>
+      <path d="M23 145l16 6m1-48 17 11m16-48 7 17m35-16-1 17m32-1-8 14m30 27-17 6"
+        stroke="#ffdf98" strokeWidth="3.6" opacity=".64"/>
+      <path d="M18 171h24m-22 18h26m-26 20h28m-30 19h28M154 168h34m-32 19h35m-32 20h37m-34 21h33"
+        stroke="#b98456" strokeWidth="3" opacity=".65"/>
+      <path d="M204 21l3 214m165-215-3 217"
+        stroke="#211b21" strokeWidth="21" opacity=".5"/>
+      <path d="M205 22l3 207m161-206-3 207" stroke="#b47c4b" strokeWidth="4" opacity=".7"/>
+      <path d="M210 62l162 105m-163 0L368 60"
+        stroke="#2a211f" strokeWidth="12" opacity=".63"/>
+      <path d="M211 63l159 105m-162 0L367 63"
+        stroke="#e1a267" strokeWidth="3.2" opacity=".58"/>
+      <path d="M28 52v38m3-36-1 39" stroke="#231f1e" strokeWidth="2"/>
+      <path d="M25 86h13l4 13-6 10H24l-6-10Z"
+        fill="#604226" stroke="#f8d38b" strokeWidth="2.5"/>
+      <path d="M27 91h9v9h-9Z" fill="#ffcd64"/>
+      <path d="M23 107h19" stroke="#d9904b" strokeWidth="3"/>
+      <path d="M148 15v39m9-39v44" stroke="#bda17e" strokeWidth="2.5"/>
+      <circle cx="153" cy="62" r="12" fill="#533b30" stroke="#e1ac69" strokeWidth="4"/>
+      <circle cx="153" cy="62" r="5" fill="#202124" stroke="#ebbb79" strokeWidth="2"/>
+      <path d="M145 70l-8 31" stroke="#c4a78a" strokeWidth="2.5"/>
+      <g fill="#ffd08a" opacity=".92">
+        <circle cx="100" cy="127" r="2.8"/><circle cx="91" cy="156" r="2.1"/>
+        <circle cx="118" cy="137" r="2.6"/><circle cx="132" cy="178" r="1.8"/>
+        <circle cx="80" cy="191" r="2.8"/><circle cx="104" cy="165" r="2"/>
+      </g>
+      <g stroke="#f4ca80" strokeWidth="2.3" fill="none" opacity=".85">
+        <path d="M86 173q-5-13 0-19m33-7q-6-12-1-22"/>
+        <path d="M49 230q23 7 42 4m141 10 60 1"/>
+      </g>
+    </g>
  </svg>;
 }
 
@@ -322,6 +368,31 @@ function ForgeCannonArtwork(){
       <g fill="#ffe8ad" opacity=".88">
        <circle cx="151" cy="143" r="2"/><circle cx="198" cy="130" r="2.2"/><circle cx="250" cy="116" r="2"/>
        <circle cx="151" cy="180" r="2"/><circle cx="201" cy="164" r="2"/><circle cx="263" cy="147" r="2"/>
+      </g>
+    </g>
+    {/* WORK4 / reference 04: original engraved ironwork and brass/carriage
+        reflections. Decorative paths only; actual upgrade state is unchanged. */}
+    <g className="w4-cannon-approved-fittings" pointerEvents="none">
+      <path d="M118 132L283 95M117 137l173-39"
+        stroke="#fff0c0" strokeWidth="2" opacity=".65"/>
+      <path d="M105 173l187-46M106 182l181-44"
+        stroke="#6d8090" strokeWidth="2.4" opacity=".76"/>
+      <path d="M148 147l18 39m52-56 15 43m50-57 13 34"
+        stroke="#f4d9a0" strokeWidth="2" opacity=".77"/>
+      <path d="M140 157l9 18m60-32 8 19m53-35 9 17"
+        stroke="#3e3130" strokeWidth="2.7" opacity=".9"/>
+      <path d="M73 230l80 35 160-52"
+        stroke="#f7bf6f" strokeWidth="3.5" fill="none" opacity=".82"/>
+      <path d="M92 237l44 18m48-4 84-25"
+        stroke="#2f2622" strokeWidth="4" opacity=".88"/>
+      <circle cx="277" cy="217" r="39" fill="none" stroke="#69412c" strokeWidth="3"/>
+      <circle cx="277" cy="217" r="29" fill="none" stroke="#ffe1a0" strokeWidth="2" opacity=".8"/>
+      <path d="M245 189l64 57m-64-3 64-52"
+        stroke="#f4c17d" strokeWidth="2" opacity=".75"/>
+      <g fill="#ffe0a3" stroke="#67462a" strokeWidth="1.3">
+        <circle cx="120" cy="244" r="3"/><circle cx="149" cy="255" r="3"/>
+        <circle cx="207" cy="231" r="3"/><circle cx="316" cy="207" r="3"/>
+        <circle cx="280" cy="172" r="3"/>
       </g>
     </g>
     <path d="M36 236Q64 226 83 240M353 234Q380 219 397 235" stroke="#fbcc7b" strokeWidth="3" fill="none" opacity=".7"/>
