@@ -2747,3 +2747,107 @@
 @media(min-width:420px){
   .w8-approved-missions .w8-approved-quest-core>strong{font-size:19px}
 }
+
+
+/* WORK 8 — 16 Nov 08:31: reference 07/08 framing, not new content.
+   The stage SVG uses preserveAspectRatio=none, so BOTH coastal palms and
+   islands remain visible on narrow phones rather than being cropped away.
+   Keep these selectors inside WORK8 only; Porto/HUD/nav stay unchanged. */
+.w8-screen.w8-approved .w8-approved-scene{
+  height:min(66dvh,520px);
+  -webkit-mask-image:linear-gradient(#000 0%,#000 73%,transparent 100%);
+  mask-image:linear-gradient(#000 0%,#000 73%,transparent 100%);
+}
+.w8-screen.w8-approved .w8-approved-scene .w8-seascape{
+  width:100%;height:min(61dvh,490px);
+  filter:saturate(1.23) contrast(1.07);
+}
+.w8-screen.w8-approved .w8-approved-title{
+  height:58px;min-height:58px;flex-basis:58px;
+  margin-bottom:0;
+}
+.w8-screen.w8-approved .w8-approved-title::before{
+  left:12%;right:12%;top:6px;bottom:6px;
+}
+.w8-screen.w8-approved .w8-approved-title-flourish{
+  left:8%;top:3px;
+}
+.w8-screen.w8-approved .w8-approved-title-flourish .w8-art{
+  width:54px;height:54px;
+}
+.w8-screen.w8-approved .w8-approved-tabs{gap:4px;margin-bottom:4px}
+.w8-screen.w8-approved .w8-approved-tabs button{
+  min-height:43px;font-size:clamp(12px,3.45vw,15px);
+}
+/* Contrast and outer shadows make the three existing mission objectives
+   read as distinct pieces on the tropical stage (not extra missions). */
+.w8-approved-missions .w8-approved-quest{
+  border-color:#ffd38a;
+  background:linear-gradient(110deg,#19516fec,#104065f6 63%,#092942fc);
+  box-shadow:inset 0 2px #eaf9ff80,0 3px #5a351c,0 7px 12px #001528a6;
+}
+.w8-approved-missions .w8-approved-quest-core>strong{
+  font-size:clamp(16px,4.1vw,19px);line-height:1.17;
+}
+.w8-approved-missions .w8-approved-meter{background:#061e36}
+.w8-approved-missions .w8-approved-daily{
+  background:linear-gradient(180deg,#225e7eea,#0b3151f8 45%,#051a33ff);
+}
+.w8-approved-missions .w8-approved-days li{
+  box-shadow:inset 0 2px #ffeab967,0 3px #07172e;
+}
+.w8-approved-missions .w8-approved-chest .w8-art{
+  filter:drop-shadow(0 4px 2px #07182b) drop-shadow(0 0 5px #ffcb7388);
+}
+/* The unoccupied ranking positions have framed pirate silhouettes, not
+   made-up profiles. All text still says explicitly unavailable. */
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+  background:linear-gradient(180deg,#164361fa,#0a2a49ff 68%,#061e36ff);
+}
+.w8-approved-ranking .w8-approved-local-row{
+  background:linear-gradient(90deg,#255e7d,#1b496e 63%,#092942);
+}
+.w8-approved-ranking .w8-approved-empty-rank{
+  grid-template-columns:31px 43px minmax(0,1fr) 16px;
+  min-height:51px;gap:6px;padding:4px 6px;
+}
+.w8-approved-ranking .w8-approved-empty-portrait{
+  display:grid;place-items:center;width:41px;height:42px;
+  border:2px solid #9bb7b9;border-radius:9px;
+  background:radial-gradient(circle at 40% 20%,#476c85,#0a2c49 77%);
+  box-shadow:inset 0 1px #e7dba269,0 2px 3px #061428a3;
+}
+.w8-approved-ranking .w8-approved-empty-portrait svg{
+  width:37px;height:39px;opacity:1;
+}
+.w8-approved-ranking .w8-approved-empty-rank strong{
+  font-size:clamp(11px,3.2vw,14px);line-height:1.12;
+  overflow-wrap:normal;
+}
+.w8-approved-ranking .w8-approved-empty-score{
+  justify-self:end;
+}
+@media(max-width:350px){
+  .w8-screen.w8-approved .w8-approved-scene{height:390px}
+  .w8-screen.w8-approved .w8-approved-scene .w8-seascape{height:335px}
+  .w8-screen.w8-approved .w8-approved-title-flourish .w8-art{width:46px;height:46px}
+  .w8-approved-ranking .w8-approved-empty-rank{
+    grid-template-columns:24px 31px minmax(0,1fr) 10px;
+    min-height:44px;gap:3px;padding:3px;
+  }
+  .w8-approved-ranking .w8-approved-empty-portrait{
+    width:30px;height:32px;border-radius:6px;
+  }
+  .w8-approved-ranking .w8-approved-empty-portrait svg{
+    width:28px;height:30px;
+  }
+  .w8-approved-ranking .w8-approved-empty-rank strong{
+    font-size:10px;line-height:1.15;
+  }
+}
+@media(min-width:420px){
+  .w8-approved-ranking .w8-approved-empty-rank{
+    grid-template-columns:34px 45px minmax(0,1fr) 18px;
+    gap:8px;
+  }
+}
