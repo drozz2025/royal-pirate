@@ -176,15 +176,15 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
     <TabBar value={tab==='fusion'?'upgrade':tab} onSelect={setTab} label="Cartas" tabs={[['collection','A MINHA COLEÇÃO'],['upgrade','EVOLUIR']]}/>
     {tab==='collection'&&<section className="w7-content w7-collection-content" role="tabpanel" aria-label="A minha coleção">
       <div className="w7-collection-status">
-        <strong>GALERIA · 8 ILUSTRAÇÕES APROVADAS</strong>
-        <span>{profile.ownedCrew.length}/{CREW.length} tripulantes reais</span>
+        <strong>CARTAS · 8 CONCEITOS ILUSTRADOS</strong>
+        <span>{profile.ownedCrew.length}/{CREW.length} tripulantes locais</span>
       </div>
       <div className="w7-approved-grid" role="group" aria-label="Oito ilustrações conceptuais aprovadas, ainda sem cartas jogáveis">
         {approvedConcepts.map((concept,slot)=><article key={concept.title} className={'w7-approved-slot w7-approved-slot-'+slot}
           aria-label={concept.title+' — ilustração conceptual aprovada, ainda não jogável'}>
           <ApprovedArtCrop kind="cards" x={concept.x} y={concept.y} cropWidth={73} cropHeight={67}/>
           <strong>{concept.title}</strong>
-          <small>CONCEITO · EM BREVE</small>
+          <small>EM BREVE</small>
         </article>)}
       </div>
       <div className={'w7-spotlight w7-spotlight-'+active.id} aria-live="polite">
@@ -237,7 +237,7 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
       <div className="w7-feature-row"><span>♛</span><strong>Fusões em desenvolvimento</strong><b>EM BREVE</b></div>
       <button type="button" onClick={()=>setTab('collection')}>VOLTAR À COLEÇÃO</button>
     </section>}
-    <div className="w7-foot"><span>{profile.ownedCrew.length} / {CREW.length} CARTAS NO INVENTÁRIO</span><button type="button" onClick={onBattle}>IR À BATALHA</button></div>
+    <div className="w7-foot"><span>{profile.ownedCrew.length} / {CREW.length} TRIPULANTES NO INVENTÁRIO</span><button type="button" onClick={onBattle}>IR À BATALHA</button></div>
   </div>;
 }
 
@@ -255,7 +255,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
       <div className="w7-medal w7-wallet" aria-label={profile.coins+' moedas locais'}><strong>● {profile.coins}</strong><small>MOEDAS</small></div>
     </header>
     <TabBar value={tab} onSelect={setTab} label="Loja" tabs={[['offers','OFERTAS'],['coins','MOEDAS'],['gems','GEMAS'],['special','ESPECIAIS']]}/>
-    {tab==='offers'&&<section className="w7-content" role="tabpanel" aria-label="Ofertas disponíveis">
+    {tab==='offers'&&<section className="w7-content" role="tabpanel" aria-label="Pré-visualização das ofertas">
       <section className="w7-captain-pack" aria-label="Pack do Capitão em desenvolvimento, indisponível">
         <span className="w7-pack-ribbon">EM BREVE</span>
         <div className="w7-captain-pack-art" aria-hidden="true"><ApprovedArtCrop kind="shop" x={23} y={176} cropWidth={149} cropHeight={126}/></div>
@@ -292,7 +292,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
       </div>
       <div className="w7-shop-actions"><button type="button" onClick={onBattle} aria-label="EARN COINS IN BATTLE">GANHAR MOEDAS</button><button type="button" onClick={onCards} aria-label="MANAGE CREW">VER CARTAS</button></div>
       </details>
-      <p className="w7-disclaimer">No real-money checkout is available; secure payments não estão integrados. Baús e packs não têm preços, pagamentos ou entregas. Apenas o recrutamento com moedas locais está funcional; dados saved on this device only.</p>
+      <p className="w7-disclaimer">Não existem compras com dinheiro real nem pagamentos integrados. Baús e packs são apenas ilustrações aprovadas, sem preços nem entregas. Só o recrutamento com moedas do jogo funciona; o progresso fica neste dispositivo.</p>
     </section>}
     {pending&&<section className="w7-content w7-feature w7-pending" role="tabpanel" aria-label={pending.title}>
       <span className="w7-pending-relic"><ShopRelic kind={tab==='coins'?'coins':tab==='gems'?'gems':'special'}/></span>
@@ -305,6 +305,6 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
       <div className="w7-feature-row"><span aria-hidden="true">◇</span><strong>Sem pagamentos ou entregas nesta versão</strong><b>EM BREVE</b></div>
       <button type="button" onClick={()=>setTab('offers')}>VER OFERTAS LOCAIS</button>
     </section>}
-    <div className="w7-foot"><span>COMPRA COM MOEDAS LOCAIS</span><span>SEM PAGAMENTOS REAIS</span></div>
+    <div className="w7-foot"><span>RECRUTAMENTO COM MOEDAS LOCAIS</span><span>SEM COMPRAS REAIS</span></div>
   </div>;
 }
