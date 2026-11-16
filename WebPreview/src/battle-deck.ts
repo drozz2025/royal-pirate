@@ -54,5 +54,8 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     flash.position.set(x,1.85,65.75);flash.visible=false;group.add(flash);flashes.push(flash);
   }
   fire.dispose();
+  // Bring the muzzles into the lower third without hiding the playable ships.
+  // The responsive HUD remains HTML above this real 3D foreground.
+  group.position.z=-8;
   return {group,flashes};
 }
