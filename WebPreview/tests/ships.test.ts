@@ -14,7 +14,11 @@ test('original royal ship contains a real 3D hull, cannons, sails and gilded fig
   try {
     const ship = makeShip(false);
     assert.equal(ship.guns.length, 6);
-    assert.equal(ship.sails.length, 5, 'two main masts and a batched foremast retain five real cloth sails');
+    assert.equal(ship.sails.length, 6, 'two main masts, foremast and triangular jib remain genuine 3D canvas');
+    const jib = ship.sails.find(s => !(s.geometry instanceof T.PlaneGeometry) &&
+      s.geometry.getAttribute('position').count === 4);
+    assert.ok(jib, 'the royal jib uses a billowed, indexed cloth mesh rather than a flat image');
+    assert.equal(jib.geometry.getIndex()?.count, 9, 'jib has three curved triangular facets');
     const upperSails = ship.sails.filter(s => s.geometry instanceof T.PlaneGeometry && s.geometry.parameters.height === 1.55);
     assert.equal(upperSails.length, 2, 'two upper canvas sails remain real curved 3D cloth meshes');
     assert.equal(ship.flags.length, 2);
