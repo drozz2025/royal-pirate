@@ -1745,3 +1745,36 @@
     width:94%;left:-5%;top:auto;bottom:-1%;
   }
 }
+
+
+/* WORK4 / Chromium + WebGL visual QA: eliminate GPU filter surfaces around
+   the actual SVG forge scenery and cannon. In the CI 390x844 screenshot those
+   surfaces left a rectangular hole revealing the underlying harbour canvas.
+   Keep scalable vectors and normal DOM stacking, without screenshots as art. */
+.w4-forge .w4-forge-stage > svg.w4-forge-art,
+.w4-forge .w4-forge-stage > svg.w4-cannon-art,
+.w4-forge .w4-forge-stage > .w4-forge-glow {
+  filter:none!important;
+  backdrop-filter:none!important;
+  transform:none!important;
+  will-change:auto!important;
+}
+.w4-forge .w4-forge-stage > svg.w4-forge-art {z-index:0}
+.w4-forge .w4-forge-stage > svg.w4-cannon-art {
+  position:absolute;
+  z-index:2;
+  left:-4%;
+  top:auto;
+  bottom:0;
+  width:96%;
+  height:auto;
+  max-height:none;
+  overflow:visible;
+}
+.w4-forge .w4-forge-stage > .w4-forge-description {z-index:3}
+@media(max-width:359px){
+  .w4-forge .w4-forge-stage > svg.w4-cannon-art {left:-5%;width:94%;bottom:0}
+}
+@media(min-width:400px) and (max-width:659px){
+  .w4-forge .w4-forge-stage > svg.w4-cannon-art {left:-3%;width:95%;bottom:0}
+}
