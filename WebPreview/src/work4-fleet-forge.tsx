@@ -139,7 +139,7 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
     <g className="w4-ship-premium-surface" pointerEvents="none">
       {/* Three-dimensional-looking hull planking, raised gunwale and gold scrollwork. */}
       <path d="M55 152Q165 169 298 141L278 179Q174 210 91 187L73 173Z"
-        fill="#1f1820" opacity=".34"/>
+        fill="#211b24" opacity=".34"/>
       <path d="M67 158Q173 177 284 152M77 168Q183 190 277 164M84 180Q171 200 268 177"
         stroke="#e6aa61" strokeWidth="2.2" fill="none" opacity=".94"/>
       <path d="M78 174Q171 196 274 170M90 187Q172 207 255 185"
