@@ -700,3 +700,9 @@
   .app-sheet-header.app-approved-hud .app-resource-counters .app-wallet strong{max-width:none;font-size:13px}
   .app-sheet-header.app-approved-hud .app-wallet-gems svg{width:15px;height:15px;flex-basis:15px}
 }
+
+/* Keep semantic resource names for screen readers without adding a second HUD row. */
+.app-sheet-header.app-approved-hud .app-wallet-sr{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
