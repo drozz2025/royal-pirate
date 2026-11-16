@@ -1720,28 +1720,28 @@
 .w4-forge .w4-forge-stage > .w4-forge-glow{z-index:1;pointer-events:none}
 .w4-forge .w4-forge-stage > svg.w4-cannon-art{
   position:absolute;
-  z-index:3;
+  z-index:50;
   display:block;
-  top:7%;
-  bottom:auto;
-  left:-7%;
+  top:auto;
+  bottom:-1%;
+  left:-6%;
   right:auto;
-  width:91%;
+  width:98%;
   height:auto;
   max-height:none;
-  transform:rotate(-3deg);
-  transform-origin:45% 67%;
+  transform:rotate(-2deg) scale(1.02);
+  transform-origin:46% 80%;
   pointer-events:none;
   filter:saturate(1.22) contrast(1.14) drop-shadow(0 12px 8px #0c0d17dc);
 }
-.w4-forge .w4-forge-stage > .w4-forge-description{z-index:4}
+.w4-forge .w4-forge-stage > .w4-forge-description{z-index:51}
 @media(max-width:359px){
   .w4-forge .w4-forge-stage > svg.w4-cannon-art{
-    width:91%;left:-8%;top:3%;transform:rotate(-2deg);
+    width:96%;left:-8%;top:auto;bottom:-1%;transform:rotate(-2deg);
   }
 }
 @media(min-width:400px) and (max-width:659px){
   .w4-forge .w4-forge-stage > svg.w4-cannon-art{
-    width:91%;left:-5%;top:9%;
+    width:94%;left:-5%;top:auto;bottom:-1%;
   }
 }
