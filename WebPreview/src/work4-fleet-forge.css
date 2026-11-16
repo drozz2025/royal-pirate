@@ -1237,3 +1237,16 @@
   width:100%;
   box-sizing:border-box;
 }
+
+/* WORK 4 / #104 — 390×844 screenshot vs. approved frame 03:
+   the Royal Crown's bow and sails were cropped against the left stage edge.
+   Recenter and scale down the OWNED ship illustration only (not a new ship
+   model); the real status and roster remain interactive. */
+@media(max-width:430px){
+  .w4-fleet .w4-harbour-stage>.w4-ship-art{
+    left:-3%;
+    width:84%;
+    bottom:2%;
+    transform:rotate(-1deg);
+  }
+}
