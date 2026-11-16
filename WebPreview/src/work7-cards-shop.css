@@ -2115,3 +2115,126 @@
   .w7-screen[data-work7-screen="shop"] .w7-chest{min-height:145px}
   .w7-screen[data-work7-screen="shop"] .w7-chest-art{min-height:77px}
 }
+
+
+/* WORK 7 / #104 — reference 05/06 proportion pass (16 Nov, 05h).
+   Keep the eight approved images as *non-playable* concepts. This enlarges
+   artwork and gives the shop's pack/three chests the visual prominence of
+   the approved mosaic. Every selector stays inside WORK 7: Porto, global
+   header and bottom navigation are not changed. */
+.w7-screen[data-work7-screen="cards"],
+.w7-screen[data-work7-screen="shop"]{
+  background:
+    radial-gradient(ellipse 75% 23% at 50% 0%,#60b2d7a8 0%,#2576a97a 55%,transparent 100%),
+    linear-gradient(180deg,#145d8e 0%,#10446f 25%,#092744 58%,#06172f 100%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status{
+  min-height:38px;
+  padding:5px 10px;
+  border-color:#dfb77b;
+  background:linear-gradient(180deg,#224463,#0d2944);
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status strong{
+  color:#fff0c8;font-size:clamp(14px,3.7vw,17px);
+  letter-spacing:.35px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status span{
+  color:#f4d29a;font:800 clamp(8px,2.25vw,11px)/1.15 'Barlow',sans-serif;
+  white-space:normal;max-width:45%;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+  column-gap:6px;row-gap:8px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+  min-height:clamp(112px,14.5dvh,124px);
+  border-bottom-width:5px;
+  box-shadow:inset 0 2px #fff4cb66,0 4px 0 #041026,0 7px 11px #0006;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+  min-height:25px;
+  font-size:clamp(10px,2.7vw,13px);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  margin-top:auto;
+  min-height:18px;
+  font-size:clamp(8px,2.1vw,10px);
+  letter-spacing:.1px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight{
+  margin-top:7px;
+  background:linear-gradient(125deg,#2d6f95,#143f6a 47%,#0b2a50);
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-portrait{
+  background:radial-gradient(circle at 50% 35%,#5793a2,#152b4b 75%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details>summary{
+  min-height:41px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+  min-height:205px;
+  padding:12px 11px;
+  grid-template-columns:minmax(126px,48%) minmax(0,1fr);
+  border-color:#f4ce86;
+  background:radial-gradient(ellipse 76% 90% at 26% 43%,#bf649b9c,transparent 82%),
+    linear-gradient(115deg,#62206c,#29164e 65%,#111a41);
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+  height:174px;
+  display:grid;place-items:center;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+  width:min(100%,168px);
+  filter:drop-shadow(0 7px 5px #12062e9c);
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{
+  gap:8px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info h3{
+  font-size:clamp(23px,6.5vw,32px);
+  line-height:1;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+  min-height:30px;
+  margin-top:7px;
+  padding:3px 2px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading strong{
+  font-size:clamp(15px,4vw,20px);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+  gap:7px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest{
+  min-height:177px;
+  padding:8px 4px 9px;
+  border-bottom-width:5px;
+  box-shadow:inset 0 2px #fff3bd66,0 4px 0 #08132d;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  min-height:101px;
+  display:grid;place-items:center;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  width:min(100%,116px);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  font-size:clamp(10px,2.9vw,13px);
+  min-height:30px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-disclaimer{
+  max-width:100%;
+  font-size:11px;line-height:1.45;color:#c9deeb;
+}
+@media(max-width:354px),(max-height:640px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{gap:3px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{min-height:103px;padding:2px 1px 3px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{font-size:9px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{font-size:7px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    min-height:159px;grid-template-columns:41% minmax(0,1fr);padding:7px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{height:132px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest{min-height:145px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{min-height:77px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{font-size:9px}
+}
