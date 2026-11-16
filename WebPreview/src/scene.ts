@@ -40,8 +40,23 @@ export class OceanScene {
     const sun=new T.DirectionalLight('#ffe3af',3.6);sun.position.set(-24,40,15);this.scene.add(sun);
     const rim=new T.DirectionalLight('#97deff',1.4);rim.position.set(16,12,-18);this.scene.add(rim);
     this.water=new T.ShaderMaterial({uniforms:{time:{value:0},sun:{value:new T.Vector3(-24,40,15).normalize()},battleMode:{value:1}},vertexShader:`
-      uniform float time; varying vec3 vWorld; varying vec3 vNormal; varying float vWave;
-      float wave(vec2 p){return sin(p.x*.47+time*1.15)*.12+sin(p.y*.68-time*1.3)*.08+sin((p.x+p.y)*1.3-time*1.7)*.035;}
+      uniform float time; uniform float battleMode;
+      varying vec3 vWorld; varying vec3 vNormal; varying float vWave;
+      float wave(vec2 p){
+        // Porto keeps its ORIGINAL calmer animated water, pixel-for-pixel in
+        // the vertex stage. The stronger, layered rolling seas are Batalha-only.
+        float harbour=sin(p.x*.47+time*1.15)*.12+
+          sin(p.y*.68-time*1.3)*.08+
+          sin((p.x+p.y)*1.3-time*1.7)*.035;
+        if(battleMode<.5)return harbour;
+        // Three crossing wavelengths build actual 3D illustrated swells;
+        // only visual vertices move, never the physical ship/shot coordinates.
+        float rolling=sin(p.y*.275-time*.76+
+          sin(p.x*.145+time*.20)*1.14)*.295;
+        float crossSea=sin(p.x*.47+p.y*.29+time*.96)*.185;
+        float chop=sin(p.y*1.12-p.x*.32-time*1.74)*.060;
+        return rolling+crossSea+chop;
+      }
       void main(){vec3 p=position;p.z=wave(p.xy);float dx=(wave(p.xy+vec2(.05,0.))-p.z)/.05;float dy=(wave(p.xy+vec2(0.,.05))-p.z)/.05;vNormal=normalize(mat3(modelMatrix)*vec3(-dx,-dy,1.));vec4 world=modelMatrix*vec4(p,1.);vWorld=world.xyz;vWave=p.z;gl_Position=projectionMatrix*viewMatrix*world;}
     `,fragmentShader:`
       uniform float time;uniform vec3 sun;uniform float battleMode;
@@ -80,23 +95,45 @@ export class OceanScene {
             sin(vWorld.x*2.5+vWorld.z*1.25-time*2.3))*breaker;
           float foam=clamp(ridge*.27+whiteCap*.56+
             breaker*.37+crestShine*.29,0.,1.)*(.73+.27*proximity);
+          // Long broken painterly crests, not a periodic checkerboard. A
+          // warped, almost continuous ridge is interrupted by irregular
+          // transverse currents like the approved illustrated battle sea.
+          float paintedSwell=sin(vWorld.z*.72-time*.88+
+            sin(vWorld.x*.33+time*.17)*1.58+
+            sin(vWorld.x*.81-vWorld.z*.16)*.24);
+          float brokenEdges=.55+.45*sin(vWorld.x*1.31+
+            sin(vWorld.z*.27+time*.33)*1.41);
+          float foamyLip=smoothstep(.67,.94,paintedSwell)*
+            smoothstep(-.30,.57,brokenEdges);
+          float stipple=smoothstep(.32,.94,
+            sin(vWorld.x*3.73+vWorld.z*1.26-time*2.46))*
+            foamyLip;
+          foam=max(foam,clamp(foamyLip*.73+stipple*.27,0.,.86));
+          float shadowLip=(smoothstep(.16,.60,paintedSwell)-
+            smoothstep(.70,.96,paintedSwell))*.18;
           // Animated surf around the actual battle hull locations. These white
           // wakes live in the water shader, not in an image over the controls.
           vec2 playerShip=vec2(-10.,3.);
           vec2 enemyShip=vec2(10.,-3.);
           float a=length((vWorld.xz-playerShip)/vec2(3.2,6.8));
-          float b=length((vWorld.xz-enemyShip)/vec2(3.2,6.8));
-          float hullSurf=max(exp(-pow((a-.88)*5.2,2.)),exp(-pow((b-.88)*5.2,2.)));
+          // Batalha renders its red opponent at 1.82/1.88 visual scale; size the
+          // drawn surf to the DISPLAYED hull, not the smaller physics footprint.
+          float b=length((vWorld.xz-enemyShip)/vec2(4.8,10.2));
+          float hullSurf=max(exp(-pow((a-.88)*5.2,2.)),
+            exp(-pow((b-.89)*6.3,2.)));
           float streamA=exp(-pow((vWorld.x+10.)/4.7,2.))
             *smoothstep(1.5,6.5,3.-vWorld.z)*(1.-smoothstep(12.,38.,3.-vWorld.z));
           float streamB=exp(-pow((vWorld.x-10.)/4.7,2.))
             *smoothstep(1.5,6.5,-3.-vWorld.z)*(1.-smoothstep(12.,38.,-3.-vWorld.z));
           float streamRipples=.54+.46*sin(vWorld.z*2.5-time*3.4+sin(vWorld.x*.92));
           foam=max(foam,clamp(hullSurf*.68+(streamA+streamB)*streamRipples*.33,0.,.83));
-          vec3 deep=mix(vec3(.012,.19,.37),vec3(.014,.49,.69),
-                        clamp(.48+vWave*1.7+swell*.25+cross*.08,0.,1.));
-          deep=mix(deep,vec3(.27,.72,.83),fres*.34);
-          col=mix(deep,vec3(.82,.96,.97),foam);
+          // Indigo troughs and turquoise crests: tonal VOLUME, not just an
+          // overlaid blue tint. Wave shadows follow the painted wave ridge.
+          vec3 deep=mix(vec3(.006,.10,.29),vec3(.017,.49,.70),
+                        clamp(.49+vWave*1.38+swell*.23+cross*.09,0.,1.));
+          deep*=1.-shadowLip;
+          deep=mix(deep,vec3(.24,.75,.84),fres*.42);
+          col=mix(deep,vec3(.88,.97,.97),foam);
           col+=vec3(.89,.96,.82)*spec*.4;
           col=mix(col,vec3(.30,.66,.84),fog*.42);
         }
