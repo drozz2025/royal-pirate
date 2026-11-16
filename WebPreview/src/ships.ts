@@ -210,6 +210,25 @@ export function makeShip(red = false): ShipArt {
     const rim=new T.Mesh(new T.TorusGeometry(.21,.05,6,12),gold);rim.rotation.y=Math.PI/2;rim.position.x=side*.98;gun.add(rim);
     const bore=new T.Mesh(new T.CircleGeometry(.18,12),black);bore.rotation.y=side*Math.PI/2;bore.position.x=side*1.035;gun.add(bore);
   }
+  // The enemy's gilded gunport surrounds and high stern rails add visible
+  // broadside depth at phone resolution. All are batched with existing hull
+  // materials; no new objects intercept cannon hit positions.
+  if(red){
+    for(const side of [-1,1]){
+      for(const z of [-2.7,-.9,.9,2.65]){
+        const halfWidth=z>2?1.38:z< -2.4?1.48:1.76;
+        put(cube,gold,side*(halfWidth+.035),1.48,z,.075,.76,.88);
+        put(cube,black,side*(halfWidth+.095),1.49,z,.06,.48,.59);
+        put(sphere,gold,side*(halfWidth+.12),1.91,z,.11,.10,.12);
+      }
+      // Tall carved stern rail and gold brackets, visible on the red vessel.
+      for(const x of [-.90,-.45,0,.45,.90]){
+        put(cube,gold,x,3.85,-4.34,.07,.43,.10);
+      }
+      beam(new T.Vector3(-1.32,4.10,-4.35),
+        new T.Vector3(1.32,4.10,-4.35),.062,gold);
+    }
+  }
   // Royal galleon detailing is real 3D geometry, merged by material with the
   // existing hull. The enemy remains lightweight and visually distinct.
   if(!red){
@@ -344,6 +363,34 @@ export function makeShip(red = false): ShipArt {
     for(const side of [-1,1]){
       beam(new T.Vector3(side*1.4,2.65,3.15),new T.Vector3(0,6.7,3.45),.018,rope);
       beam(new T.Vector3(side*1.35,6.0,3.45),new T.Vector3(side*1.6,2.65,4.2),.018,rope);
+    }
+  }
+  // Additional red foremast and curved, tapered cloth: the opponent reads
+  // as a multi-masted galleon in the battle-only red vessel, not a tiny box
+  // with two flat rectangular flags. The playable hull/physics are unchanged.
+  if(red){
+    put(cylinder,honey,0,4.48,3.42,.10,4.75,.10);
+    put(cylinder,darkWood,0,6.54,3.42,.070,3.15,.070,new T.Euler(0,0,Math.PI/2));
+    const redForeGeometry=new T.PlaneGeometry(2.95,2.48,8,7);
+    const verts=redForeGeometry.attributes.position;
+    for(let i=0;i<verts.count;i++){
+      const u=verts.getX(i)/2.95+.5;
+      const v=verts.getY(i)/2.48+.5;
+      // The loose foot and rounded belly expand the visible red silhouette.
+      verts.setX(i,verts.getX(i)*(.79+.17*Math.sin(v*Math.PI)+.04*v));
+      verts.setZ(i,.09+.26*Math.sin(u*Math.PI)
+        +.36*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)
+        +.045*Math.sin(u*5*Math.PI)*Math.sin(v*Math.PI));
+    }
+    redForeGeometry.computeVertexNormals();
+    const redForesail=new T.Mesh(redForeGeometry,topsailMat);
+    redForesail.name='enemy-billowed-foresail';
+    redForesail.position.set(0,5.45,3.42);
+    rig.add(redForesail);sails.push(redForesail);
+    // The fore-and-aft stays shape the sail but never create a new collider.
+    for(const side of [-1,1]){
+      beam(new T.Vector3(side*1.18,6.70,3.48),
+        new T.Vector3(side*1.38,2.68,4.65),.019,rope);
     }
   }
   // Warm lanterns at bow and stern, an original anchor-shaped bow ornament.
