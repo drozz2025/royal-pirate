@@ -49,11 +49,11 @@ test('WORK6 #104: exactly the existing two first-person cannons remain',()=>{
     'battle deck cannot leak into approved Porto');
 });
 
-test('WORK6 #104: native short-phone battle controls float on real deck, with Porto selectors untouched',()=>{
+test('WORK6 #104: native 384px battle controls float on real deck, keeping 320px controls and Porto untouched',()=>{
   const css=readFileSync(new URL('../src/battle-approved.css',import.meta.url),'utf8');
   const compact=css.split('/* WORK6 #104 — ORIGINAL 384x512')[1]??'';
-  assert.ok(compact,'short reference layout is explicitly scoped');
-  assert.match(compact,/@media \(max-height:650px\)/);
+  assert.ok(compact,'native reference layout is explicitly scoped');
+  assert.match(compact,/@media \(min-width:360px\) and \(max-height:650px\)/);
   assert.match(compact,/\.in-battle \.command-deck\{[\s\S]*height:180px/);
   assert.match(compact,/\.in-battle \.command-deck \.sliders\{[\s\S]*gap:clamp\(108px,30vw,130px\)/);
   assert.match(compact,/\.in-battle \.command-deck \.fire-button\{/);
