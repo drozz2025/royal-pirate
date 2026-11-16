@@ -673,6 +673,9 @@ function ForgeBackdrop(){
   <path d="M24 142Q37 50 107 54Q159 54 168 138V271H24Z" fill="#2c2929" stroke="#b07d48" strokeWidth="9"/>
   <path d="M40 151Q51 85 103 85Q142 84 151 150V257H40Z" fill="#412b2b" stroke="#17151f" strokeWidth="9"/>
   <ellipse cx="104" cy="213" rx="68" ry="80" fill="url(#w4-fireglow)" opacity=".92"/>
+  {/* Lift the one EXISTING flame into the visible arch opening. At 320px
+      the barrel previously covered its centre; no additional furnace. */}
+  <g className="w4-forge-flame-visible" transform="translate(22 -38)">
   <path d="M77 254Q62 228 87 197Q81 222 103 216Q96 185 119 163Q110 202 137 218Q146 239 129 259Z" fill="#ffbe4a" stroke="#ffed93" strokeWidth="3"/>
    <path d="M90 252Q80 234 96 220Q91 237 108 233Q101 209 121 197Q113 225 129 238L122 258Z" fill="#ffe6a1" opacity=".94"/>
    <path d="M102 252Q96 238 108 232Q105 243 114 244L118 257Z" fill="#fff9d2" opacity=".92"/>
@@ -698,6 +701,7 @@ function ForgeBackdrop(){
        <circle cx="116" cy="181" r="2.7"/><circle cx="141" cy="205" r="2"/>
      </g>
    </g>
+  </g>
    <path d="M0 264L420 248V305H0Z" fill="#413327" stroke="#b88f53" strokeWidth="7"/>
   <path d="M0 278L420 265M56 266L55 302M175 265L182 301M312 261L332 303" stroke="#9d7a4c" strokeWidth="3" opacity=".6"/>
   <g stroke="#cc9d5b" fill="none" strokeWidth="5"><circle cx="28" cy="232" r="27"/><path d="M28 205v54M1 232h54m-45-19 36 37m0-37-36 37"/></g>
