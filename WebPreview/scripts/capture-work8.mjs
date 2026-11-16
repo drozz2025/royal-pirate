@@ -69,22 +69,24 @@ try {
   };
   const report=[];
   const originalFiles={missions:'07-missoes.webp',ranking:'08-ranking-perfil.webp'};
-  const comparison=async(screen,screenshot)=>{
+  const comparison=async(screen,screenshot,vp)=>{
     const original=await readFile(new URL('../../assets/design-approved/'+originalFiles[screen],import.meta.url));
     const referenceUrl='data:image/webp;base64,'+original.toString('base64');
     const actualUrl='data:image/png;base64,'+screenshot;
     const screenshotCompare=await evaluate('(async()=>{'+
       'const load=src=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=src});'+
       'const [original,actual]=await Promise.all([load('+JSON.stringify(referenceUrl)+'),load('+JSON.stringify(actualUrl)+')]);'+
-      'const w=390,h=844,canvas=document.createElement("canvas");canvas.width=3*w;canvas.height=h;'+
+      'const w='+vp.width+',h='+vp.height+',canvas=document.createElement("canvas");canvas.width=3*w;canvas.height=h;'+
       'const ctx=canvas.getContext("2d");ctx.fillStyle="#081c34";ctx.fillRect(0,0,3*w,h);'+
       'const contained=(i,col)=>{const scale=Math.min(w/i.width,h/i.height);const x=col*w+(w-i.width*scale)/2,y=(h-i.height*scale)/2;ctx.drawImage(i,x,y,i.width*scale,i.height*scale)};'+
       'contained(original,0);contained(actual,1);contained(original,2);ctx.globalAlpha=.5;contained(actual,2);'+
       'return {data:canvas.toDataURL("image/png").split(",")[1],sourceSize:[original.width,original.height],actualSize:[actual.width,actual.height]}})()');
-    await writeFile(join(out,'compare-'+screen+'-390x844.png'),Buffer.from(screenshotCompare.data,'base64'));
-    return {referenceSize:screenshotCompare.sourceSize,renderSize:screenshotCompare.actualSize};
+    if(vp.width===384 && (screenshotCompare.sourceSize[0]!==384 || screenshotCompare.sourceSize[1]!==512 || screenshotCompare.actualSize[0]!==384 || screenshotCompare.actualSize[1]!==512)) throw Error('Native 384x512 comparison cannot be scaled');
+    const comparisonFile=(vp.width===384?'compare-exact-':'compare-')+screen+'-'+vp.width+'x'+vp.height+'.png';
+    await writeFile(join(out,comparisonFile),Buffer.from(screenshotCompare.data,'base64'));
+    return {referenceSize:screenshotCompare.sourceSize,renderSize:screenshotCompare.actualSize,comparisonFile,method:vp.width===384?'unscaled original | unscaled Chromium | overlay':'contained reference | Chromium | overlay'};
   };
-  for(const vp of [{width:320,height:568},{width:390,height:844},{width:430,height:932}]){
+  for(const vp of [{width:320,height:568},{width:384,height:512},{width:390,height:844},{width:430,height:932}]){
     await command('Emulation.setDeviceMetricsOverride',{...vp,mobile:true,deviceScaleFactor:1,screenWidth:vp.width,screenHeight:vp.height});
     for(const screen of ['missions','ranking']){
       await command('Page.navigate',{url:origin});
@@ -115,7 +117,7 @@ try {
       const file=screen+'-mobile-'+vp.width+'x'+vp.height+'.png';
       const shot=await capture(file);
       const detail={screen,viewport:vp,file,fits,structure,layout};
-      if(vp.width===390)Object.assign(detail,await comparison(screen,shot));
+      if(vp.width===390 || (vp.width===384&&vp.height===512))Object.assign(detail,await comparison(screen,shot,vp));
       report.push(detail);
       if(!fits||!structure)throw Error(screen+' responsive gate failed: '+JSON.stringify(detail));
     }
@@ -124,7 +126,7 @@ try {
     scope:'WORK8 approved 07/08; real responsive screenshots and visual comparisons; human approval still required',
     viewportChecks:report,approved:false
   },null,2));
-  console.log('WORK8: 6 mobile captures and 2 reference comparisons passed structural/overflow gates.');
+  console.log('WORK8: 8 screenshots, exact 384x512 references, full nav and visible page checks passed.');
 } finally {
   if(ws){try{ws.close()}catch{}}
   chrome.kill('SIGTERM');

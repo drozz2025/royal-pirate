@@ -45,7 +45,7 @@ jobs:
             sleep 0.25
           done
           CHROME_BIN="$(command -v google-chrome || command -v chromium)" node scripts/capture-work8.mjs
-      - name: Upload real screenshots + comparisons at 320, 390, 430
+      - name: Upload real screenshots + comparisons at 320, 384, 390, 430
         if: always()
         uses: actions/upload-artifact@v4
         with:
