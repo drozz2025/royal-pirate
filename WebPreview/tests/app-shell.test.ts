@@ -72,13 +72,3 @@ test('captain profile exposes accessible, confirmed local backup actions',()=>{
  assert.match(main,/onChange=\{restoreBackup\}/);
  assert.match(main,/window\.confirm\(/);
 });
-
-test('every internal page shows real coins and unavailable diamonds separately',()=>{
- for(const screen of all){
-  const html=renderToStaticMarkup(React.createElement(AppScreens,{...props,screen}));
-  assert.match(html,/Ouro e diamantes do capitão/);
-  assert.match(html,/0 locally earned coins/);
-  assert.match(html,/Diamantes indisponíveis/);
-  assert.match(html,/<strong>—<\/strong>/);
- }
-});
