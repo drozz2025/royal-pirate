@@ -4,6 +4,8 @@ on:
     branches: [work6/web-3d-preview]
     paths:
       - 'WebPreview/src/scene.ts'
+      - 'WebPreview/src/battle-atmosphere.ts'
+      - 'WebPreview/tests/battle-atmosphere.test.ts'
       - 'WebPreview/src/ships.ts'
       - 'WebPreview/tests/battle-enemy-presentation.test.ts'
       - 'WebPreview/src/battle-foreground-sail.ts'
