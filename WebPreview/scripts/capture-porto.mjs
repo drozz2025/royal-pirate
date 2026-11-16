@@ -235,6 +235,10 @@ try {
   // These new real Chromium screenshots use the SAME 384x512 viewport as
   // the reference, without scaling either image. Never auto-approve artwork.
   report.nativeReferenceComparisons=[];
+  // #104: the five real dock buttons must remain visible, unobstructed and
+  // geometrically identical on every approved 384x512 screen (except battle).
+  report.nativeNavigation=[];
+  let nativePortoDock=null;
   const nativeViewport={width:384,height:512};
   await command('Emulation.setDeviceMetricsOverride',{
     width:nativeViewport.width,height:nativeViewport.height,
@@ -273,6 +277,25 @@ try {
     if(geometry.width!==384||geometry.height!==512||geometry.documentWidth>386||geometry.error)
       throw new Error('Native viewport failed on '+key+': '+JSON.stringify(geometry));
     if(key!=='battle'&&!geometry.hasNav)throw new Error('Native nav missing on '+key);
+    if(key!=='battle'){
+      const dock=await evaluate("(()=>{"+
+        "const nav=document.querySelector('.app-sheet > .harbour-nav')||document.querySelector('.harbour-screen .harbour-nav');"+
+        "if(!nav)return null;"+
+        "const box=el=>{const r=el.getBoundingClientRect();return {left:Math.round(r.left),top:Math.round(r.top),right:Math.round(r.right),bottom:Math.round(r.bottom),width:Math.round(r.width),height:Math.round(r.height)}};"+
+        "const tabs=[...nav.querySelectorAll('.harbour-nav-item')];"+
+        "return {rect:box(nav),labels:tabs.map(t=>t.textContent?.trim().replace(/\\s+/g,' ')),tabs:tabs.map(t=>{const b=box(t);const hit=document.elementFromPoint((b.left+b.right)/2,(b.top+b.bottom)/2);return {...b,hittable:hit===t||!!hit&&t.contains(hit)}})}"+
+        "})()");
+      const rect=dock?.rect;
+      const fits=!!dock&&dock.tabs.length===5&&
+        rect.left>=-2&&rect.right<=386&&rect.top>=0&&Math.abs(rect.bottom-512)<=2&&
+        dock.tabs.every(t=>t.left>=-2&&t.right<=386&&t.top>=0&&t.bottom<=512&&t.width>=35&&t.height>=35&&t.hittable);
+      const matchesPorto=!nativePortoDock||
+        ['left','right','top','bottom','width','height'].every(k=>Math.abs(rect[k]-nativePortoDock.rect[k])<=2)&&
+        dock.labels.join('|')===nativePortoDock.labels.join('|');
+      report.nativeNavigation.push({screen:key,...dock,fits,matchesPorto});
+      if(!fits||!matchesPorto)throw new Error('Approved 384x512 five-tab dock clipped/covered/inconsistent on '+key+': '+JSON.stringify(dock));
+      if(key==='porto')nativePortoDock=dock;
+    }
     const nativeShot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
     await writeFile(join(out,key+'-mobile-384x512.png'),Buffer.from(nativeShot.data,'base64'));
     const nativeRef=await readFile(new URL('../../assets/design-approved/'+referenceFiles[key],import.meta.url));
