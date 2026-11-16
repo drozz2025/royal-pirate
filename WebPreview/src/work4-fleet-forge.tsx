@@ -267,6 +267,23 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
         <circle cx="282" cy="215" r="2.5"/><circle cx="299" cy="207" r="1.8"/>
       </g>
     </g>
+    {/* Painted raised bow and deep keel of Royal Crown, original SVG only. */}
+    {!small&&<g className="w4-pictorial-bow" pointerEvents="none">
+      <path d="M270 173Q294 169 308 153Q321 148 329 157Q319 173 306 177L290 183Z"
+        fill="#2b1a1d" stroke="#a56a38" strokeWidth="3"/>
+      <path d="M276 173Q305 157 313 150Q330 146 336 157Q322 165 316 170Q313 186 300 182"
+        fill="none" stroke="#ffd27b" strokeWidth="5" strokeLinecap="round"/>
+      <path d="M313 155q11-11 16-1t-11 13q-8 9-3 16m-4-11q-16 17-28 6"
+        fill="none" stroke="#b57334" strokeWidth="3" strokeLinecap="round"/>
+      <path d="M295 159q-9-16-20-18m32 9q-3-15-14-16"
+        fill="none" stroke="#fff0bb" strokeWidth="2.2"/>
+      <path d="M92 191Q155 217 266 193L251 207Q159 233 109 205Z"
+        fill="#0f1420" opacity=".72" stroke="#d99e59" strokeWidth="2"/>
+      <path d="M103 201Q173 227 248 205M98 194Q167 218 261 197"
+        fill="none" stroke="#ffd28d" strokeWidth="1.8" opacity=".84"/>
+      <g fill="#ffcf77"><circle cx="294" cy="166" r="2.5"/>
+        <circle cx="302" cy="157" r="2"/><circle cx="314" cy="159" r="2"/></g>
+    </g>
     {/* WORK4 / screen 03: original hand-drawn wood, rigging and sail relief.
         Only vector pigment and linework: ownership, ship statistics and hit
         targets stay unchanged. The approved reference is NOT rendered as art. */}
@@ -418,6 +435,17 @@ function TropicalBackdrop(){
    <linearGradient id="w4-palm" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#e7ae62"/><stop offset=".55" stopColor="#734127"/><stop offset="1" stopColor="#412923"/></linearGradient>
   </defs>
   <g fill="#dcf7fc" opacity=".6"><ellipse cx="109" cy="52" rx="49" ry="11"/><ellipse cx="139" cy="58" rx="62" ry="10"/><ellipse cx="318" cy="70" rx="54" ry="13"/></g>
+  {/* Tropical horizon in several depth planes, behind the main live ship. */}
+  <g className="w4-tropical-distance" pointerEvents="none">
+    <path d="M125 188Q150 164 175 175Q196 157 215 172Q236 153 257 177
+      Q288 168 318 191L358 208L125 220Z" fill="#174657" opacity=".7"/>
+    <path d="M120 193Q155 169 181 183Q203 165 222 179Q253 164 274 191
+      Q295 184 343 207L121 211Z" fill="#488e65" opacity=".86"/>
+    <path d="M134 196q25-20 46-4m20-5q27-17 47-1m13 9q26-10 47 3"
+      fill="none" stroke="#a0cf89" strokeWidth="3" opacity=".68"/>
+    <path d="M128 210Q233 198 346 208" stroke="#c3ffff" strokeWidth="3"
+      fill="none" opacity=".55"/>
+  </g>
   <path d="M0 199Q26 178 40 182T91 190Q118 205 123 217L0 246Z" fill="url(#w4-cliff)" stroke="#c9b18a" strokeWidth="4"/>
   <path d="M355 195Q382 173 419 185L422 250 346 240Z" fill="url(#w4-cliff)"/>
   <path d="M-18 234Q28 217 66 238T109 269H-10Z" fill="#af9f78" opacity=".84"/>
@@ -428,6 +456,22 @@ function TropicalBackdrop(){
   <g stroke="#254b30" strokeWidth="2" fill="#317f43">
    <path d="M59 44Q21 12 -9 27Q27 27 59 50Q21 41 0 83Q38 61 62 51Q63 10 95 0Q76 34 60 50Q107 4 144 33Q96 31 61 53Q102 42 127 79Q86 62 61 56Q77 82 74 124Q48 86 57 55Z"/>
    <path d="M341 65Q297 35 270 55Q308 53 342 72Q304 73 289 110Q323 84 346 73Q339 35 364 21Q361 52 344 72Q381 27 420 39Q385 48 345 74Q401 66 426 108Q387 87 341 77Q360 111 355 145Q327 103 341 75Z"/>
+  </g>
+  {/* The approved shore is a lush rocky cove rather than bare sand. */}
+  <g className="w4-tropical-shore" pointerEvents="none">
+    <path d="M0 250L21 217 34 226 47 205 60 231 73 232 90 265 0 285Z"
+      fill="#67513a" stroke="#c8a277" strokeWidth="2.8"/>
+    <path d="M0 263L27 240 52 254 67 244 90 271L0 285Z"
+      fill="#324539" opacity=".87"/>
+    <path d="M0 277q31-13 63-2t57 1M295 272q41-8 76-1t49-1"
+      fill="none" stroke="#dbffff" strokeWidth="4" opacity=".68"/>
+    <g fill="#548b51" stroke="#306340" strokeWidth="1.4">
+      <path d="M32 234q-8-25-31-21 18 10 30 28Z"/>
+      <path d="M34 234q-2-31 14-42-4 28-13 48Z"/>
+      <path d="M37 235q11-22 35-20-20 14-32 24Z"/>
+    </g>
+    <path d="M8 229q18-14 29-1m5-13q8-8 17 2" fill="none"
+      stroke="#ead3a7" strokeWidth="2.7"/>
   </g>
   <g fill="#f4e5ae" opacity=".5"><path d="M0 274q35-7 65 2t56 0q35-10 66-3t60 0q31-8 68-2t99-1" stroke="#d6ffff" strokeWidth="3" fill="none"/></g>
   <g stroke="#9ff5fa" opacity=".65" fill="none" strokeLinecap="round"><path d="M0 289q30-9 59 0t64 0q30-11 60 0t61 0q34-9 64-1t110 0" strokeWidth="4"/><path d="M55 256q16-7 38-2m221 4q21-8 47-1" strokeWidth="3"/></g>
@@ -565,6 +609,31 @@ function ForgeBackdrop(){
       <path d="M16 224q13-6 22 0m313 20q31-8 53-2"
         fill="none" stroke="#3a2525" strokeWidth="5" opacity=".78"/>
     </g>
+   {/* Brick-lined hearth and warm refractions across the stone arch.
+       All decorative geometry remains behind the real selectable controls. */}
+   <g className="w4-foundry-pictorial-light" pointerEvents="none">
+     <path d="M49 251V149Q59 83 108 80Q151 82 162 150V256Z"
+       fill="#1d181b" opacity=".38"/>
+     <path d="M55 248V158Q67 102 108 101Q148 105 152 158V249Z"
+       fill="#c44d28" opacity=".28"/>
+     <path d="M61 245q7-43 30-44 2-18 16-19 0 34 21 34 8-22 13-29 13 41 1 58Z"
+       fill="#fc7b31" opacity=".64"/>
+     <path d="M72 245q4-25 17-34-2 24 17 25 8-29 17-38-5 30 10 44Z"
+       fill="#ffda7c" opacity=".78"/>
+     <path d="M45 148Q57 71 108 72Q169 76 177 150"
+       fill="none" stroke="#3f2925" strokeWidth="16"/>
+     <path d="M47 148Q59 73 109 74Q162 76 174 150"
+       fill="none" stroke="#ffd09a" strokeWidth="4.3"/>
+     <path d="M50 143l18 9m-6-48 18 14m18-41 7 21m26-14-10 19m29 5-17 11"
+       fill="none" stroke="#fff0bd" strokeWidth="2.7" opacity=".75"/>
+     <path d="M36 158h30m-30 22h25m-25 24h21m90-46h29m-30 23h29m-29 23h30"
+       fill="none" stroke="#f1b377" strokeWidth="3" opacity=".66"/>
+     <path d="M0 257Q195 229 420 246M0 279Q194 253 420 264"
+       fill="none" stroke="#ffc785" strokeWidth="2.7" opacity=".53"/>
+     <g fill="#fff0b3" opacity=".86"><circle cx="82" cy="172" r="2"/>
+       <circle cx="101" cy="159" r="1.9"/><circle cx="134" cy="174" r="2.4"/>
+       <circle cx="118" cy="199" r="1.7"/><circle cx="150" cy="207" r="2.4"/></g>
+   </g>
  </svg>;
 }
 
@@ -623,6 +692,21 @@ function ForgeCannonArtwork(){
       </g>
     </g>
 
+    {/* Bronze and iron bevels catch the furnace, with no invented upgrade. */}
+    <g className="w4-cannon-pictorial-metal" pointerEvents="none">
+      <path d="M111 144L282 101 313 151 145 193Z"
+        fill="#172738" fillOpacity=".2" stroke="#e3c7a1" strokeWidth="2"/>
+      <path d="M126 144L279 108M144 183L305 148" fill="none"
+        stroke="#f6e6c0" strokeWidth="2.2" opacity=".72"/>
+      <path d="M139 152L273 119M158 176L302 142" fill="none"
+        stroke="#273b47" strokeWidth="4.3" opacity=".85"/>
+      <path d="M190 125l16 51m54-66 13 54" fill="none"
+        stroke="#ffd28b" strokeWidth="7" opacity=".47"/>
+      <path d="M86 229L280 184 347 211 161 261"
+        fill="none" stroke="#f5c27b" strokeWidth="2.5" opacity=".87"/>
+      <path d="M48 165q-11 20-3 42M59 153q-15 33-2 64"
+        fill="none" stroke="#f9e8b2" strokeWidth="2.4" opacity=".83"/>
+    </g>
     {/* WORK4/04: cooler cast-iron barrel, warm foundry highlights and the
         heavy timber/carriage read in perspective; all artwork, no new stats. */}
     <g className="w4-cannon-cast-depth" pointerEvents="none">
