@@ -3192,7 +3192,14 @@
  * approved:false — human review of exact reference | render | overlay.
  */
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-  --w7-inlay:#ffe6ad;
+  --w7-inlay:#e7aeff;
+  --w7-enamel:#813cb2;
+  --w7-shadow:#371a5e;
+  border-color:var(--w7-inlay);
+  border-bottom-color:var(--w7-enamel);
+  background:
+    radial-gradient(ellipse at 50% 26%,color-mix(in srgb,var(--w7-inlay) 26%,transparent),transparent 78%),
+    linear-gradient(160deg,var(--w7-enamel),var(--w7-shadow) 70%,#0a1a38);
   box-shadow:
     inset 0 1px #fff7ce,
     inset 0 0 0 1px #fbe0a1b3,
@@ -3201,9 +3208,18 @@
     0 4px 0 #07162b,
     0 8px 11px #020d249c;
 }
-.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+2){--w7-inlay:#b5ecff}
-.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+3){--w7-inlay:#bfffd8}
-.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+4){--w7-inlay:#e6c5ff}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2),
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){--w7-inlay:#b8eaff;--w7-enamel:#2979bd;--w7-shadow:#112e75}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){--w7-inlay:#c5ffda;--w7-enamel:#2ba76c;--w7-shadow:#164c4a}
+/* All other concept frames retain the purple enamel visible in approved 05.
+   These accents are purely illustrative, NOT rarity/game-state claims. */
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  border-color:#fff0c3;
+  background:linear-gradient(180deg,#fff0bd 0%,var(--w7-enamel) 16%,var(--w7-shadow) 100%);
+  color:#fffce9;
+  text-shadow:0 1px 2px #07142c;
+  box-shadow:inset 0 1px #ffffffb3,inset 0 -2px #060f3299,0 1px 2px #050e2188;
+}
 .w7-screen[data-work7-screen="cards"] .w7-approved-slot::after,
 .w7-screen[data-work7-screen="shop"] .w7-chest::after{
   content:"";
@@ -3229,7 +3245,12 @@
 }
 .w7-screen[data-work7-screen="shop"] .w7-chest{
   --w7-inlay:#ffe8af;
+  --w7-glow:#ffde9e66;
+  --w7-chest-field:#44265b;
   border-bottom-color:#784522;
+  background:
+    radial-gradient(ellipse 85% 68% at 50% 40%,var(--w7-glow),transparent 88%),
+    linear-gradient(160deg,var(--w7-chest-field),#101f42 98%);
   box-shadow:
     inset 0 2px #fffae0d1,
     inset 0 0 0 2px #ffde9469,
@@ -3238,15 +3259,16 @@
     0 5px 0 #08182b,
     0 9px 12px #0008;
 }
-.w7-screen[data-work7-screen="shop"] .w7-chest-rare{--w7-inlay:#bdf4ff}
-.w7-screen[data-work7-screen="shop"] .w7-chest-epic{--w7-inlay:#eed0ff}
-.w7-screen[data-work7-screen="shop"] .w7-chest-legend{--w7-inlay:#fff0a2}
+.w7-screen[data-work7-screen="shop"] .w7-chest-rare{--w7-inlay:#bdf4ff;--w7-glow:#73dfff78;--w7-chest-field:#125984}
+.w7-screen[data-work7-screen="shop"] .w7-chest-epic{--w7-inlay:#eed0ff;--w7-glow:#ed8bff84;--w7-chest-field:#65277c}
+.w7-screen[data-work7-screen="shop"] .w7-chest-legend{--w7-inlay:#fff0a2;--w7-glow:#ffd06b9c;--w7-chest-field:#8a4c1a}
 .w7-screen[data-work7-screen="shop"] .w7-chest-art{
   background:
-    radial-gradient(ellipse 65% 58% at 50% 53%,#fff4cf66,transparent 100%),
-    radial-gradient(ellipse 66% 40% at 50% 88%,#ffcf5b28,transparent 100%);
+    radial-gradient(ellipse 70% 68% at 50% 47%,var(--w7-glow),transparent 100%),
+    radial-gradient(ellipse 66% 40% at 50% 88%,#ffcf5b30,transparent 100%);
 }
 .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  filter:saturate(1.25) contrast(1.11) brightness(1.045) drop-shadow(0 5px 5px #06122bc2);
   box-shadow:inset 0 1px #fff5bd80,0 5px 8px #07162aab;
 }
 @media (max-width:354px),(max-height:640px){
