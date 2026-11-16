@@ -46,6 +46,75 @@ function CardArt({id,featured=false}:{id:CrewId;featured?:boolean}) {
 }
 
 
+
+/** Five decorative heraldic seals for future collection slots.
+ * They are deliberately not characters, unlocks, rarity or game items. */
+function FutureCardSeal({slot}:{slot:number}) {
+  const colors=[
+    ['#82e8e5','#266e8c'],['#ddb0fc','#6647a1'],['#b9efad','#35795c'],
+    ['#ffd28c','#956039'],['#efb4c3','#93546c']
+  ] as const;
+  const [shine,shade]=colors[slot%colors.length];
+  const glyphs=[
+    <g key="anchor" fill="none" stroke={shine} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="49" cy="24" r="7"/><path d="M49 32V72M34 43H64M23 60Q23 78 49 79Q75 78 75 60M23 60L16 66M75 60L82 66"/>
+    </g>,
+    <g key="helm" fill="none" stroke={shine} strokeLinecap="round">
+      <circle cx="49" cy="50" r="23" strokeWidth="5"/><circle cx="49" cy="50" r="7" strokeWidth="4"/>
+      <path d="M49 15V85M14 50H84M24 25L74 75M74 25L24 75" strokeWidth="4"/>
+    </g>,
+    <g key="compass" stroke={shine} strokeLinejoin="round">
+      <path d="M49 14L59 40 84 50 59 60 49 86 39 60 14 50 39 40Z" fill={shade} strokeWidth="3"/>
+      <path d="M49 24L49 76M23 50H75" strokeWidth="2.5"/>
+      <circle cx="49" cy="50" r="6" fill={shine} strokeWidth="1"/>
+    </g>,
+    <g key="sails" stroke={shine} strokeLinejoin="round" strokeWidth="3">
+      <path d="M49 17V76M49 21L17 64H49ZM55 29L79 65H55Z" fill={shade}/>
+      <path d="M18 73H82L72 82H30Z" fill={shine}/>
+    </g>,
+    <g key="cannon" stroke={shine} strokeWidth="3.5" strokeLinejoin="round">
+      <path d="M19 45L68 28 79 50 32 66Z" fill={shade}/><path d="M68 27L79 23 90 48 79 51Z" fill={shine}/>
+      <path d="M27 70H76L85 78H19Z" fill={shade}/><circle cx="32" cy="78" r="8" fill={shine}/><circle cx="71" cy="78" r="8" fill={shine}/>
+    </g>
+  ];
+  const id='w7-seal-'+slot;
+  return <svg className="w7-future-icon" viewBox="0 0 98 96" aria-hidden="true" focusable="false">
+    <defs><radialGradient id={id}><stop stopColor={shade}/><stop offset=".7" stopColor="#152e51"/><stop offset="1" stopColor="#081a34"/></radialGradient></defs>
+    <path d="M49 3L89 17V53Q88 78 49 93Q10 78 9 53V17Z" fill={'url(#'+id+')'} stroke={shine} strokeWidth="3.5"/>
+    <path d="M49 10L81 22V51Q80 72 49 84Q18 72 17 51V22Z" fill="none" stroke="#fff4cf" strokeOpacity=".28" strokeWidth="1.5"/>
+    {glyphs[slot%glyphs.length]}
+    <circle cx="49" cy="8" r="2" fill="#fff6cc"/>
+  </svg>;
+}
+
+/** Three distinct treasure-chest illustrations, strictly preview-only. */
+function PreviewChestArt({tier}:{tier:'rare'|'epic'|'legend'}) {
+  const palette={
+    rare:{metal:'#91edff',body:'#217aaa',shade:'#123968',glow:'#e5ffff'},
+    epic:{metal:'#e7bcff',body:'#7840aa',shade:'#32195c',glow:'#fff0ff'},
+    legend:{metal:'#ffe39a',body:'#b87d38',shade:'#582e1f',glow:'#fff9cc'}
+  }[tier];
+  const id='w7-chest-'+tier;
+  return <svg className={'w7-preview-chest w7-preview-chest-'+tier} viewBox="0 0 130 116" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id={id+'-wood'} x1="0" y1="0" x2="1" y2="1"><stop stopColor={palette.body}/><stop offset="1" stopColor={palette.shade}/></linearGradient>
+      <linearGradient id={id+'-metal'} x1="0" y1="0" x2="1" y2="1"><stop stopColor={palette.glow}/><stop offset=".5" stopColor={palette.metal}/><stop offset="1" stopColor={palette.body}/></linearGradient>
+    </defs>
+    <ellipse cx="65" cy="106" rx="54" ry="8" fill="#041027" opacity=".55"/>
+    <path d="M16 50Q16 19 65 18Q114 19 114 50V68H16Z" fill={'url(#'+id+'-wood)'} stroke={palette.metal} strokeWidth="4"/>
+    <path d="M27 49Q28 28 65 27Q102 28 103 49" fill="none" stroke={palette.glow} strokeOpacity=".7" strokeWidth="3"/>
+    <path d="M12 59H118L111 99Q65 108 19 99Z" fill={'url(#'+id+'-wood)'} stroke={palette.metal} strokeWidth="4"/>
+    <path d="M20 68H110M29 31V96M101 31V96" fill="none" stroke={'url(#'+id+'-metal)'} strokeWidth="8"/>
+    <path d="M13 57H117V66H13Z" fill={'url(#'+id+'-metal)'}/>
+    <path d="M52 60H78V84Q65 97 52 84Z" fill={'url(#'+id+'-metal)'} stroke={palette.glow} strokeWidth="2"/>
+    {tier==='rare'?<path d="M65 66L72 74 65 83 58 74Z" fill={palette.shade}/>:
+      tier==='epic'?<path d="M65 65L68 72 76 73 70 79 72 85 65 82 58 85 60 79 54 73 62 72Z" fill={palette.shade}/>:
+      <path d="M57 80L54 70 61 75 65 66 69 75 76 70 73 80Z" fill={palette.shade}/>}
+    <circle cx="65" cy="89" r="3" fill={palette.glow}/>
+    <path d="M31 17L27 9M65 11V3M99 17L103 9" stroke={palette.glow} strokeWidth="3" strokeLinecap="round"/>
+  </svg>;
+}
+
 function ShopRelic({kind}:{kind:'coins'|'gems'|'special'}) {
   const id='w7-relic-'+kind;
   return <svg className={'w7-relic-svg w7-relic-'+kind} viewBox="0 0 120 110" role="img" aria-label={kind==='coins'?'Moedas douradas ilustradas':kind==='gems'?'Gema azul ilustrada':'Baú de tesouro ilustrado'}>
@@ -169,7 +238,7 @@ export function CardsCollection({profile,onBuyCrew,onEquipCrew,onBattle,announce
         {!ownedOnly&&Array.from({length:5},(_,slot)=><div key={'upcoming-'+slot}
           className={'w7-future-card w7-upcoming-'+slot}
           aria-label={'Espaço '+(slot+1)+' para carta futura; não disponível'}>
-          <div className="w7-future-seal" aria-hidden="true"><span>?</span></div>
+          <div className="w7-future-seal" aria-hidden="true"><FutureCardSeal slot={slot}/></div>
           <strong>POR REVELAR</strong><small>EM BREVE</small>
           <span className="w7-future-note">Sem personagem, custo ou nível</span>
         </div>)}
@@ -236,7 +305,7 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
         {([['rare','BAÚ RARO'],['epic','BAÚ ÉPICO'],['legend','BAÚ LENDÁRIO']] as const).map(([rarity,title])=>
           <article className={'w7-chest w7-chest-'+rarity} key={rarity}>
             <strong>{title}</strong>
-            <div className="w7-chest-art" aria-hidden="true"><ShopRelic kind="special"/></div>
+            <div className="w7-chest-art" aria-hidden="true"><PreviewChestArt tier={rarity}/></div>
             <span className="w7-chest-status">EM BREVE</span>
           </article>)}
       </div>
@@ -248,13 +317,13 @@ export function ShopMarket({profile,onBuyCrew,onCards,onBattle,announce}:MarketP
           <span className="w7-product-art"><CardArt id={c.id}/></span>
           <div className="w7-product-info"><small>{visualTier[c.id]}</small><strong title={c.name}>{compactCrewName[c.id]}</strong><span>{c.role}</span><b>{owned?'ADQUIRIDO':c.cost+' ● MOEDAS'}</b></div>
           <button type="button" disabled={!canBuy}
-            aria-label={owned?c.name+' already collected':canBuy?'Recruit '+c.name+' for '+c.cost+' local coins':'Need '+Math.max(0,c.cost-profile.coins)+' more local coins to recruit '+c.name}
+            aria-label={owned?c.name+' já adquirido':canBuy?'Recrutar '+c.name+' por '+c.cost+' moedas locais':'Faltam '+Math.max(0,c.cost-profile.coins)+' moedas para recrutar '+c.name}
             onClick={()=>announce(c.name+' recrutado com moedas locais.',()=>onBuyCrew(c.id))}>{owned?'TEU':canBuy?'RECRUTAR':'SEM SALDO'}</button>
         </article>;
       })}
       </div>
-      <div className="w7-shop-actions"><button type="button" onClick={onBattle} aria-label="EARN COINS IN BATTLE">GANHAR MOEDAS</button><button type="button" onClick={onCards} aria-label="MANAGE CREW">VER CARTAS</button></div>
-      <p className="w7-disclaimer">No real-money checkout is available; secure payments não estão integrados. Baús e packs não têm preços, pagamentos ou entregas. Apenas o recrutamento com moedas locais está funcional; dados saved on this device only.</p>
+      <div className="w7-shop-actions"><button type="button" onClick={onBattle} aria-label="Ganhar moedas em batalha">GANHAR MOEDAS</button><button type="button" onClick={onCards} aria-label="Gerir cartas da tripulação">VER CARTAS</button></div>
+      <p className="w7-disclaimer">Pagamentos reais indisponíveis. Baús e packs são apenas pré-visualizações, sem preços nem entregas. Só o recrutamento com moedas ganhas no jogo funciona; o progresso fica guardado neste dispositivo.</p>
     </section>}
     {pending&&<section className="w7-content w7-feature w7-pending" role="tabpanel" aria-label={pending.title}>
       <span className="w7-pending-relic"><ShopRelic kind={tab==='coins'?'coins':tab==='gems'?'gems':'special'}/></span>
