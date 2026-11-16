@@ -491,6 +491,73 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
       <path d="M35 201q15-8 31-2t33 5m115 0q22-6 43-1t50-3"
         fill="none" stroke="#f2ffff" strokeWidth="4" opacity=".82" strokeLinecap="round"/>
     </g>}
+
+    {/* WORK4 / reference 03: a cohesive, billowing black sail and deep
+        sculpted gun deck. All shapes remain genuine live vector artwork. */}
+    {!small&&<>
+      <defs>
+        <linearGradient id="w4-r03-canvas" x1="0%" y1="0%" x2="100%" y2="48%">
+          <stop stopColor="#070f1c"/><stop offset=".17" stopColor="#626777"/>
+          <stop offset=".3" stopColor="#1b2434"/><stop offset=".54" stopColor="#111727"/>
+          <stop offset=".76" stopColor="#394453"/><stop offset="1" stopColor="#070e1d"/>
+        </linearGradient>
+        <linearGradient id="w4-r03-hull" x1="0%" y1="0%" x2="20%" y2="100%">
+          <stop stopColor="#ffe0a2"/><stop offset=".13" stopColor="#ad6734"/>
+          <stop offset=".23" stopColor="#493027"/><stop offset=".52" stopColor="#151924"/>
+          <stop offset=".85" stopColor="#432b26"/><stop offset="1" stopColor="#d18b46"/>
+        </linearGradient>
+        <linearGradient id="w4-r03-metal" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop stopColor="#ffefaf"/><stop offset=".48" stopColor="#b87b36"/><stop offset="1" stopColor="#60351f"/>
+        </linearGradient>
+      </defs>
+      <g className="w4-reference-galleon-volume" pointerEvents="none">
+        <path d="M121 41Q163 36 184 61Q203 85 201 131Q172 147 124 132Z"
+          fill="url(#w4-r03-canvas)" stroke="#d4af76" strokeWidth="2.7"/>
+        <path d="M127 49Q151 49 164 69Q180 97 177 131"
+          fill="none" stroke="#d6d1c1" strokeWidth="3.2" opacity=".52"/>
+        <path d="M187 67Q197 91 193 121Q182 130 167 136"
+          fill="none" stroke="#060d1b" strokeWidth="10" opacity=".78"/>
+        <path d="M129 74Q153 68 187 85M129 118Q167 127 194 120"
+          fill="none" stroke="#a6a5a4" strokeWidth="1.4" opacity=".45"/>
+        <path d="M82 59Q98 47 118 44L118 124Q97 130 80 117Q71 91 82 59Z"
+          fill="url(#w4-r03-canvas)" stroke="#d7b47d" strokeWidth="2" opacity=".97"/>
+        <path d="M220 35Q247 39 255 62Q262 91 253 115Q232 128 215 123Z"
+          fill="url(#w4-r03-canvas)" stroke="#d7b47d" strokeWidth="2.1"/>
+        <path d="M229 43Q240 80 228 117" stroke="#b6b8b4" strokeWidth="3.2"
+          opacity=".42" fill="none"/>
+        <g transform="translate(162 92)" fill="#f7edd5" stroke="#352b2a" strokeWidth=".8">
+          <path d="M-13-9Q-12-19 0-20Q14-19 15-8Q19 1 10 8L8 16H-8L-11 7Q-19 1-13-9Z"/>
+          <path d="M-8 9H8V16H-8Z" fill="#e7d7b7"/>
+          <path d="M-11-7Q-4-11-2-3L-5 1Q-13 1-11-7ZM3-3Q6-11 12-7Q13 1 5 1Z" fill="#10202c"/>
+          <path d="M0 0l-4 7h7Z" fill="#20303a"/>
+          <path d="M-7 12v5m5-5v5m5-5v5m5-5v5" fill="none" stroke="#534439"/>
+        </g>
+        <path d="M139 110l46 25m-2-25-42 26" fill="none" stroke="#f0e0bd"
+          strokeWidth="4.4" strokeLinecap="round" opacity=".88"/>
+        <g fill="#eee3c9"><circle cx="139" cy="110" r="3.6"/><circle cx="185" cy="135" r="3.6"/>
+          <circle cx="183" cy="110" r="3.6"/><circle cx="141" cy="136" r="3.6"/></g>
+        <path d="M65 147Q169 168 299 137L282 187Q180 219 88 193Z"
+          fill="url(#w4-r03-hull)" stroke="#f3c47a" strokeWidth="3.8"/>
+        <path d="M67 149Q185 175 300 140M77 160Q180 187 292 154"
+          fill="none" stroke="#ffcf79" strokeWidth="3.8"/>
+        <path d="M86 183Q179 208 282 177M94 195Q185 224 270 190"
+          fill="none" stroke="#d49a58" strokeWidth="3" opacity=".9"/>
+        <path d="M80 168Q176 196 292 165" fill="none" stroke="#121821"
+          strokeWidth="7" opacity=".72"/>
+        {[[95,169],[122,175],[150,179],[179,181],[209,177],[239,172],[267,166]].map(([x,y],i)=>
+          <g key={'r03-gunport-'+i}>
+            <path d={`M${x-8} ${y-4}q8-4 16 0v12q-8 6-16 0Z`}
+              fill="#081420" stroke="url(#w4-r03-metal)" strokeWidth="2.8"/>
+            <circle cx={x} cy={y+2} r="3.6" fill="#010b13" stroke="#8c673c" strokeWidth="1.3"/>
+          </g>)}
+        <path d="M285 138Q310 131 308 155Q303 176 284 171"
+          fill="none" stroke="url(#w4-r03-metal)" strokeWidth="7" strokeLinecap="round"/>
+        <path d="M57 141q-23 7-19 25q16-10 23-2l8 17"
+          fill="none" stroke="#ffe2a0" strokeWidth="5.4" strokeLinecap="round"/>
+        <path d="M36 202Q55 191 78 201T124 204M212 207Q245 194 281 202t48 0"
+          fill="none" stroke="#c2fbff" strokeWidth="4" opacity=".85"/>
+      </g>
+    </>}
   </svg>;
 }
 
@@ -940,6 +1007,52 @@ function ForgeCannonArtwork(){
         fill="none" stroke="#ffe5ab" strokeWidth="1.9" opacity=".83"/>
       <path d="M49 167q-10 15-5 33m15-40q-11 23-4 44"
         fill="none" stroke="#f9e6b0" strokeWidth="2.3" opacity=".9"/>
+    </g>
+
+    {/* WORK4 / reference 04: cylindrical forged-iron barrel replaces the
+        flat grille reading with real curved planes and a recessed muzzle. */}
+    <defs>
+      <linearGradient id="w4-r04-iron" x1="0%" y1="0%" x2="34%" y2="100%">
+        <stop stopColor="#e8e8dc"/><stop offset=".12" stopColor="#73818b"/>
+        <stop offset=".29" stopColor="#253b48"/><stop offset=".53" stopColor="#061927"/>
+        <stop offset=".79" stopColor="#152937"/><stop offset=".94" stopColor="#81776c"/>
+        <stop offset="1" stopColor="#c99656"/>
+      </linearGradient>
+      <radialGradient id="w4-r04-mouth">
+        <stop stopColor="#030b12"/><stop offset=".72" stopColor="#07151c"/>
+        <stop offset=".84" stopColor="#584735"/><stop offset="1" stopColor="#efd18f"/>
+      </radialGradient>
+    </defs>
+    <g className="w4-reference-forge-barrel" pointerEvents="none">
+      <path d="M91 225L280 175L351 210L162 268Z" fill="#2c211e"
+        stroke="#d8a765" strokeWidth="6" opacity=".92"/>
+      <path d="M80 143Q192 118 293 93Q311 113 322 151Q206 185 91 225Z"
+        fill="url(#w4-r04-iron)" stroke="#e6bc7c" strokeWidth="5.2"/>
+      <path d="M92 151Q198 120 289 103" stroke="#f5f1d7"
+        strokeWidth="4.4" opacity=".9" fill="none"/>
+      <path d="M100 167Q197 138 298 112M102 206Q211 177 317 144"
+        stroke="#0a141e" strokeWidth="6" opacity=".78" fill="none"/>
+      <path d="M144 130l16 66m59-82 18 62m46-70 18 53"
+        stroke="#e9ad63" strokeWidth="12" fill="none"/>
+      <path d="M146 131l17 66m58-82 18 61m46-70 19 53"
+        stroke="#302b2a" strokeWidth="5" fill="none"/>
+      <path d="M151 140l14 55m60-77 14 57m50-69 15 53"
+        stroke="#fff0b7" strokeWidth="2" opacity=".85" fill="none"/>
+      <ellipse cx="70" cy="182" rx="38" ry="45" transform="rotate(-13 70 182)"
+        fill="#997447" stroke="#fbe5a9" strokeWidth="6"/>
+      <ellipse cx="70" cy="182" rx="31" ry="38" transform="rotate(-13 70 182)"
+        fill="url(#w4-r04-mouth)" stroke="#c69b62" strokeWidth="5"/>
+      <ellipse cx="70" cy="182" rx="22" ry="29" transform="rotate(-13 70 182)"
+        fill="#06131c" stroke="#1e2a30" strokeWidth="2.5"/>
+      <path d="M44 158Q31 183 44 210" fill="none" stroke="#fff4c6"
+        strokeWidth="3" opacity=".88"/>
+      <circle cx="276" cy="218" r="38" fill="#332827" stroke="#d1a05a" strokeWidth="8"/>
+      <circle cx="276" cy="218" r="27" fill="#754e32" stroke="#f6c980" strokeWidth="4"/>
+      <path d="M276 188v60m-30-30h60m-51-21 42 43m0-43-42 43"
+        fill="none" stroke="#eec27d" strokeWidth="5"/>
+      <circle cx="276" cy="218" r="9" fill="#e2ad63" stroke="#59412f" strokeWidth="3"/>
+      <path d="M100 239L160 257 337 208" fill="none" stroke="#ffe1a2"
+        strokeWidth="3.3" opacity=".86"/>
     </g>
   </svg>;
 }
