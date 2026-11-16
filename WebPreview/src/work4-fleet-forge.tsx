@@ -283,7 +283,7 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
         fill="none" stroke="#ffd28d" strokeWidth="1.8" opacity=".84"/>
       <g fill="#ffcf77"><circle cx="294" cy="166" r="2.5"/>
         <circle cx="302" cy="157" r="2"/><circle cx="314" cy="159" r="2"/></g>
-    </g>
+    </g>}
     {/* WORK4 / screen 03: original hand-drawn wood, rigging and sail relief.
         Only vector pigment and linework: ownership, ship statistics and hit
         targets stay unchanged. The approved reference is NOT rendered as art. */}
