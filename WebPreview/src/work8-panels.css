@@ -4532,3 +4532,99 @@
     margin:4px 0 0;font-size:10px;line-height:1.2;
   }
 }
+
+
+/* WORK8 #104 — illustrated-foil parity after merged #222.
+   Details follow the approved 07/08 composition; no heights, navigation,
+   game state, fictional scores or shared-shell selectors are touched. */
+.w8-approved-missions .w8-approved-quest-list{
+  border-top-color:#ffe4a1;
+  box-shadow:
+    inset 0 2px 0 #fff0bbaf,inset 0 -3px 0 #041729,
+    0 3px 0 #7a4c25,0 7px 11px #011426be;
+}
+.w8-approved-missions .w8-approved-quest{
+  box-shadow:
+    inset 0 1px 0 #fff2c0bc,inset 0 -2px 0 #071e34,
+    inset 3px 0 0 #e5b56d78,0 2px 3px #03182c;
+}
+.w8-approved-missions .w8-approved-quest-art{
+  position:relative;
+  isolation:isolate;
+}
+.w8-approved-missions .w8-approved-quest-art::before{
+  content:"";position:absolute;z-index:0;
+  inset:2px 0 3px 0;border-radius:50%;
+  background:
+    radial-gradient(circle at 37% 23%,#fff2c8b3,transparent 29%),
+    radial-gradient(ellipse at 53% 60%,#4a919a99,#133c56b5 68%,#061a2d);
+  border:2px solid #deae63;
+  box-shadow:
+    inset 0 2px 1px #ffecafcc,inset 0 -3px 2px #42321d,
+    0 2px 3px #011426aa;
+  pointer-events:none;
+}
+.w8-approved-missions .w8-approved-quest-art .w8-art{
+  position:relative;z-index:1;
+  filter:drop-shadow(0 2px 1px #031425) drop-shadow(-1px -1px 1px #ffedba9c);
+}
+.w8-approved-missions .w8-approved-quest-core>strong{
+  text-shadow:0 2px 1px #001a31,1px 0 #ffe4aa36;
+}
+.w8-approved-missions .w8-approved-quest-rewards>span{
+  text-shadow:0 1px 0 #fff2ad82,0 2px 2px #011525,0 0 4px #f5cf8352;
+}
+.w8-approved-missions .w8-approved-quest .w8-approved-meter{
+  border-color:#eac984;
+  box-shadow:inset 0 2px 1px #001327,0 1px 0 #fff0b77d;
+}
+.w8-approved-missions .w8-approved-daily{
+  border-top-color:#ffe6a8;
+  box-shadow:inset 0 2px 0 #ffedb093,0 3px 0 #795025,0 6px 9px #00152d98;
+}
+.w8-approved-missions .w8-approved-days li{
+  background:
+    radial-gradient(ellipse 65% 42% at 50% 23%,#a8d5c53e,transparent 93%),
+    linear-gradient(160deg,#2d6073,#174362 61%,#081f37);
+}
+.w8-approved-missions .w8-approved-days li .w8-art{
+  filter:drop-shadow(0 2px 1px #031629) drop-shadow(0 -1px 1px #ffdf897a);
+}
+.w8-approved-missions .w8-approved-days li small{
+  color:#ffebc5;text-shadow:0 1px 1px #03192f;
+}
+.w8-approved-ranking .w8-approved-captain{
+  border-top-color:#ffe6a9;
+  box-shadow:inset 0 2px #fff0bf95,inset 0 -2px #05172b,0 3px #795025,0 7px 10px #00152b96;
+}
+.w8-approved-ranking .w8-approved-avatar{
+  outline:1px solid #8c572a;
+  outline-offset:1px;
+  box-shadow:inset 0 2px #ffedb4,0 0 0 2px #9a5e2c,0 3px 6px #00182dc7;
+}
+.w8-approved-ranking .w8-approved-league-status .w8-art-medal{
+  filter:drop-shadow(0 3px 1px #001a2c) drop-shadow(0 0 3px #ffe9a986);
+}
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+  border-top-color:#ffe4a0;
+  box-shadow:inset 0 2px #ffdda17d,inset 0 -3px #05182c,0 4px 0 #6e4528;
+}
+.w8-approved-ranking .w8-approved-leaderboard h3{
+  color:#ffe2a2;
+  text-shadow:0 2px 1px #2e241a,0 0 4px #fce8b04c;
+}
+.w8-approved-ranking .w8-approved-local-row{
+  border-top-color:#ffdf99;
+  box-shadow:inset 0 1px #ffeaaf6e,0 2px 2px #03172abf;
+}
+.w8-approved-ranking .w8-approved-empty-rank{
+  box-shadow:inset 0 1px #c1dce129,inset 0 -1px #001e33b3;
+}
+.w8-approved-ranking .w8-approved-empty-portrait{
+  border-top-color:#f0d49d;
+}
+@media(max-width:350px){
+  .w8-approved-missions .w8-approved-quest-art::before{inset:3px 0 4px}
+  .w8-approved-missions .w8-approved-days{overflow-x:auto;scrollbar-width:thin}
+  .w8-approved-ranking .w8-approved-avatar{outline-offset:0}
+}
