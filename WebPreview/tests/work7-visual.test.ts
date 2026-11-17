@@ -271,6 +271,44 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
             await sleep(200);
           }
         }
+
+        // Temporary WORK7-only native browser micro-sweep to pick the actually
+        // winning physical chest value before merge. No UI data is altered.
+        if (width===384 && height===512 && kind==='shop') {
+          const baselineRule = '.w7-screen[data-work7-screen="shop"] .w7-chest{filter:brightness(.80)!important}' +
+            '.w7-screen[data-work7-screen="shop"] .w7-chest-status{filter:none!important}';
+          const probes: Array<[string,string]> = [['merged-head',baselineRule]];
+          for (const chest of ['rare','epic','legend']) {
+            for (const value of [.55,.65,.70,.75,.85,.9,1.0]) {
+              probes.push([chest+'-'+value,baselineRule+
+                '.w7-screen[data-work7-screen="shop"] .w7-chest-'+chest+
+                '{filter:brightness('+value+')!important}']);
+            }
+          }
+          for (const value of [.88,1.05,1.12]) {
+            probes.push(['status-'+value,baselineRule+
+              '.w7-screen[data-work7-screen="shop"] .w7-chest-status'+
+              '{filter:brightness('+value+')!important}']);
+          }
+          const referenceUrl = 'data:image/webp;base64,'+references.shop.toString('base64');
+          for (const [label,css] of probes) {
+            await evaluate("(()=>{let s=document.getElementById('work7-optical-probe');if(!s){s=document.createElement('style');s.id='work7-optical-probe';document.head.appendChild(s)}s.textContent="+JSON.stringify(css)+";return true})()");
+            await sleep(50);
+            const shot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+            const values=await evaluate("(async()=>{"+
+              "const load=s=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=s});"+
+              "const [ref,img]=await Promise.all([load("+JSON.stringify(referenceUrl)+"),load("+JSON.stringify('data:image/png;base64,'+shot.data)+")]);"+
+              "const c=document.createElement('canvas');c.width=384;c.height=512;"+
+              "const ctx=c.getContext('2d');ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
+              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
+              "let total=0,roi=0,n=0;"+
+              "for(let y=0;y<512;y++)for(let x=0;x<384;x++){const p=(y*384+x)*4;const d=Math.abs(a[p]-b[p])+Math.abs(a[p+1]-b[p+1])+Math.abs(a[p+2]-b[p+2]);total+=d;"+
+              "if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=d;n++}}"+
+              "return {global:Math.round(total/(384*512*3)*1000)/1000,roi:Math.round(roi/(n*3)*1000)/1000}})()");
+            console.log('WORK7 SHOP OPTICAL PROBE '+label+' '+JSON.stringify(values));
+          }
+          await evaluate("(()=>{document.getElementById('work7-optical-probe')?.remove();return true})()");
+        }
         const screen = await command('Page.captureScreenshot', {
           format:'png',fromSurface:true,captureBeyondViewport:false
         });
