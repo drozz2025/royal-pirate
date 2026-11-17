@@ -306,8 +306,8 @@ export class OceanScene {
     const stations=[-4.9,-4.3,-3.2,-1.6,0,1.8,3.2,4.3,5];
     const widths=[.25,1.1,1.55,1.78,1.83,1.65,1.3,.75,.08];
     const position:number[]=[],pigment:number[]=[],faces:number[]=[];
-    const keel=new T.Color('#481d29'),plum=new T.Color('#762931');
-    const sunlit=new T.Color('#b5573d');
+    const keel=new T.Color('#302127'),plum=new T.Color('#55302c');
+    const sunlit=new T.Color('#856047');
     // Use the original hull's rising station-width factor to hug the surface,
     // rather than placing a straight red box in front of the 3D enemy.
     const flare=(y:number)=>.53+(y+.5)*(.065/.35);
@@ -352,7 +352,8 @@ export class OceanScene {
         [1.73,.068,gilding],[2.40,.083,gilding],[1.63,.057,darkTrim]
       ] as const){
         const curve=new T.CatmullRomCurve3(stations.map((z,i)=>
-          new T.Vector3(side*(widths[i]*flare(y)+.10),y,z)));
+          new T.Vector3(side*(widths[i]*flare(y)+.10),
+            y+.36*Math.pow(Math.abs(z)/5,1.7)+(z < -3.6?.09:0),z)));
         const rail=new T.Mesh(new T.TubeGeometry(curve,32,radius,7,false),material);
         rail.name='battle-only-swept-hull-rail';
         dressing.add(rail);
