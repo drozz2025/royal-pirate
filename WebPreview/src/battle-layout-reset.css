@@ -1,3 +1,7 @@
+/* Desktop keeps all original camera/audio/restart controls visible. */
+.in-battle .battle-utilities {display:contents}
+.in-battle .view-controls .battle-utilities-toggle {display:none}
+.in-battle .battle-utilities-actions {display:contents}
 /* WORK 0 / #104 — systemic mobile battle hierarchy. Batalha ONLY.
    Reference: assets/design-approved/02-batalha.webp.
    Preserve the Porto, five-item navigation and all live controls. The settings
@@ -55,21 +59,21 @@
     transform:none;width:auto;padding:0;display:block;pointer-events:auto
   }
   .in-battle .battle-utilities {position:relative;display:block}
-  .in-battle .battle-utilities summary {
+  .in-battle .view-controls .battle-utilities-toggle {
     list-style:none;display:grid;place-items:center;
     width:36px;height:36px;border:1px solid #ae935d;border-radius:8px;
     background:#0a2948e8;color:#ffe9b5;cursor:pointer;
     box-shadow:0 2px 5px #081b32ab
   }
-  .in-battle .battle-utilities summary::-webkit-details-marker {display:none}
-  .in-battle .battle-utilities summary svg {width:20px;height:20px}
-  .in-battle .battle-utilities summary:focus-visible {outline:3px solid #fff2ab;outline-offset:2px}
+    .in-battle .battle-utilities-toggle span {font-size:23px;line-height:1}
+  .in-battle .battle-utilities-toggle:focus-visible {outline:3px solid #fff2ab;outline-offset:2px}
   .in-battle .battle-utilities-actions {
     position:absolute;top:42px;right:0;width:162px;padding:8px;
-    display:grid;grid-template-columns:repeat(3,44px);gap:6px;
+    display:none;grid-template-columns:repeat(3,44px);gap:6px;
     border:1px solid #b9955b;border-radius:9px;
     background:#082641f5;box-shadow:0 9px 22px #02162ad9
   }
+  .in-battle .battle-utilities-actions.is-open {display:grid}
   .in-battle .view-controls .battle-utilities-actions button,
   .in-battle .view-controls .battle-utilities-actions button:last-child {
     position:static;display:grid;place-items:center;
