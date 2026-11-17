@@ -5079,3 +5079,45 @@
     box-shadow:inset 0 1px #e6eff1a1,0 2px #724924;
   }
 }
+
+
+/* WORK8/#104 — 07 Missões only. Replace flat Unicode circle/diamond art with
+   the owner's original painted coin and faceted jewel, cropped WITHOUT numbers,
+   progress, prices or state from 07-missoes.webp. The real reward and the
+   unavailable gem dash remain DOM-owned, legible, unchanged. All reward hitboxes,
+   rows and seven chests retain their original geometry.
+   Same-frame 384x512 A/B toggles ONLY the new pictorial overprints. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  .w8-approved-missions .w8-approved-quest-rewards > span {
+    position:relative;
+  }
+  :root:not(.work8-missions-token-art-ab-baseline) .w8-approved-missions .w8-approved-quest-rewards .w8-approved-coin,
+  :root:not(.work8-missions-token-art-ab-baseline) .w8-approved-missions .w8-approved-quest-rewards .w8-approved-gem{
+    color:transparent;
+    text-shadow:none;
+  }
+  .w8-approved-missions .w8-approved-quest-rewards svg.w8-approved-painting-coin-painting,
+  .w8-approved-missions .w8-approved-quest-rewards svg.w8-approved-painting-gem-painting {
+    display:none;
+  }
+  :root:not(.work8-missions-token-art-ab-baseline) .w8-approved-missions .w8-approved-quest-rewards svg.w8-approved-painting-coin-painting,
+  :root:not(.work8-missions-token-art-ab-baseline) .w8-approved-missions .w8-approved-quest-rewards svg.w8-approved-painting-gem-painting {
+    display:block;
+    position:absolute;
+    z-index:2;
+    top:-3px;
+    left:50%;
+    transform:translateX(-50%);
+    width:24px;
+    height:24px;
+    pointer-events:none;
+    border-radius:30%;
+    -webkit-mask-image:radial-gradient(ellipse 65% 67% at 50% 50%,#000 75%,transparent 100%);
+    mask-image:radial-gradient(ellipse 65% 67% at 50% 50%,#000 75%,transparent 100%);
+    filter:drop-shadow(0 1px 1px #011526);
+  }
+  .w8-approved-missions .w8-approved-quest-rewards strong {
+    position:relative;
+    z-index:3;
+  }
+}
