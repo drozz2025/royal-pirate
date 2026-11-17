@@ -2414,3 +2414,48 @@
     max-width:54%!important;
   }
 }
+
+
+/* WORK4 / #104 / 17 Nov — scene-fill correction measured against 03/04.
+   At tall 390/430 phones the painting was a small rectangular island inside
+   a 355-390px procedural stage, with >50px empty cyan sky and >70px empty
+   synthetic waves. Keep the ONE approved pictorial ship/cannon, their live
+   right-column levels and the compositor/dock completely untouched. The
+   stage and art now share an aspect-driven composition instead of vh sizing. */
+@media (min-width:360px) and (max-width:659px) and (min-height:700px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage {
+    height:clamp(280px,75vw,326px);
+    min-height:0;
+  }
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {
+    height:clamp(235px,64vw,282px)!important;
+    max-width:76%!important;
+    left:0!important;
+    top:0!important;
+    bottom:0!important;
+    margin:auto 0!important;
+  }
+  .w4-fleet .w4-stage-label {
+    top:9%;
+    right:1.4%;
+    width:37%;
+  }
+  .w4-forge #w4-forge-panel > .w4-forge-stage {
+    height:clamp(265px,69vw,306px);
+    min-height:0;
+  }
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {
+    height:clamp(227px,60vw,265px)!important;
+    max-width:65%!important;
+    left:0!important;
+    top:0!important;
+    bottom:0!important;
+    margin:auto 0!important;
+  }
+  .w4-forge .w4-forge-stage > .w4-forge-description {
+    top:6%;
+    right:1.5%;
+  }
+}
+/* The native 384×512 crop stays exactly as WORK0 merged it in #255.
+   Tall aspect rules above do not match the native viewport or 320×568. */
