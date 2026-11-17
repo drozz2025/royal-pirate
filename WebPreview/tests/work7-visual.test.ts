@@ -45,17 +45,20 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   /* Strict current parent-HEAD A/B: restore the two existing #283
    * physical frame values AND the existing corner-metal inner rim.
    * Everything else, including the merged 320px safety fix, stays live. */
+  // Undo ONLY the two material backgrounds introduced in this PR. This is
+  // the exact merged v0.1.64 HEAD, not the pre-#288 inlay/brightness baseline.
+  // Verify shape/touch/MAE on the same Chromium frame without navigating away.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-        filter:brightness(.88)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-collection-content{
+        background:
+          radial-gradient(ellipse 92% 95px at 50% 0%,#49677b45,transparent 92%),
+          linear-gradient(180deg,#18374d 0%,#102b43 44%,#0a2039 70%,#061a33 100%)!important;
       }
-      .w7-screen[data-work7-screen="shop"] .w7-chest{
-        filter:brightness(.89)!important;
-      }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot::before,
-      .w7-screen[data-work7-screen="shop"] .w7-chest::before{
-        box-shadow:inset 0 0 0 1px #55301370!important;
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+        background:
+          radial-gradient(ellipse 66% 95% at 29% 42%,#bd539078,transparent 88%),
+          linear-gradient(112deg,#572052 0%,#4b1d4f 49%,#23183e 100%)!important;
       }
     }`;
   const cssBaseline = currentHeadBaseline;
@@ -191,6 +194,31 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await waitFor("(()=>{const images=[...document.querySelectorAll('[data-work7-screen=\""+kind+"\"] .w7-approved-crop img')];return images.length==="+(kind==='cards'?8:4)+"&&images.every(i=>i.complete&&i.naturalWidth>0)})()");
         await evaluate('document.fonts.ready.then(()=>true)');
         await sleep(350);
+        // Exercise real touchscreen input on WORK7's own secondary tab, then
+        // restore the same collection/offers scene before the A/B screenshot.
+        // This guards genuine navigation/labels against a noninteractive repaint.
+        const touchLocalTab = async (index:number,expectedLabel:string) => {
+          const point=await evaluate("(()=>{const t=document.querySelector('[data-work7-screen=\\\""+kind+"\\\"] .w7-tabs button:nth-child("+index+")');if(!t)return null;const r=t.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
+          assert.ok(point,'WORK7 local tab '+index+' must be a real touch target');
+          await command('Input.dispatchTouchEvent',{
+            type:'touchStart',touchPoints:[{x:point.x,y:point.y,id:14}]
+          });
+          await sleep(65);
+          await command('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+          await waitFor("!!document.querySelector('[data-work7-screen=\\\""+kind+"\\\"] [role=tabpanel][aria-label=\\\""+expectedLabel+"\\\"]')");
+        };
+        const walletBefore=await evaluate("document.querySelector('.w7-wallet strong')?.textContent||null");
+        if(kind==='cards'){
+          await touchLocalTab(2,'Melhorar cartas');
+          await touchLocalTab(1,'A minha coleção');
+        } else {
+          await touchLocalTab(2,'PACOTES DE MOEDAS');
+          await touchLocalTab(1,'Ofertas disponíveis');
+        }
+        const walletAfter=await evaluate("document.querySelector('.w7-wallet strong')?.textContent||null");
+        assert.equal(walletAfter,walletBefore,'WORK7 tab navigation cannot mutate genuine currency');
+        await waitFor("(()=>{const imgs=[...document.querySelectorAll('[data-work7-screen=\\\""+kind+"\\\"] .w7-approved-crop img')];return imgs.length==="+(kind==='cards'?8:4)+"&&imgs.every(img=>img.complete&&img.naturalWidth>0)})()");
+        await sleep(100);
 
         const geometry = await evaluate("(()=>{"+
           "const rect=e=>{if(!e)return null;const b=e.getBoundingClientRect();return {x:Math.round(b.x),y:Math.round(b.y),width:Math.round(b.width),height:Math.round(b.height),bottom:Math.round(b.bottom)}};"+
