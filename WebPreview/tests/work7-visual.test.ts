@@ -102,22 +102,30 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     '--headless=new', '--no-sandbox', '--disable-dev-shm-usage',
     '--enable-webgl', '--enable-unsafe-swiftshader',
     '--use-gl=angle', '--use-angle=swiftshader', '--remote-allow-origins=*',
-    '--remote-debugging-port=9337', '--user-data-dir='+temp, 'about:blank'
+    // A fixed CDP port intermittently collided with other Chromium visual
+    // tests in the same CI runner. Let Chrome reserve its own private port.
+    '--remote-debugging-port=0', '--user-data-dir='+temp, 'about:blank'
   ], { stdio: 'ignore' });
   let target: any;
-  for (let attempt = 0; attempt < 100; attempt++) {
+  // GitHub runners may saturate CPU while the other 3 visual suites start.
+  // Wait for Chrome's own DevToolsActivePort file, not an assumed 9337 port.
+  for (let attempt = 0; attempt < 300; attempt++) {
     if (browser.exitCode !== null) throw new Error('Chromium stopped before CDP connection');
     try {
-      const response = await fetch('http://127.0.0.1:9337/json/list', { signal: AbortSignal.timeout(600) });
-      if (response.ok) {
-        const pages = await response.json() as Array<{type:string;webSocketDebuggerUrl:string}>;
-        target = pages.find(page => page.type === 'page');
-        if (target) break;
+      const value = (await readFile(join(temp, 'DevToolsActivePort'), 'utf8')).split('\n')[0];
+      const cdpPort = Number(value);
+      if (Number.isInteger(cdpPort) && cdpPort > 0) {
+        const response = await fetch('http://127.0.0.1:'+cdpPort+'/json/list', { signal: AbortSignal.timeout(950) });
+        if (response.ok) {
+          const pages = await response.json() as Array<{type:string;webSocketDebuggerUrl:string}>;
+          target = pages.find(page => page.type === 'page');
+          if (target) break;
+        }
       }
-    } catch { /* browser is starting */ }
+    } catch { /* Chrome has not written its active port yet */ }
     await sleep(150);
   }
-  assert.ok(target, 'A real Chromium page must be available');
+  assert.ok(target, 'A real Chromium page must be available after its own DevToolsActivePort starts');
   ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise<void>((resolve, reject) => {
     ws!.addEventListener('open', () => resolve(), { once: true });
