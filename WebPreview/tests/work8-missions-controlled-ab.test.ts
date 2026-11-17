@@ -409,6 +409,57 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(Math.abs(posCompare.metrics.chests.delta)<.08&&Math.abs(posCompare.metrics.daily.delta)<.25,
       'seven rewards and daily panel must not visually regress');
 
+
+    /* WORK8/#104 — thin pewter original relief vs synthetic grey frame,
+       measured on the SAME real 384x512 Chromium scene and paused frame. */
+    const reliefBaselineClass='work8-missions-board-relief-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(reliefBaselineClass)+');true');
+    await delay(140);
+    const reliefBeforeLayout=await headingLayout();
+    const reliefBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(reliefBaselineClass)+');true');
+    await delay(140);
+    const reliefAfterLayout=await headingLayout();
+    const reliefAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const reliefSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+reliefBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+reliefAfter))
+      .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],questRows:[15,167,371,325],questButtons:[294,176,365,323],daily:');
+    assert.notEqual(reliefSource,source,'isolated native same-scene A/B uses real before/after');
+    const reliefCompare=await evalJs(reliefSource);
+    writeFileSync(join(evidence,'missions-relief-before-384x512.png'),Buffer.from(reliefBefore,'base64'));
+    writeFileSync(join(evidence,'missions-relief-after-384x512.png'),Buffer.from(reliefAfter,'base64'));
+    writeFileSync(join(evidence,'missions-relief-original-render-overlay-before-384x512.png'),Buffer.from(reliefCompare.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-relief-original-render-overlay-after-384x512.png'),Buffer.from(reliefCompare.overlays[1],'base64'));
+    const reliefResult={
+      baseSha:'7e07244ec313316fa762a465d60482ee2643d59f',
+      source:'assets/design-approved/07-missoes.webp',
+      scene:'single decoded app document, frame and native 384x512, paused animations',
+      scope:'07 Missões; exact three genuine quest row relief and active CTA faces',
+      roi:reliefCompare.metrics,unchanged:reliefCompare.unchanged,
+      beforeLayout:reliefBeforeLayout,afterLayout:reliefAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-relief-controlled-ab.json'),JSON.stringify(reliefResult,null,2));
+    console.log('WORK8 07 pewter relief original vs Chrome MAE '+JSON.stringify(reliefResult.roi));
+    assert.deepEqual(reliefBeforeLayout.days,reliefAfterLayout.days,'all seven actual reward positions unchanged');
+    assert.deepEqual(reliefBeforeLayout.chests,reliefAfterLayout.chests,'all seven chest drawings unchanged');
+    assert.deepEqual(reliefBeforeLayout.tabs,reliefAfterLayout.tabs,'mission navigation hitboxes unchanged');
+    assert.deepEqual(reliefBeforeLayout.questButtons,reliefAfterLayout.questButtons,'three genuine CTA hitboxes unchanged');
+    assert.deepEqual(reliefBeforeLayout.nav,reliefAfterLayout.nav,'five-button dock unchanged');
+    assert.equal(reliefAfterLayout.questCount,3);
+    assert.equal(reliefAfterLayout.dayCount,7);
+    assert.equal(reliefAfterLayout.dockCount,5);
+    assert.ok(reliefAfterLayout.documentWidth<=386);
+    assert.ok(reliefAfterLayout.chests.every((c:any)=>c.bottom<=reliefAfterLayout.nav.top+2),
+      'all seven chest drawings visible above dock');
+    assert.ok(reliefCompare.unchanged.header<.1&&reliefCompare.unchanged.dock<.1,
+      'header and shared five-item dock are byte-identical');
+    assert.ok(reliefCompare.metrics.quests.delta<0&&reliefCompare.metrics.questRows.delta<0&&reliefCompare.metrics.full.delta<0,
+      'the approved source must improve in full frame and three genuine quest rows');
+    assert.ok(Math.abs(reliefCompare.metrics.daily.delta)<.10&&Math.abs(reliefCompare.metrics.chests.delta)<.10,
+      'seven reward chests and daily panel must not regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
