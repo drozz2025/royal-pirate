@@ -71,7 +71,14 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     const clicked=await evalJs('(()=>{const b=[...document.querySelectorAll(".harbour-screen button")].find(b=>b.textContent?.includes("MISSÕES"));b?.click();return !!b})()');
     assert.ok(clicked,'Navigate via the real Porto Missions button');
     await wait('.w8-approved-missions .w8-approved-quest-list');
-    await delay(260);
+    // A first Vite render may paint SVG fallbacks before the approved WebP
+    // crops are decoded. Do not compare an incomplete artwork frame.
+    const decoded=await evalJs('(async()=>{'+
+      'const refs=[...document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting image")].map(i=>i.getAttribute("href")).filter(Boolean);'+
+      'await Promise.all([...new Set(refs)].map(src=>{const image=new Image();image.src=src;return image.decode()}));'+
+      'await document.fonts.ready;return refs.length;})()');
+    assert.ok(decoded>=8,'title, three quest illustrations and four source chest crops must have loaded');
+    await delay(340); // allow SVG image paint following source decode
     await evalJs('(()=>{document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-enamel-ab-baseline';
