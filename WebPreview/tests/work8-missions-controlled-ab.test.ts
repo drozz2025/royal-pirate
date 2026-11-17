@@ -513,6 +513,63 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(tabCompare.metrics.daily.delta<.05 && tabCompare.metrics.chests.delta<.05,
       'reward board and seven chests must remain pixel-stable');
 
+
+    /* WORK8/#104 — native 07 source-painted quest icons and real action faces.
+       Base class disables ONLY this run's paint. Same paused actual Chromium
+       scene and 384×512 frame; never screenshot-swap/replace UI with the art.
+       Preserve 3 real objectives, 7 reward chests, 5 dock items & click targets. */
+    const contrastFlag='work8-missions-source-contrast-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(contrastFlag)+');true');
+    await delay(155);
+    const contrastBeforeLayout=await headingLayout();
+    const contrastBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(contrastFlag)+');true');
+    await delay(155);
+    const contrastAfterLayout=await headingLayout();
+    const contrastAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const contrastSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+contrastBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+contrastAfter))
+      .replace('const regions={full:[0,0,384,512],quests:',
+        'const regions={full:[0,0,384,512],questArt:[17,158,68,321],questCTAs:[295,164,372,325],quests:');
+    assert.notEqual(contrastSource,source,'capture independent real source-contrast A/B');
+    const contrastCompare=await evalJs(contrastSource);
+    writeFileSync(join(evidence,'missions-source-contrast-before-384x512.png'),Buffer.from(contrastBefore,'base64'));
+    writeFileSync(join(evidence,'missions-source-contrast-after-384x512.png'),Buffer.from(contrastAfter,'base64'));
+    writeFileSync(join(evidence,'missions-source-contrast-original-render-overlay-before-384x512.png'),Buffer.from(contrastCompare.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-source-contrast-original-render-overlay-after-384x512.png'),Buffer.from(contrastCompare.overlays[1],'base64'));
+    const contrastResult={
+      baseSha:'594dc96b4669ffd2c50f95e7102dc4d1cc672844',
+      references:['assets/design-approved/00-referencia-original-aprovada.webp','assets/design-approved/00-painel-oito-ecras.webp','assets/design-approved/07-missoes.webp','assets/design-approved/01-porto.webp through 08-ranking-perfil.webp'],
+      source:'native, unscaled 384x512 approved 07 WebP',
+      scene:'same decoded Chromium document, paused animations, same viewport and frame',
+      scope:'07 Missões only: source-painted mission illustration and active CTA contrast',
+      roi:contrastCompare.metrics,unchanged:contrastCompare.unchanged,
+      beforeLayout:contrastBeforeLayout,afterLayout:contrastAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-source-contrast-controlled-ab.json'),JSON.stringify(contrastResult,null,2));
+    console.log('WORK8 07 native source contrast A/B MAE '+JSON.stringify(contrastResult.roi));
+    assert.deepEqual(contrastBeforeLayout.days,contrastAfterLayout.days,'7 days must not move');
+    assert.deepEqual(contrastBeforeLayout.chests,contrastAfterLayout.chests,'7 chest paintings must not move');
+    assert.deepEqual(contrastBeforeLayout.tabs,contrastAfterLayout.tabs,'mission tabs must not move');
+    assert.deepEqual(contrastBeforeLayout.questButtons,contrastAfterLayout.questButtons,'3 mission touch hitboxes must not move');
+    assert.deepEqual(contrastBeforeLayout.nav,contrastAfterLayout.nav,'5-item dock must not move');
+    assert.equal(contrastAfterLayout.questCount,3);
+    assert.equal(contrastAfterLayout.dayCount,7);
+    assert.equal(contrastAfterLayout.dockCount,5);
+    assert.ok(contrastAfterLayout.documentWidth<=386);
+    assert.ok(contrastAfterLayout.chests.every((c:any)=>c.bottom<=contrastAfterLayout.nav.top+2),
+      'seven chest illustrations must remain above dock at native 384');
+    assert.ok(contrastCompare.unchanged.header<.1&&contrastCompare.unchanged.dock<.1,
+      'global shell and 5-item dock unchanged');
+    assert.ok(contrastCompare.metrics.quests.delta<0&&contrastCompare.metrics.full.delta<0,
+      'keep only authentic full screen and objective ROI gains');
+    assert.ok(contrastCompare.metrics.questArt.delta<0&&contrastCompare.metrics.questCTAs.delta<0,
+      'source art icons and real CTA ink must both improve');
+    assert.ok(Math.abs(contrastCompare.metrics.daily.delta)<.05&&Math.abs(contrastCompare.metrics.chests.delta)<.05,
+      '7 rewards and daily board must not regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
