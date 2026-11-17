@@ -3970,3 +3970,26 @@
       linear-gradient(112deg,#4d0f66 0%,#460a6c 49%,#160c4d 100%);
   }
 }
+
+/* WORK7/#104 — 17 Nov 12h: selective pictorial exposure on native 384×512.
+ * A/B against true merged v0.1.65: the original 05 paints the bomb, sail,
+ * cannon, shield and mine brighter than our clipped source crop, while their
+ * darker carved physical frames are already calibrated (#283/#288).
+ * Illuminate the five REAL artwork crops only (not the frame, label or text).
+ * On original 06 the rare/epic REAL chests are underexposed but the Captain
+ * pack and legendary chest already match their source value closely.
+ * No new halo, bevel, screenshot backdrop, invented offers or gameplay.
+ * 320×568 and taller phones are pixel-identical; approved:false (0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop,
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop,
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop,
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop,
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.075);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop,
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(1.11) drop-shadow(0 4px 3px #041327a8);
+  }
+}
