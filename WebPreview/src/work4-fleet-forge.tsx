@@ -1202,6 +1202,32 @@ function ForgeCannonArtwork(){
   </svg>;
 }
 
+
+/**
+ * Pictorial crops of the owner's approved original 384×512 illustrations.
+ * Crop rectangles contain art ONLY (no reference HUD values or buttons).
+ * These replace, not duplicate, the live stage's original ship and cannon.
+ * The four roster thumbnails and all working upgrade controls remain live.
+ */
+function ApprovedFleetPainting(){
+  return <svg className="w4-ship-art w4-reference-ship" viewBox="40 151 185 189"
+    data-work4-crop="fleet" role="img"
+    aria-label="Galeão Royal Crown e costa tropical, arte pictórica aprovada">
+    <image x="0" y="0" width="384" height="512"
+      href={new URL('../../assets/design-approved/03-frota.webp', import.meta.url).href}
+      preserveAspectRatio="none"/>
+  </svg>;
+}
+function ApprovedForgePainting(){
+  return <svg className="w4-cannon-art w4-reference-cannon" viewBox="24 153 155 154"
+    data-work4-crop="forge" role="img"
+    aria-label="Canhão completo diante da fornalha de pedra e madeira, arte pictórica aprovada">
+    <image x="0" y="0" width="384" height="512"
+      href={new URL('../../assets/design-approved/04-melhorias-forja.webp', import.meta.url).href}
+      preserveAspectRatio="none"/>
+  </svg>;
+}
+
 export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfile;onForge:()=>void;onCrew:()=>void;onPorto:()=>void}){
   const [tab,setTab]=React.useState<FleetTab>('mine');
   const [details,setDetails]=React.useState(true);
@@ -1222,7 +1248,7 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
         <div className="w4-island w4-island-left" aria-hidden="true"/>
         <div className="w4-island w4-island-right" aria-hidden="true"/>
         <TropicalBackdrop/>
-        <ShipArtwork/>
+        <ApprovedFleetPainting/>
         <div className="w4-stage-label"><span>★ NAVIO REAL</span><strong>ROYAL CROWN</strong>
           <small>1 navio disponível · Capitão {captain}</small>
           <div className="w4-stage-stats" aria-label="Níveis reais da frota">
@@ -1289,7 +1315,7 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
       <div className="w4-forge-stage">
         <div className="w4-forge-scene">
           <ForgeBackdrop/>
-          {tab==='cannons'?<ForgeCannonArtwork/>:<ShipArtwork part={tab==='armour'?'armour':tab==='hull'?'hull':tab}/>}
+          {tab==='cannons'?<ApprovedForgePainting/>:<ShipArtwork part={tab==='armour'?'armour':tab==='hull'?'hull':tab}/>}
         </div>
         <div className="w4-forge-description"><div className="w4-forge-medallion"><FleetForgeSymbol id={tab}/></div><span>{upgrade?'MELHORIA LOCAL DISPONÍVEL':'FUNÇÃO FUTURA'}</span>
           <h3>{upgrade?upgradeLabel[upgrade.id]:'Armadura'}</h3>
