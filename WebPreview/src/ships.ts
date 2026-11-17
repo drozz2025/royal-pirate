@@ -330,6 +330,32 @@ export function makeShip(red = false): ShipArt {
       // Bronze lower apron gives the guns a substantial framed gun deck.
       put(cube,bronze,face,1.02,z,.09,.08,.94);
     }
+    // WORK0 / #104: Royal galleon lower artillery deck in REAL 3D, not a
+    // screenshot overlay. The reference 01 has two tiers of black gunports
+    // along the gilded broadside, not just the three playable upper guns.
+    // These seven ports PER SIDE are ornamental meshes only. They join the
+    // existing material bins, add no draw calls, change no colliders or
+    // recoil groups, and remain attached while the live ship rotates.
+    const lowerPorts: ReadonlyArray<readonly [number,number]> = [
+      [-3.15,1.48],[-2.20,1.67],[-1.22,1.78],
+      [-.21,1.82],[.80,1.72],[1.83,1.55],[2.91,1.33]
+    ];
+    for(const side of [-1,1])for(const [z,sectionWidth] of lowerPorts){
+      // At y~0.75 the tapered hull has approximately 79% of its deck beam.
+      const x=side*(sectionWidth*.79+.028);
+      const gunY=.74;
+      put(cube,black,x,gunY,z,.105,.35,.51);
+      // Four independent carved wooden/gilt sides around the deep opening.
+      for(const y of [gunY-.21,gunY+.21])
+        put(cube,bronze,x+side*.008,y,z,.105,.060,.60);
+      for(const dz of [-.295,.295])
+        put(cube,gold,x+side*.014,gunY,z+dz,.105,.48,.054);
+      // A true projecting iron cannon muzzle: fixed decorative artillery,
+      // with no new raycast target and no change to any firing mechanics.
+      beam(new T.Vector3(x+side*.025,gunY,z),
+        new T.Vector3(x+side*.38,gunY,z),.087,metal);
+      put(sphere,gold,x+side*.39,gunY,z,.102,.103,.103);
+    }
     // Upper carved side ribbons and warm gold rosettes break up the flat hull.
     for(const side of [-1,1])for(let i=0;i<9;i++){
       const z=-3.5+i*.86;
