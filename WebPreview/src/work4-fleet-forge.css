@@ -2704,3 +2704,28 @@
     box-shadow:inset 0 1px #ffe1a66c,0 4px 8px #04132366;
   }
 }
+
+
+/* WORK4/#104 native 384x512 Fleet: source-approved miniature painting
+   for four EXISTING card slots. Artwork is a crop from 03-frota.webp;
+   names/statuses and availability remain React-owned. The one full-size
+   Royal Crown, stage, sea, touch geometry and global dock stay unchanged.
+   Other viewport sizes retain their current responsive illustration. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet .w4-ship-roster > .w4-ship-slot > .w4-slot-art {
+    background-image:url('../../assets/design-approved/03-frota.webp');
+    background-repeat:no-repeat;
+    background-size:384px 512px;
+    background-position:var(--w4-mini-art-x) -355px;
+    background-color:#102b45;
+  }
+  .w4-fleet .w4-ship-roster > .w4-ship-slot:nth-child(1) { --w4-mini-art-x:-19px; }
+  .w4-fleet .w4-ship-roster > .w4-ship-slot:nth-child(2) { --w4-mini-art-x:-108px; }
+  .w4-fleet .w4-ship-roster > .w4-ship-slot:nth-child(3) { --w4-mini-art-x:-197px; }
+  .w4-fleet .w4-ship-roster > .w4-ship-slot:nth-child(4) { --w4-mini-art-x:-287px; }
+  .w4-fleet .w4-ship-roster > .w4-ship-slot > .w4-slot-art > * {opacity:0;}
+  .w4-fleet .w4-ship-roster > .w4-ship-slot.is-pending .w4-slot-unavailable {
+    opacity:1;
+    filter:none;
+  }
+}
