@@ -2687,3 +2687,21 @@
     border-color:#e6bd76;
   }
 }
+
+/* WORK4 / #104 — native 03 first-fold: expose all four ship slots without masking
+   the owner's source-registered single Royal Crown. At native 384×512 the
+   previous 206px canvas left the four real roster cards under the fixed
+   five-action dock. The approved 03 composition ends the ocean above those
+   cards; reclaim only the sea's excess lower strip. Keep the ship art at its
+   exact x/y/194px source registration, keep the real levels/selection and
+   move the stats inset upward so its active status remains visible.
+   The taller 390/430, narrow 320 and all other screens are untouched. */
+@media (min-width:360px) and (max-width:399px) and (max-height:650px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage {
+    height:184px;
+    min-height:184px;
+  }
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    top:5%;
+  }
+}
