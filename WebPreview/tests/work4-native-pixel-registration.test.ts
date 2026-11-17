@@ -322,7 +322,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           '.w4-forge #w4-forge-panel > .w4-forge-stage .w4-forge-live-level.is-current {'+
             'background:linear-gradient(100deg,#35576d,#133957)!important;'+
             'border-color:#f9d383!important;}'
-        ].join('\\n');
+        ].join('\n');
         const foundryGeometryExpression="(()=>{const box=s=>{const e=document.querySelector(s);"+
           "if(!e)return null;const b=e.getBoundingClientRect();return [b.left,b.top,b.width,b.height];};"+
           "return {panel:box('.w4-forge-description'),cannon:box('.w4-reference-cannon'),"+
@@ -356,7 +356,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         const foundryPlateAB={...plateSample,sameReactFrame:true,viewport:'384x512',
           geometry:afterFoundryGeom,approved:false};
         writeFileSync(join(folder,'forge-panel-controlled-ab.json'),
-          JSON.stringify(foundryPlateAB,null,2)+'\\n');
+          JSON.stringify(foundryPlateAB,null,2)+'\n');
         console.log('WORK4_FORGE_PANEL_AB '+JSON.stringify(foundryPlateAB));
 
 
