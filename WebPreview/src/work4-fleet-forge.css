@@ -2749,3 +2749,18 @@
     box-shadow:inset 0 2px #c3d99b8a,inset 0 -2px #09281f,0 3px #593c21,0 5px 9px #06131d9e;
   }
 }
+
+/* WORK4 / #104 — 17 Nov 17h: source-authentic inset instead of gold frame.
+   The approved Fleet 03 stats are printed into the right-side blue sea
+   inset without a bright gilded rectangle. Keep the same source-aligned
+   Royal Crown, sea pixels, roster and real button; just soften this local
+   ornamental metal outline. Native 384x512 ONLY; no WORK0 shell/dock. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    width:36%;
+    right:1.5%;
+    border:1px solid #35617a;
+    border-radius:9px;
+    box-shadow:inset 0 1px #76a9ba45,0 2px 4px #04132348;
+  }
+}
