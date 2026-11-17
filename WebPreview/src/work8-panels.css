@@ -5158,3 +5158,22 @@
     filter:brightness(.645) saturate(1.055);
   }
 }
+
+/* WORK8/#104 — 07 MISSÕES exclusively, geometric source registration.
+   Measured original 384x512 against the real decoded Chromium capture:
+   the authentic blue enamel tabs and the THREE genuine objectives are
+   painted ~13-14px below their approved reference. Move ONLY their
+   painted/interactive local groups. Transform does not reflow or move
+   the daily reward tray, seven actual chests or the global five-item dock.
+   No ranking, Porto, shell, economy or game-state changes.
+   This baseline flag is solely for the native same-frame A/B gate. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-native-register-ab-baseline) .w8-approved-missions > .w8-approved-tabs {
+    position:relative;
+    z-index:5;
+    transform:translateY(-13px);
+  }
+  :root:not(.work8-missions-native-register-ab-baseline) .w8-approved-missions > .w8-approved-quest-list {
+    transform:translateY(-14px);
+  }
+}
