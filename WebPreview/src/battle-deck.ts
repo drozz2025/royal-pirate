@@ -61,7 +61,9 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
   // The approved guns read as blue-black forged steel with sunlit facets, not
   // pitch-black tubes against a dark rectangle. Geometry and shot origins stay
   // untouched: this material belongs only to the decorative first-person deck.
-  const metal = new T.MeshStandardMaterial({color:'#354b5d',metalness:.64,roughness:.30});
+  // Blackened forged iron is closer to the ink-dark approved cannon painting;
+  // bronze collars still catch the battle-only warm key light.
+  const metal = new T.MeshStandardMaterial({color:'#202b36',metalness:.58,roughness:.36});
   const gunRope = new T.MeshStandardMaterial({color:'#d2b585',roughness:.92});
   const cheekOak = new T.MeshStandardMaterial({color:'#744022',roughness:.83});
   const bronze = new T.MeshStandardMaterial({color:'#e0ae61',metalness:.74,roughness:.27});
