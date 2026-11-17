@@ -185,6 +185,75 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       }
       const screenshot=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
+
+      // WORK4 / #104: same React scene/frame, native 384x512 original |
+      // previous oversized roster | current 4 complete cards | overlay.
+      // Restore ONLY the former local roster dimensions through a temporary
+      // style. The approved Royal Crown, painted sea and global dock never move.
+      if(screen==='fleet' && width===384 && height===512){
+        const geometryExpr="(()=>{const b=s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,bottom:r.bottom};};"+
+          "const active=document.querySelector('.w4-fleet .w4-ship-slot.is-active');"+
+          "const a=active?.getBoundingClientRect();const at=a?document.elementFromPoint(a.left+a.width/2,a.top+a.height/2):null;"+
+          "return {ship:b('.w4-reference-ship'),sea:b('.w4-reference-sea'),"+
+          "stage:b('.w4-fleet .w4-harbour-stage'),roster:b('.w4-fleet .w4-ship-roster'),"+
+          "dock:b('.harbour-nav.app-dock-porto'),active:b('.w4-fleet .w4-ship-slot.is-active'),"+
+          "cards:document.querySelectorAll('.w4-fleet .w4-ship-roster .w4-ship-slot').length,"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "hit:!!at?.closest('button.w4-ship-slot.is-active')};})()";
+        const afterGeo=await evaluate(geometryExpr);
+        assert.equal(afterGeo.cards,4,'all four real Fleet cards must render');
+        assert.equal(afterGeo.nav,5,'five protected dock items');
+        assert.ok(afterGeo.active.height>=44,'active ship retains >=44px touch target');
+        assert.ok(afterGeo.roster.bottom<=afterGeo.dock.y+6,
+          'native 384x512 Fleet roster must not be covered by the dock');
+        assert.ok(afterGeo.hit,'Royal Crown card remains hittable above dock');
+        const oldCSS=[
+          '.w4-fleet .w4-ship-roster{gap:5px!important;margin-top:0!important;}',
+          '.w4-fleet .w4-ship-roster>.w4-ship-slot{min-height:clamp(112px,16dvh,147px)!important;padding:4px 1px 6px!important;gap:2px!important;}',
+          '.w4-fleet .w4-ship-roster>.w4-ship-slot .w4-slot-art,.w4-fleet .w4-ship-roster>.w4-ship-slot.is-active .w4-slot-art{height:clamp(67px,10.6dvh,96px)!important;}'
+        ].join('\\n');
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
+          "s.id='work4-before-roster';s.textContent="+JSON.stringify(oldCSS)+
+          ";document.head.appendChild(s);return true;})()"));
+        await sleep(140);
+        const beforeGeo=await evaluate(geometryExpr);
+        const beforeImage=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-fleet-roster-384x512.png'),Buffer.from(beforeImage,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-before-roster')?.remove();return true;})()"));
+        await sleep(120);
+        for(const key of ['ship','sea','stage','dock'] as const)
+          assert.deepEqual(afterGeo[key],beforeGeo[key],'roster fix cannot affect '+key);
+        assert.ok(beforeGeo.roster.bottom-afterGeo.roster.bottom>=16,
+          'must recover at least 16px of actual roster clearance');
+        const compare="(async()=>{"+
+          "const load=async u=>{const i=new Image();i.src=u;await i.decode();return i;};"+
+          "const [ref,prev,now]=await Promise.all(["+
+          "load('data:image/webp;base64,"+references.fleet+"'),"+
+          "load('data:image/png;base64,"+beforeImage+"'),"+
+          "load('data:image/png;base64,"+screenshot+"')]);"+
+          "if([ref,prev,now].some(i=>i.width!==384||i.height!==512))throw Error('no scaling 384x512');"+
+          "const pix=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+          "const a=pix(ref),b=pix(prev),c=pix(now);"+
+          "const rois={global:[0,0,384,512],ship:[65,205,175,307],sea:[18,306,218,356],roster:[18,345,374,444],dock:[0,430,384,512]};"+
+          "const mae=(u,v,r)=>{let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;for(let j=0;j<3;j++){total+=Math.abs(u[k+j]-v[k+j]);n++;}}return total/n;};"+
+          "const before={},after={};for(const [key,rect] of Object.entries(rois)){before[key]=mae(a,b,rect);after[key]=mae(a,c,rect);}"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
+          "g.drawImage(ref,0,0);g.drawImage(prev,384,0);g.drawImage(now,768,0);g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(now,1152,0);"+
+          "return {rois,before,after,comparison:out.toDataURL('image/png').split(',')[1]};})()";
+        const ab=await evaluate(compare);
+        assert.ok(ab?.after?.roster>=0&&ab?.before?.roster>=0,'measured real roster ROI');
+        assert.ok(Math.abs(ab.after.ship-ab.before.ship)<.05,'single ship is pixel-identical');
+        assert.ok(Math.abs(ab.after.sea-ab.before.sea)<.05,'approved sea is pixel-identical');
+        writeFileSync(join(folder,'compare-fleet-roster-384x512.png'),Buffer.from(ab.comparison,'base64'));
+        delete ab.comparison;
+        const evidence={...ab,beforeGeometry:beforeGeo,afterGeometry:afterGeo,
+          viewport:'384x512',source:'assets/design-approved/03-frota.webp',
+          sameReactFrame:true,approved:false};
+        writeFileSync(join(folder,'fleet-roster-controlled-ab.json'),JSON.stringify(evidence,null,2)+'\\n');
+        console.log('WORK4_FLEET_ROSTER_AB '+JSON.stringify(evidence));
+      }
       // WORK4 / 09h: real native Forge first-fold A/B on an IDENTICAL React
       // frame. Temporarily restore the previous material-note placement and
       // compact CSS, then undo both before measuring; no artificial gameplay
