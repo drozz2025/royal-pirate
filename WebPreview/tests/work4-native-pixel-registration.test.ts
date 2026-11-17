@@ -317,6 +317,70 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         writeFileSync(join(folder,'fleet-source-thumbnails-ab.json'),JSON.stringify(evidence,null,2)+'\n');
         console.log('WORK4_SOURCE_THUMBNAILS_AB '+JSON.stringify(evidence));
       }
+      // WORK4 / #104: source-right Fleet attributes plate, native 384x512.
+      // Freeze the SAME React frame; swap only the preceding plate width/right
+      // for the "before" image, then remove local style for the "after" image.
+      // No actual user data, ship scene, water, roster or dock is changed.
+      if(screen==='fleet' && width===384 && height===512){
+        const selector='.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label';
+        const boxExpr="(()=>{const get=s=>{const n=document.querySelector(s);if(!n)return null;"+
+          "const r=n.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,bottom:r.bottom};};"+
+          "return {plate:get("+JSON.stringify(selector)+"),scene:get('.w4-fleet .w4-harbour-stage'),"+
+          "ship:get('.w4-reference-ship'),roster:get('.w4-ship-roster'),"+
+          "dock:get('.harbour-nav.app-dock-porto'),"+
+          "items:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        const current=await evaluate(boxExpr);
+        const older=selector+'{width:36%!important;right:1.5%!important;'+
+          'border:2px solid #d5ad72!important;border-radius:9px!important;'+
+          'box-shadow:inset 0 1px #ffe1a66c,0 4px 8px #04132366!important}';
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
+          "s.id='work4-plate-old';s.textContent="+JSON.stringify(older)+
+          ";document.head.appendChild(s);return true;})()"));
+        await sleep(160);
+        const previous=await evaluate(boxExpr);
+        const previousPng=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-fleet-plate-384x512.png'),Buffer.from(previousPng,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-plate-old')?.remove();return true;})()"));
+        await sleep(140);
+        assert.deepEqual(await evaluate(boxExpr),current,'plate CSS toggling restores the same scene');
+        assert.equal(current.items,5,'WORK0 dock unchanged with five buttons');
+        for(const key of ['scene','ship','roster','dock'] as const)
+          assert.deepEqual(current[key],previous[key],key+' geometry untouched');
+        assert.ok(current.plate.width<=previous.plate.width,'single stats inset metal outline is softened');
+        assert.ok(current.plate.bottom<=current.scene.bottom+1,'all live stats remain inside stage');
+        const calculate="(async()=>{"+
+          "const load=async src=>{const i=new Image();i.src=src;await i.decode();return i;};"+
+          "const [ref,old,now]=await Promise.all(["+
+          "load('data:image/webp;base64,"+references.fleet+"'),"+
+          "load('data:image/png;base64,"+previousPng+"'),"+
+          "load('data:image/png;base64,"+screenshot+"')]);"+
+          "if([ref,old,now].some(i=>i.width!==384||i.height!==512))throw Error('native 384x512');"+
+          "const pix=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data};"+
+          "const [a,b,c]=[pix(ref),pix(old),pix(now)];"+
+          "const rois={global:[0,0,384,512],plate:[225,155,378,341],ship:[65,205,175,307],"+
+            "water:[18,300,218,339],roster:[18,347,367,414],dock:[0,430,384,512]};"+
+          "const mae=(p,q,r)=>{let s=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;for(let ch=0;ch<3;ch++){s+=Math.abs(p[k+ch]-q[k+ch]);n++}}return s/n};"+
+          "const before={},after={};for(const [key,roi] of Object.entries(rois)){before[key]=mae(a,b,roi);after[key]=mae(a,c,roi)};"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
+          "g.drawImage(ref,0,0);g.drawImage(old,384,0);g.drawImage(now,768,0);"+
+          "g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(now,1152,0);"+
+          "return {rois,before,after,png:out.toDataURL('image/png').split(',')[1]};})()";
+        const ab=await evaluate(calculate);
+        writeFileSync(join(folder,'compare-fleet-plate-384x512.png'),Buffer.from(ab.png,'base64'));
+        delete ab.png;
+        const evidence={...ab,source:'assets/design-approved/03-frota.webp',
+          sameReactFrame:true,viewport:'384x512',approved:false,
+          previousPlate:previous.plate,currentPlate:current.plate};
+        writeFileSync(join(folder,'fleet-plate-ab.json'),JSON.stringify(evidence,null,2)+'\n');
+        console.log('WORK4_FLEET_PLATE_AB '+JSON.stringify(evidence));
+        assert.ok(ab.after.plate<ab.before.plate,'source-right Fleet plate ROI must improve');
+        assert.ok(ab.after.global<ab.before.global,'native Fleet global must not regress');
+        for(const key of ['ship','water','roster','dock'] as const)
+          assert.ok(Math.abs(ab.after[key]-ab.before[key])<.12,
+            'protected '+key+' native ROI must not regress');
+      }
       // WORK4 / #104: native 384x512 approved Forge enamel comparison.
       // Do not change React state, forge cost values, cannon, or the shared
       // dock. Restore only the previous grey/81% button with a local STYLE,
