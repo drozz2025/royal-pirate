@@ -65,7 +65,11 @@ export class OceanScene {
         float rolling=sin(p.y*.275-time*.76+
           sin(p.x*.145+time*.20)*1.14)*.66;
         float crossSea=sin(p.x*.47+p.y*.29+time*.96)*.30;
-        float chop=sin(p.y*1.12-p.x*.32-time*1.74)*.095;
+        // Breaking shoulder in actual displaced 3D water, not a CSS foam
+        // stripe. Batalha-only: the early harbour return remains byte-identical.
+        float foldedRim=pow(max(0.,sin(p.y*.73-time*.92+
+          sin(p.x*.31+time*.17)*1.18)),3.)*.17;
+        float chop=sin(p.y*1.12-p.x*.32-time*1.74)*.095+foldedRim;
         // Waves grow around the distant broadside, but ease off as the
         // spectator's real wooden deck approaches the screen. The plane's
         // local -Y axis becomes world +Z after its -90 degree rotation.
