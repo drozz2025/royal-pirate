@@ -1,0 +1,137 @@
+/* WORK 0 / #104 — systemic mobile battle hierarchy. Batalha ONLY.
+   Reference: assets/design-approved/02-batalha.webp.
+   Preserve the Porto, five-item navigation and all live controls. The settings
+   drawer is disclosure UI, not an extra gameplay feature. */
+@media (max-width:600px) {
+  .app.in-battle {height:100dvh;min-height:0;overflow:hidden}
+
+  /* One title, one exit, and one compact health row; the large duplicate
+     brand/currency slabs previously ate the first third of the battlefield. */
+  .in-battle .battle-approved-top {
+    height:46px;top:0;padding-top:max(8px,env(safe-area-inset-top));
+    display:flex;align-items:flex-start;justify-content:center
+  }
+  .in-battle .battle-approved-logo,
+  .in-battle .battle-approved-currencies {display:none}
+  .in-battle .battle-approved-banner {
+    margin:0;width:auto;height:34px;padding:0 8px;
+    border:0;border-radius:0;background:none;box-shadow:none;
+    font:900 22px/34px 'Barlow Condensed',sans-serif;
+    text-shadow:0 2px 5px #071a33;letter-spacing:1.1px
+  }
+  .in-battle .battle-approved-banner svg {width:13px;height:13px;opacity:.75}
+  .in-battle .return-harbour {
+    top:max(8px,env(safe-area-inset-top));left:10px;
+    height:36px;min-height:36px;padding:6px 10px;border:1px solid #b89459;
+    border-radius:7px;font:800 12px 'Barlow Condensed',sans-serif;
+    box-shadow:0 2px 5px #081b32ab;background:#0a2948d9;
+    letter-spacing:.2px
+  }
+  .in-battle .battle-hud {
+    top:max(52px,calc(env(safe-area-inset-top) + 49px));
+    left:50%;width:calc(100% - 18px);gap:4px
+  }
+  .in-battle .health-card {
+    min-height:46px;padding:5px 7px;gap:0;border:1px solid #9a824f;
+    border-radius:7px;box-shadow:0 2px 7px #071b3499;
+    background:linear-gradient(#183b62de,#0a274de8)
+  }
+  .in-battle .health-crest {display:none}
+  .in-battle .ship-label {font-size:8px;letter-spacing:.1px}
+  .in-battle .ship-label strong {font-size:10px}
+  .in-battle .health-detail h2 {
+    font:800 clamp(12px,3.6vw,17px)/1 'Barlow Condensed',sans-serif;
+    margin:2px 0 4px;max-width:100%
+  }
+  .in-battle .health-track {height:6px;border:0}
+  .in-battle .round {flex-basis:28px;gap:1px}
+  .in-battle .round .battle-versus {font-size:18px}
+  .in-battle .round span {font-size:8px;margin-top:2px}
+
+  /* Keep five existing camera/audio/restart actions, but not five giant
+     ornaments blocking the enemy and fighting the primary DISPARAR CTA. */
+  .in-battle .view-controls {
+    top:max(8px,env(safe-area-inset-top));right:9px;bottom:auto;left:auto;
+    transform:none;width:auto;padding:0;display:block;pointer-events:auto
+  }
+  .in-battle .battle-utilities {position:relative;display:block}
+  .in-battle .battle-utilities summary {
+    list-style:none;display:grid;place-items:center;
+    width:36px;height:36px;border:1px solid #ae935d;border-radius:8px;
+    background:#0a2948e8;color:#ffe9b5;cursor:pointer;
+    box-shadow:0 2px 5px #081b32ab
+  }
+  .in-battle .battle-utilities summary::-webkit-details-marker {display:none}
+  .in-battle .battle-utilities summary svg {width:20px;height:20px}
+  .in-battle .battle-utilities summary:focus-visible {outline:3px solid #fff2ab;outline-offset:2px}
+  .in-battle .battle-utilities-actions {
+    position:absolute;top:42px;right:0;width:162px;padding:8px;
+    display:grid;grid-template-columns:repeat(3,44px);gap:6px;
+    border:1px solid #b9955b;border-radius:9px;
+    background:#082641f5;box-shadow:0 9px 22px #02162ad9
+  }
+  .in-battle .view-controls .battle-utilities-actions button,
+  .in-battle .view-controls .battle-utilities-actions button:last-child {
+    position:static;display:grid;place-items:center;
+    width:44px;height:44px;flex:none;margin:0;padding:0;
+    border:1px solid #8b9bac;border-radius:7px;
+    background:#184265;color:#f9e5b6;box-shadow:none
+  }
+  .in-battle .view-controls .battle-utilities-actions button svg {width:21px;height:21px;filter:none}
+  .in-battle .view-controls .battle-utilities-actions button.active {border-color:#ffe5a0;background:#76532f}
+
+  /* The stage must remain visually dominant at 320-430px. Two deliberately
+     quiet sliders flank ONE recognisable firing control over the real deck. */
+  .in-battle .command-deck {
+    height:160px;bottom:0;left:0;right:0;width:100%;
+    border:0;border-radius:0;box-shadow:none;
+    background:linear-gradient(180deg,transparent 0%,#0c24314d 38%,#14232abb 100%);
+    pointer-events:none;overflow:visible
+  }
+  .in-battle .command-deck::before {display:none}
+  .in-battle .command-deck .turn-line {
+    position:absolute;top:-27px;left:12px;right:12px;
+    width:auto;height:25px;min-height:25px;padding:4px 9px;
+    border:1px solid #8a805a;border-radius:7px;
+    background:#0b2d4ce8;box-shadow:0 2px 6px #081c31a8
+  }
+  .in-battle .command-deck .turn-line strong {font-size:11px}
+  .in-battle .command-deck .turn-line .message {font-size:10px;max-width:63%}
+  .in-battle .command-deck .controls-body {padding:0;min-height:0}
+  .in-battle .command-deck .sliders {
+    position:absolute;left:10px;right:10px;bottom:20px;
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:clamp(100px,28vw,128px);min-height:68px;
+    padding:0;margin:0;border:0;border-radius:0;
+    background:none;box-shadow:none;pointer-events:auto
+  }
+  .in-battle .command-deck .sliders label {
+    min-width:0;padding:7px 5px 4px;
+    border:1px solid #8e8465;border-radius:7px;
+    background:#0a2c48d6;box-shadow:none
+  }
+  .in-battle .command-deck .sliders label>span {font-size:11px;gap:2px}
+  .in-battle .command-deck .sliders label>span svg {display:none}
+  .in-battle .command-deck .sliders b {font-size:13px}
+  .in-battle .command-deck .sliders input {height:30px;margin:0;touch-action:pan-y}
+  .in-battle .command-deck .sliders .scale {font-size:7px}
+  .in-battle .command-deck .fire-button {
+    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+    width:94px;height:94px;flex:none;
+    border:3px solid #e6b868;border-radius:50%;
+    background:radial-gradient(circle at 35% 20%,#f56c4a,#c81d30 68%,#69172c);
+    box-shadow:0 0 0 2px #4f3628,0 7px 12px #0317289e;
+    pointer-events:auto
+  }
+  .in-battle .command-deck .fire-button svg {width:23px;height:23px}
+  .in-battle .command-deck .fire-button>span {font-size:23px;line-height:1}
+  .in-battle .command-deck .fire-button>small {font-size:8px}
+  .in-battle .command-deck .fire-button:active {transform:translate(-50%,2px)}
+  .in-battle .command-deck .deck-footer {display:none}
+}
+@media (max-width:350px) {
+  .in-battle .command-deck .sliders {left:6px;right:6px;gap:100px}
+  .in-battle .command-deck .sliders label>span {font-size:10px}
+  .in-battle .command-deck .sliders .scale {font-size:6px}
+  .in-battle .command-deck .fire-button {width:88px;height:88px;bottom:27px}
+}
