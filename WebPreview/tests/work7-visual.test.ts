@@ -56,7 +56,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
 
   browser = spawn(chrome!, [
     '--headless=new', '--no-sandbox', '--disable-dev-shm-usage',
-    '--disable-gpu', '--remote-allow-origins=*',
+    '--enable-webgl', '--enable-unsafe-swiftshader',
+    '--use-gl=angle', '--use-angle=swiftshader', '--remote-allow-origins=*',
     '--remote-debugging-port=9337', '--user-data-dir='+temp, 'about:blank'
   ], { stdio: 'ignore' });
   let target: any;
