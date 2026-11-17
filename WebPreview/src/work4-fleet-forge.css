@@ -2811,3 +2811,18 @@
       linear-gradient(to bottom,transparent 0%,#000 5%,#000 92%,transparent 100%);
   }
 }
+
+/* WORK4/#104 — native Forge 04: align the actual upgrade/status plaque with
+   the right-hand inset of the approved 04 painting (x≈176 at 384×512).
+   The merged 43% plaque started at x≈211, leaving an artificial timber gap.
+   Expand ONLY the real text/level plaque leftward; furnace x<172, one cannon,
+   materials and real costs, touch and WORK0's five-item dock are unchanged.
+   Compare with merged HEAD in one paused Chromium frame before approval. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+    width:53%;
+    right:1.5%;
+    border-color:#8a9ba1;
+    box-shadow:inset 0 1px #f6ddb06b,0 3px 7px #06101a9c;
+  }
+}
