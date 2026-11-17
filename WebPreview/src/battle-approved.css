@@ -310,3 +310,46 @@ body:has(.in-battle) > .rp-version{top:auto!important;left:7px!important;bottom:
   .in-battle .command-deck .sliders input{height:20px}
   .in-battle .command-deck .sliders .scale{font-size:7px;line-height:1.1}
 }
+
+/* WORK6 #104 — ORIGINAL 384x512 battle layout, preserving original 320px control layout.
+   The approved short portrait art shows real timber under floating controls,
+   not a full-width navy plate. Every original control stays present and
+   tappable. Tall phones retain the previously integrated layout. */
+@media (min-width:360px) and (max-height:650px){
+  .in-battle .command-deck{
+    height:180px;
+    background:linear-gradient(180deg,transparent 0%,rgba(26,24,28,.05) 50%,rgba(32,22,20,.19) 100%);
+    box-shadow:none;
+  }
+  .in-battle .command-deck::before{display:none}
+  .in-battle .command-deck .turn-line{
+    top:clamp(-88px,calc(484px - 100dvh),-28px);
+    height:26px;min-height:26px;
+  }
+  .in-battle .view-controls{
+    bottom:clamp(52px,calc(110dvh - 511px),126px);
+  }
+  .in-battle .view-controls button:not(:last-child){
+    flex-basis:clamp(42px,12vw,50px);
+    width:clamp(42px,12vw,50px);height:clamp(42px,12vw,50px);
+  }
+  .in-battle .command-deck .fire-button{
+    bottom:clamp(39px,calc(110dvh - 524px),104px);
+  }
+  .in-battle .command-deck .sliders{
+    left:4px;right:4px;bottom:5px;
+    gap:clamp(108px,30vw,130px);
+    min-height:55px;padding:0;
+    background:none;border:0;border-radius:0;box-shadow:none;
+  }
+  .in-battle .command-deck .sliders label{
+    min-width:0;padding:4px 5px 2px;
+    border:1px solid #986d3d;border-radius:8px;
+    background:linear-gradient(180deg,#122b43c7,#0b2035b7);
+    box-shadow:inset 0 1px #f1cf9c55;
+  }
+  .in-battle .command-deck .sliders label>span{font-size:9px;gap:2px}
+  .in-battle .command-deck .sliders b{font-size:11px}
+  .in-battle .command-deck .sliders input{height:18px;margin:0}
+  .in-battle .command-deck .sliders .scale{font-size:7px;line-height:1.1}
+}
