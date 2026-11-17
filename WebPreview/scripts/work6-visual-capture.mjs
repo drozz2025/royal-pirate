@@ -33,8 +33,30 @@ try {
     if(!touch)throw new Error(`DISPARAR touch target covered at ${width}x${height}`);
     const canvas=page.locator('.ocean canvas');
     if(await canvas.count()!==1)throw new Error('Real battle renderer canvas absent');
+    // Systemic Battle QA: the naval stage must dominate while the original
+    // five utility actions remain reachable through one compact menu.
+    const toggle=page.locator('.battle-utilities-toggle');
+    const menu=page.locator('.battle-utilities-actions');
+    if(!await toggle.isVisible() || await menu.isVisible())
+      throw new Error(`Mobile utilities not correctly collapsed at ${width}x${height}`);
+    await toggle.click();
+    if(!await menu.isVisible() || await menu.locator('button').count()!==5)
+      throw new Error(`Mobile utilities lost existing controls at ${width}x${height}`);
+    if(await toggle.getAttribute('aria-expanded')!=='true')
+      throw new Error('Utility menu accessibility state did not update');
+    await toggle.click();
+    if(await menu.isVisible() || await toggle.getAttribute('aria-expanded')!=='false')
+      throw new Error('Utility menu did not close');
+    const bearing=page.locator('#bearing'), power=page.locator('#power');
+    if(!await bearing.isEnabled() || !await power.isEnabled())
+      throw new Error('Existing firing sliders not operable');
+    const noXOverflow=await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1);
+    if(!noXOverflow)throw new Error(`Batalha horizontal overflow at ${width}x${height}`);
     await page.screenshot({path:resolve(root,`battle-${width}x${height}.png`),animations:'disabled'});
-    console.log(`WORK6 screenshot ${width}x${height}: Porto/Batalha, HP + FIRE boundaries OK`);
+    await page.locator('.fire-button').click();
+    await page.locator('.fire-button:disabled').waitFor({state:'visible',timeout:2500});
+    await page.screenshot({path:resolve(root,`battle-shot-${width}x${height}.png`),animations:'disabled'});
+    console.log(`WORK6 ${width}x${height}: Porto/Batalha, mobile utility disclosure, sliders and DISPARAR flight confirmed`);
     await ctx.close();
   }
 } finally {await browser.close();}
