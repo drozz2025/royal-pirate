@@ -497,22 +497,25 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
     {!small&&<>
       <defs>
         <linearGradient id="w4-r03-canvas" x1="0%" y1="0%" x2="100%" y2="48%">
-          <stop stopColor="#060e1d"/><stop offset=".16" stopColor="#525c6a"/>
-          <stop offset=".3" stopColor="#26303d"/><stop offset=".54" stopColor="#0b1525"/>
-          <stop offset=".76" stopColor="#394858"/><stop offset="1" stopColor="#081320"/>
+          <stop stopColor="#060d1b"/><stop offset=".12" stopColor="#5d6369"/>
+          <stop offset=".29" stopColor="#1c2834"/><stop offset=".52" stopColor="#060e1c"/>
+          <stop offset=".73" stopColor="#424a52"/><stop offset=".89" stopColor="#101927"/>
+          <stop offset="1" stopColor="#050d18"/>
         </linearGradient>
         <linearGradient id="w4-r03-hull" x1="0%" y1="0%" x2="20%" y2="100%">
-          <stop stopColor="#ac7d4e"/><stop offset=".13" stopColor="#68422f"/>
-          <stop offset=".23" stopColor="#38282a"/><stop offset=".52" stopColor="#121721"/>
-          <stop offset=".85" stopColor="#352329"/><stop offset="1" stopColor="#9c6138"/>
+          <stop stopColor="#bd8b53"/><stop offset=".10" stopColor="#6a412e"/>
+          <stop offset=".23" stopColor="#272127"/><stop offset=".52" stopColor="#090f1a"/>
+          <stop offset=".79" stopColor="#211922"/><stop offset=".92" stopColor="#462a29"/>
+          <stop offset="1" stopColor="#a26735"/>
         </linearGradient>
         <linearGradient id="w4-r03-metal" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop stopColor="#ffe1a6"/><stop offset=".48" stopColor="#ac773d"/><stop offset="1" stopColor="#583722"/>
         </linearGradient>
       </defs>
       <g className="w4-reference-galleon-volume" pointerEvents="none">
-        <path d="M121 41Q155 30 180 55Q210 89 198 136Q160 152 124 131Q137 90 121 41Z"
-          fill="url(#w4-r03-canvas)" stroke="#c7a36e" strokeWidth="2.3"/>
+        <path d="M115 37C143 23 179 36 190 61C209 89 209 124 198 141
+          C162 155 130 138 122 123C138 82 123 53 115 37Z"
+          fill="url(#w4-r03-canvas)" stroke="#a58d70" strokeWidth="2.5"/>
         <path d="M127 49Q151 49 164 69Q180 97 177 131"
           fill="none" stroke="#d6d1c1" strokeWidth="3.2" opacity=".52"/>
         <path d="M187 67Q197 91 193 121Q182 130 167 136"
@@ -550,8 +553,15 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
           strokeWidth="4.4" strokeLinecap="round" opacity=".88"/>
         <g fill="#eee3c9"><circle cx="139" cy="110" r="3.6"/><circle cx="185" cy="135" r="3.6"/>
           <circle cx="183" cy="110" r="3.6"/><circle cx="141" cy="136" r="3.6"/></g>
-        <path d="M65 147Q174 169 299 137Q297 170 273 194Q180 226 86 196Q70 176 65 147Z"
-          fill="url(#w4-r03-hull)" stroke="#d9a968" strokeWidth="3.4"/>
+        <path d="M64 145C124 165 224 166 300 137C300 172 278 197 245 211
+          C189 231 125 219 89 194C74 181 67 164 64 145Z"
+          fill="url(#w4-r03-hull)" stroke="#c79a60" strokeWidth="3.4"/>
+        {/* Existing single broadside: its lower mass becomes dark, rounded timber,
+            not another hull. Gunports remain above this shadow plane. */}
+        <path d="M77 175C136 196 235 203 286 169L272 190
+          C223 220 139 219 93 194Z" fill="#090f19" opacity=".69"/>
+        <path d="M92 194C138 214 225 220 273 188"
+          fill="none" stroke="#d09a57" strokeWidth="2.7" opacity=".84"/>
         <path d="M67 149Q185 175 300 140M77 160Q180 187 292 154"
           fill="none" stroke="#ffcf79" strokeWidth="3.8"/>
         <path d="M84 181Q172 209 282 177M92 195Q181 224 270 190"
@@ -589,6 +599,13 @@ function TropicalBackdrop(){
   
   {/* Warm haze and contrasting sea planes behind the SAME vessel. */}
   <g className="w4-r03-coastal-depth" pointerEvents="none">
+    {/* Three distinct water depths converge beneath the existing flagship. */}
+    <path d="M0 206C91 194 128 212 208 201C290 189 363 205 420 195V310H0Z"
+      fill="#043a58" opacity=".5"/>
+    <path d="M0 223C103 206 159 239 249 215C303 202 364 224 420 207V310H0Z"
+      fill="#075d74" opacity=".5"/>
+    <path d="M0 241Q81 224 147 236T289 232T420 230"
+      fill="none" stroke="#b0f9f0" strokeWidth="4" opacity=".48"/>
     <path d="M0 170Q56 149 118 183Q189 170 243 176Q337 139 420 167V213H0Z"
       fill="#89d8bf" opacity=".2"/>
     <path d="M0 202Q49 182 87 203M131 201Q211 190 291 202M330 195Q382 182 420 198"
@@ -656,12 +673,24 @@ function ForgeBackdrop(){
   <path d="M24 142Q37 50 107 54Q159 54 168 138V271H24Z" fill="#2c2929" stroke="#b07d48" strokeWidth="9"/>
   <path d="M40 151Q51 85 103 85Q142 84 151 150V257H40Z" fill="#412b2b" stroke="#17151f" strokeWidth="9"/>
   <ellipse cx="104" cy="213" rx="68" ry="80" fill="url(#w4-fireglow)" opacity=".92"/>
+  {/* Lift the one EXISTING flame into the visible arch opening. At 320px
+      the barrel previously covered its centre; no additional furnace. */}
+  <g className="w4-forge-flame-visible" transform="translate(22 -38)">
   <path d="M77 254Q62 228 87 197Q81 222 103 216Q96 185 119 163Q110 202 137 218Q146 239 129 259Z" fill="#ffbe4a" stroke="#ffed93" strokeWidth="3"/>
    <path d="M90 252Q80 234 96 220Q91 237 108 233Q101 209 121 197Q113 225 129 238L122 258Z" fill="#ffe6a1" opacity=".94"/>
    <path d="M102 252Q96 238 108 232Q105 243 114 244L118 257Z" fill="#fff9d2" opacity=".92"/>
   
    {/* Added light to the existing hearth, without another furnace or flame. */}
    <g className="w4-r04-hearth-core" pointerEvents="none">
+     {/* Irregular flame tongues are confined to the EXISTING stone hearth,
+         with warm reflection on the inner arch rather than a second fire. */}
+     <path d="M61 253C64 220 80 219 82 192C93 210 94 219 103 215
+       C105 189 120 182 122 156C136 187 133 204 142 216
+       C150 232 150 247 145 258Z" fill="#ff8f30" opacity=".72"/>
+     <path d="M79 255C77 234 89 222 98 207C97 225 109 231 114 213
+       C123 228 135 232 130 254Z" fill="#ffe49b" opacity=".7"/>
+     <path d="M48 147Q64 76 108 75Q157 79 174 149"
+       fill="none" stroke="#ffd4a0" strokeWidth="5" opacity=".42"/>
      <ellipse cx="105" cy="239" rx="51" ry="37" fill="#ff6d22" opacity=".36"/>
      <path d="M73 253Q85 225 95 220Q87 241 105 238Q109 212 121 200Q115 230 131 239L137 253Z"
        fill="#ffd66b" opacity=".68"/>
@@ -672,6 +701,7 @@ function ForgeBackdrop(){
        <circle cx="116" cy="181" r="2.7"/><circle cx="141" cy="205" r="2"/>
      </g>
    </g>
+  </g>
    <path d="M0 264L420 248V305H0Z" fill="#413327" stroke="#b88f53" strokeWidth="7"/>
   <path d="M0 278L420 265M56 266L55 302M175 265L182 301M312 261L332 303" stroke="#9d7a4c" strokeWidth="3" opacity=".6"/>
   <g stroke="#cc9d5b" fill="none" strokeWidth="5"><circle cx="28" cy="232" r="27"/><path d="M28 205v54M1 232h54m-45-19 36 37m0-37-36 37"/></g>
@@ -1065,11 +1095,12 @@ function ForgeCannonArtwork(){
         <stop offset=".84" stopColor="#584735"/><stop offset="1" stopColor="#efd18f"/>
       </radialGradient>
     </defs>
-    <g className="w4-reference-forge-barrel" pointerEvents="none">
+    <g className="w4-reference-forge-barrel" pointerEvents="none"
+       transform="rotate(7 188 171)">
       <path d="M91 225L280 175L351 210L162 268Z" fill="#2c211e"
         stroke="#d8a765" strokeWidth="6" opacity=".92"/>
-      <path d="M80 143Q194 113 293 93Q314 113 322 151Q206 191 91 225Q73 182 80 143Z"
-        fill="url(#w4-r04-iron)" stroke="#cda36d" strokeWidth="4.5"/>
+      <path d="M80 143Q192 111 293 93Q315 113 322 151Q206 191 91 225Q73 182 80 143Z"
+        fill="url(#w4-r04-iron)" stroke="#9a7a50" strokeWidth="4.5"/>
       <path d="M91 152Q196 120 289 103" stroke="#e9e1c7"
         strokeWidth="3.8" opacity=".84" fill="none"/>
       <path d="M93 158Q191 128 294 109" fill="none"
