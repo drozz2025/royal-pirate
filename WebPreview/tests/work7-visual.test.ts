@@ -345,6 +345,38 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         }
 
 
+
+        // Diagnostic ONLY: native Chromium source-art calibration in the
+        // original SAME React frame. Render the exact v0.1.71 HEAD first;
+        // trial pairs must not modify application, state or any saved asset.
+        if(kind==='shop' && width===384 && height===512){
+          const basestyle=await evaluate("(()=>{let s=document.createElement('style');s.id='w7-head-sweep';s.textContent="+
+            JSON.stringify(currentHeadBaseline)+";document.head.appendChild(s);return true})()");
+          assert.ok(basestyle);
+          for(const pack of [.82,.85,.88,.91]) for(const crop of [1.07,1.12,1.18,1.24,1.30]){
+            const temporaryCss='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness('+pack+')!important}'+
+              '.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{'+
+              'filter:saturate(1.2) contrast(1.06) brightness('+crop+') drop-shadow(0 6px 5px #14062ca3)!important}}';
+            await evaluate("(()=>{let s=document.createElement('style');s.id='w7-pair-sweep';s.textContent="+JSON.stringify(temporaryCss)+";document.head.appendChild(s);return true})()");
+            await sleep(80);
+            const snap=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+            const m=await evaluate("(async()=>{"+
+              "let load=src=>new Promise((ok,fail)=>{let i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "let ref=await load("+JSON.stringify(refUrl)+"),img=await load("+JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(snap.data)+");"+
+              "let cv=document.createElement('canvas');cv.width=384;cv.height=512;let cx=cv.getContext('2d');"+
+              "cx.drawImage(ref,0,0);let a=cx.getImageData(0,0,384,512).data;"+
+              "cx.clearRect(0,0,384,512);cx.drawImage(img,0,0);let b=cx.getImageData(0,0,384,512).data;"+
+              "let full=0,roi=0,n=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
+              "for(let k=0;k<3;k++){let d=Math.abs(a[p+k]-b[p+k]);full+=d;"+
+              "if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=d;n++}}}"+
+              "return {global:Math.round(full/(384*512*3)*1000)/1000,roi:Math.round(roi/n*1000)/1000}})()");
+            console.log('WORK7 PACK-CROP PAIR '+pack+' '+crop+' '+JSON.stringify(m));
+            await evaluate("(()=>{document.getElementById('w7-pair-sweep')?.remove();return true})()");
+          }
+          await evaluate("(()=>{document.getElementById('w7-head-sweep')?.remove();return true})()");
+        }
+
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
