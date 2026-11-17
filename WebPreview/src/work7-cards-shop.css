@@ -4123,9 +4123,13 @@
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.745)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.58)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.64)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.77)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.77)}
-  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-    filter:saturate(1.2) contrast(1.06) brightness(1.05) drop-shadow(0 6px 5px #14062ca3)
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(1.20) drop-shadow(0 4px 3px #041327a8)
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(1.20) drop-shadow(0 4px 3px #041327a8)
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(1.40) drop-shadow(0 4px 3px #041327a8)
   }
 }
