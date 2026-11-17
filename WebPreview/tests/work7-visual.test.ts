@@ -50,10 +50,18 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // Verify shape/touch/MAE on the same Chromium frame without navigating away.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-collection-content{
+      .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+        border-color:#e8c68e!important;
+        border-radius:7px!important;
+        box-shadow:inset 0 1px rgba(255,240,192,.53),0 2px 4px rgba(4,19,41,.32)!important;
+        background:linear-gradient(90deg,#101e2e,#152734 50%,#101e2e)!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
+        border-color:#b69a70!important;
+        border-bottom-color:#695035!important;
         background:
-          radial-gradient(ellipse 92% 95px at 50% 0%,#49677b45,transparent 92%),
-          linear-gradient(180deg,#18374d 0%,#102b43 44%,#0a2039 70%,#061a33 100%)!important;
+          radial-gradient(ellipse 85% 60% at 50% 18%,#263b576b,transparent 84%),
+          linear-gradient(180deg,#111e35 0%,#07182d 60%,#0b1830 100%)!important;
       }
       .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
         background:
@@ -343,12 +351,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         if(width===384 && height===512) {
           assert.ok(Number.isFinite(comparison.roiBefore)&&Number.isFinite(comparison.roiAfter),'Real native 384 ROI metrics recorded');
           if(kind==='cards') {
-            assert.ok(comparison.roiAfter<comparison.roiBefore,'Eight portrait pigments must improve approved native ROI vs same-frame HEAD');
-            assert.ok(comparison.mae<comparison.maeBefore,'Cards global MAE must improve vs same-frame HEAD');
+            assert.ok(comparison.roiAfter!==null&&comparison.mae!==null,
+              'Keep reference metrics available for final gate after both screens');
           }
           if(kind==='shop') {
-            assert.ok(comparison.roiAfter<comparison.roiBefore,'Native approved chest ROI must improve vs same-frame HEAD');
-            assert.ok(comparison.mae<comparison.maeBefore,'Full native 384px shop MAE must also improve vs same-frame HEAD');
+            assert.ok(comparison.roiAfter!==null&&comparison.mae!==null,
+              'Measure actual Captain/chests ROI before joint gate');
           }
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y+1),
             'All true PRÉVIA / EM BREVE labels must stay above the dock at native size');
@@ -377,4 +385,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     await writeFile(join(output,'work7-report.json'),JSON.stringify(report,null,2)+'\n');
   }
   assert.equal(report.screens.length,8,'All four viewports must capture both screens');
+  const native=report.screens.filter(screen=>screen.width===384&&screen.height===512);
+  assert.equal(native.length,2,'Both real native screens must be available');
+  assert.ok(native.every(screen=>
+    screen.maeRgbAfter<screen.maeRgbBefore&&screen.roiMaeAfter<screen.roiMaeBefore),
+    'Both live 05/06 screens must strictly improve global RGB MAE and artwork ROI against merged HEAD: '+
+    JSON.stringify(native.map(s=>({kind:s.kind,global:[s.maeRgbBefore,s.maeRgbAfter],
+      roi:[s.roiMaeBefore,s.roiMaeAfter]}))));
 });
