@@ -124,10 +124,16 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     mesh.computeBoundingSphere();
     group.add(mesh);
   };
-  for(const x of [-3.15,5.72]){
+  // LOCAL ONLY A/B: provide the exact HEAD starboard geometry as control.
+  // The normal game always renders the right-hand candidate; this flag is
+  // never active on GitHub Pages or on an ordinary player visit.
+  const abBase=typeof window!=='undefined' &&
+    (window.location.hostname==='127.0.0.1'||window.location.hostname==='localhost') &&
+    new URLSearchParams(window.location.search).get('work6ab')==='baseline';
+  for(const x of [-3.15,abBase?3.15:5.72]){
     // Only the right-hand decorative cannon changes. Previous PR #261 moved
     // both sides and worsened the left ROI; do not repeat that regression.
-    const right=x>0,size=right?.86:1;
+    const right=x>0&&!abBase,size=right?.86:1;
     // Reuse the original two gun carriages and four spoked wheels.
     addBox(x,1.0,74.2,2.3,.62,5.3,wood);
     addBox(x,1.40,74.8,1.75,.26,3.0,bronze);
