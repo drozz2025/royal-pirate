@@ -570,6 +570,58 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(Math.abs(contrastCompare.metrics.daily.delta)<.05&&Math.abs(contrastCompare.metrics.chests.delta)<.05,
       '7 rewards and daily board must not regress');
 
+
+    /* WORK8/#104 — after integrating #312, compare ONLY the latest
+       daily-board luminance pass in a single decoded, paused Chromium frame.
+       Exact approved 07 WebP and both real renders: 384x512 DPR 1.
+       This flag does not alter any prior integrated WORK8 paint or Rank 08. */
+    const dailyLumFlag='work8-missions-daily-luminance-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(dailyLumFlag)+');true');
+    await delay(145);
+    const dailyLumBeforeLayout=await headingLayout();
+    const dailyLumBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(dailyLumFlag)+');true');
+    await delay(145);
+    const dailyLumAfterLayout=await headingLayout();
+    const dailyLumAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const dailyLumSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+dailyLumBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+dailyLumAfter));
+    assert.notEqual(dailyLumSource,source,'same-frame daily board A/B must use independent screenshots');
+    const dailyLumCompare=await evalJs(dailyLumSource);
+    writeFileSync(join(evidence,'missions-daily-luminance-before-384x512.png'),Buffer.from(dailyLumBefore,'base64'));
+    writeFileSync(join(evidence,'missions-daily-luminance-after-384x512.png'),Buffer.from(dailyLumAfter,'base64'));
+    writeFileSync(join(evidence,'missions-daily-luminance-original-render-overlay-before-384x512.png'),Buffer.from(dailyLumCompare.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-daily-luminance-original-render-overlay-after-384x512.png'),Buffer.from(dailyLumCompare.overlays[1],'base64'));
+    const dailyLumResult={
+      baseSha:'42ce405b6d3638937354e94c9f5906cc8579cafb',
+      source:'assets/design-approved/07-missoes.webp',
+      references:['assets/design-approved/00-referencia-original-aprovada.webp','assets/design-approved/00-painel-oito-ecras.webp','assets/design-approved/01-porto.webp through 08-ranking-perfil.webp'],
+      frame:'identical decoded genuine Missions DOM, paused animations, native unscaled 384x512',
+      viewport:{width:384,height:512,dpr:1},baselineFlag:dailyLumFlag,
+      scope:'07 Missions real seven-day board luminance only',
+      roi:dailyLumCompare.metrics,unchanged:dailyLumCompare.unchanged,
+      beforeLayout:dailyLumBeforeLayout,afterLayout:dailyLumAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-daily-luminance-controlled-ab.json'),JSON.stringify(dailyLumResult,null,2));
+    console.log('WORK8 07 daily-board native A/B MAE '+JSON.stringify(dailyLumResult.roi));
+    assert.deepEqual(dailyLumBeforeLayout.days,dailyLumAfterLayout.days,'7 genuine day hitboxes stable');
+    assert.deepEqual(dailyLumBeforeLayout.chests,dailyLumAfterLayout.chests,'7 illustrated chest positions stable');
+    assert.deepEqual(dailyLumBeforeLayout.questButtons,dailyLumAfterLayout.questButtons,'3 real mission buttons stable');
+    assert.deepEqual(dailyLumBeforeLayout.nav,dailyLumAfterLayout.nav,'5-item dock stable');
+    assert.equal(dailyLumAfterLayout.questCount,3);
+    assert.equal(dailyLumAfterLayout.dayCount,7);
+    assert.equal(dailyLumAfterLayout.dockCount,5);
+    assert.ok(dailyLumAfterLayout.documentWidth<=386);
+    assert.ok(dailyLumAfterLayout.chests.every((c:any)=>c.bottom<=dailyLumAfterLayout.nav.top+2),'seven painted chests above fixed dock');
+    assert.ok(dailyLumCompare.unchanged.header<.1 && dailyLumCompare.unchanged.dock<.1,
+      'header and dock must be pixel identical');
+    assert.ok(dailyLumCompare.metrics.daily.delta < -.05 && dailyLumCompare.metrics.full.delta < -.01,
+      'new daily pigment must improve source-art MAE in panel and full frame');
+    assert.ok(dailyLumCompare.metrics.quests.delta < .05 &&
+      dailyLumCompare.metrics.chests.delta < .06,'cannot regress three missions or seven real rewards');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');

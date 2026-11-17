@@ -5132,3 +5132,15 @@
     filter:brightness(.87) saturate(1.04);
   }
 }
+
+/* WORK8 / #104 — 07 Missões ONLY, no Ranking/Porto/dock edits.
+   Real 384x512 source reference shows the SEVEN reward backgrounds brighter
+   than its navy-grey engraving. Test a subtle luminance-only adjustment on
+   the existing reward board, preserving the three missions and all seven
+   real chests, labels, positions, taps and claim states. No geometry changed.
+   The baseline class is toggled only by the same-frame Chromium pixel gate. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-daily-luminance-ab-baseline):not(.work8-missions-ink-ab-baseline):not(.work8-missions-frame-ab-baseline) .w8-approved-missions .w8-approved-daily {
+    filter:brightness(.675) saturate(1.055);
+  }
+}
