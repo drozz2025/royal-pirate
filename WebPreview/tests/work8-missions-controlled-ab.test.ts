@@ -245,6 +245,51 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       headingCompare.metrics.daily.delta < -0.08,
       'native full-screen and daily panel MAE cannot regress');
 
+
+    /* WORK8: precisely registered quest engraving, independent of the earlier
+       heading/enamel gates, in the SAME genuine decoded/paused 384x512 scene. */
+    const questClass='work8-missions-quest-engraving-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(questClass)+');true');
+    await delay(150);
+    const questLayoutBefore=await headingLayout();
+    const questBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(questClass)+');true');
+    await delay(150);
+    const questLayoutAfter=await headingLayout();
+    const questAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const questSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+questBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+questAfter))
+      .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],questRows:[25,158,370,323],daily:');
+    const questCompare=await evalJs(questSource);
+    writeFileSync(join(evidence,'missions-quest-engraving-baseline-384x512.png'),Buffer.from(questBefore,'base64'));
+    writeFileSync(join(evidence,'missions-quest-engraving-candidate-384x512.png'),Buffer.from(questAfter,'base64'));
+    writeFileSync(join(evidence,'missions-quest-original-render-overlay-before-384x512.png'),Buffer.from(questCompare.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-quest-original-render-overlay-after-384x512.png'),Buffer.from(questCompare.overlays[1],'base64'));
+    const questResult={
+      base: "ef4bc501fafb6363933c2411f6e6a6efb8119dd2",ref:'assets/design-approved/07-missoes.webp',
+      sourceSizes:questCompare.sizes,scene:'same Chromium document and frame; native 384x512; images decoded, animations frozen',
+      scope:'07 Missões genuine quest paint, width distribution and legibility ONLY',
+      metrics:questCompare.metrics,unchanged:questCompare.unchanged,
+      layoutBefore:questLayoutBefore,layoutAfter:questLayoutAfter,approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-quest-engraving-controlled-ab.json'),JSON.stringify(questResult,null,2));
+    console.log('WORK8 new quest engraving MAE/ROI '+JSON.stringify(questResult.metrics));
+    assert.equal(questLayoutAfter.questCount,3);
+    assert.equal(questLayoutAfter.dayCount,7);
+    assert.equal(questLayoutAfter.dockCount,5);
+    assert.ok(questLayoutAfter.documentWidth<=386,'no sideways overflow at native 384');
+    assert.deepEqual(questLayoutBefore.days,questLayoutAfter.days,'do not move seven actual chest touch targets');
+    assert.deepEqual(questLayoutBefore.nav,questLayoutAfter.nav,'five-button dock geometry untouched');
+    assert.deepEqual(questLayoutBefore.tabs,questLayoutAfter.tabs,'the tab touch areas must not change');
+    assert.ok(questLayoutAfter.chests.every((c:any)=>c.bottom<=questLayoutAfter.nav.top+2),'all seven chests visible over the dock');
+    assert.ok(questLayoutAfter.questButtons.every((b:any)=>b.bottom<=questLayoutAfter.nav.top&&b.bottom-b.top>=30),'three genuine CTA hit targets remain usable');
+    assert.ok(questCompare.unchanged.dock<0.1&&questCompare.unchanged.header<0.1,'shared header/dock must have zero paint regressions');
+    assert.ok(questCompare.metrics.full.delta<-.03 && questCompare.metrics.quests.delta<-.12,
+      'visual changes must improve true 384x512 original-frame quest and full-screen MAE');
+    assert.ok(Math.abs(questCompare.metrics.daily.delta)<.03&&Math.abs(questCompare.metrics.chests.delta)<.03,
+      'seven daily rewards must not suffer a visual regression');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
