@@ -37,21 +37,18 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  const marker = '/* WORK7 / #104 — 17 Nov, native 384×512 lateral frame alignment';
-  assert.ok(cssText.includes(marker),'Locate only this PR work7 CSS changes');
-  // Override ONLY this PR's lateral changes to render the true HEAD
-  // baseline. Re-appending the full old stylesheet leaves previously unset
-  // properties (notably transform) active and biases before/after MAE.
+  const marker = '/* WORK7 / #104 — native illustrated deck 05/06, 17 Nov 03h */';
+  assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
+  // Undo solely this PR while keeping every merged HEAD change (#190–#252).
+  // The same Chromium session, true 384x512 viewport and real assets measure
+  // before/after, rather than comparing against a stale old PR.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:430px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
-        width:auto!important;margin-inline:0!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
+        content:none!important;
       }
-    }
-    @media (min-width:355px) and (max-width:430px) and (max-height:560px){
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack,
-      .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
-        width:auto!important;margin-left:0!important;transform:none!important;
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+        transform:none!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -181,7 +178,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "const chests=[...root.querySelectorAll('.w7-chest')].map(rect);"+
           "const labels=[...root.querySelectorAll('.w7-approved-slot small,.w7-chest-status')].map(e=>({text:e.textContent.trim(),...rect(e)}));"+
           "return {viewport:[innerWidth,innerHeight],nav:rect(nav),navItems:nav?.querySelectorAll('.harbour-nav-item').length||0,"+
-          "slots,chests,pack:rect(root.querySelector('.w7-captain-pack')),labels,"+
+          "slots,chests,pack:rect(root.querySelector('.w7-captain-pack')),packArt:rect(root.querySelector('.w7-captain-pack-art .w7-approved-crop')),labels,"+
           "horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1};})()");
         let baselineScreenshotData: string | null = null;
         let baselineGeometry: any = null;
@@ -197,7 +194,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           baselineGeometry = await evaluate("(()=>{"+
             "const rect=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {x:Math.round(r.x),y:Math.round(r.y),width:Math.round(r.width),height:Math.round(r.height),bottom:Math.round(r.bottom)}};"+
             "const root=document.querySelector('[data-work7-screen=\""+kind+"\"]');"+
-            "return {slots:[...root.querySelectorAll('.w7-approved-slot')].map(rect),chests:[...root.querySelectorAll('.w7-chest')].map(rect),pack:rect(root.querySelector('.w7-captain-pack'))};})()");
+            "return {slots:[...root.querySelectorAll('.w7-approved-slot')].map(rect),chests:[...root.querySelectorAll('.w7-chest')].map(rect),pack:rect(root.querySelector('.w7-captain-pack')),packArt:rect(root.querySelector('.w7-captain-pack-art .w7-approved-crop'))};})()");
           const baseline = await command('Page.captureScreenshot', {
             format:'png',fromSurface:true,captureBeyondViewport:false
           });
@@ -267,6 +264,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               'Captain pack should align with the approved x≈18 border');
             assert.ok(geometry.chests[0].x>=17 && geometry.chests[0].x<=20,
               'First chest should align with the approved x≈18 border');
+            assert.ok(geometry.packArt && baselineGeometry.packArt,
+              'Measure original 06 chest crop separately from its pack panel');
+            assert.ok(geometry.packArt.width>=baselineGeometry.packArt.width+4,
+              'Original 06 treasure artwork must be visibly enlarged vs HEAD');
           }
         }
       }
