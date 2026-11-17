@@ -1,0 +1,201 @@
+/**
+ * WORK7-only real Chromium visual evidence for 05 Cartas and 06 Loja.
+ * On CI (where Chrome is preinstalled) tests the actual React/Vite screens,
+ * saves reference | render | overlay (native 384x512, plus mobile regressions),
+ * checks eight illustrated cards, three chests, real labels and the five-tab dock.
+ * No fake purchases, no changed shared QA scripts, no visual auto-approval.
+ */
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { spawn, spawnSync } from 'node:child_process';
+import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { setTimeout as sleep } from 'node:timers/promises';
+
+const variants = [
+  [384, 512], [320, 568], [390, 844], [430, 932]
+] as const;
+const chrome = [process.env.CHROME_BIN, 'google-chrome', 'chromium'].filter(Boolean)
+  .find(binary => spawnSync('which', [binary!]).status === 0);
+const enabled = process.env.CI === 'true' && Boolean(chrome);
+
+test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
+  skip: enabled ? false : 'Real browser captures run only on CI with Chromium installed',
+  timeout: 240_000
+}, async t => {
+  const output = join(process.cwd(), 'porto-qa', 'work7');
+  const temp = await mkdtemp(join(tmpdir(), 'royal-work7-chrome-'));
+  await mkdir(output, { recursive: true });
+  const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
+    ['--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
+    { cwd: process.cwd(), stdio: 'ignore' });
+  let browser: ReturnType<typeof spawn> | undefined;
+  let ws: WebSocket | undefined;
+  const outstanding = new Map<number, { ok: (value: any) => void; fail: (reason: Error) => void }>();
+  let counter = 0;
+  t.after(async () => {
+    ws?.close();
+    browser?.kill('SIGTERM');
+    server.kill('SIGTERM');
+    await sleep(300);
+    await rm(temp, { recursive: true, force: true });
+  });
+
+  const origin = 'http://127.0.0.1:4287/royal-pirate/';
+  let running = false;
+  for (let attempt = 0; attempt < 80; attempt++) {
+    if (server.exitCode !== null) throw new Error('Vite server stopped before WORK7 captures');
+    try {
+      const response = await fetch(origin, { signal: AbortSignal.timeout(750) });
+      if (response.ok) { running = true; break; }
+    } catch { /* server is starting */ }
+    await sleep(150);
+  }
+  assert.ok(running, 'Vite preview must serve the actual React app');
+
+  browser = spawn(chrome!, [
+    '--headless=new', '--no-sandbox', '--disable-dev-shm-usage',
+    '--disable-gpu', '--remote-allow-origins=*',
+    '--remote-debugging-port=9337', '--user-data-dir='+temp, 'about:blank'
+  ], { stdio: 'ignore' });
+  let target: any;
+  for (let attempt = 0; attempt < 100; attempt++) {
+    if (browser.exitCode !== null) throw new Error('Chromium stopped before CDP connection');
+    try {
+      const response = await fetch('http://127.0.0.1:9337/json/list', { signal: AbortSignal.timeout(600) });
+      if (response.ok) {
+        const pages = await response.json() as Array<{type:string;webSocketDebuggerUrl:string}>;
+        target = pages.find(page => page.type === 'page');
+        if (target) break;
+      }
+    } catch { /* browser is starting */ }
+    await sleep(150);
+  }
+  assert.ok(target, 'A real Chromium page must be available');
+  ws = new WebSocket(target.webSocketDebuggerUrl);
+  await new Promise<void>((resolve, reject) => {
+    ws!.addEventListener('open', () => resolve(), { once: true });
+    ws!.addEventListener('error', () => reject(new Error('Chromium websocket failed')), { once: true });
+  });
+  ws.addEventListener('message', event => {
+    const message = JSON.parse(String(event.data));
+    if (!message.id) return;
+    const callback = outstanding.get(message.id);
+    if (!callback) return;
+    outstanding.delete(message.id);
+    message.error ? callback.fail(new Error(message.error.message)) : callback.ok(message.result);
+  });
+  const command = (method: string, params: Record<string,unknown> = {}): Promise<any> =>
+    new Promise((resolve, reject) => {
+      const id = ++counter;
+      const timer = setTimeout(() => {
+        outstanding.delete(id);
+        reject(new Error('Chromium CDP timeout: ' + method));
+      }, 30000);
+      outstanding.set(id, {
+        ok: value => { clearTimeout(timer); resolve(value); },
+        fail: error => { clearTimeout(timer); reject(error); }
+      });
+      ws!.send(JSON.stringify({ id, method, params }));
+    });
+  const evaluate = async (expression:string):Promise<any> => {
+    const response = await command('Runtime.evaluate', {
+      expression, returnByValue: true, awaitPromise: true
+    });
+    if (response.exceptionDetails) throw new Error(
+      response.exceptionDetails.text || 'Chromium evaluation failed');
+    return response.result?.value;
+  };
+  const waitFor = async (expression:string):Promise<void> => {
+    for (let n=0;n<75;n++) {
+      if (await evaluate(expression)) return;
+      await sleep(120);
+    }
+    throw new Error('Timed out waiting for React screen: '+expression);
+  };
+  await command('Page.enable');
+  await command('Runtime.enable');
+
+  const references = {
+    cards: await readFile(new URL('../../assets/design-approved/05-cartas.webp', import.meta.url)),
+    shop: await readFile(new URL('../../assets/design-approved/06-loja.webp', import.meta.url))
+  };
+  const report: { approved:boolean; source:string; screens:any[] } = {
+    approved:false, source:'Real Chromium + unscaled approved 384x512 originals',
+    screens:[]
+  };
+  try {
+    for (const [width,height] of variants) {
+      await command('Emulation.setDeviceMetricsOverride', {
+        width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height
+      });
+      await command('Emulation.setTouchEmulationEnabled', { enabled:true,maxTouchPoints:2 });
+      for (const kind of ['cards','shop'] as const) {
+        await command('Page.navigate', { url: origin });
+        await waitFor("!!document.querySelector('.harbour-screen .harbour-nav-item:nth-child(4)')");
+        const tab = kind === 'cards' ? 3 : 4;
+        const clicked = await evaluate(
+          "(()=>{const tab=document.querySelector('.harbour-screen .harbour-nav-item:nth-child("+tab+")');if(!tab)return false;tab.click();return true})()");
+        assert.ok(clicked, 'Open '+kind+' through actual Porto navigation');
+        await waitFor("!!document.querySelector('[data-work7-screen=\""+kind+"\"]')");
+        await evaluate('document.fonts.ready.then(()=>true)');
+        await sleep(350);
+
+        const geometry = await evaluate("(()=>{"+
+          "const rect=e=>{if(!e)return null;const b=e.getBoundingClientRect();return {x:Math.round(b.x),y:Math.round(b.y),width:Math.round(b.width),height:Math.round(b.height),bottom:Math.round(b.bottom)}};"+
+          "const root=document.querySelector('[data-work7-screen=\""+kind+"\"]');"+
+          "const nav=document.querySelector('.app-sheet > .harbour-nav')||document.querySelector('.harbour-screen .harbour-nav');"+
+          "const slots=[...root.querySelectorAll('.w7-approved-slot')].map(rect);"+
+          "const chests=[...root.querySelectorAll('.w7-chest')].map(rect);"+
+          "const labels=[...root.querySelectorAll('.w7-approved-slot small,.w7-chest-status')].map(e=>({text:e.textContent.trim(),...rect(e)}));"+
+          "return {viewport:[innerWidth,innerHeight],nav:rect(nav),navItems:nav?.querySelectorAll('.harbour-nav-item').length||0,"+
+          "slots,chests,pack:rect(root.querySelector('.w7-captain-pack')),labels,"+
+          "horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1};})()");
+        const screen = await command('Page.captureScreenshot', {
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        });
+        await writeFile(join(output, kind+'-'+width+'x'+height+'.png'),
+          Buffer.from(screen.data, 'base64'));
+        const refUrl = 'data:image/webp;base64,'+references[kind].toString('base64');
+        const liveUrl = 'data:image/png;base64,'+screen.data;
+        const comparison = await evaluate("(async()=>{"+
+          "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+          "const [reference,live]=await Promise.all([load("+JSON.stringify(refUrl)+"),load("+JSON.stringify(liveUrl)+")]);"+
+          "const w="+width+",h="+height+";"+
+          "const c=document.createElement('canvas');c.width=w*3;c.height=h;"+
+          "const ctx=c.getContext('2d');ctx.fillStyle='#081c34';ctx.fillRect(0,0,c.width,c.height);"+
+          "const draw=(image,x)=>{const scale=Math.min(w/image.naturalWidth,h/image.naturalHeight);"+
+          "const rw=Math.round(image.naturalWidth*scale),rh=Math.round(image.naturalHeight*scale);"+
+          "ctx.drawImage(image,x+(w-rw)/2,(h-rh)/2,rw,rh)};"+
+          "draw(reference,0);draw(live,w);draw(reference,w*2);"+
+          "ctx.globalAlpha=.5;draw(live,w*2);ctx.globalAlpha=1;"+
+          "let mae=null;if(w===384&&h===512){"+
+          "const first=document.createElement('canvas'),second=document.createElement('canvas');"+
+          "first.width=second.width=w;first.height=second.height=h;"+
+          "first.getContext('2d').drawImage(reference,0,0);second.getContext('2d').drawImage(live,0,0);"+
+          "const a=first.getContext('2d').getImageData(0,0,w,h).data,b=second.getContext('2d').getImageData(0,0,w,h).data;"+
+          "let diff=0;for(let p=0;p<a.length;p+=4){diff+=Math.abs(a[p]-b[p])+Math.abs(a[p+1]-b[p+1])+Math.abs(a[p+2]-b[p+2])}"+
+          "mae=Math.round(diff/(w*h*3)*100)/100;}"+
+          "return {png:c.toDataURL('image/png').slice(22),mae,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
+        await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
+          Buffer.from(comparison.png,'base64'));
+        report.screens.push({kind,width,height,approved:false,
+          method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
+          maeRgb:comparison.mae,referenceSize:comparison.referenceSize,
+          ...geometry});
+        assert.equal(geometry.navItems,5,'The approved five-button dock must remain intact');
+        assert.equal(geometry.horizontalOverflow,false,'No horizontal overflow at '+width);
+        if(kind==='cards') assert.equal(geometry.slots.length,8,'Eight original illustrated cards in a 4x2 grid');
+        if(kind==='shop') assert.equal(geometry.chests.length,3,'Three preview-only illustrated chests');
+        if(width===384 && height===512) {
+          assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y+1),
+            'All true PRÉVIA / EM BREVE labels must stay above the dock at native size');
+        }
+      }
+    }
+  } finally {
+    await writeFile(join(output,'work7-report.json'),JSON.stringify(report,null,2)+'\n');
+  }
+  assert.equal(report.screens.length,8,'All four viewports must capture both screens');
+});
