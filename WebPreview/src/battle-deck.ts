@@ -123,30 +123,52 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     group.add(mesh);
   };
   for(const x of [-3.15,3.15]){
+    // Shift the existing carriages toward the near port/starboard quarters.
+    // Both guns remain aboard the same first-person deck (no third vessel).
+    const carriageX=x<0?x*1.23:x*1.30;
     // Reuse the original two gun carriages and four spoked wheels.
-    addBox(x,1.0,74.2,2.3,.62,5.3,wood);
-    addBox(x,1.40,74.8,1.75,.26,3.0,bronze);
+    addBox(carriageX,1.0,74.2,2.3,.62,5.3,wood);
+    addBox(carriageX,1.40,74.8,1.75,.26,3.0,bronze);
     for(const offset of [-1.25,1.25]){
       const wheel=new T.Mesh(wheelGeo,darkWood);
-      wheel.rotation.z=Math.PI/2;wheel.position.set(x+offset,.94,74.3);group.add(wheel);
+      wheel.rotation.z=Math.PI/2;wheel.position.set(carriageX+offset,.94,74.3);group.add(wheel);
       const hub=new T.Mesh(wheelHub,bronze);
-      hub.rotation.z=Math.PI/2;hub.position.set(x+offset+Math.sign(offset)*.18,.94,74.3);
+      hub.rotation.z=Math.PI/2;hub.position.set(carriageX+offset+Math.sign(offset)*.18,.94,74.3);
       group.add(hub);
     }
     // The flared wrought-iron barrel now projects from the near carriage
     // into the exposed sea: real tapered cylinder + concentric bronze rims,
     // not a 2D gun decal or another gameplay projectile.
-    const breechPoint=new T.Vector3(x,1.90,78.6);
-    const muzzlePoint=new T.Vector3(x,4.86,65.35);
+    // Native 384x512 composition: the port cannon sweeps from the lower-left
+    // foreground toward the centre of the water; the starboard cannon exits
+    // toward the opposing red broadside. Before: two parallel barrels aligned
+    // vertically in the middle of the screen. Camera and real shots unchanged.
+    const breechPoint=new T.Vector3(x<0?x*1.38:x*1.43,1.90,78.6);
+    const muzzlePoint=new T.Vector3(x<0?x*.60:x*1.72,3.55,65.35);
     const direction=muzzlePoint.clone().sub(breechPoint).normalize();
     const axisOrientation=new T.Quaternion().setFromUnitVectors(axisUp,direction);
     const rimOrientation=new T.Quaternion().setFromUnitVectors(axisFace,direction);
     const length=breechPoint.distanceTo(muzzlePoint);
-    const barrel=new T.Mesh(new T.CylinderGeometry(1.14,1.48,length,24,1),metal);
+    // A forged taper, cast reinforcing throat and genuinely flared muzzle.
+    // Lathe geometry replaces each existing featureless cylinder: TWO barrels,
+    // identical draw-call count and the same pooled muzzle flashes.
+    const profile=[
+      new T.Vector2(1.34,-length*.50),
+      new T.Vector2(1.47,-length*.45),
+      new T.Vector2(1.43,-length*.39),
+      new T.Vector2(1.29,-length*.25),
+      new T.Vector2(1.21,-length*.04),
+      new T.Vector2(1.12,length*.23),
+      new T.Vector2(1.10,length*.39),
+      new T.Vector2(1.23,length*.46),
+      new T.Vector2(1.36,length*.50)
+    ];
+    const barrel=new T.Mesh(new T.LatheGeometry(profile,28),metal);
     barrel.name='first-person-broadside-cannon';
+    barrel.userData.decorativeSightline={breech:breechPoint.toArray(),muzzle:muzzlePoint.toArray()};
     barrel.position.copy(breechPoint).add(muzzlePoint).multiplyScalar(.5);
     barrel.quaternion.copy(axisOrientation);group.add(barrel);
-    const muzzle=new T.Mesh(new T.TorusGeometry(1.25,.18,12,32),bronze);
+    const muzzle=new T.Mesh(new T.TorusGeometry(1.35,.15,12,32),bronze);
     muzzle.name='first-person-broadside-muzzle';
     muzzle.position.copy(muzzlePoint);
     muzzle.quaternion.copy(rimOrientation);group.add(muzzle);
@@ -171,15 +193,15 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     // Four timber carriage cheeks, eight bolts and four curved breeching
     // ropes; all batched. No per-frame allocations, collisions or HUD overlay.
     for(const side of [-1,1]){
-      cheekMatrices.push(matrix(new T.Vector3(x+side*1.01,1.44,74.36),
+      cheekMatrices.push(matrix(new T.Vector3(carriageX+side*1.01,1.44,74.36),
         identity,new T.Vector3(1,1,1)));
       for(const z of [73.05,75.75])
-        boltMatrices.push(matrix(new T.Vector3(x+side*1.15,1.52,z),
+        boltMatrices.push(matrix(new T.Vector3(carriageX+side*1.15,1.52,z),
           identity,new T.Vector3(.35,1,1)));
       // A mirrored tube is separate real geometry: InstancedMesh does not
       // support negative-determinant per-instance matrices in Three.js.
       (side<0?portRopeMatrices:starboardRopeMatrices).push(
-        matrix(new T.Vector3(x,0,0),identity,new T.Vector3(1,1,1)));
+        matrix(new T.Vector3(carriageX,0,0),identity,new T.Vector3(1,1,1)));
     }
     const breech=new T.Mesh(new T.SphereGeometry(1.40,16,12),metal);
     breech.position.copy(breechPoint);group.add(breech);
