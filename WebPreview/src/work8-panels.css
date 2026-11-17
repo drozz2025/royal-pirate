@@ -4874,3 +4874,15 @@
     repeating-linear-gradient(0deg,#fbe1a700 0px,#fbe1a700 12px,#fbe1a70b 13px,#fbe1a700 14px),
     linear-gradient(165deg,#21546d,#103653 49%,#071c34 100%);
 }
+
+
+/* WORK8 / #104 — final exact-overlay correction for the TOP plaque.
+   The reference starts the TOP board ~10px beneath the captain portrait;
+   the 384×512 Chromium capture kept ~20px of unused sea between them.
+   Bring the existing five honest rows upward; no row height, rank, value
+   or dock geometry changes. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px){
+  .w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+    margin-top:-9px;
+  }
+}
