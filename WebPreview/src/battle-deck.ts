@@ -122,7 +122,16 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     mesh.computeBoundingSphere();
     group.add(mesh);
   };
-  for(const x of [-3.15,3.15]){
+  // From inside the player's gun deck the two barrels do NOT form parallel
+  // railroad tracks. The nearer port gun leads diagonally inward, while the
+  // starboard muzzle sits farther right and is physically smaller. Both remain
+  // decorative; the live projectile and its firing origin are untouched.
+  const gunLayouts = [
+    { carriageX:-4.35, breechX:-6.65, muzzleX:-2.42, size:1.10 },
+    { carriageX: 5.72, breechX: 6.75, muzzleX: 5.72, size: .86 }
+  ] as const;
+  for(const {carriageX,breechX,muzzleX,size} of gunLayouts){
+    const x=carriageX;
     // Reuse the original two gun carriages and four spoked wheels.
     addBox(x,1.0,74.2,2.3,.62,5.3,wood);
     addBox(x,1.40,74.8,1.75,.26,3.0,bronze);
@@ -136,25 +145,25 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     // The flared wrought-iron barrel now projects from the near carriage
     // into the exposed sea: real tapered cylinder + concentric bronze rims,
     // not a 2D gun decal or another gameplay projectile.
-    const breechPoint=new T.Vector3(x,1.90,78.6);
-    const muzzlePoint=new T.Vector3(x,4.86,65.35);
+    const breechPoint=new T.Vector3(breechX,1.80,81.0);
+    const muzzlePoint=new T.Vector3(muzzleX,3.0,66.8);
     const direction=muzzlePoint.clone().sub(breechPoint).normalize();
     const axisOrientation=new T.Quaternion().setFromUnitVectors(axisUp,direction);
     const rimOrientation=new T.Quaternion().setFromUnitVectors(axisFace,direction);
     const length=breechPoint.distanceTo(muzzlePoint);
-    const barrel=new T.Mesh(new T.CylinderGeometry(1.14,1.48,length,24,1),metal);
+    const barrel=new T.Mesh(new T.CylinderGeometry(1.14*size,1.48*size,length,24,1),metal);
     barrel.name='first-person-broadside-cannon';
     barrel.position.copy(breechPoint).add(muzzlePoint).multiplyScalar(.5);
     barrel.quaternion.copy(axisOrientation);group.add(barrel);
-    const muzzle=new T.Mesh(new T.TorusGeometry(1.25,.18,12,32),bronze);
+    const muzzle=new T.Mesh(new T.TorusGeometry(1.25*size,.18*size,12,32),bronze);
     muzzle.name='first-person-broadside-muzzle';
     muzzle.position.copy(muzzlePoint);
     muzzle.quaternion.copy(rimOrientation);group.add(muzzle);
-    const darkMuzzle=new T.Mesh(new T.CircleGeometry(1.10,32),bore);
+    const darkMuzzle=new T.Mesh(new T.CircleGeometry(1.10*size,32),bore);
     darkMuzzle.position.copy(muzzlePoint).addScaledVector(direction,.045);
     darkMuzzle.quaternion.copy(rimOrientation);group.add(darkMuzzle);
     for(const t of [.20,.48,.75]){
-      const hoop=new T.Mesh(new T.TorusGeometry(1.48-t*.34,.09,8,28),bronze);
+      const hoop=new T.Mesh(new T.TorusGeometry((1.48-t*.34)*size,.09*size,8,28),bronze);
       hoop.position.copy(breechPoint).lerp(muzzlePoint,t);
       hoop.quaternion.copy(rimOrientation);
       group.add(hoop);
@@ -164,26 +173,26 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     for(const t of [.30,.67]){
       const radius=1.48-t*.34;
       const p=breechPoint.clone().lerp(muzzlePoint,t);
-      collarMatrices.push(matrix(p,axisOrientation,new T.Vector3(radius+.055,1,radius+.095)));
+      collarMatrices.push(matrix(p,axisOrientation,new T.Vector3((radius+.055)*size,1,(radius+.095)*size)));
       shadowMatrices.push(matrix(breechPoint.clone().lerp(muzzlePoint,t+.014),
-        rimOrientation,new T.Vector3(radius+.065,radius+.065,1)));
+        rimOrientation,new T.Vector3((radius+.065)*size,(radius+.065)*size,1)));
     }
     // Four timber carriage cheeks, eight bolts and four curved breeching
     // ropes; all batched. No per-frame allocations, collisions or HUD overlay.
     for(const side of [-1,1]){
-      cheekMatrices.push(matrix(new T.Vector3(x+side*1.01,1.44,74.36),
+      cheekMatrices.push(matrix(new T.Vector3(x+side*1.01*size,1.44,74.36),
         identity,new T.Vector3(1,1,1)));
       for(const z of [73.05,75.75])
-        boltMatrices.push(matrix(new T.Vector3(x+side*1.15,1.52,z),
+        boltMatrices.push(matrix(new T.Vector3(x+side*1.15*size,1.52,z),
           identity,new T.Vector3(.35,1,1)));
       // A mirrored tube is separate real geometry: InstancedMesh does not
       // support negative-determinant per-instance matrices in Three.js.
       (side<0?portRopeMatrices:starboardRopeMatrices).push(
         matrix(new T.Vector3(x,0,0),identity,new T.Vector3(1,1,1)));
     }
-    const breech=new T.Mesh(new T.SphereGeometry(1.40,16,12),metal);
+    const breech=new T.Mesh(new T.SphereGeometry(1.40*size,16,12),metal);
     breech.position.copy(breechPoint);group.add(breech);
-    const flash=new T.Mesh(new T.SphereGeometry(1.15,10,8),fire.clone());
+    const flash=new T.Mesh(new T.SphereGeometry(1.15*size,10,8),fire.clone());
     flash.position.copy(muzzlePoint).addScaledVector(direction,.22);
     flash.visible=false;group.add(flash);flashes.push(flash);
   }
