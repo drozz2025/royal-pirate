@@ -19,7 +19,7 @@ export class OceanScene {
   private pathGeometry=new T.BufferGeometry().setAttribute('position',new T.BufferAttribute(new Float32Array(240*3),3)); private path: T.Line; private marker: T.Mesh;
   private ball: T.Mesh; private particleGeometry=new T.IcosahedronGeometry(1,0); private particleMaterial=new T.MeshBasicMaterial({color:'#fff'});
   private particles: { mesh:T.Mesh;velocity:T.Vector3;age:number;life:number;size:number;smoke:boolean }[]=[];
-  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private muzzleFlash:Partial<Record<'player'|'enemy',T.Mesh>>={}; private recoilAge:Record<'player'|'enemy',number>={player:Infinity,enemy:Infinity}; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'='battle'; private harbourDock=new T.Group(); private worldScenery=new T.Group(); private battleBattery=new T.Group(); private battleForegroundSail=new T.Group(); private batteryFlashes:T.Mesh[]=[]; private battleSky:T.CanvasTexture; private shake=0;
+  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private muzzleFlash:Partial<Record<'player'|'enemy',T.Mesh>>={}; private recoilAge:Record<'player'|'enemy',number>={player:Infinity,enemy:Infinity}; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'='battle'; private harbourDock=new T.Group(); private worldScenery=new T.Group(); private battleBattery=new T.Group(); private battleForegroundSail=new T.Group(); private batteryFlashes:T.Mesh[]=[]; private battleSky:T.CanvasTexture; private battleAccentLights=new T.Group(); private shake=0;
   private shipPointers=new Set<number>(); private shipStart: {x:number;y:number}|null=null; private shipMoved=false;
   private renderMs=0;private lastRender=0;private frameSamples:number[]=[];private metricsAt=0; private pirateAudio=new PirateAudio(); paused=false; disposed=false;
   private onContextLost=(event:Event)=>{event.preventDefault();this.paused=true;this.onError('The 3D view was interrupted. Reload to restore the ocean.');};
@@ -39,6 +39,17 @@ export class OceanScene {
     const hemi=new T.HemisphereLight('#e7f8ff','#497f8b',2.6);this.scene.add(hemi);
     const sun=new T.DirectionalLight('#ffe3af',3.6);sun.position.set(-24,40,15);this.scene.add(sun);
     const rim=new T.DirectionalLight('#97deff',1.4);rim.position.set(16,12,-18);this.scene.add(rim);
+    // Battle-only sculptural light: warm sidelight models the enemy's RED
+    // broadside and cool fill separates the two foreground guns from the
+    // timber. No shadows, extra water layers, camera motion or gameplay effects.
+    // The entire rig is hidden in Porto: its approved lighting is preserved.
+    this.battleAccentLights.name='battle-only-broadside-light';
+    const broadsideKey=new T.PointLight('#ffca92',540,56,2);
+    broadsideKey.position.set(17,15,6);this.battleAccentLights.add(broadsideKey);
+    const gunDeckFill=new T.PointLight('#93c6e9',390,40,2);
+    gunDeckFill.position.set(-5,12,64);this.battleAccentLights.add(gunDeckFill);
+    this.battleAccentLights.visible=false;this.scene.add(this.battleAccentLights);
+
     this.water=new T.ShaderMaterial({uniforms:{time:{value:0},sun:{value:new T.Vector3(-24,40,15).normalize()},battleMode:{value:1}},vertexShader:`
       uniform float time; uniform float battleMode;
       varying vec3 vWorld; varying vec3 vNormal; varying float vWave;
@@ -517,7 +528,7 @@ export class OceanScene {
   }
 
   private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();}
-  home(){this.cameraMode='battle';this.scene.background=this.battleSky;this.water.uniforms.battleMode.value=1;
+  home(){this.cameraMode='battle';this.scene.background=this.battleSky;this.water.uniforms.battleMode.value=1;this.battleAccentLights.visible=true;
     // Cinematic battle-only art scale; the genuine physics ships and hit logic stay live.
     // Reset to the original size in Porto so its approved composition/touch remain identical.
     // Slightly enlarge ONLY the enemy's existing live render mesh in Batalha.
@@ -556,7 +567,7 @@ export class OceanScene {
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
   /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
   showHarbour(){
-    this.cameraMode='harbour';this.camera.fov=42;this.camera.updateProjectionMatrix();
+    this.cameraMode='harbour';this.battleAccentLights.visible=false;this.camera.fov=42;this.camera.updateProjectionMatrix();
     this.scene.background=new T.Color('#58baf1');this.water.uniforms.battleMode.value=0;
     this.ships.player.root.scale.setScalar(1);this.ships.enemy.root.scale.setScalar(1);
     this.ships.player.root.visible=true;
