@@ -2470,7 +2470,13 @@
   display:block;
   z-index:0;
   width:100%;
-  height:29%;
+  /* Water is cropped from x24..237/y308..339 (213:31) of the ORIGINAL.
+     Match its native aspect at 384, 320, 390 and 430; 29% stage height
+     vertically stretched the same water pixels on taller phones and made
+     a false painted wave band. Only the existing approved sea is affected. */
+  height:auto;
+  aspect-ratio:213 / 31;
+  max-height:29%;
   pointer-events:none;
   opacity:.94;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 34%,#000 100%);
