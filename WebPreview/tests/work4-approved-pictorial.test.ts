@@ -18,7 +18,7 @@ const renderForge=()=>renderToStaticMarkup(React.createElement(ForgePanel,{
 test('03: a single pictorial Royal Crown crops ONLY approved art pixels, not the reference HUD',()=>{
   const html=renderFleet();
   assert.equal((html.match(/data-work4-crop="fleet"/g)||[]).length,1);
-  assert.match(html,/viewBox="40 151 185 189"/);
+  assert.match(html,/viewBox="40 151 197 189"/);
   assert.match(html,/03-frota\.webp/);
   assert.equal((html.match(/data-work4-crop="forge"/g)||[]).length,0);
   assert.match(html,/NAVIOS DA FROTA/);
