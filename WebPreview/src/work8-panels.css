@@ -4961,3 +4961,15 @@
 :root:not(.work8-missions-frame-ab-baseline) .w8-approved-missions .w8-approved-days li:nth-child(7){
   border-color:#e5c283;
 }
+
+/* WORK8 / #104 · 2026-11-17 08:32 — Missions 07 ONLY.
+   Exact unscaled 384x512 approved source vs Chromium render show both
+   boards remain over-luminous, especially navy enamel in the three authentic
+   mission rows and seven-day reward tray. Darken painted surfaces modestly,
+   WITHOUT altering height, hit areas, day data, quest state or navigation.
+   The separate ink A/B baseline disables ONLY these declarations. The frame
+   baseline also disables them so the earlier #275 gate stays independent. */
+:root:not(.work8-missions-ink-ab-baseline):not(.work8-missions-frame-ab-baseline) .w8-approved-missions .w8-approved-quest-list,
+:root:not(.work8-missions-ink-ab-baseline):not(.work8-missions-frame-ab-baseline) .w8-approved-missions .w8-approved-daily{
+  filter:brightness(.70) saturate(1.055);
+}
