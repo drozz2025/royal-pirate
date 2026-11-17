@@ -415,8 +415,6 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'seven rewards and daily panel must not visually regress');
 
 
-    await evalJs('document.documentElement.classList.remove("work8-missions-native-register-ab-baseline");true');
-
     /* WORK8/#104 — thin pewter original relief vs synthetic grey frame,
        measured on the SAME real 384x512 Chromium scene and paused frame. */
     const reliefBaselineClass='work8-missions-board-relief-ab-baseline';
@@ -692,6 +690,10 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        TWO genuine captures of the SAME paused, decoded Chromium document
        at DPR 1, 384x512. Change only a root class; no state spoofing or
        painted reference screenshot as a background. */
+    /* Historical WORK8 pigment tests must run on the exact geometry they
+       were validated with; the new registration is switched on only for
+       its own isolated A/B below. No tolerance relaxation. */
+    await evalJs('document.documentElement.classList.remove("work8-missions-native-register-ab-baseline");true');
     const registerFlag='work8-missions-native-register-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(registerFlag)+');true');
     await delay(150);
