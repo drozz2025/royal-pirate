@@ -34,7 +34,7 @@ test('WORK6 #104: crimson opponent has genuinely curved hull panels, not a flat 
   assert.equal(hull.geometry.index?.count,2*7*8*6);
   const colors=hull.geometry.getAttribute('color') as T.BufferAttribute;
   assert.equal(colors.count,hull.geometry.getAttribute('position').count);
-  assert.ok(colors.getR(0)!==colors.getR(18),'red painted planks have several shaded tonal bands');
+  assert.ok(colors.getX(0)!==colors.getX(18),'red painted planks have several shaded tonal bands');
   hull.geometry.computeBoundingBox();
   const bounds=hull.geometry.boundingBox!; // local ship-space, not world x=10
   assert.ok(bounds.min.x < -1.70 && bounds.max.x>1.70);
