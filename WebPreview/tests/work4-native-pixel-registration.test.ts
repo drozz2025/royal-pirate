@@ -352,6 +352,79 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       }
 
 
+      // WORK4 22h / #104: native 384x512 deep-sea plate compared with
+      // the EXACT merged-HEAD color, on the SAME paused React frame.
+      // The real values, single ship painting and sea are never substituted.
+      if(screen==='fleet' && width===384 && height===512){
+        const liveBox="(()=>{const q=s=>{const r=document.querySelector(s)?.getBoundingClientRect();"+
+          "return r?[r.x,r.y,r.width,r.height]:null;};"+
+          "return {plate:q('.w4-fleet .w4-stage-label'),ship:q('.w4-reference-ship'),"+
+          "sea:q('.w4-reference-sea'),roster:q('.w4-ship-roster'),"+
+          "dock:q('.harbour-nav.app-dock-porto'),"+
+          "ships:document.querySelectorAll('.w4-ship-roster .w4-ship-slot').length,"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        const candidateGeo=await evaluate(liveBox);
+        assert.equal(candidateGeo.ships,4,'four existing roster slots remain');
+        assert.equal(candidateGeo.nav,5,'WORK0 five-item dock remains');
+        const previousPaint=
+          '.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label{'+
+          'background:linear-gradient(155deg,#102f46f2 0%,#061b2ef7 100%)!important;}';
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
+          "s.id='work4-before-deepsea-plate';s.textContent="+JSON.stringify(previousPaint)+
+          ";document.head.appendChild(s);return true;})()"));
+        await sleep(140);
+        const previousGeo=await evaluate(liveBox);
+        const previousPng=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-fleet-deepsea-inset-384x512.png'),
+          Buffer.from(previousPng,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-before-deepsea-plate')?.remove();return true;})()"));
+        await sleep(140);
+        assert.deepEqual(await evaluate(liveBox),candidateGeo,
+          'restored same-frame scene and navigation');
+        assert.deepEqual(previousGeo,candidateGeo,'paint must not move any hitbox or picture');
+        const sample="(async()=>{"+
+          "const load=async u=>{const i=new Image();i.src=u;await i.decode();return i;};"+
+          "const [ref,old,newer]=await Promise.all(["+
+          "load('data:image/webp;base64,"+references.fleet+"'),"+
+          "load('data:image/png;base64,"+previousPng+"'),"+
+          "load('data:image/png;base64,"+screenshot+"')]);"+
+          "if([ref,old,newer].some(i=>i.width!==384||i.height!==512))throw Error('must be native 384x512');"+
+          "const pix=i=>{const el=document.createElement('canvas');el.width=384;el.height=512;"+
+          "const g=el.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);"+
+          "return g.getImageData(0,0,384,512).data;};"+
+          "const [a,b,c]=[pix(ref),pix(old),pix(newer)];"+
+          "const roi={full:[0,0,384,512],stats:[232,160,375,340],"+
+          "royalCrown:[65,205,175,307],sea:[18,300,218,339],"+
+          "roster:[18,347,367,414],dock:[0,430,384,512]};"+
+          "const mae=(u,v,r)=>{let s=0,n=0;for(let y=r[1];y<r[3];y++)"+
+          "for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;"+
+          "for(let ch=0;ch<3;ch++){s+=Math.abs(u[k+ch]-v[k+ch]);n++;}}return s/n;};"+
+          "const before={},after={};for(const [name,r] of Object.entries(roi)){"+
+          "before[name]=mae(a,b,r);after[name]=mae(a,c,r);}"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;"+
+          "const g=out.getContext('2d');g.drawImage(ref,0,0);g.drawImage(old,384,0);"+
+          "g.drawImage(newer,768,0);g.drawImage(ref,1152,0);g.globalAlpha=.5;"+
+          "g.drawImage(newer,1152,0);"+
+          "return {roi,before,after,comparison:out.toDataURL('image/png').split(',')[1]};})()";
+        const data=await evaluate(sample);
+        assert.ok(data?.before?.stats>=0&&data?.after?.stats>=0,'actual native MAE');
+        writeFileSync(join(folder,'compare-fleet-deepsea-384x512.png'),Buffer.from(data.comparison,'base64'));
+        delete data.comparison;
+        const evidence={...data,sameReactFrame:true,native:'384x512',
+          source:'assets/design-approved/03-frota.webp',
+          geometry:candidateGeo,approved:false};
+        writeFileSync(join(folder,'fleet-deepsea-native-ab.json'),JSON.stringify(evidence,null,2)+'\n');
+        console.log('WORK4_FLEET_DEEPSEA_AB '+JSON.stringify(evidence));
+        assert.ok(data.after.stats<data.before.stats,'source-aligned navy panel ROI must improve');
+        assert.ok(data.after.full<data.before.full,'global native MAE must not regress');
+        for(const key of ['royalCrown','sea','roster','dock'] as const){
+          assert.ok(Math.abs(data.after[key]-data.before[key])<.04,
+            key+' must retain its original pixels');
+        }
+      }
+
       // WORK4 19h / issue #104: coast seam A/B in the EXACT SAME native
       // Chromium scene/frame. Reinstall the merged-HEAD source mask for BEFORE,
       // remove only that temporary override for RENDER. The single Royal Crown,
