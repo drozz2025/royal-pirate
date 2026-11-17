@@ -264,6 +264,59 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         assert.ok(Math.abs(ab.after.roster-ab.before.roster)<.2,
           'four real ship slot pictures cannot regress');
       }
+
+      // WORK4 15h: ORIGINAL | previous live vector | painted source | OVERLAY.
+      // Same Chromium native scene/frame at DPR1; only artwork inside four
+      // existing local card slots changes. A/B uses approved 03 pixels only.
+      if(screen==='fleet' && width===384 && height===512){
+        const previousPaint=[
+          '.w4-fleet .w4-ship-roster > .w4-ship-slot > .w4-slot-art {background-image:none!important;}',
+          '.w4-fleet .w4-ship-roster > .w4-ship-slot > .w4-slot-art > * {opacity:1!important;}',
+          '.w4-fleet .w4-ship-roster > .w4-ship-slot.is-pending .w4-slot-unavailable {opacity:.48!important;filter:grayscale(.85) brightness(.78)!important;}'
+        ].join('\n');
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');s.id='work4-before-thumbnails';s.textContent="+
+          JSON.stringify(previousPaint)+";document.head.appendChild(s);return true;})()"));
+        await sleep(150);
+        const previousFrame=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-source-thumbnails-fleet-384x512.png'),Buffer.from(previousFrame,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-before-thumbnails')?.remove();return true;})()"));
+        await sleep(120);
+        const compare="(async()=>{"+
+          "const im=async u=>{const i=new Image();i.src=u;await i.decode();return i;};"+
+          "const [ref,old,now]=await Promise.all(["+
+          "im('data:image/webp;base64,"+references.fleet+"'),"+
+          "im('data:image/png;base64,"+previousFrame+"'),"+
+          "im('data:image/png;base64,"+screenshot+"')]);"+
+          "if([ref,old,now].some(i=>i.width!==384||i.height!==512))throw Error('native no scale');"+
+          "const data=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+          "const a=data(ref),b=data(old),c=data(now);"+
+          "const rois={global:[0,0,384,512],ship:[65,205,175,307],sea:[18,300,218,339],"+
+            "rosterArt:[18,347,367,414],activeArt:[283,347,367,414],dock:[0,430,384,512]};"+
+          "const mae=(u,v,r)=>{let s=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;for(let j=0;j<3;j++){s+=Math.abs(u[k+j]-v[k+j]);n++;}}return s/n;};"+
+          "const before={},after={};for(const [name,rect] of Object.entries(rois)){before[name]=mae(a,b,rect);after[name]=mae(a,c,rect);}"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
+          "g.drawImage(ref,0,0);g.drawImage(old,384,0);g.drawImage(now,768,0);"+
+          "g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(now,1152,0);"+
+          "return {rois,before,after,image:out.toDataURL('image/png').split(',')[1]};})()";
+        const ab=await evaluate(compare);
+        assert.ok(Number.isFinite(ab.after.rosterArt)&&Number.isFinite(ab.after.global),'ROI measured');
+        // Regression gate: the approved native card art must genuinely beat
+        // the previous vector thumbnails; a working build alone is not proof.
+        assert.ok(ab.before.rosterArt-ab.after.rosterArt>10,
+          'approved 03 ship miniatures must reduce the native card-art MAE by >10');
+        assert.ok(ab.before.global-ab.after.global>1,
+          'approved 03 ship miniatures must improve full-frame native MAE');
+        for(const key of ['ship','sea','dock'] as const)
+          assert.ok(Math.abs(ab.after[key]-ab.before[key])<.05,key+' protected ROI unchanged');
+        writeFileSync(join(folder,'compare-source-thumbnails-fleet-384x512.png'),Buffer.from(ab.image,'base64'));
+        delete ab.image;
+        const evidence={...ab,source:'assets/design-approved/03-frota.webp',
+          sameReactFrame:true,viewport:'384x512',approved:false};
+        writeFileSync(join(folder,'fleet-source-thumbnails-ab.json'),JSON.stringify(evidence,null,2)+'\n');
+        console.log('WORK4_SOURCE_THUMBNAILS_AB '+JSON.stringify(evidence));
+      }
       // WORK4 / 09h: real native Forge first-fold A/B on an IDENTICAL React
       // frame. Temporarily restore the previous material-note placement and
       // compact CSS, then undo both before measuring; no artificial gameplay
