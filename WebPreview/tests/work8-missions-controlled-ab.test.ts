@@ -680,6 +680,65 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(depthComparison.metrics.quests.delta<.05 && depthComparison.metrics.chests.delta<.05,
       'three missions and seven chest ROI cannot regress');
 
+
+    /* WORK8/#104 — new-only native same-frame A/B after integrated v0.1.72.
+       No mock player values: the genuine Missions page is already rendered,
+       decoded and frozen. Baseline toggles ONLY this additional CSS override. */
+    const midnightFlag='work8-missions-daily-midnight-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(midnightFlag)+');true');
+    await delay(155);
+    const midnightBeforeLayout=await headingLayout();
+    const midnightBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(midnightFlag)+');true');
+    await delay(155);
+    const midnightAfterLayout=await headingLayout();
+    const midnightAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const midnightSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+midnightBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+midnightAfter))
+      .replace('chests:[20,356,370,427],dock:', 'chests:[20,356,370,427],rewardBoard:[13,325,373,436],dock:');
+    assert.notEqual(midnightSource,source,'independent midnight A/B screenshots required');
+    const midnightCompare=await evalJs(midnightSource);
+    const midnightFile=(name:string,value:string)=>writeFileSync(join(evidence,name),Buffer.from(value,'base64'));
+    midnightFile('missions-daily-midnight-before-384x512.png',midnightBefore);
+    midnightFile('missions-daily-midnight-after-384x512.png',midnightAfter);
+    midnightFile('missions-daily-midnight-original-render-overlay-before-384x512.png',midnightCompare.overlays[0]);
+    midnightFile('missions-daily-midnight-original-render-overlay-after-384x512.png',midnightCompare.overlays[1]);
+    const midnightTouch=await evalJs('(()=>{const hit=e=>{const b=e.getBoundingClientRect();const t=document.elementFromPoint((b.left+b.right)/2,(b.top+b.bottom)/2);return !!t&&(t===e||e.contains(t))};const quest=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest > button")],nav=[...document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item")];return {questCount:quest.length,questHit:quest.map(hit),navCount:nav.length,navHit:nav.map(hit)}})()');
+    const midnightResult={
+      baseSha:"b9e54f556434eb9aa1acf5ff086a0fe7ff2a6dd6",
+      scope:'07 Missões only; real daily-board pigment .645 -> .620',
+      references:[
+        'assets/design-approved/00-referencia-original-aprovada.webp',
+        'assets/design-approved/00-painel-oito-ecras.webp',
+        ...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(s=>'assets/design-approved/'+s)
+      ],
+      scene:'same authentic, decoded, paused Chromium frame; 384x512 DPR1; no image rescaling',
+      baselineFlag:midnightFlag,roi:midnightCompare.metrics,unchanged:midnightCompare.unchanged,
+      beforeLayout:midnightBeforeLayout,afterLayout:midnightAfterLayout,touch:midnightTouch,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-daily-midnight-controlled-ab.json'),JSON.stringify(midnightResult,null,2));
+    console.log('WORK8/#104 07 daily-midnight native 384x512 A/B MAE '+JSON.stringify(midnightResult.roi));
+    assert.deepEqual(midnightBeforeLayout.days,midnightAfterLayout.days,'seven live reward slots unchanged');
+    assert.deepEqual(midnightBeforeLayout.chests,midnightAfterLayout.chests,'all seven chest illustrations fixed');
+    assert.deepEqual(midnightBeforeLayout.tabs,midnightAfterLayout.tabs,'mission tabs unchanged');
+    assert.deepEqual(midnightBeforeLayout.questButtons,midnightAfterLayout.questButtons,'three mission buttons unchanged');
+    assert.deepEqual(midnightBeforeLayout.nav,midnightAfterLayout.nav,'five-button dock fixed');
+    assert.equal(midnightAfterLayout.questCount,3);
+    assert.equal(midnightAfterLayout.dayCount,7);
+    assert.equal(midnightAfterLayout.dockCount,5);
+    assert.ok(midnightAfterLayout.documentWidth<=386);
+    assert.ok(midnightAfterLayout.chests.every((c:any)=>c.bottom<=midnightAfterLayout.nav.top+2),'seven chests above dock at 384x512');
+    assert.equal(midnightTouch.questCount,3);
+    assert.equal(midnightTouch.navCount,5);
+    assert.ok(midnightTouch.questHit.every(Boolean)&&midnightTouch.navHit.every(Boolean),'all mission and dock centre tap targets reachable');
+    assert.ok(midnightCompare.unchanged.header<.1&&midnightCompare.unchanged.dock<.1,'header/dock pixel identical');
+    assert.ok(midnightCompare.metrics.full.delta<-.003&&midnightCompare.metrics.rewardBoard.delta<-.012,
+      'new real daily pigmentation must improve original-frame MAE');
+    assert.ok(midnightCompare.metrics.quests.delta<.05&&midnightCompare.metrics.chests.delta<.05,
+      'real missions and all seven chest ROIs cannot regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
