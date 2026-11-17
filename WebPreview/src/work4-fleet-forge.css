@@ -2729,3 +2729,23 @@
     filter:none;
   }
 }
+
+/* WORK4/#104 — native 04 Forge: the approved foundry's compact green
+   enamel upgrade plaque has a narrower silhouette than the prior 81% wide
+   grey bar. Keep the *real* disabled status and "MOEDAS INSUFICIENTES"
+   copy visible: this is muted, embossed green (not an enabled button).
+   Only the WORK4 local button paint and width change; existing cannon,
+   furnace, live costs, touch height and WORK0 dock stay exactly in place.
+   320x568 / 390x844 / 430x932 remain unchanged. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-improve-button {
+    width:56%;
+  }
+  .w4-forge #w4-forge-panel > .w4-improve-button:disabled {
+    background:linear-gradient(180deg,#668447 0%,#386d37 47%,#19472a 100%);
+    border-color:#e7c88f!important;
+    color:#f1f4d4;
+    text-shadow:0 2px 2px #102b18;
+    box-shadow:inset 0 2px #c3d99b8a,inset 0 -2px #09281f,0 3px #593c21,0 5px 9px #06131d9e;
+  }
+}
