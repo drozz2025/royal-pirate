@@ -3942,21 +3942,27 @@
   }
 }
 
-/* WORK7/#104 — native 384×512 atlas/treasure field registration, 17 Nov 11h.
- * Full-size approved 05 is a CHARCOAL carved album behind eight live 4×2
- * portraits; the current blue collection substrate is visibly too cyan.
- * The approved 06 Captain pack has a deeper royal-violet velvet backdrop,
- * not the reddish-brown gradient of merged HEAD. Correct only these painted
- * materials: retain exact crop geometry, real title/price availability,
- * eight concept cards, three chests, five-tab dock, Porto and state.
- * No image screenshot or UI masking; no duplicated halos/filter passes.
- * 320×568 and all tall viewports intentionally remain pixel-identical.
- * approved:false, 0/8 until human visual inspection. */
+/* WORK7/#104 — native 384×512 carved album + treasure panel, 17 Nov 11h.
+ * The source 05 has a steel/charcoal atlas recess, not a luminous gold
+ * outline around the entire section. Individual eight gilded picture frames
+ * remain untouched, with genuine PRÉVIA and local count intact. On 06 the
+ * reference velvet is royal violet rather than reddish-brown. No new
+ * screenshot backgrounds, filters, halos, opaque UI covers or fake offers.
+ * This native-only material pass leaves 320px and tall screens pixel-identical.
+ * approved:false, 0/8 until human review. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-  .w7-screen[data-work7-screen="cards"] .w7-collection-content{
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+    border-color:transparent transparent #49515b;
+    border-radius:0;
+    box-shadow:none;
+    background:transparent;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
+    border-color:#515a5f;
+    border-bottom-color:#343b41;
     background:
-      radial-gradient(ellipse 92% 95px at 50% 0%,#3b485b28,transparent 92%),
-      linear-gradient(180deg,#171e2d 0%,#111b2e 44%,#0d182b 70%,#071325 100%);
+      radial-gradient(ellipse 85% 60% at 50% 18%,#37495740,transparent 84%),
+      linear-gradient(180deg,#171f2a 0%,#101a26 60%,#111720 100%);
   }
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
     background:
