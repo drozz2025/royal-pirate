@@ -4150,6 +4150,6 @@
   .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.76)}
   .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.62)}
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-    filter:saturate(1.2) contrast(1.06) brightness(1.11) drop-shadow(0 6px 5px #14062ca3);
+    filter:saturate(1.2) contrast(1.06) brightness(1.07) drop-shadow(0 6px 5px #14062ca3);
   }
 }
