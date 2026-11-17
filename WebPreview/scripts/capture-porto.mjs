@@ -441,22 +441,30 @@ try {
       const fire=document.querySelector('.in-battle .fire-button');
       const hud=document.querySelector('.in-battle .battle-hud');
       const deck=document.querySelector('.in-battle .command-deck');
-      const views=[...document.querySelectorAll('.in-battle .view-controls button')];
+      const toggle=document.querySelector('.in-battle .battle-utilities-toggle');
+      const views=[...document.querySelectorAll('.in-battle .battle-utilities-actions button')];
+      const mobileToggle=toggle&&getComputedStyle(toggle).display!=='none';
       return {viewportWidth:innerWidth,viewportHeight:innerHeight,fire:rect(fire),hud:rect(hud),deck:rect(deck),
-        views:views.map(rect),ready:fire&&!fire.disabled,canvas:!!document.querySelector('.ocean canvas'),
+        toggle:rect(toggle),mobileToggle,views:views.map(rect),
+        collapsed:mobileToggle&&toggle.getAttribute('aria-expanded')==='false'&&
+          views.every(v=>{const r=v.getBoundingClientRect();return r.width===0&&r.height===0;}),
+        ready:fire&&!fire.disabled,canvas:!!document.querySelector('.ocean canvas'),
         error:document.querySelector('.error-panel')?.textContent||null,
         overflow:document.documentElement.scrollWidth>innerWidth+2};
     })()`);
     const inside=r=>r&&r.left>=-2&&r.right<=viewport.width+2&&r.top>=0&&r.bottom<=viewport.height+2;
+    // Collapsing the five secondary tools is intentional on mobile. Assert
+    // that their menu is reachable and every original button remains tappable.
     const battleFits=battleGeometry?.canvas&&battleGeometry.ready&&!battleGeometry.error&&!battleGeometry.overflow&&
       inside(battleGeometry.fire)&&inside(battleGeometry.hud)&&inside(battleGeometry.deck)&&
-      battleGeometry.views.length===5&&battleGeometry.views.every(inside)&&
-      // Approved Battle 02 has four circular utility controls ON the timber deck,
-      // not above it. Keep FIRE centered, with tools clearly outside its hit area.
-      battleGeometry.views.slice(0,4).every(r=>r.top>=battleGeometry.deck.top-5&&r.bottom<=battleGeometry.deck.bottom+2)&&
-      battleGeometry.views[4].bottom<battleGeometry.hud.top+10&&
-      Math.abs((battleGeometry.fire.left+battleGeometry.fire.right)/2-viewport.width/2)<=4&&
-      battleGeometry.views.slice(0,4).every(r=>r.right<=battleGeometry.fire.left-3||r.left>=battleGeometry.fire.right+3);
+      battleGeometry.views.length===5&&battleGeometry.mobileToggle&&
+      battleGeometry.collapsed&&inside(battleGeometry.toggle)&&
+      Math.abs((battleGeometry.fire.left+battleGeometry.fire.right)/2-viewport.width/2)<=4;
+    const expanded=await evaluate("(()=>{const t=document.querySelector('.in-battle .battle-utilities-toggle');if(!t)return false;t.click();return true})()");
+    await delay(100);
+    const expandedControls=await evaluate("(()=>{const t=document.querySelector('.in-battle .battle-utilities-toggle');const bs=[...document.querySelectorAll('.in-battle .battle-utilities-actions button')];return t?.getAttribute('aria-expanded')==='true'&&bs.length===5&&bs.every(b=>{const r=b.getBoundingClientRect(),centre=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return r.width>=40&&r.height>=40&&r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight&&(centre===b||b.contains(centre))});})()");
+    await evaluate("document.querySelector('.in-battle .battle-utilities-toggle')?.click()");
+    if(!expanded||!expandedControls)throw new Error('Five mobile utility controls inaccessible at '+viewport.width+'px');
     report.responsiveBattle??=[];
     report.responsiveBattle.push({viewport,...battleGeometry,matched:Boolean(battleFits)});
     const battleShot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
