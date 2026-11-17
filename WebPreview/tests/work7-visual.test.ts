@@ -295,7 +295,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         }
         if(width===384 && height===512) {
           assert.ok(Number.isFinite(comparison.roiBefore)&&Number.isFinite(comparison.roiAfter),'Real native 384 ROI metrics recorded');
-          if(kind==='shop') assert.ok(comparison.roiAfter<comparison.roiBefore,'Native approved chest ROI must improve vs same-frame HEAD');
+          if(kind==='shop') {
+            assert.ok(comparison.roiAfter<comparison.roiBefore,'Native approved chest ROI must improve vs same-frame HEAD');
+            assert.ok(comparison.mae<comparison.maeBefore,'Full native 384px shop MAE must also improve vs same-frame HEAD');
+          }
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y+1),
             'All true PRÉVIA / EM BREVE labels must stay above the dock at native size');
           assert.ok(baselineGeometry,'HEAD baseline boxes must be recorded, not inferred');
@@ -311,8 +314,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               'First chest should align with the approved x≈18 border');
             assert.ok(geometry.packArt && baselineGeometry.packArt,
               'Measure original 06 chest crop separately from its pack panel');
-            assert.ok(Math.abs(geometry.packArt.width-baselineGeometry.packArt.width)<=1,
-              'Native 384px Captain artwork remains exactly as merged HEAD; this PR only adjusts 320px framing');
+            assert.ok(geometry.packArt.width<baselineGeometry.packArt.width &&
+                      baselineGeometry.packArt.width-geometry.packArt.width<=12,
+              'Native 384px Captain art is deliberately reframed by no more than 12px, without changing frame or data');
           }
         }
       }
