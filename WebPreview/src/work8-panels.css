@@ -5144,3 +5144,17 @@
     filter:brightness(.675) saturate(1.055);
   }
 }
+
+
+/* WORK8 / #104 — 07 Missões ONLY, 17 Nov 2026.
+   Continue the measured navy-depth calibration of the genuine seven-reward
+   board, from .675 to .645, without touching the real mission data, rewards,
+   button layout or five-item shared dock. The new flag isolates ONLY this
+   experiment; earlier integrated WORK8 A/B flags can still restore their
+   own historical baselines. Keep screenshot fidelity measurable in native
+   Chromium 384×512 before WORK0 considers any integration. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-daily-depth-ab-baseline):not(.work8-missions-daily-luminance-ab-baseline):not(.work8-missions-ink-ab-baseline):not(.work8-missions-frame-ab-baseline) .w8-approved-missions .w8-approved-daily {
+    filter:brightness(.645) saturate(1.055);
+  }
+}
