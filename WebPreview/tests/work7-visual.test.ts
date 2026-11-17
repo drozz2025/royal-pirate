@@ -37,73 +37,23 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  const marker = '/* WORK7 / #104 — native 384x512 illustrated pigment calibration, 17 Nov 06:23.';
+  const marker = '/* WORK7/#104 — 17 Nov 2026: original 05/06 native pictorial-value registration.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  // Undo solely this PR's 320px local gutters, retaining merged #257.
+  // Native-only WORK7 pass, with all merged mobile geometry retained.
   // The same Chromium session, true 384x512 viewport and real assets measure
   // before/after, rather than comparing against a stale old PR.
-  const cssBaseline = `
-    /* Restore solely the 320px properties of merged HEAD before this PR.
-       Native 384x512 remains visually identical; all #257 CSS is retained. */
-    @media (max-width:354px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
-        width:auto!important;margin-left:0!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-content{
-        gap:5px!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
-        min-height:156px!important;padding-block:6px!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
-        min-height:22px!important;margin:0!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
-        width:auto!important;margin-left:0!important;
-      }
-    }
-    /* Same-scene HEAD baseline: the new 05 art registration and 06 image
-       highlight are disabled; old #263 and #268 rules stay preserved. */
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
-        transform:none!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        filter:saturate(1.2) contrast(1.06) drop-shadow(0 6px 5px #14062ca3)!important;
-      }
-    }
-    /* Same-scene HEAD baseline for this PR at native 384x512. */
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        transform:translate(-2px,5px) scale(1.07)!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
-        transform:none!important;
-      }
-    }`;
-  /* This PR's immediate HEAD A/B overrides only the two new pixel-calibration
-   * rules, retaining all already-merged transforms and the same browser frame. */
+  /* Strict parent-HEAD A/B: disable ONLY the two new native frame
+   * lighting values. Merged #257/#263/#268/#276/#279 are retained. */
   const currentHeadBaseline = `
-    /* Strict same-frame native 384x512 parent HEAD before this PR.
-       This override reverts ONLY the two local colour changes below;
-       approved #276 card registration and pack illumination stay intact. */
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-collection-content{
-        background:
-          radial-gradient(ellipse 92% 95px at 50% 0%,#d3fff23d,transparent),
-          linear-gradient(180deg,#339abea6 0%,#175781df 44%,#082b50f4 70%,#061a33 100%)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+        filter:none!important;
       }
-      .w7-screen[data-work7-screen="cards"] .w7-collection-status{
-        background:linear-gradient(100deg,rgba(12,56,86,.94),rgba(28,83,116,.94) 53%,rgba(12,50,80,.95))!important;
-      }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) small,
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) small{
-        background:linear-gradient(180deg,#fff0bd 0%,var(--w7-enamel) 16%,var(--w7-shadow) 100%)!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(.88) drop-shadow(0 4px 3px #041327a8)!important;
+      .w7-screen[data-work7-screen="shop"] .w7-chest{
+        filter:none!important;
       }
     }`;
+  const cssBaseline = currentHeadBaseline;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
     { cwd: process.cwd(), stdio: 'ignore' });
@@ -251,7 +201,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         let headScreenshotData: string | null = null;
         let baselineGeometry: any = null;
         if ((width===384 && height===512)||(width===320 && height===568)) {
-          // Temporarily undo only this PR's four CSS properties via precise
+          // Temporarily undo only this PR's two CSS properties via precise
           // overrides. Keep HEAD assets, state, earlier visual passes, browser
           // viewport and font rendering identical before/after.
           const enabled = await evaluate("(()=>{const s=document.createElement('style');s.id='work7-css-baseline';s.textContent="+JSON.stringify(cssBaseline)+";document.head.appendChild(s);return true})()");
@@ -354,8 +304,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           assert.ok(baselineGeometry && baselineGeometry.labels.length===3,
             'Measure the genuine prior HEAD chest labels at the same 320x568 viewport');
           assert.ok(Math.max(...geometry.labels.map((label:any)=>label.bottom))
-                <=Math.max(...baselineGeometry.labels.map((label:any)=>label.bottom))-5,
-            'Compact 320px local gutters must raise all 3 chest availability plaques by at least 5px');
+                ===Math.max(...baselineGeometry.labels.map((label:any)=>label.bottom)),
+            'Native-only work must preserve the merged 320px chest label position');
         }
         if(width===384 && height===512) {
           assert.ok(Number.isFinite(comparison.roiBefore)&&Number.isFinite(comparison.roiAfter),'Real native 384 ROI metrics recorded');
@@ -373,8 +323,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           if(kind==='cards') {
             assert.ok(geometry.slots[0].x>=17 && geometry.slots[0].x<=20,
               'First conceptual card should align with the approved x≈18 border');
-            assert.equal(geometry.slots[0].y, baselineGeometry.slots[0].y+2,
-              'All eight live original portraits should move exactly 2px toward approved art');
+            assert.equal(geometry.slots[0].y, baselineGeometry.slots[0].y,
+              'Eight original portraits retain exact HEAD frame geometry');
             assert.ok(geometry.slots.every((slot:any)=>slot.bottom===geometry.slots[0].bottom||slot.bottom===geometry.slots[4].bottom),
               'Eight concept cards retain exactly two aligned rows');
           } else {
@@ -384,9 +334,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               'First chest should align with the approved x≈18 border');
             assert.ok(geometry.packArt && baselineGeometry.packArt,
               'Measure original 06 chest crop separately from its pack panel');
-            assert.ok(geometry.packArt.width<baselineGeometry.packArt.width &&
-                      baselineGeometry.packArt.width-geometry.packArt.width<=12,
-              'Native 384px Captain art is deliberately reframed by no more than 12px, without changing frame or data');
+            assert.equal(geometry.packArt.width,baselineGeometry.packArt.width,
+              'Native 384px Captain art preserves merged original framing');
           }
         }
       }
