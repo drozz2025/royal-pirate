@@ -37,17 +37,22 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  const marker = '/* WORK7 / #104 — native 384×512 engraved metal inlay depth, 17 Nov 15h.';
+  const marker = '/* WORK7 / #104 — 384×512 native carved frame relief, 17 Nov 15h.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  // True merged v0.1.67 HEAD (after WORK0 integrated #300).
-  // Undo ONLY this PR's local engraved inner-frame depth, leaving all HEAD crops and styles intact.
+  // True merged v0.1.68 HEAD (after WORK0 integrated #305).
+  // Undo ONLY this PR's physical frame-value filters and chest inlay, leaving all HEAD crops and geometry intact.
   // All pre-existing atlas/velvet backing, 3D frames and approved assets stay
   // identical in the SAME Chromium scene. Use !important so the baseline
   // reliably wins after the final native media query.
 
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot::before,
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+        filter:brightness(.81)!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest{
+        filter:brightness(.80)!important;
+      }
       .w7-screen[data-work7-screen="shop"] .w7-chest::before{
         box-shadow:
           inset 0 0 0 1px #472714ae,
