@@ -32,6 +32,14 @@ test('WORK6 #104: five curved real 3D red sail skirts extend both mast silhouett
   const color=sail.geometry.getAttribute('color') as T.BufferAttribute;
   assert.equal(vertices.count,5*9*13);
   assert.equal(color.count,vertices.count);
+  // At native 384px pointed triangular strips read as rigid red spikes.
+  // The new outline must retain at least 55% of its mid-belly breadth
+  // across BOTH upper yard and lower hem of the leading cloth panel.
+  const span=(row:number)=>Math.abs(vertices.getX(row*9+8)-vertices.getX(row*9));
+  const middle=span(6);
+  assert.ok(middle>1.0);
+  assert.ok(span(0)/middle>.55,'lower painted edge must be broad, not a spike');
+  assert.ok(span(12)/middle>.55,'upper painted yard must be broad, not a spike');
   const bounds=new T.Box3().setFromObject(sail);
   assert.ok(bounds.min.x < -2.8 && bounds.max.x > 3.0,
     'painted red ship canvas extends laterally on both windward sides');
