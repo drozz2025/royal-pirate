@@ -271,10 +271,12 @@ function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
  * The existing live SVG remains behind each image as an offline/failure fallback.
  * Never use the approved screenshot as a panel background or a player data source.
  */
-type W8ApprovedCrop = 'title-missions'|'title-ranking'|'quest-swords'|'quest-ship'|'quest-target'|'captain'|'league-badge'|'chest-silver'|'chest-gold'|'chest-violet'|'chest-royal';
+type W8ApprovedCrop = 'title-missions'|'title-ranking'|'quest-swords'|'quest-ship'|'quest-target'|'captain'|'league-badge'|'chest-silver'|'chest-gold'|'chest-violet'|'chest-royal'|'daily-heading';
 const W8_ART_CROPS:Record<W8ApprovedCrop,{rect:string;frame:'missions'|'ranking'}>={
   // The original engraved plaques replace only the two existing static decorative headers.
   'title-missions':{rect:'98 74 189 45',frame:'missions'},
+  // Original static lettering/engraved flourishes only: not reward data or a full screenshot.
+  'daily-heading':{rect:'45 325 294 36',frame:'missions'},
   'title-ranking':{rect:'98 74 189 45',frame:'ranking'},
   'quest-swords':{rect:'15 160 51 48',frame:'missions'},
   'quest-ship':{rect:'15 213 51 48',frame:'missions'},
@@ -542,7 +544,7 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
         })}
       </section>
       <section className="w8-approved-daily" aria-label="7-day supply route" title={canClaim?'Next claim earns '+(15+next*5)+' coins':'Recompensa de hoje já recolhida'}>
-        <h3>Recompensa Diária</h3>
+        <h3>Recompensa Diária<W8ApprovedPainting art="daily-heading"/></h3>
         <ol className="w8-approved-days" aria-label="Seven consecutive daily rewards">
           {Array.from({length:7},(_,i)=>i+1).map(n=><li key={n} aria-label={'DAY '+n} className={'app-week-day'+(n<=visibleStreak?' is-claimed':canClaim&&n===next?' is-next':'')}>
             <span className="w8-approved-chest" aria-hidden="true"><W8Art kind="chest"/>{n>=4&&<W8ApprovedPainting art={n===4?'chest-silver':n===5?'chest-gold':n===6?'chest-violet':'chest-royal'}/>} {n<=visibleStreak&&<b>✓</b>}</span>
