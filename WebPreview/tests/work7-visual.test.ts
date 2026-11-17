@@ -39,7 +39,21 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7 / #104 — 17 Nov, native 384×512 lateral frame alignment';
   assert.ok(cssText.includes(marker),'Locate only this PR work7 CSS changes');
-  const cssBaseline = cssText.slice(0,cssText.indexOf(marker));
+  // Override ONLY this PR's lateral changes to render the true HEAD
+  // baseline. Re-appending the full old stylesheet leaves previously unset
+  // properties (notably transform) active and biases before/after MAE.
+  const cssBaseline = `
+    @media (min-width:355px) and (max-width:430px){
+      .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+        width:auto!important;margin-inline:0!important;
+      }
+    }
+    @media (min-width:355px) and (max-width:430px) and (max-height:560px){
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack,
+      .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+        width:auto!important;margin-left:0!important;transform:none!important;
+      }
+    }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
     { cwd: process.cwd(), stdio: 'ignore' });
@@ -172,9 +186,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         let baselineScreenshotData: string | null = null;
         let baselineGeometry: any = null;
         if (width===384 && height===512) {
-          // Reconstruct the exact initial HEAD work7 CSS by removing this PR's
-          // final rules and overriding them in a temporary style. Keep app,
-          // assets, state and Chromium instance identical before/after.
+          // Temporarily undo only this PR's four CSS properties via precise
+          // overrides. Keep HEAD assets, state, earlier visual passes, browser
+          // viewport and font rendering identical before/after.
           const enabled = await evaluate("(()=>{const s=document.createElement('style');s.id='work7-css-baseline';s.textContent="+JSON.stringify(cssBaseline)+";document.head.appendChild(s);return true})()");
           assert.ok(enabled,'Isolated work7 CSS-only baseline installed');
           await sleep(200);
