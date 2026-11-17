@@ -3608,20 +3608,8 @@
  * Reallocate LOCAL heading/gutter space to the picture, not to fake prices.
  * No HUD, shell, Porto, dock, purchase, state or version changes. */
 @media (min-width:355px) and (max-width:430px) and (max-height:560px){
-  .w7-screen[data-work7-screen="cards"] .w7-collection-content{
-    gap:2px;
-  }
-  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
-    padding-top:0;
-    row-gap:4px;
-  }
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
-    min-height:26px;
-    padding:3px 1px 2px;
-    font-size:11.25px;
-    line-height:1.04;
-    text-wrap:balance;
-  }
+  /* Chromium review: moving the entire 05 grid upwards made MAE worse;
+   * retain the already merged #231 native portrait geometry. */
   .w7-screen[data-work7-screen="shop"] .w7-content{
     gap:2px;
   }
