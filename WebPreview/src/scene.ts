@@ -160,6 +160,9 @@ export class OceanScene {
     for(const side of ['player','enemy'] as const){this.ships[side].root.position.set(SHIPS[side].x,0,SHIPS[side].z);this.scene.add(this.ships[side].root);
       const foam=new T.Mesh(new T.RingGeometry(1,1.09,40),new T.MeshBasicMaterial({color:'#b5f9ed',transparent:true,opacity:.45,side:T.DoubleSide,depthWrite:false}));foam.rotation.x=-Math.PI/2;foam.scale.set(2.3,5.3,1);foam.position.set(SHIPS[side].x,.09,SHIPS[side].z);this.scene.add(foam);this.foam.push(foam);
     }
+    // Battle 02 only: expand the *visible* red silhouette with real wind-filled
+    // canvas skirts. The enemy root stays at its unchanged physics position.
+    this.dressBattleEnemy();
     // A single pooled flash per ship rides the correct firing-side centre gun.
     // No dynamic geometry or material allocations during a cannon shot.
     const flashGeometry=new T.SphereGeometry(1,10,8);
@@ -204,6 +207,87 @@ export class OceanScene {
    * rails into the sea, rather than across a horizontal wooden fence.
    * Geometry is a child of the existing cannon battery, never the Porto ship,
    * projectile system, DOM/HUD or navigation. */
+
+  /**
+   * Batalha 02: hand-shaped crimson cloth widens the actual opponent silhouette,
+   * especially in a narrow portrait. The curved hems are Three.js geometry;
+   * no 2D compositing, duplicate ships, photo backgrounds or extra hit targets.
+   * These panels are attached to the enemy's existing rig and do not enter
+   * its sails[] array, cannon origins, collision model or damage simulation.
+   * Porto always hides this enemy root and is therefore entirely unaffected.
+   */
+  private dressBattleEnemy(){
+    const rig=this.ships.enemy.rig;
+    const cloth=new T.BufferGeometry();
+    const positions:number[]=[],colors:number[]=[],indices:number[]=[];
+    const bright=new T.Color('#c85648'),shadow=new T.Color('#692632');
+    const goldLine:number[]=[];
+    // local coordinates: mast Z, cloth foot Y, height, original yard end X,
+    // flank and wind extension. Each panel joins its ORIGINAL mast, never
+    // detaches a cloth decal into HUD space or creates a third vessel.
+    const panels:[number,number,number,number,number,number][]=[
+      [.90,4.16,3.67,2.20,1,1.28],
+      [.90,4.16,3.67,2.20,-1,.97],
+      [-2.10,3.02,3.55,1.70,1,1.02],
+      [-2.10,3.02,3.55,1.70,-1,.80],
+      [3.42,4.24,2.43,1.35,1,.68]
+    ];
+    const cols=8,rows=12;
+    for(let p=0;p<panels.length;p++){
+      const [z,foot,height,edge,sign,extension]=panels[p];
+      const offset=positions.length/3;
+      const point=(u:number,v:number):[number,number,number]=>{
+        const belly=.28+.72*Math.pow(Math.max(0,Math.sin(Math.PI*v)),.66);
+        const sag=.13*Math.sin(Math.PI*u)*(1-v);
+        return [
+          sign*(edge+extension*u*belly),
+          foot+height*v-sag,
+          z+.09+.48*u*Math.sin(Math.PI*v)+.20*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)
+        ];
+      };
+      for(let iy=0;iy<=rows;iy++){
+        const v=iy/rows;
+        for(let ix=0;ix<=cols;ix++){
+          const u=ix/cols;
+          positions.push(...point(u,v));
+          const sun=.28+.48*(1-u)+.23*Math.sin(v*Math.PI*3+.5*p);
+          const tone=shadow.clone().lerp(bright,Math.max(.10,Math.min(.89,sun)));
+          colors.push(tone.r,tone.g,tone.b);
+        }
+      }
+      for(let iy=0;iy<rows;iy++)for(let ix=0;ix<cols;ix++){
+        const a=offset+iy*(cols+1)+ix,b=a+cols+1;
+        indices.push(a,b,a+1,a+1,b,b+1);
+      }
+      // Gilded sewn hems are genuinely connected to the curved cloth edge.
+      for(let i=0;i<rows;i++){
+        goldLine.push(...point(1,i/rows),...point(1,(i+1)/rows));
+        // A handful of long cloth folds follow the wind, not a gridded decal.
+        if(i%3===0){
+          goldLine.push(...point(.48,i/rows),...point(.48,(i+1)/rows));
+        }
+      }
+      goldLine.push(...point(0,1),...point(1,1));
+    }
+    cloth.setAttribute('position',new T.Float32BufferAttribute(positions,3));
+    cloth.setAttribute('color',new T.Float32BufferAttribute(colors,3));
+    cloth.setIndex(indices);
+    cloth.computeVertexNormals();
+    cloth.computeBoundingSphere();
+    const fabric=new T.Mesh(cloth,new T.MeshStandardMaterial({
+      vertexColors:true,side:T.DoubleSide,roughness:.87,metalness:0
+    }));
+    fabric.name='battle-only-billowed-red-silhouette';
+    fabric.castShadow=true;
+    rig.add(fabric);
+    const seams=new T.LineSegments(
+      new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(goldLine,3)),
+      new T.LineBasicMaterial({color:'#d4a56e',transparent:true,opacity:.85})
+    );
+    seams.name='battle-only-red-hem-stitching';
+    rig.add(seams);
+  }
+
   private dressBattleDeck(){
     const dressing=new T.Group();
     dressing.name='battle-only-wooden-bulwark';
