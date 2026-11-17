@@ -237,7 +237,10 @@ export class OceanScene {
       const [z,foot,height,edge,sign,extension]=panels[p];
       const offset=positions.length/3;
       const point=(u:number,v:number):[number,number,number]=>{
-        const belly=.28+.72*Math.pow(Math.max(0,Math.sin(Math.PI*v)),.66);
+        // Keep a broad, wind-filled head and foot instead of sharp red spikes.
+        // The free edge ripples in height like the illustrated cloth outline.
+        const belly=.62+.38*Math.pow(Math.max(0,Math.sin(Math.PI*v)),.62)
+          +.055*Math.sin(v*Math.PI*4+p*.75);
         const sag=.13*Math.sin(Math.PI*u)*(1-v);
         return [
           sign*(edge+extension*u*belly),
