@@ -317,6 +317,84 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         writeFileSync(join(folder,'fleet-source-thumbnails-ab.json'),JSON.stringify(evidence,null,2)+'\n');
         console.log('WORK4_SOURCE_THUMBNAILS_AB '+JSON.stringify(evidence));
       }
+      // WORK4 / #104: native 384x512 approved Forge enamel comparison.
+      // Do not change React state, forge cost values, cannon, or the shared
+      // dock. Restore only the previous grey/81% button with a local STYLE,
+      // screenshot the same frame, remove STYLE, and compare to approved 04.
+      if(screen==='forge' && width===384 && height===512){
+        const plaqueSelector='.w4-forge #w4-forge-panel > .w4-improve-button';
+        const geometryExpr="(()=>{const r=s=>{const e=document.querySelector(s);"+
+          "if(!e)return null;const b=e.getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height,bottom:b.bottom};};"+
+          "const button=document.querySelector("+JSON.stringify(plaqueSelector)+");"+
+          "return {button:r("+JSON.stringify(plaqueSelector)+"),materials:r('.w4-forge .w4-materials'),"+
+          "cannon:r('.w4-reference-cannon'),dock:r('.harbour-nav.app-dock-porto'),"+
+          "dockItems:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "disabled:button?.disabled,text:button?.textContent?.trim()};})()";
+        const current=await evaluate(geometryExpr);
+        const oldCSS=[
+          plaqueSelector+'{width:81%!important}',
+          plaqueSelector+':disabled{background:linear-gradient(#596f69,#304d50)!important;'+
+            'border-color:#f6d88e!important;color:#dfecdc!important;text-shadow:inherit!important;'+
+            'box-shadow:0 3px #584327,0 5px 12px #091b2d,inset 0 2px #edffbd99!important}'
+        ].join('\n');
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');s.id='work4-previous-grey-plaque';"+
+          "s.textContent="+JSON.stringify(oldCSS)+";document.head.appendChild(s);return true;})()"));
+        await sleep(170);
+        const previous=await evaluate(geometryExpr);
+        const previousImage=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-forge-enamel-384x512.png'),Buffer.from(previousImage,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-previous-grey-plaque')?.remove();return true;})()"));
+        await sleep(120);
+        const restored=await evaluate(geometryExpr);
+        assert.deepEqual(restored,current,'same original frame, no changed geometry');
+        assert.equal(current.dockItems,5,'original dock stays five-item');
+        assert.equal(current.disabled,true,'insufficient-coin action stays genuinely disabled');
+        assert.match(String(current.text),/MOEDAS INSUFICIENTES/,'honest upgrade status unchanged');
+        assert.ok(current.button.width>=170 && current.button.width<=235,'native plaque is narrower');
+        assert.ok(current.button.height>=44,'touch target stays 44px');
+        assert.ok(current.button.bottom<=current.dock.y-1,'button visible above dock');
+        assert.deepEqual(current.cannon,previous.cannon,'approved single cannon remains untouched');
+        assert.deepEqual(current.materials,previous.materials,'three live cost fields stay in place');
+        assert.deepEqual(current.dock,previous.dock,'dock is WORK0-owned and untouched');
+
+        const expr="(async()=>{"+
+          "const image=async uri=>{const i=new Image();i.src=uri;await i.decode();return i;};"+
+          "const [ref,old,now]=await Promise.all(["+
+            "image('data:image/webp;base64,"+references.forge+"'),"+
+            "image('data:image/png;base64,"+previousImage+"'),"+
+            "image('data:image/png;base64,"+screenshot+"')]);"+
+          "if([ref,old,now].some(i=>i.width!==384||i.height!==512))throw Error('native 384x512 only');"+
+          "const rgba=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data};"+
+          "const [a,b,c]=[rgba(ref),rgba(old),rgba(now)];"+
+          "const rois={global:[0,0,384,512],button:[47,381,338,429],plaque:[96,381,308,429],"+
+          "cannon:[100,230,160,300],costs:[18,317,368,378],dock:[0,430,384,512]};"+
+          "const mae=(u,v,r)=>{let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;for(let j=0;j<3;j++){total+=Math.abs(u[k+j]-v[k+j]);n++;}}return total/n};"+
+          "const before={},after={};for(const [key,r] of Object.entries(rois)){before[key]=mae(a,b,r);after[key]=mae(a,c,r)};"+
+          "const result=document.createElement('canvas');result.width=1536;result.height=512;const g=result.getContext('2d');"+
+          "g.drawImage(ref,0,0);g.drawImage(old,384,0);g.drawImage(now,768,0);"+
+          "g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(now,1152,0);"+
+          "return {rois,before,after,png:result.toDataURL('image/png').split(',')[1]};})()";
+        const ab=await evaluate(expr);
+        writeFileSync(join(folder,'compare-forge-enamel-384x512.png'),Buffer.from(ab.png,'base64'));
+        delete ab.png;
+        const evidence={...ab,previous,new:current,source:'assets/design-approved/04-melhorias-forja.webp',
+          sameReactFrame:true,viewport:'384x512',approved:false};
+        writeFileSync(join(folder,'forge-enamel-controlled-ab.json'),JSON.stringify(evidence,null,2)+'\n');
+        console.log('WORK4_FORGE_ENAMEL_AB '+JSON.stringify(evidence));
+        assert.ok(ab.after.button<ab.before.button,
+          'Forge native button frame must improve against approved source');
+        assert.ok(ab.after.global<ab.before.global,
+          'Forge native global must not regress against approved source');
+        // The materials' DOM geometry and live values are exactly equal.
+        // Chromium rasterization can shift source-vs-render MAE by <0.1px
+        // across a large adjacent ROI after a compositing style recalc;
+        // keep a strict 0.15 ceiling for costs, 0.05 for cannon and dock.
+        for(const k of ['cannon','costs','dock'])
+          assert.ok(Math.abs(ab.after[k]-ab.before[k])<(k==='costs'?.15:.05),
+            'protected '+k+' ROI remains within native raster tolerance');
+      }
       // WORK4 / 09h: real native Forge first-fold A/B on an IDENTICAL React
       // frame. Temporarily restore the previous material-note placement and
       // compact CSS, then undo both before measuring; no artificial gameplay
