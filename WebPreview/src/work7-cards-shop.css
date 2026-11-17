@@ -4133,3 +4133,26 @@
     filter:saturate(1.27) contrast(1.12) brightness(1.40) drop-shadow(0 4px 3px #041327a8)
   }
 }
+
+
+/* WORK7/#104 — v0.1.73 native artwork recess colour registration, 17 Nov 20h.
+ * Original approved 05: the collection backing is carved charcoal/steel,
+ * not the previous luminous cyan/navy. Original 06: a richer ink-blue
+ * violet on the Captain's panel. Both are CSS-native material surfaces
+ * beneath the live 4×2 illustrations, one pack and three true chests.
+ * No screenshot backgrounds, economic state, text, menu, geometry or JS.
+ * Deliberately isolated to 355–390px SHORT viewports; #263 at 320px
+ * and all 390×844 / 430×932 viewports remain pixel-identical to HEAD.
+ * Same-scene/current-HEAD A/B visual gate required; approved:false 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px) {
+  .w7-screen[data-work7-screen="cards"] .w7-collection-content {
+    background:
+      radial-gradient(ellipse 92% 95px at 50% 0%,#37495a38,transparent 92%),
+      linear-gradient(180deg,#142636 0%,#102332 44%,#0b1e30 70%,#061523 100%);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack {
+    background:
+      radial-gradient(ellipse 66% 95% at 29% 42%,#b02c7955,transparent 88%),
+      linear-gradient(112deg,#390963 0%,#2f095d 49%,#0a0c4c 100%);
+  }
+}
