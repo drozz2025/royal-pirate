@@ -17,8 +17,13 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     spawnSync('sh',['-c','command -v google-chrome || command -v chromium'],{encoding:'utf8'}).stdout.trim();
   if(!chromeBin){console.log('Chromium unavailable: cannot claim visual QA');return;}
   const evidence='work8-qa';mkdirSync(evidence,{recursive:true});
+  // Vite dev may not serve the approved ../../assets WebP from outside
+  // WebPreview. Compare the same *built* image-bearing app used in the
+  // responsive capture, not temporary fallback SVG artwork.
+  const built=spawnSync('npm',['run','build','--','--base=/'],{encoding:'utf8',timeout:120000});
+  assert.equal(built.status,0,'production preview build required: '+built.stderr+' '+built.stdout);
   const profile=mkdtempSync(join(tmpdir(),'rp-work8-ab-'));
-  const vite=spawn(process.execPath,['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','4186','--strictPort'],{stdio:'ignore'});
+  const vite=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--host','127.0.0.1','--port','4186','--strictPort'],{stdio:'ignore'});
   let browser,ws;
   const cdpPort=9300+(process.pid%3000);
   try {
