@@ -4064,3 +4064,28 @@
       inset 0 -2px 1px #e7b77529;
   }
 }
+
+
+/* WORK7 / #104 — 17 Nov 16h, controlled native-value pass.
+ * Adjust only individual REAL approved relief panels at 384x512.
+ * The prior 8-card .72 and 3-chest .80 filters are preserved as the
+ * same-frame baseline in work7-visual.test.ts. Per-panel image-value
+ * calibration avoids modifying art URLs, content, geometry or mechanics.
+ * All original PRÉVIA/EM BREVE labels remain real live DOM, as do the
+ * single pack, four-by-two grid and three chests. No effect at 320x568
+ * or tall viewports. Human approval required; approved:false (0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.66)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.77)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.64)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.65)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.62)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.71)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.62)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.71)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.70)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.71)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.59)}
+  /* Brighten genuine unavailable labels inside the darker carved frames. */
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{filter:brightness(1.12)}
+}
