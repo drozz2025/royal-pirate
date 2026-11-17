@@ -2687,3 +2687,26 @@
     border-color:#e6bd76;
   }
 }
+
+/* WORK4 / #104 — native 03 roster first-fold clearance, 17 Nov 14h.
+   Native 384x512 renders 112px tall local ship cards from y346, ending
+   below the protected 5-item dock at y430. The original approved composition
+   keeps all four cards inside its first fold. Reclaim unused thumbnail space
+   ONLY in WORK4 03; do not shrink the 206px painted ship/sea, move the dock,
+   invent a ship, or remove any real labels. Active touch target stays >=44px. */
+@media (min-width:360px) and (max-width:399px) and (max-height:650px) {
+  .w4-fleet #w4-fleet-panel ~ .w4-ship-roster,
+  .w4-fleet .w4-ship-roster {
+    gap:5px;
+    margin-top:0;
+  }
+  .w4-fleet .w4-ship-roster > .w4-ship-slot {
+    min-height:84px;
+    padding:2px 1px 3px;
+    gap:1px;
+  }
+  .w4-fleet .w4-ship-roster > .w4-ship-slot .w4-slot-art,
+  .w4-fleet .w4-ship-roster > .w4-ship-slot.is-active .w4-slot-art {
+    height:45px;
+  }
+}
