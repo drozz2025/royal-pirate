@@ -4928,3 +4928,36 @@
   color:#fff3d7;
   text-shadow:0 1px #02182a,0 0 3px #f3d99b80;
 }
+
+
+/* WORK8/#104 · native 384×512 source comparison, 17 Nov 2026.
+   07 Missões ONLY: the approved quest/reward boards are less cyan and their
+   hand-painted edging is pewter/bronze rather than the synthetic broad gold.
+   These are pigment and border-only changes: no geometry, new objective,
+   altered prize, day claim, navigation, Porto or Ranking 08 mutation.
+   A/B disables ONLY this block, leaving integrated #269/#271 intact. */
+:root:not(.work8-missions-frame-ab-baseline) .w8-approved-missions .w8-approved-quest-list{
+  filter:brightness(.785) saturate(1.055);
+  border-color:#a8a99c;
+}
+:root:not(.work8-missions-frame-ab-baseline) .w8-approved-missions .w8-approved-quest{
+  border-top-color:#b5c2bf;
+  border-left-color:#64879a;
+  border-right-color:#64879a;
+  border-bottom-color:#3b5262;
+  box-shadow:inset 0 1px #e7e9d177,inset 0 -1px #09283e,0 2px 2px #031829;
+}
+:root:not(.work8-missions-frame-ab-baseline) .w8-approved-missions .w8-approved-daily{
+  filter:brightness(.785) saturate(1.055);
+  border-color:#99a9ac;
+}
+:root:not(.work8-missions-frame-ab-baseline) .w8-approved-missions .w8-approved-days li{
+  border-color:#718e96;
+  box-shadow:inset 0 1px #f4ebcb99,inset 0 -2px #0b263e,0 2px 2px #041829;
+}
+:root:not(.work8-missions-frame-ab-baseline) .w8-approved-missions .w8-approved-days li:nth-child(-n+3){
+  border-color:#3f8c66;
+}
+:root:not(.work8-missions-frame-ab-baseline) .w8-approved-missions .w8-approved-days li:nth-child(7){
+  border-color:#e5c283;
+}

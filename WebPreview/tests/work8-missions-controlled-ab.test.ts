@@ -7,7 +7,7 @@ import {join} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 
 /* WORK8 / #104: A/B in one genuine live Missions scene and one Chrome tab.
-   The baseline root class disables ONLY this PR's enamel CSS; integrated #269 stays active in both frames.
+   The baseline root class disables ONLY this PR's frame-pigment CSS; integrated #269/#271 stay active in both frames.
    No fictional mission states, no screenshot replacement, no navigation edits.
    Each screenshot is native 384x512 and checked against 07-missoes.webp. */
 test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves ROI without dock or day regressions', {timeout:150000}, async()=>{
@@ -86,7 +86,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(340); // allow SVG image paint following source decode
     await evalJs('(()=>{document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
-    const baselineClass='work8-missions-enamel-ab-baseline';
+    const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
     await delay(110);
     const beforeLayout=await readLayout();
@@ -116,9 +116,9 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     writeFileSync(join(evidence,'missions-ab-original-render-overlay-before-384x512.png'),Buffer.from(comparisons.overlays[0],'base64'));
     writeFileSync(join(evidence,'missions-ab-original-render-overlay-after-384x512.png'),Buffer.from(comparisons.overlays[1],'base64'));
     const delta=(region:string)=>comparisons.metrics[region].delta;
-    const result={base:'work6/web-3d-preview',comparison:'HEAD v0.1.59 versus enamel-only new CSS',baselineClass,frame:'identical loaded DOM; paused animations; same viewport, canvas and deviceScaleFactor',roi:comparisons.metrics,unchanged:comparisons.unchanged,referenceSize:comparisons.sizes[0],renderSize:comparisons.sizes[2],beforeLayout,afterLayout,approved:false};
+    const result={base:'work6/web-3d-preview',comparison:'HEAD v0.1.60 versus native-frame pigment CSS only',baselineClass,frame:'identical loaded DOM; paused animations; same viewport, canvas and deviceScaleFactor',roi:comparisons.metrics,unchanged:comparisons.unchanged,referenceSize:comparisons.sizes[0],renderSize:comparisons.sizes[2],beforeLayout,afterLayout,approved:false};
     writeFileSync(join(evidence,'work8-missions-controlled-ab.json'),JSON.stringify(result,null,2));
-    console.log('WORK8 native same-scene A/B '+JSON.stringify(result.roi));
+    console.log('WORK8 native-frame same-scene A/B '+JSON.stringify(result.roi));
     assert.equal(afterLayout.quests,3,'only the three existing true missions');
     assert.equal(afterLayout.days.length,7,'all seven real daily rewards');
     assert.equal(afterLayout.navCount,5,'untouched 5-item dock');
