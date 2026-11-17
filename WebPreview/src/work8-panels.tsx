@@ -265,6 +265,36 @@ function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
   </svg>;
 }
 
+/**
+ * Genuine pictorial details isolated from the owner's native approved 384×512 frames.
+ * All viewBoxes stop before the mock HUD, reward counts, names and rank scores.
+ * The existing live SVG remains behind each image as an offline/failure fallback.
+ * Never use the approved screenshot as a panel background or a player data source.
+ */
+type W8ApprovedCrop = 'quest-swords'|'quest-ship'|'quest-target'|'captain'|'league-badge'|'chest-silver'|'chest-gold'|'chest-violet'|'chest-royal';
+const W8_ART_CROPS:Record<W8ApprovedCrop,{rect:string;frame:'missions'|'ranking'}>={
+  'quest-swords':{rect:'15 160 51 48',frame:'missions'},
+  'quest-ship':{rect:'15 213 51 48',frame:'missions'},
+  'quest-target':{rect:'15 268 51 50',frame:'missions'},
+  'captain':{rect:'19 155 89 78',frame:'ranking'},
+  'league-badge':{rect:'244 160 54 61',frame:'ranking'},
+  'chest-silver':{rect:'165 362 41 46',frame:'missions'},
+  'chest-gold':{rect:'213 362 42 46',frame:'missions'},
+  'chest-violet':{rect:'257 362 44 46',frame:'missions'},
+  'chest-royal':{rect:'305 353 62 57',frame:'missions'},
+};
+function W8ApprovedPainting({art}:{art:W8ApprovedCrop}){
+  const {rect,frame}=W8_ART_CROPS[art];
+  const src=frame==='missions'
+    ?new URL('../../assets/design-approved/07-missoes.webp',import.meta.url).href
+    :new URL('../../assets/design-approved/08-ranking-perfil.webp',import.meta.url).href;
+  return <svg className={'w8-approved-painting w8-approved-painting-'+art}
+    viewBox={rect} preserveAspectRatio="xMidYMid meet"
+    data-work8-crop={art} aria-hidden="true" focusable="false">
+    <image x="0" y="0" width="384" height="512" href={src} preserveAspectRatio="none"/>
+  </svg>;
+}
+
 /** WORK 8: live React screens. All player values come from the persisted local profile. */
 export type RankingTab = 'ranking'|'leagues';
 type Navigate = (screen:'ranking'|'profile'|'missions'|'battle')=>void;
@@ -392,7 +422,7 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
       onLeagues={()=>onTab('leagues')}/>
     {tab==='ranking'?<>
       <section className="w8-approved-captain" aria-label="Progresso real do capitão local">
-        <div className="w8-approved-avatar" aria-hidden="true"><W8CaptainPortrait/></div>
+        <div className="w8-approved-avatar" aria-hidden="true"><W8CaptainPortrait/><W8ApprovedPainting art="captain"/></div>
         <div className="w8-approved-identity">
           <strong>{localName}</strong>
           <span>Nível {level} · {total} batalhas</span>
@@ -402,7 +432,7 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
           <small>{profile.xp.toLocaleString('pt-PT')} / {xpCeiling.toLocaleString('pt-PT')} XP</small>
         </div>
         <div className="w8-approved-league-status">
-          <W8Art kind="medal"/>
+          <W8Art kind="medal"/><W8ApprovedPainting art="league-badge"/>
           <small>LIGA OFFLINE</small>
           <strong>{profile.wins} VITÓRIAS</strong>
         </div>
@@ -411,7 +441,7 @@ export function RankingPanel({profile,tab,onTab,onNavigate}:{
         <h3>TOP JOGADORES</h3>
         <div className="w8-approved-local-row">
           <span className="w8-approved-place w8-local-indicator" title="Sem posição no ranking global" aria-hidden="true"><W8Art kind="flag"/></span>
-          <div className="w8-approved-mini-avatar" aria-hidden="true"><W8CaptainPortrait/></div>
+          <div className="w8-approved-mini-avatar" aria-hidden="true"><W8CaptainPortrait/><W8ApprovedPainting art="captain"/></div>
           <div className="w8-approved-player-detail"><strong>{localName}</strong><small>O TEU PERFIL LOCAL</small></div>
           <span className="w8-approved-player-score"><PirateIcon name="ranking" size={17}/>{profile.xp} XP</span>
         </div>
@@ -488,7 +518,7 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
           const canCollect=!claimed&&progress>=mission.target;
           const kind:W8ArtKind=index===0?'swords':index===1?'ship':'target';
           return <article className="w8-approved-quest" key={id} data-state={claimed?'claimed':canCollect?'ready':'active'}>
-            <div className="w8-approved-quest-art" aria-hidden="true"><W8Art kind={kind}/></div>
+            <div className="w8-approved-quest-art" aria-hidden="true"><W8Art kind={kind}/><W8ApprovedPainting art={index===0?'quest-swords':index===1?'quest-ship':'quest-target'}/></div>
             <div className="w8-approved-quest-core">
               <strong>{titles[id]}</strong>
               <div className="w8-approved-meter" role="progressbar" aria-label={titles[id]+' — progresso'} aria-valuemin={0} aria-valuemax={mission.target} aria-valuenow={progress}>
@@ -511,7 +541,7 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
         <h3>Recompensa Diária</h3>
         <ol className="w8-approved-days" aria-label="Seven consecutive daily rewards">
           {Array.from({length:7},(_,i)=>i+1).map(n=><li key={n} aria-label={'DAY '+n} className={'app-week-day'+(n<=visibleStreak?' is-claimed':canClaim&&n===next?' is-next':'')}>
-            <span className="w8-approved-chest" aria-hidden="true"><W8Art kind="chest"/>{n<=visibleStreak&&<b>✓</b>}</span>
+            <span className="w8-approved-chest" aria-hidden="true"><W8Art kind="chest"/>{n>=4&&<W8ApprovedPainting art={n===4?'chest-silver':n===5?'chest-gold':n===6?'chest-violet':'chest-royal'}/>} {n<=visibleStreak&&<b>✓</b>}</span>
             <small>Dia {n}</small>
           </li>)}
         </ol>
