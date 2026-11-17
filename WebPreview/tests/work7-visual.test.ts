@@ -341,6 +341,46 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           }
         }
 
+
+        // Experimental scalar-material sweep against the EXACT integrated
+        // v0.1.71 HEAD in the SAME Chromium scene/frame. Diagnostics only:
+        // never write these trial values to production, and reject regressions.
+        if (kind==='shop' && width===384 && height===512) {
+          const sweeps:ReadonlyArray<readonly [string,string,ReadonlyArray<number>]>=[
+            ['rare','.w7-chest-rare',[.70,.74,.77,.80,.83]],
+            ['epic','.w7-chest-epic',[.70,.74,.77,.80,.83]],
+            ['legend','.w7-chest-legend',[.55,.60,.63,.65,.68]],
+            ['pack','.w7-captain-pack',[.82,.85,.88,.90,.94]]
+          ];
+          await evaluate("(()=>{const s=document.createElement('style');s.id='w7-true-head-sweep';s.textContent="+
+            JSON.stringify(currentHeadBaseline)+";document.head.appendChild(s);return true})()");
+          for (const [name,selector,values] of sweeps) for (const value of values) {
+            const rule='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="shop"] '+selector+'{filter:brightness('+value+')!important}}';
+            await evaluate("(()=>{let s=document.createElement('style');s.id='w7-test-sweep';s.textContent="+
+              JSON.stringify(rule)+";document.head.appendChild(s);return true})()");
+            await sleep(85);
+            const snap=await command('Page.captureScreenshot',{
+              format:'png',fromSurface:true,captureBeyondViewport:false
+            });
+            const result=await evaluate("(async()=>{"+
+              "let load=src=>new Promise((ok,fail)=>{let i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "let ref=await load("+JSON.stringify(refUrl)+"),img=await load("+
+                JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(snap.data)+");"+
+              "let cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+              "let ctx=cv.getContext('2d');ctx.drawImage(ref,0,0);let a=ctx.getImageData(0,0,384,512).data;"+
+              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);let b=ctx.getImageData(0,0,384,512).data;"+
+              "let sum=0,count=0,roi=0,rn=0;"+
+              "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
+              "for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
+              "if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=v;rn++}}}"+
+              "return {global:Math.round(sum/count*1000)/1000,roi:Math.round(roi/rn*1000)/1000}})()");
+            console.log('WORK7 PARAM SWEEP '+name+'='+value+' '+JSON.stringify(result));
+            await evaluate("(()=>{document.getElementById('w7-test-sweep')?.remove();return true})()");
+          }
+          await evaluate("(()=>{document.getElementById('w7-true-head-sweep')?.remove();return true})()");
+        }
+
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
