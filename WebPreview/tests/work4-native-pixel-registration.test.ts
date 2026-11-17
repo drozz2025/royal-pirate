@@ -252,6 +252,57 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           JSON.stringify(forgeMaterialsAB,null,2)+'\n');
         console.log('WORK4_FORGE_MATERIALS_AB '+JSON.stringify(forgeMaterialsAB));
       }
+      /* WORK4 / #104: native A/B of fake VECTOR ripples versus approved
+         pictorial water. The current React state, original scene, CSS crops,
+         paused animations, dock and geometry are identical in both frames. */
+      let pictorialWaterAB:any=null;
+      if(screen==='fleet' && width===384 && height===512){
+        /* Restore the exact authored opacity for every decorative SVG group;
+           presentational attributes were .65/.50/.48/.34/.51 before cleanup. */
+        const originalRipples=[
+          '.w4-fleet .w4-tropical-art .w4-r03-water-perspective{opacity:1!important}',
+          '.w4-fleet .w4-tropical-art > g[stroke="#9ff5fa"]{opacity:.65!important}',
+          '.w4-fleet .w4-tropical-art > g[fill="#f4e5ae"]{opacity:.5!important}',
+          '.w4-fleet .w4-tropical-art .w4-r03-coastal-depth > path[stroke="#b0f9f0"]{opacity:.48!important}',
+          '.w4-fleet .w4-tropical-art .w4-r03-coastal-depth > path[stroke="#e6ffff"]{opacity:.34!important}',
+          '.w4-fleet .w4-tropical-art .w4-r03-coastal-depth > path[stroke="#d5fff4"]{opacity:.51!important}'
+        ].join('\n');
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
+          "s.id='work4-before-synthetic-water';s.textContent="+JSON.stringify(originalRipples)+
+          ";document.head.appendChild(s);return true;})()"));
+        await sleep(130);
+        const previousRipples=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-synthetic-water-fleet-384x512.png'),
+          Buffer.from(previousRipples,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-before-synthetic-water')?.remove();return true;})()"));
+        await sleep(130);
+        const compare="(async()=>{"+
+          "const load=async u=>{const i=new Image();i.src=u;await i.decode();return i;};"+
+          "const [ref,prev,now]=await Promise.all(["+
+          "load('data:image/webp;base64,"+references.fleet+"'),"+
+          "load('data:image/png;base64,"+previousRipples+"'),"+
+          "load('data:image/png;base64,"+screenshot+"')]);"+
+          "if([ref,prev,now].some(i=>i.width!==384||i.height!==512))throw Error('native pixel alignment required');"+
+          "const pixels=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+          "const a=pixels(ref),b=pixels(prev),c=pixels(now);"+
+          "const boxes={global:[0,0,384,512],sea:[20,294,370,370],ship:[65,205,175,307]};"+
+          "const mae=(x,y,r)=>{let total=0,count=0;for(let j=r[1];j<r[3];j++)for(let i=r[0];i<r[2];i++){const k=(j*384+i)*4;for(let q=0;q<3;q++){total+=Math.abs(x[k+q]-y[k+q]);count++;}}return total/count;};"+
+          "const before={},after={};for(const [key,rect] of Object.entries(boxes)){before[key]=mae(a,b,rect);after[key]=mae(a,c,rect);}"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');g.drawImage(ref,0,0);g.drawImage(prev,384,0);g.drawImage(now,768,0);g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(now,1152,0);"+
+          "return {boxes,before,after,comparison:out.toDataURL('image/png').split(',')[1]};})()";
+        pictorialWaterAB=await evaluate(compare);
+        assert.ok(pictorialWaterAB?.before?.sea>=0&&pictorialWaterAB?.after?.sea>=0,
+          'both original/ripple and approved-source sea states must be measured');
+        writeFileSync(join(folder,'compare-clean-water-384x512.png'),
+          Buffer.from(pictorialWaterAB.comparison,'base64'));
+        delete pictorialWaterAB.comparison;
+        pictorialWaterAB={...pictorialWaterAB,sameFrame:true,approved:false,viewport:'384x512'};
+        writeFileSync(join(folder,'native-approved-water-cleanup.json'),
+          JSON.stringify(pictorialWaterAB,null,2)+'\n');
+        console.log('WORK4_PAINTED_SEA_AB '+JSON.stringify(pictorialWaterAB));
+      }
       /* Controlled water A/B at the same frame: reinstate ONLY the previous
          vertically stretched 29%-height sea, then remove that temporary CSS.
          Registration, state, approved source painting and dock stay identical. */
@@ -339,7 +390,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         console.log('WORK4_NATIVE_AB '+screen+' '+JSON.stringify({before:old,after:now}));
       }
       report.visual.push({screen,width,height,geometry,
-        before:measurement?.before||null,after:measurement?.after||null,seaAspect,antiBlue,forgeMaterialsAB,
+        before:measurement?.before||null,after:measurement?.after||null,seaAspect,antiBlue,pictorialWaterAB,forgeMaterialsAB,
         approved:false,source:'approved art from original 384x512; no reference rescaling at 384'});
     }
   }

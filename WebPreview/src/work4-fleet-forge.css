@@ -2615,3 +2615,17 @@
   }
 }
 
+
+
+/* WORK4 / #104 — 17 Nov 10h: stop double-painting vector water over the
+   approved-source sea. The earlier #266/#278 water bridge remains unchanged.
+   Only obviously synthetic ripple strokes inside the scene's decorative SVG
+   are hidden. Keep the tropical cliffs/palms, dark depth planes, ONE pictured
+   Royal Crown, live ship stats and the five-item global dock untouched.
+   This is a scene-paint correction, not a stage geometry or economy change. */
+.w4-fleet .w4-tropical-art .w4-r03-water-perspective,
+.w4-fleet .w4-tropical-art > g[stroke="#9ff5fa"],
+.w4-fleet .w4-tropical-art > g[fill="#f4e5ae"],
+.w4-fleet .w4-tropical-art .w4-r03-coastal-depth > path[stroke] {
+  opacity:0;
+}
