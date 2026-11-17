@@ -3640,3 +3640,33 @@
     gap:9px;
   }
 }
+
+
+/* WORK7 / #104 — 17 Nov, artwork-first proportions for approved 05 / 06.
+ * The native 384×512 original gives portrait illustrations slightly more
+ * vertical room and the Captain's treasure a wider portion of its banner.
+ * Preserve the live titles, honest unavailable states and 5-item Porto dock.
+ * No additional filters, glow passes, duplicated borders or UI screenshots.
+ * Artistic status: approved:false; pending owner review. */
+@media (min-width:355px) and (max-width:430px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+    /* Reveal another sliver of each of the eight actual illustration crops,
+       rather than enlarging their frames or hiding the caption below. */
+    aspect-ratio:73/72;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    /* Move artwork/text division toward the 06 reference: chest at left,
+       content at right; retain natural height and a legible second column. */
+    grid-template-columns:minmax(0,46%) minmax(0,1fr);
+    background:
+      radial-gradient(ellipse 66% 95% at 29% 42%,#bd539078,transparent 88%),
+      linear-gradient(112deg,#572052 0%,#4b1d4f 49%,#23183e 100%);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    max-width:147px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{
+    min-width:0;
+    padding-left:2px;
+  }
+}
