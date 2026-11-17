@@ -3687,6 +3687,13 @@
     margin:0;
     line-height:1;
   }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info h3{
+    /* A single compact illustrated-pack heading, as in 06 reference,
+       prevents the right column becoming a tall two-line opaque panel. */
+    font-size:clamp(19px,5vw,20px);
+    white-space:nowrap;
+    overflow-wrap:normal;
+  }
   .w7-screen[data-work7-screen="shop"] .w7-chests-heading strong{
     font-size:14px;
     line-height:1;
