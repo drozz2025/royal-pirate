@@ -4686,3 +4686,70 @@
     width:62px;height:64px;
   }
 }
+
+
+/* WORK8 / #104 · approved pictorial details from native 384×512 source.
+   Crops contain ONLY original icon, reward chest, captain or league insignia.
+   Each overlays its existing vector fallback without changing any live value,
+   state, rank, claim status, controls, scroll ownership, Porto or shared dock. */
+.w8-approved-missions .w8-approved-quest-art,
+.w8-approved-missions .w8-approved-chest,
+.w8-approved-ranking .w8-approved-avatar,
+.w8-approved-ranking .w8-approved-mini-avatar,
+.w8-approved-ranking .w8-approved-league-status{
+  position:relative;
+}
+.w8-approved-missions svg.w8-approved-painting,
+.w8-approved-ranking svg.w8-approved-painting{
+  display:block;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:2;
+  overflow:hidden;
+  pointer-events:none;
+  user-select:none;
+  filter:drop-shadow(0 2px 1px #041a2b9e);
+}
+.w8-approved-missions .w8-approved-quest-art > svg.w8-approved-painting{
+  border-radius:38%;
+  -webkit-mask-image:radial-gradient(ellipse 72% 70% at 50% 50%,#000 71%,transparent 100%);
+  mask-image:radial-gradient(ellipse 72% 70% at 50% 50%,#000 71%,transparent 100%);
+}
+.w8-approved-ranking .w8-approved-avatar > svg.w8-approved-painting,
+.w8-approved-ranking .w8-approved-mini-avatar > svg.w8-approved-painting{
+  border-radius:50%;
+  overflow:hidden;
+  -webkit-mask-image:radial-gradient(circle at 50% 51%,#000 80%,transparent 99%);
+  mask-image:radial-gradient(circle at 50% 51%,#000 80%,transparent 99%);
+}
+.w8-approved-ranking .w8-approved-mini-avatar > svg.w8-approved-painting{
+  border-radius:7px;
+}
+.w8-approved-ranking .w8-approved-league-status > svg.w8-approved-painting{
+  position:relative;
+  inset:auto;
+  width:55px;
+  height:57px;
+  flex:0 0 57px;
+  margin:-57px 0 0;
+  z-index:2;
+  -webkit-mask-image:radial-gradient(ellipse at center,#000 75%,transparent 100%);
+  mask-image:radial-gradient(ellipse at center,#000 75%,transparent 100%);
+}
+.w8-approved-missions .w8-approved-chest > svg.w8-approved-painting{
+  border-radius:5px;
+  -webkit-mask-image:radial-gradient(ellipse 69% 67% at 50% 49%,#000 78%,transparent 100%);
+  mask-image:radial-gradient(ellipse 69% 67% at 50% 49%,#000 78%,transparent 100%);
+}
+/* The green check is generated exclusively by the actual saved streak.
+   Approved art never supplies a pre-claimed token or a fictitious prize. */
+.w8-approved-missions .w8-approved-chest > b{
+  z-index:3;
+}
+@media(max-width:350px){
+  .w8-approved-ranking .w8-approved-league-status > svg.w8-approved-painting{
+    width:49px;height:49px;flex-basis:49px;margin-top:-49px;
+  }
+}
