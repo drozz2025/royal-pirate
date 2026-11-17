@@ -2256,7 +2256,7 @@
   display:block;
   width:auto!important;
   max-width:60%!important;
-  height:clamp(168px,54vw,240px)!important;
+  height:clamp(168px,51vw,226px)!important;
   aspect-ratio:197/189;
   left:1%!important;
   top:0!important;
@@ -2269,12 +2269,12 @@
   pointer-events:none;
   overflow:hidden;
   -webkit-mask-image:
-    linear-gradient(to right,#000 0%,#000 94%,transparent 100%),
-    linear-gradient(to bottom,#000 0%,#000 88%,transparent 100%);
+    linear-gradient(to right,#000 0%,#000 97%,transparent 100%),
+    linear-gradient(to bottom,#000 0%,#000 94%,transparent 100%);
   -webkit-mask-composite:source-in;
   mask-image:
-    linear-gradient(to right,#000 0%,#000 94%,transparent 100%),
-    linear-gradient(to bottom,#000 0%,#000 88%,transparent 100%);
+    linear-gradient(to right,#000 0%,#000 97%,transparent 100%),
+    linear-gradient(to bottom,#000 0%,#000 94%,transparent 100%);
   mask-composite:intersect;
 }
 .w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {
@@ -2300,16 +2300,21 @@
   z-index:30;
 }
 
+/* WORK4 / #104: preserve the approved cannon wheel and wooden carriage
+   through the lower 96% of the original crop. The reference 03 ship also
+   retains its hull below the waterline; feather just the outer seam.
+   This adjusts only the EXISTING single pictorial ship/cannon, never the
+   real UI, paint isolation or shared dock. */
 /* Browser comparison: at 390/430px, the approved 04 crop had sharp photo
    right/bottom edges against the live workshop. Feather just its boundary,
    not the protected compositor, data panel, flame or cannon silhouette. */
 .w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {
   -webkit-mask-image:
-    linear-gradient(to right,#000 0%,#000 87%,transparent 100%),
-    linear-gradient(to bottom,#000 0%,#000 90%,transparent 100%);
+    linear-gradient(to right,#000 0%,#000 92%,transparent 100%),
+    linear-gradient(to bottom,#000 0%,#000 96%,transparent 100%);
   -webkit-mask-composite:source-in;
   mask-image:
-    linear-gradient(to right,#000 0%,#000 87%,transparent 100%),
-    linear-gradient(to bottom,#000 0%,#000 90%,transparent 100%);
+    linear-gradient(to right,#000 0%,#000 92%,transparent 100%),
+    linear-gradient(to bottom,#000 0%,#000 96%,transparent 100%);
   mask-composite:intersect;
 }
