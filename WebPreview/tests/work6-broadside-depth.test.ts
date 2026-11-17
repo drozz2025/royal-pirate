@@ -59,10 +59,14 @@ test('both existing visual cannons have long iron barrels and legible mouths on 
   assert.equal(barrels.length,2);
   assert.equal(muzzles.length,2);
   for(const barrel of barrels){
-    assert.ok(barrel.geometry instanceof T.CylinderGeometry);
-    assert.ok(barrel.geometry.parameters.height>12,
-      'a long tapered 3D barrel must read as an actual naval cannon');
-    assert.ok(barrel.geometry.parameters.radiusBottom>barrel.geometry.parameters.radiusTop);
+    // Upgraded WORK6 broadside keeps the original two visual cannons but
+    // sculpts a continuous flared barrel instead of a featureless cylinder.
+    assert.ok(barrel.geometry instanceof T.LatheGeometry);
+    const profile=barrel.geometry.parameters.points;
+    const height=profile[profile.length-1].y-profile[0].y;
+    assert.ok(height>12,'a long tapered 3D barrel must read as an actual naval cannon');
+    assert.ok(profile[1].x>profile[5].x && profile[profile.length-1].x>profile[6].x,
+      'breech volume tapers toward a genuinely flared muzzle');
   }
   for(const [w,h] of [[320,568],[384,512],[390,844],[430,932]]){
     const pose=battleCameraPose(w/h);
