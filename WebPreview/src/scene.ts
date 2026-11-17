@@ -362,7 +362,9 @@ export class OceanScene {
     // The heavier existing cannon barrels sit farther apart. Low wooden
     // support beams now align with those TWO muzzles; the former raised
     // rectangular frames cut across the sea and partly hid the broadside.
-    for(const x of [-3.15,3.15]){
+    // Align ONLY the starboard support to its isolated visual muzzle.
+    // Port remains at -3.15; no camera or shot origin changes.
+    for(const x of [-3.15,5.72]){
       add(box,oak,x,1.45,65.65,2.30,.29,.48);
       add(box,gold,x,1.63,65.54,2.26,.10,.20);
       for(const dx of [-.96,.96])
