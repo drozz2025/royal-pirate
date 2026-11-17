@@ -185,6 +185,25 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       }
       const screenshot=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
+      let antiBlue:any=null;
+      if(screen==='forge'){
+        // A gross blue compositor rectangle must not replace the warm foundry
+        // in any viewport; source windows may legitimately contain some blue.
+        const check="(async()=>{const im=new Image();im.src='data:image/png;base64,"+screenshot+"';await im.decode();"+
+          "const c=document.createElement('canvas');c.width=im.width;c.height=im.height;"+
+          "const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);"+
+          "const pixels=x.getImageData(0,0,im.width,im.height).data;"+
+          "const e=document.querySelector('.w4-forge-scene'),r=e.getBoundingClientRect();"+
+          "const x0=Math.max(0,Math.ceil(r.left+12)),x1=Math.min(im.width,Math.floor(r.left+Math.min(132,r.width*.45)));"+
+          "const y0=Math.max(0,Math.ceil(r.top+12)),y1=Math.min(im.height,Math.floor(r.top+Math.min(144,r.height*.64)));"+
+          "let blue=0,total=0;for(let y=y0;y<y1;y++)for(let xx=x0;xx<x1;xx++){"+
+          "const p=(y*im.width+xx)*4,red=pixels[p],green=pixels[p+1],b=pixels[p+2];"+
+          "if(b>red*1.25&&b>green*1.12&&b>90)blue++;total++;}"+
+          "return {ratio:blue/total,blue,total};})()";
+        antiBlue=await evaluate(check);
+        assert.ok(antiBlue&&antiBlue.ratio<.5,
+          'gross blue compositor rectangle must not replace the Forge scenery at '+width+'x'+height);
+      }
       let measurement:any=null;
       if(width===384&&height===512){
         const code="(async()=>{"+
@@ -209,9 +228,10 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         const {before:old,after:now}=measurement;
         assert.ok(now.roi<old.roi,'source registration improves '+screen+' local ROI');
         assert.ok(now.global<old.global,'source registration improves '+screen+' full-frame MAE');
+        console.log('WORK4_NATIVE_AB '+screen+' '+JSON.stringify({before:old,after:now}));
       }
       report.visual.push({screen,width,height,geometry,
-        before:measurement?.before||null,after:measurement?.after||null,
+        before:measurement?.before||null,after:measurement?.after||null,antiBlue,
         approved:false,source:'approved art from original 384x512; no reference rescaling at 384'});
     }
   }
