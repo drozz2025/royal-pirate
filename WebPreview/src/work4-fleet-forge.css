@@ -2257,7 +2257,7 @@
   width:auto!important;
   max-width:60%!important;
   height:clamp(168px,54vw,240px)!important;
-  aspect-ratio:185/189;
+  aspect-ratio:197/189;
   left:1%!important;
   top:0!important;
   bottom:0!important;
@@ -2268,8 +2268,14 @@
   filter:drop-shadow(0 9px 7px #031926c9)!important;
   pointer-events:none;
   overflow:hidden;
-  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 88%,transparent 100%);
-  mask-image:linear-gradient(to bottom,#000 0%,#000 88%,transparent 100%);
+  -webkit-mask-image:
+    linear-gradient(to right,#000 0%,#000 94%,transparent 100%),
+    linear-gradient(to bottom,#000 0%,#000 88%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:
+    linear-gradient(to right,#000 0%,#000 94%,transparent 100%),
+    linear-gradient(to bottom,#000 0%,#000 88%,transparent 100%);
+  mask-composite:intersect;
 }
 .w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {
   position:absolute;
