@@ -3865,3 +3865,34 @@
     filter:saturate(1.2) contrast(1.06) brightness(.95) drop-shadow(0 6px 5px #14062ca3);
   }
 }
+
+/* WORK7/#104 — native 384x512 illustration field calibration (17 Nov 08h).
+ * The original 05 places its gold card frames on a carved dark navy album,
+ * not the bright teal recess present in the previous rendering. Restore
+ * the illustrated background palette while leaving actual 8 image assets,
+ * touch targets, captions, header and fixed five-item dock untouched.
+ * In 06 bring the three real chest crops closer to the original pigment,
+ * not by replacing them or altering their unavailable status.
+ * Only native short screens: do not repeat merged 320px spacing fixes.
+ * approved:false — visual review belongs to the owner. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-collection-content{
+    background:
+      radial-gradient(ellipse 92% 95px at 50% 0%,#49677b45,transparent 92%),
+      linear-gradient(180deg,#18374d 0%,#102b43 44%,#0a2039 70%,#061a33 100%);
+  }
+  /* The approved 05 inventory header is deep navy rather than cyan:
+     retain real CARTAS count and concept caption as editable HTML. */
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+    background:linear-gradient(90deg,#101e2e,#152734 50%,#101e2e);
+  }
+  /* Same honest PRÉVIA label; use the approved 05 green nameplate pigment
+     on the two sail/shield concepts, without adding fake level numbers. */
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) small,
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) small{
+    background:linear-gradient(180deg,#fff0bd 0%,#9fe54a 16%,#2ba345 74%,#145c2a 100%);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(.92) drop-shadow(0 4px 3px #041327a8);
+  }
+}

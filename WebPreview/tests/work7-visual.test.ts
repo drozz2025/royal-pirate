@@ -84,14 +84,24 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   /* This PR's immediate HEAD A/B overrides only the two new pixel-calibration
    * rules, retaining all already-merged transforms and the same browser frame. */
   const currentHeadBaseline = `
-    /* Exact parent HEAD in the same Chromium production scene and frame.
-       Unlike previous PRs we must not rewind merged brightness corrections. */
+    /* Strict same-frame native 384x512 parent HEAD before this PR.
+       This override reverts ONLY the two local colour changes below;
+       approved #276 card registration and pack illumination stay intact. */
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
-        transform:none!important;
+      .w7-screen[data-work7-screen="cards"] .w7-collection-content{
+        background:
+          radial-gradient(ellipse 92% 95px at 50% 0%,#d3fff23d,transparent),
+          linear-gradient(180deg,#339abea6 0%,#175781df 44%,#082b50f4 70%,#061a33 100%)!important;
       }
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        filter:saturate(1.2) contrast(1.06) drop-shadow(0 6px 5px #14062ca3)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+        background:linear-gradient(100deg,rgba(12,56,86,.94),rgba(28,83,116,.94) 53%,rgba(12,50,80,.95))!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) small,
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) small{
+        background:linear-gradient(180deg,#fff0bd 0%,var(--w7-enamel) 16%,var(--w7-shadow) 100%)!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+        filter:saturate(1.27) contrast(1.12) brightness(.88) drop-shadow(0 4px 3px #041327a8)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -322,6 +332,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           referenceSize:comparison.referenceSize,
           baselineGeometry,
           ...geometry});
+        if(width===384 && height===512){
+          console.log('WORK7 SAME-FRAME HEAD A/B '+kind+': '+JSON.stringify({
+            maeBefore:comparison.maeBefore,maeAfter:comparison.mae,
+            roiBefore:comparison.roiBefore,roiAfter:comparison.roiAfter,
+            slots:geometry.slots.length,chests:geometry.chests.length,
+            navItems:geometry.navItems
+          }));
+        }
         assert.equal(geometry.navItems,5,'The approved five-button dock must remain intact');
         assert.equal(geometry.horizontalOverflow,false,'No horizontal overflow at '+width);
         if(kind==='cards') assert.equal(geometry.slots.length,8,'Eight original illustrated cards in a 4x2 grid');
