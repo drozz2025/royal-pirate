@@ -37,7 +37,7 @@ test('aspect-driven tall composition is confined to 03/04 at 390 and 430, not 32
   assert.match(block,/\.w4-forge #w4-forge-panel > \.w4-forge-stage/);
   assert.match(block,/height:clamp\(265px,69vw,306px\)/);
   assert.match(block,/height:clamp\(227px,60vw,265px\)!important/);
-  assert.match(block,/@media \(min-width:360px\) and \(max-width:659px\) and \(max-height:650px\)/);
+  assert.match(block,/native 384×512 crop stays exactly as WORK0 merged it/);
 });
 
 test('WORK4 rules cannot move global dock, hide progress or break blue-tile isolation',()=>{
