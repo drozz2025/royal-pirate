@@ -4109,3 +4109,22 @@
     filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)
   }
 }
+
+
+/* WORK7/#104 — 17 Nov 18h: native, per-frame contrast registration.
+ * Calibrated with the exact 384×512 source screenshots from CI #44141082800:
+ * refine individual frame values only, preserving approved live artwork, the
+ * 4×2 grid, single genuine pack, all three chests and PRÉVIA/EM BREVE.
+ * The independent Chromium gate will reject any regression in global MAE,
+ * artwork ROI, 320px dock clearance, geometry or interactive touch.
+ * These rules DO NOT apply to 320×568 or tall phones. approved:false 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.585)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.745)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.58)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.64)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.785)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.775)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.635)}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.895)}
+}
