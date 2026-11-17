@@ -40,7 +40,7 @@ test('aspect-driven tall composition is confined to 03/04 at 390 and 430, not 32
   assert.match(block,/@media \(min-width:360px\) and \(max-width:659px\) and \(max-height:650px\)/);
 });
 
-test('WORK4's new rules cannot move global dock, hide progress or break blue-tile isolation',()=>{
+test('WORK4 rules cannot move global dock, hide progress or break blue-tile isolation',()=>{
   assert.match(css,/contain:paint/);
   assert.match(css,/transform:translateZ\(0\)/);
   assert.doesNotMatch(block,/(?:\.app-dock|\.app-shell|\.porto-|\.harbour-nav|\.bottom-nav|\.w4-attributes\s*\{|\.w4-materials\s*\{)/);
