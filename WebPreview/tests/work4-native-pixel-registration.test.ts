@@ -211,7 +211,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           '.w4-fleet .w4-ship-roster{gap:5px!important;margin-top:0!important;}',
           '.w4-fleet .w4-ship-roster>.w4-ship-slot{min-height:clamp(112px,16dvh,147px)!important;padding:4px 1px 6px!important;gap:2px!important;}',
           '.w4-fleet .w4-ship-roster>.w4-ship-slot .w4-slot-art,.w4-fleet .w4-ship-roster>.w4-ship-slot.is-active .w4-slot-art{height:clamp(67px,10.6dvh,96px)!important;}'
-        ].join('\\n');
+        ].join('\n');
         assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
           "s.id='work4-before-roster';s.textContent="+JSON.stringify(oldCSS)+
           ";document.head.appendChild(s);return true;})()"));
@@ -251,7 +251,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         const evidence={...ab,beforeGeometry:beforeGeo,afterGeometry:afterGeo,
           viewport:'384x512',source:'assets/design-approved/03-frota.webp',
           sameReactFrame:true,approved:false};
-        writeFileSync(join(folder,'fleet-roster-controlled-ab.json'),JSON.stringify(evidence,null,2)+'\\n');
+        writeFileSync(join(folder,'fleet-roster-controlled-ab.json'),JSON.stringify(evidence,null,2)+'\n');
         console.log('WORK4_FLEET_ROSTER_AB '+JSON.stringify(evidence));
       }
       // WORK4 / 09h: real native Forge first-fold A/B on an IDENTICAL React
