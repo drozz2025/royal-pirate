@@ -37,27 +37,23 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  const marker = '/* WORK7/#104 — 17 Nov 12h: selective pictorial exposure on native 384×512.';
+  const marker = '/* WORK7/#104 — native 384×512 material-field value registration, 17 Nov 13h.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   // Native-only WORK7 pass, with all merged mobile geometry retained.
   // The same Chromium session, true 384x512 viewport and real assets measure
   // before/after, rather than comparing against a stale old PR.
-  // Exact HEAD A/B in one Chromium frame. Only the seven updated source-image
-  // exposure values are reversed; all inherited frame and geometry rules stay.
-  // Restore only the exposure properties added in this PR. The other 05/06
-  // material, crop transforms, 320px margin fixes and dock remain HEAD.
+  // Same-frame HEAD A/B: override ONLY the two new backing backgrounds.
+  // All source assets, live labels, UI state, animation frame and shared shell
+  // stay identical. This is merged v0.1.66, NOT a pre-#295 baseline.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop,
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop,
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop,
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop,
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{
-        filter:saturate(1.25) contrast(1.13) brightness(.88)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
+        background:radial-gradient(ellipse 85% 60% at 50% 18%,#37495740,transparent 84%),
+          linear-gradient(180deg,#171f2a 0%,#101a26 60%,#111720 100%)!important;
       }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop,
-      .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(.92) drop-shadow(0 4px 3px #041327a8)!important;
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+        background:radial-gradient(ellipse 66% 95% at 29% 42%,#cb3e9678,transparent 88%),
+          linear-gradient(112deg,#4d0f66 0%,#460a6c 49%,#160c4d 100%)!important;
       }
     }`;
   const cssBaseline = currentHeadBaseline;
@@ -352,6 +348,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y+1),
             'All true PRÉVIA / EM BREVE labels must stay above the dock at native size');
           assert.ok(baselineGeometry,'HEAD baseline boxes must be recorded, not inferred');
+          assert.deepEqual({slots:geometry.slots,chests:geometry.chests,pack:geometry.pack,packArt:geometry.packArt,labels:geometry.labels.map((l:any)=>({x:l.x,y:l.y,width:l.width,height:l.height,bottom:l.bottom}))},baselineGeometry,'Pure WORK7 backing pigments may not move one original illustration, label or hit area');
+          assert.deepEqual(comparison.referenceSize,[384,512],'Approved 05/06 originals are 384×512 and must be compared natively without scaling');
           if(kind==='cards') {
             assert.ok(geometry.slots[0].x>=17 && geometry.slots[0].x<=20,
               'First conceptual card should align with the approved x≈18 border');
