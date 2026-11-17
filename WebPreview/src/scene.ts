@@ -530,8 +530,7 @@ export class OceanScene {
   }
 
   private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();}
-  home(){this.cameraMode='battle';this.scene.background=this.battleSky;this.water.uniforms.battleMode.value=1;
-    this.battleSeaCrests.visible=true;this.battleAccentLights.visible=true;
+  home(){this.cameraMode='battle';this.scene.background=this.battleSky;this.water.uniforms.battleMode.value=1;this.battleAccentLights.visible=true;this.battleSeaCrests.visible=true;
     // Cinematic battle-only art scale; the genuine physics ships and hit logic stay live.
     // Reset to the original size in Porto so its approved composition/touch remain identical.
     // Slightly enlarge ONLY the enemy's existing live render mesh in Batalha.
