@@ -187,6 +187,92 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
 
 
+      // WORK4/#104 — Forge 04: one real plaque over the approved right inset.
+      // A/B must be native, within this SAME paused React/Chromium frame:
+      // ORIGINAL | MERGED HEAD (43%) | RENDER (53%) | OVERLAY.
+      // No second cannon, false costs or changes to the WORK0 shell/dock.
+      if(screen==='forge' && width===384 && height===512){
+        const boxExpr="(()=>{const box=s=>{const r=document.querySelector(s)?.getBoundingClientRect();"+
+          "return r?[r.x,r.y,r.width,r.height]:null;};"+
+          "return {panel:box('.w4-forge .w4-forge-description'),"+
+          "stage:box('.w4-forge .w4-forge-stage'),"+
+          "cannon:box('.w4-forge .w4-reference-cannon'),"+
+          "materials:box('.w4-forge .w4-materials'),"+
+          "dock:box('.harbour-nav.app-dock-porto'),"+
+          "levels:document.querySelectorAll('.w4-forge-live-level').length,"+
+          "costs:document.querySelectorAll('.w4-resource-grid > div').length,"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        const newGeom=await evaluate(boxExpr);
+        assert.equal(newGeom.levels,3,'real Forge levels remain');
+        assert.equal(newGeom.costs,3,'real costs remain');
+        assert.equal(newGeom.nav,5,'WORK0 dock retains five items');
+        assert.ok(newGeom.panel[0]>=170&&newGeom.panel[0]<=195,
+          'native status inset begins beside furnace, near approved x176');
+        const oldStyle=[
+          '.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description{',
+          'width:43%!important;right:1.5%!important;',
+          'border-color:#c5a173!important;',
+          'box-shadow:inset 1px 0 #e4c18b54,inset -2px 0 #070e18aa,0 3px 7px #06101999!important;}'
+        ].join('');
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
+          "s.id='work4-prior-forge-inset';s.textContent="+JSON.stringify(oldStyle)+
+          ";document.head.appendChild(s);return true;})()"));
+        await sleep(140);
+        const oldGeom=await evaluate(boxExpr);
+        const prior=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-forge-inset-384x512.png'),Buffer.from(prior,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-prior-forge-inset')?.remove();return true;})()"));
+        for(const key of ['stage','cannon','materials','dock'] as const){
+          assert.deepEqual(newGeom[key],oldGeom[key],
+            'Forge inset cannot alter '+key+' geometry');
+        }
+        assert.ok(oldGeom.panel[0]-newGeom.panel[0]>25,
+          'approved status panel occupies the earlier missing right inset');
+        assert.ok(newGeom.panel[0]>170,
+          'inset does not cover the visible furnace opening');
+        assert.ok(newGeom.panel[1]+newGeom.panel[3]<=newGeom.stage[1]+newGeom.stage[3]+1,
+          'real level card remains inside the workshop');
+        const measure="(async()=>{"+
+          "const load=async u=>{const i=new Image();i.src=u;await i.decode();return i;};"+
+          "const [o,b,c]=await Promise.all(["+
+          "load('data:image/webp;base64,"+references.forge+"'),"+
+          "load('data:image/png;base64,"+prior+"'),"+
+          "load('data:image/png;base64,"+screenshot+"')]);"+
+          "if([o,b,c].some(i=>i.width!==384||i.height!==512))throw Error('native 384x512 only');"+
+          "const pixels=i=>{const el=document.createElement('canvas');el.width=384;el.height=512;"+
+          "const g=el.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+          "const a=pixels(o),p=pixels(b),n=pixels(c);"+
+          "const rois={global:[0,0,384,512],panel:[175,148,373,315],"+
+          "cannon:[30,230,166,309],furnace:[116,225,171,302],"+
+          "materials:[16,320,369,378],dock:[0,430,384,512]};"+
+          "const mae=(u,v,r)=>{let s=0,count=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
+          "const q=(y*384+x)*4;for(let j=0;j<3;j++){s+=Math.abs(u[q+j]-v[q+j]);count++;}}return s/count;};"+
+          "const before={},after={};for(const [key,r] of Object.entries(rois)){"+
+          "before[key]=mae(a,p,r);after[key]=mae(a,n,r);}"+
+          "const composite=document.createElement('canvas');composite.width=1536;composite.height=512;"+
+          "const g=composite.getContext('2d');g.drawImage(o,0,0);g.drawImage(b,384,0);"+
+          "g.drawImage(c,768,0);g.drawImage(o,1152,0);g.globalAlpha=.5;g.drawImage(c,1152,0);"+
+          "return {rois,before,after,compare:composite.toDataURL('image/png').split(',')[1]};})()";
+        const result=await evaluate(measure);
+        assert.ok(result?.before?.panel>=0&&result?.after?.panel>=0,'real ROI computed');
+        writeFileSync(join(folder,'compare-forge-inset-384x512.png'),Buffer.from(result.compare,'base64'));
+        delete result.compare;
+        const proof={...result,oldGeom,newGeom,sameReactFrame:true,native:'384x512',
+          source:'assets/design-approved/04-melhorias-forja.webp',approved:false};
+        writeFileSync(join(folder,'forge-inset-controlled-ab.json'),JSON.stringify(proof,null,2)+'\\n');
+        console.log('WORK4_FORGE_INSET_AB '+JSON.stringify(proof));
+        assert.ok(result.after.panel<result.before.panel,
+          'wider authentic status inset must improve Forge panel ROI MAE');
+        assert.ok(result.after.global<result.before.global,
+          'Forge correction must improve full-screen MAE, not just shape');
+        for(const key of ['cannon','furnace','materials','dock'] as const){
+          assert.ok(Math.abs(result.before[key]-result.after[key])<.25,
+            key+' picture, real costs and dock must not regress');
+        }
+      }
+
       // WORK4 / #104 — same-frame 03 composition gate after rejecting the
       // stage-crop experiment (+1.78 global / +23.3 water ROI regression).
       // Restore ONLY merged-HEAD stats-panel paint/position in Chromium,
