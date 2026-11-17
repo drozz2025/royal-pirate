@@ -209,3 +209,57 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
   group.position.z=-15;
   return {group,flashes};
 }
+
+/**
+ * Battle-only animated-water accompaniment: broken volumetric foam crests.
+ * These are actual triangles positioned in the ocean world, not a screenshot,
+ * HUD layer or simulated gameplay object. All 40 strokes are merged into one
+ * mesh so a phone pays for exactly one extra draw call.
+ */
+export function makeBattleSeaCrests(): T.Group {
+  const group=new T.Group();
+  group.name='battle-painted-3d-sea-crests';
+  const positions:number[]=[],colors:number[]=[],indices:number[]=[];
+  const snow=new T.Color('#e5ffff');
+  const jade=new T.Color('#4fb6d2');
+  for(let row=0;row<10;row++){
+    const z=-30+row*7.2;
+    for(let stroke=0;stroke<4;stroke++){
+      const phase=row*1.83+stroke*2.39;
+      const x=-34+stroke*18.5+Math.sin(phase)*5.6;
+      const length=5.2+2.3*(.5+.5*Math.sin(phase*1.7));
+      const thickness=.30+.58*(.5+.5*Math.cos(phase*.77));
+      const start=positions.length/3;
+      for(let i=0;i<=8;i++){
+        const t=i/8;
+        // Each whitecap curls and tapers; no long ruler-straight horizontal bars.
+        const taper=Math.pow(Math.sin(Math.PI*t),.70);
+        const px=x+length*t;
+        const pz=z+.72*Math.sin(t*Math.PI*2+phase)+.23*Math.sin(t*9+phase);
+        const py=.83+.13*Math.sin(phase+t*4)+.10*Math.sin(t*Math.PI);
+        const span=thickness*taper;
+        positions.push(px,py,pz-span*.46,px,py-.055,pz+span*.54);
+        for(const color of [snow,jade])colors.push(color.r,color.g,color.b);
+      }
+      for(let i=0;i<8;i++){
+        const a=start+i*2;
+        indices.push(a,a+2,a+1,a+1,a+2,a+3);
+      }
+    }
+  }
+  const geometry=new T.BufferGeometry();
+  geometry.setAttribute('position',new T.Float32BufferAttribute(positions,3));
+  geometry.setAttribute('color',new T.Float32BufferAttribute(colors,3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  const material=new T.MeshBasicMaterial({
+    vertexColors:true,transparent:true,opacity:.77,side:T.DoubleSide,
+    depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1
+  });
+  const mesh=new T.Mesh(geometry,material);
+  mesh.name='battle-breaker-ribbons';
+  mesh.frustumCulled=false;
+  group.add(mesh);
+  group.visible=false;
+  return group;
+}
