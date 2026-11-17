@@ -582,6 +582,63 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           JSON.stringify(forgeFinishAB,null,2)+'\n');
         console.log('WORK4_FORGE_TIMBER_AB '+JSON.stringify(forgeFinishAB));
 
+        // WORK4 18h: paint-only continuation of the approved charcoal resource
+        // board behind its real upgrade action. Toggle ONLY the new decorative
+        // ::after layer; costs, genuine cannon, touch bounds and WORK0 dock
+        // remain frozen in the SAME React/animation frame at native 384x512.
+        const boardGeometry="(()=>{const b=s=>{const e=document.querySelector(s);"+
+          "if(!e)return null;const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,bottom:r.bottom}};"+
+          "const m=document.querySelector('.w4-forge #w4-forge-panel>.w4-materials');"+
+          "return {materials:b('.w4-forge #w4-forge-panel>.w4-materials'),"+
+          "action:b('.w4-forge #w4-forge-panel>.w4-improve-button'),"+
+          "cannon:b('.w4-forge .w4-reference-cannon'),"+
+          "dock:b('.harbour-nav.app-dock-porto'),"+
+          "numbers:document.querySelectorAll('.w4-forge .w4-resource-grid>div').length,"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "underlay:m?getComputedStyle(m,'::after').content:null};})()";
+        const boardNow=await evaluate(boardGeometry);
+        assert.equal(boardNow.numbers,3,'preserve three actual currency fields');
+        assert.equal(boardNow.nav,5,'preserve all WORK0 navigation items');
+        assert.ok(boardNow.action.height>=44,'upgrade touch target remains >=44px');
+        assert.ok(boardNow.action.bottom<=boardNow.dock.y+1,
+          'cost action remains visible before the fixed dock');
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
+          "s.id='work4-before-board-extension';"+
+          "s.textContent='.w4-forge #w4-forge-panel>.w4-materials::after{content:none!important}';"+
+          "document.head.appendChild(s);return true;})()"));
+        await sleep(130);
+        const boardOld=await evaluate(boardGeometry);
+        const boardBefore=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-forge-board-384x512.png'),
+          Buffer.from(boardBefore,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-before-board-extension')?.remove();return true;})()"));
+        await sleep(120);
+        const boardRestored=await evaluate(boardGeometry);
+        assert.deepEqual(boardRestored,boardNow,'must restore same Forge scene and underlay');
+        for(const k of ['materials','action','cannon','dock'] as const)
+          assert.deepEqual(boardNow[k],boardOld[k],
+            'decorative board cannot move real '+k);
+        assert.equal(boardOld.underlay,'none');
+        const boardCompare=await evaluate(sample.replace(previousFrame,boardBefore));
+        writeFileSync(join(folder,'compare-forge-board-384x512.png'),
+          Buffer.from(boardCompare.image,'base64'));
+        delete boardCompare.image;
+        const boardEvidence={...boardCompare,source:'assets/design-approved/04-melhorias-forja.webp',
+          sameReactFrame:true,native:'384x512',before:boardCompare.before,
+          after:boardCompare.after,geometry:boardNow,approved:false};
+        writeFileSync(join(folder,'forge-board-controlled-ab.json'),
+          JSON.stringify(boardEvidence,null,2)+'\n');
+        console.log('WORK4_FORGE_BOARD_CONTINUITY_AB '+JSON.stringify(boardEvidence));
+        for(const k of ['cannon','foundryPanel'] as const)
+          assert.ok(Math.abs(boardCompare.after[k]-boardCompare.before[k])<.05,
+            'protected '+k+' ROI unchanged');
+        assert.ok(boardCompare.after.materials<boardCompare.before.materials,
+          'connected real costs/button surface must improve source materials ROI');
+        assert.ok(boardCompare.after.global<boardCompare.before.global,
+          'connected real costs/button surface must improve native global MAE');
+
         // New 04 foundry-plate A/B: physically darkened right panel versus
         // the SAME release HEAD's bright navy panel, with untouched DOM,
         // levels and exact cannon/interactive hitboxes.
