@@ -3881,8 +3881,16 @@
       radial-gradient(ellipse 92% 95px at 50% 0%,#49677b45,transparent 92%),
       linear-gradient(180deg,#18374d 0%,#102b43 44%,#0a2039 70%,#061a33 100%);
   }
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
-    filter:saturate(1.25) contrast(1.13) brightness(.84);
+  /* The approved 05 inventory header is deep navy rather than cyan:
+     retain real CARTAS count and concept caption as editable HTML. */
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+    background:linear-gradient(90deg,#101e2e,#152734 50%,#101e2e);
+  }
+  /* Same honest PRÉVIA label; use the approved 05 green nameplate pigment
+     on the two sail/shield concepts, without adding fake level numbers. */
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) small,
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) small{
+    background:linear-gradient(180deg,#fff0bd 0%,#9fe54a 16%,#2ba345 74%,#145c2a 100%);
   }
   .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
     filter:saturate(1.27) contrast(1.12) brightness(.92) drop-shadow(0 4px 3px #041327a8);
