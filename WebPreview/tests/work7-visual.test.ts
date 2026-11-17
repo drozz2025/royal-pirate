@@ -346,50 +346,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
 
 
 
-        // WORK7 #104: NON-PRODUCTION optical experiment on the same
-        // Chromium frame. Measurements precede any candidate CSS selection;
-        // all overrides are removed before geometry and strict HEAD gates.
-        if(width===384 && height===512) {
-          const targets=kind==='cards'
-            ? [
-              ['.w7-approved-slot:nth-child(5)',[.53,.56,.59,.615,.65]],
-              ['.w7-approved-slot:nth-child(7)',[.54,.58,.62,.64,.68]]
-            ] as const
-            : [
-              ['.w7-chest-rare',[.61,.68,.72,.76,.80]],
-              ['.w7-chest-epic',[.61,.68,.72,.76,.80]],
-              ['.w7-chest-legend',[.46,.53,.58,.62,.65]]
-            ] as const;
-          for(const [selector,values] of targets) {
-            for(const value of values) {
-              const override='.w7-screen[data-work7-screen="'+kind+'"] '+selector+
-                '{filter:brightness('+value+')!important}';
-              await evaluate("(()=>{const s=document.createElement('style');s.id='work7-tonal-optical-trial';s.textContent="+JSON.stringify(override)+";document.head.appendChild(s);return true})()");
-              await sleep(95);
-              const shot=await command('Page.captureScreenshot',{
-                format:'png',fromSurface:true,captureBeyondViewport:false
-              });
-              const sweep=await evaluate("(async()=>{"+
-                "const load=src=>new Promise((ok,bad)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=bad;im.src=src});"+
-                "const ref=await load("+JSON.stringify(refUrl)+"),render=await load("+
-                  JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+");"+
-                "const can=document.createElement('canvas');can.width=384;can.height=512;"+
-                "const context=can.getContext('2d');context.drawImage(ref,0,0);"+
-                "const a=context.getImageData(0,0,384,512).data;context.clearRect(0,0,384,512);"+
-                "context.drawImage(render,0,0);const b=context.getImageData(0,0,384,512).data;"+
-                "let total=0,roi=0,n=0;const ranges="+
-                   JSON.stringify(kind==='cards'?[[18,195,365,428]]:[[18,175,173,309],[18,329,365,427]])+";"+
-                "for(let y=0;y<512;y++)for(let x=0;x<384;x++){const p=(y*384+x)*4;"+
-                "for(let c=0;c<3;c++){const d=Math.abs(a[p+c]-b[p+c]);total+=d;"+
-                "if(ranges.some(([x0,y0,x1,y1])=>x>=x0&&x<x1&&y>=y0&&y<y1)){roi+=d;n++}}}"+
-                "return {global:+(total/(384*512*3)).toFixed(3),roi:+(roi/n).toFixed(3)};})()");
-              console.log('WORK7 OPTICAL SWEEP '+kind+' '+selector+' '+value+' '+JSON.stringify(sweep));
-              await evaluate("(()=>{document.getElementById('work7-tonal-optical-trial')?.remove();return true})()");
-              await sleep(55);
-            }
-          }
-        }
-
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
