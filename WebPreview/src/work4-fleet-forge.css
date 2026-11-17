@@ -2771,7 +2771,7 @@
    without resizing or occluding the real cost cells or 44px button.
    No dummy inventories, extra cannon, fake action or shared shell styles. */
 @media (width:384px) and (height:512px) {
-  .w4-forge #w4-forge-panel > .w4-materials {
+  .w4-forge #w4-forge-panel > .w4-materials:where(*) {
     position:relative;
   }
   .w4-forge #w4-forge-panel > .w4-materials::after {
