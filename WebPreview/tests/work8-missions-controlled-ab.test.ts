@@ -131,6 +131,57 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(comparisons.unchanged.dock<0.1&&comparisons.unchanged.header<0.1,'only Missions content may change');
     assert.ok(delta('full') < -0.15 && delta('quests') < -0.25 && delta('daily') < -0.25 && delta('chests') < -0.20,
       'Missions candidate MUST improve full MAE and both active content ROIs');
+
+    /* WORK8 07: isolated extra ink-pass A/B in the SAME loaded, paused
+       Chromium scene. Only this appended CSS is switched; the integrated
+       #275 frame tuning and every other app style remain active in both. */
+    const inkBaselineClass='work8-missions-ink-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(inkBaselineClass)+');true');
+    await delay(130);
+    const inkBeforeLayout=await readLayout();
+    const inkBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(inkBaselineClass)+');true');
+    await delay(130);
+    const inkAfterLayout=await readLayout();
+    const inkAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const inkSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+inkBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+inkAfter));
+    assert.notEqual(inkSource,source,'isolated same-scene A/B must use its own native screenshots');
+    const inkCompare=await evalJs(inkSource);
+    writeFileSync(join(evidence,'missions-ink-ab-baseline-384x512.png'),Buffer.from(inkBefore,'base64'));
+    writeFileSync(join(evidence,'missions-ink-ab-candidate-384x512.png'),Buffer.from(inkAfter,'base64'));
+    writeFileSync(join(evidence,'missions-ink-original-render-overlay-before-384x512.png'),Buffer.from(inkCompare.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-ink-original-render-overlay-after-384x512.png'),Buffer.from(inkCompare.overlays[1],'base64'));
+    const inkResult={
+      base:'work6/web-3d-preview',
+      scope:'07 Missions only; integrated prior changes ON in BOTH captures',
+      candidate:'lower navy-board brightness; no boxes or interactive changes',
+      frame:'identical real scene, decoded original art, paused animations, unscaled 384x512',
+      baselineClass:inkBaselineClass,roi:inkCompare.metrics,
+      unchanged:inkCompare.unchanged,referenceSize:inkCompare.sizes[0],
+      renderSize:inkCompare.sizes[2],beforeLayout:inkBeforeLayout,
+      afterLayout:inkAfterLayout,approved:false
+    };
+    writeFileSync(join(evidence,'work8-missions-ink-controlled-ab.json'),JSON.stringify(inkResult,null,2));
+    console.log('WORK8 07 isolated native ink A/B '+JSON.stringify(inkResult.roi));
+    for(const region of ['full','quests','daily','chests']){
+      assert.ok(inkCompare.metrics[region].delta<-0.20,
+        '07 new ink pass must reduce exact-source RGB MAE for '+region);
+    }
+    assert.ok(inkCompare.unchanged.dock<0.1&&inkCompare.unchanged.header<0.1,
+      'original header and five-button dock unchanged in same-frame A/B');
+    assert.equal(inkAfterLayout.quests,3);
+    assert.equal(inkAfterLayout.days.length,7);
+    assert.equal(inkAfterLayout.navCount,5);
+    assert.ok(inkAfterLayout.documentWidth<=386);
+    assert.ok(inkAfterLayout.dayContent.every((pair:any)=>
+      pair.every((item:any)=>item && item.top>=0 && item.bottom<=inkAfterLayout.nav.y+2)),
+      'seven chest images and seven captions fully above dock at 384');
+    assert.deepEqual(inkBeforeLayout.days,inkAfterLayout.days,
+      'pigment correction cannot move real day slots or alter tap hitboxes');
+    assert.deepEqual(inkBeforeLayout.nav,inkAfterLayout.nav,
+      'pigment correction cannot move the five-item dock');
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
