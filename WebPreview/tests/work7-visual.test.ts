@@ -39,25 +39,28 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7 / #104 — 384×512 native carved frame relief, 17 Nov 15h.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  // Compare against the actual WORK0-integrated v0.1.71 HEAD (including merged #316).
-  // Exact CSS on that HEAD, not an obsolete older uniform .72 baseline.
-  // Restoring it in the SAME Chromium frame isolates ONLY this PR's
-  // four optical changes, including preserving original 320px rules.
+  // Compare against exact v0.1.72 WORK0-integrated SHA b9e54f556434eb9aa1acf5ff086a0fe7ff2a6dd6.
+  // These are the precise pre-change computed filter values from the merged
+  // CSS; before/after use the very same Chromium scene, fonts and animation frame.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.63)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.77)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.61)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.65)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.585)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.745)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.58)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.64)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.59)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.71)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.62)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.71)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.80)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.80)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.65)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop,
       .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.11) drop-shadow(0 4px 3px #041327a8)!important
+        filter:saturate(1.27) contrast(1.12) brightness(1.20) drop-shadow(0 4px 3px #041327a8)!important
       }
       .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.16) drop-shadow(0 4px 3px #041327a8)!important
+        filter:saturate(1.27) contrast(1.12) brightness(1.40) drop-shadow(0 4px 3px #041327a8)!important
       }
       .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.88)!important}
       .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
@@ -164,6 +167,19 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   await command('Page.enable');
   await command('Runtime.enable');
 
+  // Read all 10 immutable approved visual contracts before running the
+  // 05/06 A/B. This prevents accidental substitution of placeholder imagery.
+  const approvedRefs = [
+    '00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+    '01-porto.webp','02-batalha.webp','03-frota.webp',
+    '04-melhorias-forja.webp','05-cartas.webp','06-loja.webp',
+    '07-missoes.webp','08-ranking-perfil.webp'
+  ];
+  for (const name of approvedRefs) {
+    const data = await readFile(new URL('../../assets/design-approved/'+name,import.meta.url));
+    assert.ok(data.length>1024&&data.toString('ascii',0,4)==='RIFF'&&data.toString('ascii',8,12)==='WEBP',
+      'Approved WEBP visual contract must remain intact: '+name);
+  }
   const references = {
     cards: await readFile(new URL('../../assets/design-approved/05-cartas.webp', import.meta.url)),
     shop: await readFile(new URL('../../assets/design-approved/06-loja.webp', import.meta.url))
