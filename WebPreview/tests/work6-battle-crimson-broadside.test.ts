@@ -50,6 +50,10 @@ test('WORK6 #104: sculpted hull rails and eight sunk gunports use bounded real 3
   const rails=group.children.filter(n=>n.name==='battle-only-swept-hull-rail');
   assert.equal(rails.length,6,'three curved longitudinal rails on both sides');
   assert.ok(rails.every(n=>n instanceof T.Mesh && n.geometry instanceof T.TubeGeometry));
+  const bowRail=(rails[0] as T.Mesh).geometry;
+  bowRail.computeBoundingBox();
+  assert.ok(bowRail.boundingBox!.max.y-bowRail.boundingBox!.min.y>.32,
+    'curved railing must climb into the bow and stern, not stay a square horizontal fence');
   const rings=group.getObjectByName('battle-only-engraved-gunport-rims');
   const recesses=group.getObjectByName('battle-only-recessed-gunports');
   assert.ok(rings instanceof T.InstancedMesh);
