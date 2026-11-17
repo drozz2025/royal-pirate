@@ -180,9 +180,15 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await command('Page.navigate', { url: origin });
         await waitFor("!!document.querySelector('.harbour-screen .harbour-nav-item:nth-child(4)')");
         const tab = kind === 'cards' ? 3 : 4;
-        const clicked = await evaluate(
-          "(()=>{const tab=document.querySelector('.harbour-screen .harbour-nav-item:nth-child("+tab+")');if(!tab)return false;tab.click();return true})()");
-        assert.ok(clicked, 'Open '+kind+' through actual Porto navigation');
+        const touchTarget = await evaluate(
+          "(()=>{const tab=document.querySelector('.harbour-screen .harbour-nav-item:nth-child("+tab+")');if(!tab)return null;const r=tab.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
+        assert.ok(touchTarget,'The real '+kind+' Porto navigation target must be present');
+        // Real Chromium CDP touchscreen press; not a synthetic HTMLElement.click().
+        await command('Input.dispatchTouchEvent',{
+          type:'touchStart',touchPoints:[{x:touchTarget.x,y:touchTarget.y,id:7}]
+        });
+        await sleep(65);
+        await command('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
         await waitFor("!!document.querySelector('[data-work7-screen=\""+kind+"\"]')");
         // A nonempty crop element is insufficient: all 8 + 4 image URLs must
         // actually decode on the production build before screenshots count.
