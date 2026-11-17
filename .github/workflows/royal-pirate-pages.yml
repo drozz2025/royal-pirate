@@ -85,6 +85,20 @@ jobs:
           done
           CHROME_BIN="$(command -v google-chrome || command -v chromium)" node scripts/capture-porto.mjs
           python3 scripts/assert-forge-visibility.py porto-qa/forge-mobile-390x844.png
+      # Read-only probe. This is NOT a Sites deploy and cannot synchronize code.
+      # An unavailable/private Site never blocks GitHub Pages publication.
+      - name: Probe pre-existing ChatGPT Sites endpoint (read-only)
+        if: always()
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          SITE_URL="https://royal-pirate.ricardomalheiro.chatgpt.site/"
+          code=$(curl --max-time 15 --location --silent --show-error \
+            --output /tmp/royal-pirate-chatgpt-sites.html --write-out '%{http_code}' "$SITE_URL") || code="000"
+          echo "CHATGPT SITES READ-ONLY HTTP: $code at $SITE_URL"
+          echo "ChatGPT Sites read-only HTTP probe: $code (not a deploy or sync)" >> "$GITHUB_STEP_SUMMARY"
+          test "$code" = "200"
+
       - name: Upload short-lived browser snapshot and mobile QA data
         if: always()
         uses: actions/upload-artifact@v4
