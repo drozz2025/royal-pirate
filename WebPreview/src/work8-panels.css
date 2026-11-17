@@ -4813,3 +4813,64 @@
   opacity:0;
   pointer-events:none;
 }
+
+
+/* WORK8 / #104 — native reference composition alignment, 17 Nov 2026.
+   384×512: reference tabs start ~119px, current tabs ~132px; quest / captain
+   begin ~158px vs ~176px. Shift only the two owned panel groups, not the
+   shared HUD, 5-button dock or any live reward/ranking state.
+   Keep the 320px flow and scroll unchanged. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px){
+  .w8-screen.w8-approved.w8-approved-missions .w8-approved-tabs,
+  .w8-screen.w8-approved.w8-approved-ranking .w8-approved-tabs{
+    margin-top:-10px;
+  }
+  .w8-screen.w8-approved.w8-approved-missions .w8-approved-quest-list,
+  .w8-screen.w8-approved.w8-approved-ranking .w8-approved-captain{
+    margin-top:-6px;
+  }
+
+  /* The original portrait occupies ~75px vertically; the previous local
+     rendering made the captain look like a small icon. Keep the portrait
+     inside its existing real local-profile card and preserve text space. */
+  .w8-approved-ranking .w8-approved-captain{
+    grid-template-columns:73px minmax(0,1fr) 49px;
+    column-gap:5px;
+    overflow:visible;
+  }
+  .w8-approved-ranking .w8-approved-avatar{
+    width:72px;height:72px;
+    margin-left:-2px;
+    transform:translateY(-3px);
+    position:relative;z-index:2;
+  }
+  .w8-approved-ranking .w8-approved-league-status .w8-art{
+    width:46px;height:47px;
+  }
+  .w8-approved-ranking .w8-approved-league-status > svg.w8-approved-painting{
+    width:46px;height:47px;flex-basis:47px;margin-top:-47px;
+  }
+
+  /* Reference shows 7 distinguishable, taller chest silhouettes.
+     Enlarge only existing artwork and leave the seven real day statuses
+     and the real claim action completely unchanged. */
+  .w8-approved-missions .w8-approved-days li{min-height:69px}
+  .w8-approved-missions .w8-approved-chest{height:44px}
+  .w8-approved-missions .w8-approved-chest .w8-art{height:44px}
+}
+
+/* WO RK8 engraved surfaces: sharpen the EXISTING pictorial silhouettes
+   rather than adding cards, badges, values, ranks or fake rewards. */
+.w8-approved-missions .w8-approved-quest-art > svg.w8-approved-painting{
+  filter:drop-shadow(0 2px 1px #031b2c) contrast(1.08) saturate(1.12);
+}
+.w8-approved-ranking .w8-approved-avatar > svg.w8-approved-painting{
+  filter:drop-shadow(0 2px 1px #031423) contrast(1.08) saturate(1.1);
+}
+.w8-approved-missions .w8-approved-daily,
+.w8-approved-ranking .w8-approved-leaderboard:not(.w8-approved-leagues-offline){
+  background-image:
+    radial-gradient(ellipse 75% 40% at 50% 0%,#78bac438,transparent 88%),
+    repeating-linear-gradient(0deg,#fbe1a700 0px,#fbe1a700 12px,#fbe1a70b 13px,#fbe1a700 14px),
+    linear-gradient(165deg,#21546d,#103653 49%,#071c34 100%);
+}
