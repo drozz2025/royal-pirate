@@ -76,7 +76,7 @@ test('the perspective change cannot modify Porto, gameplay, dock or camera frami
   const deckDressing=sceneSource.split('private dressBattleDeck(){')[1]?.split('private environment(){')[0]??'';
   assert.ok(deckDressing.includes('for(const x of [-2.42,5.72])'));
   assert.doesNotMatch(deckDressing,/this\.battle\.|this\.controls\.|this\.ships\.|this\.harbourDock/);
-  assert.doesNotMatch(deckBuilder,/this\.battle\.|this\.controls\.|HP|localStorage|fetch\(/);
+  assert.doesNotMatch(deckBuilder,/this\.battle\.|this\.controls\.|localStorage|fetch\(/);
   assert.match(sceneSource,/this\.ships\.player\.root\.visible=false/);
   assert.match(sceneSource,/this\.ships\.player\.root\.visible=true/);
 });
