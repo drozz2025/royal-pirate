@@ -39,29 +39,16 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7 / #104 — 384×512 native carved frame relief, 17 Nov 15h.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  // Latest verified merged v0.1.69 HEAD (WORK0 #310; WORK7 #308 included).
-  // Undo ONLY this PR's per-panel 05/06 optical values at the same browser
-  // viewport and scene. The merged .72 card relief and .80 chest relief,
-  // original chest inlay and live DOM labels must be identical before/after.
-  // !important wins over the final WORK7-only media rules.
-
+  // Compare against the actual WORK0-integrated v0.1.70 HEAD (#311 in base).
+  // Exact CSS on that HEAD, not an obsolete older uniform .72 baseline.
+  // Restoring it in the SAME Chromium frame isolates ONLY this PR's
+  // four optical changes, including preserving original 320px rules.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-        filter:brightness(.72)!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest{
-        filter:brightness(.80)!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-status{
-        filter:none!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest::before{
-        box-shadow:
-          inset 0 0 0 3px #071321cd,
-          inset 0 2px 11px 3px #020817c5,
-          inset 0 -2px 1px #e7b77529 !important;
-      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.66)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.64)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.62)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.68)!important}
     }`;
   const cssBaseline = currentHeadBaseline;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
