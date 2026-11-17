@@ -464,6 +464,9 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* WORK8 07 — newest HEAD v0.1.67: inactive tab paint only.
        Capture a controlled A/B in the SAME decoded 384x512 Chromium scene,
        identical animation frame and live mission state; reference unscaled. */
+    // Independently isolate the previous WORK8 tab-ink gate: its baseline
+    // must never inherit this PR's later tab-depth override.
+    await evalJs('document.documentElement.classList.add("work8-missions-tab-depth-ab-baseline");true');
     const tabInkFlag='work8-missions-tab-ink-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(tabInkFlag)+');true');
     await delay(140);
@@ -512,6 +515,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'only retain measured improvements against real unscaled original');
     assert.ok(tabCompare.metrics.daily.delta<.05 && tabCompare.metrics.chests.delta<.05,
       'reward board and seven chests must remain pixel-stable');
+    await evalJs('document.documentElement.classList.remove("work8-missions-tab-depth-ab-baseline");true');
 
 
     /* WORK8/#104 — same paused real 07 Chromium frame, native reference:
