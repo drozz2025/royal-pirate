@@ -3703,3 +3703,13 @@
     line-height:1;
   }
 }
+
+
+/* In 05 at original 384×512, the second portrait row begins ~3px
+ * above the approved atlas. Space the two real rows, preserving 4 columns
+ * and the second row's PRÉVIA labels above the shared y≈430 dock. */
+@media (min-width:355px) and (max-width:430px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    row-gap:8px;
+  }
+}
