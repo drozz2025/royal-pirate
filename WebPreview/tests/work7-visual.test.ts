@@ -290,8 +290,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               'First chest should align with the approved x≈18 border');
             assert.ok(geometry.packArt && baselineGeometry.packArt,
               'Measure original 06 chest crop separately from its pack panel');
-            assert.ok(geometry.packArt.width>=baselineGeometry.packArt.width+4,
-              'Original 06 treasure artwork must be visibly enlarged vs HEAD');
+            assert.ok(Math.abs(geometry.packArt.width-baselineGeometry.packArt.width)<=1,
+              'Native 384px Captain artwork remains exactly as merged HEAD; this PR only adjusts 320px framing');
           }
         }
       }
