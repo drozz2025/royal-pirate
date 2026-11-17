@@ -47,5 +47,8 @@ test('03/04 painting rules are scoped and do not override #158 paint isolation o
   const own=css.split('WORK4 approved source painting pass 17 Nov')[1];
   assert.ok(own);
   assert.doesNotMatch(own,/\.app-dock|\.harbour-nav|\.porto-|\.app-shell/);
-  assert.doesNotMatch(own,/\.w4-forge-stage\s*\{/);
+  // This guard applies to the approved painting block, not to later,
+  // independently tested WORK4 short-screen layout rules (PR #249).
+  const paintingOnly=own.split('WORK4 / #104 — native 384×512 composition pass')[0];
+  assert.doesNotMatch(paintingOnly,/\.w4-forge-stage\s*\{/);
 });

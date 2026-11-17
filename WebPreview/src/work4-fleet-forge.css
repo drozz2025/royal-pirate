@@ -2313,3 +2313,62 @@
     linear-gradient(to bottom,#000 0%,#000 90%,transparent 100%);
   mask-composite:intersect;
 }
+
+/* WORK4 / #104 — native 384×512 composition pass, 17 Nov 02h.
+   The original Forja has the furnace/cannon above one complete resource band.
+   On 384×512 the old 208px minimum left that band behind the unchanged dock.
+   Recover 20-24px ONLY inside WORK4's stage and retain the actual level/cost
+   controls in normal document flow. No clip or scale on the protected
+   contain:paint / translateZ(0) scene (#158/#159). */
+@media (max-width:659px) and (max-height:650px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage {
+    height:clamp(184px,34dvh,202px);
+    min-height:clamp(184px,34dvh,202px);
+  }
+  .w4-forge .w4-forge-stage > .w4-forge-description {
+    top:3%;
+    right:1.5%;
+    width:43%;
+    min-height:0;
+    max-height:94%;
+    padding:5px 5px 6px;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    scrollbar-width:none;
+  }
+  .w4-forge .w4-forge-description::-webkit-scrollbar {display:none;}
+  .w4-forge .w4-forge-medallion {width:30px;height:30px;}
+  .w4-forge .w4-forge-medallion .w4-tab-symbol {width:20px;height:20px;}
+  .w4-forge .w4-forge-description h3 {margin:2px 0;font-size:19px;}
+  .w4-forge .w4-forge-description > strong {font-size:15px;}
+  .w4-forge .w4-forge-live-levels {margin-top:3px;padding-top:2px;}
+  .w4-forge .w4-forge-live-level {min-height:18px;padding:1px 3px;}
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art:not(.w4-reference-cannon) {
+    width:64%;
+    left:-1%;
+    top:12%;
+  }
+  /* Compatible with the separately reviewed pictorial crop in draft #243:
+     keep its ONE cannon fully inside the shorter stage if WORK0 merges it. */
+  .w4-forge .w4-forge-scene > svg.w4-reference-cannon {
+    height:clamp(151px,30dvh,174px)!important;
+  }
+  .w4-forge .w4-materials {margin-top:-2px;padding:5px 6px 6px;}
+  .w4-forge .w4-materials h3 {margin:0 0 4px;}
+  .w4-forge .w4-resource-grid > div {min-height:54px;padding:2px 3px;}
+  .w4-forge .w4-resource-grid > div > span {height:20px;font-size:20px;}
+  .w4-forge .w4-improve-button {min-height:47px;margin:0 auto 3px;}
+  /* Original Frota displays ship and unboxed statistics side by side.
+     Preserve all real levels and the single active Royal Crown. */
+  .w4-fleet .w4-stage-label {
+    top:10%;
+    right:1.5%;
+    width:36%;
+    padding:5px 4px 6px 7px;
+    border:0;
+    border-left:1px solid #e5bf80;
+    border-radius:0 8px 8px 0;
+    box-shadow:none;
+    background:linear-gradient(90deg,#08294385,#062640d9);
+  }
+}
