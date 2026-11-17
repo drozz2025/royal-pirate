@@ -584,6 +584,33 @@ function ShipArtwork({small=false,part='ship'}:{small?:boolean;part?:'ship'|'can
           fill="none" stroke="#c2fbff" strokeWidth="4" opacity=".85"/>
       </g>
     </>}
+  
+    {/* Refine the EXISTING hull and billowing sail, not a second ship. */}
+    {!small&&<g className="w4-r03-perspective-facets" pointerEvents="none">
+      <path d="M125 45C143 34 169 41 181 64C170 57 158 53 145 54
+        C157 75 169 97 165 120C146 114 135 91 125 45Z"
+        fill="#b8c0bd" opacity=".20"/>
+      <path d="M171 47C197 69 206 111 194 138C189 133 184 128 179 125
+        C191 101 184 73 171 47Z" fill="#030c1b" opacity=".47"/>
+      <path d="M83 65C86 58 95 53 104 50C98 71 98 99 109 121
+        C99 125 92 121 87 116C81 102 79 82 83 65Z"
+        fill="#e4e3c9" opacity=".14"/>
+      <path d="M74 159C95 173 125 183 158 187C196 192 244 184 288 159"
+        fill="none" stroke="#0b0f16" strokeWidth="9" opacity=".52"/>
+      <path d="M78 166C115 188 194 203 274 178"
+        fill="none" stroke="#a16a3d" strokeWidth="2.8" opacity=".8"/>
+      <path d="M88 190C142 217 223 217 272 191"
+        fill="none" stroke="#0b1018" strokeWidth="9" opacity=".63"/>
+      <path d="M92 199C146 223 223 225 265 198"
+        fill="none" stroke="#e2ac65" strokeWidth="2.3" opacity=".78"/>
+      <path d="M275 140C299 130 305 132 309 140
+        C311 154 301 168 285 176L274 169C293 163 300 145 275 140Z"
+        fill="#1b1720" stroke="#d6a05d" strokeWidth="2.4"/>
+      <path d="M284 144Q300 139 304 143M286 164Q301 155 305 145"
+        fill="none" stroke="#f9d28e" strokeWidth="2.6" opacity=".82"/>
+      <path d="M36 196Q56 188 77 201T122 205M223 211Q250 197 278 202T331 198"
+        fill="none" stroke="#e5ffff" strokeWidth="4.1" strokeLinecap="round" opacity=".83"/>
+    </g>}
   </svg>;
 }
 
@@ -650,6 +677,16 @@ function TropicalBackdrop(){
     </g>
     <path d="M8 229q18-14 29-1m5-13q8-8 17 2" fill="none"
       stroke="#ead3a7" strokeWidth="2.7"/>
+  </g>
+  
+  {/* Receding wave planes converge beneath the one existing flagship. */}
+  <g className="w4-r03-water-perspective" pointerEvents="none">
+    <path d="M0 219C58 210 89 219 146 214C207 208 245 215 303 211
+      C355 207 380 214 420 206" fill="none" stroke="#aaf4ec" strokeWidth="2.8" opacity=".48"/>
+    <path d="M0 249C58 236 98 250 146 245C191 240 233 246 276 240
+      C324 233 375 240 420 234" fill="none" stroke="#0b354f" strokeWidth="13" opacity=".46"/>
+    <path d="M10 260Q49 251 88 261T171 262T267 258T419 258"
+      fill="none" stroke="#93e5e6" strokeWidth="3.3" opacity=".58"/>
   </g>
   <g fill="#f4e5ae" opacity=".5"><path d="M0 274q35-7 65 2t56 0q35-10 66-3t60 0q31-8 68-2t99-1" stroke="#d6ffff" strokeWidth="3" fill="none"/></g>
   <g stroke="#9ff5fa" opacity=".65" fill="none" strokeLinecap="round"><path d="M0 289q30-9 59 0t64 0q30-11 60 0t61 0q34-9 64-1t110 0" strokeWidth="4"/><path d="M55 256q16-7 38-2m221 4q21-8 47-1" strokeWidth="3"/></g>
@@ -874,7 +911,23 @@ function ForgeBackdrop(){
        <circle cx="95" cy="143" r="1.8"/><circle cx="138" cy="193" r="2"/>
      </g>
    </g>
- </svg>;
+ 
+    {/* Stone relief on the existing forge arch; preserve the single hearth. */}
+    <g className="w4-r04-masonry-relief" pointerEvents="none">
+      <path d="M15 146C24 82 54 42 110 40C153 43 179 80 186 146"
+        fill="none" stroke="#2c201f" strokeWidth="17" opacity=".65"/>
+      <path d="M20 143C29 78 60 47 109 47C151 49 174 89 181 145"
+        fill="none" stroke="#c68e5e" strokeWidth="6" opacity=".92"/>
+      <path d="M23 144L45 148L47 120L28 112ZM37 92L55 109L72 84L54 65Z
+        M77 54L85 82L112 78L111 46ZM122 48L119 81L149 96L160 69Z
+        M166 83L146 105L159 131L182 126Z"
+        fill="#5b3a2b" stroke="#d99e66" strokeWidth="2.5" opacity=".88"/>
+      <path d="M25 140L39 142M38 94L54 100M80 58L89 76M130 53L123 74M166 94L157 110"
+        fill="none" stroke="#f7c892" strokeWidth="3" opacity=".72"/>
+      <path d="M6 256C73 248 146 251 194 246C258 239 336 245 416 243"
+        fill="none" stroke="#2d2123" strokeWidth="8" opacity=".67"/>
+    </g>
+  </svg>;
 }
 
 /** Original 2D cannon illustration for the Forge's largest visual stage.
@@ -891,6 +944,8 @@ function ForgeCannonArtwork(){
       </linearGradient>
       <radialGradient id="w4-cannon-muzzle"><stop stopColor="#020d1c"/><stop offset=".8" stopColor="#0a1923"/><stop offset="1" stopColor="#7b6a57"/></radialGradient>
     </defs>
+    {/* The existing cannon and carriage rotate together to a flatter angle. */}
+    <g transform="rotate(7 196 178)">
     <ellipse cx="188" cy="250" rx="172" ry="22" fill="#061928" opacity=".55"/>
     <path d="M63 233 L285 173 L377 206 L162 273Z" fill="#502d22" stroke="#d99c54" strokeWidth="8" strokeLinejoin="round"/>
     <path d="M84 231 L284 187 L351 209 L157 258" fill="none" stroke="#f9cc7a" strokeWidth="5"/>
@@ -1143,6 +1198,7 @@ function ForgeCannonArtwork(){
       </g>
 
     </g>
+      </g>
   </svg>;
 }
 
