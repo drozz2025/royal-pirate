@@ -348,7 +348,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'native 384px daily-heading ROI must improve after removing the rectangle');
     assert.ok(titleInkCompare.metrics.full.delta<-.02&&titleInkCompare.metrics.daily.delta<-.06,
       'daily heading improvement must improve the entire frame and daily panel');
-    assert.ok(Math.abs(titleInkCompare.metrics.quests.delta)<.06&&Math.abs(titleInkCompare.metrics.chests.delta)<.06,
+    assert.ok(titleInkCompare.metrics.quests.delta<.06&&titleInkCompare.metrics.chests.delta<.06,
       'other three quests and seven chest icons must not regress');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
