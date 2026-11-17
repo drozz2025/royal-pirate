@@ -362,7 +362,12 @@ export class OceanScene {
     // The heavier existing cannon barrels sit farther apart. Low wooden
     // support beams now align with those TWO muzzles; the former raised
     // rectangular frames cut across the sea and partly hid the broadside.
-    for(const x of [-3.15,3.15]){
+    // Align ONLY the starboard support to its isolated visual muzzle.
+    // Port remains at -3.15; no camera or shot origin changes.
+    const work6Baseline=typeof window!=='undefined' &&
+      (window.location.hostname==='127.0.0.1'||window.location.hostname==='localhost') &&
+      new URLSearchParams(window.location.search).get('work6ab')==='baseline';
+    for(const x of [-3.15,work6Baseline?3.15:5.72]){
       add(box,oak,x,1.45,65.65,2.30,.29,.48);
       add(box,gold,x,1.63,65.54,2.26,.10,.20);
       for(const dx of [-.96,.96])
@@ -728,11 +733,18 @@ export class OceanScene {
     if(this.compatibility&&timestamp-this.lastRender<45)return;this.lastRender=timestamp;
     const raw=this.previous?(timestamp-this.previous):16.7,dt=Math.min(raw/1000,.25);this.previous=timestamp;this.elapsed+=dt;this.frameSamples.push(raw);if(this.frameSamples.length>120)this.frameSamples.shift();
     if(this.cameraMode==='battle'||this.cameraMode==='deck'){this.battle.tick(dt);for(const event of this.battle.drainEvents())this.effect(event);}
-    this.water.uniforms.time.value=this.elapsed;
+    // The optional LOCAL visual A/B probe freezes only the rendered sea and
+    // decorative ship bob/sails at one frame. Gameplay, HP, camera and ticks
+    // remain untouched. This flag is ignored in the public Pages host.
+    const abFrame=typeof window!=='undefined' &&
+      (window.location.hostname==='127.0.0.1'||window.location.hostname==='localhost') &&
+      new URLSearchParams(window.location.search).has('work6ab');
+    const pictureTime=abFrame?2.25:this.elapsed;
+    this.water.uniforms.time.value=pictureTime;
     for(const [side,art] of Object.entries(this.ships) as ['player'|'enemy',ShipArt][]){const health=this.battle.health[side];const damage=1-health/100;
-      art.root.position.y=Math.sin(this.elapsed*1.1+(side==='player'?0:2))*.075-(health===0?1.3:0);art.root.rotation.z=Math.sin(this.elapsed*.9)*.018+(health===0?(side==='enemy'?-.23:.23):damage*.035);
-      art.root.rotation.x=Math.sin(this.elapsed*.75+2)*.014;art.rig.rotation.z=damage>.5?damage*.14:0;
-      art.sails.forEach((s,i)=>{s.rotation.y=Math.sin(this.elapsed*1.3+i)*.035;s.scale.y=health<=42?.86:1;});art.flags.forEach((f,i)=>f.rotation.y=Math.sin(this.elapsed*3+i)*.18);
+      art.root.position.y=Math.sin(pictureTime*1.1+(side==='player'?0:2))*.075-(health===0?1.3:0);art.root.rotation.z=Math.sin(pictureTime*.9)*.018+(health===0?(side==='enemy'?-.23:.23):damage*.035);
+      art.root.rotation.x=Math.sin(pictureTime*.75+2)*.014;art.rig.rotation.z=damage>.5?damage*.14:0;
+      art.sails.forEach((s,i)=>{s.rotation.y=Math.sin(pictureTime*1.3+i)*.035;s.scale.y=health<=42?.86:1;});art.flags.forEach((f,i)=>f.rotation.y=Math.sin(pictureTime*3+i)*.18);
       if(this.recoilAge[side]<CANNON_FX_DURATION)this.recoilAge[side]+=dt;
       const cannonFx=cannonFxState(this.recoilAge[side]),flash=this.muzzleFlash[side],direction=side==='player'?1:-1;
       if(flash){flash.visible=cannonFx.visible;flash.scale.set(cannonFx.flashScale,cannonFx.flashScale*.58,cannonFx.flashScale*.58);
@@ -746,7 +758,7 @@ export class OceanScene {
     // A live broadside briefly illuminates the real foreground cannon muzzles.
     const batteryFx=cannonFxState(this.recoilAge.player);
     for(const flare of this.batteryFlashes){flare.visible=this.battleBattery.visible&&batteryFx.visible;flare.scale.setScalar(Math.max(.05,batteryFx.flashScale*.75));(flare.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity;}
-    this.foam.forEach((f,i)=>{(f.material as T.MeshBasicMaterial).opacity=.3+Math.sin(this.elapsed*2+i)*.12;f.scale.x=2.25+Math.sin(this.elapsed)*.09;});
+    this.foam.forEach((f,i)=>{(f.material as T.MeshBasicMaterial).opacity=.3+Math.sin(pictureTime*2+i)*.12;f.scale.x=2.25+Math.sin(pictureTime)*.09;});
     for(let i=this.ripples.length-1;i>=0;i--){const ripple=this.ripples[i];ripple.age+=dt;const state=rippleState(ripple.age,ripple.life);
       if(state.finished){ripple.mesh.visible=false;this.ripplePool.push(ripple.mesh);this.ripples.splice(i,1);continue;}
       ripple.mesh.scale.setScalar(state.scale);ripple.mesh.position.y=state.surfaceY;(ripple.mesh.material as T.MeshBasicMaterial).opacity=state.opacity;
