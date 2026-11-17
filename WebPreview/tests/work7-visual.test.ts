@@ -39,28 +39,19 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7 / #104 — 384×512 native carved frame relief, 17 Nov 15h.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  // Latest verified merged v0.1.69 HEAD (WORK0 #310; WORK7 #308 included).
-  // Undo ONLY this PR's per-panel 05/06 optical values at the same browser
-  // viewport and scene. The merged .72 card relief and .80 chest relief,
-  // original chest inlay and live DOM labels must be identical before/after.
-  // !important wins over the final WORK7-only media rules.
-
+  // Compare against the actual WORK0-integrated v0.1.70 HEAD (#311 in base).
+  // Exact CSS on that HEAD, not an obsolete older uniform .72 baseline.
+  // Restoring it in the SAME Chromium frame isolates ONLY this PR's
+  // four optical changes, including preserving original 320px rules.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-        filter:brightness(.72)!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest{
-        filter:brightness(.80)!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-status{
-        filter:none!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest::before{
-        box-shadow:
-          inset 0 0 0 3px #071321cd,
-          inset 0 2px 11px 3px #020817c5,
-          inset 0 -2px 1px #e7b77529 !important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.66)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.64)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.62)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.68)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:none!important}
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+        filter:saturate(1.2) contrast(1.06) brightness(.95) drop-shadow(0 6px 5px #14062ca3)!important
       }
     }`;
   const cssBaseline = currentHeadBaseline;
@@ -311,6 +302,45 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "return {png:c.toDataURL('image/png').slice(22),mae,maeBefore,roiBefore,roiAfter,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
+
+        // WORK7 experimental tuning grid, never applied to the production UI:
+        // same 384x512 screenshot frame and same approved artwork for every
+        // real-chest brightness candidate; log absolute native MAE/ROI and
+        // only commit a verified winner in a separate revision.
+        if (kind==='shop' && width===384 && height===512) {
+          const candidates:[string,number][]=[
+            ['crop',.98],['crop',1.02],['crop',1.05],['crop',1.07],
+            ['crop',1.09],['crop',1.11],['crop',1.14],['crop',1.18],
+            ['crop',1.22],['crop',1.28]
+          ];
+          for (const [chest,value] of candidates) {
+            const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop'+
+              '{filter:saturate(1.2) contrast(1.06) brightness('+value+') drop-shadow(0 6px 5px #14062ca3)!important}}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-sweep';s.textContent="+
+              JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
+            await sleep(90);
+            const shot=await command('Page.captureScreenshot',{
+              format:'png',fromSurface:true,captureBeyondViewport:false
+            });
+            const metrics=await evaluate("(async()=>{"+
+              "const load=src=>new Promise((ok,fail)=>{let i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "const ref=await load("+JSON.stringify(refUrl)+"),img=await load("+
+                JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+");"+
+              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+              "const ctx=cv.getContext('2d');ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
+              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
+              "let sum=0,count=0,roi=0,roiCount=0;"+
+              "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
+              "for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
+              "if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=v;roiCount++}}}"+
+              "return {global:Math.round(sum/count*1000)/1000,roi:Math.round(roi/roiCount*1000)/1000}})()");
+            console.log('WORK7 CROP SWEEP '+chest+'='+value+' '+JSON.stringify(metrics));
+            await evaluate("(()=>{document.getElementById('w7-sweep')?.remove();return true})()");
+            await sleep(55);
+          }
+        }
+
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
