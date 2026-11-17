@@ -62,6 +62,16 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         width:auto!important;margin-left:0!important;
       }
     }
+    /* Same-scene HEAD baseline: the new 05 art registration and 06 image
+       highlight are disabled; old #263 and #268 rules stay preserved. */
+    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
+      .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+        transform:none!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+        filter:saturate(1.2) contrast(1.06) drop-shadow(0 6px 5px #14062ca3)!important;
+      }
+    }
     /* Same-scene HEAD baseline for this PR at native 384x512. */
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
@@ -74,12 +84,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   /* This PR's immediate HEAD A/B overrides only the two new pixel-calibration
    * rules, retaining all already-merged transforms and the same browser frame. */
   const currentHeadBaseline = `
+    /* Exact parent HEAD in the same Chromium production scene and frame.
+       Unlike previous PRs we must not rewind merged brightness corrections. */
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
-        filter:saturate(1.25) contrast(1.13) brightness(1.04)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+        transform:none!important;
       }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.045) drop-shadow(0 4px 3px #041327a8)!important;
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+        filter:saturate(1.2) contrast(1.06) drop-shadow(0 6px 5px #14062ca3)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -343,6 +355,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           if(kind==='cards') {
             assert.ok(geometry.slots[0].x>=17 && geometry.slots[0].x<=20,
               'First conceptual card should align with the approved x≈18 border');
+            assert.equal(geometry.slots[0].y, baselineGeometry.slots[0].y+2,
+              'All eight live original portraits should move exactly 2px toward approved art');
             assert.ok(geometry.slots.every((slot:any)=>slot.bottom===geometry.slots[0].bottom||slot.bottom===geometry.slots[4].bottom),
               'Eight concept cards retain exactly two aligned rows');
           } else {
