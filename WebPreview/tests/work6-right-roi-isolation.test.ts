@@ -71,7 +71,7 @@ test('WORK6: change cannot alter Porto, gameplay HP, firing or the five-item men
   const deck=readFileSync(new URL('../src/battle-deck.ts',import.meta.url),'utf8');
   const scene=readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
   const dressing=scene.split('private dressBattleDeck(){')[1]?.split('private environment(){')[0]??'';
-  assert.match(dressing,/for\(const x of \[-3\.15,5\.72\]\)/);
+  assert.match(dressing,/for\(const x of \[-3\.15,work6Baseline\?3\.15:5\.72\]\)/);
   assert.doesNotMatch(dressing,/this\.battle\.|this\.controls\.|this\.ships\.|this\.harbourDock\./);
   assert.doesNotMatch(deck,/this\.battle\.|localStorage|fetch\(/);
   assert.match(scene,/this\.ships\.player\.root\.visible=false/);
