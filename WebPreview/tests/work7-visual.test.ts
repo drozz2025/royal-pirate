@@ -169,6 +169,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "return {viewport:[innerWidth,innerHeight],nav:rect(nav),navItems:nav?.querySelectorAll('.harbour-nav-item').length||0,"+
           "slots,chests,pack:rect(root.querySelector('.w7-captain-pack')),labels,"+
           "horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1};})()");
+        let baselineScreenshotData: string | null = null;
         if (width===384 && height===512) {
           // Reconstruct the exact initial HEAD work7 CSS by removing this PR's
           // final rules and overriding them in a temporary style. Keep app,
@@ -179,6 +180,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           const baseline = await command('Page.captureScreenshot', {
             format:'png',fromSurface:true,captureBeyondViewport:false
           });
+          baselineScreenshotData = baseline.data;
           await writeFile(join(output,'before-'+kind+'-384x512.png'),
             Buffer.from(baseline.data,'base64'));
           await evaluate("(()=>{document.getElementById('work7-css-baseline')?.remove();return true})()");
@@ -191,6 +193,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           Buffer.from(screen.data, 'base64'));
         const refUrl = 'data:image/webp;base64,'+references[kind].toString('base64');
         const liveUrl = 'data:image/png;base64,'+screen.data;
+        const beforeUrl = baselineScreenshotData ? 'data:image/png;base64,'+baselineScreenshotData : null;
         const comparison = await evaluate("(async()=>{"+
           "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
           "const [reference,live]=await Promise.all([load("+JSON.stringify(refUrl)+"),load("+JSON.stringify(liveUrl)+")]);"+
@@ -202,19 +205,27 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "ctx.drawImage(image,x+(w-rw)/2,(h-rh)/2,rw,rh)};"+
           "draw(reference,0);draw(live,w);draw(reference,w*2);"+
           "ctx.globalAlpha=.5;draw(live,w*2);ctx.globalAlpha=1;"+
-          "let mae=null;if(w===384&&h===512){"+
+          "let mae=null,maeBefore=null;if(w===384&&h===512){"+
           "const first=document.createElement('canvas'),second=document.createElement('canvas');"+
           "first.width=second.width=w;first.height=second.height=h;"+
           "first.getContext('2d').drawImage(reference,0,0);second.getContext('2d').drawImage(live,0,0);"+
           "const a=first.getContext('2d').getImageData(0,0,w,h).data,b=second.getContext('2d').getImageData(0,0,w,h).data;"+
           "let diff=0;for(let p=0;p<a.length;p+=4){diff+=Math.abs(a[p]-b[p])+Math.abs(a[p+1]-b[p+1])+Math.abs(a[p+2]-b[p+2])}"+
-          "mae=Math.round(diff/(w*h*3)*100)/100;}"+
-          "return {png:c.toDataURL('image/png').slice(22),mae,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
+          "mae=Math.round(diff/(w*h*3)*100)/100;"+
+          "const baselineUrl="+JSON.stringify(beforeUrl)+";"+
+          "if(baselineUrl){const baseline=await load(baselineUrl);"+
+          "const third=document.createElement('canvas');third.width=w;third.height=h;"+
+          "const tctx=third.getContext('2d');tctx.drawImage(baseline,0,0);"+
+          "const b0=tctx.getImageData(0,0,w,h).data;let diff0=0;"+
+          "for(let p=0;p<a.length;p+=4){diff0+=Math.abs(a[p]-b0[p])+Math.abs(a[p+1]-b0[p+1])+Math.abs(a[p+2]-b0[p+2])}"+
+          "maeBefore=Math.round(diff0/(w*h*3)*100)/100;}}"+
+          "return {png:c.toDataURL('image/png').slice(22),mae,maeBefore,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
-          maeRgb:comparison.mae,referenceSize:comparison.referenceSize,
+          maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
+          referenceSize:comparison.referenceSize,
           ...geometry});
         assert.equal(geometry.navItems,5,'The approved five-button dock must remain intact');
         assert.equal(geometry.horizontalOverflow,false,'No horizontal overflow at '+width);
