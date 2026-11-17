@@ -5016,15 +5016,13 @@
 
 
 /* WORK8 / #104 — 07 Missões: reconstruct the approved 384x512 quest engraving.
-   Authentic 07 reference has a narrow pewter edge, compact progress tracks and
-   legible reward symbols; retain existing reward layout, row and CTA widths.
+   Authentic 07 reference has a narrow pewter edge, darker paint and legible rewards; retain the exact
+   existing row grid, font metrics, spacing, size and CTA dimensions.
    Change only visual paint and the grid columns. All three real objectives,
    their values, their buttons and the seven actual chests stay interactive.
    This root class isolates this pass in same-scene Chromium A/B. */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
   :root:not(.work8-missions-quest-engraving-ab-baseline) .w8-approved-missions .w8-approved-quest {
-    grid-template-columns:39px minmax(0,1fr) 41px 59px;
-    border-width:2px;
     border-top-color:#91bfd0;
     border-right-color:#467c95;
     border-bottom-color:#345770;
@@ -5035,8 +5033,6 @@
   }
   :root:not(.work8-missions-quest-engraving-ab-baseline) .w8-approved-missions .w8-approved-quest-core>strong{
     color:#fff6e6;
-    font-size:12.5px;
-    line-height:1.03;
     text-shadow:0 1px #021324,0 0 3px #fff3d56b;
     filter:brightness(1.19);
   }
