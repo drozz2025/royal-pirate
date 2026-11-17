@@ -52,7 +52,7 @@ function paintedDeckTimber(base:string, seed:number): T.MeshStandardMaterial {
  * Decorative geometry only: aiming, damage and shots remain in Battle.
  * Never displayed in Porto, never replaces the real moving ships.
  */
-export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
+export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]; muzzles: T.Vector3[]} {
   const group = new T.Group();
   group.name = 'battle-foreground-cannons';
   const wood = paintedDeckTimber('#91522f',73);
@@ -94,6 +94,7 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
   // to read as a player's broadside in a 384x512 first-person crop. The live
   // Battle cannon ball, shot origin, recoil logic and HP are not touched.
   const flashes: T.Mesh[] = [];
+  const muzzles: T.Vector3[] = [];
   const axisUp=new T.Vector3(0,1,0);
   const axisFace=new T.Vector3(0,0,1);
   // Batch repeating, real 3D relief pieces in six InstancedMesh draw calls.
@@ -149,6 +150,7 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
     // not a 2D gun decal or another gameplay projectile.
     const breechPoint=right?new T.Vector3(6.75,1.80,81.0):new T.Vector3(x,1.90,78.6);
     const muzzlePoint=right?new T.Vector3(5.72,3.0,66.8):new T.Vector3(x,4.86,65.35);
+    muzzles.push(muzzlePoint.clone());
     const direction=muzzlePoint.clone().sub(breechPoint).normalize();
     const axisOrientation=new T.Quaternion().setFromUnitVectors(axisUp,direction);
     const rimOrientation=new T.Quaternion().setFromUnitVectors(axisFace,direction);
@@ -218,5 +220,5 @@ export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]} {
   // swell over the ships or the five functional touch controls.
   // This group is never visible in Porto.
   group.position.z=-15;
-  return {group,flashes};
+  return {group,flashes,muzzles};
 }
