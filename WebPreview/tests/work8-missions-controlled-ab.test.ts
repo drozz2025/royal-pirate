@@ -351,6 +351,62 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(titleInkCompare.metrics.quests.delta<.06&&titleInkCompare.metrics.chests.delta<.06,
       'other three quests and seven chest icons must not regress');
 
+
+    /* WORK8 #104: source-registered geometry A/B in the identical paused
+       and decoded 384x512 Chromium scene. Only mission tabs and the three
+       genuine objective rows move in paint space; the seven rewards do not. */
+    const positionClass='work8-missions-position-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(positionClass)+');true');
+    await delay(150);
+    const posBeforeLayout=await headingLayout();
+    const posBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(positionClass)+');true');
+    await delay(150);
+    const posAfterLayout=await headingLayout();
+    const posAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const posSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+posBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+posAfter))
+      .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],tabs:[12,115,372,166],questUpper:[12,155,372,264],daily:');
+    assert.notEqual(posSource,source,'native A/B must compare two genuinely captured frames');
+    const posCompare=await evalJs(posSource);
+    writeFileSync(join(evidence,'missions-position-before-384x512.png'),Buffer.from(posBefore,'base64'));
+    writeFileSync(join(evidence,'missions-position-after-384x512.png'),Buffer.from(posAfter,'base64'));
+    writeFileSync(join(evidence,'missions-position-original-render-overlay-before-384x512.png'),Buffer.from(posCompare.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-position-original-render-overlay-after-384x512.png'),Buffer.from(posCompare.overlays[1],'base64'));
+    const positionReport={
+      baseCommit:"dda438e66bb20752a55a6160ec62758eb80a0ab1",scope:'07 Missões only: source-space vertical tab/three-quest geometry',
+      source:'assets/design-approved/07-missoes.webp; native unscaled 384x512',
+      scene:'same paused/decoded Chromium document and frame; deviceScaleFactor=1',
+      roi:posCompare.metrics,unchanged:posCompare.unchanged,
+      beforeLayout:posBeforeLayout,afterLayout:posAfterLayout,approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-position-controlled-ab.json'),JSON.stringify(positionReport,null,2));
+    console.log('WORK8 native 07 position/form A/B '+JSON.stringify(positionReport.roi));
+    assert.deepEqual(posBeforeLayout.days,posAfterLayout.days,'all seven reward slots unchanged');
+    assert.deepEqual(posBeforeLayout.chests,posAfterLayout.chests,'all seven chest illustrations stay fixed');
+    assert.deepEqual(posBeforeLayout.nav,posAfterLayout.nav,'five-item dock untouched');
+    assert.equal(posAfterLayout.questCount,3,'three genuine local objectives');
+    assert.equal(posAfterLayout.dayCount,7,'seven genuine rewards');
+    assert.equal(posAfterLayout.dockCount,5,'five global dock buttons');
+    assert.ok(posAfterLayout.documentWidth<=386,'no horizontal overflow at 384');
+    assert.ok(posAfterLayout.chests.every((c:any)=>c.bottom<=posAfterLayout.nav.top+2),
+      'every chest illustration remains visible above dock');
+    assert.ok(posAfterLayout.tabs.every((b:any)=>b.top>=70&&b.bottom<=posAfterLayout.nav.top&&b.bottom-b.top>=30),
+      'three mission tab hitboxes remain usable');
+    assert.ok(posAfterLayout.questButtons.every((b:any)=>b.top>=70&&b.bottom<=posAfterLayout.nav.top&&b.bottom-b.top>=30),
+      'three mission CTA hitboxes remain usable');
+    assert.ok(posBeforeLayout.tabs.every((b:any,i:number)=>Math.abs(b.top-posAfterLayout.tabs[i].top-11)<.2),
+      'real tab hitbox registration equals eleven native pixels');
+    assert.ok(posBeforeLayout.questButtons.every((b:any,i:number)=>Math.abs(b.top-posAfterLayout.questButtons[i].top-9)<.2),
+      'real quest row registration equals nine native pixels');
+    assert.ok(posCompare.unchanged.header<.1&&posCompare.unchanged.dock<.1,
+      'unowned header and dock must be pixel-identical');
+    assert.ok(posCompare.metrics.full.delta<0&&posCompare.metrics.quests.delta<0&&posCompare.metrics.tabs.delta<0,
+      'original-frame MAE must improve globally and in tab/objective ROIs');
+    assert.ok(Math.abs(posCompare.metrics.chests.delta)<.08&&Math.abs(posCompare.metrics.daily.delta)<.25,
+      'seven rewards and daily panel must not visually regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
