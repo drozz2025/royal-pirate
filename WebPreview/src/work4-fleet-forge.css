@@ -2457,16 +2457,5 @@
     right:1.5%;
   }
 }
-/* The original 384×512 is a separate compact art-direction target, not a
-   scaled copy of the 390×844 capture. Keep the complete barrel to the LEFT
-   of the true levels panel, with the fire still exposed behind the wheel. */
-@media (min-width:360px) and (max-width:659px) and (max-height:650px) {
-  .w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {
-    left:1.6%!important;
-  }
-  .w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {
-    height:clamp(151px,31dvh,162px)!important;
-    left:2.5%!important;
-    max-width:57%!important;
-  }
-}
+/* The native 384×512 crop stays exactly as WORK0 merged it in #255.
+   Tall aspect rules above do not match the native viewport or 320×568. */
