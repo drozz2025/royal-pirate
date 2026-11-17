@@ -185,6 +185,73 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       }
       const screenshot=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
+      // WORK4 / 09h: real native Forge first-fold A/B on an IDENTICAL React
+      // frame. Temporarily restore the previous material-note placement and
+      // compact CSS, then undo both before measuring; no artificial gameplay
+      // or currency changes, no edits to any shared shell, Porto or dock.
+      let forgeMaterialsAB:any=null;
+      if(screen==='forge' && width===384 && height===512){
+        const baselineStyle=[
+          '.w4-forge #w4-forge-panel{gap:5px!important}',
+          '.w4-forge #w4-forge-panel>.w4-forge-stage{height:clamp(184px,34dvh,202px)!important;min-height:clamp(184px,34dvh,202px)!important}',
+          '.w4-forge #w4-forge-panel>.w4-materials{margin:-2px 1px 0!important;padding:5px 6px 6px!important;background:linear-gradient(160deg,#204a68,#0b2845 65%,#081f3b)!important}',
+          '.w4-forge #w4-forge-panel>.w4-materials h3{margin:0 0 4px!important;font-size:16px!important}',
+          '.w4-forge #w4-forge-panel .w4-resource-grid>div{min-height:54px!important;padding:2px 3px!important;gap:3px!important}',
+          '.w4-forge #w4-forge-panel .w4-resource-grid>div>span{height:20px!important;font-size:20px!important}',
+          '.w4-forge #w4-forge-panel .w4-resource-grid small{font-size:8px!important;line-height:1.15!important}',
+          '.w4-forge #w4-forge-panel .w4-resource-grid strong{font-size:16px!important;line-height:1.1!important}',
+          '.w4-forge #w4-forge-panel>.w4-improve-button{width:94%!important;min-height:47px!important;margin:0 auto 3px!important;font-size:18px!important}'
+        ].join('\n');
+        const geometryOfAction="(()=>{const q=s=>document.querySelector(s);const action=q('#w4-forge-panel>.w4-improve-button');const dock=q('.harbour-nav.app-dock-porto');const material=q('.w4-materials');const note=q('.w4-materials-note');const stage=q('.w4-forge-stage');if(!action||!dock||!material||!note||!stage)return null;const box=e=>{const r=e.getBoundingClientRect();return {top:r.top,bottom:r.bottom,height:r.height,width:r.width}};return {button:box(action),dock:box(dock),material:box(material),stage:box(stage),note:box(note),noteText:note.textContent,buttonText:action.textContent};})()";
+        const afterGeo=await evaluate(geometryOfAction);
+        assert.ok(afterGeo?.button && afterGeo?.dock && afterGeo?.material,
+          'real costs and actual upgrade action must remain in the DOM');
+        assert.ok(afterGeo.button.height>=44,'native upgrade action preserves 44px touch target');
+        assert.ok(afterGeo.button.bottom<=afterGeo.dock.top+2,
+          'native upgrade action must be wholly visible ABOVE the protected dock');
+        assert.ok(afterGeo.material.bottom<=afterGeo.button.top+3,
+          'real material amounts must be before the actionable upgrade');
+        assert.ok(afterGeo.noteText?.includes('Não existe inventário'),
+          'honest local-currency explanation must remain available in scroll flow');
+        assert.ok(await evaluate("(()=>{const note=document.querySelector('.w4-materials-note');const materials=document.querySelector('.w4-materials');if(!note||!materials)return false;materials.appendChild(note);return true;})()"));
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');s.id='work4-before-forge-first-fold';s.textContent="+JSON.stringify(baselineStyle)+";document.head.appendChild(s);return true;})()"));
+        await sleep(150);
+        const oldGeo=await evaluate(geometryOfAction);
+        const previousFrame=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-materials-forge-384x512.png'),
+          Buffer.from(previousFrame,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-before-forge-first-fold')?.remove();const n=document.querySelector('.w4-materials-note'),b=document.querySelector('#w4-forge-panel>.w4-improve-button');if(!n||!b)return false;b.after(n);return true;})()"));
+        await sleep(100);
+        const sample="(async()=>{"+
+          "const load=async uri=>{const i=new Image();i.src=uri;await i.decode();return i;};"+
+          "const [ref,previous,current]=await Promise.all(["+
+          "load('data:image/webp;base64,"+references.forge+"'),"+
+          "load('data:image/png;base64,"+previousFrame+"'),"+
+          "load('data:image/png;base64,"+screenshot+"')]);"+
+          "if([ref,previous,current].some(i=>i.width!==384||i.height!==512))throw Error('Forge comparison scaled');"+
+          "const pixels=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+          "const a=pixels(ref),b=pixels(previous),c=pixels(current);"+
+          "const rois={global:[0,0,384,512],materials:[16,327,375,459],action:[105,415,290,461],cannon:[100,230,160,300]};"+
+          "const mae=(x,y,r)=>{let sum=0,n=0;for(let yy=r[1];yy<r[3];yy++)for(let xx=r[0];xx<r[2];xx++){const k=(yy*384+xx)*4;for(let j=0;j<3;j++){sum+=Math.abs(x[k+j]-y[k+j]);n++;}}return sum/n;};"+
+          "const before={},after={};for(const [name,rect] of Object.entries(rois)){before[name]=mae(a,b,rect);after[name]=mae(a,c,rect);}"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
+          "g.drawImage(ref,0,0);g.drawImage(previous,384,0);g.drawImage(current,768,0);"+
+          "g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(current,1152,0);"+
+          "return {rois,before,after,image:out.toDataURL('image/png').split(',')[1]};})()";
+        const sampleResult=await evaluate(sample);
+        assert.ok(sampleResult?.after?.materials>=0 && sampleResult?.after?.action>=0,
+          'native approved-material and action ROIs must both be measured');
+        writeFileSync(join(folder,'compare-forge-materials-384x512.png'),
+          Buffer.from(sampleResult.image,'base64'));
+        delete sampleResult.image;
+        forgeMaterialsAB={...sampleResult,previousGeometry:oldGeo,newGeometry:afterGeo,
+          approved:false,sameFrame:true,sourceWidth:384,sourceHeight:512};
+        writeFileSync(join(folder,'forge-materials-ab-384x512.json'),
+          JSON.stringify(forgeMaterialsAB,null,2)+'\n');
+        console.log('WORK4_FORGE_MATERIALS_AB '+JSON.stringify(forgeMaterialsAB));
+      }
       /* Controlled water A/B at the same frame: reinstate ONLY the previous
          vertically stretched 29%-height sea, then remove that temporary CSS.
          Registration, state, approved source painting and dock stay identical. */
@@ -272,7 +339,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         console.log('WORK4_NATIVE_AB '+screen+' '+JSON.stringify({before:old,after:now}));
       }
       report.visual.push({screen,width,height,geometry,
-        before:measurement?.before||null,after:measurement?.after||null,seaAspect,antiBlue,
+        before:measurement?.before||null,after:measurement?.after||null,seaAspect,antiBlue,forgeMaterialsAB,
         approved:false,source:'approved art from original 384x512; no reference rescaling at 384'});
     }
   }
