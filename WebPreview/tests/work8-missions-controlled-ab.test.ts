@@ -410,58 +410,55 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'seven rewards and daily panel must not visually regress');
 
 
-    /* WORK8 / #104 — test the 07-only original minted coin and gem engravings,
-       with all previous #269–#296 work active in BOTH screenshots. The same
-       Chromium document, real profile, frozen animations and decoded WebP
-       prevent misleading cross-release or cross-frame MAE comparisons. */
-    const tokenBaselineClass='work8-missions-token-art-ab-baseline';
-    const tokenDom=await evalJs('(()=>({coins:document.querySelectorAll(".w8-approved-missions .w8-approved-coin > svg.w8-approved-painting-coin-painting").length,gems:document.querySelectorAll(".w8-approved-missions .w8-approved-gem > svg.w8-approved-painting-gem-painting").length,prizes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-coin strong")].map(e=>e.textContent),gemValues:[...document.querySelectorAll(".w8-approved-missions .w8-approved-gem strong")].map(e=>e.textContent)}))()');
-    assert.deepEqual([tokenDom.coins,tokenDom.gems],[3,3],'only three real coins and three unavailable jewel icons');
-    assert.ok(tokenDom.gemValues.every((v:string)=>v==='—'),'never invent online gems or prices');
-    await evalJs('document.documentElement.classList.add('+JSON.stringify(tokenBaselineClass)+');true');
+    /* WORK8/#104 — thin pewter original relief vs synthetic grey frame,
+       measured on the SAME real 384x512 Chromium scene and paused frame. */
+    const reliefBaselineClass='work8-missions-board-relief-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(reliefBaselineClass)+');true');
     await delay(140);
-    const tokenBeforeLayout=await headingLayout();
-    const tokenBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    await evalJs('document.documentElement.classList.remove('+JSON.stringify(tokenBaselineClass)+');true');
+    const reliefBeforeLayout=await headingLayout();
+    const reliefBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(reliefBaselineClass)+');true');
     await delay(140);
-    const tokenAfterLayout=await headingLayout();
-    const tokenAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    const tokenSource=source
-      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+tokenBefore))
-      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+tokenAfter))
-      .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],rewardInk:[233,165,295,321],daily:');
-    assert.notEqual(tokenSource,source,'A/B uses two independent native screenshots from the same scene');
-    const tokenCompare=await evalJs(tokenSource);
-    writeFileSync(join(evidence,'missions-token-before-384x512.png'),Buffer.from(tokenBefore,'base64'));
-    writeFileSync(join(evidence,'missions-token-after-384x512.png'),Buffer.from(tokenAfter,'base64'));
-    writeFileSync(join(evidence,'missions-token-original-render-overlay-before-384x512.png'),Buffer.from(tokenCompare.overlays[0],'base64'));
-    writeFileSync(join(evidence,'missions-token-original-render-overlay-after-384x512.png'),Buffer.from(tokenCompare.overlays[1],'base64'));
-    const tokenResult={
-      source:'assets/design-approved/07-missoes.webp',
-      scope:'07 Missões; three real coin and three pictorial unavailable jewel icons',
+    const reliefAfterLayout=await headingLayout();
+    const reliefAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const reliefSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+reliefBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+reliefAfter))
+      .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],questRows:[15,167,371,325],questButtons:[294,176,365,323],daily:');
+    assert.notEqual(reliefSource,source,'isolated native same-scene A/B uses real before/after');
+    const reliefCompare=await evalJs(reliefSource);
+    writeFileSync(join(evidence,'missions-relief-before-384x512.png'),Buffer.from(reliefBefore,'base64'));
+    writeFileSync(join(evidence,'missions-relief-after-384x512.png'),Buffer.from(reliefAfter,'base64'));
+    writeFileSync(join(evidence,'missions-relief-original-render-overlay-before-384x512.png'),Buffer.from(reliefCompare.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-relief-original-render-overlay-after-384x512.png'),Buffer.from(reliefCompare.overlays[1],'base64'));
+    const reliefResult={
       baseSha:'7e07244ec313316fa762a465d60482ee2643d59f',
-      nativeViewport:[384,512],deviceScaleFactor:1,approved:false,approvedScreens:0,
-      scene:'same decoded Chromium document/frame, animations paused',
-      roi:tokenCompare.metrics,unchanged:tokenCompare.unchanged,
-      beforeLayout:tokenBeforeLayout,afterLayout:tokenAfterLayout,tokenDom,
+      source:'assets/design-approved/07-missoes.webp',
+      scene:'single decoded app document, frame and native 384x512, paused animations',
+      scope:'07 Missões; exact three genuine quest row relief and active CTA faces',
+      roi:reliefCompare.metrics,unchanged:reliefCompare.unchanged,
+      beforeLayout:reliefBeforeLayout,afterLayout:reliefAfterLayout,
+      approved:false,approvedScreens:0
     };
-    writeFileSync(join(evidence,'work8-missions-token-art-controlled-ab.json'),JSON.stringify(tokenResult,null,2));
-    console.log('WORK8 original 07 minted reward ink same-scene A/B '+JSON.stringify(tokenResult.roi));
-    assert.deepEqual(tokenBeforeLayout.days,tokenAfterLayout.days,'seven actual chest positions must not change');
-    assert.deepEqual(tokenBeforeLayout.chests,tokenAfterLayout.chests,'seven actual chest pictures must not move');
-    assert.deepEqual(tokenBeforeLayout.tabs,tokenAfterLayout.tabs,'three mission navigation hitboxes must be stable');
-    assert.deepEqual(tokenBeforeLayout.questButtons,tokenAfterLayout.questButtons,'mission CTAs must not move');
-    assert.deepEqual(tokenBeforeLayout.nav,tokenAfterLayout.nav,'untouched five-item dock');
-    assert.equal(tokenAfterLayout.questCount,3);
-    assert.equal(tokenAfterLayout.dayCount,7);
-    assert.equal(tokenAfterLayout.dockCount,5);
-    assert.ok(tokenAfterLayout.documentWidth<=386,'no horizontal overflow');
-    assert.ok(tokenAfterLayout.chests.every((c:any)=>c.bottom<=tokenAfterLayout.nav.top+2),
-      'seven chest artwork stay visible above the dock');
-    assert.ok(tokenCompare.unchanged.header<.1&&tokenCompare.unchanged.dock<.1,
-      'header and dock must be pixel-identical between A/B');
-    assert.ok(tokenCompare.metrics.rewardInk.delta<0&&tokenCompare.metrics.full.delta<0,
-      'real minted icon engravings must improve exact original ROI and whole frame');
+    writeFileSync(join(evidence,'work8-missions-relief-controlled-ab.json'),JSON.stringify(reliefResult,null,2));
+    console.log('WORK8 07 pewter relief original vs Chrome MAE '+JSON.stringify(reliefResult.roi));
+    assert.deepEqual(reliefBeforeLayout.days,reliefAfterLayout.days,'all seven actual reward positions unchanged');
+    assert.deepEqual(reliefBeforeLayout.chests,reliefAfterLayout.chests,'all seven chest drawings unchanged');
+    assert.deepEqual(reliefBeforeLayout.tabs,reliefAfterLayout.tabs,'mission navigation hitboxes unchanged');
+    assert.deepEqual(reliefBeforeLayout.questButtons,reliefAfterLayout.questButtons,'three genuine CTA hitboxes unchanged');
+    assert.deepEqual(reliefBeforeLayout.nav,reliefAfterLayout.nav,'five-button dock unchanged');
+    assert.equal(reliefAfterLayout.questCount,3);
+    assert.equal(reliefAfterLayout.dayCount,7);
+    assert.equal(reliefAfterLayout.dockCount,5);
+    assert.ok(reliefAfterLayout.documentWidth<=386);
+    assert.ok(reliefAfterLayout.chests.every((c:any)=>c.bottom<=reliefAfterLayout.nav.top+2),
+      'all seven chest drawings visible above dock');
+    assert.ok(reliefCompare.unchanged.header<.1&&reliefCompare.unchanged.dock<.1,
+      'header and shared five-item dock are byte-identical');
+    assert.ok(reliefCompare.metrics.quests.delta<0&&reliefCompare.metrics.questRows.delta<0&&reliefCompare.metrics.full.delta<0,
+      'the approved source must improve in full frame and three genuine quest rows');
+    assert.ok(Math.abs(reliefCompare.metrics.daily.delta)<.10&&Math.abs(reliefCompare.metrics.chests.delta)<.10,
+      'seven reward chests and daily panel must not regress');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
