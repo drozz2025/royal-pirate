@@ -3811,3 +3811,23 @@
     margin-left:-3px;
   }
 }
+
+/* WORK7 / #104 — 17 Nov 05:21: native 384x512 pictorial ROI pass.
+ * Feature matching against unscaled approved 06 showed the chest crops were
+ * oversized inside their already-aligned frames (rare/epic ~13%; pack ~6%).
+ * Reframe original art only; no screenshot backgrounds, new effects or state.
+ * 320px stays EXACTLY as merged #263. approved:false until human review. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    transform:translate(-4px,7px) scale(1.01);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{
+    transform:translate(-2px,0) scale(.88);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
+    transform:translate(4px,0) scale(.9);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+    transform:translate(4px,4px) scale(1.02);
+  }
+}
