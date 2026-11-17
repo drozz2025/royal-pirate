@@ -4673,3 +4673,20 @@
  .w8-approved-missions .w8-approved-days li{scroll-snap-align:start}
  .w8-approved-ranking .w8-approved-empty-rank strong{letter-spacing:0}
 }
+
+
+/* Same native viewport, composition-only correction: the approved source
+   places the ornamental heading/tabs ~14px higher than the current render.
+   Preserve every quest and rank row's existing height; no dock changes. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px){
+  .w8-screen.w8-approved.w8-approved-missions,
+  .w8-screen.w8-approved.w8-approved-ranking{
+    margin-top:-40px;
+  }
+  .w8-approved-ranking .w8-approved-captain{
+    grid-template-columns:64px minmax(0,1fr) 50px;
+  }
+  .w8-approved-ranking .w8-approved-avatar{
+    width:62px;height:64px;
+  }
+}
