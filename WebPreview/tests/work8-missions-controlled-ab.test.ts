@@ -85,6 +85,12 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(decoded>=8,'title, three quest illustrations and four source chest crops must have loaded');
     await delay(340); // allow SVG image paint following source decode
     await evalJs('(()=>{document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
+    /* Previous immutable WORK8 A/B gates compare their own historical art.
+       Keep the newly proposed coast treatment disabled for those gates;
+       enable it only for the independent coastal A/B near the end. This
+       preserves the exact original v0.1.75 baselines without relaxing
+       their MAE or pixel-stability requirements. */
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
