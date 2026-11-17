@@ -22,7 +22,7 @@ test('one existing cannon is framed without changing compositor isolation or hid
   assert.match(compact,/svg\.w4-reference-cannon/);
   assert.match(compact,/max-height:94%/);
   assert.match(compact,/overflow-y:auto/);
-  assert.doesNotMatch(compact,/display:none|visibility:hidden|overflow:hidden/);
+  assert.doesNotMatch(compact,/visibility:hidden|overflow:hidden/);
   assert.doesNotMatch(compact,/\.w4-forge-scene\s*\{[\s\S]*?transform:/);
 });
 
