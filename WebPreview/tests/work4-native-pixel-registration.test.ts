@@ -187,6 +187,86 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
 
 
+      // WORK4/#104: remove only the TWO additive SVG glows over the already
+      // source-lit cannon and furnace. Compare the same Chromium React frame,
+      // same CSS except for opacity=1 versus opacity=0, native WebP 384x512.
+      if(screen==='forge' && width===384 && height===512){
+        const nativeLightSelector='.w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon > ellipse';
+        const lightGeometry="(()=>{const box=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null;};"+
+          "return {cannon:box('.w4-reference-cannon'),furnace:box('.w4-forge-scene'),"+
+          "costs:box('.w4-resource-grid'),button:box('.w4-improve-button'),"+
+          "dock:box('.harbour-nav.app-dock-porto'),"+
+          "lights:document.querySelectorAll("+JSON.stringify(nativeLightSelector)+").length,"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "costCount:document.querySelectorAll('.w4-resource-grid>div').length};})()";
+        const nowGeometry=await evaluate(lightGeometry);
+        assert.equal(nowGeometry.lights,2,'exactly the two duplicate local SVG light ellipses');
+        assert.equal(nowGeometry.costCount,3,'no invented or missing cost tiles');
+        assert.equal(nowGeometry.nav,5,'five protected menu items remain');
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
+          "s.id='work4-restore-double-light';s.textContent="+
+          JSON.stringify(nativeLightSelector+'{opacity:1!important}')+
+          ";document.head.appendChild(s);return true;})()"));
+        await sleep(140);
+        const oldGeometry=await evaluate(lightGeometry);
+        assert.deepEqual(nowGeometry,oldGeometry,
+          'cannon, furnace, cost board, action, dock bounds unchanged by lighting');
+        const previousLight=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-double-light-forge-384x512.png'),
+          Buffer.from(previousLight,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-restore-double-light')?.remove();return true;})()"));
+        await sleep(140);
+        const cleanLight=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'render-single-light-forge-384x512.png'),
+          Buffer.from(cleanLight,'base64'));
+        const evaluateLight="(async()=>{"+
+          "const load=async u=>{const i=new Image();i.src=u;await i.decode();return i;};"+
+          "const [ref,bef,aft]=await Promise.all(["+
+          "load('data:image/webp;base64,"+references.forge+"'),"+
+          "load('data:image/png;base64,"+previousLight+"'),"+
+          "load('data:image/png;base64,"+cleanLight+"')]);"+
+          "if([ref,bef,aft].some(i=>i.width!==384||i.height!==512))throw Error('native 384x512 exact comparison required');"+
+          "const px=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
+          "const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+          "const a=px(ref),b=px(bef),c=px(aft);"+
+          "const rois={global:[0,0,384,512],cannon:[30,230,166,309],"+
+          "furnace:[116,225,171,302],ironCore:[35,251,140,290],"+
+          "costs:[16,320,369,378],dock:[0,430,384,512]};"+
+          "const mae=(x,y,r)=>{let sum=0,count=0;for(let yy=r[1];yy<r[3];yy++)for(let xx=r[0];xx<r[2];xx++){"+
+          "const k=(yy*384+xx)*4;for(let j=0;j<3;j++){sum+=Math.abs(x[k+j]-y[k+j]);count++;}}return sum/count;};"+
+          "const before={},after={};for(const [name,r] of Object.entries(rois)){before[name]=mae(a,b,r);after[name]=mae(a,c,r);}"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
+          "g.drawImage(ref,0,0);g.drawImage(bef,384,0);g.drawImage(aft,768,0);"+
+          "g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(aft,1152,0);"+
+          "return {before,after,rois,compare:out.toDataURL('image/png').split(',')[1]};})()";
+        const sample=await evaluate(evaluateLight);
+        assert.ok(sample?.before?.cannon>=0&&sample?.after?.cannon>=0,
+          'real approved cannon ROI must be sampled before and after');
+        writeFileSync(join(folder,'compare-source-light-forge-384x512.png'),
+          Buffer.from(sample.compare,'base64'));
+        delete sample.compare;
+        const measured={...sample,oldGeometry,nowGeometry,sameFrame:true,
+          original:'assets/design-approved/04-melhorias-forja.webp',
+          viewport:'384x512',approved:false};
+        writeFileSync(join(folder,'forge-source-light-controlled-ab.json'),
+          JSON.stringify(measured,null,2)+'\n');
+        console.log('WORK4_NATIVE_FORGE_LIGHT_AB '+JSON.stringify(measured));
+        assert.ok(sample.after.cannon<=sample.before.cannon+0.03,
+          'removing duplicate cannon lighting cannot regress actual cannon ROI');
+        assert.ok(sample.after.furnace<=sample.before.furnace+0.03,
+          'removing extra light must not hide or regress furnace ROI');
+        assert.ok(sample.after.global<=sample.before.global+0.02,
+          'no full-frame visual regression after the light cleanup');
+        for(const key of ['costs','dock'] as const){
+          assert.ok(Math.abs(sample.after[key]-sample.before[key])<0.02,
+            'source light cleanup must preserve protected '+key+' pixels');
+        }
+      }
+
       // WORK4/#104 — Forge 04: one real plaque over the approved right inset.
       // A/B must be native, within this SAME paused React/Chromium frame:
       // ORIGINAL | MERGED HEAD (43%) | RENDER (53%) | OVERLAY.
@@ -997,4 +1077,10 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
   }
   writeFileSync(join(folder,'work4-pixel-registration.json'),JSON.stringify(report,null,2)+'\n');
   assert.equal(report.visual.length,8,'four Chromium viewports for both Work4 screens');
+});
+
+test('WORK4 native Forge avoids painting a second furnace glow onto approved source',()=>{
+  assert.ok(css.includes('native Forge 04: eliminate a duplicate glow'));
+  assert.match(css, /@media \(width:384px\) and \(height:512px\)[\s\S]*?svg\.w4-cannon-art\.w4-reference-cannon > ellipse \{\s*opacity:0;/);
+  assert.doesNotMatch(css.split('native Forge 04: eliminate a duplicate glow')[1], /\.app-|\.harbour-nav|\.w4-resource-grid/);
 });

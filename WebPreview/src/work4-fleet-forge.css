@@ -2826,3 +2826,16 @@
     box-shadow:inset 0 1px #f6ddb06b,0 3px 7px #06101a9c;
   }
 }
+
+/* WORK4/#104 — native Forge 04: eliminate a duplicate glow over approved-source pixels.
+   The approved 04 WebP already depicts the lit furnace and iron barrel.
+   Two extra SVG ellipses in ApprovedForgePainting add light a SECOND time.
+   At exact 384x512 remove only that redundant light, preserving the single
+   cannon bitmap, furnace, genuine price cells, panel, menu and hit targets.
+   Other responsive viewports retain their established lighting unchanged.
+   Reversible against the old opacity=1 in one paused Chromium frame. */
+@media (width:384px) and (height:512px) {
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon > ellipse {
+    opacity:0;
+  }
+}
