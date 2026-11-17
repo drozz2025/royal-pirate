@@ -460,6 +460,59 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(Math.abs(reliefCompare.metrics.daily.delta)<.10&&Math.abs(reliefCompare.metrics.chests.delta)<.10,
       'seven reward chests and daily panel must not regress');
 
+
+    /* WORK8 07 — newest HEAD v0.1.67: inactive tab paint only.
+       Capture a controlled A/B in the SAME decoded 384x512 Chromium scene,
+       identical animation frame and live mission state; reference unscaled. */
+    const tabInkFlag='work8-missions-tab-ink-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(tabInkFlag)+');true');
+    await delay(140);
+    const tabBeforeLayout=await headingLayout();
+    const tabBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(tabInkFlag)+');true');
+    await delay(140);
+    const tabAfterLayout=await headingLayout();
+    const tabAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const tabSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+tabBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+tabAfter))
+      .replace('const regions={full:[0,0,384,512],quests:',
+        'const regions={full:[0,0,384,512],tabInk:[134,132,370,163],quests:');
+    assert.notEqual(tabSource,source,'independent real tab captures mandatory');
+    const tabCompare=await evalJs(tabSource);
+    writeFileSync(join(evidence,'missions-tab-ink-before-384x512.png'),Buffer.from(tabBefore,'base64'));
+    writeFileSync(join(evidence,'missions-tab-ink-after-384x512.png'),Buffer.from(tabAfter,'base64'));
+    writeFileSync(join(evidence,'missions-tab-ink-original-render-overlay-before-384x512.png'),Buffer.from(tabCompare.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-tab-ink-original-render-overlay-after-384x512.png'),Buffer.from(tabCompare.overlays[1],'base64'));
+    const tabResult={
+      baseSha:'588c858a48379e2fd39ee380d2da62512dadd79f',
+      scope:'07 Missões only; 2 inactive navy enamel tabs',
+      source:'assets/design-approved/07-missoes.webp; native unscaled 384x512',
+      scene:'same actual paused Chromium frame, exact original decoded artwork',
+      baselineClass:tabInkFlag,roi:tabCompare.metrics,unchanged:tabCompare.unchanged,
+      beforeLayout:tabBeforeLayout,afterLayout:tabAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-tab-ink-controlled-ab.json'),JSON.stringify(tabResult,null,2));
+    console.log('WORK8 native 07 tab ink original/Chromium A/B '+JSON.stringify(tabResult.roi));
+    assert.deepEqual(tabBeforeLayout.tabs,tabAfterLayout.tabs,'all three mission tab hitboxes fixed');
+    assert.deepEqual(tabBeforeLayout.questButtons,tabAfterLayout.questButtons,'genuine mission CTA hitboxes fixed');
+    assert.deepEqual(tabBeforeLayout.days,tabAfterLayout.days,'all seven reward slots fixed');
+    assert.deepEqual(tabBeforeLayout.chests,tabAfterLayout.chests,'all seven real illustrations fixed');
+    assert.deepEqual(tabBeforeLayout.nav,tabAfterLayout.nav,'five-button shared dock fixed');
+    assert.equal(tabAfterLayout.questCount,3);
+    assert.equal(tabAfterLayout.dayCount,7);
+    assert.equal(tabAfterLayout.dockCount,5);
+    assert.ok(tabAfterLayout.documentWidth<=386);
+    assert.ok(tabAfterLayout.chests.every((c:any)=>c.bottom<=tabAfterLayout.nav.top+2),
+      'all seven chest paintings must remain above the dock');
+    assert.ok(tabCompare.unchanged.header<.1&&tabCompare.unchanged.dock<.1,
+      'owned Missions paint must not touch global header or dock');
+    assert.ok(tabCompare.metrics.tabInk.delta<-.5 && tabCompare.metrics.full.delta<-.02,
+      'only retain measured improvements against real unscaled original');
+    assert.ok(tabCompare.metrics.daily.delta<.05 && tabCompare.metrics.chests.delta<.05,
+      'reward board and seven chests must remain pixel-stable');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
