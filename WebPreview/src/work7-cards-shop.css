@@ -4083,9 +4083,7 @@
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.71)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.62)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.71)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.70)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.71)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.59)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.68)}
   /* Brighten genuine unavailable labels inside the darker carved frames. */
   .w7-screen[data-work7-screen="shop"] .w7-chest-status{filter:brightness(1.12)}
 }
