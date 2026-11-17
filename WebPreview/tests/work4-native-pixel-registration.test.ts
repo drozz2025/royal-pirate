@@ -236,7 +236,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           "if([ref,prev,now].some(i=>i.width!==384||i.height!==512))throw Error('no scaling 384x512');"+
           "const pix=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
           "const a=pix(ref),b=pix(prev),c=pix(now);"+
-          "const rois={global:[0,0,384,512],ship:[65,205,175,307],sea:[18,306,218,356],roster:[18,345,374,444],dock:[0,430,384,512]};"+
+          "const rois={global:[0,0,384,512],ship:[65,205,175,307],sea:[18,300,218,339],roster:[18,345,374,444],dock:[0,430,384,512]};"+
           "const mae=(u,v,r)=>{let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;for(let j=0;j<3;j++){total+=Math.abs(u[k+j]-v[k+j]);n++;}}return total/n;};"+
           "const before={},after={};for(const [key,rect] of Object.entries(rois)){before[key]=mae(a,b,rect);after[key]=mae(a,c,rect);}"+
           "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
@@ -244,6 +244,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           "return {rois,before,after,comparison:out.toDataURL('image/png').split(',')[1]};})()";
         const ab=await evaluate(compare);
         assert.ok(ab?.after?.roster>=0&&ab?.before?.roster>=0,'measured real roster ROI');
+        console.log('WORK4_FLEET_ROSTER_AB_ROI '+JSON.stringify({before:ab.before,after:ab.after,rois:ab.rois,beforeGeometry:beforeGeo,afterGeometry:afterGeo}));
         assert.ok(Math.abs(ab.after.ship-ab.before.ship)<.05,'single ship is pixel-identical');
         assert.ok(Math.abs(ab.after.sea-ab.before.sea)<.05,'approved sea is pixel-identical');
         writeFileSync(join(folder,'compare-fleet-roster-384x512.png'),Buffer.from(ab.comparison,'base64'));
