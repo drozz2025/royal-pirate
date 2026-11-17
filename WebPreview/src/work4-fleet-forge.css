@@ -2459,3 +2459,66 @@
 }
 /* The native 384×512 crop stays exactly as WORK0 merged it in #255.
    Tall aspect rules above do not match the native viewport or 320×568. */
+
+/* WORK4 / #104 — natural approved water bridge and native-size artwork.
+   The lower sea reuses ONLY approved 03 water pixels; there is still one
+   Royal Crown and one cannon. All real statistics/costs remain foreground
+   controls. Do not alter WORK0 compositor containment, Porto or dock. */
+.w4-fleet .w4-harbour-stage > svg.w4-reference-sea {
+  position:absolute;
+  inset:auto 0 0 0;
+  display:block;
+  z-index:0;
+  width:100%;
+  height:29%;
+  pointer-events:none;
+  opacity:.94;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 34%,#000 100%);
+  mask-image:linear-gradient(to bottom,transparent 0%,#000 34%,#000 100%);
+}
+/* Procedural stripes were a second, visibly synthetic sea. The approved
+   painted water now bridges the ship's lower edge. */
+.w4-fleet .w4-harbour-stage::after {background:none;}
+/* Organic boundary rather than an abrupt rectangular photographic island.
+   Keep the central gunports, dark bow, yards and sails opaque. */
+.w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {
+  -webkit-mask-image:
+    radial-gradient(ellipse 75% 105% at 30% 50%,#000 0%,#000 75%,transparent 99%),
+    linear-gradient(to bottom,transparent 0%,#000 7%,#000 88%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:
+    radial-gradient(ellipse 75% 105% at 30% 50%,#000 0%,#000 75%,transparent 99%),
+    linear-gradient(to bottom,transparent 0%,#000 7%,#000 88%,transparent 100%);
+  mask-composite:intersect;
+}
+.w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {
+  -webkit-mask-image:
+    radial-gradient(ellipse 106% 105% at 37% 49%,#000 0%,#000 69%,transparent 99%),
+    linear-gradient(to bottom,#000 0%,#000 91%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:
+    radial-gradient(ellipse 106% 105% at 37% 49%,#000 0%,#000 69%,transparent 99%),
+    linear-gradient(to bottom,#000 0%,#000 91%,transparent 100%);
+  mask-composite:intersect;
+}
+/* Exact native 384×512 view: one source pixel per art pixel. Match the
+   original source y146 artwork rather than centring a scaled rectangle.
+   Taller 390/430 and narrow 320 still use the merged responsive framing. */
+@media (min-width:360px) and (max-width:399px) and (max-height:650px) {
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {
+    height:194px!important;
+    max-width:68%!important;
+    left:0!important;
+    top:11px!important;
+    bottom:auto!important;
+    margin:0!important;
+  }
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {
+    height:161px!important;
+    max-width:59%!important;
+    left:-7px!important;
+    top:5px!important;
+    bottom:auto!important;
+    margin:0!important;
+  }
+}

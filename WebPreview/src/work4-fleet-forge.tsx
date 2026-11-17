@@ -1209,6 +1209,21 @@ function ForgeCannonArtwork(){
  * These replace, not duplicate, the live stage's original ship and cannon.
  * The four roster thumbnails and all working upgrade controls remain live.
  */
+/**
+ * Source-authentic water only: pixels x24..237/y319..338 of approved 03.
+ * This crop contains neither another vessel nor the reference's dummy HUD.
+ * It bridges the water under the ONE existing Royal Crown picture.
+ */
+function ApprovedFleetSea(){
+  return <svg className="w4-reference-sea" viewBox="24 308 213 31"
+    data-work4-sea="approved-water-only" preserveAspectRatio="none"
+    aria-hidden="true" focusable="false">
+    <image x="0" y="0" width="384" height="512"
+      href={new URL('../../assets/design-approved/03-frota.webp', import.meta.url).href}
+      preserveAspectRatio="none"/>
+  </svg>;
+}
+
 function ApprovedFleetPainting(){
   return <svg className="w4-ship-art w4-reference-ship" viewBox="18 146 223 194"
     data-work4-crop="fleet" role="img"
@@ -1225,6 +1240,23 @@ function ApprovedForgePainting(){
     <image x="0" y="0" width="384" height="512"
       href={new URL('../../assets/design-approved/04-melhorias-forja.webp', import.meta.url).href}
       preserveAspectRatio="none"/>
+    {/* Furnace light and a small warm iron reflection live on the same approved
+        painting. Not a second cannon, backdrop screenshot or economy UI. */}
+    <defs>
+      <radialGradient id="w4-approved-hearth-20261117" gradientUnits="userSpaceOnUse"
+        cx="161" cy="245" r="45">
+        <stop stopColor="#ffe1a0" stopOpacity=".33"/>
+        <stop offset=".42" stopColor="#ff8135" stopOpacity=".13"/>
+        <stop offset="1" stopColor="#ff812e" stopOpacity="0"/>
+      </radialGradient>
+      <radialGradient id="w4-approved-iron-20261117" gradientUnits="userSpaceOnUse"
+        cx="106" cy="274" r="36">
+        <stop stopColor="#e4a46a" stopOpacity=".19"/>
+        <stop offset="1" stopColor="#e4a46a" stopOpacity="0"/>
+      </radialGradient>
+    </defs>
+    <ellipse cx="158" cy="245" rx="41" ry="48" fill="url(#w4-approved-hearth-20261117)" pointerEvents="none"/>
+    <ellipse cx="105" cy="273" rx="37" ry="20" fill="url(#w4-approved-iron-20261117)" pointerEvents="none"/>
   </svg>;
 }
 
@@ -1248,6 +1280,7 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
         <div className="w4-island w4-island-left" aria-hidden="true"/>
         <div className="w4-island w4-island-right" aria-hidden="true"/>
         <TropicalBackdrop/>
+        <ApprovedFleetSea/>
         <ApprovedFleetPainting/>
         <div className="w4-stage-label"><span>★ NAVIO REAL</span><strong>ROYAL CROWN</strong>
           <small>1 navio disponível · Capitão {captain}</small>

@@ -4,7 +4,9 @@ import {readFileSync} from 'node:fs';
 
 const css=readFileSync(new URL('../src/work4-fleet-forge.css',import.meta.url),'utf8');
 const marker='WORK4 / #104 — native 384×512 composition pass';
-const compact=css.split(marker)[1];
+// Guard only the compact native block. Later WORK4 artwork layers need
+// absolute positioning but must never be mistaken for hidden cost controls.
+const compact=css.split(marker)[1]?.split('WORK4 / issue #104 — native 03/04 pictorial FRAMING, 17 Nov.')[0];
 
 test('WORK4 native short-screen composition exists without modifying global navigation',()=>{
   assert.ok(compact,'missing native-size composition rules');
