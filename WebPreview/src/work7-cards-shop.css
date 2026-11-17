@@ -3679,10 +3679,10 @@
  * This heading stays legible at 14px and is not part of the shared shell. */
 @media (min-width:355px) and (max-width:430px) and (max-height:560px){
   .w7-screen[data-work7-screen="shop"] .w7-content{
-    gap:0;
+    gap:3px;
   }
   .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
-    min-height:14px;
+    min-height:18px;
     padding:0 2px;
     margin:0;
     line-height:1;
