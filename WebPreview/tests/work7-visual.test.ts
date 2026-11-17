@@ -61,6 +61,15 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
         width:auto!important;margin-left:0!important;
       }
+    }
+    /* Same-scene HEAD baseline for this PR at native 384x512. */
+    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+        transform:translate(-2px,5px) scale(1.07)!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+        transform:none!important;
+      }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
@@ -234,7 +243,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "ctx.drawImage(image,x+(w-rw)/2,(h-rh)/2,rw,rh)};"+
           "draw(reference,0);draw(live,w);draw(reference,w*2);"+
           "ctx.globalAlpha=.5;draw(live,w*2);ctx.globalAlpha=1;"+
-          "let mae=null,maeBefore=null;if(w===384&&h===512){"+
+          "let mae=null,maeBefore=null,roiBefore=null,roiAfter=null;if(w===384&&h===512){"+
           "const first=document.createElement('canvas'),second=document.createElement('canvas');"+
           "first.width=second.width=w;first.height=second.height=h;"+
           "first.getContext('2d').drawImage(reference,0,0);second.getContext('2d').drawImage(live,0,0);"+
@@ -247,13 +256,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "const tctx=third.getContext('2d');tctx.drawImage(baseline,0,0);"+
           "const b0=tctx.getImageData(0,0,w,h).data;let diff0=0;"+
           "for(let p=0;p<a.length;p+=4){diff0+=Math.abs(a[p]-b0[p])+Math.abs(a[p+1]-b0[p+1])+Math.abs(a[p+2]-b0[p+2])}"+
-          "maeBefore=Math.round(diff0/(w*h*3)*100)/100;}}"+
-          "return {png:c.toDataURL('image/png').slice(22),mae,maeBefore,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
+          "maeBefore=Math.round(diff0/(w*h*3)*100)/100;"+
+"const patches="+JSON.stringify(kind==='shop'?[[18,175,173,309],[18,329,365,427]]:[[18,195,365,428]])+";"+
+"let sumA=0,sumB=0,pixels=0;for(const [x0,y0,x1,y1] of patches){for(let y=y0;y<y1;y++){for(let x=x0;x<x1;x++){const p=(y*w+x)*4;for(let k=0;k<3;k++){sumA+=Math.abs(a[p+k]-b0[p+k]);sumB+=Math.abs(a[p+k]-b[p+k]);pixels++}}}}"+
+"roiBefore=Math.round(sumA/pixels*100)/100;roiAfter=Math.round(sumB/pixels*100)/100;}}"+
+          "return {png:c.toDataURL('image/png').slice(22),mae,maeBefore,roiBefore,roiAfter,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
+          roiMaeBefore:comparison.roiBefore,roiMaeAfter:comparison.roiAfter,
           referenceSize:comparison.referenceSize,
           baselineGeometry,
           ...geometry});
@@ -275,6 +288,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
             'Compact 320px local gutters must raise all 3 chest availability plaques by at least 5px');
         }
         if(width===384 && height===512) {
+          assert.ok(Number.isFinite(comparison.roiBefore)&&Number.isFinite(comparison.roiAfter),'Real native 384 ROI metrics recorded');
+          if(kind==='shop') assert.ok(comparison.roiAfter<comparison.roiBefore,'Native approved chest ROI must improve vs same-frame HEAD');
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y+1),
             'All true PRÉVIA / EM BREVE labels must stay above the dock at native size');
           assert.ok(baselineGeometry,'HEAD baseline boxes must be recorded, not inferred');
