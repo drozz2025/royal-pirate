@@ -141,22 +141,26 @@ async function verifyCausalIsolation(
   return report;
 }
 
-test('WORK6: controlled genuine Chromium 384x512 A/B with fixed wave and camera', {timeout:100000},async t=>{
+test('WORK6: controlled genuine Chromium 384x512 A/B with fixed wave and camera', {timeout:180000},async t=>{
   const chrome=process.env.CHROME_BIN||findBinary('google-chrome')||findBinary('chromium');
   if(!chrome){if(process.env.CI)throw Error('Chrome required in CI');t.skip('No Chromium locally');return;}
   const profile=mkdtempSync(join(tmpdir(),'royal-work6-ab-'));
   const p=await port();
   const vite=spawn(process.execPath,['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port',String(p),'--strictPort'],{cwd:process.cwd(),stdio:'ignore'});
-  const browser=spawn(chrome,['--headless=new','--no-sandbox','--disable-dev-shm-usage',
-    '--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader',
-    '--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+  // In the full test suite multiple Chromium jobs run concurrently. Do not
+  // start Chrome until Vite is actually ready; otherwise GitHub's small CI
+  // runner can starve the DevToolsActivePort startup for over 14 seconds.
+  let browser:ReturnType<typeof spawn>|undefined;
   let socket:WebSocket|undefined;
   try{
-    await until(async()=>{const r=await fetch('http://127.0.0.1:'+p+'/');return r.ok?true:undefined;},20000);
+    await until(async()=>{const r=await fetch('http://127.0.0.1:'+p+'/');return r.ok?true:undefined;},35000);
+    browser=spawn(chrome,['--headless=new','--no-sandbox','--disable-dev-shm-usage',
+      '--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader',
+      '--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
     const chromePort=await until(async()=>{
       try{const value=+readFileSync(join(profile,'DevToolsActivePort'),'utf8').split('\n')[0];return value||undefined;}
       catch{return undefined;}
-    });
+    },45000);
     const tabs=await (await fetch('http://127.0.0.1:'+chromePort+'/json/list')).json() as any[];
     const tab=tabs.find(x=>x.type==='page');assert.ok(tab?.webSocketDebuggerUrl);
     socket=new WebSocket(tab.webSocketDebuggerUrl);
@@ -192,7 +196,7 @@ test('WORK6: controlled genuine Chromium 384x512 A/B with fixed wave and camera'
     assert.ok(delta.left_cannon<0.5,'port cannon must not regress');
     assert.ok(delta.global<-0.02,'global reference MAE must improve before merge');
   }finally{
-    socket?.close();vite.kill('SIGTERM');browser.kill('SIGTERM');
+    socket?.close();vite.kill('SIGTERM');browser?.kill('SIGTERM');
     await sleep(600);try{rmSync(profile,{force:true,recursive:true,maxRetries:5,retryDelay:80});}catch{}
   }
 });
