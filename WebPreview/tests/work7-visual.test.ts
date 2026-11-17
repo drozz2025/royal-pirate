@@ -37,17 +37,29 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  const marker = '/* WORK7 / #104 — native 05/06 composition: pack silhouette + 320px framing, 17 Nov 04h. */';
+  const marker = '/* WORK7 / #104 — true 320px 05/06 artwork framing, 17 Nov 04h.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  // Undo solely this PR while keeping every merged HEAD change (#190–#252).
+  // Undo solely this PR's 320px local gutters, retaining merged #257.
   // The same Chromium session, true 384x512 viewport and real assets measure
   // before/after, rather than comparing against a stale old PR.
   const cssBaseline = `
-    /* Restore the exact already-merged #257 transform at 384x512:
-       comparison must isolate THIS PR, not incorrectly undo #257. */
-    @media (min-width:355px) and (max-width:430px){
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        transform:translate(-2px,5px) scale(1.07)!important;
+    /* Restore solely the 320px properties of merged HEAD before this PR.
+       Native 384x512 remains visually identical; all #257 CSS is retained. */
+    @media (max-width:354px){
+      .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+        width:auto!important;margin-left:0!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-content{
+        gap:5px!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+        min-height:156px!important;padding-block:6px!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+        min-height:22px!important;margin:0!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+        width:auto!important;margin-left:0!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -181,7 +193,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1};})()");
         let baselineScreenshotData: string | null = null;
         let baselineGeometry: any = null;
-        if (width===384 && height===512) {
+        if ((width===384 && height===512)||(width===320 && height===568)) {
           // Temporarily undo only this PR's four CSS properties via precise
           // overrides. Keep HEAD assets, state, earlier visual passes, browser
           // viewport and font rendering identical before/after.
@@ -193,12 +205,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           baselineGeometry = await evaluate("(()=>{"+
             "const rect=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {x:Math.round(r.x),y:Math.round(r.y),width:Math.round(r.width),height:Math.round(r.height),bottom:Math.round(r.bottom)}};"+
             "const root=document.querySelector('[data-work7-screen=\""+kind+"\"]');"+
-            "return {slots:[...root.querySelectorAll('.w7-approved-slot')].map(rect),chests:[...root.querySelectorAll('.w7-chest')].map(rect),pack:rect(root.querySelector('.w7-captain-pack')),packArt:rect(root.querySelector('.w7-captain-pack-art .w7-approved-crop'))};})()");
+            "return {slots:[...root.querySelectorAll('.w7-approved-slot')].map(rect),chests:[...root.querySelectorAll('.w7-chest')].map(rect),pack:rect(root.querySelector('.w7-captain-pack')),packArt:rect(root.querySelector('.w7-captain-pack-art .w7-approved-crop')),labels:[...root.querySelectorAll('.w7-approved-slot small,.w7-chest-status')].map(rect)};})()");
           const baseline = await command('Page.captureScreenshot', {
             format:'png',fromSurface:true,captureBeyondViewport:false
           });
           baselineScreenshotData = baseline.data;
-          await writeFile(join(output,'before-'+kind+'-384x512.png'),
+          await writeFile(join(output,'before-'+kind+'-'+width+'x'+height+'.png'),
             Buffer.from(baseline.data,'base64'));
           await evaluate("(()=>{document.getElementById('work7-css-baseline')?.remove();return true})()");
           await sleep(200);
@@ -256,6 +268,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         if(width===320 && kind==='shop') {
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y-8),
             'All three real chest availability labels need at least 8px clear above the 320px dock');
+          assert.ok(baselineGeometry && baselineGeometry.labels.length===3,
+            'Measure the genuine prior HEAD chest labels at the same 320x568 viewport');
+          assert.ok(Math.max(...geometry.labels.map((label:any)=>label.bottom))
+                <=Math.max(...baselineGeometry.labels.map((label:any)=>label.bottom))-5,
+            'Compact 320px local gutters must raise all 3 chest availability plaques by at least 5px');
         }
         if(width===384 && height===512) {
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y+1),
