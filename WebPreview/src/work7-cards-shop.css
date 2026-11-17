@@ -3848,3 +3848,20 @@
     filter:saturate(1.27) contrast(1.12) brightness(.88) drop-shadow(0 4px 3px #041327a8);
   }
 }
+
+/* WORK7/#104 — native 384×512 image registration, 17 Nov 07h.
+ * Pixel-geometry review against approved 05: illustrated 4×2 grid is
+ * approximately 2px too high. Shift its local collection art ONLY, leaving
+ * the shared header, tabs, menu and live PRÉVIA labels unchanged.
+ * The original 06 Captain chest has slightly deeper shadows: retain the
+ * actual illustration and its existing filter chain while toning highlights.
+ * This rule is intentionally inactive at 320px and tall mobile viewports.
+ * No screenshot backdrop, payments, catalogue data or new gameplay. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    transform:translateY(2px);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    filter:saturate(1.2) contrast(1.06) brightness(.95) drop-shadow(0 6px 5px #14062ca3);
+  }
+}
