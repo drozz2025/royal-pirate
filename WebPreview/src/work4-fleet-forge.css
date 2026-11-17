@@ -2286,10 +2286,24 @@
   margin:auto 0!important;
   overflow:hidden;
   pointer-events:none;
-  /* No GPU filter, transform or mask on the protected forge scene/cannon. */
+  /* Keep the #158 paint/transform isolation on the scene unchanged. */
   filter:none!important;
 }
 .w4-fleet .w4-stage-label,
 .w4-forge .w4-forge-description {
   z-index:30;
+}
+
+/* Browser comparison: at 390/430px, the approved 04 crop had sharp photo
+   right/bottom edges against the live workshop. Feather just its boundary,
+   not the protected compositor, data panel, flame or cannon silhouette. */
+.w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {
+  -webkit-mask-image:
+    linear-gradient(to right,#000 0%,#000 87%,transparent 100%),
+    linear-gradient(to bottom,#000 0%,#000 90%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:
+    linear-gradient(to right,#000 0%,#000 87%,transparent 100%),
+    linear-gradient(to bottom,#000 0%,#000 90%,transparent 100%);
+  mask-composite:intersect;
 }
