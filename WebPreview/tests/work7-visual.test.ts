@@ -37,29 +37,27 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  const marker = '/* WORK7 / #104 — native 384×512 source-art tonal depth (17 Nov, 14h).';
+  const marker = '/* WORK7 / #104 — 384×512 native carved frame relief, 17 Nov 15h.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  // True merged v0.1.67 HEAD (after WORK0 integrated #300).
-  // Undo ONLY the five art-crop exposure settings introduced by this branch.
+  // True merged v0.1.68 HEAD (after WORK0 integrated #305).
+  // Undo ONLY this PR's physical frame-value filters and chest inlay, leaving all HEAD crops and geometry intact.
   // All pre-existing atlas/velvet backing, 3D frames and approved assets stay
   // identical in the SAME Chromium scene. Use !important so the baseline
   // reliably wins after the final native media query.
+
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{
-        filter:saturate(1.25) contrast(1.13) brightness(1.075)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+        filter:brightness(.81)!important;
       }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{
-        filter:saturate(1.25) contrast(1.13) brightness(1.075)!important;
+      .w7-screen[data-work7-screen="shop"] .w7-chest{
+        filter:brightness(.80)!important;
       }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{
-        filter:saturate(1.25) contrast(1.13) brightness(.88)!important;
-      }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{
-        filter:saturate(1.25) contrast(1.13) brightness(1.075)!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(.92) drop-shadow(0 4px 3px #041327a8)!important;
+      .w7-screen[data-work7-screen="shop"] .w7-chest::before{
+        box-shadow:
+          inset 0 0 0 1px #472714ae,
+          inset 0 3px 6px #080c237a,
+          inset 0 -2px 1px #ffdb7b2b !important;
       }
     }`;
   const cssBaseline = currentHeadBaseline;
@@ -354,7 +352,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y+1),
             'All true PRÉVIA / EM BREVE labels must stay above the dock at native size');
           assert.ok(baselineGeometry,'HEAD baseline boxes must be recorded, not inferred');
-          assert.deepEqual({slots:geometry.slots,chests:geometry.chests,pack:geometry.pack,packArt:geometry.packArt,labels:geometry.labels.map((l:any)=>({x:l.x,y:l.y,width:l.width,height:l.height,bottom:l.bottom}))},baselineGeometry,'Pure WORK7 artwork exposure may not move one original illustration, label or hit area');
+          assert.deepEqual({slots:geometry.slots,chests:geometry.chests,pack:geometry.pack,packArt:geometry.packArt,labels:geometry.labels.map((l:any)=>({x:l.x,y:l.y,width:l.width,height:l.height,bottom:l.bottom}))},baselineGeometry,'Pure WORK7 carved frame depth may not move one original illustration, label or hit area');
           assert.deepEqual(comparison.referenceSize,[384,512],'Approved 05/06 originals are 384×512 and must be compared natively without scaling');
           if(kind==='cards') {
             assert.ok(geometry.slots[0].x>=17 && geometry.slots[0].x<=20,
