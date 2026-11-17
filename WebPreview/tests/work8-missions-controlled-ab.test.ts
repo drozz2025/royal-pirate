@@ -622,6 +622,64 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(dailyLumCompare.metrics.quests.delta < .05 &&
       dailyLumCompare.metrics.chests.delta < .06,'cannot regress three missions or seven real rewards');
 
+
+    /* WORK8/#104: new 07-only daily-depth paint gate.
+       Both screenshots share the same live decoded Missions page, paused
+       animation frame, native DPR1 and unscaled approved 07 reference.
+       Exactly one CSS rule is toggled; never take a fresh navigation/state. */
+    const depthFlag='work8-missions-daily-depth-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(depthFlag)+');true');
+    await delay(145);
+    const depthBeforeLayout=await headingLayout();
+    const depthBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(depthFlag)+');true');
+    await delay(145);
+    const depthAfterLayout=await headingLayout();
+    const depthAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const depthSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+depthBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+depthAfter));
+    assert.notEqual(depthSource,source,'independent same-frame screenshot sources required');
+    const depthComparison=await evalJs(depthSource);
+    const depthFile=(name:string,bytes:string)=>writeFileSync(join(evidence,name),Buffer.from(bytes,'base64'));
+    depthFile('missions-daily-depth-before-384x512.png',depthBefore);
+    depthFile('missions-daily-depth-after-384x512.png',depthAfter);
+    depthFile('missions-daily-depth-original-render-overlay-before-384x512.png',depthComparison.overlays[0]);
+    depthFile('missions-daily-depth-original-render-overlay-after-384x512.png',depthComparison.overlays[1]);
+    const touchGate=await evalJs('(()=>{const reachable=e=>{const r=e.getBoundingClientRect(),x=(r.left+r.right)/2,y=(r.top+r.bottom)/2,t=document.elementFromPoint(x,y);return !!t&&(t===e||e.contains(t))};const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest > button")],nav=[...document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item")];return {questButtons:quests.length,questReachable:quests.map(reachable),navCount:nav.length,navReachable:nav.map(reachable)}})()');
+    const depthResult={
+      baseSha:'1ec919a052feddd63130f2687e2479d9bb4f05c7',
+      source:'assets/design-approved/07-missoes.webp',
+      references:['assets/design-approved/00-referencia-original-aprovada.webp','assets/design-approved/00-painel-oito-ecras.webp','assets/design-approved/01-porto.webp through 08-ranking-perfil.webp'],
+      sameFrame:'one genuine decoded paused Missions Chromium document, identical viewport, DPR1, native unscaled 384x512',
+      candidate:'seven-reward board depth only; .675 => .645',
+      baselineFlag:depthFlag,roi:depthComparison.metrics,unchanged:depthComparison.unchanged,
+      beforeLayout:depthBeforeLayout,afterLayout:depthAfterLayout,touchGate,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-daily-depth-controlled-ab.json'),JSON.stringify(depthResult,null,2));
+    console.log('WORK8/#104 07 daily-depth native 384x512 A/B MAE '+JSON.stringify(depthResult.roi));
+    assert.deepEqual(depthBeforeLayout.days,depthAfterLayout.days,'all seven reward hitboxes must stay still');
+    assert.deepEqual(depthBeforeLayout.chests,depthAfterLayout.chests,'all seven chest illustrations must stay still');
+    assert.deepEqual(depthBeforeLayout.questButtons,depthAfterLayout.questButtons,'all three mission buttons must stay still');
+    assert.deepEqual(depthBeforeLayout.nav,depthAfterLayout.nav,'shared dock must stay still');
+    assert.equal(depthAfterLayout.questCount,3);
+    assert.equal(depthAfterLayout.dayCount,7);
+    assert.equal(depthAfterLayout.dockCount,5);
+    assert.ok(depthAfterLayout.documentWidth<=386);
+    assert.ok(depthAfterLayout.chests.every((c:any)=>c.bottom<=depthAfterLayout.nav.top+2),
+      'all seven chests fit above the unchanged dock');
+    assert.equal(touchGate.questButtons,3,'three genuine mission action targets');
+    assert.equal(touchGate.navCount,5,'five shared dock targets');
+    assert.ok(touchGate.questReachable.every(Boolean) && touchGate.navReachable.every(Boolean),
+      'mission and five-menu centre hit targets remain reachable');
+    assert.ok(depthComparison.unchanged.header<.1 && depthComparison.unchanged.dock<.1,
+      'header and five-button dock must remain pixel-identical');
+    assert.ok(depthComparison.metrics.full.delta<-.02 && depthComparison.metrics.daily.delta<-.1,
+      'retain only visibly better full-frame and daily panel against real approved 07');
+    assert.ok(depthComparison.metrics.quests.delta<.05 && depthComparison.metrics.chests.delta<.05,
+      'three missions and seven chest ROI cannot regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
