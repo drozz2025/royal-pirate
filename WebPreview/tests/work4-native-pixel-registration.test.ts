@@ -187,6 +187,87 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
 
 
+
+      // WORK4/#104 21h — controlled original vs merged HEAD warm level ink vs
+      // proposed deep foundry ink on the EXACT SAME paused React / Chromium
+      // scene. These three existing rows are actual levels, never dummy costs.
+      if(screen==='forge' && width===384 && height===512){
+        const sampleGeometry="(()=>{const b=s=>{const r=document.querySelector(s)?.getBoundingClientRect();"+
+          "return r?[r.x,r.y,r.width,r.height]:null;};return {cannon:b('.w4-reference-cannon'),"+
+          "furnace:b('.w4-forge-scene'),materials:b('.w4-materials'),"+
+          "levels:[...document.querySelectorAll('.w4-forge-live-level')].map(x=>{const r=x.getBoundingClientRect();return [r.x,r.y,r.width,r.height]}) ,"+
+          "dock:b('.harbour-nav.app-dock-porto'),"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        const geometryAfter=await evaluate(sampleGeometry);
+        assert.equal(geometryAfter.levels.length,3,'preserve three true forge level indicators');
+        assert.equal(geometryAfter.nav,5,'preserve global five item dock');
+        const oldRows=[
+          '.w4-forge #w4-forge-panel > .w4-forge-stage .w4-forge-live-level:where(*) {',
+          'background:linear-gradient(104deg,#312e2be8,#16252be8)!important;',
+          'border-color:#907c5b9e!important;}',
+          '.w4-forge #w4-forge-panel > .w4-forge-stage .w4-forge-live-level.is-current:where(*) {',
+          'background:linear-gradient(104deg,#55422fa8,#223036e8)!important;',
+          'border-color:#e6bd76!important;}'
+        ].join('');
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
+          "s.id='work4-merged-level-before';s.textContent="+JSON.stringify(oldRows)+
+          ";document.head.appendChild(s);return true;})()"));
+        await sleep(130);
+        assert.deepEqual(await evaluate(sampleGeometry),geometryAfter,
+          'a foundry ink-only change cannot move cannon, rows, resources or dock');
+        const previous=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-forge-level-ink-384x512.png'),Buffer.from(previous,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-merged-level-before')?.remove();return true;})()"));
+        await sleep(130);
+        assert.deepEqual(await evaluate(sampleGeometry),geometryAfter,'removal restores geometry');
+        const current=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'render-forge-level-ink-384x512.png'),Buffer.from(current,'base64'));
+        const compare="(async()=>{"+
+          "const load=async u=>{const im=new Image();im.src=u;await im.decode();return im;};"+
+          "const [o,b,n]=await Promise.all(["+
+            "load('data:image/webp;base64,"+references.forge+"'),"+
+            "load('data:image/png;base64,"+previous+"'),"+
+            "load('data:image/png;base64,"+current+"')]);"+
+          "if([o,b,n].some(i=>i.width!==384||i.height!==512))throw Error('native 384x512 no scaling');"+
+          "const pixels=i=>{const canvas=document.createElement('canvas');canvas.width=384;canvas.height=512;"+
+          "const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(i,0,0);return ctx.getImageData(0,0,384,512).data;};"+
+          "const ref=pixels(o),old=pixels(b),now=pixels(n);"+
+          "const boxes={global:[0,0,384,512],levelRows:[175,238,373,313],"+
+          "cannon:[30,230,166,309],furnace:[116,225,171,302],"+
+          "costs:[16,320,369,378],dock:[0,430,384,512]};"+
+          "const mae=(a,b,r)=>{let sum=0,count=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
+          "const k=(y*384+x)*4;for(let i=0;i<3;i++){sum+=Math.abs(a[k+i]-b[k+i]);count++;}}return sum/count;};"+
+          "const before={},after={};for(const [key,r] of Object.entries(boxes)){"+
+          "before[key]=mae(ref,old,r);after[key]=mae(ref,now,r);}"+
+          "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;"+
+          "const g=canvas.getContext('2d');g.drawImage(o,0,0);g.drawImage(b,384,0);g.drawImage(n,768,0);"+
+          "g.drawImage(o,1152,0);g.globalAlpha=.5;g.drawImage(n,1152,0);"+
+          "return {boxes,before,after,comparison:canvas.toDataURL('image/png').split(',')[1]};})()";
+        const result=await evaluate(compare);
+        assert.ok(Number.isFinite(result?.after?.global)&&Number.isFinite(result?.after?.levelRows));
+        writeFileSync(join(folder,'compare-forge-level-ink-384x512.png'),
+          Buffer.from(result.comparison,'base64'));
+        delete result.comparison;
+        const proof={...result,native:'384x512',sameReactFrame:true,
+          source:'assets/design-approved/04-melhorias-forja.webp',
+          panelReference:'assets/design-approved/00-painel-oito-ecras.webp',
+          ownerReference:'assets/design-approved/00-referencia-original-aprovada.webp',
+          approved:false};
+        writeFileSync(join(folder,'forge-level-ink-controlled-ab.json'),JSON.stringify(proof,null,2)+'\n');
+        console.log('WORK4_FORGE_LEVEL_INK_AB '+JSON.stringify(proof));
+        for(const key of ['cannon','furnace','costs','dock'] as const)
+          assert.ok(Math.abs(result.before[key]-result.after[key])<.08,
+            'protected '+key+' ROI cannot change');
+        assert.ok(result.after.levelRows<result.before.levelRows,
+          'deep foundry live row ink must improve its native approved ROI');
+        assert.ok(result.after.global<result.before.global,
+          'level-row paint must not regress full-frame native MAE');
+      }
+
       // WORK4/#104 — Forge 04: one real plaque over the approved right inset.
       // A/B must be native, within this SAME paused React/Chromium frame:
       // ORIGINAL | MERGED HEAD (43%) | RENDER (53%) | OVERLAY.
