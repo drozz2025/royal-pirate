@@ -4100,5 +4100,5 @@
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.63)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.61)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.59)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.65)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.56)}
 }
