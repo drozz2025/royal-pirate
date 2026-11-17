@@ -290,6 +290,67 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(Math.abs(questCompare.metrics.daily.delta)<.03&&Math.abs(questCompare.metrics.chests.delta)<.03,
       'seven daily rewards must not suffer a visual regression');
 
+
+    /* WORK8 / 07 Missões — source-registered gold title WITHOUT the opaque
+       rectangular crop. The painted reference, test baseline, and candidate
+       are drawn from the SAME paused, decoded Chromium scene at 384x512.
+       No mock rewards, no scaling and no changes to other WORK screens. */
+    const titleInkClass='work8-missions-title-ink-ab-baseline';
+    const inkPaintingRect=()=>evalJs('(()=>{const n=document.querySelector(".w8-approved-missions .w8-approved-daily h3 > svg.w8-approved-painting-daily-heading"),r=n?.getBoundingClientRect();return r?{top:r.top,bottom:r.bottom,left:r.left,right:r.right}:null;})()');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(titleInkClass)+');true');
+    await delay(160);
+    const titleInkBeforeLayout=await headingLayout();
+    const titleInkBeforePainting=await inkPaintingRect();
+    const titleInkBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(titleInkClass)+');true');
+    await delay(160);
+    const titleInkAfterLayout=await headingLayout();
+    const titleInkAfterPainting=await inkPaintingRect();
+    const titleInkAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const titleInkSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+titleInkBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+titleInkAfter))
+      .replace('chests:[20,356,370,427],dock:', 'chests:[20,356,370,427],dailyInk:[42,319,343,363],dock:');
+    assert.notEqual(titleInkSource,source,'title ink A/B must be genuinely isolated');
+    const titleInkCompare=await evalJs(titleInkSource);
+    writeFileSync(join(evidence,'missions-title-ink-before-384x512.png'),Buffer.from(titleInkBefore,'base64'));
+    writeFileSync(join(evidence,'missions-title-ink-after-384x512.png'),Buffer.from(titleInkAfter,'base64'));
+    writeFileSync(join(evidence,'missions-title-ink-original-render-overlay-before-384x512.png'),Buffer.from(titleInkCompare.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-title-ink-original-render-overlay-after-384x512.png'),Buffer.from(titleInkCompare.overlays[1],'base64'));
+    const titleInkReport={
+      baseCommit:'0ad0602f6238aecd24a47fe4e9ce6872f0c09550',
+      art:'assets/design-approved/07-missoes.webp',
+      scope:'ONLY 07 Missions engraved Recompensa Diaria source inscription',
+      scene:'same native Chromium 384x512 document/frame, 1x device scale, SVG WebP art decoded, animations paused',
+      baselineClass:titleInkClass,roi:titleInkCompare.metrics,unchanged:titleInkCompare.unchanged,
+      sourceSize:titleInkCompare.sizes[0],renderSize:titleInkCompare.sizes[2],
+      paintingBefore:titleInkBeforePainting,paintingAfter:titleInkAfterPainting,
+      beforeLayout:titleInkBeforeLayout,afterLayout:titleInkAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-title-ink-controlled-ab.json'),JSON.stringify(titleInkReport,null,2));
+    console.log('WORK8 new title-ink same-frame MAE/ROI '+JSON.stringify(titleInkReport.roi));
+    assert.equal(titleInkAfterLayout.questCount,3,'exactly the 3 true local objectives');
+    assert.equal(titleInkAfterLayout.dayCount,7,'all 7 actual daily chest slots');
+    assert.equal(titleInkAfterLayout.dockCount,5,'five unchanged dock entries');
+    assert.deepEqual(titleInkBeforePainting,titleInkAfterPainting,'static painted title geometry must not move');
+    assert.deepEqual(titleInkBeforeLayout.days,titleInkAfterLayout.days,'real seven-day geometries identical');
+    assert.deepEqual(titleInkBeforeLayout.chests,titleInkAfterLayout.chests,'chest paintings are not moved');
+    assert.deepEqual(titleInkBeforeLayout.questButtons,titleInkAfterLayout.questButtons,'quest touch targets unchanged');
+    assert.deepEqual(titleInkBeforeLayout.tabs,titleInkAfterLayout.tabs,'mission tab touch targets unchanged');
+    assert.deepEqual(titleInkBeforeLayout.nav,titleInkAfterLayout.nav,'dock geometry unchanged');
+    assert.ok(titleInkAfterLayout.documentWidth<=386,'no 384px sideways scrolling');
+    assert.ok(titleInkAfterLayout.chests.every((c:any)=>c.bottom<=titleInkAfterLayout.nav.top+2),
+      'seven chest drawings remain clear of the five-button dock');
+    assert.ok(titleInkCompare.unchanged.header<.1&&titleInkCompare.unchanged.dock<.1,
+      'unowned header and dock must remain pixel-identical');
+    assert.ok(titleInkCompare.metrics.dailyInk.delta<-.18,
+      'native 384px daily-heading ROI must improve after removing the rectangle');
+    assert.ok(titleInkCompare.metrics.full.delta<-.02&&titleInkCompare.metrics.daily.delta<-.06,
+      'daily heading improvement must improve the entire frame and daily panel');
+    assert.ok(titleInkCompare.metrics.quests.delta<.06&&titleInkCompare.metrics.chests.delta<.06,
+      'other three quests and seven chest icons must not regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
