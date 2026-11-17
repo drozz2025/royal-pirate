@@ -667,6 +667,16 @@ export class OceanScene {
     this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
     this.controls.enableRotate=false;this.controls.enableZoom=false;this.controls.maxPolarAngle=1.28;
     const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
+    // WORK0 / #104: candidate native 384x512 SHIP-FIRST composition.
+    // Enlarge ONLY the existing interactive Three.js galleon for the short
+    // source-image viewport; keep the proven tall-iPhone and battle poses.
+    // "portoShipAB=baseline" is accepted ONLY on localhost for pixel A/B QA.
+    const nativeFrame=portrait && this.host.clientWidth>=355 &&
+      this.host.clientWidth<=390 && this.host.clientHeight<=560;
+    const portoABBaseline=typeof window!=='undefined' &&
+      (window.location.hostname==='127.0.0.1'||window.location.hostname==='localhost') &&
+      new URLSearchParams(window.location.search).get('portoShipAB')==='baseline';
+    this.ships.player.root.scale.setScalar(nativeFrame&&!portoABBaseline?1.34:1);
     this.controls.target.set(ship.x,portrait?3.5:2.9,ship.z+(portrait?1:0));
     // Verified in the 390x844 Chromium capture: the old close camera cropped
     // the starboard bow, left flank and upper sails. Pull back in portrait so
@@ -738,7 +748,8 @@ export class OceanScene {
     // remain untouched. This flag is ignored in the public Pages host.
     const abFrame=typeof window!=='undefined' &&
       (window.location.hostname==='127.0.0.1'||window.location.hostname==='localhost') &&
-      new URLSearchParams(window.location.search).has('work6ab');
+      (new URLSearchParams(window.location.search).has('work6ab') ||
+       new URLSearchParams(window.location.search).has('portoShipAB'));
     const pictureTime=abFrame?2.25:this.elapsed;
     this.water.uniforms.time.value=pictureTime;
     for(const [side,art] of Object.entries(this.ships) as ['player'|'enemy',ShipArt][]){const health=this.battle.health[side];const damage=1-health/100;
