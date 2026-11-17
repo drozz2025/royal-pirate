@@ -2629,3 +2629,61 @@
 .w4-fleet .w4-tropical-art .w4-r03-coastal-depth > path[stroke] {
   opacity:0;
 }
+
+
+/* WORK4 / #104 — 17 Nov 11h: physical timber/iron finish of the real
+   Forge cost board at the original 384×512 first fold. The approved frame
+   uses a near-charcoal hardwood surround beneath the whole cannon, rather
+   than three flat navy tiles. Keep the same THREE REAL local-currency
+   fields, identical 44px upgrade hitbox, source-pixel cannon, hearth,
+   protected scene compositor and five-item dock. Pure paint: no spacing,
+   sizing, content, gameplay, Porto, shared navigation or extra objects. */
+@media (min-width:360px) and (max-width:399px) and (max-height:650px) {
+  .w4-forge #w4-forge-panel > .w4-materials:where(*) {
+    background:
+      radial-gradient(ellipse 76% 94% at 32% 0%,#a86e3738 0%,transparent 77%),
+      repeating-linear-gradient(2deg,transparent 0 10px,#c89b5410 10px 11px,transparent 12px 21px),
+      linear-gradient(173deg,#2b3030 0%,#1a282c 52%,#0d1e2a 100%);
+    border-color:#b78b55;
+    box-shadow:inset 0 1px #ebc38a91,inset 0 -2px #080f14b3,0 2px 4px #05101d8a;
+  }
+  .w4-forge #w4-forge-panel > .w4-materials h3 {
+    color:#f4daa8;
+    text-shadow:0 1px 1px #080e12,0 0 5px #b36a2538;
+  }
+  .w4-forge #w4-forge-panel .w4-resource-grid > div {
+    background:
+      radial-gradient(ellipse 91% 85% at 46% 0%,#d6a26216 0%,transparent 85%),
+      linear-gradient(180deg,#352f2b22,#0b14192c);
+    box-shadow:inset 0 1px #ffdfad1f,inset 0 -1px #040c1170;
+  }
+  .w4-forge #w4-forge-panel .w4-resource-grid small {color:#ded4bf;}
+  .w4-forge #w4-forge-panel .w4-resource-grid strong {
+    color:#fff0d3;
+    text-shadow:0 1px #0b1014;
+  }
+}
+
+/* WORK4 / #104 — native 04 right-side foundry plate. The owner-approved
+   screenshot paints a smoked iron/charcoal relief, not a solid blue menu box.
+   Its THREE real levels, mini-bars, action and the furnace silhouette retain
+   the same geometry, selectors and working buttons. This only darkens the
+   physical backing on the original 384×512 composition; taller previews
+   preserve their previous layouts and the Porto/dock are untouched. */
+@media (min-width:360px) and (max-width:399px) and (max-height:650px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description:where(*) {
+    background:
+      radial-gradient(ellipse 78% 87% at 0% 75%,#9b572822 0%,transparent 84%),
+      linear-gradient(112deg,#2a2627f0 0%,#172123f5 53%,#071720f7 100%);
+    border-color:#c5a173;
+    box-shadow:inset 1px 0 #e4c18b54,inset -2px 0 #070e18aa,0 3px 7px #06101999;
+  }
+  .w4-forge #w4-forge-panel > .w4-forge-stage .w4-forge-live-level:where(*) {
+    background:linear-gradient(104deg,#312e2be8,#16252be8);
+    border-color:#907c5b9e;
+  }
+  .w4-forge #w4-forge-panel > .w4-forge-stage .w4-forge-live-level.is-current:where(*) {
+    background:linear-gradient(104deg,#55422fa8,#223036e8);
+    border-color:#e6bd76;
+  }
+}
