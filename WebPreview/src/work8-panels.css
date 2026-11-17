@@ -5197,13 +5197,13 @@
 /* WORK8/#104 · 07 MISSÕES ONLY · candidate source-calibrated coastal depth.
    In the exact 384x512 ORIGINAL/RENDER overlay after #338, the sea behind
    the genuine three mission tabs remains too luminous in the lower strip.
-   A controlled, local 0.80→0.77 coastal ink pass ONLY on existing seascape
+   A controlled 0.80→0.77 luminance and +15deg pigment-hue pass ONLY on existing seascape
    (not the mission cards, seven actual reward chests, header or dock).
    The AB baseline flag is only toggled by the same-scene Chromium test.
    No geometry, navigation, gameplay, state or non-WORK8 files change. */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
   :root:not(.work8-missions-sea-depth-ab-baseline) .w8-approved-missions .w8-approved-scene .w8-seascape {
-    filter:saturate(1.02) contrast(1.08) brightness(.77)
+    filter:hue-rotate(15deg) saturate(1.02) contrast(1.08) brightness(.77)
       drop-shadow(0 3px 2px rgba(2,25,45,.32));
   }
 }
