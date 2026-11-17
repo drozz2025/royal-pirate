@@ -37,18 +37,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  const marker = '/* WORK7 / #104 — native illustrated deck 05/06, 17 Nov 03h */';
+  const marker = '/* WORK7 / #104 — native 05/06 composition: pack silhouette + 320px framing, 17 Nov 04h. */';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   // Undo solely this PR while keeping every merged HEAD change (#190–#252).
   // The same Chromium session, true 384x512 viewport and real assets measure
   // before/after, rather than comparing against a stale old PR.
   const cssBaseline = `
+    /* Restore the exact already-merged #257 transform at 384x512:
+       comparison must isolate THIS PR, not incorrectly undo #257. */
     @media (min-width:355px) and (max-width:430px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
-        content:none!important;
-      }
       .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        transform:none!important;
+        transform:translate(-2px,5px) scale(1.07)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -250,6 +249,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         assert.equal(geometry.horizontalOverflow,false,'No horizontal overflow at '+width);
         if(kind==='cards') assert.equal(geometry.slots.length,8,'Eight original illustrated cards in a 4x2 grid');
         if(kind==='shop') assert.equal(geometry.chests.length,3,'Three preview-only illustrated chests');
+        if(width===320 && kind==='cards') {
+          assert.ok(geometry.slots[0].x>=12 && geometry.slots[0].x<=18,
+            'The scaled original 05 left border starts around x=16 at 320px');
+        }
+        if(width===320 && kind==='shop') {
+          assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y-8),
+            'All three real chest availability labels need at least 8px clear above the 320px dock');
+        }
         if(width===384 && height===512) {
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y+1),
             'All true PRÉVIA / EM BREVE labels must stay above the dock at native size');
