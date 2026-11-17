@@ -328,6 +328,12 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         writeFileSync(join(folder,'fleet-edge-controlled-ab.json'),
           JSON.stringify(evidence,null,2)+'\n');
         console.log('WORK4_FLEET_EDGE_AB '+JSON.stringify(evidence));
+        assert.ok(sample.after.global<sample.before.global,
+          'native full-frame MAE must improve, not just seam appearance');
+        assert.ok(sample.after.edge+1<sample.before.edge,
+          'the painted source coastline must remove the obvious hard crop edge');
+        assert.ok(sample.after.water<sample.before.water,
+          'approved source sea must improve the sea ROI, not become a false painted wave');
         assert.ok(Math.abs(sample.before.ship-sample.after.ship)<0.2,
           'source-aligned unique Royal Crown hull must remain unchanged');
         assert.ok(Math.abs(sample.before.dock-sample.after.dock)<0.05,
