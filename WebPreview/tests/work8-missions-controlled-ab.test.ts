@@ -514,7 +514,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'reward board and seven chests must remain pixel-stable');
 
 
-    /* WORK8/#104 — native 07 source-painted quest icons and real action faces.
+    /* WORK8/#104 — native 07 real ongoing mission action faces; original art unchanged.
        Base class disables ONLY this run's paint. Same paused actual Chromium
        scene and 384×512 frame; never screenshot-swap/replace UI with the art.
        Preserve 3 real objectives, 7 reward chests, 5 dock items & click targets. */
@@ -543,7 +543,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       references:['assets/design-approved/00-referencia-original-aprovada.webp','assets/design-approved/00-painel-oito-ecras.webp','assets/design-approved/07-missoes.webp','assets/design-approved/01-porto.webp through 08-ranking-perfil.webp'],
       source:'native, unscaled 384x512 approved 07 WebP',
       scene:'same decoded Chromium document, paused animations, same viewport and frame',
-      scope:'07 Missões only: source-painted mission illustration and active CTA contrast',
+      scope:'07 Missões only: non-claimable mission CTA enamel; original quest art stable',
       roi:contrastCompare.metrics,unchanged:contrastCompare.unchanged,
       beforeLayout:contrastBeforeLayout,afterLayout:contrastAfterLayout,
       approved:false,approvedScreens:0
@@ -565,8 +565,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'global shell and 5-item dock unchanged');
     assert.ok(contrastCompare.metrics.quests.delta<0&&contrastCompare.metrics.full.delta<0,
       'keep only authentic full screen and objective ROI gains');
-    assert.ok(contrastCompare.metrics.questArt.delta<0&&contrastCompare.metrics.questCTAs.delta<0,
-      'source art icons and real CTA ink must both improve');
+    assert.ok(Math.abs(contrastCompare.metrics.questArt.delta)<.05&&contrastCompare.metrics.questCTAs.delta<0,
+      'source paintings fixed and real ongoing CTA enamel improved');
     assert.ok(Math.abs(contrastCompare.metrics.daily.delta)<.05&&Math.abs(contrastCompare.metrics.chests.delta)<.05,
       '7 rewards and daily board must not regress');
 
