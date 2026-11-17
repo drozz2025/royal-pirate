@@ -9,7 +9,7 @@ assert.ok(painting,'approved paintings #243 must remain installed');
 test('03: whole Royal Crown hull survives the pictorial edge feather',()=>{
   const ship=painting.split('.w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {')[1]?.split('\n}')[0];
   assert.ok(ship,'only the original ship painting is styled');
-  assert.match(ship,/height:clamp\(168px,51vw,226px\)!important/);
+  assert.match(ship,/height:clamp\(168px,54vw,240px\)!important/);
   assert.equal((ship.match(/#000 97%,transparent 100%/g)||[]).length,2);
   assert.equal((ship.match(/#000 94%,transparent 100%/g)||[]).length,2);
   assert.doesNotMatch(ship,/visibility:hidden|display:none/);
