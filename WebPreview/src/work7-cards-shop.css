@@ -4133,3 +4133,23 @@
     filter:saturate(1.27) contrast(1.12) brightness(1.40) drop-shadow(0 4px 3px #041327a8)
   }
 }
+
+/* WORK7/#104 — 17 Nov 21h. Native 384x512 only. Controlled A/B
+ * against WORK0-integrated v0.1.74. The first darker-field trial was
+ * REJECTED by Chromium (cards ROI 57.76→57.88; shop 38.15→38.36).
+ * Calibrate actual illustrated lower-row relief and genuine chest crop:
+ * retain the 4x2 grid, one pack, 3 chests, PRÉVIA/EM BREVE and data.
+ * No 320px/tall-screen, Porto, dock, shared UI or screenshot background.
+ * Artistic approval remains false (0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.615)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.735)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.64)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.75)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.76)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.76)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.62)}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    filter:saturate(1.2) contrast(1.06) brightness(1.11) drop-shadow(0 6px 5px #14062ca3);
+  }
+}
