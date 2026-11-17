@@ -185,6 +185,47 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       }
       const screenshot=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
+      /* Controlled water A/B at the same frame: reinstate ONLY the previous
+         vertically stretched 29%-height sea, then remove that temporary CSS.
+         Registration, state, approved source painting and dock stay identical. */
+      let stretchedSea:string|null=null;
+      let seaAspect:any=null;
+      if(screen==='fleet'){
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');s.id='work4-before-water-aspect';s.textContent="+
+          JSON.stringify('.w4-fleet .w4-harbour-stage > svg.w4-reference-sea{height:29%!important;aspect-ratio:auto!important;max-height:none!important;}')+
+          ";document.head.appendChild(s);return true;})()"));
+        await sleep(120);
+        stretchedSea=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-water-fleet-'+width+'x'+height+'.png'),
+          Buffer.from(stretchedSea,'base64'));
+        await evaluate("(()=>{document.getElementById('work4-before-water-aspect').remove();return true})()");
+        if(width===384&&height===512){
+          const compare="(async()=>{"+
+            "const load=async u=>{const i=new Image();i.src=u;await i.decode();return i;};"+
+            "const [ref,bef,aft]=await Promise.all(["+
+              "load('data:image/webp;base64,"+references.fleet+"'),"+
+              "load('data:image/png;base64,"+stretchedSea+"'),"+
+              "load('data:image/png;base64,"+screenshot+"')]);"+
+            "if([ref,bef,aft].some(i=>i.width!==384||i.height!==512))throw Error('non-native water comparison');"+
+            "const pix=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(i,0,0);return x.getImageData(0,0,384,512).data;};"+
+            "const a=pix(ref),b=pix(bef),c=pix(aft);"+
+            "const roi=[28,313,238,358];"+
+            "const mae=(u,v,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;for(let j=0;j<3;j++){sum+=Math.abs(u[k+j]-v[k+j]);n++;}}return sum/n;};"+
+            "const cv=document.createElement('canvas');cv.width=1536;cv.height=512;const g=cv.getContext('2d');"+
+            "g.drawImage(ref,0,0);g.drawImage(bef,384,0);g.drawImage(aft,768,0);g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(aft,1152,0);"+
+            "return {waterROI:roi,before:{global:mae(a,b,[0,0,384,512]),water:mae(a,b,roi)},"+
+            "after:{global:mae(a,c,[0,0,384,512]),water:mae(a,c,roi)},"+
+            "comparison:cv.toDataURL('image/png').split(',')[1]};})()";
+          seaAspect=await evaluate(compare);
+          assert.ok(seaAspect?.before?.water>=0&&seaAspect?.after?.water>=0);
+          writeFileSync(join(folder,'compare-water-fleet-384x512.png'),
+            Buffer.from(seaAspect.comparison,'base64'));
+          delete seaAspect.comparison;
+          console.log('WORK4_WATER_AB '+JSON.stringify(seaAspect));
+        }
+      }
       let antiBlue:any=null;
       if(screen==='forge'){
         // A gross blue compositor rectangle must not replace the warm foundry
@@ -231,7 +272,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         console.log('WORK4_NATIVE_AB '+screen+' '+JSON.stringify({before:old,after:now}));
       }
       report.visual.push({screen,width,height,geometry,
-        before:measurement?.before||null,after:measurement?.after||null,antiBlue,
+        before:measurement?.before||null,after:measurement?.after||null,seaAspect,antiBlue,
         approved:false,source:'approved art from original 384x512; no reference rescaling at 384'});
     }
   }
