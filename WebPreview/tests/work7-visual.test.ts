@@ -93,8 +93,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           radial-gradient(ellipse 92% 95px at 50% 0%,#d3fff23d,transparent),
           linear-gradient(180deg,#339abea6 0%,#175781df 44%,#082b50f4 70%,#061a33 100%)!important;
       }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
-        filter:saturate(1.25) contrast(1.13) brightness(.88)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+        background:linear-gradient(100deg,rgba(12,56,86,.94),rgba(28,83,116,.94) 53%,rgba(12,50,80,.95))!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) small,
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) small{
+        background:linear-gradient(180deg,#fff0bd 0%,var(--w7-enamel) 16%,var(--w7-shadow) 100%)!important;
       }
       .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
         filter:saturate(1.27) contrast(1.12) brightness(.88) drop-shadow(0 4px 3px #041327a8)!important;
