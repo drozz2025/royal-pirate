@@ -4753,3 +4753,37 @@
     width:49px;height:49px;flex-basis:49px;margin-top:-49px;
   }
 }
+
+/* WORK8 — 07/08: authentic engraved heading ornament from the native 384×512
+   approved illustration. This is a limited crop of the existing *static* title,
+   not a screenshot backdrop or a mock stateful HUD. The live h2 remains intact
+   and accessible as the text/failure fallback. */
+.w8-approved-missions .w8-approved-title,
+.w8-approved-ranking .w8-approved-title{
+  overflow:visible;
+}
+.w8-approved-missions .w8-approved-title > svg.w8-approved-painting-title-missions,
+.w8-approved-ranking .w8-approved-title > svg.w8-approved-painting-title-ranking{
+  display:block;
+  position:absolute;
+  z-index:3;
+  top:calc(50% - 25px);
+  left:50%;
+  inset-inline-end:auto;
+  transform:translateX(-50%);
+  width:min(189px,58vw);
+  height:45px;
+  pointer-events:none;
+  overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+  filter:drop-shadow(0 2px 2px #051728);
+}
+/* The shorter native reference deliberately shows the ornament slightly higher,
+   without moving the actual panel or the shared header/dock. */
+@media(max-height:620px) and (max-width:440px){
+  .w8-approved-missions .w8-approved-title > svg.w8-approved-painting-title-missions,
+  .w8-approved-ranking .w8-approved-title > svg.w8-approved-painting-title-ranking{
+    top:calc(50% - 29px);
+  }
+}

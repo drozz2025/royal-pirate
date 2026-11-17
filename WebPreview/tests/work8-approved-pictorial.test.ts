@@ -54,3 +54,17 @@ test('approved crops cannot replace stateful UI, global dock or other workers',(
   assert.ok(existsSync(new URL('../../assets/design-approved/07-missoes.webp',import.meta.url)));
   assert.ok(existsSync(new URL('../../assets/design-approved/08-ranking-perfil.webp',import.meta.url)));
 });
+
+test('07/08: native engraved title overlays retain semantic titles and honest local data',()=>{
+  const mission=renderMissions(),rank=renderRanking();
+  assert.equal((mission.match(/data-work8-crop="title-missions"/g)||[]).length,1);
+  assert.equal((rank.match(/data-work8-crop="title-ranking"/g)||[]).length,1);
+  assert.match(mission,/<h2>MISSÕES<\/h2>/);
+  assert.match(rank,/<h2>RANKING<\/h2>/);
+  assert.match(mission,/viewBox="98 74 189 45"/);
+  assert.match(rank,/viewBox="98 74 189 45"/);
+  assert.equal((mission.match(/class="w8-approved-quest"/g)||[]).length,3);
+  assert.equal((mission.match(/class="w8-approved-chest"/g)||[]).length,7);
+  assert.equal((rank.match(/class="w8-approved-empty-rank"/g)||[]).length,4);
+  assert.doesNotMatch(rank,/CapitãoNero|LadyCorsária|SilverJack/);
+});

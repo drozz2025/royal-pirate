@@ -271,8 +271,11 @@ function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
  * The existing live SVG remains behind each image as an offline/failure fallback.
  * Never use the approved screenshot as a panel background or a player data source.
  */
-type W8ApprovedCrop = 'quest-swords'|'quest-ship'|'quest-target'|'captain'|'league-badge'|'chest-silver'|'chest-gold'|'chest-violet'|'chest-royal';
+type W8ApprovedCrop = 'title-missions'|'title-ranking'|'quest-swords'|'quest-ship'|'quest-target'|'captain'|'league-badge'|'chest-silver'|'chest-gold'|'chest-violet'|'chest-royal';
 const W8_ART_CROPS:Record<W8ApprovedCrop,{rect:string;frame:'missions'|'ranking'}>={
+  // The original engraved plaques replace only the two existing static decorative headers.
+  'title-missions':{rect:'98 74 189 45',frame:'missions'},
+  'title-ranking':{rect:'98 74 189 45',frame:'ranking'},
   'quest-swords':{rect:'15 160 51 48',frame:'missions'},
   'quest-ship':{rect:'15 213 51 48',frame:'missions'},
   'quest-target':{rect:'15 268 51 50',frame:'missions'},
@@ -315,6 +318,7 @@ function W8Title({children,kind}:{children:string;kind:'flag'|'trophy'|'scroll'}
     <div className="w8-approved-title-flourish" aria-hidden="true"><W8Art kind={kind}/></div>
     <h2>{children}</h2>
     <span className="w8-approved-title-curl" aria-hidden="true">❦</span>
+    {(kind==='scroll'||kind==='trophy')&&<W8ApprovedPainting art={kind==='scroll'?'title-missions':'title-ranking'}/>} 
   </div>;
 }
 
