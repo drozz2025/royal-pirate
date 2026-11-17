@@ -3713,3 +3713,30 @@
     row-gap:8px;
   }
 }
+
+/* WORK7 / #104 — 17 Nov, native 384×512 lateral frame alignment against 05/06.
+ * Baseline PR #245 Chromium boxes at 384×512: first card x21/width81,
+ * first chest x16/width112, pack x16/width352; original illustrated
+ * silhouettes begin around x18. Shift/expand only the LOCAL decorative
+ * frames so real cropped concepts occupy the artwork's lateral positions.
+ * Keep Porto, five-button dock, shell, genuine labels/economy untouched.
+ * All eight conceptual portraits and three unavailable chests remain live
+ * elements (not screenshot backgrounds). Human review: approved:false. */
+@media (min-width:355px) and (max-width:430px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    width:calc(100% + 6px);
+    margin-inline:-3px;
+  }
+}
+@media (min-width:355px) and (max-width:430px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    width:calc(100% - 4px);
+    margin-left:2px;
+    transform:translateY(3px);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+    width:calc(100% - 4px);
+    margin-left:2px;
+    transform:translateY(2px);
+  }
+}

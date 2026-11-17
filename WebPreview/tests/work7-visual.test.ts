@@ -37,9 +37,23 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  const marker = '/* WORK7 / #104 — 17 Nov, artwork-first proportions';
+  const marker = '/* WORK7 / #104 — 17 Nov, native 384×512 lateral frame alignment';
   assert.ok(cssText.includes(marker),'Locate only this PR work7 CSS changes');
-  const cssBaseline = cssText.slice(0,cssText.indexOf(marker));
+  // Override ONLY this PR's lateral changes to render the true HEAD
+  // baseline. Re-appending the full old stylesheet leaves previously unset
+  // properties (notably transform) active and biases before/after MAE.
+  const cssBaseline = `
+    @media (min-width:355px) and (max-width:430px){
+      .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+        width:auto!important;margin-inline:0!important;
+      }
+    }
+    @media (min-width:355px) and (max-width:430px) and (max-height:560px){
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack,
+      .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+        width:auto!important;margin-left:0!important;transform:none!important;
+      }
+    }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
     { cwd: process.cwd(), stdio: 'ignore' });
@@ -170,13 +184,20 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "slots,chests,pack:rect(root.querySelector('.w7-captain-pack')),labels,"+
           "horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1};})()");
         let baselineScreenshotData: string | null = null;
+        let baselineGeometry: any = null;
         if (width===384 && height===512) {
-          // Reconstruct the exact initial HEAD work7 CSS by removing this PR's
-          // final rules and overriding them in a temporary style. Keep app,
-          // assets, state and Chromium instance identical before/after.
+          // Temporarily undo only this PR's four CSS properties via precise
+          // overrides. Keep HEAD assets, state, earlier visual passes, browser
+          // viewport and font rendering identical before/after.
           const enabled = await evaluate("(()=>{const s=document.createElement('style');s.id='work7-css-baseline';s.textContent="+JSON.stringify(cssBaseline)+";document.head.appendChild(s);return true})()");
           assert.ok(enabled,'Isolated work7 CSS-only baseline installed');
           await sleep(200);
+          // Actual HEAD geometry before this PR, measured in the same browser
+          // and viewport. Position/area validation matters beyond global MAE.
+          baselineGeometry = await evaluate("(()=>{"+
+            "const rect=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {x:Math.round(r.x),y:Math.round(r.y),width:Math.round(r.width),height:Math.round(r.height),bottom:Math.round(r.bottom)}};"+
+            "const root=document.querySelector('[data-work7-screen=\""+kind+"\"]');"+
+            "return {slots:[...root.querySelectorAll('.w7-approved-slot')].map(rect),chests:[...root.querySelectorAll('.w7-chest')].map(rect),pack:rect(root.querySelector('.w7-captain-pack'))};})()");
           const baseline = await command('Page.captureScreenshot', {
             format:'png',fromSurface:true,captureBeyondViewport:false
           });
@@ -226,6 +247,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
           referenceSize:comparison.referenceSize,
+          baselineGeometry,
           ...geometry});
         assert.equal(geometry.navItems,5,'The approved five-button dock must remain intact');
         assert.equal(geometry.horizontalOverflow,false,'No horizontal overflow at '+width);
@@ -234,6 +256,18 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         if(width===384 && height===512) {
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y+1),
             'All true PRÉVIA / EM BREVE labels must stay above the dock at native size');
+          assert.ok(baselineGeometry,'HEAD baseline boxes must be recorded, not inferred');
+          if(kind==='cards') {
+            assert.ok(geometry.slots[0].x>=17 && geometry.slots[0].x<=20,
+              'First conceptual card should align with the approved x≈18 border');
+            assert.ok(geometry.slots.every((slot:any)=>slot.bottom===geometry.slots[0].bottom||slot.bottom===geometry.slots[4].bottom),
+              'Eight concept cards retain exactly two aligned rows');
+          } else {
+            assert.ok(geometry.pack.x>=17 && geometry.pack.x<=20,
+              'Captain pack should align with the approved x≈18 border');
+            assert.ok(geometry.chests[0].x>=17 && geometry.chests[0].x<=20,
+              'First chest should align with the approved x≈18 border');
+          }
         }
       }
     }
