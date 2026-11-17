@@ -39,19 +39,29 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7 / #104 — 384×512 native carved frame relief, 17 Nov 15h.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  // Compare against the actual WORK0-integrated v0.1.70 HEAD (#311 in base).
+  // Compare against the actual WORK0-integrated v0.1.71 HEAD (including merged #316).
   // Exact CSS on that HEAD, not an obsolete older uniform .72 baseline.
   // Restoring it in the SAME Chromium frame isolates ONLY this PR's
   // four optical changes, including preserving original 320px rules.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.66)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.64)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.62)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.68)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:none!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.63)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.77)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.61)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.65)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.80)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.80)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.65)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop,
+      .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
+        filter:saturate(1.27) contrast(1.12) brightness(1.11) drop-shadow(0 4px 3px #041327a8)!important
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+        filter:saturate(1.27) contrast(1.12) brightness(1.16) drop-shadow(0 4px 3px #041327a8)!important
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.88)!important}
       .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        filter:saturate(1.2) contrast(1.06) brightness(.95) drop-shadow(0 6px 5px #14062ca3)!important
+        filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)!important
       }
     }`;
   const cssBaseline = currentHeadBaseline;
@@ -340,6 +350,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
             await sleep(55);
           }
         }
+
+
 
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
