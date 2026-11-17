@@ -4861,3 +4861,21 @@
     repeating-linear-gradient(0deg,#fbe1a700 0px,#fbe1a700 12px,#fbe1a70b 13px,#fbe1a700 14px),
     linear-gradient(165deg,#21546d,#103653 49%,#071c34 100%);
 }
+
+
+/* WORK8 #104 — Missions 07 ONLY, native source-frame tonal calibration.
+   The approved 07 painting uses a deeper midnight-blue enamel than our
+   brighter cyan frames. Restore blue/gold depth within the existing THREE
+   genuine quest rows and the SEVEN actual day slots. No move, hide, state
+   or economy change. Baseline root class is injected ONLY by the isolated
+   Chromium A/B test on the same live screen/frame. */
+:root:not(.work8-missions-ab-baseline) .w8-approved-missions .w8-approved-quest-list,
+:root:not(.work8-missions-ab-baseline) .w8-approved-missions .w8-approved-daily{
+  filter:brightness(.90) saturate(1.04);
+}
+/* Keep approved pictorial detail legible inside the darker enamel;
+   the seven live day-state checks and real values remain untouched. */
+:root:not(.work8-missions-ab-baseline) .w8-approved-missions .w8-approved-quest-art > svg.w8-approved-painting,
+:root:not(.work8-missions-ab-baseline) .w8-approved-missions .w8-approved-chest > svg.w8-approved-painting{
+  filter:contrast(1.07) saturate(1.07) drop-shadow(0 1px 1px #011625);
+}
