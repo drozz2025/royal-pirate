@@ -3781,3 +3781,33 @@
     transform-origin:52% 55%;
   }
 }
+
+
+
+/* WORK7 / #104 — true 320px 05/06 artwork framing, 17 Nov 04h.
+ * The native 384x512 reference already aligns correctly on the merged HEAD.
+ * Measured Chromium 320x568: the last chest plaque only clears the Porto
+ * dock by 7px and portraits are 3px too far inset. Reallocate ONLY local
+ * gutters and pictorial columns; keep all genuine labels, pictures and art.
+ * No screenshot background, fake purchase, shared shell, nav or release. */
+@media (max-width:354px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    width:calc(100% + 8px);
+    margin-left:-4px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-content{
+    gap:2px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    min-height:148px;
+    padding-block:4px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    min-height:19px;
+    margin:0;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+    width:calc(100% + 6px);
+    margin-left:-3px;
+  }
+}
