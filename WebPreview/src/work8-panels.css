@@ -4794,22 +4794,22 @@
    beyond the 384px approved plaque. Only remove those duplicate *decorations*
    where the original engraved art is already present; live h2 remains as a
    keyboard/screen-reader and failed-image fallback. No screen geometry moves. */
-.w8-approved-missions .w8-approved-title::before,
-.w8-approved-ranking .w8-approved-title::before{
+.w8-screen.w8-approved.w8-approved-missions .w8-approved-title::before,
+.w8-screen.w8-approved.w8-approved-ranking .w8-approved-title::before{
   border:0;
   background:none;
   box-shadow:none;
 }
-.w8-approved-missions .w8-approved-title::after,
-.w8-approved-ranking .w8-approved-title::after,
-.w8-approved-missions .w8-approved-title h2::before,
-.w8-approved-missions .w8-approved-title h2::after,
-.w8-approved-ranking .w8-approved-title h2::before,
-.w8-approved-ranking .w8-approved-title h2::after{
+.w8-screen.w8-approved.w8-approved-missions .w8-approved-title::after,
+.w8-screen.w8-approved.w8-approved-ranking .w8-approved-title::after,
+.w8-screen.w8-approved.w8-approved-missions .w8-approved-title h2::before,
+.w8-screen.w8-approved.w8-approved-missions .w8-approved-title h2::after,
+.w8-screen.w8-approved.w8-approved-ranking .w8-approved-title h2::before,
+.w8-screen.w8-approved.w8-approved-ranking .w8-approved-title h2::after{
   content:none;
 }
-.w8-approved-missions .w8-approved-title-flourish,
-.w8-approved-ranking .w8-approved-title-flourish{
+.w8-screen.w8-approved.w8-approved-missions .w8-approved-title-flourish,
+.w8-screen.w8-approved.w8-approved-ranking .w8-approved-title-flourish{
   opacity:0;
   pointer-events:none;
 }
