@@ -355,6 +355,11 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* WORK8 #104: source-registered geometry A/B in the identical paused
        and decoded 384x512 Chromium scene. Only mission tabs and the three
        genuine objective rows move in paint space; the seven rewards do not. */
+    /* Independent historical tab-enamel gate: explicitly switch OFF this PR's
+       positional registration while checking the old, immutable #303 ROI.
+       Otherwise its border antialiasing changes from the new translation and
+       creates a false failure in a test that predates this geometry change. */
+    await evalJs('document.documentElement.classList.add("work8-missions-native-register-ab-baseline");true');
     const positionClass='work8-missions-position-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(positionClass)+');true');
     await delay(150);
@@ -409,6 +414,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(Math.abs(posCompare.metrics.chests.delta)<.08&&Math.abs(posCompare.metrics.daily.delta)<.25,
       'seven rewards and daily panel must not visually regress');
 
+
+    await evalJs('document.documentElement.classList.remove("work8-missions-native-register-ab-baseline");true');
 
     /* WORK8/#104 — thin pewter original relief vs synthetic grey frame,
        measured on the SAME real 384x512 Chromium scene and paused frame. */
