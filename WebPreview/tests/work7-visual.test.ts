@@ -27,8 +27,21 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const output = join(process.cwd(), 'porto-qa', 'work7');
   const temp = await mkdtemp(join(tmpdir(), 'royal-work7-chrome-'));
   await mkdir(output, { recursive: true });
+  // Vite dev does not serve approved WEBP references outside its source root.
+  // Build exactly as production before capturing; otherwise illustrations
+  // falsely appear as empty dark cards/chests in QA screenshots.
+  const productionBuild = spawnSync('npm',
+    ['run', 'build', '--', '--base=/royal-pirate/'],
+    { cwd:process.cwd(),encoding:'utf8',timeout:120_000,maxBuffer:10_000_000 });
+  assert.equal(productionBuild.status,0,
+    'Production assets required for real Chromium QA: ' +
+      (productionBuild.stderr || productionBuild.stdout).slice(-3000));
+  const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
+  const marker = '/* WORK7 / #104 — 17 Nov, artwork-first proportions';
+  assert.ok(cssText.includes(marker),'Locate only this PR work7 CSS changes');
+  const cssBaseline = cssText.slice(0,cssText.indexOf(marker));
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
-    ['--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
+    ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
     { cwd: process.cwd(), stdio: 'ignore' });
   let browser: ReturnType<typeof spawn> | undefined;
   let ws: WebSocket | undefined;
@@ -140,6 +153,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "(()=>{const tab=document.querySelector('.harbour-screen .harbour-nav-item:nth-child("+tab+")');if(!tab)return false;tab.click();return true})()");
         assert.ok(clicked, 'Open '+kind+' through actual Porto navigation');
         await waitFor("!!document.querySelector('[data-work7-screen=\""+kind+"\"]')");
+        // A nonempty crop element is insufficient: all 8 + 4 image URLs must
+        // actually decode on the production build before screenshots count.
+        await waitFor("(()=>{const images=[...document.querySelectorAll('[data-work7-screen=\""+kind+"\"] .w7-approved-crop img')];return images.length==="+(kind==='cards'?8:4)+"&&images.every(i=>i.complete&&i.naturalWidth>0)})()");
         await evaluate('document.fonts.ready.then(()=>true)');
         await sleep(350);
 
@@ -153,6 +169,21 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "return {viewport:[innerWidth,innerHeight],nav:rect(nav),navItems:nav?.querySelectorAll('.harbour-nav-item').length||0,"+
           "slots,chests,pack:rect(root.querySelector('.w7-captain-pack')),labels,"+
           "horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1};})()");
+        if (width===384 && height===512) {
+          // Reconstruct the exact initial HEAD work7 CSS by removing this PR's
+          // final rules and overriding them in a temporary style. Keep app,
+          // assets, state and Chromium instance identical before/after.
+          const enabled = await evaluate("(()=>{const s=document.createElement('style');s.id='work7-css-baseline';s.textContent="+JSON.stringify(cssBaseline)+";document.head.appendChild(s);return true})()");
+          assert.ok(enabled,'Isolated work7 CSS-only baseline installed');
+          await sleep(200);
+          const baseline = await command('Page.captureScreenshot', {
+            format:'png',fromSurface:true,captureBeyondViewport:false
+          });
+          await writeFile(join(output,'before-'+kind+'-384x512.png'),
+            Buffer.from(baseline.data,'base64'));
+          await evaluate("(()=>{document.getElementById('work7-css-baseline')?.remove();return true})()");
+          await sleep(200);
+        }
         const screen = await command('Page.captureScreenshot', {
           format:'png',fromSurface:true,captureBeyondViewport:false
         });
