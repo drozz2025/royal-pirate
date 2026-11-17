@@ -2826,3 +2826,19 @@
     box-shadow:inset 0 1px #f6ddb06b,0 3px 7px #06101a9c;
   }
 }
+
+/* WORK4/#104 21h — 04 Forge, real three-level ink inside the approved
+   charcoal foundry plate. The 384px artwork depicts deep blue-black embossed
+   readings; remove the flat tobacco-colored filling ONLY within the current
+   three live level rows. The single source cannon, furnace opening, actual
+   costs, status text, touch geometry and WORK0 dock are immutable. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage .w4-forge-live-level:where(*) {
+    background:linear-gradient(104deg,#1d3038eb,#0b2232ed);
+    border-color:#6b818aab;
+  }
+  .w4-forge #w4-forge-panel > .w4-forge-stage .w4-forge-live-level.is-current:where(*) {
+    background:linear-gradient(104deg,#30413ab5,#142d3aed);
+    border-color:#cdae78;
+  }
+}
