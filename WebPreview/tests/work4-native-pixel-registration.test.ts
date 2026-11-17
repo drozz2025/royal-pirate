@@ -64,7 +64,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
   const temp=mkdtempSync(join(tmpdir(),'royal-work4-reg-'));
   let browser:ReturnType<typeof spawn>|undefined;
   let ws:WebSocket|undefined;
-  t.after(async()=>{ws?.close();browser?.kill('SIGTERM');server.kill('SIGTERM');await sleep(350);rmSync(temp,{force:true,recursive:true});});
+  t.after(async()=>{ws?.close();browser?.kill('SIGTERM');server.kill('SIGTERM');await sleep(500);rmSync(temp,{force:true,recursive:true,maxRetries:12,retryDelay:250});});
   const origin='http://127.0.0.1:'+port+'/royal-pirate/';
   let live=false;
   for(let n=0;n<100;n++){
