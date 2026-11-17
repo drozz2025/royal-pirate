@@ -5158,3 +5158,15 @@
     filter:brightness(.645) saturate(1.055);
   }
 }
+
+/* WORK8 / issue #104 — Missions 07 exclusively, 2026-11-17.
+   Compare the real seven-day board at .645 (integrated HEAD) against a
+   slightly deeper navy enamel at .620 on the same Chromium frame. Geometry,
+   all real rewards, mission data, actions, ranking 08 and dock are unchanged.
+   Historical A/B classes also inhibit this override, keeping independent
+   tests of previously merged visual treatments reproducible. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-daily-midnight-ab-baseline):not(.work8-missions-daily-depth-ab-baseline):not(.work8-missions-daily-luminance-ab-baseline):not(.work8-missions-ink-ab-baseline):not(.work8-missions-frame-ab-baseline) .w8-approved-missions .w8-approved-daily {
+    filter:brightness(.620) saturate(1.055);
+  }
+}
