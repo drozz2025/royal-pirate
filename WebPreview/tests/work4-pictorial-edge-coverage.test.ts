@@ -21,7 +21,11 @@ test('04: existing cannon wheels and wooden carriage stay opaque near the lower 
   assert.equal((cannon.match(/#000 92%,transparent 100%/g)||[]).length,2);
   assert.equal((cannon.match(/#000 96%,transparent 100%/g)||[]).length,2);
   assert.match(painting,/svg\.w4-cannon-art\.w4-reference-cannon/);
-  assert.doesNotMatch(cannon,/display:none|visibility:hidden/);
+  // Keep this assertion on the actual crop only: later WORK4 compact rules
+  // legitimately hide other UI elements and must not fail this artwork test.
+  const referenceCrop=painting.split('.w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {')[1]?.split('\n}')[0];
+  assert.ok(referenceCrop);
+  assert.match(referenceCrop,/display:block/);
 });
 
 test('03/04: painted edges cannot alter harbour dock or compositor',()=>{
