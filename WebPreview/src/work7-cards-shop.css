@@ -4135,26 +4135,24 @@
 }
 
 
+
 /* WORK7 / #104 — native 384×512 matte-wood physical-frame registration
- * Baseline: WORK0-integrated v0.1.72 SHA b9e54f556434eb9aa1acf5ff086a0fe7ff2a6dd6.
- * Natively rendered 05 and 06 have substantially brighter wooden/metallic
- * borders than the approved source even when approved illustration crops
- * retain their own RGB highlights. Tone the eight genuine live card frames,
- * the 3 true chest borders and the one existing Captain backing separately.
- * No image screenshot backgrounds, no fabricated offers or level/price data.
- * Inactive on 320×568 and taller viewports. approved:false, 0/8. */
+ * Exact baseline: WORK0 v0.1.72 b9e54f556434eb9aa1acf5ff086a0fe7ff2a6dd6.
+ * First darkening sweep was REJECTED by Chromium: cards 61.93→61.94,
+ * ROI 57.76→57.81. Per-frame source/reference residuals identified
+ * four panels that need optical illumination, NOT universal darkening.
+ * Keep cards 1–4 at merged values; adjust 5–8 individually.
+ * Shop pack + rare/epic physical panels improved in that same A/B;
+ * revert the legendary frame's unsuccessful darkening.
+ * All artwork, geometry, genuine PRÉVIA/EM BREVE labels and local
+ * state unchanged. Outside 384×512 this block is inactive. 0/8. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.565)}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.730)}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.560)}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.625)}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.570)}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.695)}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.605)}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.695)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.600)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.750)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.650)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.750)}
   .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.770)}
   .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.770)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.630)}
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.855)}
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
     filter:saturate(1.2) contrast(1.06) brightness(1.10) drop-shadow(0 6px 5px #14062ca3)
