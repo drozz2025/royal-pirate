@@ -161,9 +161,9 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         "const box=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,bottom:r.bottom}};"+
         "const scene=q('.w4-'+ "+JSON.stringify(screen)+" + ' .w4-'+("+JSON.stringify(screen)+"==='fleet'?'harbour':'forge')+'-stage');"+
         "const artwork=q("+JSON.stringify(screen==='fleet'?'.w4-reference-ship':'.w4-reference-cannon')+");"+
-        "const dock=q('.app-dock');"+
+        "const dock=q('.harbour-nav.app-dock-porto');"+
         "return {width:innerWidth,height:innerHeight,scene:box(scene),artwork:box(artwork),"+
-        "dock:box(dock),dockItems:q('.app-dock')?.querySelectorAll('.app-tab-glyph').length||0,"+
+        "dock:box(dock),dockItems:q('.harbour-nav.app-dock-porto')?.querySelectorAll('.harbour-nav-item').length||0,"+
         "overflow:document.documentElement.scrollWidth>innerWidth+1,"+
         "materials:box(q('.w4-materials .w4-resource-grid'))};})()");
       assert.equal(geometry.dockItems,5,'five original dock items retained');
