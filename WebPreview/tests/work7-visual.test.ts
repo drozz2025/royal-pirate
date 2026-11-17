@@ -305,14 +305,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         // only commit a verified winner in a separate revision.
         if (kind==='shop' && width===384 && height===512) {
           const candidates:[string,number][]=[
-            ['pack',.72],['pack',.78],['pack',.84],['pack',.9],
-            ['pack',1.0],['pack',1.06],['pack',1.12],['pack',1.18],
-            ['pack',1.25],['pack',1.32]
+            ['pack',.7],['pack',.8],['pack',.88],['pack',.94],
+            ['pack',1.04],['pack',1.09],['pack',1.15],['pack',1.23],
+            ['pack',1.32],['pack',1.43]
           ];
           for (const [chest,value] of candidates) {
             const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
-              '.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop'+
-              '{filter:saturate(1.2) contrast(1.06) brightness('+value+') drop-shadow(0 6px 5px #14062ca3)!important}}';
+              '.w7-screen[data-work7-screen="shop"] .w7-captain-pack'+
+              '{filter:brightness('+value+')!important}}';
             await evaluate("(()=>{const s=document.createElement('style');s.id='w7-sweep';s.textContent="+
               JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
             await sleep(90);
@@ -331,7 +331,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               "for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
               "if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=v;roiCount++}}}"+
               "return {global:Math.round(sum/count*1000)/1000,roi:Math.round(roi/roiCount*1000)/1000}})()");
-            console.log('WORK7 PACK SWEEP '+chest+'='+value+' '+JSON.stringify(metrics));
+            console.log('WORK7 PANEL SWEEP '+chest+'='+value+' '+JSON.stringify(metrics));
             await evaluate("(()=>{document.getElementById('w7-sweep')?.remove();return true})()");
             await sleep(55);
           }
