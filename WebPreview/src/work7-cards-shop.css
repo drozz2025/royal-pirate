@@ -3941,3 +3941,32 @@
       inset 0 -2px 1px #ffdb7b2b;
   }
 }
+
+/* WORK7/#104 — native 384×512 carved album + treasure panel, 17 Nov 11h.
+ * The source 05 has a steel/charcoal atlas recess, not a luminous gold
+ * outline around the entire section. Individual eight gilded picture frames
+ * remain untouched, with genuine PRÉVIA and local count intact. On 06 the
+ * reference velvet is royal violet rather than reddish-brown. No new
+ * screenshot backgrounds, filters, halos, opaque UI covers or fake offers.
+ * This native-only material pass leaves 320px and tall screens pixel-identical.
+ * approved:false, 0/8 until human review. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+    border-color:transparent transparent #49515b;
+    border-radius:0;
+    box-shadow:none;
+    background:transparent;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
+    border-color:#515a5f;
+    border-bottom-color:#343b41;
+    background:
+      radial-gradient(ellipse 85% 60% at 50% 18%,#37495740,transparent 84%),
+      linear-gradient(180deg,#171f2a 0%,#101a26 60%,#111720 100%);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    background:
+      radial-gradient(ellipse 66% 95% at 29% 42%,#cb3e9678,transparent 88%),
+      linear-gradient(112deg,#4d0f66 0%,#460a6c 49%,#160c4d 100%);
+  }
+}

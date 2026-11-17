@@ -45,17 +45,28 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   /* Strict current parent-HEAD A/B: restore the two existing #283
    * physical frame values AND the existing corner-metal inner rim.
    * Everything else, including the merged 320px safety fix, stays live. */
+  // Undo ONLY the two material backgrounds introduced in this PR. This is
+  // the exact merged v0.1.64 HEAD, not the pre-#288 inlay/brightness baseline.
+  // Verify shape/touch/MAE on the same Chromium frame without navigating away.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-        filter:brightness(.88)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+        border-color:#e8c68e!important;
+        border-radius:7px!important;
+        box-shadow:inset 0 1px rgba(255,240,192,.53),0 2px 4px rgba(4,19,41,.32)!important;
+        background:linear-gradient(90deg,#101e2e,#152734 50%,#101e2e)!important;
       }
-      .w7-screen[data-work7-screen="shop"] .w7-chest{
-        filter:brightness(.89)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
+        border-color:#b69a70!important;
+        border-bottom-color:#695035!important;
+        background:
+          radial-gradient(ellipse 85% 60% at 50% 18%,#263b576b,transparent 84%),
+          linear-gradient(180deg,#111e35 0%,#07182d 60%,#0b1830 100%)!important;
       }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot::before,
-      .w7-screen[data-work7-screen="shop"] .w7-chest::before{
-        box-shadow:inset 0 0 0 1px #55301370!important;
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+        background:
+          radial-gradient(ellipse 66% 95% at 29% 42%,#bd539078,transparent 88%),
+          linear-gradient(112deg,#572052 0%,#4b1d4f 49%,#23183e 100%)!important;
       }
     }`;
   const cssBaseline = currentHeadBaseline;
@@ -191,6 +202,31 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await waitFor("(()=>{const images=[...document.querySelectorAll('[data-work7-screen=\""+kind+"\"] .w7-approved-crop img')];return images.length==="+(kind==='cards'?8:4)+"&&images.every(i=>i.complete&&i.naturalWidth>0)})()");
         await evaluate('document.fonts.ready.then(()=>true)');
         await sleep(350);
+        // Exercise real touchscreen input on WORK7's own secondary tab, then
+        // restore the same collection/offers scene before the A/B screenshot.
+        // This guards genuine navigation/labels against a noninteractive repaint.
+        const touchLocalTab = async (index:number,expectedLabel:string) => {
+          const point=await evaluate("(()=>{const t=document.querySelector('[data-work7-screen=\\\""+kind+"\\\"] .w7-tabs button:nth-child("+index+")');if(!t)return null;const r=t.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
+          assert.ok(point,'WORK7 local tab '+index+' must be a real touch target');
+          await command('Input.dispatchTouchEvent',{
+            type:'touchStart',touchPoints:[{x:point.x,y:point.y,id:14}]
+          });
+          await sleep(65);
+          await command('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+          await waitFor("!!document.querySelector('[data-work7-screen=\\\""+kind+"\\\"] [role=tabpanel][aria-label=\\\""+expectedLabel+"\\\"]')");
+        };
+        const walletBefore=await evaluate("document.querySelector('.w7-wallet strong')?.textContent||null");
+        if(kind==='cards'){
+          await touchLocalTab(2,'Melhorar cartas');
+          await touchLocalTab(1,'A minha coleção');
+        } else {
+          await touchLocalTab(2,'PACOTES DE MOEDAS');
+          await touchLocalTab(1,'Ofertas disponíveis');
+        }
+        const walletAfter=await evaluate("document.querySelector('.w7-wallet strong')?.textContent||null");
+        assert.equal(walletAfter,walletBefore,'WORK7 tab navigation cannot mutate genuine currency');
+        await waitFor("(()=>{const imgs=[...document.querySelectorAll('[data-work7-screen=\\\""+kind+"\\\"] .w7-approved-crop img')];return imgs.length==="+(kind==='cards'?8:4)+"&&imgs.every(img=>img.complete&&img.naturalWidth>0)})()");
+        await sleep(100);
 
         const geometry = await evaluate("(()=>{"+
           "const rect=e=>{if(!e)return null;const b=e.getBoundingClientRect();return {x:Math.round(b.x),y:Math.round(b.y),width:Math.round(b.width),height:Math.round(b.height),bottom:Math.round(b.bottom)}};"+
@@ -315,12 +351,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         if(width===384 && height===512) {
           assert.ok(Number.isFinite(comparison.roiBefore)&&Number.isFinite(comparison.roiAfter),'Real native 384 ROI metrics recorded');
           if(kind==='cards') {
-            assert.ok(comparison.roiAfter<comparison.roiBefore,'Eight portrait pigments must improve approved native ROI vs same-frame HEAD');
-            assert.ok(comparison.mae<comparison.maeBefore,'Cards global MAE must improve vs same-frame HEAD');
+            assert.ok(comparison.roiAfter!==null&&comparison.mae!==null,
+              'Keep reference metrics available for final gate after both screens');
           }
           if(kind==='shop') {
-            assert.ok(comparison.roiAfter<comparison.roiBefore,'Native approved chest ROI must improve vs same-frame HEAD');
-            assert.ok(comparison.mae<comparison.maeBefore,'Full native 384px shop MAE must also improve vs same-frame HEAD');
+            assert.ok(comparison.roiAfter!==null&&comparison.mae!==null,
+              'Measure actual Captain/chests ROI before joint gate');
           }
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y+1),
             'All true PRÉVIA / EM BREVE labels must stay above the dock at native size');
@@ -349,4 +385,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     await writeFile(join(output,'work7-report.json'),JSON.stringify(report,null,2)+'\n');
   }
   assert.equal(report.screens.length,8,'All four viewports must capture both screens');
+  const native=report.screens.filter(screen=>screen.width===384&&screen.height===512);
+  assert.equal(native.length,2,'Both real native screens must be available');
+  assert.ok(native.every(screen=>
+    screen.maeRgbAfter<screen.maeRgbBefore&&screen.roiMaeAfter<screen.roiMaeBefore),
+    'Both live 05/06 screens must strictly improve global RGB MAE and artwork ROI against merged HEAD: '+
+    JSON.stringify(native.map(s=>({kind:s.kind,global:[s.maeRgbBefore,s.maeRgbAfter],
+      roi:[s.roiMaeBefore,s.roiMaeAfter]}))));
 });
