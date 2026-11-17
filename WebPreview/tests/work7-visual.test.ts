@@ -44,24 +44,19 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // Restoring it in the SAME Chromium frame isolates ONLY this PR's
   // four optical changes, including preserving original 320px rules.
   const currentHeadBaseline = `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.63)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.77)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.61)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.65)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.80)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.80)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.65)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop,
-      .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.11) drop-shadow(0 4px 3px #041327a8)!important
+    /* WORK0-integrated 47727b7 (v0.1.73): restore ONLY two overridden
+       material backings. Every other active rule is identical in the same
+       Chromium DOM/frame, with original CSS 320px/tall view untouched. */
+    @media (min-width:355px) and (max-width:390px) and (max-height:560px) {
+      .w7-screen[data-work7-screen="cards"] .w7-collection-content {
+        background:
+          radial-gradient(ellipse 92% 95px at 50% 0%,#49677b45,transparent 92%),
+          linear-gradient(180deg,#18374d 0%,#102b43 44%,#0a2039 70%,#061a33 100%) !important;
       }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.16) drop-shadow(0 4px 3px #041327a8)!important
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.88)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)!important
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack {
+        background:
+          radial-gradient(ellipse 66% 95% at 29% 42%,#a51c6655,transparent 88%),
+          linear-gradient(112deg,#360957 0%,#31065a 49%,#110839 100%) !important;
       }
     }`;
   const cssBaseline = currentHeadBaseline;
