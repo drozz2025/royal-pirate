@@ -90,7 +90,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        enable it only for the independent coastal A/B near the end. This
        preserves the exact original v0.1.75 baselines without relaxing
        their MAE or pixel-stability requirements. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-sea-depth-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -810,6 +810,56 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'coastal pigment must measurably improve native approved art and full-frame MAE');
     assert.ok(coastComparison.metrics.daily.delta<.12&&coastComparison.metrics.chests.delta<.12&&coastComparison.metrics.quests.delta<.12,
       'existing genuine mission and daily reward ROIs cannot materially regress');
+
+
+    /* WORK8/#104 sea-depth experiment: exact same loaded Chromium DOM,
+       paused frame and native 384x512 viewport; only coastal pigment toggled.
+       Historical #338 coast/quest gates above ran with this candidate disabled. */
+    const seaFlag='work8-missions-sea-depth-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(seaFlag)+');true');
+    await delay(140);
+    const seaBeforeLayout=await headingLayout();
+    const seaBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(seaFlag)+');true');
+    await delay(140);
+    const seaAfterLayout=await headingLayout();
+    const seaAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const seaSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+seaBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+seaAfter))
+      .replace('quests:[12,155,372,321],daily:','quests:[12,155,372,321],coast:[0,86,384,155],daily:');
+    assert.notEqual(seaSource,source,'sea depth uses new genuine Chromium captures');
+    const seaComparison=await evalJs(seaSource);
+    const saveSea=(name:string,png:string)=>writeFileSync(join(evidence,name),Buffer.from(png,'base64'));
+    saveSea('missions-sea-before-384x512.png',seaBefore);
+    saveSea('missions-sea-after-384x512.png',seaAfter);
+    saveSea('missions-sea-original-render-overlay-before-384x512.png',seaComparison.overlays[0]);
+    saveSea('missions-sea-original-render-overlay-after-384x512.png',seaComparison.overlays[1]);
+    const seaReport={
+      baseHead:'5e8a6d2f8d7a9dec1efa6053d8d173ade2fa560f',version:'v0.1.76',
+      scope:'07 Missions coastal-pigment only; 3 real missions, 7 actual rewards unchanged',
+      references:['assets/design-approved/00-referencia-original-aprovada.webp',
+        'assets/design-approved/00-painel-oito-ecras.webp',
+        ...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(n=>'assets/design-approved/'+n)],
+      source:'assets/design-approved/07-missoes.webp, native 384x512 no resize',
+      method:'same Chromium tab, native DPR1, all artwork decoded, exact same paused frame, root CSS toggle',
+      roi:seaComparison.metrics,unchanged:seaComparison.unchanged,
+      beforeLayout:seaBeforeLayout,afterLayout:seaAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-sea-depth-controlled-ab.json'),JSON.stringify(seaReport,null,2));
+    console.log('WORK8 native 07 sea-depth A/B '+JSON.stringify(seaReport.roi));
+    assert.deepEqual(seaBeforeLayout,seaAfterLayout,'sea ink must not change any game, day or dock geometry');
+    assert.equal(seaAfterLayout.questCount,3);
+    assert.equal(seaAfterLayout.dayCount,7);
+    assert.equal(seaAfterLayout.dockCount,5);
+    assert.ok(seaAfterLayout.documentWidth<=386);
+    assert.ok(seaComparison.unchanged.header<.10&&seaComparison.unchanged.dock<.10,'Porto header and dock must remain pixel identical');
+    assert.ok(seaComparison.metrics.coast.delta<-.01&&seaComparison.metrics.full.delta<0,
+      'new coastal ink must improve authentic source MAE globally and in the targeted ROI');
+    assert.ok(seaComparison.metrics.daily.delta<.12&&seaComparison.metrics.quests.delta<.12&&seaComparison.metrics.chests.delta<.12,
+      'three real missions and seven rewards may not regress materially');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
