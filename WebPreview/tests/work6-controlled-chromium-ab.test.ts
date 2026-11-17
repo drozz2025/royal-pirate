@@ -74,6 +74,73 @@ async function capture(request:(method:string,params?:Record<string,unknown>)=>P
   return pair.metrics;
 }
 
+
+/**
+ * The previous water/enemy ROI rectangles intersect the near-right cannon.
+ * A changed foreground silhouette therefore showed up as a tiny "water" and
+ * "enemy" MAE regression even though their *unoccluded* pixels were identical.
+ * Verify the actual causal pixel envelope against the two unscaled CDP PNGs.
+ * The conservative foreground rectangle is FIXED before inspecting results;
+ * scenery outside it must be exactly unchanged, RGB channel by channel.
+ */
+async function verifyCausalIsolation(
+  request:(method:string,params?:Record<string,unknown>)=>Promise<any>,
+  reference64:string
+) {
+  const baseline64=readFileSync('work6-qa/ab-baseline-384x512.png').toString('base64');
+  const candidate64=readFileSync('work6-qa/ab-candidate-384x512.png').toString('base64');
+  const code=[
+    '(async()=>{',
+    'const load=async(bytes,type)=>{const im=new Image();im.src="data:"+type+";base64,"+bytes;await im.decode();return im;};',
+    'const before=await load('+JSON.stringify(baseline64)+',"image/png");',
+    'const after=await load('+JSON.stringify(candidate64)+',"image/png");',
+    'const original=await load('+JSON.stringify(reference64)+',"image/webp");',
+    'if([before,after,original].some(im=>im.width!==384||im.height!==512))throw Error("non-native A/B input");',
+    'const pix=im=>{const c=document.createElement("canvas");c.width=384;c.height=512;const g=c.getContext("2d",{willReadFrequently:true});g.drawImage(im,0,0);return g.getImageData(0,0,384,512).data;};',
+    'const a=pix(before),b=pix(after),ref=pix(original);',
+    // This fixed rectangle covers the right foreground cannon and its carriage,
+    // not the left cannon, ship hull/upper sails, header or buttons.
+    'const foreground={x0:210,y0:270,x1:384,y1:490};',
+    'const inForeground=(x,y)=>x>=foreground.x0&&x<foreground.x1&&y>=foreground.y0&&y<foreground.y1;',
+    'let outsideChangedPixels=0,changedPixels=0,minX=384,minY=512,maxX=-1,maxY=-1;',
+    'const visual=document.createElement("canvas");visual.width=384;visual.height=512;',
+    'const ctx=visual.getContext("2d");const heat=ctx.createImageData(384,512);',
+    'for(let y=0;y<512;y++)for(let x=0;x<384;x++){',
+    'const i=(y*384+x)*4;let changed=false,maximum=0;',
+    'for(let k=0;k<3;k++){const v=Math.abs(a[i+k]-b[i+k]);if(v)changed=true;maximum=Math.max(maximum,v);}',
+    'heat.data[i]=changed?Math.min(255,maximum*2):0;',
+    'heat.data[i+1]=changed&&(!inForeground(x,y))?255:0;',
+    'heat.data[i+2]=changed?Math.min(255,maximum):0;heat.data[i+3]=255;',
+    'if(!changed)continue;changedPixels++;',
+    'minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);',
+    'if(!inForeground(x,y))outsideChangedPixels++;',
+    '}ctx.putImageData(heat,0,0);',
+    // Protected unoccluded scenery pixels; original rectangular ROIs include
+    // changed foreground pixels at y>=270 and cannot be attributed to the sea.
+    'const regions={enemy_unoccluded:[210,167,375,297],water_unoccluded:[7,248,375,360]};',
+    'const scenery={};for(const [name,[x0,y0,x1,y1]] of Object.entries(regions)){',
+    'let sumBefore=0,sumAfter=0,pixels=0;',
+    'for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){if(inForeground(x,y))continue;',
+    'const i=(y*384+x)*4;for(let k=0;k<3;k++){sumBefore+=Math.abs(ref[i+k]-a[i+k]);sumAfter+=Math.abs(ref[i+k]-b[i+k]);}pixels++;',
+    '}scenery[name]={pixels,baseline:sumBefore/(3*pixels),candidate:sumAfter/(3*pixels),delta:(sumAfter-sumBefore)/(3*pixels)};',
+    '}',
+    'return {foreground,changedPixels,outsideChangedPixels,changedBounds:changedPixels?[minX,minY,maxX,maxY]:null,scenery,differencePng:visual.toDataURL("image/png").split(",")[1]};',
+    '})()'
+  ].join('\n');
+  const response=await request('Runtime.evaluate',{expression:code,awaitPromise:true,returnByValue:true});
+  if(response.exceptionDetails)throw Error('WORK6 causal isolation image check failed '+JSON.stringify(response.exceptionDetails));
+  const data=response.result.value as {
+    foreground:{x0:number;y0:number;x1:number;y1:number};
+    changedPixels:number;outsideChangedPixels:number;changedBounds:number[]|null;
+    scenery:Record<string,{pixels:number;baseline:number;candidate:number;delta:number}>;
+    differencePng:string
+  };
+  assert.ok(data?.changedPixels>0,'candidate must change real pixels, not only source code');
+  const {differencePng,...report}=data;
+  writeFileSync('work6-qa/ab-causal-pixel-difference-384x512.png',Buffer.from(differencePng,'base64'));
+  return report;
+}
+
 test('WORK6: controlled genuine Chromium 384x512 A/B with fixed wave and camera', {timeout:100000},async t=>{
   const chrome=process.env.CHROME_BIN||findBinary('google-chrome')||findBinary('chromium');
   if(!chrome){if(process.env.CI)throw Error('Chrome required in CI');t.skip('No Chromium locally');return;}
@@ -110,12 +177,17 @@ test('WORK6: controlled genuine Chromium 384x512 A/B with fixed wave and camera'
     const reference=readFileSync(new URL('../../assets/design-approved/02-batalha.webp',import.meta.url)).toString('base64');
     const base=await capture(send,'baseline',p,reference);
     const candidate=await capture(send,'candidate',p,reference);
+    const isolation=await verifyCausalIsolation(send,reference);
     const delta=Object.fromEntries(Object.keys(bounds).map(key=>[key,+(candidate[key]-base[key]).toFixed(4)]));
     const metrics={reference:'assets/design-approved/02-batalha.webp',viewport:'384x512',
-      fixedWaveTime:2.25,sameCamera:true,baseline:base,candidate,delta,approved:false};
+      fixedWaveTime:2.25,sameCamera:true,baseline:base,candidate,delta,causalIsolation:isolation,approved:false};
     mkdirSync('work6-qa',{recursive:true});
     writeFileSync('work6-qa/ab-same-frame-metrics.json',JSON.stringify(metrics,null,2));
     console.log('WORK6 CONTROLLED A/B MAE:',JSON.stringify(metrics));
+    assert.equal(isolation.outsideChangedPixels,0,'no scenery, HUD, left-cannon or Porto pixel may change outside the fixed right-foreground envelope');
+    for(const [name,roi] of Object.entries(isolation.scenery)){
+      assert.ok(Math.abs(roi.delta)<1e-8,name+' unoccluded scenery must be pixel-identical');
+    }
     assert.ok(delta.right_cannon<-0.05,'right cannon must improve');
     assert.ok(delta.left_cannon<0.5,'port cannon must not regress');
     assert.ok(delta.global<-0.02,'global reference MAE must improve before merge');
