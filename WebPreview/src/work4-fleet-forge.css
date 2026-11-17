@@ -2242,3 +2242,54 @@
     transform-origin:43% 92%;
   }
 }
+
+
+/* WORK4 approved source painting pass 17 Nov / #104.
+   Only two art-only crops from the owner's native 384x512 originals.
+   They REPLACE the stage ship/cannon illustrations, not add a second ship
+   or cannon; source image rectangles end before any reference HUD/upgrade data.
+   Keep live level/attribute panels above the art. Do not touch the protected
+   Forge contain:paint + translateZ(0) compositor (#158/#159), Porto or dock. */
+.w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {
+  position:absolute;
+  z-index:1;
+  display:block;
+  width:auto!important;
+  max-width:60%!important;
+  height:clamp(168px,54vw,240px)!important;
+  aspect-ratio:185/189;
+  left:1%!important;
+  top:0!important;
+  bottom:0!important;
+  right:auto;
+  margin:auto 0!important;
+  transform:none!important;
+  transform-origin:center!important;
+  filter:drop-shadow(0 9px 7px #031926c9)!important;
+  pointer-events:none;
+  overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 88%,transparent 100%);
+  mask-image:linear-gradient(to bottom,#000 0%,#000 88%,transparent 100%);
+}
+.w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {
+  position:absolute;
+  z-index:2;
+  display:block;
+  width:auto!important;
+  max-width:62%!important;
+  height:clamp(165px,56vw,237px)!important;
+  aspect-ratio:155/154;
+  left:0!important;
+  right:auto!important;
+  top:0!important;
+  bottom:0!important;
+  margin:auto 0!important;
+  overflow:hidden;
+  pointer-events:none;
+  /* No GPU filter, transform or mask on the protected forge scene/cannon. */
+  filter:none!important;
+}
+.w4-fleet .w4-stage-label,
+.w4-forge .w4-forge-description {
+  z-index:30;
+}
