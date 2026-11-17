@@ -359,10 +359,10 @@ export class OceanScene {
       const cleat=add(box,darkOak,side*4.95,.77,76.4,.64,.19,.22);
       cleat.rotation.y=side*.3;
     }
-    // The heavier existing cannon barrels sit farther apart. Low wooden
-    // support beams now align with those TWO muzzles; the former raised
-    // rectangular frames cut across the sea and partly hid the broadside.
-    for(const x of [-3.15,3.15]){
+    // Asymmetric first-person broadside: align the existing low support
+    // beams with each muzzle rather than leaving parallel rails on the horizon.
+    // The actual battle cannon origins, camera and HUD remain untouched.
+    for(const x of [-2.42,5.72]){
       add(box,oak,x,1.45,65.65,2.30,.29,.48);
       add(box,gold,x,1.63,65.54,2.26,.10,.20);
       for(const dx of [-.96,.96])
