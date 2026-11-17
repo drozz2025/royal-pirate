@@ -163,6 +163,7 @@ export class OceanScene {
     // Battle 02 only: expand the *visible* red silhouette with real wind-filled
     // canvas skirts. The enemy root stays at its unchanged physics position.
     this.dressBattleEnemy();
+    this.dressBattleBroadside();
     // A single pooled flash per ship rides the correct firing-side centre gun.
     // No dynamic geometry or material allocations during a cannon shot.
     const flashGeometry=new T.SphereGeometry(1,10,8);
@@ -289,6 +290,102 @@ export class OceanScene {
     );
     seams.name='battle-only-red-hem-stitching';
     rig.add(seams);
+  }
+
+
+  /**
+   * WORK6 #104: a carved, genuinely curved red broadside on the EXISTING
+   * enemy hull, not a billboard or a second ship. It follows the nine source
+   * hull stations, so its silhouette bends towards the bow and stern.
+   * Render-only dressing on the enemy root: hidden in Porto and absent from
+   * battle physics, weapons, raycasting controls, HUD and camera logic.
+   */
+  private dressBattleBroadside(){
+    const dressing=new T.Group();
+    dressing.name='battle-only-crimson-carved-broadside';
+    const stations=[-4.9,-4.3,-3.2,-1.6,0,1.8,3.2,4.3,5];
+    const widths=[.25,1.1,1.55,1.78,1.83,1.65,1.3,.75,.08];
+    const position:number[]=[],pigment:number[]=[],faces:number[]=[];
+    const keel=new T.Color('#481d29'),plum=new T.Color('#762931');
+    const sunlit=new T.Color('#b5573d');
+    // Use the original hull's rising station-width factor to hug the surface,
+    // rather than placing a straight red box in front of the 3D enemy.
+    const flare=(y:number)=>.53+(y+.5)*(.065/.35);
+    for(const side of [-1,1]){
+      for(let band=0;band<7;band++){
+        const y0=-.44+band*.33,y1=y0+.315;
+        const offset=position.length/3;
+        for(let station=0;station<stations.length;station++){
+          const z=stations[station],w=widths[station];
+          const carve=(y:number)=>side*(w*flare(y)+.045);
+          position.push(carve(y0),y0,z,carve(y1),y1,z);
+          const light=Math.max(.05,Math.min(.90,
+            .14+band*.092+Math.sin(station*1.34+band*.65)*.058));
+          const tone=keel.clone().lerp(plum,Math.min(1,light*1.3))
+            .lerp(sunlit,Math.max(0,light-.22)*.53);
+          const upper=tone.clone().lerp(sunlit,.095);
+          pigment.push(tone.r,tone.g,tone.b,upper.r,upper.g,upper.b);
+        }
+        for(let s=0;s<stations.length-1;s++){
+          const a=offset+s*2;
+          if(side>0)faces.push(a,a+1,a+2,a+1,a+3,a+2);
+          else faces.push(a,a+2,a+1,a+1,a+2,a+3);
+        }
+      }
+    }
+    const shell=new T.BufferGeometry();
+    shell.setAttribute('position',new T.Float32BufferAttribute(position,3));
+    shell.setAttribute('color',new T.Float32BufferAttribute(pigment,3));
+    shell.setIndex(faces);shell.computeVertexNormals();shell.computeBoundingSphere();
+    const hull=new T.Mesh(shell,new T.MeshStandardMaterial({
+      vertexColors:true,side:T.DoubleSide,roughness:.76,metalness:.05
+    }));
+    hull.name='battle-only-curved-crimson-planking';
+    dressing.add(hull);
+
+    // Follow the ship's real gunwale curves. Continuous golden lines and a
+    // deeper shadow under the cap reveal the bow/stern sweep at mobile size.
+    const gilding=new T.MeshStandardMaterial({color:'#e4b462',metalness:.56,roughness:.37});
+    const darkTrim=new T.MeshStandardMaterial({color:'#422821',roughness:.76});
+    for(const side of [-1,1]){
+      for(const [y,radius,material] of [
+        [1.73,.068,gilding],[2.40,.083,gilding],[1.63,.057,darkTrim]
+      ] as const){
+        const curve=new T.CatmullRomCurve3(stations.map((z,i)=>
+          new T.Vector3(side*(widths[i]*flare(y)+.10),y,z)));
+        const rail=new T.Mesh(new T.TubeGeometry(curve,32,radius,7,false),material);
+        rail.name='battle-only-swept-hull-rail';
+        dressing.add(rail);
+      }
+    }
+
+    // Eight recessed dark gunports with bronze lips, following the curved
+    // sides; both materials are GPU-instanced (2 draw calls, no extra shots).
+    const rim=new T.InstancedMesh(
+      new T.TorusGeometry(.245,.071,7,18),
+      new T.MeshStandardMaterial({color:'#e3ae55',metalness:.62,roughness:.34}),8);
+    const recess=new T.InstancedMesh(
+      new T.CircleGeometry(.203,18),
+      new T.MeshStandardMaterial({color:'#181b25',roughness:.96,side:T.DoubleSide}),8);
+    rim.name='battle-only-engraved-gunport-rims';
+    recess.name='battle-only-recessed-gunports';
+    let id=0;
+    for(const side of [-1,1]){
+      const normal=new T.Vector3(side,0,0);
+      const quaternion=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,0,1),normal);
+      for(const station of [2,3,4,5]){
+        const z=stations[station],w=widths[station],x=side*(w*flare(1.08)+.16);
+        const ringMatrix=new T.Matrix4().compose(
+          new T.Vector3(x,1.08,z),quaternion,new T.Vector3(1,1,1));
+        const insetMatrix=new T.Matrix4().compose(
+          new T.Vector3(x-side*.018,1.08,z),quaternion,new T.Vector3(1,1,1));
+        rim.setMatrixAt(id,ringMatrix);recess.setMatrixAt(id,insetMatrix);id++;
+      }
+    }
+    rim.instanceMatrix.needsUpdate=true;recess.instanceMatrix.needsUpdate=true;
+    rim.computeBoundingSphere();recess.computeBoundingSphere();
+    dressing.add(recess,rim);
+    this.ships.enemy.root.add(dressing);
   }
 
   private dressBattleDeck(){
