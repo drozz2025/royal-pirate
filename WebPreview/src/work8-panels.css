@@ -5118,3 +5118,17 @@
     background:linear-gradient(180deg,#183749 0%,#071e32 43%,#03111e 100%);
   }
 }
+
+/* WORK8 / #104 · 07 MISSÕES ONLY · source-art contrast at native 384×512.
+   Approved source 07 has distinct bright etched swords, ship, target and
+   enamel CTAs. Chrome A/B rejected globally brightening the original art (+0.325 MAE).
+   A follow-up A/B rejected enlarging source-art crops (art ROI +1.213).
+   Retain ONLY verified quieter enamel on ongoing (non-claimable) CTA;
+   source paintings, three quest icons and geometry remain untouched.
+   No game-state/progress/reward edits; WORK0/Ranking/Porto/dock untouched.
+   The class disables this candidate for controlled same-frame Chromium A/B. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-source-contrast-ab-baseline) .w8-approved-missions .w8-approved-quest[data-state=active] > button {
+    filter:brightness(.87) saturate(1.04);
+  }
+}
