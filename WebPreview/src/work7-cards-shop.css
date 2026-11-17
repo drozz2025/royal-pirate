@@ -3781,3 +3781,38 @@
     transform-origin:52% 55%;
   }
 }
+
+
+/* WORK7 / #104 — native 05/06 composition: pack silhouette + 320px framing, 17 Nov 04h. */
+/* Baseline: #257 already recessed the 05 atlas and enlarged the real
+ * Captain treasure crop by 1.07. The approved 06 silhouette is still roughly
+ * 8px wider at the original 384x512; adjust that existing crop in place.
+ * No screenshot background, invented purchase, wallet, Porto or shared dock. */
+@media (min-width:355px) and (max-width:430px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    transform:translate(-2px,5px) scale(1.13);
+    transform-origin:52% 55%;
+  }
+}
+/* 320x568 QA: both rows of 05 are inset farther than the scaled approved
+ * artwork, and 06's actual EM BREVE plaques sit only 3px above the dock.
+ * Recover vertical room in the local pack frame rather than shrinking/hiding
+ * a chest, moving any navigation or truncating the truthful labels. */
+@media (max-width:354px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    width:calc(100% + 8px);
+    margin-left:-4px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    min-height:148px;
+    padding-block:4px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    min-height:19px;
+    margin:0;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+    width:calc(100% + 6px);
+    margin-left:-3px;
+  }
+}
