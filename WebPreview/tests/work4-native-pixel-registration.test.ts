@@ -209,7 +209,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         const previousCSS=[
           '.w4-fleet #w4-fleet-panel > .w4-harbour-stage {height:206px!important;min-height:206px!important;}',
           '.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label{top:10%!important;}'
-        ].join('\\n');
+        ].join('\n');
         assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
           "s.id='work4-fleet-before-first-fold';s.textContent="+JSON.stringify(previousCSS)+
           ";document.head.appendChild(s);return true;})()"));
@@ -258,7 +258,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           previousGeometry:previousGeo,afterGeometry:revisedGeo,
           sameReactFrame:true,native:true,approved:false};
         writeFileSync(join(folder,'fleet-first-fold-controlled-ab.json'),
-          JSON.stringify(evidence,null,2)+'\\n');
+          JSON.stringify(evidence,null,2)+'\n');
         console.log('WORK4_FLEET_FIRST_FOLD_AB '+JSON.stringify(evidence));
         assert.ok(Math.abs(ab.after.ship-ab.before.ship)<.25,
           'the Royal Crown source-pixel ROI must not regress');
