@@ -4014,3 +4014,30 @@
       linear-gradient(112deg,#360957 0%,#31065a 49%,#110839 100%);
   }
 }
+
+
+/* WORK7 / #104 — native 384×512 source-art tonal depth (17 Nov, 14h).
+ * The reference portraits show materially brighter highlights on the
+ * bombardier, shield, elite crew and mine than the merged 0.1.67 crops;
+ * the legendary treasure is also underlit inside its unchanged frame.
+ * Raise only the corresponding REAL approved illustration pixels; the
+ * existing carved borders, physical sizes, captions, honest disabled
+ * offerings and actual game data stay untouched. At 320×568 and all tall
+ * screens the CSS is intentionally inactive. Not an approved artwork. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.19);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.16);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(.96);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.18);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(1.16) drop-shadow(0 4px 3px #041327a8);
+  }
+}
