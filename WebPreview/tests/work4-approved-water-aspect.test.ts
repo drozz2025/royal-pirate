@@ -25,7 +25,7 @@ test('WORK4/03: the approved water crop preserves its original 213:31 proportion
   assert.match(sea,/height:auto/);
   assert.match(sea,/aspect-ratio:213 \/ 31/);
   assert.match(sea,/max-height:29%/);
-  assert.doesNotMatch(sea,/height:29%/);
+  assert.doesNotMatch(sea,/(?:^|\n)\s*height:29%/);
   assert.match(sea,/pointer-events:none/);
   assert.match(css,/\.w4-fleet \.w4-harbour-stage::after \{background:none;\}/);
   assert.equal((fleet.match(/data-work4-crop="fleet"/g)||[]).length,1);
