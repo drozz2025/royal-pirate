@@ -4889,3 +4889,42 @@
     margin-top:-14px;
   }
 }
+
+
+/* WORK8 / #104 · 2026-11-17 06:24 — Missions 07 blue enamel and engraved
+   picture-frame treatment. Deliberately scoped to existing, real objectives
+   and the real seven-day strip. No change to geometry, player state or dock.
+   Controlled new-only baseline in the Chromium same-scene regression test. */
+:root:not(.work8-missions-enamel-ab-baseline) .w8-approved-missions .w8-approved-quest-list{
+  filter:brightness(.825) saturate(1.055);
+  border-color:#d5ad6e;
+  background:
+    radial-gradient(ellipse 95% 70% at 8% 5%,#70a9aa3d,transparent 79%),
+    repeating-linear-gradient(180deg,#f4c97d00 0px,#f4c97d00 11px,#f4c97d0b 12px,#f4c97d00 13px),
+    linear-gradient(164deg,#123e5b,#092943 51%,#051b30);
+  box-shadow:inset 0 1px #ffe2a79c,inset 0 -2px #06192e,0 3px #5d4127,0 6px 9px #001426ac;
+}
+:root:not(.work8-missions-enamel-ab-baseline) .w8-approved-missions .w8-approved-quest{
+  background:
+    radial-gradient(ellipse 100% 85% at 0% 38%,#438a9770,transparent 69%),
+    linear-gradient(171deg,#1b4e6a 0%,#10334f 49%,#071e35 100%);
+  border-top-color:#dbbd87;
+  border-bottom-color:#775538;
+  box-shadow:inset 0 1px #fff2c27a,inset 0 -1px #04192c,0 2px 2px #03182b;
+}
+:root:not(.work8-missions-enamel-ab-baseline) .w8-approved-missions .w8-approved-daily{
+  filter:brightness(.825) saturate(1.055);
+  border-color:#caa871;
+  background:
+    radial-gradient(ellipse 85% 44% at 50% 0%,#7ba9a43e,transparent 85%),
+    linear-gradient(171deg,#153e5b,#0b2b46 59%,#051a2f);
+  box-shadow:inset 0 1px #ffe5b49c,inset 0 -2px #06182c,0 3px #563a24,0 6px 9px #0314269c;
+}
+/* Re-lift printed captions against the deeper enamel, while preserving
+   disabled/enabled actions, progress, day-state indicators and tap targets. */
+:root:not(.work8-missions-enamel-ab-baseline) .w8-approved-missions .w8-approved-quest-core>strong,
+:root:not(.work8-missions-enamel-ab-baseline) .w8-approved-missions .w8-approved-daily h3,
+:root:not(.work8-missions-enamel-ab-baseline) .w8-approved-missions .w8-approved-days li>small{
+  color:#fff3d7;
+  text-shadow:0 1px #02182a,0 0 3px #f3d99b80;
+}
