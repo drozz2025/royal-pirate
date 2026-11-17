@@ -37,36 +37,27 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  const marker = '/* WORK7/#104 — 17 Nov 2026: original 05/06 native pictorial-value registration.';
+  const marker = '/* WORK7/#104 — 17 Nov 12h: selective pictorial exposure on native 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   // Native-only WORK7 pass, with all merged mobile geometry retained.
   // The same Chromium session, true 384x512 viewport and real assets measure
   // before/after, rather than comparing against a stale old PR.
-  /* Strict current parent-HEAD A/B: restore the two existing #283
-   * physical frame values AND the existing corner-metal inner rim.
-   * Everything else, including the merged 320px safety fix, stays live. */
-  // Undo ONLY the two material backgrounds introduced in this PR. This is
-  // the exact merged v0.1.64 HEAD, not the pre-#288 inlay/brightness baseline.
-  // Verify shape/touch/MAE on the same Chromium frame without navigating away.
+  // Exact HEAD A/B in one Chromium frame. Only the seven updated source-image
+  // exposure values are reversed; all inherited frame and geometry rules stay.
+  // Restore only the exposure properties added in this PR. The other 05/06
+  // material, crop transforms, 320px margin fixes and dock remain HEAD.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-collection-status{
-        border-color:#e8c68e!important;
-        border-radius:7px!important;
-        box-shadow:inset 0 1px rgba(255,240,192,.53),0 2px 4px rgba(4,19,41,.32)!important;
-        background:linear-gradient(90deg,#101e2e,#152734 50%,#101e2e)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop,
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop,
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop,
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop,
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{
+        filter:saturate(1.25) contrast(1.13) brightness(.88)!important;
       }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
-        border-color:#b69a70!important;
-        border-bottom-color:#695035!important;
-        background:
-          radial-gradient(ellipse 85% 60% at 50% 18%,#263b576b,transparent 84%),
-          linear-gradient(180deg,#111e35 0%,#07182d 60%,#0b1830 100%)!important;
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
-        background:
-          radial-gradient(ellipse 66% 95% at 29% 42%,#bd539078,transparent 88%),
-          linear-gradient(112deg,#572052 0%,#4b1d4f 49%,#23183e 100%)!important;
+      .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop,
+      .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
+        filter:saturate(1.27) contrast(1.12) brightness(.92) drop-shadow(0 4px 3px #041327a8)!important;
       }
     }`;
   const cssBaseline = currentHeadBaseline;
