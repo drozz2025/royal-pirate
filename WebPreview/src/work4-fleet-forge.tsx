@@ -1210,7 +1210,7 @@ function ForgeCannonArtwork(){
  * The four roster thumbnails and all working upgrade controls remain live.
  */
 function ApprovedFleetPainting(){
-  return <svg className="w4-ship-art w4-reference-ship" viewBox="40 151 197 189"
+  return <svg className="w4-ship-art w4-reference-ship" viewBox="18 146 223 194"
     data-work4-crop="fleet" role="img"
     aria-label="Galeão Royal Crown e costa tropical, arte pictórica aprovada">
     <image x="0" y="0" width="384" height="512"
@@ -1219,7 +1219,7 @@ function ApprovedFleetPainting(){
   </svg>;
 }
 function ApprovedForgePainting(){
-  return <svg className="w4-cannon-art w4-reference-cannon" viewBox="24 153 155 154"
+  return <svg className="w4-cannon-art w4-reference-cannon" viewBox="9 146 171 161"
     data-work4-crop="forge" role="img"
     aria-label="Canhão completo diante da fornalha de pedra e madeira, arte pictórica aprovada">
     <image x="0" y="0" width="384" height="512"
