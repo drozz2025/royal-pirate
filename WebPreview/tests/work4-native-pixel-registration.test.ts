@@ -8,7 +8,7 @@ import {createServer} from 'node:net';
 
 const css=readFileSync(new URL('../src/work4-fleet-forge.css',import.meta.url),'utf8');
 const marker='WORK4 / #104 — source-pixel registration of approved 03/04';
-const block=css.split(marker)[1]||'';
+const block=(css.split(marker)[1]||'').split('/* WORK4 / #104 — 17 Nov 10h:')[0];
 const nativeBaseline=[
   '@media (min-width:360px) and (max-width:399px) and (max-height:650px) {',
   '.w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {top:11px!important;}',
@@ -190,6 +190,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       // compact CSS, then undo both before measuring; no artificial gameplay
       // or currency changes, no edits to any shared shell, Porto or dock.
       let forgeMaterialsAB:any=null;
+      let forgeFinishAB:any=null;
       if(screen==='forge' && width===384 && height===512){
         const baselineStyle=[
           '.w4-forge #w4-forge-panel{gap:5px!important}',
@@ -233,7 +234,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           "if([ref,previous,current].some(i=>i.width!==384||i.height!==512))throw Error('Forge comparison scaled');"+
           "const pixels=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
           "const a=pixels(ref),b=pixels(previous),c=pixels(current);"+
-          "const rois={global:[0,0,384,512],materials:[16,327,375,459],action:[105,415,290,461],cannon:[100,230,160,300]};"+
+          "const rois={global:[0,0,384,512],materials:[16,327,375,459],action:[105,415,290,461],cannon:[100,230,160,300],foundryPanel:[218,187,372,331]};"+
           "const mae=(x,y,r)=>{let sum=0,n=0;for(let yy=r[1];yy<r[3];yy++)for(let xx=r[0];xx<r[2];xx++){const k=(yy*384+xx)*4;for(let j=0;j<3;j++){sum+=Math.abs(x[k+j]-y[k+j]);n++;}}return sum/n;};"+
           "const before={},after={};for(const [name,rect] of Object.entries(rois)){before[name]=mae(a,b,rect);after[name]=mae(a,c,rect);}"+
           "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
@@ -251,6 +252,114 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         writeFileSync(join(folder,'forge-materials-ab-384x512.json'),
           JSON.stringify(forgeMaterialsAB,null,2)+'\n');
         console.log('WORK4_FORGE_MATERIALS_AB '+JSON.stringify(forgeMaterialsAB));
+
+        // WORK4 11h / #104: same-source, same React state/frame A/B of
+        // the NEW charcoal wood/iron finish against the exact merged HEAD.
+        // Only temporary colour/material overrides are applied; geometry,
+        // levels, action, 44px touch target, the cannon and dock are identical.
+        const mergedHeadMaterialPaint=[
+          '.w4-forge #w4-forge-panel > .w4-materials {'+
+            'background:linear-gradient(90deg,#9b6c3855 0 1px,transparent 1px calc(100% - 1px),#9b6c3855 calc(100% - 1px)),'+
+            'linear-gradient(170deg,#172d40 0%,#102538 45%,#081b2f 100%)!important;'+
+            'border-color:#d2a46b!important;'+
+            'box-shadow:inset 0 1px #f5d5a466,0 2px 4px #05101d8a!important;}',
+          '.w4-forge #w4-forge-panel > .w4-materials h3 {'+
+            'color:#f5da9b!important;text-shadow:none!important;}',
+          '.w4-forge #w4-forge-panel .w4-resource-grid > div {'+
+            'background:transparent!important;box-shadow:none!important;}',
+          '.w4-forge #w4-forge-panel .w4-resource-grid small {color:#d3e5f3!important;}',
+          '.w4-forge #w4-forge-panel .w4-resource-grid strong {'+
+            'color:#fff0c7!important;text-shadow:none!important;}'
+        ].join('\n');
+        const paintGeometryExpression="(()=>{const b=s=>{const e=document.querySelector(s);"+
+          "if(!e)return null;const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height];};"+
+          "return {materials:b('.w4-materials'),"+
+          "action:b('#w4-forge-panel>.w4-improve-button'),"+
+          "cannon:b('.w4-reference-cannon'),"+
+          "dock:b('.harbour-nav.app-dock-porto'),"+
+          "fiveItems:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        const afterFinishGeometry=await evaluate(paintGeometryExpression);
+        assert.ok(await evaluate("(()=>{const style=document.createElement('style');"+
+          "style.id='work4-before-timber-finish';style.textContent="+
+          JSON.stringify(mergedHeadMaterialPaint)+";document.head.appendChild(style);return true;})()"));
+        await sleep(130);
+        const beforeFinishGeometry=await evaluate(paintGeometryExpression);
+        const timberBefore=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-forge-timber-384x512.png'),
+          Buffer.from(timberBefore,'base64'));
+        await evaluate("(()=>{document.getElementById('work4-before-timber-finish')?.remove();return true;})()");
+        assert.deepEqual(beforeFinishGeometry,afterFinishGeometry,
+          'paint-only Forge update must not change real cannon/cost/action/dock bounds');
+        assert.equal(afterFinishGeometry.fiveItems,5,
+          'all five existing dock actions stay untouched');
+        const timberSample=await evaluate(sample.replace(previousFrame,timberBefore));
+        assert.ok(timberSample?.before?.materials>=0&&timberSample?.after?.materials>=0);
+        assert.ok(Math.abs(timberSample.before.cannon-timberSample.after.cannon)<0.05,
+          'Forge cannon registration must remain unchanged');
+        writeFileSync(join(folder,'compare-forge-timber-384x512.png'),
+          Buffer.from(timberSample.image,'base64'));
+        delete timberSample.image;
+        forgeFinishAB={...timberSample,source:'HEAD merged Forge paint vs real WORK4 finish',
+          originalWidth:384,originalHeight:512,sameReactFrame:true,approved:false,
+          geometry:afterFinishGeometry};
+        writeFileSync(join(folder,'forge-timber-controlled-ab.json'),
+          JSON.stringify(forgeFinishAB,null,2)+'\n');
+        console.log('WORK4_FORGE_TIMBER_AB '+JSON.stringify(forgeFinishAB));
+
+        // New 04 foundry-plate A/B: physically darkened right panel versus
+        // the SAME release HEAD's bright navy panel, with untouched DOM,
+        // levels and exact cannon/interactive hitboxes.
+        const stageHeadPaint=[
+          '.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {'+
+            'background:linear-gradient(145deg,#102c47ed,#071c33f2)!important;'+
+            'border-color:#d5af78!important;'+
+            'box-shadow:inset 0 2px #ffedab45,0 4px 10px #090f1fa8!important;}',
+          '.w4-forge #w4-forge-panel > .w4-forge-stage .w4-forge-live-level {'+
+            'background:linear-gradient(100deg,#153c59,#0b2946)!important;'+
+            'border-color:#6e92a5a8!important;}',
+          '.w4-forge #w4-forge-panel > .w4-forge-stage .w4-forge-live-level.is-current {'+
+            'background:linear-gradient(100deg,#35576d,#133957)!important;'+
+            'border-color:#f9d383!important;}'
+        ].join('\\n');
+        const foundryGeometryExpression="(()=>{const box=s=>{const e=document.querySelector(s);"+
+          "if(!e)return null;const b=e.getBoundingClientRect();return [b.left,b.top,b.width,b.height];};"+
+          "return {panel:box('.w4-forge-description'),cannon:box('.w4-reference-cannon'),"+
+          "materials:box('.w4-materials'),button:box('#w4-forge-panel>.w4-improve-button'),"+
+          "dock:box('.harbour-nav.app-dock-porto'),"+
+          "bars:document.querySelectorAll('.w4-forge-live-level>i').length, "+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        const afterFoundryGeom=await evaluate(foundryGeometryExpression);
+        assert.ok(await evaluate("(()=>{const e=document.createElement('style');"+
+          "e.id='work4-before-foundry-plate';e.textContent="+JSON.stringify(stageHeadPaint)+
+          ";document.head.appendChild(e);return true;})()"));
+        await sleep(150);
+        const beforeFoundryGeom=await evaluate(foundryGeometryExpression);
+        const foundryBefore=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-foundry-plate-384x512.png'),Buffer.from(foundryBefore,'base64'));
+        await evaluate("(()=>{document.getElementById('work4-before-foundry-plate')?.remove();return true;})()");
+        assert.deepEqual(afterFoundryGeom,beforeFoundryGeom,
+          'paint cannot relocate cannon, Forge levels, materials, upgrade action or dock');
+        assert.equal(afterFoundryGeom.bars,3,'all three genuine levels remain present');
+        assert.equal(afterFoundryGeom.nav,5,'the five existing dock actions stay untouched');
+        const plateSample=await evaluate(sample.replace(previousFrame,foundryBefore));
+        assert.ok(plateSample?.before?.foundryPanel>=0&&plateSample?.after?.foundryPanel>=0,
+          'same-frame native foundry panel ROI must be measured');
+        assert.ok(Math.abs(plateSample.before.cannon-plateSample.after.cannon)<0.05,
+          'single genuine cannon painting must remain pixel-registered');
+        writeFileSync(join(folder,'compare-foundry-panel-384x512.png'),
+          Buffer.from(plateSample.image,'base64'));
+        delete plateSample.image;
+        const foundryPlateAB={...plateSample,sameReactFrame:true,viewport:'384x512',
+          geometry:afterFoundryGeom,approved:false};
+        writeFileSync(join(folder,'forge-panel-controlled-ab.json'),
+          JSON.stringify(foundryPlateAB,null,2)+'\\n');
+        console.log('WORK4_FORGE_PANEL_AB '+JSON.stringify(foundryPlateAB));
+
+
       }
       /* WORK4 / #104: native A/B of fake VECTOR ripples versus approved
          pictorial water. The current React state, original scene, CSS crops,
