@@ -240,8 +240,8 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           "if([ref,prev,now].some(i=>i.width!==384||i.height!==512))throw Error('384x512 source must not be scaled');"+
           "const data=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
           "const a=data(ref),b=data(prev),c=data(now);"+
-          "const rois={global:[0,0,384,512],panel:[228,151,373,341],"+
-          "ship:[65,205,175,307],water:[18,306,238,356],roster:[18,350,374,458]};"+
+          "// Water ROI stops before x235 stats-panel left edge, so panel paint\n          // cannot contaminate sea-only comparisons.\n          const rois={global:[0,0,384,512],panel:[228,151,373,341],"+
+          "ship:[65,205,175,307],water:[18,306,218,356],roster:[18,350,374,458]};"+
           "const mae=(u,v,r)=>{let s=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;for(let j=0;j<3;j++){s+=Math.abs(u[k+j]-v[k+j]);n++;}}return s/n;};"+
           "const before={},after={};for(const [name,r] of Object.entries(rois)){before[name]=mae(a,b,r);after[name]=mae(a,c,r);}"+
           "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
