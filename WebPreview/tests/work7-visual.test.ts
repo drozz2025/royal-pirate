@@ -39,25 +39,28 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7 / #104 — 384×512 native carved frame relief, 17 Nov 15h.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  // True merged v0.1.68 HEAD (after WORK0 integrated #305).
-  // Undo ONLY this PR's physical frame-value filters and chest inlay, leaving all HEAD crops and geometry intact.
-  // All pre-existing atlas/velvet backing, 3D frames and approved assets stay
-  // identical in the SAME Chromium scene. Use !important so the baseline
-  // reliably wins after the final native media query.
+  // Latest verified merged v0.1.69 HEAD (WORK0 #310; WORK7 #308 included).
+  // Undo ONLY this PR's per-panel 05/06 optical values at the same browser
+  // viewport and scene. The merged .72 card relief and .80 chest relief,
+  // original chest inlay and live DOM labels must be identical before/after.
+  // !important wins over the final WORK7-only media rules.
 
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-        filter:brightness(.81)!important;
+        filter:brightness(.72)!important;
       }
       .w7-screen[data-work7-screen="shop"] .w7-chest{
         filter:brightness(.80)!important;
       }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+        filter:none!important;
+      }
       .w7-screen[data-work7-screen="shop"] .w7-chest::before{
         box-shadow:
-          inset 0 0 0 1px #472714ae,
-          inset 0 3px 6px #080c237a,
-          inset 0 -2px 1px #ffdb7b2b !important;
+          inset 0 0 0 3px #071321cd,
+          inset 0 2px 11px 3px #020817c5,
+          inset 0 -2px 1px #e7b77529 !important;
       }
     }`;
   const cssBaseline = currentHeadBaseline;
