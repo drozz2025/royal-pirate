@@ -513,6 +513,59 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(tabCompare.metrics.daily.delta<.05 && tabCompare.metrics.chests.delta<.05,
       'reward board and seven chests must remain pixel-stable');
 
+
+    /* WORK8/#104 — same paused real 07 Chromium frame, native reference:
+       trial changes ONLY the inactive blue enamel on 2 tabs. Maintain
+       3 live quests, 7 live chest rewards and exactly 5 dock targets. */
+    const depthFlag='work8-missions-tab-depth-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(depthFlag)+');true');
+    await delay(150);
+    const depthBeforeLayout=await headingLayout();
+    const depthBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(depthFlag)+');true');
+    await delay(150);
+    const depthAfterLayout=await headingLayout();
+    const depthAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const depthSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+depthBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+depthAfter))
+      .replace('const regions={full:[0,0,384,512],quests:',
+        'const regions={full:[0,0,384,512],tabDepth:[134,132,370,163],quests:');
+    assert.notEqual(depthSource,source,'native A/B must use independent Chromium screenshots');
+    const depthCompare=await evalJs(depthSource);
+    writeFileSync(join(evidence,'missions-tab-depth-before-384x512.png'),Buffer.from(depthBefore,'base64'));
+    writeFileSync(join(evidence,'missions-tab-depth-after-384x512.png'),Buffer.from(depthAfter,'base64'));
+    writeFileSync(join(evidence,'missions-tab-depth-original-render-overlay-before-384x512.png'),Buffer.from(depthCompare.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-tab-depth-original-render-overlay-after-384x512.png'),Buffer.from(depthCompare.overlays[1],'base64'));
+    const depthResult={
+      baseSha:"c7c94b83d5a782fc3b857f2fbcfe5dccf278b291",
+      scope:'07 Missões only: inactive tab enamel; no other WORK changed',
+      source:'assets/design-approved/07-missoes.webp; 384x512 native pixels, no rescale',
+      compared:'same live Chromium scene, same paused frame, same viewport and data',
+      roi:depthCompare.metrics,unchanged:depthCompare.unchanged,
+      beforeLayout:depthBeforeLayout,afterLayout:depthAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-tab-depth-controlled-ab.json'),JSON.stringify(depthResult,null,2));
+    console.log('WORK8 native 07 tab depth original/render/overlay '+JSON.stringify(depthResult.roi));
+    assert.deepEqual(depthBeforeLayout.tabs,depthAfterLayout.tabs,'tab hitboxes must be unchanged');
+    assert.deepEqual(depthBeforeLayout.questButtons,depthAfterLayout.questButtons,'real mission actions unchanged');
+    assert.deepEqual(depthBeforeLayout.days,depthAfterLayout.days,'seven reward positions unchanged');
+    assert.deepEqual(depthBeforeLayout.chests,depthAfterLayout.chests,'seven chest illustrations unchanged');
+    assert.deepEqual(depthBeforeLayout.nav,depthAfterLayout.nav,'five-target dock unchanged');
+    assert.equal(depthAfterLayout.questCount,3);
+    assert.equal(depthAfterLayout.dayCount,7);
+    assert.equal(depthAfterLayout.dockCount,5);
+    assert.ok(depthAfterLayout.documentWidth<=386);
+    assert.ok(depthAfterLayout.chests.every((c:any)=>c.bottom<=depthAfterLayout.nav.top+2),
+      'all seven rewards remain above dock at native 384');
+    assert.ok(depthCompare.unchanged.header<.1&&depthCompare.unchanged.dock<.1,
+      'shared header and five-item dock must be pixel-identical');
+    assert.ok(depthCompare.metrics.tabDepth.delta<-.2&&depthCompare.metrics.full.delta<-.015,
+      '07 inactive-tab enamel must reduce real-reference RGB MAE');
+    assert.ok(Math.abs(depthCompare.metrics.quests.delta)<.02&&Math.abs(depthCompare.metrics.daily.delta)<.02,
+      'real quests and seven-day rewards must remain pixel-stable');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
