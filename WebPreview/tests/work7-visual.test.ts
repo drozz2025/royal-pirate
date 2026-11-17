@@ -42,15 +42,20 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // Native-only WORK7 pass, with all merged mobile geometry retained.
   // The same Chromium session, true 384x512 viewport and real assets measure
   // before/after, rather than comparing against a stale old PR.
-  /* Strict parent-HEAD A/B: disable ONLY the two new native frame
-   * lighting values. Merged #257/#263/#268/#276/#279 are retained. */
+  /* Strict current parent-HEAD A/B: restore the two existing #283
+   * physical frame values AND the existing corner-metal inner rim.
+   * Everything else, including the merged 320px safety fix, stays live. */
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-        filter:none!important;
+        filter:brightness(.88)!important;
       }
       .w7-screen[data-work7-screen="shop"] .w7-chest{
-        filter:none!important;
+        filter:brightness(.89)!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot::before,
+      .w7-screen[data-work7-screen="shop"] .w7-chest::before{
+        box-shadow:inset 0 0 0 1px #55301370!important;
       }
     }`;
   const cssBaseline = currentHeadBaseline;
