@@ -1388,12 +1388,15 @@ export function ForgePanel({profile,onUpgrade,onFleet}:{profile:LocalProfile;onU
           <div><span aria-hidden="true">⚒</span><small>{max?'MELHORIA COMPLETA':'CUSTO REAL'}</small><strong>{max?'MÁXIMO':cost.toLocaleString('pt-PT')+' ●'}</strong></div>
           <div><span aria-hidden="true">◆</span><small>EM FALTA</small><strong>{max?'—':shortfall.toLocaleString('pt-PT')+' ●'}</strong></div>
         </div>}
-        <p>{upgrade?'Não existe inventário de madeira, ferro ou gemas nesta versão: apenas moedas locais são usadas.':'A armadura e os respetivos materiais ainda não estão implementados.'}</p>
       </div>
       {upgrade?<button type="button" className="w4-improve-button" disabled={max||shortfall>0}
         onClick={()=>onUpgrade(upgrade.id)} aria-label={max?'Melhoria no máximo':shortfall>0?'Moedas insuficientes, faltam '+shortfall:'Melhorar '+upgradeLabel[upgrade.id]+' por '+cost+' moedas'}>
         {max?'MELHORIA MÁXIMA':shortfall>0?'MOEDAS INSUFICIENTES':'MELHORAR · '+cost.toLocaleString('pt-PT')+' ●'}
       </button>:<button type="button" className="w4-improve-button" disabled>ARMADURA INDISPONÍVEL</button>}
+      {/* The existing real-cost disclaimer remains available by scrolling,
+          but never separates the actionable upgrade from its material amounts
+          on the reference's compact 384x512 frame. No cost/level logic changes. */}
+      <p className="w4-materials-note">{upgrade?'Não existe inventário de madeira, ferro ou gemas nesta versão: apenas moedas locais são usadas.':'A armadura e os respetivos materiais ainda não estão implementados.'}</p>
       <div className="w4-action-pair"><button type="button" onClick={onFleet}>← VOLTAR À FROTA</button></div>
       <p className="w4-footnote">Os valores apresentados são exclusivamente níveis e moedas guardados neste navegador. Sem compras externas nem efeitos de combate simulados.</p>
     </div>
