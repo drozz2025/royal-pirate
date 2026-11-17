@@ -9,7 +9,7 @@ import {createServer} from 'node:net';
 const css=readFileSync(new URL('../src/work4-fleet-forge.css',import.meta.url),'utf8');
 const marker='WORK4 / #104 — source-pixel registration of approved 03/04';
 const block=css.split(marker)[1]||'';
-const nativeBaseline=String.raw[
+const nativeBaseline=[
   '@media (min-width:360px) and (max-width:399px) and (max-height:650px) {',
   '.w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {top:11px!important;}',
   '.w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {left:-7px!important;top:5px!important;}',
