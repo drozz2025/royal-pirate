@@ -182,6 +182,69 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'pigment correction cannot move real day slots or alter tap hitboxes');
     assert.deepEqual(inkBeforeLayout.nav,inkAfterLayout.nav,
       'pigment correction cannot move the five-item dock');
+    /* Native 384x512 ORIGINAL | RENDER | OVERLAY on the SAME decoded,
+       paused Missions frame. This phase toggles ONLY the new heading ink
+       registration; integrated #269/#271/#275/#280 remain live both times. */
+    const headingBaselineClass='work8-missions-heading-ab-baseline';
+    const headingLayout=()=>evalJs('(()=>{const rect=e=>{const r=e?.getBoundingClientRect();return r?{top:r.top,bottom:r.bottom,left:r.left,right:r.right}:null};return {heading:rect(document.querySelector(".w8-approved-daily h3")),chests:[...document.querySelectorAll(".w8-approved-days .w8-approved-chest")].map(rect),days:[...document.querySelectorAll(".w8-approved-days li")].map(rect),nav:rect(document.querySelector(".app-sheet > .harbour-nav")),tabs:[...document.querySelectorAll(".w8-approved-tabs button")].map(rect),questButtons:[...document.querySelectorAll(".w8-approved-quest button")].map(rect),questCount:document.querySelectorAll(".w8-approved-quest").length,dayCount:document.querySelectorAll(".w8-approved-days li").length,dockCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,documentWidth:document.documentElement.scrollWidth};})()');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(headingBaselineClass)+');true');
+    await delay(130);
+    const headingBeforeLayout=await headingLayout();
+    const headingBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(headingBaselineClass)+');true');
+    await delay(130);
+    const headingAfterLayout=await headingLayout();
+    const headingAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const headingSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+headingBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+headingAfter))
+      .replace('chests:[20,356,370,427],dock:', 'chests:[20,356,370,427],dailyHeading:[25,324,370,365],dock:');
+    assert.notEqual(headingSource,source,'native heading A/B must use independent baseline and candidate pixels');
+    const headingCompare=await evalJs(headingSource);
+    writeFileSync(join(evidence,'missions-heading-ab-baseline-384x512.png'),Buffer.from(headingBefore,'base64'));
+    writeFileSync(join(evidence,'missions-heading-ab-candidate-384x512.png'),Buffer.from(headingAfter,'base64'));
+    writeFileSync(join(evidence,'missions-heading-original-render-overlay-before-384x512.png'),Buffer.from(headingCompare.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-heading-original-render-overlay-after-384x512.png'),Buffer.from(headingCompare.overlays[1],'base64'));
+    const headingResult={
+      base:'work6/web-3d-preview',
+      scope:'07 Missões heading only; full integrated paint/pigment active in A/B',
+      reference:'assets/design-approved/07-missoes.webp; original 384x512 without scaling',
+      scene:'single real Chromium document, decoded images, frozen animations, identical scene/frame',
+      baselineClass:headingBaselineClass,roi:headingCompare.metrics,
+      unchanged:headingCompare.unchanged,
+      beforeLayout:headingBeforeLayout,afterLayout:headingAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-heading-controlled-ab.json'),JSON.stringify(headingResult,null,2));
+    console.log('WORK8 genuine heading registration A/B '+JSON.stringify({roi:headingResult.roi,headingBefore:headingBeforeLayout.heading,headingAfter:headingAfterLayout.heading}));
+    assert.equal(headingAfterLayout.questCount,3);
+    assert.equal(headingAfterLayout.dayCount,7);
+    assert.equal(headingAfterLayout.dockCount,5);
+    assert.ok(headingAfterLayout.documentWidth<=386);
+    assert.deepEqual(headingAfterLayout.days,headingBeforeLayout.days,
+      'heading must not alter any real chest slot or hitbox');
+    assert.deepEqual(headingAfterLayout.nav,headingBeforeLayout.nav,
+      'shared five-button dock must not move');
+    assert.deepEqual(headingAfterLayout.tabs,headingBeforeLayout.tabs,
+      'mission tab touch targets must remain unchanged');
+    assert.deepEqual(headingAfterLayout.questButtons,headingBeforeLayout.questButtons,
+      'the three genuine mission CTA hitboxes must not move');
+    assert.ok(headingAfterLayout.tabs.every((b:any)=>b.bottom<=headingAfterLayout.nav.top&&b.bottom-b.top>=30),
+      'all three tab buttons remain usable above dock');
+    assert.ok(headingAfterLayout.questButtons.every((b:any)=>b.bottom<=headingAfterLayout.nav.top&&b.bottom-b.top>=30),
+      'all three quest CTA buttons remain usable above dock');
+    assert.ok(headingAfterLayout.chests.every((c:any)=>c.bottom<=headingAfterLayout.nav.top+2),
+      'all seven reward pictures are still clear of dock');
+    assert.ok(headingAfterLayout.heading.bottom < headingBeforeLayout.heading.bottom-12,
+      'heading ink must visibly move above the seven reward pictures');
+    assert.ok(headingCompare.unchanged.dock<0.1&&headingCompare.unchanged.header<0.1,
+      'Porto/header and unchanged global dock cannot repaint');
+    assert.ok(headingCompare.metrics.dailyHeading.delta < -0.20,
+      'the actual daily heading ROI must approach native approved source');
+    assert.ok(headingCompare.metrics.full.delta < -0.03 &&
+      headingCompare.metrics.daily.delta < -0.08,
+      'native full-screen and daily panel MAE cannot regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
