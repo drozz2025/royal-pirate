@@ -85,6 +85,12 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(decoded>=8,'title, three quest illustrations and four source chest crops must have loaded');
     await delay(340); // allow SVG image paint following source decode
     await evalJs('(()=>{document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
+    /* Previous immutable WORK8 A/B gates compare their own historical art.
+       Keep the newly proposed coast treatment disabled for those gates;
+       enable it only for the independent coastal A/B near the end. This
+       preserves the exact original v0.1.75 baselines without relaxing
+       their MAE or pixel-stability requirements. */
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -758,6 +764,53 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(registerComparison.metrics.daily.delta<.60&&Math.abs(registerComparison.metrics.chests.delta)<.08,
       'daily/chest content must remain stable apart from <=0.6 boundary shadow MAE');
 
+    /* WORK8/#104 — independent sea-color comparison using the SAME real
+       decoded + paused 384x512 Chromium frame. No captured image is rendered
+       into the application, no state is forged. The original 07 WebP is used
+       only as the numerical A/B source. */
+    const coastFlag='work8-missions-coast-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(coastFlag)+');true');
+    await delay(150);
+    const coastBeforeLayout=await headingLayout();
+    const coastBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(coastFlag)+');true');
+    await delay(150);
+    const coastAfterLayout=await headingLayout();
+    const coastAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const coastSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+coastBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+coastAfter))
+      .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],coast:[0,86,384,155],daily:');
+    assert.notEqual(coastSource,source,'coast comparison must use its own captured frames');
+    const coastComparison=await evalJs(coastSource);
+    const saveCoast=(name:string,value:string)=>writeFileSync(join(evidence,name),Buffer.from(value,'base64'));
+    saveCoast('missions-coast-before-384x512.png',coastBefore);
+    saveCoast('missions-coast-after-384x512.png',coastAfter);
+    saveCoast('missions-coast-original-render-overlay-before-384x512.png',coastComparison.overlays[0]);
+    saveCoast('missions-coast-original-render-overlay-after-384x512.png',coastComparison.overlays[1]);
+    const coastReport={
+      baseHead:'840c02bc4bf2e5fa43b853f60cfb807f5beb07ab',
+      version:'v0.1.75',scope:'ONLY 07 Missões coastal panorama ink, no geometry or game-data edits',
+      source:'assets/design-approved/07-missoes.webp, 384x512 native without resampling',
+      otherReferences:['assets/design-approved/00-referencia-original-aprovada.webp','assets/design-approved/00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(n=>'assets/design-approved/'+n)],
+      method:'same Chromium tab, same paused animation frame, native DPR 1, root CSS pigment toggle',
+      roi:coastComparison.metrics,unchanged:coastComparison.unchanged,
+      beforeLayout:coastBeforeLayout,afterLayout:coastAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-coast-controlled-ab.json'),JSON.stringify(coastReport,null,2));
+    console.log('WORK8 07 native coastal painting A/B '+JSON.stringify(coastReport.roi));
+    assert.deepEqual(coastBeforeLayout,coastAfterLayout,'coastal pigment must not move ANY native Missions geometry');
+    assert.equal(coastAfterLayout.questCount,3);
+    assert.equal(coastAfterLayout.dayCount,7);
+    assert.equal(coastAfterLayout.dockCount,5);
+    assert.ok(coastAfterLayout.documentWidth<=386);
+    assert.ok(coastComparison.unchanged.header<.10&&coastComparison.unchanged.dock<.10,'shared header/dock must remain pixel identical');
+    assert.ok(coastComparison.metrics.coast.delta<-.10&&coastComparison.metrics.full.delta<-.015,
+      'coastal pigment must measurably improve native approved art and full-frame MAE');
+    assert.ok(coastComparison.metrics.daily.delta<.12&&coastComparison.metrics.chests.delta<.12&&coastComparison.metrics.quests.delta<.12,
+      'existing genuine mission and daily reward ROIs cannot materially regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
@@ -765,6 +818,19 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.equal(narrow.items,7);
     assert.equal(narrow.navCount,5);
     assert.ok(narrow.width<=322&&narrow.day7Visible&&Math.abs(narrow.dockBottom-568)<=2,'320 scroll, day seven and five-item dock usable');
+
+    saveCoast('missions-coast-320x568.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    for(const viewport of [{width:390,height:844},{width:430,height:932}]){
+      await cmd('Emulation.setDeviceMetricsOverride',{...viewport,mobile:true,deviceScaleFactor:1,screenWidth:viewport.width,screenHeight:viewport.height});
+      await delay(180);
+      const responsive=await evalJs('(()=>({scrollWidth:document.documentElement.scrollWidth,questCount:document.querySelectorAll(".w8-approved-quest").length,dayCount:document.querySelectorAll(".w8-approved-days li").length,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length}))()');
+      assert.ok(responsive.scrollWidth<=viewport.width+2,'no horizontal overflow at '+viewport.width);
+      assert.equal(responsive.questCount,3,'three authentic missions at '+viewport.width);
+      assert.equal(responsive.dayCount,7,'seven genuine reward chests at '+viewport.width);
+      assert.equal(responsive.navCount,5,'five live navigation items at '+viewport.width);
+      saveCoast('missions-coast-'+viewport.width+'x'+viewport.height+'.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    }
+
   } finally {
     try{ws?.close();}catch{}
     browser?.kill('SIGTERM');vite.kill('SIGTERM');
