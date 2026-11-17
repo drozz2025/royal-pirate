@@ -44,19 +44,24 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // Restoring it in the SAME Chromium frame isolates ONLY this PR's
   // four optical changes, including preserving original 320px rules.
   const currentHeadBaseline = `
-    /* WORK0-integrated 47727b7 (v0.1.73): restore ONLY two overridden
-       material backings. Every other active rule is identical in the same
-       Chromium DOM/frame, with original CSS 320px/tall view untouched. */
+    /* Original WORK0-integrated 47727b7 / v0.1.73 real materials only.
+       Screenshots restore EXACT prior CSS in the SAME paused Chromium scene;
+       geometry, labels, header, Porto and dock remain unmodified. */
     @media (min-width:355px) and (max-width:390px) and (max-height:560px) {
-      .w7-screen[data-work7-screen="cards"] .w7-collection-content {
+      .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before {
+        border-color:#515a5f !important;
+        border-bottom-color:#343b41 !important;
         background:
-          radial-gradient(ellipse 92% 95px at 50% 0%,#49677b45,transparent 92%),
-          linear-gradient(180deg,#18374d 0%,#102b43 44%,#0a2039 70%,#061a33 100%) !important;
+          radial-gradient(ellipse 85% 60% at 50% 18%,#28394237,transparent 84%),
+          linear-gradient(180deg,#121a24 0%,#0c1621 60%,#0d131c 100%) !important;
       }
       .w7-screen[data-work7-screen="shop"] .w7-captain-pack {
         background:
           radial-gradient(ellipse 66% 95% at 29% 42%,#a51c6655,transparent 88%),
           linear-gradient(112deg,#360957 0%,#31065a 49%,#110839 100%) !important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop {
+        filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3) !important;
       }
     }`;
   const cssBaseline = currentHeadBaseline;
