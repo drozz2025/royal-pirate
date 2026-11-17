@@ -271,12 +271,15 @@ function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
  * The existing live SVG remains behind each image as an offline/failure fallback.
  * Never use the approved screenshot as a panel background or a player data source.
  */
-type W8ApprovedCrop = 'title-missions'|'title-ranking'|'quest-swords'|'quest-ship'|'quest-target'|'captain'|'league-badge'|'chest-silver'|'chest-gold'|'chest-violet'|'chest-royal'|'daily-heading';
+type W8ApprovedCrop = 'title-missions'|'title-ranking'|'quest-swords'|'quest-ship'|'quest-target'|'captain'|'league-badge'|'chest-silver'|'chest-gold'|'chest-violet'|'chest-royal'|'daily-heading'|'coin-painting'|'gem-painting';
 const W8_ART_CROPS:Record<W8ApprovedCrop,{rect:string;frame:'missions'|'ranking'}>={
   // The original engraved plaques replace only the two existing static decorative headers.
   'title-missions':{rect:'98 74 189 45',frame:'missions'},
   // Original static lettering/engraved flourishes only: not reward data or a full screenshot.
   'daily-heading':{rect:'45 325 294 36',frame:'missions'},
+  // Painterly coin and faceted jewel symbols ONLY; no cropped prices or player rewards.
+  'coin-painting':{rect:'210 164 26 26',frame:'missions'},
+  'gem-painting':{rect:'249 164 29 26',frame:'missions'},
   'title-ranking':{rect:'98 74 189 45',frame:'ranking'},
   'quest-swords':{rect:'15 160 51 48',frame:'missions'},
   'quest-ship':{rect:'15 213 51 48',frame:'missions'},
@@ -533,8 +536,8 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
               </div>
             </div>
             <div className="w8-approved-quest-rewards">
-              <span className="w8-approved-coin" title="Moedas locais">●<strong>{mission.reward}</strong></span>
-              <span className="w8-approved-gem" title="Gemas indisponíveis">◆<strong>—</strong></span>
+              <span className="w8-approved-coin" title="Moedas locais">●<W8ApprovedPainting art="coin-painting"/><strong>{mission.reward}</strong></span>
+              <span className="w8-approved-gem" title="Gemas indisponíveis">◆<W8ApprovedPainting art="gem-painting"/><strong>—</strong></span>
             </div>
             <button type="button" disabled={claimed} onClick={()=>{
               if(canCollect){onMission(id);setMessage('Recompensa de '+titles[id]+' recolhida neste dispositivo.');}
