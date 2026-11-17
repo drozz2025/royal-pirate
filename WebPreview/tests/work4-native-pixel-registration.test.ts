@@ -265,6 +265,75 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           'four real ship slot pictures cannot regress');
       }
 
+
+      // WORK4 19h / issue #104: coast seam A/B in the EXACT SAME native
+      // Chromium scene/frame. Reinstall the merged-HEAD source mask for BEFORE,
+      // remove only that temporary override for RENDER. The single Royal Crown,
+      // genuine painted sea, React levels, four ship slots and dock stay fixed.
+      if(screen==='fleet' && width===384 && height===512){
+        const originalMask=[
+          '.w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship{',
+          '-webkit-mask-image:radial-gradient(ellipse 75% 105% at 30% 50%,#000 0%,#000 75%,transparent 99%),',
+          'linear-gradient(to bottom,transparent 0%,#000 7%,#000 88%,transparent 100%)!important;',
+          'mask-image:radial-gradient(ellipse 75% 105% at 30% 50%,#000 0%,#000 75%,transparent 99%),',
+          'linear-gradient(to bottom,transparent 0%,#000 7%,#000 88%,transparent 100%)!important;}'
+        ].join('');
+        const sceneGeometry="(()=>{const b=s=>{const r=document.querySelector(s)?.getBoundingClientRect();"+
+          "return r?[r.x,r.y,r.width,r.height]:null;};"+
+          "return {ship:b('.w4-reference-ship'),sea:b('.w4-reference-sea'),"+
+          "stage:b('.w4-harbour-stage'),roster:b('.w4-ship-roster'),"+
+          "dock:b('.harbour-nav.app-dock-porto'),"+
+          "cards:document.querySelectorAll('.w4-ship-slot').length,"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        const sceneNew=await evaluate(sceneGeometry);
+        assert.equal(sceneNew.cards,4);
+        assert.equal(sceneNew.nav,5);
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
+          "s.id='work4-before-edge-feather';s.textContent="+JSON.stringify(originalMask)+
+          ";document.head.appendChild(s);return true;})()"));
+        await sleep(130);
+        const sceneOld=await evaluate(sceneGeometry);
+        assert.deepEqual(sceneNew,sceneOld,'source edge feather must not move ship, sea, roster or dock');
+        const prior=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-ship-edge-fleet-384x512.png'),Buffer.from(prior,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-before-edge-feather')?.remove();return true;})()"));
+        await sleep(130);
+        const measure="(async()=>{"+
+          "const load=async uri=>{const i=new Image();i.src=uri;await i.decode();return i;};"+
+          "const [ref,previous,current]=await Promise.all(["+
+          "load('data:image/webp;base64,"+references.fleet+"'),"+
+          "load('data:image/png;base64,"+prior+"'),"+
+          "load('data:image/png;base64,"+screenshot+"')]);"+
+          "if([ref,previous,current].some(i=>i.width!==384||i.height!==512))throw Error('must be 1:1 native');"+
+          "const px=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+          "const a=px(ref),b=px(previous),c=px(current);"+
+          "const rois={global:[0,0,384,512],ship:[65,205,175,307],coast:[18,137,235,338],edge:[180,153,235,338],water:[18,306,218,356],dock:[0,430,384,512]};"+
+          "const mae=(u,v,r)=>{let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;for(let j=0;j<3;j++){total+=Math.abs(u[k+j]-v[k+j]);n++;}}return total/n;};"+
+          "const before={},after={};for(const [key,r] of Object.entries(rois)){before[key]=mae(a,b,r);after[key]=mae(a,c,r);}"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
+          "g.drawImage(ref,0,0);g.drawImage(previous,384,0);g.drawImage(current,768,0);"+
+          "g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(current,1152,0);"+
+          "return {before,after,rois,image:out.toDataURL('image/png').split(',')[1]};})()";
+        const sample=await evaluate(measure);
+        assert.ok(sample?.before?.edge>=0&&sample?.after?.edge>=0,
+          'both source coastline masks measured at same native frame');
+        writeFileSync(join(folder,'compare-ship-edge-fleet-384x512.png'),
+          Buffer.from(sample.image,'base64'));
+        delete sample.image;
+        const evidence={...sample,sameReactFrame:true,viewport:'384x512',
+          source:'assets/design-approved/03-frota.webp',approved:false,
+          priorGeometry:sceneOld,newGeometry:sceneNew};
+        writeFileSync(join(folder,'fleet-edge-controlled-ab.json'),
+          JSON.stringify(evidence,null,2)+'\n');
+        console.log('WORK4_FLEET_EDGE_AB '+JSON.stringify(evidence));
+        assert.ok(Math.abs(sample.before.ship-sample.after.ship)<0.2,
+          'source-aligned unique Royal Crown hull must remain unchanged');
+        assert.ok(Math.abs(sample.before.dock-sample.after.dock)<0.05,
+          'protected five-item dock pixels must remain unchanged');
+      }
+
       // WORK4 15h: ORIGINAL | previous live vector | painted source | OVERLAY.
       // Same Chromium native scene/frame at DPR1; only artwork inside four
       // existing local card slots changes. A/B uses approved 03 pixels only.
