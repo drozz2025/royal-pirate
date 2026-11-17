@@ -3831,3 +3831,20 @@
     transform:translate(4px,4px) scale(1.02);
   }
 }
+
+
+/* WORK7 / #104 — native 384x512 illustrated pigment calibration, 17 Nov 06:23.
+ * Reference-aligned original image crops only: temper bright highlights on
+ * the eight concept portraits and three real chest illustrations. The real
+ * labels PRÉVIA / EM BREVE remain separate readable HTML; no new borders,
+ * screenshot backgrounds, state, Porto, dock, prices or effects.
+ * Short native viewport ONLY; #263 mobile 320px layout stays unchanged.
+ * Artistic approval: false pending owner's visual review. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(.88);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(.88) drop-shadow(0 4px 3px #041327a8);
+  }
+}

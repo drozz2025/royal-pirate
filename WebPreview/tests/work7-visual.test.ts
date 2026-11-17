@@ -37,7 +37,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  const marker = '/* WORK7 / #104 — true 320px 05/06 artwork framing, 17 Nov 04h.';
+  const marker = '/* WORK7 / #104 — native 384x512 illustrated pigment calibration, 17 Nov 06:23.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   // Undo solely this PR's 320px local gutters, retaining merged #257.
   // The same Chromium session, true 384x512 viewport and real assets measure
@@ -69,6 +69,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       }
       .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
         transform:none!important;
+      }
+    }`;
+  /* This PR's immediate HEAD A/B overrides only the two new pixel-calibration
+   * rules, retaining all already-merged transforms and the same browser frame. */
+  const currentHeadBaseline = `
+    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+        filter:saturate(1.25) contrast(1.13) brightness(1.04)!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+        filter:saturate(1.27) contrast(1.12) brightness(1.045) drop-shadow(0 4px 3px #041327a8)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -215,6 +226,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "slots,chests,pack:rect(root.querySelector('.w7-captain-pack')),packArt:rect(root.querySelector('.w7-captain-pack-art .w7-approved-crop')),labels,"+
           "horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1};})()");
         let baselineScreenshotData: string | null = null;
+        let headScreenshotData: string | null = null;
         let baselineGeometry: any = null;
         if ((width===384 && height===512)||(width===320 && height===568)) {
           // Temporarily undo only this PR's four CSS properties via precise
@@ -237,6 +249,20 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
             Buffer.from(baseline.data,'base64'));
           await evaluate("(()=>{document.getElementById('work7-css-baseline')?.remove();return true})()");
           await sleep(200);
+          if (width===384 && height===512) {
+            // Actual current HEAD, not the older pre-#268 baseline: the only
+            // difference from the new render is this PR's two image filters.
+            await evaluate("(()=>{const s=document.createElement('style');s.id='work7-head-baseline';s.textContent="+JSON.stringify(currentHeadBaseline)+";document.head.appendChild(s);return true})()");
+            await sleep(200);
+            const currentHead = await command('Page.captureScreenshot', {
+              format:'png',fromSurface:true,captureBeyondViewport:false
+            });
+            headScreenshotData=currentHead.data;
+            await writeFile(join(output,'head-before-'+kind+'-384x512.png'),
+              Buffer.from(headScreenshotData,'base64'));
+            await evaluate("(()=>{document.getElementById('work7-head-baseline')?.remove();return true})()");
+            await sleep(200);
+          }
         }
         const screen = await command('Page.captureScreenshot', {
           format:'png',fromSurface:true,captureBeyondViewport:false
@@ -245,7 +271,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           Buffer.from(screen.data, 'base64'));
         const refUrl = 'data:image/webp;base64,'+references[kind].toString('base64');
         const liveUrl = 'data:image/png;base64,'+screen.data;
-        const beforeUrl = baselineScreenshotData ? 'data:image/png;base64,'+baselineScreenshotData : null;
+        const beforeUrl = (headScreenshotData ?? baselineScreenshotData) ? 'data:image/png;base64,'+(headScreenshotData ?? baselineScreenshotData) : null;
         const comparison = await evaluate("(async()=>{"+
           "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
           "const [reference,live]=await Promise.all([load("+JSON.stringify(refUrl)+"),load("+JSON.stringify(liveUrl)+")]);"+
@@ -303,6 +329,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         }
         if(width===384 && height===512) {
           assert.ok(Number.isFinite(comparison.roiBefore)&&Number.isFinite(comparison.roiAfter),'Real native 384 ROI metrics recorded');
+          if(kind==='cards') {
+            assert.ok(comparison.roiAfter<comparison.roiBefore,'Eight portrait pigments must improve approved native ROI vs same-frame HEAD');
+            assert.ok(comparison.mae<comparison.maeBefore,'Cards global MAE must improve vs same-frame HEAD');
+          }
           if(kind==='shop') {
             assert.ok(comparison.roiAfter<comparison.roiBefore,'Native approved chest ROI must improve vs same-frame HEAD');
             assert.ok(comparison.mae<comparison.maeBefore,'Full native 384px shop MAE must also improve vs same-frame HEAD');
