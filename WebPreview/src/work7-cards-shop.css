@@ -3896,3 +3896,21 @@
     filter:saturate(1.27) contrast(1.12) brightness(.92) drop-shadow(0 4px 3px #041327a8);
   }
 }
+
+/* WORK7/#104 — 17 Nov 2026: original 05/06 native pictorial-value registration.
+ * At 384x512, both original approved physical frames are materially darker
+ * than the current render, although the artwork placement already aligns.
+ * Tone the entire individual artwork frame (not the shared page, menu or HUD):
+ * carved navy 4x2 cards and rarer, physically deeper chest surrounds.
+ * 320px, 390x844 and 430x932 layouts remain deliberately unchanged.
+ * The same live eight portraits, three chests, labels and genuine no-purchase
+ * states remain DOM and pointer-accessible; no screenshot repaint.
+ * approved:false until human review. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+    filter:brightness(.88);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest{
+    filter:brightness(.89);
+  }
+}
