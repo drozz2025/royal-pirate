@@ -5043,17 +5043,14 @@
 }
 
 
-/* WORK8 / #104 — 07 Missions daily-inscription ink, native 384x512.
-   Source panel carries a continuous deep-blue reward tray; the previous
-   engraved WebP title was painting its dark rectangular crop over that tray.
-   Screen-blend ONLY the existing approved title crop with its existing panel
-   paint to retain the original gold lettering/rules without an opaque patch.
-   The actual semantic h3, seven honest reward states, layout, pointer areas,
-   dock, Porto, and Ranking 08 remain completely unchanged.
-   Baseline root flag is for a controlled same-frame Chromium comparison. */
+/* WORK8 / #104 — 07 Missions daily inscription from the APPROVED art.
+   Prior global enamel dimming (.70) made this genuine gold-on-navy WebP
+   appear ~30% darker than its unscaled 384x512 reference. Restore ONLY the
+   source crop's luminosity (not the panel/chests), preserving the native
+   engraved letters and thin rules. No state, placement, hitbox, scroll,
+   ranking 08, Porto or five-item dock changes. Controlled A/B root flag. */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
   :root:not(.work8-missions-title-ink-ab-baseline) .w8-approved-missions .w8-approved-daily h3 > svg.w8-approved-painting-daily-heading {
-    mix-blend-mode:screen;
-    filter:contrast(1.07) saturate(1.06);
+    filter:brightness(1.42) saturate(1.02);
   }
 }
