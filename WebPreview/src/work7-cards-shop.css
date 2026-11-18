@@ -4313,6 +4313,6 @@
  * approved:false (0/8); no merge, publication or versioning by WORK7. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
-    filter:brightness(.50) saturate(2.00) contrast(.79);
+    filter:brightness(.54) saturate(2.00) contrast(.79);
   }
 }
