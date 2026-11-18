@@ -4301,3 +4301,21 @@
     filter:saturate(1.05) contrast(1.06) brightness(1.16) drop-shadow(0 6px 5px #14062ca3);
   }
 }
+
+
+/* WORK7/#104 — 18 Nov 20:30 UTC. Native card 4+7 inlay/exposure candidate.
+ * Starting HEAD c92c8c82 (v0.1.96); do not mix unmerged #426/#433/#436/#430.
+ * Fourth and seventh genuine approved 05 4×2 portraits only, original WebP intact.
+ * Leaves three original chests, unique pack, live PRÉVIA/EM BREVE labels,
+ * 320px labels/dock, Porto, shared shell, economy and gameplay untouched.
+ * Source: 00 original/mosaic and actual 01–08 approved design WebPs.
+ * CI strict SAME-FRAME A/B MAE + eight-card ROI gate before review.
+ * approved:false (0/8); no merge, publication or versioning by WORK7. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
+    filter:brightness(.49) saturate(2.00) contrast(.79);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+    filter:brightness(.40) saturate(1.75) contrast(.79);
+  }
+}

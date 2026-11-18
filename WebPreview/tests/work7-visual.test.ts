@@ -39,6 +39,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
+  assert.ok(cssText.includes('Native card 4+7 inlay/exposure candidate'),
+    'Only cards 4 and 7 physical artwork filters are recalibrated in this branch');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
     'New WORK7 eight-card short-viewport art treatment exists without screenshot backgrounds');
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
@@ -50,79 +52,19 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
   // All eight image sublayers also restore their actual pre-PR values.
   // These !important overrides exist ONLY for controlled same-frame A/B screenshots.
-  const currentHeadBaseline = `
+  // Exact merged WORK0 v0.1.96 HEAD: undo ONLY THIS PR's fourth
+  // frame filter. Previous #411/#422 and live artwork stay untouched.
+  // The override is installed on the SAME page and animation frame.
+  // It is inert for Shop and for 320/tall viewports.
+  const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.50) saturate(1.70) contrast(.87)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.65) saturate(1.75) contrast(.75)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.43) saturate(1.20) contrast(.74)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.42) saturate(2.30) contrast(.76)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.45) saturate(2.00) contrast(.85)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.65) saturate(1.30) contrast(.92)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.42) saturate(1.75) contrast(.79)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.64) saturate(1.90) contrast(.88)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.49)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.20)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.05)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.03)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.55)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.30)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.31)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)!important}
-    }`;
-  // Restore actual merged WORK0 v0.1.89 + #395 crop values for BEFORE,
-  // not #392: both images are captured in the same Chromium frame / viewport.
-  const merged395Baseline = currentHeadBaseline + `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.95)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.27)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.11)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.86)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.45)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.52)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.60)!important}
-    }`;
-  // Actual merged v0.1.90 HEAD incorporates WORK7 #400 over #395.
-  // Do not compare the candidate against a stale pre-#400 crop state.
-  const merged400Baseline = merged395Baseline + `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.09)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.37)!important}
-    }`;
-  // WORK0 has integrated #404 into the actual branch HEAD; restoring #400
-  // would falsely attribute #404's previous improvement to this new PR.
-  const merged404Baseline = merged400Baseline + `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.14)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.67)!important}
-    }`;
-  // Restore the exact last integrated #404 metallic shell. The new native
-  // 2px inlay is *not* allowed into the before/HEAD render.
-  const actual404FrameShadow = `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-        box-shadow:inset 0 1px #fff7ce,inset 0 0 0 1px #fbe0a1b3,
-          inset 0 -4px #4d2c22a3,0 0 0 1px #513319,
-          0 4px 0 #07162b,0 8px 11px #020d249c!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
+        filter:brightness(.52) saturate(2.00) contrast(.79)!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+        filter:brightness(.42) saturate(1.75) contrast(.79)!important;
       }
     }`;
-  // ACTUAL latest merged HEAD: #411 changed the carved inlay after #404.
-  // Retain that inlay unchanged in both same-frame screenshots; reverse ONLY
-  // this candidate's Captain art pigment to the real v0.1.93 base value.
-  const actual411Inlay = `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-        box-shadow:inset 0 0 2px 2px #f1bd76aa,0 3px 0 #06142b!important;
-      }
-    }`;
-  const actualPackHEAD = `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        transform:translate(-4px,7px) scale(1.01)!important;
-        filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)!important;
-      }
-    }`;
-  const cssBaseline = merged404Baseline + actual411Inlay + actualPackHEAD;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
     { cwd: process.cwd(), stdio: 'ignore' });
@@ -292,6 +234,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await waitFor("(()=>{const imgs=[...document.querySelectorAll('[data-work7-screen=\\\""+kind+"\\\"] .w7-approved-crop img')];return imgs.length==="+(kind==='cards'?8:4)+"&&imgs.every(img=>img.complete&&img.naturalWidth>0)})()");
         await sleep(100);
 
+        // Freeze decorative CSS/Web Animations after real touchscreen navigation.
+        // HEAD and RENDER now share identical timeline, DOM, assets and frame.
+        await evaluate("(()=>{const s=document.createElement('style');s.id='work7-qa-frozen-frame';"+
+          "s.textContent='*,*::before,*::after{animation-play-state:paused!important;transition-duration:0s!important}';"+
+          "document.head.appendChild(s);document.getAnimations().forEach(a=>a.pause());return true})()");
+        await sleep(100);
         const geometry = await evaluate("(()=>{"+
           "const rect=e=>{if(!e)return null;const b=e.getBoundingClientRect();return {x:Math.round(b.x),y:Math.round(b.y),width:Math.round(b.width),height:Math.round(b.height),bottom:Math.round(b.bottom)}};"+
           "const root=document.querySelector('[data-work7-screen=\""+kind+"\"]');"+
@@ -367,17 +315,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "first.getContext('2d').drawImage(reference,0,0);second.getContext('2d').drawImage(live,0,0);"+
           "const a=first.getContext('2d').getImageData(0,0,w,h).data,b=second.getContext('2d').getImageData(0,0,w,h).data;"+
           "let diff=0;for(let p=0;p<a.length;p+=4){diff+=Math.abs(a[p]-b[p])+Math.abs(a[p+1]-b[p+1])+Math.abs(a[p+2]-b[p+2])}"+
-          "mae=Math.round(diff/(w*h*3)*100)/100;"+
+          "mae=Math.round(diff/(w*h*3)*10000)/10000;"+
           "const baselineUrl="+JSON.stringify(beforeUrl)+";"+
           "if(baselineUrl){const baseline=await load(baselineUrl);"+
           "const third=document.createElement('canvas');third.width=w;third.height=h;"+
           "const tctx=third.getContext('2d');tctx.drawImage(baseline,0,0);"+
           "const b0=tctx.getImageData(0,0,w,h).data;let diff0=0;"+
           "for(let p=0;p<a.length;p+=4){diff0+=Math.abs(a[p]-b0[p])+Math.abs(a[p+1]-b0[p+1])+Math.abs(a[p+2]-b0[p+2])}"+
-          "maeBefore=Math.round(diff0/(w*h*3)*100)/100;"+
+          "maeBefore=Math.round(diff0/(w*h*3)*10000)/10000;"+
 "const patches="+JSON.stringify(kind==='shop'?[[18,175,173,309],[18,329,365,427]]:[[18,195,365,428]])+";"+
 "let sumA=0,sumB=0,pixels=0;for(const [x0,y0,x1,y1] of patches){for(let y=y0;y<y1;y++){for(let x=x0;x<x1;x++){const p=(y*w+x)*4;for(let k=0;k<3;k++){sumA+=Math.abs(a[p+k]-b0[p+k]);sumB+=Math.abs(a[p+k]-b[p+k]);pixels++}}}}"+
-"roiBefore=Math.round(sumA/pixels*100)/100;roiAfter=Math.round(sumB/pixels*100)/100;}}"+
+"roiBefore=Math.round(sumA/pixels*10000)/10000;roiAfter=Math.round(sumB/pixels*10000)/10000;}}"+
           "return {png:c.toDataURL('image/png').slice(22),mae,maeBefore,roiBefore,roiAfter,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
@@ -498,10 +446,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const card=native.find(screen=>screen.kind==='cards');
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
-  assert.ok(card.maeRgbAfter<=card.maeRgbBefore&&card.roiMaeAfter<=card.roiMaeBefore,
-    'Unmodified 05 Cartas must not regress vs the ACTUAL v0.1.93 HEAD with #411: '+
+  assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
+    'Only native genuine 05 slots 4 and 7 may improve strict full-frame+eight-card ROI vs current merged v0.1.96 HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
-  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore&&shop.roiMaeAfter<shop.roiMaeBefore,
-    'The actual Captain pack art must strictly improve 06 native global + ROI vs v0.1.93 HEAD: '+
-    JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
+  assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
+    '06 Shop global image must be pixel-identical to merged HEAD');
+  assert.equal(shop.roiMaeAfter,shop.roiMaeBefore,
+    '06 pack/chests ROI must not change from this 05-only candidate');
 });
