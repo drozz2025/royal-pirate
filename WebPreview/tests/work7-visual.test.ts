@@ -37,24 +37,28 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  const marker = '/* WORK7 / #104 — 384×512 native carved frame relief, 17 Nov 15h.';
+  const marker = '/* WORK7/#104 — 18 Nov 06:24 UTC. Native source-art luminance only.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   // Compare against the exact WORK0-integrated v0.1.81 HEAD (release #363).
   // Restore ONLY this branch's five candidate filters in the SAME frame.
   // Restoring it in the SAME Chromium frame isolates ONLY this PR's
-  // five optical changes, including preserving original 320px rules.
+  // eleven crop-only changes, including preserving original 320px rules.
+  // Exact WORK0-integrated HEAD v0.1.82 before this PR. The temporary
+  // override reverts ONLY the eleven source-art crop exposure changes below.
+  // Same component, same data, same paused Chromium scene and screenshot.
   const currentHeadBaseline = `
-    /* Exact v0.1.81 merged HEAD, undo only five optical properties. */
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{
-        filter:saturate(1.25) contrast(1.13) brightness(1.075)!important
-      }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{
-        filter:saturate(1.25) contrast(1.13) brightness(.96)!important
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.80)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.80)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.65)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.19)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.075)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(.88)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(.88)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.16)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.20)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.18)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.20) drop-shadow(0 4px 3px #041327a8)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.20) drop-shadow(0 4px 3px #041327a8)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.40) drop-shadow(0 4px 3px #041327a8)!important}
     }`;
   const cssBaseline = currentHeadBaseline;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -240,7 +244,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         let headScreenshotData: string | null = null;
         let baselineGeometry: any = null;
         if ((width===384 && height===512)||(width===320 && height===568)) {
-          // Temporarily undo only this PR's five CSS properties via precise
+          // Temporarily undo only this PR's eleven native crop properties via precise
           // overrides. Keep HEAD assets, state, earlier visual passes, browser
           // viewport and font rendering identical before/after.
           const enabled = await evaluate("(()=>{const s=document.createElement('style');s.id='work7-css-baseline';s.textContent="+JSON.stringify(cssBaseline)+";document.head.appendChild(s);return true})()");
@@ -262,7 +266,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           await sleep(200);
           if (width===384 && height===512) {
             // Actual current HEAD, not the older pre-#268 baseline: the only
-            // difference from the new render is this PR's two image filters.
+            // difference from the new render is this PR's eleven genuine source image crop filters.
             await evaluate("(()=>{const s=document.createElement('style');s.id='work7-head-baseline';s.textContent="+JSON.stringify(currentHeadBaseline)+";document.head.appendChild(s);return true})()");
             await sleep(200);
             const currentHead = await command('Page.captureScreenshot', {
