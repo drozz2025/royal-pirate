@@ -150,6 +150,18 @@ test('07 Missions: measured reward column registration native 384x512 A/B', {tim
     await delay(150);
     if(browser?.exitCode===null)browser.kill('SIGKILL');
     if(vite.exitCode===null)vite.kill('SIGKILL');
-    rmSync(profile,{recursive:true,force:true,maxRetries:12,retryDelay:150});
+    // Chromium's extension-storage helpers can still flush after its parent exits.
+    // Do not turn a successful native visual assertion into a false CI failure
+    // just because a disposable /tmp profile is still being populated.
+    try {
+      rmSync(profile,{recursive:true,force:true,maxRetries:12,retryDelay:150});
+    } catch (error) {
+      if (error instanceof Error && 'code' in error &&
+          ['ENOTEMPTY','EBUSY','EPERM'].includes(String(error.code))) {
+        console.warn('WORK8 temporary Chromium profile cleanup deferred to CI runner:',error.message);
+      } else {
+        throw error;
+      }
+    }
   }
 });
