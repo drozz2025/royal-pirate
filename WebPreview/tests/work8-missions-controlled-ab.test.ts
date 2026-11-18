@@ -972,37 +972,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.equal(edgeGeometry.navCount,5);
     assert.ok(edgeGeometry.documentWidth<=386);
     assert.ok(edgeCompare.unchanged.header<.10&&edgeCompare.unchanged.dock<.10,'global header/dock unchanged');
-    // Diagnose alternative paint treatments on the SAME paused/decoded DOM
-    // before deciding whether to keep this candidate. Do not change thresholds.
-    const edgeVariants=[
-      ['moderate-top','border-top-color:#9aafba!important;'],
-      ['dark-top','border-top-color:#597587!important;'],
-      ['muted-sides','border-left-color:#567d91!important;border-right-color:#567d91!important;'],
-      ['dark-sides','border-left-color:#2c5067!important;border-right-color:#2c5067!important;'],
-      ['soft-all','border-color:#93a8ae #56778b #39556a!important;'],
-      ['dark-all','border-color:#54778a #2a4d64 #173b55!important;'],
-      ['bright-no-shadow','border-color:#b7ced0 #7898a6 #567489!important;'],
-      ['shadow-silver','box-shadow:inset 0 1px #b3d0d0a0,inset 0 -1px #052237,0 2px 3px #04172b!important;'],
-      ['subtle-depth','filter:brightness(.96) saturate(.98)!important;']
-    ];
-    await evalJs('document.documentElement.classList.add('+JSON.stringify(edgeFlag)+');true');
-    const edgeTrialMetrics=[];
-    for(const [name,declarations] of edgeVariants){
-      await evalJs('(()=>{let s=document.getElementById("work8-edge-probe");if(!s){s=document.createElement("style");s.id="work8-edge-probe";document.head.appendChild(s)}s.textContent='+JSON.stringify('.w8-approved-missions .w8-approved-quest{'+declarations+'}')+';return true})()');
-      await delay(90);
-      const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-      const trialSource=source
-        .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+edgeBefore))
-        .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+shot))
-        .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],questEdges:[12,157,372,318],daily:');
-      const m=await evalJs(trialSource);
-      edgeTrialMetrics.push({name,full:m.metrics.full.delta,quests:m.metrics.quests.delta,roi:m.metrics.questEdges.delta});
-    }
-    console.log('WORK8 07 SAME-FRAME edge variations '+JSON.stringify(edgeTrialMetrics));
-    writeFileSync(join(evidence,'work8-missions-edge-probe-variants.json'),JSON.stringify(edgeTrialMetrics,null,2));
-    await evalJs('(()=>{document.getElementById("work8-edge-probe")?.remove();document.documentElement.classList.remove('+JSON.stringify(edgeFlag)+');return true})()');
-    assert.ok(edgeCompare.metrics.questEdges.delta<0&&edgeCompare.metrics.full.delta<0,
-      'pewter edging must improve both 3 quest ROI and native full-frame MAE');
+    assert.ok(edgeCompare.metrics.questEdges.delta<-.30&&edgeCompare.metrics.full.delta<-.10,
+      'source-registered navy edging must improve quest ROI at least 0.30 and full MAE at least 0.10');
     assert.ok(edgeCompare.metrics.chests.delta<.1&&edgeCompare.metrics.daily.delta<.1,
       'seven reward chests and daily panel cannot regress');
     assert.ok(edgeGeometry.dayContent.every((items:any)=>items.every((p:any)=>p&&p.bottom<=edgeGeometry.nav.y+2)),
