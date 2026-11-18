@@ -19,6 +19,41 @@ function sealTexture(red: boolean, flag = false) {
   const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 512;
   const c = canvas.getContext('2d')!;
   c.fillStyle = flag ? '#151923' : red ? '#a7342f' : '#101923'; c.fillRect(0, 0, 512, 512);
+  // WORK0/#104: paint depth into the THREE real red enemy sails, not the HUD.
+  // A single 512² CanvasTexture is reused by the two main sails and foremast;
+  // the actual mesh, animation, physics, hit boxes and draw-call count remain.
+  // Broad overlapping curved fabric folds break the bright, flat rectangles
+  // that were visually unlike the approved enemy galleon (02-batalha.webp).
+  if(red && !flag){
+    for(let i=0;i<8;i++){
+      const x=-30+i*73;
+      c.fillStyle=i%2===0?'rgba(51,12,23,.30)':'rgba(251,154,108,.13)';
+      c.beginPath();
+      c.moveTo(x,0);
+      c.bezierCurveTo(x+37,132,x+18,349,x-13,512);
+      c.lineTo(x+54,512);
+      c.bezierCurveTo(x+85,328,x+90,124,x+58,0);
+      c.closePath();
+      c.fill();
+      c.strokeStyle=i%2===0?'rgba(255,187,119,.19)':'rgba(62,12,23,.24)';
+      c.lineWidth=i%2===0?4:6;
+      c.beginPath();
+      c.moveTo(x+52,0);
+      c.bezierCurveTo(x+74,152,x+40,329,x+16,512);
+      c.stroke();
+    }
+    // Slightly bowed transverse seams emphasize hanging canvas rather than
+    // a uniform red flag; skull texture remains above these folds.
+    for(const y of [105,224,355,464]){
+      c.strokeStyle='rgba(94,28,30,.24)';
+      c.lineWidth=3;
+      c.beginPath();c.moveTo(14,y);
+      c.quadraticCurveTo(256,y+27,498,y-6);
+      c.stroke();
+    }
+    c.fillStyle='rgba(31,8,18,.11)';
+    c.fillRect(0,459,512,53);
+  }
   c.strokeStyle = red ? '#d6634d' : '#303741'; c.lineWidth = 2;
   for (let x = 16; x < 512; x += 48) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, 512); c.stroke(); }
   c.strokeStyle = '#d5bf8c'; c.lineWidth = 4; c.strokeRect(12, 12, 488, 488);
@@ -395,8 +430,12 @@ export function makeShip(red = false): ShipArt {
       // Rounded shoulders, narrowed foot and alternating curved canvas
       // panels create a three-dimensional galleon silhouette from either side.
       p.setX(i,p.getX(i)*(.84+.13*Math.sin(v*Math.PI)+.03*v));
+      // The enemy's real red 3D canvas gains a scalloped lower edge and a
+      // deeper, asymmetric wind belly: no extra meshes or player/Porto edits.
+      if(red) p.setY(i,p.getY(i)-.16*(1-v)*Math.cos(u*4*Math.PI));
       p.setZ(i,.05+.74*belly+.10*Math.sin(u*Math.PI)
-        +.065*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
+        +.065*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI)
+        +(red ? .23*belly+.075*Math.sin(u*4*Math.PI)*Math.sin(v*Math.PI) : 0));
     }
     g.computeVertexNormals();const sail=new T.Mesh(g,sailMat);sail.position.set(0,h-2.3,z);rig.add(sail);sails.push(sail);
     // A slender rope along the lower canvas edge gives a readable curved
