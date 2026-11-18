@@ -7,16 +7,16 @@ import {join,resolve} from 'node:path';
 import {tmpdir} from 'node:os';
 
 const css=readFileSync(new URL('../src/work4-fleet-forge.css',import.meta.url),'utf8');
-const marker='WORK4/#104 — 18 Nov 22h: source-dark inset interior with a preserved ocean-blue rim';
+const marker='WORK4/#104 — 18 Nov 23h: native source-depth inset A/B v2';
 const paint=css.split(marker)[1]?.split('/*')[0]||'';
 const selector='.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label';
-const oldGradient='linear-gradient(90deg,#075684ec 0%,#0a4b74ed 12%,#0b3655f6 28%,#06263ff9 44%,#031b30fa 70%,#031729fb 100%)';
+const oldGradient='linear-gradient(90deg,#075684ec 0%,#075080ed 6%,#09263ef5 16%,#04182af9 27%,#042039f9 45%,#031b30fa 68%,#031729fb 100%)';
 const approved=readFileSync(new URL('../../assets/design-approved/03-frota.webp',import.meta.url)).toString('base64');
 
 test('WORK4 Fleet native inset dark pigment keeps source rim and local scope, never ship geometry, sea or shared UI',()=>{
   assert.ok(paint,'native source inset must exist');
   assert.match(paint,/@media \(width:384px\) and \(height:512px\)/);
-  assert.match(paint,/#075080ed 6%/);
+  assert.match(paint,/#075080ed 4%/);
   assert.match(paint,/100%\)!important/);
   assert.equal((paint.match(/\.w4-stage-label/g)||[]).length,1);
   assert.doesNotMatch(paint,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-reference-sea|\.w4-reference-ship|\.w4-cannon-art|contain:paint|transform:|position:|pointer-events:)/);
@@ -140,9 +140,9 @@ test('WORK4 Fleet native inset depth controlled A/B: same Chromium frame, per-RO
   assert.equal(result.metrics.dock.changedPixels,0,'shared five-item dock pixels must remain identical');
   assert.ok(result.metrics.insetLeft.changedPixels>0,'native left inset must have a real visible effect');
   assert.equal(result.metrics.sea.changedPixels,0,'approved source water pixels must stay unchanged');
-  writeFileSync(join(qa,'original-before-render-overlay-fleet-inset-depth-384x512.png'),Buffer.from(result.comparison,'base64'));
-  const report={approved:false,screensApproved:0,viewport:'384x512',source:'03-frota.webp',frame:'same Chromium page; paused animations; same persisted data',geometry,roi:result.metrics,
-    note:'MAE is evidence, not human artistic approval. Only the depth transition of the live inset pigment changes relative to the already merged #444.'};
-  writeFileSync(join(qa,'work4-native-inset-depth-ab.json'),JSON.stringify(report,null,2)+'\n');
+  writeFileSync(join(qa,'original-before-render-overlay-fleet-inset-depth-v2-384x512.png'),Buffer.from(result.comparison,'base64'));
+  const report={approved:false,screensApproved:0,viewport:'384x512',source:'03-frota.webp',baseline:'WORK4 PR #448 v1 current DRAFT',frame:'same Chromium page; paused animations; same persisted data',geometry,roi:result.metrics,
+    note:'MAE is evidence, not human artistic approval. Only the depth transition of the live inset pigment changes relative to PR #448 initial measured candidate (not yet merged).'};
+  writeFileSync(join(qa,'work4-native-inset-depth-v2-ab.json'),JSON.stringify(report,null,2)+'\n');
   console.log('WORK4_FLEET_INSET_DEPTH_NATIVE_AB '+JSON.stringify(report));
 });
