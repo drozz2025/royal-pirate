@@ -552,7 +552,7 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
           :root:not(.work8-missions-mid-chests-ab-baseline) .w8-approved-missions
           .w8-approved-days li:nth-child(n+4):nth-child(-n+6) .w8-approved-chest > svg.w8-approved-painting {
             top:-1px;
-            left:calc(50% - 2px);
+            left:calc(50% - 6px);
             right:auto;
             width:auto;
             height:46px;
@@ -566,7 +566,14 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
           :root:not(.work8-missions-mid-chests-ab-baseline) .w8-approved-missions
           .w8-approved-days li:nth-child(5) .w8-approved-chest > svg.w8-approved-painting-chest-gold { width:42px; }
           :root:not(.work8-missions-mid-chests-ab-baseline) .w8-approved-missions
-          .w8-approved-days li:nth-child(6) .w8-approved-chest > svg.w8-approved-painting-chest-violet { width:44px; }
+          .w8-approved-days li:nth-child(6) .w8-approved-chest > svg.w8-approved-painting-chest-violet { width:44px; left:calc(50% - 10px); }
+          :root:not(.work8-missions-mid-chests-ab-baseline) .w8-approved-missions
+          .w8-approved-days li:nth-child(n+4):nth-child(-n+6) > small {
+            position:relative;
+            z-index:4;
+            background:linear-gradient(180deg,rgba(7,25,42,.93),rgba(7,25,42,.96));
+            border-radius:2px;
+          }
         }
       `}</style>
       <section className="w8-approved-daily" aria-label="7-day supply route" title={canClaim?'Next claim earns '+(15+next*5)+' coins':'Recompensa de hoje já recolhida'}>
