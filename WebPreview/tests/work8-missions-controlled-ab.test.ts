@@ -982,6 +982,55 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(artCompare.metrics.daily.delta<.08&&artCompare.metrics.chests.delta<.08,
       'no daily-reward or seven-chest regression');
 
+
+    /* WORK8 native 07 only: independently register genuine three quest art
+       crops to source size; isolate 1.18x optical scale from the confirmed
+       tone pass above. Real Chromium screenshot before and after in same
+       DOM and frozen frame with 384x512 WebP unscaled. */
+    const artRegisterFlag='work8-missions-quest-art-register-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(artRegisterFlag)+');true');
+    await delay(140);
+    const artRegisterBeforeLayout=await headingLayout();
+    const artRegisterBefore=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-art > svg.w8-approved-painting")].map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}}))()');
+    const artRegisterBeforeShot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(artRegisterFlag)+');true');
+    await delay(140);
+    const artRegisterAfterLayout=await headingLayout();
+    const artRegisterAfter=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-art > svg.w8-approved-painting")].map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}}))()');
+    const artRegisterAfterShot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const artRegisterSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+artRegisterBeforeShot))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+artRegisterAfterShot))
+      .replace('quests:[12,155,372,321],daily:',
+        'quests:[12,155,372,321],questIcons:[14,157,72,318],daily:');
+    const artRegisterMetrics=await evalJs(artRegisterSource);
+    const saveRegister=(name:string,data:string)=>writeFileSync(join(evidence,name),Buffer.from(data,'base64'));
+    saveRegister('missions-quest-register-original-384x512.webp',orig);
+    saveRegister('missions-quest-register-before-384x512.png',artRegisterBeforeShot);
+    saveRegister('missions-quest-register-render-384x512.png',artRegisterAfterShot);
+    saveRegister('missions-quest-register-overlay-before-384x512.png',artRegisterMetrics.overlays[0]);
+    saveRegister('missions-quest-register-overlay-after-384x512.png',artRegisterMetrics.overlays[1]);
+    const artRegisterReport={
+      scope:'only original decorative three quest illustrations on Missions 07',
+      references:['assets/design-approved/00-referencia-original-aprovada.webp','assets/design-approved/00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(n=>'assets/design-approved/'+n)],
+      sameScene:'real 384x512 Chromium DPR1, decoded art, paused animation, no fake profile; CSS-only scale',
+      roi:artRegisterMetrics.metrics,unchanged:artRegisterMetrics.unchanged,
+      rects:{before:artRegisterBefore,after:artRegisterAfter},
+      beforeLayout:artRegisterBeforeLayout,afterLayout:artRegisterAfterLayout,
+      approved:false,approvedScreens:0};
+    writeFileSync(join(evidence,'work8-missions-quest-register-controlled-ab.json'),JSON.stringify(artRegisterReport,null,2));
+    console.log('WORK8 07 original quest art registration A/B '+JSON.stringify(artRegisterReport.roi));
+    assert.equal(artRegisterBefore.length,3);assert.equal(artRegisterAfter.length,3);
+    assert.deepEqual(artRegisterBeforeLayout,artRegisterAfterLayout,'registration cannot change tabs, quests, days, or dock');
+    assert.ok(artRegisterAfter.every((r:any,i:number)=>Math.abs(r.w/artRegisterBefore[i].w-1.18)<.015),
+      'only original illustration scales 18%, never the click target');
+    assert.ok(artRegisterMetrics.unchanged.header<.1 && artRegisterMetrics.unchanged.dock<.1,
+      'no change to Porto / shared five-item navigation');
+    assert.ok(artRegisterMetrics.metrics.questIcons.delta<-.06 && artRegisterMetrics.metrics.full.delta<-.006,
+      'real icon art must improve both quest icon ROI and full frame MAE');
+    assert.ok(artRegisterMetrics.metrics.daily.delta<.08&&artRegisterMetrics.metrics.chests.delta<.08,
+      'all seven reward paintings and captions remain unchanged');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
