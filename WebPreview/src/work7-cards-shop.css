@@ -4207,3 +4207,16 @@
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.46) saturate(1.55) contrast(.82)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.64) saturate(1.90) contrast(.88)}
 }
+
+/* WORK7/#104 — 18 Nov 09:32 UTC. Native 384×512 independent material pass.
+ * Exact current merged #384 filter field is the baseline. This pass only
+ * recalibrates genuine original 05 frame/pigment value on 4 of 8 actual
+ * illustrated cards; images and all live text remain unchanged. No 320px or
+ * tall-phone effect. Interactive A/B + MAE/ROI must pass before approval.
+ * No approved screenshot backgrounds; approved:false, 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.50) saturate(1.70) contrast(.87)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.43) saturate(1.20) contrast(.74)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.42) saturate(2.30) contrast(.76)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.42) saturate(1.75) contrast(.79)}
+}
