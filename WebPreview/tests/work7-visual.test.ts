@@ -108,7 +108,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     }`;
   // ACTUAL latest merged HEAD: #411 changed the carved inlay after #404.
   // Retain that inlay unchanged in both same-frame screenshots; reverse ONLY
-  // this candidate's Captain art scale to its real v0.1.93 base value.
+  // this candidate's Captain art pigment to the real v0.1.93 base value.
   const actual411Inlay = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
@@ -118,7 +118,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const actualPackHEAD = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        transform:translate(-2px,5px) scale(1.07)!important;
+        transform:translate(-4px,7px) scale(1.01)!important;
+        filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)!important;
       }
     }`;
   const cssBaseline = merged404Baseline + actual411Inlay + actualPackHEAD;
