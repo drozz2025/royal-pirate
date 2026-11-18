@@ -37,6 +37,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
+  assert.ok(cssText.includes('18 Nov 15:26 UTC: native 06 chest source-painted highlights.'),
+    'Only three genuine approved 06 chest crops are retuned; live labels and click targets stay intact');
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
@@ -45,68 +47,23 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
     'The final WORK7 candidate changes only genuine 05 frame inlays');
-    // The only admissible before-image is the actual merged #392 v0.1.88 field.
-  // Art and frames are restored with temporary CSS, never with older #384 values.
-  // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
-  // All eight image sublayers also restore their actual pre-PR values.
-  // These !important overrides exist ONLY for controlled same-frame A/B screenshots.
-  const currentHeadBaseline = `
+  // A/B against CURRENT actual merged v0.1.92 HEAD, not a historic Cards
+  // candidate. This PR changes ONLY three Shop crop filters. Nothing is
+  // undone on Cards (so Cards BEFORE and AFTER must be pixel-identical).
+  // For Shop, temporarily restore the exact three pre-PR crop filters in the
+  // very same Chromium page with the same images, viewport, fonts and state.
+  const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.50) saturate(1.70) contrast(.87)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.65) saturate(1.75) contrast(.75)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.43) saturate(1.20) contrast(.74)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.42) saturate(2.30) contrast(.76)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.45) saturate(2.00) contrast(.85)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.65) saturate(1.30) contrast(.92)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.42) saturate(1.75) contrast(.79)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.64) saturate(1.90) contrast(.88)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.49)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.20)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.05)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.03)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.55)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.30)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.31)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)!important}
-    }`;
-  // Restore actual merged WORK0 v0.1.89 + #395 crop values for BEFORE,
-  // not #392: both images are captured in the same Chromium frame / viewport.
-  const merged395Baseline = currentHeadBaseline + `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.95)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.27)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.11)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.86)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.45)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.52)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.60)!important}
-    }`;
-  // Actual merged v0.1.90 HEAD incorporates WORK7 #400 over #395.
-  // Do not compare the candidate against a stale pre-#400 crop state.
-  const merged400Baseline = merged395Baseline + `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.09)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.37)!important}
-    }`;
-  // WORK0 has integrated #404 into the actual branch HEAD; restoring #400
-  // would falsely attribute #404's previous improvement to this new PR.
-  const merged404Baseline = merged400Baseline + `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.14)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.67)!important}
-    }`;
-  // Restore the exact last integrated #404 metallic shell. The new native
-  // 2px inlay is *not* allowed into the before/HEAD render.
-  const actual404FrameShadow = `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-        box-shadow:inset 0 1px #fff7ce,inset 0 0 0 1px #fbe0a1b3,
-          inset 0 -4px #4d2c22a3,0 0 0 1px #513319,
-          0 4px 0 #07162b,0 8px 11px #020d249c!important;
+      .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{
+        filter:saturate(1.27) contrast(1.12) brightness(1.32) drop-shadow(0 4px 3px #041327a8)!important
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
+        filter:saturate(1.27) contrast(1.12) brightness(1.32) drop-shadow(0 4px 3px #041327a8)!important
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+        filter:saturate(1.27) contrast(1.12) brightness(1.59) drop-shadow(0 4px 3px #041327a8)!important
       }
     }`;
-  const cssBaseline = merged404Baseline + actual404FrameShadow;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
     { cwd: process.cwd(), stdio: 'ignore' });
@@ -451,7 +408,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y+1),
             'All true PRÉVIA / EM BREVE labels must stay above the dock at native size');
           assert.ok(baselineGeometry,'HEAD baseline boxes must be recorded, not inferred');
-          assert.deepEqual({slots:geometry.slots,chests:geometry.chests,pack:geometry.pack,packArt:geometry.packArt,labels:geometry.labels.map((l:any)=>({x:l.x,y:l.y,width:l.width,height:l.height,bottom:l.bottom}))},baselineGeometry,'Pure WORK7 card enamel filtering may not move one original illustration, label or hit area');
+          assert.deepEqual({slots:geometry.slots,chests:geometry.chests,pack:geometry.pack,packArt:geometry.packArt,labels:geometry.labels.map((l:any)=>({x:l.x,y:l.y,width:l.width,height:l.height,bottom:l.bottom}))},baselineGeometry,'Pure WORK7 source-art color filtering may not move original pack, chest, card, label or hit geometry');
           assert.deepEqual(comparison.referenceSize,[384,512],'Approved 05/06 originals are 384×512 and must be compared natively without scaling');
           if(kind==='cards') {
             assert.ok(geometry.slots[0].x>=17 && geometry.slots[0].x<=20,
@@ -482,10 +439,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const card=native.find(screen=>screen.kind==='cards');
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
-  assert.ok(card.maeRgbAfter<card.maeRgbBefore&&card.roiMaeAfter<card.roiMaeBefore,
-    'Real 05 Cartas must strictly improve global MAE and source-art ROI vs real integrated #404 HEAD: '+
+  assert.ok(card.maeRgbAfter===card.maeRgbBefore&&card.roiMaeAfter===card.roiMaeBefore,
+    'Untouched 05 Cartas must remain pixel-identical to actual merged HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
-  assert.ok(shop.maeRgbAfter<=shop.maeRgbBefore&&shop.roiMaeAfter<=shop.roiMaeBefore,
-    'Unmodified 06 Loja cannot regress relative to actual HEAD: '+
+  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore&&shop.roiMaeAfter<shop.roiMaeBefore,
+    '06 Loja must STRICTLY improve both native global MAE and real pack/chest ROI versus actual HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
