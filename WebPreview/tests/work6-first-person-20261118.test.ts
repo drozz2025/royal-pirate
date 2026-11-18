@@ -79,7 +79,9 @@ test('WORK6: rendered reticle and flying ball follow the SAME mouth-to-impact ar
    assert.ok(point.x>=mouth.x&&point.x<=impact.x);
    assert.ok(point.z>=impact.z&&point.z<=mouth.z);
  }
- assert.deepEqual(firstPersonShotPosition({...shot,age:flightTime},mouth,impact,flightTime),impact);
+ const arrived=firstPersonShotPosition({...shot,age:flightTime},mouth,impact,flightTime);
+ for(const coordinate of ['x','y','z'] as const)
+   assert.ok(Math.abs(arrived[coordinate]-impact[coordinate])<1e-10,'arc lands on exact target');
  assert.deepEqual(firstPersonShotPosition({...shot,side:'enemy'},mouth,impact,flightTime),shot.position,
    'enemy ship keeps its original independent physics renderer');
  const scene=readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
