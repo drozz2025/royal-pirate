@@ -4151,3 +4151,25 @@
   .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.74)}
   .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.60)}
 }
+
+
+/* WORK7/#104 — 18 Nov 06:24 UTC. Native source-art luminance only.
+ * This pass retains all eight true approved 05 portrait crops, the single
+ * approved 06 Captain pack and all three genuine chest crops. Calibrated
+ * against ORIGINAL vs integrated v0.1.82 same-pixel image-region error,
+ * with final Chromium A/B and touch/ROI regression gate in work7-visual.test.
+ * No mock counters, prices, screenshot backdrops, layout, labels, menu,
+ * shared header or 320px changes. Human visual approval remains false. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.49)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.20)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.05)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.03)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.55)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.30)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.31)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.32) drop-shadow(0 4px 3px #041327a8)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.32) drop-shadow(0 4px 3px #041327a8)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.59) drop-shadow(0 4px 3px #041327a8)}
+}
