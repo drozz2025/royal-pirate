@@ -41,6 +41,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
     'New WORK7 eight-card short-viewport art treatment exists without screenshot backgrounds');
+  assert.ok(cssText.includes('18 Nov 17:28 UTC, v0.1.94 source-based 05 card enamel.'),
+    'WORK7 05 lower-row source painting is the only new native candidate');
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
@@ -107,8 +109,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       }
     }`;
   // ACTUAL latest merged HEAD: #411 changed the carved inlay after #404.
-  // Retain that inlay unchanged in both same-frame screenshots; reverse ONLY
-  // this candidate's Captain art pigment to the real v0.1.93 base value.
+  // Retain that inlay on both frames. Compare current WORK7 candidate ONLY
+  // against genuine merged v0.1.94, which already includes #422 Captain art.
   const actual411Inlay = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
@@ -119,10 +121,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
         transform:translate(-4px,7px) scale(1.01)!important;
-        filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)!important;
+        filter:saturate(1.05) contrast(1.06) brightness(1.16) drop-shadow(0 6px 5px #14062ca3)!important;
       }
     }`;
-  const cssBaseline = merged404Baseline + actual411Inlay + actualPackHEAD;
+  const nativeLowerHead = `
+    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.45) saturate(2.00) contrast(.85)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.65) saturate(1.30) contrast(.92)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.42) saturate(1.75) contrast(.79)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.64) saturate(1.90) contrast(.88)!important}
+    }`;
+  const cssBaseline = merged404Baseline + actual411Inlay + actualPackHEAD + nativeLowerHead;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
     { cwd: process.cwd(), stdio: 'ignore' });
@@ -498,10 +507,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const card=native.find(screen=>screen.kind==='cards');
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
-  assert.ok(card.maeRgbAfter<=card.maeRgbBefore&&card.roiMaeAfter<=card.roiMaeBefore,
-    'Unmodified 05 Cartas must not regress vs the ACTUAL v0.1.93 HEAD with #411: '+
+  assert.ok(card.maeRgbAfter<card.maeRgbBefore&&card.roiMaeAfter<card.roiMaeBefore,
+    'Candidate 05 Cartas must strictly improve MAE and ROI vs ACTUAL merged v0.1.94 HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
-  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore&&shop.roiMaeAfter<shop.roiMaeBefore,
-    'The actual Captain pack art must strictly improve 06 native global + ROI vs v0.1.93 HEAD: '+
+  assert.ok(shop.maeRgbAfter<=shop.maeRgbBefore&&shop.roiMaeAfter<=shop.roiMaeBefore,
+    'Unmodified 06 Loja must not regress vs merged v0.1.94 HEAD with #422: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
