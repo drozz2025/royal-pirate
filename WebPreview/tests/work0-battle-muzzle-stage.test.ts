@@ -36,9 +36,9 @@ test('WORK0 #104: 4 mobile portraits shrink ONLY the pair of visual guns',()=>{
 
 test('WORK0 #104: scene binds visual trajectory and both smoke/fire effects to live muzzle point',()=>{
   const scene=readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
-  assert.match(scene,/this\\.battleBattery\\.scale\\.setScalar\\(pose\\.batteryScale\\)/);
-  assert.match(scene,/battleDeckMuzzleWorld\\(this\\.battleBattery,muzzle\\)/);
-  assert.match(scene,/projectileFromMuzzle\\(s,visibleMuzzle\\)/);
-  assert.match(scene,/this\\.activeBatteryMuzzle=\\(Math\\.max\\(0,this\\.battle\\.shotsFired-1\\)\\)/);
-  assert.match(scene,/vfxOrigin\\?\\.x\\?\\?event\\.position\\.x/);
+  assert.match(scene,/this\.battleBattery\.scale\.setScalar\(pose\.batteryScale\)/);
+  assert.match(scene,/battleDeckMuzzleWorld\(this\.battleBattery,muzzle\)/);
+  assert.match(scene,/projectileFromMuzzle\(s,visibleMuzzle\)/);
+  assert.match(scene,/this\.activeBatteryMuzzle=\(Math\.max\(0,this\.battle\.shotsFired-1\)\)/);
+  assert.match(scene,/vfxOrigin\?\.x\?\?event\.position\.x/);
 });
