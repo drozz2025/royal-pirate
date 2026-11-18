@@ -4220,3 +4220,24 @@
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.42) saturate(2.30) contrast(.76)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.42) saturate(1.75) contrast(.79)}
 }
+
+
+/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.
+ * Start from the actual merged #392 + v0.1.88 HEAD (563d7abc66).
+ * Eight ORIGINAL WEBP art crops, not screenshot backgrounds. Tune pigment
+ * luminance INSIDE existing relief frames to match the approved 05 art; do
+ * not change any source, layout, hit target, label, currency or shared shell.
+ * Native short viewport only. 320×568 and tall mobiles are unchanged.
+ * Same-frame baseline MUST be the #392 merged field plus original crop values;
+ * require strict global MAE and source-art ROI improvement in real Chromium.
+ * No ownership of Porto, dock, header or 06 Shop. approved:false; 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.95)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.27)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.11)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.86)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.45)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.52)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.60)}
+}
