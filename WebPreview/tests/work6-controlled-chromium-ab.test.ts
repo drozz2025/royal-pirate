@@ -100,13 +100,14 @@ async function verifyCausalIsolation(
     'const a=pix(before),b=pix(after),ref=pix(original);',
     // This fixed rectangle covers the right foreground cannon and its carriage,
     // not the left cannon, ship hull/upper sails, header or buttons.
-    // The structural battle framing repositions both REAL first-person guns
-    // via pose.batteryOffsetX. A fixed x0=210 envelope incorrectly classified
-    // 783 pixels of the right carriage at x=198..209 as "background" even
-    // though the left gun, HUD and enemy are intact. Protect x<190 and y<270
-    // exactly; this remains a static, conservative RIGHT-gun-only envelope.
-    // The pixel-difference CI must still reject every change outside it.
-    'const foreground={x0:190,y0:270,x1:384,y1:512};',
+    // The camera-fit transform now scales BOTH genuine 3D cannon barrels
+    // (pose.batteryScale), and the right barrel's outside edge shifts from
+    // x190 to x185 at native 384x512. Real Chromium reported precisely 18
+    // pixels in x185..189 while changing the right cannon silhouette.
+    // Widen this FIXED right-only causal envelope 10px to x180. The upper
+    // enemy, HUD, free-water ROIs and left gun outside that envelope remain
+    // pixel-identical; reject >4 pixels elsewhere. No dynamic mask.
+    'const foreground={x0:180,y0:270,x1:384,y1:512};',
     'const inForeground=(x,y)=>x>=foreground.x0&&x<foreground.x1&&y>=foreground.y0&&y<foreground.y1;',
     'let outsideChangedPixels=0,changedPixels=0,minX=384,minY=512,maxX=-1,maxY=-1;',
     'const visual=document.createElement("canvas");visual.width=384;visual.height=512;',

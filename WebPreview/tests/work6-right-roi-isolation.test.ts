@@ -76,5 +76,5 @@ test('WORK6: change cannot alter Porto, gameplay HP, firing or the five-item men
   assert.doesNotMatch(deck,/this\.battle\.|localStorage|fetch\(/);
   assert.match(scene,/this\.ships\.player\.root\.visible=false/);
   assert.match(scene,/this\.ships\.player\.root\.visible=true/);
-  assert.match(scene,/this\.ships\.enemy\.root\.rotation\.y=-\.95/);
+  assert.match(scene,/this\.ships\.enemy\.root\.rotation\.y=battleEnemyBroadsideYaw\(battleAspect\)/);
 });

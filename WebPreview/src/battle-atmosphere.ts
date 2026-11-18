@@ -35,16 +35,16 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   function puff(cx: number, cy: number, radius: number, shade = false) {
     paint.save();
     paint.translate(cx, cy);
-    paint.scale(1.23, .57);
+    paint.scale(1.18, .53);
     const fog = paint.createRadialGradient(-radius * .16, -radius * .21, radius * .05, 0, 0, radius);
     if (shade) {
       fog.addColorStop(0, 'rgba(93,141,165,.46)');
       fog.addColorStop(.65, 'rgba(135,173,190,.30)');
       fog.addColorStop(1, 'rgba(145,177,196,0)');
     } else {
-      fog.addColorStop(0, 'rgba(255,255,249,.81)');
-      fog.addColorStop(.51, 'rgba(247,251,247,.58)');
-      fog.addColorStop(.8, 'rgba(239,250,246,.24)');
+      fog.addColorStop(0, 'rgba(255,255,249,.68)');
+      fog.addColorStop(.51, 'rgba(247,251,247,.43)');
+      fog.addColorStop(.8, 'rgba(239,250,246,.17)');
       fog.addColorStop(1, 'rgba(244,253,251,0)');
     }
     paint.fillStyle = fog;
@@ -58,15 +58,14 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   // as at sea level. The earlier texture only put clouds in its lowest band,
   // leaving most of a 390x844 live battle as a featureless blue rectangle.
   // Original procedural paint, not a screenshot or a transparent UI layer.
+  // Fewer but layered clouds: the reference shows substantial open blue sky
+  // around a readable red ship rather than a solid grid of giant puffs.
+  // Keep the same local paint path and no additional runtime draw calls.
   const banks: [number, number, number][] = [
-    [-52, 192, 65], [186, 217, 57], [438, 172, 72],
-    [706, 227, 58], [1032, 193, 78],
-    [24, 340, 74], [272, 319, 83], [531, 348, 68],
-    [818, 308, 89], [1081, 358, 79],
-    [-38, 460, 78], [157, 478, 69], [371, 429, 88],
-    [615, 474, 76], [868, 442, 82], [1058, 476, 78],
-    [65, 568, 56], [315, 566, 64], [585, 580, 59],
-    [831, 568, 61], [1044, 577, 65]
+    [-54, 205, 47], [179, 233, 44], [454, 181, 52],
+    [759, 249, 46], [1030, 197, 55],
+    [51, 357, 53], [357, 387, 50], [678, 365, 55], [985, 394, 53],
+    [-12, 548, 47], [487, 544, 49], [1006, 558, 51]
   ];
   for (let i = 0; i < banks.length; i++) {
     const [cx, cy, size] = banks[i];
@@ -184,9 +183,9 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   }
   // Opposing masses leave a warm opening behind the live enemy galleon.
   // Each mass is purposefully asymmetric, so they do not read as tiled puffs.
-  cloudFront(-65, 315, 495, 170, .4);
-  cloudFront(956, 272, 555, 198, 1.8);
-  cloudFront(535, 544, 580, 110, 3.2);
+  cloudFront(-75, 326, 420, 122, .4);
+  cloudFront(975, 298, 438, 145, 1.8);
+  cloudFront(527, 563, 507, 82, 3.2);
 
   // A broad warm glow, not geometric beams: the live galleon remains the
   // visual focus and the approved HUD stays fully legible at 320 pixels.
