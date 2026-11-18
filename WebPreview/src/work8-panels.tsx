@@ -577,6 +577,8 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
             background:linear-gradient(180deg,rgba(7,25,42,.93),rgba(7,25,42,.96));
             border-radius:2px;
           }
+          :root.work8-missions-claimed-chests-ab-baseline .w8-approved-missions
+          .w8-approved-days li:nth-child(-n+3) .w8-approved-chest > svg.w8-approved-painting { display:none!important; }
           /* Only display the actual original green-check chest if the saved
              local daily streak confirms this day was claimed. Never paint a
              pre-claimed chest for a new or lapsed player. A controlled QA
