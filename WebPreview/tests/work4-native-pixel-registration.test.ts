@@ -128,11 +128,14 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
     return resp.result?.value;
   };
   const wait=async(expression:string)=>{
-    for(let n=0;n<100;n++){
+    // Production WebGL/Chromium can start slowly on busy parallel CI runners.
+    // Wait for the REAL interactive DOM rather than skipping touch or canvas QA.
+    for(let n=0;n<180;n++){
       if(await evaluate(expression))return;
       await sleep(120);
     }
-    throw Error('Missing target: '+expression);
+    const diagnostic=await evaluate("(()=>({url:location.href,ready:document.readyState,root:document.querySelector('#root')?.textContent?.slice(0,180)}))()");
+    throw Error('Missing interactive target: '+expression+' | '+JSON.stringify(diagnostic));
   };
   const touch=async(selector:string)=>{
     const point=await evaluate("(()=>{const e=document.querySelector("+JSON.stringify(selector)+");if(!e)return null;const b=e.getBoundingClientRect();return {x:b.left+b.width/2,y:b.top+b.height/2};})()");
