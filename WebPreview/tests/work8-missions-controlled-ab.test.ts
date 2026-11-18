@@ -1440,6 +1440,85 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.equal(meterResults.length,11);
     assert.ok(meterResults.every(s=>s.dockDelta<.08),'meter paint must never alter global dock');
 
+
+    /* WORK8/#104 — exact CURRENT HEAD 07 Missões active tab enamel study.
+       Toggle styling in ONE genuine decoded, paused Chromium DOM/frame.
+       Measure all candidates at native DPR1; keep the 3 real missions,
+       seven live reward slots and global five-button dock untouched.
+       This A/B is intentionally isolated from historical toggled baselines. */
+    await evalJs('(()=>{for(const c of [...document.documentElement.classList])if(c.startsWith("work8-missions-")&&c.endsWith("-ab-baseline"))document.documentElement.classList.remove(c);return true})()');
+    await delay(130);
+    const activeTabSelector='.w8-approved-missions .w8-approved-tabs button[aria-pressed=true]';
+    const activeTabRects=await evalJs('(()=>[...document.querySelectorAll('+JSON.stringify(activeTabSelector)+')].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
+    assert.equal(activeTabRects.length,1,'one actual selected Missions tab');
+    const tabLayoutBefore=await headingLayout();
+    const activeTabVariants=[
+      ['HEAD',''],
+      ['brightness-82','filter:brightness(.82)!important'],
+      ['brightness-88','filter:brightness(.88)!important'],
+      ['brightness-94','filter:brightness(.94)!important'],
+      ['brightness-108','filter:brightness(1.08)!important'],
+      ['muted-90','filter:brightness(.90) saturate(.90)!important'],
+      ['muted-96','filter:brightness(.96) saturate(.85)!important'],
+      ['deep-strong','filter:brightness(.84) saturate(1.12)!important'],
+      ['desaturate','filter:saturate(.78)!important'],
+      ['hue-minus-12','filter:hue-rotate(-12deg)!important'],
+      ['hue-plus-12','filter:hue-rotate(12deg)!important'],
+      ['navy-enamel','background:linear-gradient(180deg,#0c5a7d,#03476d 52%,#032d50)!important']
+    ] as const;
+    const activeTabShots:string[]=[];
+    for(const [variant,style] of activeTabVariants){
+      await evalJs('(()=>{let s=document.getElementById("work8-active-tab-study");if(!s){s=document.createElement("style");s.id="work8-active-tab-study";document.head.append(s)}s.textContent='+JSON.stringify(style?activeTabSelector+'{'+style+'}':'')+';return true})()');
+      await delay(115);
+      activeTabShots.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    }
+    await evalJs('document.getElementById("work8-active-tab-study")?.remove();true');
+    const tabLayoutAfter=await headingLayout();
+    const activeTabMetrics=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(activeTabRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,...activeTabShots.map(s=>'data:image/png;base64,'+s)])));
+    const activeTabResults=activeTabVariants.map(([variant],i)=>({
+      variant,...activeTabMetrics[i],
+      tabDelta:activeTabMetrics[i].meters-activeTabMetrics[0].meters,
+      fullDelta:activeTabMetrics[i].full-activeTabMetrics[0].full
+    }));
+    const improvedTabs=activeTabResults
+      .filter(x=>x.tabDelta<-.01&&x.fullDelta<-.002&&Math.abs(x.dockDelta)<.08)
+      .sort((a,b)=>a.fullDelta-b.fullDelta);
+    const preferredTab=improvedTabs[0]??activeTabResults[0];
+    const preferredIndex=activeTabResults.findIndex(x=>x.variant===preferredTab.variant);
+    const tabOverlaySource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+activeTabShots[0]))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+activeTabShots[preferredIndex]));
+    const tabOverlays=await evalJs(tabOverlaySource);
+    saveTone('missions-active-tab-before-384x512.png',activeTabShots[0]);
+    saveTone('missions-active-tab-study-render-384x512.png',activeTabShots[preferredIndex]);
+    saveTone('missions-active-tab-original-before-overlay-384x512.png',tabOverlays.overlays[0]);
+    saveTone('missions-active-tab-original-render-overlay-384x512.png',tabOverlays.overlays[1]);
+    writeFileSync(join(evidence,'work8-missions-active-tab-study.json'),JSON.stringify({
+      issue:104,baseHead:'39c15fb699a1974a80921cad03192aa8a0428a9b',
+      refs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(n=>'assets/design-approved/'+n),
+      source:'assets/design-approved/07-missoes.webp',
+      method:'native 384x512 DPR1, same real DOM with images decoded, animation frozen',
+      activeTabRects,before:tabLayoutBefore,after:tabLayoutAfter,
+      results:activeTabResults,preferred:preferredTab,approved:false,approvedScreens:0
+    },null,2));
+    console.log('WORK8 #104 NEW current-HEAD active tab native Chromium sweep '+JSON.stringify({
+      preferred:preferredTab,results:activeTabResults
+    }));
+    assert.deepEqual(tabLayoutBefore,tabLayoutAfter,
+      'visual study must not alter actual mission, chest, dock or tab hitboxes');
+    assert.equal(tabLayoutAfter.questCount,3);
+    assert.equal(tabLayoutAfter.dayCount,7);
+    assert.equal(tabLayoutAfter.dockCount,5);
+    assert.ok(tabLayoutAfter.chests.every((c:any)=>c.bottom<=tabLayoutAfter.nav.top+2),
+      'seven real reward chests remain above unchanged dock');
+    assert.ok(activeTabResults.every(x=>Math.abs(x.dockDelta)<.08),
+      'candidate paints must not affect shared five-item dock');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
