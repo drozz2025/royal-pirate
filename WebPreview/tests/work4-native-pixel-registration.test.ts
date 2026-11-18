@@ -653,7 +653,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         // the hearth, live levels, cost cells or the WORK0 dock. Only a measured
         // winner may become shipping CSS in a later commit on this draft.
         const edgeCandidates=[
-          {id:'HEAD',radial:'ellipse 125% 115% at 37% 49%',opaque:77,bottom:96},
+          {id:'HEAD',radial:'ellipse 140% 122% at 37% 49%',opaque:84,bottom:98},
           {id:'merged-head',radial:'ellipse 106% 105% at 37% 49%',opaque:69,bottom:91},
           {id:'edge-soft',radial:'ellipse 106% 105% at 37% 49%',opaque:75,bottom:91},
           {id:'edge-tight',radial:'ellipse 100% 102% at 37% 49%',opaque:69,bottom:91},
@@ -663,7 +663,20 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           {id:'lower-fade',radial:'ellipse 106% 105% at 37% 49%',opaque:69,bottom:85},
           {id:'warm-side',radial:'ellipse 106% 105% at 33% 49%',opaque:72,bottom:91},
           {id:'full-coast',radial:'ellipse 125% 115% at 37% 49%',opaque:77,bottom:96},
-          {id:'focused-barrel',radial:'ellipse 97% 109% at 34% 49%',opaque:73,bottom:93}
+          {id:'focused-barrel',radial:'ellipse 97% 109% at 34% 49%',opaque:73,bottom:93},
+          // WORK4 #104 / 18 Nov: extended source-contour study. Keep all
+          // variants in the SAME paused native Chromium React frame, not
+          // interpolated screenshots or an alternative ship/cannon.
+          {id:'wide-132',radial:'ellipse 132% 120% at 37% 49%',opaque:80,bottom:97},
+          {id:'wide-140',radial:'ellipse 140% 122% at 37% 49%',opaque:84,bottom:98},
+          {id:'wide-115',radial:'ellipse 115% 115% at 37% 49%',opaque:82,bottom:98},
+          {id:'feather-85',radial:'ellipse 125% 115% at 37% 49%',opaque:85,bottom:98},
+          {id:'opaque-lower',radial:'ellipse 125% 115% at 37% 49%',opaque:77,bottom:100},
+          {id:'extended-lower',radial:'ellipse 132% 120% at 37% 49%',opaque:80,bottom:100},
+          {id:'left-register',radial:'ellipse 125% 115% at 34% 49%',opaque:77,bottom:96},
+          {id:'right-register',radial:'ellipse 125% 115% at 41% 49%',opaque:77,bottom:96},
+          {id:'soft-top',radial:'ellipse 125% 120% at 37% 44%',opaque:79,bottom:98},
+          {id:'interior-preserve',radial:'ellipse 118% 118% at 36% 49%',opaque:87,bottom:97}
         ];
         const edgeSelector='.w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon';
         const geomTest="(()=>{const rect=s=>{const x=document.querySelector(s)?.getBoundingClientRect();"+
@@ -757,11 +770,52 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         console.log('WORK4_FORGE_CANNON_AB '+JSON.stringify(finalAB));
         const edgeRecord={...edgeMetrics,ranking:edgeSorted.map((x:any)=>x.id),
           sameReactFrame:true,viewport:'384x512',source:'assets/design-approved/04-melhorias-forja.webp',
-          baseSHA:"16d67fcd16c2bb174e02f594e804e52c2566dc78",
+          baseSHA:"df20776f2f12a847e1ea1f8c3dc1a9bebb7f7db4",
           approved:false,approvedScreens:0,shipped:'HEAD (full-coast mask, current PR)'};
         writeFileSync(join(folder,'work4-forge-cannon-mask-candidates.json'),
           JSON.stringify(edgeRecord,null,2)+'\n');
         console.log('WORK4_FORGE_CANNON_MASK_STUDY '+JSON.stringify(edgeRecord));
+
+        // WORK4/#104: measure this PR against the genuine previously merged
+        // 125%x115% source contour, not the obsolete 106%x105% mask. The 98%
+        // feathered lower edge is intentional: 100% scores slightly lower
+        // numerically but risks a hard photographic boundary at the frame.
+        const lastReleasedContour=edgeMetrics.scores.find((x:any)=>x.id==='full-coast');
+        assert.ok(lastReleasedContour,'measured released-source control is mandatory');
+        assert.ok(edgeHead.cannon<lastReleasedContour.cannon-1.0,
+          'new true cannon pixels must improve the released 04 cannon ROI');
+        assert.ok(edgeHead.hearth<lastReleasedContour.hearth-1.0,
+          'new mask must recover the real approved furnace');
+        assert.ok(edgeHead.seam<lastReleasedContour.seam-.1,
+          'new mask cannot worsen the photographic seam');
+        assert.ok(edgeHead.global<lastReleasedContour.global-.05,
+          'new scene must reduce global native 384x512 reference MAE');
+        for(const k of ['costs','dock']){
+          assert.ok(Math.abs(edgeHead[k]-lastReleasedContour[k])<.01,
+            'real '+k+' source pixels must be unchanged');
+        }
+        const compareRelease={reference:references.forge,
+          before:edgeShots['full-coast'],after:screenshot};
+        const releaseImage=await evaluate("(async()=>{const v="+JSON.stringify(compareRelease)+";"+
+          "const load=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;await i.decode();"+
+          "if(i.width!==384||i.height!==512)throw Error('only native 384x512');return i};"+
+          "const [a,b,c]=await Promise.all([load('webp',v.reference),load('png',v.before),load('png',v.after)]);"+
+          "const o=document.createElement('canvas');o.width=1536;o.height=512;const g=o.getContext('2d');"+
+          "g.drawImage(a,0,0);g.drawImage(b,384,0);g.drawImage(c,768,0);"+
+          "g.drawImage(a,1152,0);g.globalAlpha=.5;g.drawImage(c,1152,0);"+
+          "return o.toDataURL('image/png').split(',')[1]})()");
+        writeFileSync(join(folder,'original-before-render-overlay-forge-source-20261118-384x512.png'),
+          Buffer.from(releaseImage,'base64'));
+        const trueSourceAB={screen:'forge',viewport:'384x512',
+          source:'assets/design-approved/04-melhorias-forja.webp',
+          before:lastReleasedContour,after:edgeHead,
+          protected:['costs','dock'],sameReactFrame:true,
+          geometry:edgeGeom,approved:false,approvedScreens:0,
+          selected:'wide-140 (98% bottom feather, no hard cut)',
+          rejected:'opaque-lower (100% bottom, potential hard edge)'};
+        writeFileSync(join(folder,'work4-source-cannon-20261118-controlled-ab.json'),
+          JSON.stringify(trueSourceAB,null,2)+'\n');
+        console.log('WORK4_FORGE_NEW_VS_RELEASE_AB '+JSON.stringify(trueSourceAB));
       }
 
       // WORK4/#104 native Forge stage: real original/before/render/overlay.
@@ -2028,4 +2082,21 @@ test('WORK4 native source-cannon contour stays isolated from costs, navigation a
   assert.match(suffix,/radial-gradient\(ellipse 125% 115% at 37% 49%/);
   assert.match(suffix,/linear-gradient\(to bottom,#000 0%,#000 96%,transparent 100%\)/);
   assert.doesNotMatch(suffix,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-resource-grid|contain:paint|translateZ)/);
+});
+
+
+/* WORK4 / #104 — 18 Nov 19h: guard final native 04 painter layer.
+   The current source-cannon refinement must never accidentally extend
+   beyond the 384x512 reference or cover WORK0 UI / live material costs. */
+test('WORK4 source-cannon visual refinement is native-only and cost/dock-safe',()=>{
+  const marker='WORK4/#104 — 18 Nov 15h: source-cannon contour refinement';
+  const suffix=css.split(marker)[1];
+  assert.ok(suffix,'final measured cannon contour must survive rebase');
+  const rules=suffix.split('*/')[1]||'';
+  assert.match(rules,/@media \(width:384px\) and \(height:512px\)/);
+  assert.match(rules,/radial-gradient\(ellipse 140% 122% at 37% 49%,#000 0%,#000 84%,transparent 99%\)/);
+  assert.match(rules,/linear-gradient\(to bottom,#000 0%,#000 98%,transparent 100%\)/);
+  assert.match(rules,/mask-composite:intersect/);
+  assert.equal((rules.match(/\.w4-cannon-art\.w4-reference-cannon/g)||[]).length,1);
+  assert.doesNotMatch(rules,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-resource-grid|\.w4-improve-button|position:fixed)/);
 });
