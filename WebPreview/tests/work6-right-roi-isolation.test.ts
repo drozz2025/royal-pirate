@@ -46,24 +46,28 @@ test('WORK6 right ROI: only the existing starboard cannon is a smaller angled 3D
   assert.equal(barrels[1].material.color.getHexString(),'202b36');
 });
 
-test('WORK6: two muzzles remain visible at 320/384/390/430 without camera changes',()=>{
-  const {muzzles}=guns();
+test('WORK6: new single barrel replaces the visible right/left pair on 4 mobiles',()=>{
+  const {group,muzzles,flashes}=makeBattleDeck(true);
+  assert.equal(muzzles.length,1);
+  assert.equal(flashes.length,1);
+  const barrel=group.getObjectByName('first-person-central-recoil')!;
   for(const [w,h] of [[320,568],[384,512],[390,844],[430,932]]){
     const pose=battleCameraPose(w/h);
     const camera=new T.PerspectiveCamera(42,w/h,.1,220);
     camera.position.set(...pose.position);
     camera.lookAt(...pose.target);
     camera.updateMatrixWorld();
+    group.position.set(pose.batteryOffsetX,0,pose.batteryOffsetZ);
+    barrel.updateWorldMatrix(true,false);
     const projection=muzzles.map(m=>{
-      const ndc=m.position.clone()
-        .add(new T.Vector3(0,0,pose.batteryOffsetZ)).project(camera);
+      const ndc=m.clone().applyMatrix4(barrel.matrixWorld).project(camera);
       return {x:(1+ndc.x)*w/2,y:(1-ndc.y)*h/2};
     });
     for(const p of projection){
-      assert.ok(p.x>w*.06 && p.x<w*.95,JSON.stringify({w,h,p}));
+      assert.ok(p.x>w*.40 && p.x<w*.60,JSON.stringify({w,h,p}));
       assert.ok(p.y>h*.48 && p.y<h*.70,JSON.stringify({w,h,p}));
     }
-    assert.ok(projection[0].x+60<projection[1].x);
+    assert.equal(projection.length,1,'exactly one visible cannon on deck');
   }
 });
 
