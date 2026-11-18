@@ -4304,15 +4304,12 @@
 
 /* WORK7/#104 — native 384×512 painted enamel-depth reconciliation.
  * Isolated from pending #426 (slot 3) and #430 (06 chest panels): only
- * genuine lower-row 05 source frames 6 and 8. Restore the pre-PR
+ * genuine lower-row 05 source frame 8. Restore the pre-PR
  * filters in the same live Chromium frame for strict A/B MAE and ROI.
  * Reference: approved 00 original/mosaic and 01–08; no screenshots as
  * backgrounds, no 320px layout, shell, dock, currency or game changes.
  * approved:false; 0/8 pending human review. WORK0 owns integration. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
-    filter:brightness(.57) saturate(1.30) contrast(.92);
-  }
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
     filter:brightness(.58) saturate(1.90) contrast(.88);
   }
