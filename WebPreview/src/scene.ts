@@ -7,7 +7,7 @@ import { makeShip, type ShipArt } from './ships';
 import { hullImpactPlacement } from './impact-visuals';
 import { rippleState } from './water-vfx';
 import { cannonFxState, CANNON_FX_DURATION } from './cannon-vfx';
-import { battleCameraPose, battleEnemyScale, battleDeckMuzzleWorld } from './battle-framing';
+import { battleCameraPose, battleEnemyScale, battleEnemyBroadsideYaw, battleDeckMuzzleWorld } from './battle-framing';
 import { makeBattleDeck } from './battle-deck';
 import { projectileFromMuzzle } from './battle-shot-presentation';
 import { makeBattleForegroundSail } from './battle-foreground-sail';
@@ -92,49 +92,44 @@ export class OceanScene {
         col=mix(col,vec3(.6,.85,.87),fog);
         // Battle-only whitecaps: waves remain animated and ship collisions untouched.
         if(battleMode>.5){
-          float swell=sin(vWorld.z*.51+sin(vWorld.x*.26+time*.37)*1.65-time*.87);
-          float cross=sin(vWorld.x*.97-vWorld.z*.24+time*.68);
-          float crest=sin(vWorld.x*3.6+vWorld.z*1.8+sin(vWorld.z*2.2-time)*.9-time*3.1);
-          float flecks=sin(vWorld.x*8.2-vWorld.z*5.1+time*4.0);
-          float ridge=smoothstep(.18,.78,swell*.56+cross*.29+crest*.38);
-          float whiteCap=smoothstep(.30,.88,crest*.72+flecks*.28)*ridge;
+          // BATALHA 02: long, irregular surf lines instead of a checkerboard.
+          // Shader-only: Porto keeps its separate original battleMode path.
+          float swell=sin(vWorld.z*.33+sin(vWorld.x*.17+time*.29)*1.35-time*.63);
+          float cross=sin(vWorld.x*.73-vWorld.z*.18+time*.57);
+          float crest=sin(vWorld.x*2.35+vWorld.z*1.04+
+                          sin(vWorld.z*.93-time*.71)*.87-time*2.02);
+          float flecks=sin(vWorld.x*6.20-vWorld.z*3.35+time*3.2);
+          float ridge=smoothstep(.29,.83,swell*.61+cross*.18+crest*.24);
+          float whiteCap=smoothstep(.53,.92,crest*.75+flecks*.25)*ridge;
           float distanceToEye=length(cameraPosition.xz-vWorld.xz);
           float proximity=1.-smoothstep(20.,88.,distanceToEye);
-          // Long translucent breakers replace part of the old regularly-spaced
-          // white pattern. Everything is in the existing battle shader: no
-          // new meshes, texture downloads, gameplay state or touch overlays.
-          float rolling=sin(vWorld.z*1.14-time*1.24+
-                           sin(vWorld.x*.41+time*.23)*1.5);
-          float breaker=smoothstep(.58,.93,rolling)*
-                        smoothstep(.10,.62,ridge);
-          float crestShine=smoothstep(.63,.95,
-            sin(vWorld.x*2.5+vWorld.z*1.25-time*2.3))*breaker;
-          float foam=clamp(ridge*.27+whiteCap*.56+
-            breaker*.37+crestShine*.29,0.,1.)*(.73+.27*proximity);
-          // Long broken painterly crests, not a periodic checkerboard. A
-          // warped, almost continuous ridge is interrupted by irregular
-          // transverse currents like the approved illustrated battle sea.
-          float paintedSwell=sin(vWorld.z*.72-time*.88+
-            sin(vWorld.x*.33+time*.17)*1.58+
-            sin(vWorld.x*.81-vWorld.z*.16)*.24);
-          float brokenEdges=.55+.45*sin(vWorld.x*1.31+
-            sin(vWorld.z*.27+time*.33)*1.41);
-          float foamyLip=smoothstep(.67,.94,paintedSwell)*
-            smoothstep(-.30,.57,brokenEdges);
-          float stipple=smoothstep(.32,.94,
-            sin(vWorld.x*3.73+vWorld.z*1.26-time*2.46))*
-            foamyLip;
-          foam=max(foam,clamp(foamyLip*.73+stipple*.27,0.,.86));
-          float shadowLip=(smoothstep(.16,.60,paintedSwell)-
-            smoothstep(.70,.96,paintedSwell))*.18;
+          float rolling=sin(vWorld.z*.83-time*.93+
+                           sin(vWorld.x*.29+time*.18)*1.22);
+          float breaker=smoothstep(.72,.97,rolling)*smoothstep(.22,.71,ridge);
+          float crestShine=smoothstep(.69,.95,
+            sin(vWorld.x*2.07+vWorld.z*.94-time*1.86))*breaker;
+          float foam=clamp(ridge*.17+whiteCap*.31+
+            breaker*.19+crestShine*.13,0.,.72)*(.68+.22*proximity);
+          // Discontinuous organic lips leave darker troughs between crests.
+          float paintedSwell=sin(vWorld.z*.59-time*.71+
+            sin(vWorld.x*.27+time*.13)*1.44+
+            sin(vWorld.x*.72-vWorld.z*.13)*.20);
+          float brokenEdges=.50+.50*sin(vWorld.x*1.19+
+            sin(vWorld.z*.21+time*.29)*1.31);
+          float foamyLip=smoothstep(.77,.97,paintedSwell)*
+            smoothstep(-.15,.67,brokenEdges);
+          float stipple=smoothstep(.54,.96,
+            sin(vWorld.x*3.12+vWorld.z*.95-time*1.96))*foamyLip;
+          foam=max(foam,clamp(foamyLip*.42+stipple*.15,0.,.56));
+          float shadowLip=(smoothstep(.10,.52,paintedSwell)-
+            smoothstep(.71,.96,paintedSwell))*.16;
           // Animated surf around the actual battle hull locations. These white
           // wakes live in the water shader, not in an image over the controls.
           vec2 playerShip=vec2(-10.,3.);
           vec2 enemyShip=vec2(10.,-3.);
           float a=length((vWorld.xz-playerShip)/vec2(3.2,6.8));
-          // Batalha renders its red opponent at 1.82/1.88 visual scale; size the
-          // drawn surf to the DISPLAYED hull, not the smaller physics footprint.
-          float b=length((vWorld.xz-enemyShip)/vec2(4.8,10.2));
+          // Match the smaller mobile DISPLAY hull, without moving collisions.
+          float b=length((vWorld.xz-enemyShip)/vec2(4.15,8.5));
           float hullSurf=max(exp(-pow((a-.88)*5.2,2.)),
             exp(-pow((b-.89)*6.3,2.)));
           float streamA=exp(-pow((vWorld.x+10.)/4.7,2.))
@@ -142,15 +137,15 @@ export class OceanScene {
           float streamB=exp(-pow((vWorld.x-10.)/4.7,2.))
             *smoothstep(1.5,6.5,-3.-vWorld.z)*(1.-smoothstep(12.,38.,-3.-vWorld.z));
           float streamRipples=.54+.46*sin(vWorld.z*2.5-time*3.4+sin(vWorld.x*.92));
-          foam=max(foam,clamp(hullSurf*.68+(streamA+streamB)*streamRipples*.33,0.,.83));
+          foam=max(foam,clamp(hullSurf*.57+(streamA+streamB)*streamRipples*.24,0.,.69));
           // Indigo troughs and turquoise crests: tonal VOLUME, not just an
           // overlaid blue tint. Wave shadows follow the painted wave ridge.
-          vec3 deep=mix(vec3(.006,.10,.29),vec3(.017,.49,.70),
-                        clamp(.49+vWave*1.38+swell*.23+cross*.09,0.,1.));
+          vec3 deep=mix(vec3(.008,.12,.31),vec3(.017,.43,.65),
+                        clamp(.48+vWave*1.04+swell*.18+cross*.07,0.,1.));
           deep*=1.-shadowLip;
-          deep=mix(deep,vec3(.24,.75,.84),fres*.42);
-          col=mix(deep,vec3(.88,.97,.97),foam);
-          col+=vec3(.89,.96,.82)*spec*.4;
+          deep=mix(deep,vec3(.19,.71,.82),fres*.34);
+          col=mix(deep,vec3(.82,.94,.95),foam);
+          col+=vec3(.88,.95,.84)*spec*.31;
           col=mix(col,vec3(.30,.66,.84),fog*.42);
         }
         gl_FragColor=vec4(col,1.);
@@ -635,7 +630,7 @@ export class OceanScene {
     // Battle-only broadside: reveal the enemy's three-dimensional port flank
     // instead of aiming its narrow bow straight at the camera. No camera
     // movement, hit-point changes, altered controls or Porto composition.
-    this.ships.enemy.root.rotation.y=-.95;
+    this.ships.enemy.root.rotation.y=battleEnemyBroadsideYaw(battleAspect);
     // First-person broadside: the player is standing behind the live gun deck.
     // Keep the player's physics ship active for HP, firing, collisions and scars;
     // hide only its exterior hull from this camera (never from Porto).
