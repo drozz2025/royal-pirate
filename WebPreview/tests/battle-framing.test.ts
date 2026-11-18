@@ -4,6 +4,8 @@ import * as T from 'three';
 import {readFileSync} from 'node:fs';
 import {battleCameraPose} from '../src/battle-framing';
 import {makeBattleDeck} from '../src/battle-deck';
+import {projectileFromMuzzle} from '../src/battle-shot-presentation';
+import {launch} from '../src/battle';
 
 function screen(w:number,h:number,point:[number,number,number]) {
   const pose=battleCameraPose(w/h);
@@ -29,8 +31,20 @@ test('WORK6 native 384 and mobile 320/390/430 show a right-side enemy broadside 
   // transform — this would miss a visually displaced cannonball.
   const muzzleWorld=(i:number):[number,number,number]=>{
     const m=battery.muzzles[i];
-    return [m.x+pose.batteryOffsetX,m.y,m.z+battery.group.position.z+pose.batteryOffsetZ];
+    // scene.home() ASSIGNS battleBattery.position.z = pose.batteryOffsetZ;
+    // it does not add the group's initial -15. Earlier projection tests were
+    // 15 world units out and could pass a false muzzle/ball alignment gate.
+    return [m.x+pose.batteryOffsetX,m.y,m.z+pose.batteryOffsetZ];
   };
+  // The visual shot origin for either selected muzzle must be EXACTLY the
+  // same world point as the visible barrel mouth at the first animation tick.
+  const simulation=launch('player',0,65);
+  for(const cannonIndex of [0,1]) {
+    const world=muzzleWorld(cannonIndex);
+    const ball=projectileFromMuzzle(simulation,{x:world[0],y:world[1],z:world[2]});
+    assert.deepEqual(ball,{x:world[0],y:world[1],z:world[2]},
+      `projectile not on selected visible muzzle ${cannonIndex} at ${w}x${h}`);
+  }
   const portCannon=screen(w,h,muzzleWorld(0));
   const starboardCannon=screen(w,h,muzzleWorld(1));
   const blackSail=screen(w,h,[pose.sailX,8.85,42]);
