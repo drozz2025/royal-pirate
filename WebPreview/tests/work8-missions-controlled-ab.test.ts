@@ -90,7 +90,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        enable it only for the independent coastal A/B near the end. This
        preserves the exact original v0.1.75 baselines without relaxing
        their MAE or pixel-stability requirements. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -869,6 +869,60 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'authentic royal art must improve both target ROI and full-frame MAE');
     assert.ok(royalComparison.metrics.quests.delta<.12&&royalComparison.metrics.daily.delta<.20,
       'no significant regression in 3 genuine objectives or 7 daily rewards');
+
+    /* WORK8/#104: independent registered original silver/gold/violet day
+       chest 4-6 artwork at native pixel sizes. Same REAL missions screen,
+       exact 384x512 Chromium DPR1, images decoded, animations paused.
+       Change only the decorative SVG treatment, not the data, rewards,
+       tab selection, scroll ownership, or the shared five-item dock. */
+    const midFlag='work8-missions-mid-chests-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(midFlag)+');true');
+    await delay(140);
+    const midBeforeLayout=await headingLayout();
+    const midBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(midFlag)+');true');
+    await delay(140);
+    const midAfterLayout=await headingLayout();
+    const midAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const midSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+midBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+midAfter))
+      .replace('chests:[20,356,370,427],dock:',
+        'chests:[20,356,370,427],midChests:[160,354,308,417],dock:');
+    assert.notEqual(midSource,source,'days 4-6 source A/B must use fresh real Chromium frames');
+    const midCompare=await evalJs(midSource);
+    const saveMid=(name:string,value:string)=>writeFileSync(join(evidence,name),Buffer.from(value,'base64'));
+    saveMid('missions-mid-chests-original-384x512.webp',orig);
+    saveMid('missions-mid-chests-before-384x512.png',midBefore);
+    saveMid('missions-mid-chests-render-384x512.png',midAfter);
+    saveMid('missions-mid-chests-overlay-before-384x512.png',midCompare.overlays[0]);
+    saveMid('missions-mid-chests-overlay-after-384x512.png',midCompare.overlays[1]);
+    const midGeometry=await evalJs('(()=>{const r=e=>{const p=e?.getBoundingClientRect();return p?{left:p.left,top:p.top,right:p.right,bottom:p.bottom}:null};const days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")];const nav=document.querySelector(".app-sheet > .harbour-nav");return {dayCount:days.length,quests:document.querySelectorAll(".w8-approved-missions .w8-approved-quest").length,dockCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,midArt:days.slice(3,6).map(el=>r(el.querySelector("svg.w8-approved-painting"))),chests:days.map(el=>r(el.querySelector(".w8-approved-chest"))),captions:days.map(el=>r(el.querySelector("small"))),dock:r(nav),width:document.documentElement.scrollWidth}})()');
+    const midReport={
+      reference:'assets/design-approved/07-missoes.webp; native unscaled 384x512',
+      requiredReferences:['assets/design-approved/00-referencia-original-aprovada.webp','assets/design-approved/00-painel-oito-ecras.webp',
+        ...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp',
+        '06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(p=>'assets/design-approved/'+p)],
+      method:'same real Chromium DOM, original source art decoded, animations frozen, one viewport and DPR=1',
+      scope:'07 Missions only; three source-painted non-fictional day 4-6 chest artworks',
+      roi:midCompare.metrics,unchanged:midCompare.unchanged,geometry:midGeometry,
+      beforeLayout:midBeforeLayout,afterLayout:midAfterLayout,approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-mid-chests-controlled-ab.json'),JSON.stringify(midReport,null,2));
+    console.log('WORK8 07 native source mid-chests A/B '+JSON.stringify(midReport.roi));
+    assert.deepEqual(midBeforeLayout,midAfterLayout,'art only must not move the three missions, rewards, labels or dock');
+    assert.equal(midGeometry.quests,3);assert.equal(midGeometry.dayCount,7);assert.equal(midGeometry.dockCount,5);
+    assert.ok(midGeometry.width<=386,'384px must not gain horizontal overflow');
+    assert.ok(midGeometry.midArt.every((x:any)=>x&&x.width===undefined&&x.left>=158&&x.right<=309&&x.top>=348&&x.bottom<=417),
+      'silver/gold/violet source crops stay in original art region');
+    assert.ok(midGeometry.captions.every((x:any)=>x&&x.bottom<=midGeometry.dock.top+3),
+      'seven original labels remain visible before dock');
+    assert.ok(midCompare.unchanged.header<.1&&midCompare.unchanged.dock<.1,
+      'global HUD and five-item dock pixel-identical');
+    assert.ok(midCompare.metrics.midChests.delta<-.10 && midCompare.metrics.full.delta<-.01,
+      'genuine original day 4-6 source art must measurably improve both ROI and full-frame MAE');
+    assert.ok(midCompare.metrics.quests.delta<.10&&midCompare.metrics.daily.delta<.25,
+      'three real quests and overall daily reward board must not regress');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
