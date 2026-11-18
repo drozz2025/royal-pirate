@@ -28,7 +28,8 @@ test('WORK0 #104: 4 mobile portraits shrink ONLY the pair of visual guns',()=>{
   for(const [w,h] of [[320,568],[384,512],[390,844],[430,932]]){
     const pose=battleCameraPose(w/h);
     assert.ok(pose.showBattery);
-    assert.ok(pose.batteryScale<=1 && pose.batteryScale>=.8,`mobile stage scale ${w}x${h}`);\n    if(w===384) assert.equal(pose.batteryScale,1,'do not regress the proven native right-cannon silhouette');
+    assert.ok(pose.batteryScale<=1 && pose.batteryScale>=.8,`mobile stage scale ${w}x${h}`);
+    if(w===384) assert.equal(pose.batteryScale,1,'do not regress the proven native right-cannon silhouette');
     assert.ok(Number.isFinite(pose.batteryOffsetZ));
   }
   assert.equal(battleCameraPose(1.3).batteryScale,1);
