@@ -5226,3 +5226,16 @@
     border-color:#314d65!important;
   }
 }
+
+/* WORK8 / #104 — Missões 07 only, 384x512 native approved action enamel.
+   A live unclaimed mission retains its own actual state and CTA text. The
+   inherited .87 filter made blue actionable faces substantially dimmer than
+   the approved 07 painting. Re-expose their existing blue enamel, not the
+   mission values/buttons or green claim state. Root toggle supports exact
+   same-scene same-frame Chromium ORIGINAL / BEFORE / RENDER / OVERLAY.
+   No Porto, dock, Ranking, economy or unrelated WORK selectors. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-action-enamel-ab-baseline) .w8-approved-missions .w8-approved-quest[data-state=active] > button {
+    filter:brightness(1.18) saturate(1.06);
+  }
+}
