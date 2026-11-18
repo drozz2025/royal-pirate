@@ -45,7 +45,8 @@ test('enemy red three-mast silhouette uses curved, tapered sails without changin
     assert.ok(widthAt(upper, -.775) < widthAt(upper, .155) * .78,
       'red topsail foot must taper, too');
     assert.ok(depth(main) > 1.0, 'the enemy main canvas has substantial real 3D belly');
-    assert.ok(depth(upper) > .40, 'red topsail is no longer a nearly flat banner');
+    assert.ok(depth(upper) > .10 && depth(upper) < .22,
+      'red topsail curves as cloth while respecting compact topmast depth');
     assert.ok(depth(fore) > .65, 'the third forward sail is genuinely billowed');
     const bounds = new T.Box3().setFromObject(red.root);
     assert.ok(bounds.max.y > 8 && bounds.max.z > 6,
