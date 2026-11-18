@@ -282,6 +282,79 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         console.log('WORK4_NATIVE_FORGE_STAGE_AB '+JSON.stringify(output));
       }
 
+      // WORK4/#104: compare SOURCE-NATIVE sea strip against the current merged
+      // 384px HEAD sea in the very same paused Chromium/React scene.
+      // No mocked source assets, economy, viewport scaling or second vessel.
+      if(screen==='fleet'&&width===384&&height===512){
+        const geometryExpression="(()=>{const box=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null};"+
+          "return {ship:box('.w4-reference-ship'),panel:box('.w4-stage-label'),"+
+          "roster:box('.w4-ship-roster'),dock:box('.harbour-nav.app-dock-porto'),"+
+          "sea:box('.w4-reference-sea'),nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "cards:document.querySelectorAll('.w4-ship-slot').length};})()";
+        const afterGeometry=await evaluate(geometryExpression);
+        assert.equal(afterGeometry.nav,5,'five WORK0 dock buttons');
+        assert.equal(afterGeometry.cards,4,'single owned Royal Crown with 3 unavailable slots');
+        const mergedHeadSea='.w4-fleet #w4-fleet-panel > .w4-harbour-stage > svg.w4-reference-sea {'+
+          'width:100%!important;height:auto!important;max-height:29%!important;'+
+          'aspect-ratio:213/31!important;left:0!important;right:0!important;bottom:0!important;opacity:.94!important;}';
+        await evaluate("(()=>{const x=document.createElement('style');x.id='w4-native-merged-sea';"+
+          "x.textContent="+JSON.stringify(mergedHeadSea)+";document.head.appendChild(x);return true;})()");
+        await sleep(150);
+        const beforeGeometry=await evaluate(geometryExpression);
+        for(const region of ['ship','panel','roster','dock']){
+          assert.deepEqual(beforeGeometry[region],afterGeometry[region],
+            'native water cannot move '+region);
+        }
+        const oldScreenshot=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-fleet-native-sea-384x512.png'),
+          Buffer.from(oldScreenshot,'base64'));
+        await evaluate("(()=>{document.getElementById('w4-native-merged-sea').remove();return true})()");
+        await sleep(150);
+        assert.deepEqual(await evaluate(geometryExpression),afterGeometry,
+          'native source sea must restore exact new geometry');
+        const compare="(async()=>{const d="+JSON.stringify({
+          original:references.fleet,before:oldScreenshot,render:screenshot
+        })+";"+
+          "const load=async(type,s)=>{const i=new Image();i.src='data:image/'+type+';base64,'+s;await i.decode();return i};"+
+          "const [o,b,a]=await Promise.all([load('webp',d.original),load('png',d.before),load('png',d.render)]);"+
+          "if([o,b,a].some(i=>i.width!==384||i.height!==512))throw Error('native art geometry');"+
+          "const px=i=>{const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+          "const c=cv.getContext('2d',{willReadFrequently:true});c.drawImage(i,0,0);"+
+          "return c.getImageData(0,0,384,512).data};"+
+          "const orig=px(o),bef=px(b),aft=px(a);"+
+          "const rois={global:[0,0,384,512],water:[28,313,238,358],"+
+          "bridge:[23,300,243,340],ship:[65,205,175,307],"+
+          "roster:[18,350,374,429],dock:[0,430,384,512]};"+
+          "const mae=(v,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
+          "const p=(y*384+x)*4;for(let j=0;j<3;j++){sum+=Math.abs(orig[p+j]-v[p+j]);n++}}return sum/n};"+
+          "const before={},after={};for(const [name,r] of Object.entries(rois)){before[name]=mae(bef,r);after[name]=mae(aft,r)}"+
+          "const cv=document.createElement('canvas');cv.width=1536;cv.height=512;"+
+          "const ctx=cv.getContext('2d');ctx.drawImage(o,0,0);ctx.drawImage(b,384,0);"+
+          "ctx.drawImage(a,768,0);ctx.drawImage(o,1152,0);ctx.globalAlpha=.5;ctx.drawImage(a,1152,0);"+
+          "return {rois,before,after,overlay:cv.toDataURL('image/png').split(',')[1]};})()";
+        const result=await evaluate(compare);
+        assert.ok(Number.isFinite(result.before.water)&&Number.isFinite(result.after.water),
+          'real approved-source RGB sea MAE');
+        assert.ok(result.after.water<=result.before.water,
+          'native 213px water strip must improve the exact 03 sea ROI');
+        assert.ok(Math.abs(result.after.ship-result.before.ship)<.1,
+          'single Royal Crown painted pixels remain intact');
+        assert.ok(Math.abs(result.after.dock-result.before.dock)<.1,
+          'five-item WORK0 dock pixels remain intact');
+        assert.ok(Math.abs(result.after.roster-result.before.roster)<.1,
+          'four real Fleet roster slots remain intact');
+        writeFileSync(join(folder,'original-before-render-overlay-fleet-native-sea-384x512.png'),
+          Buffer.from(result.overlay,'base64'));
+        delete result.overlay;
+        const evidence={...result,source:'assets/design-approved/03-frota.webp',
+          viewport:'384x512',samePausedFrame:true,headCSS:'merged work6/web-3d-preview',
+          beforeGeometry,afterGeometry,approved:false,approvedScreens:0};
+        writeFileSync(join(folder,'fleet-native-sea-source-ab.json'),JSON.stringify(evidence,null,2)+'\n');
+        console.log('WORK4_NATIVE_SEA_SOURCE_AB '+JSON.stringify(evidence));
+      }
+
       // WORK4 06h: compare actual HEAD before/after sky shade in ONE paused frame.
       if(screen==='fleet'&&width===384&&height===512){
         const geom=()=>evaluate("(()=>{const box=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null};return {ship:box('.w4-reference-ship'),sea:box('.w4-reference-sea'),stage:box('.w4-harbour-stage'),roster:box('.w4-ship-roster'),dock:box('.harbour-nav.app-dock-porto'),nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,cards:document.querySelectorAll('.w4-ship-slot').length};})()");
