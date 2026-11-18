@@ -4133,3 +4133,17 @@
     filter:saturate(1.27) contrast(1.12) brightness(1.40) drop-shadow(0 4px 3px #041327a8)
   }
 }
+
+
+/* WORK7/#104 · 18 Nov · experimental original-chest physical depth.
+ * Real Chromium 384×512 source-vs-render registration, same 06 layout:
+ * rebalance native-only *existing* blue/violet/gold carved chest panels.
+ * Unlike the older work7 crop-brightness proposals this changes only the
+ * physical backing value, not any authentic illustration, price, label,
+ * title, hit-area, inventory, shell, header, or five-item Porto dock.
+ * Disabled at 320px and tall mobile resolutions. Human approved:false. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px) {
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare,
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic { filter:brightness(.75); }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend { filter:brightness(.625); }
+}
