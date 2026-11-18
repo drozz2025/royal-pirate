@@ -61,7 +61,9 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
   skip:runBrowser?false:'Chromium evidence is recorded on CI',
   timeout:240_000
 },async t=>{
-  const build=spawnSync('npm',['run','build','--','--base=/royal-pirate/'],
+  const buildDir=mkdtempSync(join(tmpdir(),'rp-work4-isolated-build-'));
+  t.after(()=>rmSync(buildDir,{recursive:true,force:true,maxRetries:10,retryDelay:200}));
+  const build=spawnSync('npm',['run','build','--','--base=/royal-pirate/','--outDir',buildDir],
     {cwd:process.cwd(),encoding:'utf8',timeout:120_000,maxBuffer:12000000});
   assert.equal(build.status,0,'production WebP assets must build: '+(build.stderr||build.stdout).slice(-2200));
   const folder=resolve('porto-qa/work4');mkdirSync(folder,{recursive:true});
@@ -74,7 +76,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
     });
   });
   const server=spawn(join(process.cwd(),'node_modules','.bin','vite'),
-    ['preview','--host','127.0.0.1','--port',String(port),'--strictPort','--base=/royal-pirate/'],
+    ['preview','--outDir',buildDir,'--host','127.0.0.1','--port',String(port),'--strictPort','--base=/royal-pirate/'],
     {cwd:process.cwd(),stdio:'ignore'});
   const temp=mkdtempSync(join(tmpdir(),'royal-work4-reg-'));
   let browser:ReturnType<typeof spawn>|undefined;

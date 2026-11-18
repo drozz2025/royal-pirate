@@ -32,7 +32,9 @@ test('WORK4 Fleet native live-inset controlled A/B: same Chromium frame, per-ROI
   skip:process.env.CI==='true'&&chrome?false:'CI Chromium screenshot evidence only',
   timeout:240_000
 },async t=>{
-  const build=spawnSync('npm',['run','build','--','--base=/royal-pirate/'],{
+  const buildDir=mkdtempSync(join(tmpdir(),'rp-work4-isolated-build-'));
+  t.after(()=>rmSync(buildDir,{recursive:true,force:true,maxRetries:10,retryDelay:200}));
+  const build=spawnSync('npm',['run','build','--','--base=/royal-pirate/','--outDir',buildDir],{
     cwd:process.cwd(),encoding:'utf8',timeout:120_000,maxBuffer:12000000
   });
   assert.equal(build.status,0,'build must pass before native comparison: '+(build.stderr||build.stdout).slice(-1200));
@@ -44,7 +46,7 @@ test('WORK4 Fleet native live-inset controlled A/B: same Chromium frame, per-ROI
     });
   });
   const preview=spawn(join(process.cwd(),'node_modules','.bin','vite'),[
-    'preview','--host','127.0.0.1','--port',String(port),'--strictPort','--base=/royal-pirate/'
+    'preview','--outDir',buildDir,'--host','127.0.0.1','--port',String(port),'--strictPort','--base=/royal-pirate/'
   ],{stdio:'ignore'});
   const profile=mkdtempSync(join(tmpdir(),'rp-work4-live-seam-'));
   let browser:ReturnType<typeof spawn>|undefined;
