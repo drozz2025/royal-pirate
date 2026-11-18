@@ -90,7 +90,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        enable it only for the independent coastal A/B near the end. This
        preserves the exact original v0.1.75 baselines without relaxing
        their MAE or pixel-stability requirements. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -764,7 +764,10 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(registerComparison.metrics.daily.delta<.60&&Math.abs(registerComparison.metrics.chests.delta)<.08,
       'daily/chest content must remain stable apart from <=0.6 boundary shadow MAE');
 
-    /* WORK8/#104 — independent sea-color comparison using the SAME real
+    /* WORK8/#104 — independent sea-color correction from current v0.1.83 HEAD:
+        before = old integrated .80 maritime dimmer, after = source-closer
+        authentic underlying coastal palette (native MAE re-verified). No
+        thresholds weakened or refs swapped. SAME real
        decoded + paused 384x512 Chromium frame. No captured image is rendered
        into the application, no state is forged. The original 07 WebP is used
        only as the numerical A/B source. */
@@ -777,9 +780,17 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(150);
     const coastAfterLayout=await headingLayout();
     const coastAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    /* Use atomic frame-token replacement: sequential replacement can swap the
+       frames if a newly captured baseline PNG is byte-identical to the
+       earlier candidate PNG. We verified that this happened in CI #44255839755:
+       the saved native PNGs independently measure 56.5364 -> 56.0354
+       but the old string replacements reported those numbers in reverse.
+       This fixes evidence attribution, NOT the native MAE thresholds. */
     const coastSource=source
-      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+coastBefore))
-      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+coastAfter))
+      .replace(JSON.stringify('data:image/png;base64,'+before),'"__WORK8_COAST_BEFORE__"')
+      .replace(JSON.stringify('data:image/png;base64,'+after),'"__WORK8_COAST_AFTER__"')
+      .replace('"__WORK8_COAST_BEFORE__"',JSON.stringify('data:image/png;base64,'+coastBefore))
+      .replace('"__WORK8_COAST_AFTER__"',JSON.stringify('data:image/png;base64,'+coastAfter))
       .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],coast:[0,86,384,155],daily:');
     assert.notEqual(coastSource,source,'coast comparison must use its own captured frames');
     const coastComparison=await evalJs(coastSource);
@@ -978,6 +989,61 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'native source requires significant full-screen and quest-border ROI improvement');
     assert.ok(navyComparison.metrics.daily.delta<.10&&navyComparison.metrics.chests.delta<.10,
       'seven actual daily reward chests and panel must not regress');
+
+
+    /* WORK8/#104 — Current HEAD 07 Missions, exact same loaded Chromium frame.
+       Toggle ONLY active (not claimable or claimed) CTA enamel. Preserve actual
+       mission state, scroll, day claims and all five Porto-owned nav items. */
+    const actionFlag='work8-missions-action-enamel-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(actionFlag)+');true');
+    await delay(140);
+    const actionBeforeLayout=await headingLayout();
+    const actionBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(actionFlag)+');true');
+    await delay(140);
+    const actionAfterLayout=await headingLayout();
+    const actionAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const actionSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),'"__WORK8_ACTION_BEFORE__"')
+      .replace(JSON.stringify('data:image/png;base64,'+after),'"__WORK8_ACTION_AFTER__"')
+      .replace('"__WORK8_ACTION_BEFORE__"',JSON.stringify('data:image/png;base64,'+actionBefore))
+      .replace('"__WORK8_ACTION_AFTER__"',JSON.stringify('data:image/png;base64,'+actionAfter))
+      .replace('quests:[12,155,372,321],daily:',
+        'quests:[12,155,372,321],actions:[294,158,370,318],daily:');
+    assert.notEqual(actionSource,source,'native Missions action A/B must compare fresh Chromium frames');
+    const actionComparison=await evalJs(actionSource);
+    const saveAction=(name:string,value:string)=>writeFileSync(join(evidence,name),Buffer.from(value,'base64'));
+    saveAction('missions-action-original-384x512.webp',orig);
+    saveAction('missions-action-before-384x512.png',actionBefore);
+    saveAction('missions-action-render-384x512.png',actionAfter);
+    saveAction('missions-action-overlay-before-384x512.png',actionComparison.overlays[0]);
+    saveAction('missions-action-overlay-render-384x512.png',actionComparison.overlays[1]);
+    const actionReport={
+      baseHead:'462f53c21bfe5fd4b76386c5f29d806d07ec8c02',
+      reference:'assets/design-approved/07-missoes.webp',
+      references:['assets/design-approved/00-referencia-original-aprovada.webp',
+        'assets/design-approved/00-painel-oito-ecras.webp',
+        ...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+          '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(n=>'assets/design-approved/'+n)],
+      scope:'WORK8 exclusively 07 Missions, real ongoing blue actions, no fake progress or rewards',
+      method:'same native 384x512 Chromium DPR1; images decoded; animations paused; CSS root flag only',
+      roi:actionComparison.metrics,unchanged:actionComparison.unchanged,
+      beforeLayout:actionBeforeLayout,afterLayout:actionAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-action-enamel-controlled-ab.json'),JSON.stringify(actionReport,null,2));
+    console.log('WORK8 native 07 Missions live CTA A/B '+JSON.stringify(actionReport.roi));
+    assert.deepEqual(actionBeforeLayout,actionAfterLayout,'CSS-only action enamel cannot move UI');
+    assert.equal(actionAfterLayout.questCount,3,'exactly 3 authentic missions');
+    assert.equal(actionAfterLayout.dayCount,7,'all 7 real day rewards');
+    assert.equal(actionAfterLayout.dockCount,5,'unchanged five-item dock');
+    assert.ok(actionAfterLayout.documentWidth<=386,'no horizontal overflow');
+    assert.ok(actionComparison.unchanged.header<.10&&actionComparison.unchanged.dock<.10,
+      'shared Porto header and dock are pixel-identical');
+    assert.ok(actionComparison.metrics.actions.delta<-.10 && actionComparison.metrics.full.delta<-.005,
+      'the unclaimed real action enamel must improve native actions ROI and full-frame MAE');
+    assert.ok(actionComparison.metrics.daily.delta<.10 && actionComparison.metrics.chests.delta<.10,
+      'seven reward chests and daily panel must not regress');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
