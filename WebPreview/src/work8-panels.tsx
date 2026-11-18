@@ -543,6 +543,32 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
           </article>;
         })}
       </section>
+      {/* WORK8/#104, 07 Missões ONLY. Paint the original approved 07 source
+          crops of REAL day-4/5/6 chests at native dimensions. This scoped
+          stylesheet is used rather than changing the shared/dock CSS. The
+          baseline class is toggled only in native same-frame Chromium QA. */}
+      <style>{`
+        @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+          :root:not(.work8-missions-mid-chests-ab-baseline) .w8-approved-missions
+          .w8-approved-days li:nth-child(n+4):nth-child(-n+6) .w8-approved-chest > svg.w8-approved-painting {
+            top:-1px;
+            left:calc(50% - 2px);
+            right:auto;
+            width:auto;
+            height:46px;
+            transform:translateX(-50%);
+            border-radius:0;
+            -webkit-mask-image:radial-gradient(ellipse 76% 72% at 50% 50%,#000 78%,transparent 100%);
+            mask-image:radial-gradient(ellipse 76% 72% at 50% 50%,#000 78%,transparent 100%);
+          }
+          :root:not(.work8-missions-mid-chests-ab-baseline) .w8-approved-missions
+          .w8-approved-days li:nth-child(4) .w8-approved-chest > svg.w8-approved-painting-chest-silver { width:41px; }
+          :root:not(.work8-missions-mid-chests-ab-baseline) .w8-approved-missions
+          .w8-approved-days li:nth-child(5) .w8-approved-chest > svg.w8-approved-painting-chest-gold { width:42px; }
+          :root:not(.work8-missions-mid-chests-ab-baseline) .w8-approved-missions
+          .w8-approved-days li:nth-child(6) .w8-approved-chest > svg.w8-approved-painting-chest-violet { width:44px; }
+        }
+      `}</style>
       <section className="w8-approved-daily" aria-label="7-day supply route" title={canClaim?'Next claim earns '+(15+next*5)+' coins':'Recompensa de hoje já recolhida'}>
         <h3>Recompensa Diária<W8ApprovedPainting art="daily-heading"/></h3>
         <ol className="w8-approved-days" aria-label="Seven consecutive daily rewards">
