@@ -3,6 +3,12 @@ on:
   pull_request:
     branches: [work6/web-3d-preview]
     paths:
+      - 'WebPreview/src/battle-layout-reset.css'
+      - 'WebPreview/src/battle-approved.css'
+      - 'WebPreview/src/main.tsx'
+      - 'WebPreview/src/battle-framing.ts'
+      - 'WebPreview/src/battle-deck.ts'
+      - 'WebPreview/tests/work0-battle-mobile-systemic.test.ts'
       - 'WebPreview/src/scene.ts'
       - 'WebPreview/src/battle-atmosphere.ts'
       - 'WebPreview/tests/battle-atmosphere.test.ts'
