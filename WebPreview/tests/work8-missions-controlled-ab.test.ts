@@ -1586,6 +1586,72 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(Math.abs(seventhDelta.dockDelta)<.06&&Math.abs(seventhDelta.quests)<.06,
       'no WORK0 dock or three real mission regression');
 
+
+    /* WORK8 #104 — new first-three genuine green reward enamel, NO fake
+       reward data. One live paused Chromium frame, native 384x512 DPR1;
+       production CSS switched by the opt-out class, not an injected
+       screenshot substitute. Previous historical A/B checks are untouched. */
+    const earlyFlag='work8-missions-early-tile-enamel-ab-baseline';
+    const earlyReferenceSet=['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+      '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+      '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+      .map(name=>'assets/design-approved/'+name);
+    for(const reference of earlyReferenceSet){
+      assert.ok(readFileSync(new URL('../../'+reference,import.meta.url)).length>1000,'missing approved source '+reference);
+    }
+    const earlyRects=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li:nth-child(-n+3)")].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
+    assert.equal(earlyRects.length,3,'exactly three authentic first-day reward tiles');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(earlyFlag)+');true');
+    await delay(140);
+    const earlyBeforeLayout=await headingLayout();
+    const earlyBeforePaint=await evalJs('getComputedStyle(document.querySelector(".w8-approved-days li:first-child")).backgroundImage');
+    const earlyBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(earlyFlag)+');true');
+    await delay(140);
+    const earlyAfterLayout=await headingLayout();
+    const earlyAfterPaint=await evalJs('getComputedStyle(document.querySelector(".w8-approved-days li:first-child")).backgroundImage');
+    const earlyAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const earlyScores=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(earlyRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        'data:image/png;base64,'+earlyBefore,'data:image/png;base64,'+earlyAfter])));
+    const earlyDelta=Object.fromEntries(Object.keys(earlyScores[0])
+      .map(k=>[k,earlyScores[1][k]-earlyScores[0][k]]));
+    const earlyOverlaySource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+earlyBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+earlyAfter));
+    assert.notEqual(earlyOverlaySource,source,'A/B must use its own Chromium source screenshots');
+    const earlyOverlays=await evalJs(earlyOverlaySource);
+    saveTone('missions-early-rewards-original-384x512.webp',orig);
+    saveTone('missions-early-rewards-before-384x512.png',earlyBefore);
+    saveTone('missions-early-rewards-render-384x512.png',earlyAfter);
+    saveTone('missions-early-rewards-original-before-overlay-384x512.png',earlyOverlays.overlays[0]);
+    saveTone('missions-early-rewards-original-render-overlay-384x512.png',earlyOverlays.overlays[1]);
+    const earlyReport={
+      issue:104,baseHead:'b9c517c7a1b4844d5a9e597f632f531db77b5cb3',
+      reference:'assets/design-approved/07-missoes.webp',referenceSet:earlyReferenceSet,
+      viewport:'Chromium native 384x512 DPR1',
+      scene:'same real DOM, 3 existing missions, 7 real rewards, paused animations',
+      scope:'only backgrounds of genuine daily rewards 1-3',
+      rectangles:earlyRects,cssBefore:earlyBeforePaint,cssRender:earlyAfterPaint,
+      before:earlyScores[0],render:earlyScores[1],delta:earlyDelta,
+      geometry:{before:earlyBeforeLayout,render:earlyAfterLayout},
+      overlay:earlyOverlays.metrics,approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-early-rewards-native-ab.json'),JSON.stringify(earlyReport,null,2));
+    console.log('WORK8 #104 ACTUAL three green rewards native MAE '+JSON.stringify(earlyReport));
+    assert.notEqual(earlyBeforePaint,earlyAfterPaint,'new production CSS must modify authentic reward pigment');
+    assert.deepEqual(earlyBeforeLayout,earlyAfterLayout,'never move seven chests, three missions or five-item dock');
+    assert.equal(earlyAfterLayout.questCount,3);
+    assert.equal(earlyAfterLayout.dayCount,7);
+    assert.equal(earlyAfterLayout.dockCount,5);
+    assert.ok(earlyAfterLayout.chests.every((c:any)=>c.bottom<=earlyAfterLayout.nav.top+2),
+      'seven genuine chest paintings stay visible above shared dock');
+    assert.ok(earlyDelta.meters < -0.005 && earlyDelta.full < -0.0002 && earlyDelta.daily < -0.002,
+      'the production green enamel must improve both the real tiles ROI and the full approved 07 frame');
+    assert.ok(Math.abs(earlyDelta.quests)<.05 && Math.abs(earlyDelta.dockDelta)<.05,
+      'no regressions in the three missions or WORK0 dock');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
