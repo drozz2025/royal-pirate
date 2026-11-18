@@ -2995,3 +2995,26 @@
       linear-gradient(to bottom,#000 0%,#000 96%,transparent 100%);
   }
 }
+
+
+/* WORK4/#104 — native 384×512 source-coast contour, 18 Nov 16h.
+   Measured on ONE paused Chromium frame against the real approved 03-frota
+   WebP, not a mock. An expanded 110%×123% organic contour restores source
+   sky/coast behind the ONE Royal Crown and reduces false hard crop edges;
+   2% top and 3% lower feather avoid a sharp rectangular photograph seam.
+   Pre-merge measured RGB MAE: whole 49.7169→49.1553, coastline 8.8697→
+   6.5547, upper coast 24.7102→18.0107, edge 1.8521→0.6127; Royal Crown
+   central hull 0.3490 unchanged, all four cards and WORK0 dock pixel-identical.
+   No synthetic water, UI changes, other screen sizes or second ship. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {
+    -webkit-mask-image:
+      radial-gradient(ellipse 110% 123% at 30% 50%,#000 0%,#000 84%,transparent 99%),
+      linear-gradient(to bottom,transparent 0%,#000 2%,#000 97%,transparent 100%);
+    mask-image:
+      radial-gradient(ellipse 110% 123% at 30% 50%,#000 0%,#000 84%,transparent 99%),
+      linear-gradient(to bottom,transparent 0%,#000 2%,#000 97%,transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-composite:intersect;
+  }
+}
