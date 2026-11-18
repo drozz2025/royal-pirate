@@ -39,7 +39,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  assert.ok(cssText.includes('Native 05 carved-frame atlas relief'),
+  assert.ok(cssText.includes('Native 05 charcoal frame depth'),
     'A controlled local 05 album-material improvement exists without changing any of the eight cards');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
     'New WORK7 eight-card short-viewport art treatment exists without screenshot backgrounds');
