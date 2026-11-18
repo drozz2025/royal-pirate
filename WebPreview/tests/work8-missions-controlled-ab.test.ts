@@ -962,6 +962,43 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     };
     writeFileSync(join(evidence,'work8-missions-deep-hull-controlled-ab.json'),JSON.stringify(hullReport,null,2));
     console.log('WORK8 07 native deep hull A/B '+JSON.stringify(hullReport.roi));
+
+    // Diagnostic search only: run native 07 ROI on prospective painted values
+    // inside the same frozen, decoded Chromium page. Nothing is deployed.
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(hullFlag)+');true');
+    const trials:any[]=[];
+    const specs:{name:string,selector:string,css:string}[]=[];
+    const radial=['#438a9770','#438a9750','#568a9770','#368a9770','#4381a070','#498e9c70'];
+    const top=['#1b4e6a','#1c4c65','#1a4c68','#1d5067','#1a4b63','#184b69','#1e4b69','#1b4b65'];
+    const mid=['#10334f','#12344c','#10314d','#11354e'];
+    for(const color of radial)specs.push({name:'radial-'+color,selector:'.w8-approved-quest',css:'background:radial-gradient(ellipse 100% 85% at 0% 38%,'+color+',transparent 69%),linear-gradient(171deg,#1b4e6a,#10334f 49%,#071e35)!important'});
+    for(const color of top)specs.push({name:'top-'+color,selector:'.w8-approved-quest',css:'background:radial-gradient(ellipse 100% 85% at 0% 38%,#438a9770,transparent 69%),linear-gradient(171deg,'+color+',#10334f 49%,#071e35)!important'});
+    for(const color of mid)specs.push({name:'mid-'+color,selector:'.w8-approved-quest',css:'background:radial-gradient(ellipse 100% 85% at 0% 38%,#438a9770,transparent 69%),linear-gradient(171deg,#1b4e6a,'+color+' 49%,#071e35)!important'});
+    for(const color of ['#708c90','#809b98','#aec2c1','#d1b177','#5c7e91','#51738c','#6c838b','#77978b'])
+      specs.push({name:'meter-border-'+color,selector:'.w8-approved-meter',css:'border-color:'+color+'!important'});
+    for(const color of ['#041a2e','#061f32','#09283a','#0a2d45','#071b32','#061b2a'])
+      specs.push({name:'meter-bg-'+color,selector:'.w8-approved-meter',css:'background:'+color+'!important'});
+    for(const color of ['#254b67','#1c4965','#0c3856','#194566','#103b5b','#123c52'])
+      specs.push({name:'button-bg-'+color,selector:'.w8-approved-quest[data-state=active]>button',css:'background:linear-gradient(180deg,'+color+',#072a47)!important'});
+    for(const color of ['#54778a','#4b7285','#648d99','#72929d','#536c79','#75877c'])
+      specs.push({name:'quest-border-'+color,selector:'.w8-approved-quest',css:'border-color:'+color+'!important'});
+    for(const spec of specs){
+      const cssText='.w8-approved-missions '+spec.selector+'{'+spec.css+'}';
+      await evalJs('(()=>{let s=document.getElementById("work8-native-tuning");if(!s){s=document.createElement("style");s.id="work8-native-tuning";document.head.append(s)}s.textContent='+JSON.stringify(cssText)+';return true})()');
+      await delay(26);
+      const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      const src=source
+        .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+hullBefore))
+        .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+shot))
+        .replace('quests:[12,155,372,321],daily:','quests:[12,155,372,321],questPlates:[14,156,371,318],daily:');
+      const m=(await evalJs(src)).metrics;
+      trials.push({name:spec.name,full:+m.full.delta.toFixed(4),quests:+m.quests.delta.toFixed(4),questPlates:+m.questPlates.delta.toFixed(4)});
+    }
+    await evalJs('document.getElementById("work8-native-tuning")?.remove();document.documentElement.classList.remove('+JSON.stringify(hullFlag)+');true');
+    trials.sort((a,b)=>a.full-b.full);
+    console.log('WORK8 native palette probe TOP '+JSON.stringify(trials.slice(0,20)));
+    writeFileSync(join(evidence,'work8-missions-native-palette-probe.json'),JSON.stringify(trials,null,2));
+
     assert.deepEqual(hullBeforeLayout,hullAfterLayout,'paint-only must not move real missions or seven rewards');
     assert.equal(hullGeometry.quests,3);assert.equal(hullGeometry.days,7);assert.equal(hullGeometry.navItems,5);
     assert.equal(hullGeometry.taps.length,11);assert.ok(hullGeometry.taps.every(Boolean),'all eleven controls must remain hittable');
