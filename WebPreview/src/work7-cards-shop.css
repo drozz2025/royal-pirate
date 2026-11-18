@@ -4270,3 +4270,19 @@
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.14)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.67)}
 }
+
+
+/* WORK7/#104 — 18 Nov 13:45 UTC. True 384×512 carved-frame inlay.
+ * Source: priority 00 original + eight-screen mosaic + authentic 01–08 WebP.
+ * The genuine 05 eight-card atlas keeps its 4×2 geometry and illustration
+ * crops: only the NATIVE frame material/relief is retuned. Independent
+ * same-scene Chromium sweep compared seven inset depths: 2px enamel inlay
+ * measured 60.739 global and 54.907 card-ROI MAE on the candidate.
+ * Original live PREVIEW labels, single genuine 06 pack, three EM BREVE chests,
+ * real coins, Porto, dock, shell, 320px and tall screens are all unchanged.
+ * No screenshot backgrounds. approved:false; 0/8. WORK0 integration only. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+    box-shadow:inset 0 0 2px 2px #f1bd76aa,0 3px 0 #06142b;
+  }
+}
