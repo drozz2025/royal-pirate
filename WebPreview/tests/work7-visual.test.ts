@@ -39,7 +39,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  assert.ok(cssText.includes('Native 05 carved atlas material registration'),
+  assert.ok(cssText.includes('Native 05 carved-frame atlas relief'),
     'A controlled local 05 album-material improvement exists without changing any of the eight cards');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
     'New WORK7 eight-card short-viewport art treatment exists without screenshot backgrounds');
@@ -58,8 +58,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // It is inert for Shop and for 320/tall viewports.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-grid {
-        background:linear-gradient(180deg,rgba(153,223,234,.12),rgba(5,27,53,0) 76%)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
+        border-color:#515a5f!important;
+        border-bottom-color:#343b41!important;
+        background:radial-gradient(ellipse 85% 60% at 50% 18%,#28394237,transparent 84%),
+          linear-gradient(180deg,#121a24 0%,#0c1621 60%,#0d131c 100%)!important;
+        box-shadow:inset 0 2px 0 #e3b96e4f,inset 0 0 0 3px #0c1427,0 4px 8px #041021b8!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
