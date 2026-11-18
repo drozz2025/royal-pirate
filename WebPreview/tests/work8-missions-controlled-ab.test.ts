@@ -1450,6 +1450,10 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await evalJs('document.documentElement.classList.add("work8-missions-active-tab-enamel-ab-baseline");true');
     await delay(130);
     const activeTabSelector='.w8-approved-missions .w8-approved-tabs button[aria-pressed=true]';
+    // A CSS transition started after the initial global animation pause can
+    // interpolate a filter mid-screenshot (e.g. .841 instead of .84). Freeze
+    // this REAL tab's transitions in the test ONLY for deterministic A/B.
+    await evalJs('(()=>{const s=document.createElement("style");s.id="work8-native-static-active-tab";s.textContent=".w8-approved-missions .w8-approved-tabs button[aria-pressed=true]{transition:none!important;animation:none!important}";document.head.append(s);return true})()');
     const activeTabRects=await evalJs('(()=>[...document.querySelectorAll('+JSON.stringify(activeTabSelector)+')].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
     assert.equal(activeTabRects.length,1,'one actual selected Missions tab');
     const tabLayoutBefore=await headingLayout();
@@ -1561,8 +1565,11 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       JSON.stringify(tabProdReport,null,2));
     console.log('WORK8 #104 ACTUAL PRODUCTION active tab ORIGINAL|RENDER|OVERLAY RGB MAE '+JSON.stringify(tabProdReport));
     assert.notEqual(activeTabBaselineFilter,activeTabProductionFilter,'real committed enamel must change');
-    assert.equal(activeTabProductionFilter,'brightness(0.84) saturate(1.12)',
-      'committed production enamel must exactly match selected native winner');
+    const filterNums=[...activeTabProductionFilter.matchAll(/(?:brightness|saturate)\\(([0-9.]+)\\)/g)]
+      .map(m=>Number(m[1]));
+    assert.equal(filterNums.length,2,'real selected tab retains BOTH calibrated filter operations');
+    assert.ok(Math.abs(filterNums[0]-.84)<.005 && Math.abs(filterNums[1]-1.12)<.005,
+      'actual production enamel must match the chosen native source treatment');
     assert.deepEqual(tabLayoutBefore,activeTabProductionLayout,
       'selected tab paint cannot move real mission targets, daily rewards or dock');
     assert.ok(tabProdDelta.meters<-.20&&tabProdDelta.full<-.01,
