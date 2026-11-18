@@ -62,7 +62,7 @@ export function battleCameraPose(aspect: number): CameraPose {
     // centre. Shift the DECORATIVE gun deck back to port to keep both real
     // muzzles visible when the camera looks farther left toward the ocean.
     return {position:[0,10.3,75],target:[-1.8,4.2,0],showBattery:true,
-      batteryOffsetZ:-26,batteryOffsetX:-2,batteryScale:.87,sailX:-7.8,sailScaleX:.41,sailScaleY:.66};
+      batteryOffsetZ:-26,batteryOffsetX:-2,batteryScale:1,sailX:-7.8,sailScaleX:.41,sailScaleY:.66};
   }
   const distance=aspect<1.2?43:34;
   return {position:[distance*.20,distance*.56,distance*.88],target:[0,2,0],
