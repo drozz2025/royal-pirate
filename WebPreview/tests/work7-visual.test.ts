@@ -37,6 +37,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
+  assert.ok(cssText.includes('Independent 384x512 two-frame enamel pass'), 'Candidate 05 CSS material must be present');
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
@@ -122,7 +123,13 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)!important;
       }
     }`;
-  const cssBaseline = merged404Baseline + actual411Inlay + actualPackHEAD;
+  // Strict comparison: undo ONLY this PR's two 05 enamel values. The whole
+  // integrated HEAD, including every merged #411/#422 choice, stays intact.
+  const cssBaseline = `
+    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.45) saturate(2.00) contrast(.85)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.65) saturate(1.30) contrast(.92)!important}
+    }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
     { cwd: process.cwd(), stdio: 'ignore' });
@@ -367,17 +374,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "first.getContext('2d').drawImage(reference,0,0);second.getContext('2d').drawImage(live,0,0);"+
           "const a=first.getContext('2d').getImageData(0,0,w,h).data,b=second.getContext('2d').getImageData(0,0,w,h).data;"+
           "let diff=0;for(let p=0;p<a.length;p+=4){diff+=Math.abs(a[p]-b[p])+Math.abs(a[p+1]-b[p+1])+Math.abs(a[p+2]-b[p+2])}"+
-          "mae=Math.round(diff/(w*h*3)*100)/100;"+
+          "mae=Math.round(diff/(w*h*3)*10000)/10000;"+
           "const baselineUrl="+JSON.stringify(beforeUrl)+";"+
           "if(baselineUrl){const baseline=await load(baselineUrl);"+
           "const third=document.createElement('canvas');third.width=w;third.height=h;"+
           "const tctx=third.getContext('2d');tctx.drawImage(baseline,0,0);"+
           "const b0=tctx.getImageData(0,0,w,h).data;let diff0=0;"+
           "for(let p=0;p<a.length;p+=4){diff0+=Math.abs(a[p]-b0[p])+Math.abs(a[p+1]-b0[p+1])+Math.abs(a[p+2]-b0[p+2])}"+
-          "maeBefore=Math.round(diff0/(w*h*3)*100)/100;"+
+          "maeBefore=Math.round(diff0/(w*h*3)*10000)/10000;"+
 "const patches="+JSON.stringify(kind==='shop'?[[18,175,173,309],[18,329,365,427]]:[[18,195,365,428]])+";"+
 "let sumA=0,sumB=0,pixels=0;for(const [x0,y0,x1,y1] of patches){for(let y=y0;y<y1;y++){for(let x=x0;x<x1;x++){const p=(y*w+x)*4;for(let k=0;k<3;k++){sumA+=Math.abs(a[p+k]-b0[p+k]);sumB+=Math.abs(a[p+k]-b[p+k]);pixels++}}}}"+
-"roiBefore=Math.round(sumA/pixels*100)/100;roiAfter=Math.round(sumB/pixels*100)/100;}}"+
+"roiBefore=Math.round(sumA/pixels*10000)/10000;roiAfter=Math.round(sumB/pixels*10000)/10000;}}"+
           "return {png:c.toDataURL('image/png').slice(22),mae,maeBefore,roiBefore,roiAfter,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
@@ -498,10 +505,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const card=native.find(screen=>screen.kind==='cards');
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
-  assert.ok(card.maeRgbAfter<=card.maeRgbBefore&&card.roiMaeAfter<=card.roiMaeBefore,
-    'Unmodified 05 Cartas must not regress vs the ACTUAL v0.1.93 HEAD with #411: '+
+  assert.ok(card.maeRgbAfter<card.maeRgbBefore&&card.roiMaeAfter<card.roiMaeBefore,
+    'Only candidate 05 material changes must strictly improve vs exact current branch HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
-  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore&&shop.roiMaeAfter<shop.roiMaeBefore,
-    'The actual Captain pack art must strictly improve 06 native global + ROI vs v0.1.93 HEAD: '+
+  assert.ok(shop.maeRgbAfter===shop.maeRgbBefore&&shop.roiMaeAfter===shop.roiMaeBefore,
+    'Unchanged 06 Loja must be pixel-identical to exact current branch HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
