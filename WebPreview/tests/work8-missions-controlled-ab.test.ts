@@ -1319,6 +1319,57 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(chestInkComparison.metrics.quests.delta<.08,
       'the three live missions cannot regress with a chest-only change');
 
+
+    /* WORK8/#104: same-frame, state-true painted claimed-chest depth.
+       Reuse the ORIGINAL image, same live Chromium DOM, frozen animations,
+       identical 384x512 DPR1 and seven real rewards, not a mock state. */
+    const claimedFlag='work8-missions-claimed-engraving-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(claimedFlag)+');true');
+    await delay(150);
+    const claimedBeforeLayout=await headingLayout();
+    const claimedBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const claimedBeforeInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li.is-claimed .w8-approved-chest")).filter');
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(claimedFlag)+');true');
+    await delay(150);
+    const claimedAfterLayout=await headingLayout();
+    const claimedAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const claimedAfterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li.is-claimed .w8-approved-chest")).filter');
+    assert.notEqual(claimedBeforeInk,claimedAfterInk,'actually claimed reward paintings must change');
+    const claimedSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+claimedBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+claimedAfter));
+    assert.notEqual(claimedSource,source,'a fresh native Chromium A/B is required');
+    const claimedCompare=await evalJs(claimedSource);
+    saveTone('missions-claimed-original-384x512.webp',orig);
+    saveTone('missions-claimed-before-384x512.png',claimedBefore);
+    saveTone('missions-claimed-render-384x512.png',claimedAfter);
+    saveTone('missions-claimed-before-overlay-384x512.png',claimedCompare.overlays[0]);
+    saveTone('missions-claimed-render-overlay-384x512.png',claimedCompare.overlays[1]);
+    const claimedReport={
+      issue:104,baseHead:"84caf039d1cdfe13aad13dc17c17787ffa573cc8",approved:false,approvedScreens:0,
+      visualReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(n=>'assets/design-approved/'+n),
+      source:'assets/design-approved/07-missoes.webp',
+      method:'single actual Chromium 384x512 DPR1 state/frame with animations paused, claimed-day ink opt-out only',
+      scope:'07 Missões existing genuinely claimed chest artwork only; no progression/rewards/layout, no Ranking or dock',
+      beforeFilter:claimedBeforeInk,afterFilter:claimedAfterInk,
+      roi:claimedCompare.metrics,unchanged:claimedCompare.unchanged,
+      geometry:{before:claimedBeforeLayout,after:claimedAfterLayout}
+    };
+    writeFileSync(join(evidence,'work8-missions-claimed-controlled-ab.json'),JSON.stringify(claimedReport,null,2));
+    console.log('WORK8 #104 native claimed reward source A/B '+JSON.stringify(claimedReport.roi));
+    assert.deepEqual(claimedBeforeLayout,claimedAfterLayout,'claimed artwork cannot shift any mission, chest or dock');
+    assert.equal(claimedAfterLayout.questCount,3,'three real objectives retained');
+    assert.equal(claimedAfterLayout.dayCount,7,'seven real rewards retained');
+    assert.equal(claimedAfterLayout.dockCount,5,'five global menu controls retained');
+    assert.ok(claimedAfterLayout.chests.every((c:any)=>c.bottom<=claimedAfterLayout.nav.top+2),'seven chests remain unobscured');
+    assert.ok(claimedCompare.unchanged.header<.10&&claimedCompare.unchanged.dock<.10,'WORK0 shared shell/dock pixel-identical');
+    assert.ok(claimedCompare.metrics.chests.delta<-.015&&claimedCompare.metrics.full.delta<-.002,
+      'claimed source enamel must improve RGB MAE on chest ROI and whole 384x512 frame');
+    assert.ok(claimedCompare.metrics.quests.delta<.08,'three genuine missions cannot regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
