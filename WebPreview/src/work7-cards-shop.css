@@ -4304,14 +4304,14 @@
 
 
 
-/* WORK7/#104 — 18 Nov 17:56 UTC. Native 05 original card-3 pigment study.
- * Controlled native A/B relative to WORK0 v0.1.94; no inherited 05/06
+/* WORK7/#104 — 18 Nov 17:56 UTC. Native 05 source-card-3 confirmed pigment calibration.
+ * 11 actual native brightness trials; 0.36 minimized both full MAE and\n * eight-card ROI against WORK0 v0.1.94. No inherited 05/06
  * edits, no screenshot background. Final merge only if Chromium gate proves
  * both global and 8-card ROI improvement with unchanged geometry.
  * 06 Loja, 320px, dock, header, other WORKs untouched.
  * approved:false / 0 of 8; WORK0 owns merge/release/publication. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
-    filter:brightness(.40) saturate(1.20) contrast(.74);
+    filter:brightness(.36) saturate(1.20) contrast(.74);
   }
 }
