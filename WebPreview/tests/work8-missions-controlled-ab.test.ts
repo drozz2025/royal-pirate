@@ -1396,6 +1396,49 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       saveCoast('missions-coast-'+viewport.width+'x'+viewport.height+'.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     }
 
+    /* WORK8 07 native finger regression: same real Missions DOM, not .click().
+       Confirm the seven-day strip scrolls (when it overflows) and that the
+       genuine PORTO item in WORK0's five-control dock responds to a tap.
+       Test only: do not mutate the dock, missions, ranking or game state. */
+    await cmd('Emulation.setDeviceMetricsOverride',{
+      width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568
+    });
+    await cmd('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
+    await delay(200);
+    const fingerStrip=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;d.scrollLeft=0;const r=d.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,scrollWidth:d.scrollWidth,clientWidth:d.clientWidth}})()');
+    const needsHorizontalScroll=fingerStrip.scrollWidth>fingerStrip.clientWidth+5;
+    const fy=Math.round((fingerStrip.top+fingerStrip.bottom)/2);
+    const startX=Math.floor(fingerStrip.right-18);
+    const endX=Math.max(Math.ceil(fingerStrip.left+18),startX-155);
+    await cmd('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:startX,y:fy}]});
+    for(let i=1;i<=6;i++){
+      const x=Math.round(startX+(endX-startX)*i/6);
+      await cmd('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:fy}]});
+      await delay(25);
+    }
+    await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await delay(300);
+    const fingerResult=await evalJs('(()=>({scrollLeft:document.querySelector(".w8-approved-days").scrollLeft,quests:document.querySelectorAll(".w8-approved-quest").length,days:document.querySelectorAll(".w8-approved-days li").length,dock:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length}))()');
+    assert.equal(fingerResult.quests,3,'finger swipe must preserve the three genuine missions');
+    assert.equal(fingerResult.days,7,'finger swipe must preserve the seven real rewards');
+    assert.equal(fingerResult.dock,5,'five global dock buttons must remain available');
+    if(needsHorizontalScroll)assert.ok(fingerResult.scrollLeft>5,'real finger swipe must scroll overflowing day rewards');
+    else assert.ok(fingerResult.scrollLeft<=2,'fully visible day strip must not invent overflow');
+    const portTap=await evalJs('(()=>{const e=document.querySelector(".app-sheet > .harbour-nav .harbour-nav-item:first-child"),r=e.getBoundingClientRect();return {x:Math.round((r.left+r.right)/2),y:Math.round((r.top+r.bottom)/2)}})()');
+    await cmd('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[portTap]});
+    await delay(75);
+    await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await delay(300);
+    const returnedPort=await evalJs('!!document.querySelector(".harbour-screen")');
+    assert.ok(returnedPort,'real finger tap on the shared PORTO dock item must navigate home');
+    writeFileSync(join(evidence,'work8-missions-quest-icons-320-real-touch.json'),JSON.stringify({
+      source:'native Chromium CDP Input.dispatchTouchEvent',viewport:[320,568],
+      questCount:fingerResult.quests,dayCount:fingerResult.days,dockCount:fingerResult.dock,
+      swipe:{xFrom:startX,xTo:endX,y:fy,scrollRequired:needsHorizontalScroll,scrollLeft:fingerResult.scrollLeft},
+      portTap,returnedPort,approved:false,approvedScreens:0
+    },null,2));
+
+
   } finally {
     try{ws?.close();}catch{}
     browser?.kill('SIGTERM');vite.kill('SIGTERM');
