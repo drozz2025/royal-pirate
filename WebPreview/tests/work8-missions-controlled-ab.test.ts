@@ -1266,6 +1266,59 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(dailyTitleComparison.metrics.chests.delta<.08 && dailyTitleComparison.metrics.quests.delta<.08,
       'seven real chests and three genuine quests cannot regress');
 
+
+    /* WORK8/#104: unclaimed chest source crop ink, NOT actual player rewards.
+       Real native Chromium 384x512, same DOM/state/animation frame, opt-out
+       class only; compare decoded ORIGINAL|BEFORE|RENDER|OVERLAY with RGB MAE. */
+    const chestInkFlag='work8-missions-chest-art-ink-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(chestInkFlag)+');true');
+    await delay(160);
+    const chestInkBeforeLayout=await headingLayout();
+    const chestInkBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const chestInkBeforeFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:nth-child(4) .w8-approved-chest > svg.w8-approved-painting")).filter');
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(chestInkFlag)+');true');
+    await delay(160);
+    const chestInkAfterLayout=await headingLayout();
+    const chestInkAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const chestInkAfterFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:nth-child(4) .w8-approved-chest > svg.w8-approved-painting")).filter');
+    assert.notEqual(chestInkBeforeFilter,chestInkAfterFilter,'A/B must change an actual source painting filter');
+    const chestInkSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+chestInkBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+chestInkAfter));
+    assert.notEqual(chestInkSource,source,'new source-art A/B requires independent native Chromium frames');
+    const chestInkComparison=await evalJs(chestInkSource);
+    saveTone('missions-chest-art-original-384x512.webp',orig);
+    saveTone('missions-chest-art-before-384x512.png',chestInkBefore);
+    saveTone('missions-chest-art-render-384x512.png',chestInkAfter);
+    saveTone('missions-chest-art-original-before-overlay-384x512.png',chestInkComparison.overlays[0]);
+    saveTone('missions-chest-art-original-render-overlay-384x512.png',chestInkComparison.overlays[1]);
+    const chestInkReport={
+      issue:104,baseHead:'52ea87c02d417481d19c792358bbdbf42fb845c2',
+      visualReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(n=>'assets/design-approved/'+n),
+      source:'assets/design-approved/07-missoes.webp',
+      method:'same native Chromium 384x512 DPR1 loaded scene/frame; only CSS filter for genuine chest crops 4–7 toggled',
+      scope:'07 Missions genuine unclaimed reward artwork only; no values, progress, state, Porto, Ranking or dock',
+      beforeFilter:chestInkBeforeFilter,afterFilter:chestInkAfterFilter,
+      roi:chestInkComparison.metrics,unchanged:chestInkComparison.unchanged,
+      geometry:{before:chestInkBeforeLayout,after:chestInkAfterLayout},
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-chest-art-controlled-ab.json'),JSON.stringify(chestInkReport,null,2));
+    console.log('WORK8 #104 native genuine chest art A/B '+JSON.stringify(chestInkReport.roi));
+    assert.deepEqual(chestInkBeforeLayout,chestInkAfterLayout,'chest paint cannot shift any mission, chest, label or dock');
+    assert.equal(chestInkAfterLayout.questCount,3,'preserve all three real objectives');
+    assert.equal(chestInkAfterLayout.dayCount,7,'preserve seven true daily rewards');
+    assert.equal(chestInkAfterLayout.dockCount,5,'preserve WORK0 five-item navigation');
+    assert.ok(chestInkAfterLayout.chests.every((c:any)=>c.bottom<=chestInkAfterLayout.nav.top+2),'every chest must remain above dock');
+    assert.ok(chestInkComparison.unchanged.header<.10&&chestInkComparison.unchanged.dock<.10,'shared HUD and dock must be pixel-identical');
+    assert.ok(chestInkComparison.metrics.chests.delta<-.015&&chestInkComparison.metrics.full.delta<-.002,
+      'authentic chest artwork must improve source MAE both in chest ROI and full scene');
+    assert.ok(chestInkComparison.metrics.quests.delta<.08,
+      'the three live missions cannot regress with a chest-only change');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
