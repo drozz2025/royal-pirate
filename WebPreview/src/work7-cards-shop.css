@@ -4301,3 +4301,26 @@
     filter:saturate(1.05) contrast(1.06) brightness(1.16) drop-shadow(0 6px 5px #14062ca3);
   }
 }
+
+
+/* WORK7/#104 — 18 Nov 17:28 UTC, v0.1.94 source-based 05 card enamel.
+ * Four native compact lower-row frames receive lower ink luminance and
+ * warmer, deeper material contrast; original 05 WebP illustrations,
+ * live labels, all 8 cards (4x2), and touch hitboxes remain intact.
+ * No change to 06 Loja, 320px, tall mobile or shared UI.
+ * Acceptance: same-frame Chromium HEAD A/B MAE/ROI and touch tests.
+ * approved:false, 0/8. WORK0 owns merge and publication. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.36) saturate(2.05) contrast(.78);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+    filter:brightness(.52) saturate(1.45) contrast(.86);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+    filter:brightness(.31) saturate(2.15) contrast(.68);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
+    filter:brightness(.55) saturate(2.10) contrast(.82);
+  }
+}
