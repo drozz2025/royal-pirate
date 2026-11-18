@@ -4319,3 +4319,25 @@
     filter:brightness(.40) saturate(1.75) contrast(.79);
   }
 }
+
+
+/* WORK7/#104 — 18 Nov 21:25 UTC. Native lower-row 05 true-frame enamel.
+ * Starting from verified WORK0 HEAD b9c517c7 (v0.1.97, #442 integrated).
+ * Preserve the original eight 4x2 WEBP card crops, one authentic pack and
+ * three genuine chests, PRÉVIA/EM BREVE, live currency and all touch targets.
+ * This short-viewport-only pigment/relief calibration changes only real
+ * 05 slots 5, 6 and 8; slots 4 and 7 retain WORK0-integrated #442.
+ * No screenshot backgrounds, shared shell, dock, header, 320px or tall UI.
+ * Strict same-frame 384x512 ORIGINAL/HEAD/RENDER/OVERLAY and native ROI
+ * must improve before WORK0 may integrate. approved:false, 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.42) saturate(2.00) contrast(.85);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+    filter:brightness(.61) saturate(1.30) contrast(.92);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
+    filter:brightness(.60) saturate(1.90) contrast(.88);
+  }
+}
