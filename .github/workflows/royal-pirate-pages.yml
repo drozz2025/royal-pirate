@@ -99,9 +99,14 @@ jobs:
             --output /tmp/royal-pirate-chatgpt-sites.html --write-out '%{http_code}' "$SITE_URL") || code="000"
           echo "CHATGPT SITES READ-ONLY HTTP: $code at $SITE_URL"
           echo "ChatGPT Sites HTTP: $code at $SITE_URL" >> "$GITHUB_STEP_SUMMARY"
-          if [[ "$code" == "200" ]] && grep -Fq "v${RELEASE_VERSION}" /tmp/royal-pirate-chatgpt-sites.html; then
-            echo "ChatGPT Sites: release marker v${RELEASE_VERSION} present in HTML." >> "$GITHUB_STEP_SUMMARY"
-            echo "Version marker found; this alone DOES NOT prove source-code equality or automatic sync."
+          # On a failed PR the release step can be skipped, leaving an empty
+          # version; never grep for bare "v" and report a false parity match.
+          if [[ ! "${RELEASE_VERSION:-}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "ChatGPT Sites: version comparison SKIPPED (no validated release version)." >> "$GITHUB_STEP_SUMMARY"
+            echo "No validated release version; HTTP status alone does NOT establish parity."
+          elif [[ "$code" == "200" ]] && grep -Fq "v${RELEASE_VERSION}" /tmp/royal-pirate-chatgpt-sites.html; then
+            echo "ChatGPT Sites: release marker v${RELEASE_VERSION} present in HTML (marker only; code equality NOT proven)." >> "$GITHUB_STEP_SUMMARY"
+            echo "Marker found; NOT proof of source-code equality or automatic sync."
           else
             echo "ChatGPT Sites: release marker v${RELEASE_VERSION} NOT VERIFIED in HTML." >> "$GITHUB_STEP_SUMMARY"
             echo "No version parity proof and no authenticated GitHub Pages -> Sites deployment configured."
