@@ -4304,21 +4304,23 @@
 
 
 
-/* WORK7/#104 — 18 Nov 17:28 UTC, v0.1.94 source-based 05 card enamel.
- * Three native compact lower-row frames: controlled lower-color-value
- * matching to the original true 05 illustration atlas, preserving existing
- * 4x2 geometry, 8 true WEBP art crops, real preview text and live hitboxes.
- * Preserve 06 Loja, 320px and tall-screen visuals, dock and economy.
- * Same-frame strict native MAE+ROI plus touch regression required.
- * approved:false, 0/8. WORK0 owns merge and publication. */
+/* WORK7/#104 — 18 Nov 17:28 UTC. Native 05 source-enamel calibration.
+ * Chromium same-scene 384x512 four-slot sweep gave lower MAE/ROI at
+ * these actual 05 approved-card relief values against v0.1.94 HEAD.
+ * Real art 4x2, live PRÉVIA, DOM labels/hitboxes preserved. No 06 Shop,
+ * 320px, tall screens, shared header/dock/economy or other WORK touched.
+ * Human approval pending: approved:false, 0/8. WORK0 owns merge/release. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
-    filter:brightness(.45) saturate(1.70) contrast(.85);
+    filter:brightness(.435) saturate(2.00) contrast(.85);
   }
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
-    filter:brightness(.62) saturate(1.30) contrast(.92);
+    filter:brightness(.635) saturate(1.30) contrast(.92);
   }
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
-    filter:brightness(.40) saturate(1.75) contrast(.79);
+    filter:brightness(.405) saturate(1.75) contrast(.79);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
+    filter:brightness(.625) saturate(1.90) contrast(.88);
   }
 }
