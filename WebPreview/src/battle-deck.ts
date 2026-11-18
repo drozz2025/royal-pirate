@@ -132,6 +132,34 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
   blast.position.copy(mouth).addScaledVector(direction,.36);
   blast.quaternion.copy(mouthFace);
   blast.visible=false;recoil.add(blast);
+  // Six lightweight powder wisps in ONE instanced draw call. The smoke is
+  // attached to the REAL recoil/yaw group, in the barrel's local muzzle axis;
+  // it is not a screen overlay or a second simulated projectile.
+  const smokeRig=new T.Group();
+  smokeRig.name='first-person-central-smoke';
+  smokeRig.position.copy(mouth).addScaledVector(direction,.52);
+  smokeRig.quaternion.copy(mouthFace);
+  const smokePuffs=new T.InstancedMesh(
+    new T.IcosahedronGeometry(.65,1),
+    new T.MeshBasicMaterial({color:'#d7d3c3',transparent:true,opacity:0,
+      depthWrite:false,side:T.DoubleSide}),
+    6
+  );
+  smokePuffs.name='first-person-central-smoke-puffs';
+  const cloudInstance=new T.Object3D();
+  for(let i=0;i<6;i++){
+    const angle=i*Math.PI*2/6;
+    cloudInstance.position.set(Math.cos(angle)*(.27+i*.045),
+      Math.sin(angle)*(.22+i*.04),.24+i*.23);
+    cloudInstance.rotation.set(i*.31,i*.47,i*.23);
+    cloudInstance.scale.setScalar(.58+i*.07);
+    cloudInstance.updateMatrix();
+    smokePuffs.setMatrixAt(i,cloudInstance.matrix);
+  }
+  smokePuffs.instanceMatrix.needsUpdate=true;
+  smokeRig.add(smokePuffs);
+  smokeRig.visible=false;
+  recoil.add(smokeRig);
   // Keep the legacy group's initial offset; battleCameraPose overrides it on
   // every Batalha entry and resize, without touching Porto.
   group.position.z=-15;
