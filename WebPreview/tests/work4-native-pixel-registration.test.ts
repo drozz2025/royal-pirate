@@ -557,6 +557,66 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         console.log('WORK4_SOURCE_SEA_MASK_STUDY '+JSON.stringify(reportMask));
       }
 
+
+      // WORK4 #104: independently controlled old-98% vs current 99% cannon
+      // feather in the SAME paused 384x512 Chromium scene. This does not
+      // create another cannon or edit the native design-approved WebP.
+      if(screen==='forge'&&width===384&&height===512){
+        const registration="(()=>{const rect=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null};return {cannon:rect('.w4-reference-cannon'),scene:rect('.w4-forge-stage'),costs:rect('.w4-materials'),button:rect('.w4-improve-button'),dock:rect('.harbour-nav.app-dock-porto'),nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,prices:document.querySelectorAll('.w4-resource-grid > div').length}})()";
+        const geometryNew=await evaluate(registration);
+        assert.equal(geometryNew.nav,5);
+        assert.equal(geometryNew.prices,3);
+        const oldMask='radial-gradient(ellipse 140% 122% at 37% 49%,#000 0%,#000 84%,transparent 99%),linear-gradient(to bottom,#000 0%,#000 98%,transparent 100%)';
+        const override='.w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon{' +
+          '-webkit-mask-image:'+oldMask+'!important;mask-image:'+oldMask+'!important;' +
+          '-webkit-mask-composite:source-in!important;mask-composite:intersect!important;}';
+        await evaluate("(()=>{const s=document.createElement('style');s.id='work4-forge-98-baseline';s.textContent="+JSON.stringify(override)+";document.head.appendChild(s);return true})()");
+        await sleep(145);
+        const oldFrame=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
+        assert.deepEqual(await evaluate(registration),geometryNew,
+          'baseline 98% may change paint only, never cannon geometry or real prices');
+        await evaluate("(()=>{document.getElementById('work4-forge-98-baseline')?.remove();return true})()");
+        await sleep(145);
+        const currentFrame=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
+        assert.deepEqual(await evaluate(registration),geometryNew,
+          '99% source feather cannot alter costs or WORK0 five-item dock geometry');
+        const study=await evaluate("(async()=>{const d="+JSON.stringify({
+          source:references.forge,oldFrame,currentFrame
+        })+";const load=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;await i.decode();return i};"+
+          "const [r,a,b]=await Promise.all([load('webp',d.source),load('png',d.oldFrame),load('png',d.currentFrame)]);"+
+          "if([r,a,b].some(i=>i.width!==384||i.height!==512))throw Error('not native 384x512');"+
+          "const pix=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
+          "const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data};"+
+          "const ref=pix(r),o=pix(a),n=pix(b);const rois={full:[0,0,384,512],"+
+          "cannon:[30,220,176,313],furnace:[115,217,180,307],"+
+          "seam:[147,150,216,311],costs:[16,320,369,378],dock:[0,430,384,512]};"+
+          "const mae=(px,box)=>{let s=0,k=0;for(let y=box[1];y<box[3];y++)for(let x=box[0];x<box[2];x++){"+
+          "const p=(y*384+x)*4;for(let z=0;z<3;z++){s+=Math.abs(px[p+z]-ref[p+z]);k++}}return s/k};"+
+          "const scores=px=>Object.fromEntries(Object.entries(rois).map(([k,b])=>[k,mae(px,b)]));"+
+          "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;"+
+          "const g=canvas.getContext('2d');g.drawImage(r,0,0);g.drawImage(a,384,0);"+
+          "g.drawImage(b,768,0);g.drawImage(r,1152,0);g.globalAlpha=.5;g.drawImage(b,1152,0);"+
+          "return {before:scores(o),after:scores(n),rois,montage:canvas.toDataURL('image/png').split(',')[1]};})()");
+        const {montage,...metrics}=study;
+        assert.ok(metrics.after.full<metrics.before.full-0.002,
+          'soft 99% cannon feather must beat 98% full-frame MAE');
+        assert.ok(metrics.after.cannon<metrics.before.cannon-0.002,
+          'soft 99% cannon feather must beat 98% cannon ROI');
+        assert.ok(metrics.after.furnace<=metrics.before.furnace+0.01,
+          'approved original furnace cannot lose source fidelity');
+        for(const key of ['costs','dock']){
+          assert.ok(Math.abs(metrics.before[key]-metrics.after[key])<0.02,
+            'real costs and WORK0 dock must stay pixel-identical: '+key);
+        }
+        writeFileSync(join(folder,'original-before-render-overlay-forge-feather-99-384x512.png'),
+          Buffer.from(montage,'base64'));
+        writeFileSync(join(folder,'forge-feather-99-native-controlled-ab.json'),
+          JSON.stringify({...metrics,geometry:geometryNew,samePausedFrame:true,
+            viewport:'384x512',source:'assets/design-approved/04-melhorias-forja.webp',
+            approved:false,approvedScreens:0},null,2)+'\n');
+        console.log('WORK4_FORGE_FEATHER_99_AB '+JSON.stringify(metrics));
+      }
+
       // WORK4/#104 18 Nov 10h: prospective Forge smoke/iron pigments measured
       // against ORIGINAL 04, with exact 384x512 and the SAME React frame.
       // Every variant is reverted before any existing checks; no shipping CSS
@@ -2092,11 +2152,20 @@ test('WORK4 source-cannon visual refinement is native-only and cost/dock-safe',(
   const marker='WORK4/#104 — 18 Nov 15h: source-cannon contour refinement';
   const suffix=css.split(marker)[1];
   assert.ok(suffix,'final measured cannon contour must survive rebase');
-  const rules=suffix.split('*/')[1]||'';
+  const rules=(suffix.split('*/')[1]||'').split('/* WORK4/#104 — 20:00 source-forge cannon edge:')[0];
   assert.match(rules,/@media \(width:384px\) and \(height:512px\)/);
   assert.match(rules,/radial-gradient\(ellipse 140% 122% at 37% 49%,#000 0%,#000 84%,transparent 99%\)/);
   assert.match(rules,/linear-gradient\(to bottom,#000 0%,#000 98%,transparent 100%\)/);
   assert.match(rules,/mask-composite:intersect/);
   assert.equal((rules.match(/\.w4-cannon-art\.w4-reference-cannon/g)||[]).length,1);
   assert.doesNotMatch(rules,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-resource-grid|\.w4-improve-button|position:fixed)/);
+});
+
+test('WORK4 99%-bottom source-forge feather remains native, live and dock-safe',()=>{
+  const tail=css.split('WORK4/#104 — 20:00 source-forge cannon edge:')[1];
+  assert.ok(tail,'new source mask has a dedicated isolated block');
+  assert.match(tail,/@media \(width:384px\) and \(height:512px\)/);
+  assert.match(tail,/linear-gradient\(to bottom,#000 0%,#000 99%,transparent 100%\)/);
+  assert.match(tail,/mask-composite:intersect/);
+  assert.doesNotMatch(tail,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-resource-grid|\.w4-improve-button|position:fixed)/);
 });

@@ -3040,3 +3040,24 @@
     mask-composite:intersect;
   }
 }
+
+
+/* WORK4/#104 — 20:00 source-forge cannon edge: keep a REAL 1% alpha feather
+   at the bottom of the single approved cannon/hearth painting. Prior 98%
+   fades away 2% of the real approved metal/fire; the 100% hard edge removes
+   the anti-aliased transition entirely. This guarded 99% intermediate is
+   measured against the 98% released source on one paused native Chromium
+   frame. Only 04's source bitmap opacity changes at 384×512; no geometry,
+   levels, real prices, taps, Porto, dock, version or other WORK files. */
+@media (width:384px) and (height:512px) {
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {
+    -webkit-mask-image:
+      radial-gradient(ellipse 140% 122% at 37% 49%,#000 0%,#000 84%,transparent 99%),
+      linear-gradient(to bottom,#000 0%,#000 99%,transparent 100%);
+    mask-image:
+      radial-gradient(ellipse 140% 122% at 37% 49%,#000 0%,#000 84%,transparent 99%),
+      linear-gradient(to bottom,#000 0%,#000 99%,transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-composite:intersect;
+  }
+}
