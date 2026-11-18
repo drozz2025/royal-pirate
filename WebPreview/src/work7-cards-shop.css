@@ -4287,16 +4287,17 @@
   }
 }
 
-/* WORK7/#104 — 18 Nov native source-paint scale trial, current v0.1.93 HEAD.
- * The approved ORIGINAL 06 pack illustrates a larger Captain chest than the
- * current native 384x512 crop. Modestly expand ONLY the live original WebP
- * pack art (1.07 -> 1.16) within its existing real pack; this does not
- * change card count, 3 chests, PRÉVIA/EM BREVE, prices, hitboxes, dock,
- * economic behavior, Porto, shell, or smaller/taller viewports.
- * Chromium same-frame HEAD A/B with strict MAE/ROI must pass.
- * approved:false, 0/8; only WORK0 may integrate/publish. */
+/* WORK7/#104 — 18 Nov native 06 real source-art pigment calibration.
+ * Reject the first image-scale candidate (failed 65.35 -> 67.03 global).
+ * Corrected same-frame base is v0.1.93 HEAD scale(1.01), not the older
+ * scale(1.07) from an overridden media query. Preserve the exact live
+ * crop, original genuine pack, 3 chests, 8 cards, labels and all layout.
+ * Correct only pigment: softening oversaturated magenta and recovering
+ * warm gold illumination in the authentic approved Captain WEBP illustration.
+ * Source WEBP and all hitboxes/text/320px/tall sizes remain unchanged.
+ * WORK0 alone may merge; approved:false (0/8). */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-    transform:translate(-2px,5px) scale(1.16);
+    filter:saturate(1.05) contrast(1.06) brightness(1.16) drop-shadow(0 6px 5px #14062ca3);
   }
 }
