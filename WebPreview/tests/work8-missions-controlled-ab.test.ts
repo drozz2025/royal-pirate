@@ -831,7 +831,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.notEqual(royalSource,source,'royal A/B must compare actual independent Chromium frames');
     const royalComparison=await evalJs(royalSource);
     const saveRoyal=(name:string,value:string)=>writeFileSync(join(evidence,name),Buffer.from(value,'base64'));
-    saveRoyal('missions-royal-original-384x512.png',orig);
+    saveRoyal('missions-royal-original-384x512.webp',orig);
     saveRoyal('missions-royal-before-384x512.png',royalBefore);
     saveRoyal('missions-royal-render-384x512.png',royalAfter);
     saveRoyal('missions-royal-overlay-before-384x512.png',royalComparison.overlays[0]);
