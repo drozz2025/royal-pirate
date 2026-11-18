@@ -35,6 +35,16 @@ export function battleEnemyScale(aspect:number):number {
   if(aspect<.80)return 1.42; // reference-native 384x512 and compact portrait
   return 1.82; // do not change non-portrait framing
 }
+/** Batalha 02: turn the existing live red ship into a readable starboard broadside.
+ * This only changes its rendered yaw, never its position, hitbox, projectile
+ * origin or the Porto camera. Mobile needs more visible hull than the narrow
+ * near-bow silhouette in the current 384x512 screenshot. */
+export function battleEnemyBroadsideYaw(aspect:number):number {
+  if (aspect < .50) return -1.19; // tall phones: avoid hiding the hull behind HUD
+  if (aspect < .80) return -1.30; // approved native illustration: visible long gun deck
+  return -.95; // unchanged desktop composition
+}
+
 export function battleCameraPose(aspect: number): CameraPose {
   if (aspect < .50) {
     // Tall iPhone: reveal more enemy starboard silhouette without changing the
