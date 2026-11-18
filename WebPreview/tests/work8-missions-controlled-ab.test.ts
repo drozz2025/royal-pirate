@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-active-tab-enamel-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1447,6 +1447,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        seven live reward slots and global five-button dock untouched.
        This A/B is intentionally isolated from historical toggled baselines. */
     await evalJs('(()=>{for(const c of [...document.documentElement.classList])if(c.startsWith("work8-missions-")&&c.endsWith("-ab-baseline"))document.documentElement.classList.remove(c);return true})()');
+    await evalJs('document.documentElement.classList.add("work8-missions-active-tab-enamel-ab-baseline");true');
     await delay(130);
     const activeTabSelector='.w8-approved-missions .w8-approved-tabs button[aria-pressed=true]';
     const activeTabRects=await evalJs('(()=>[...document.querySelectorAll('+JSON.stringify(activeTabSelector)+')].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
@@ -1518,6 +1519,62 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'seven real reward chests remain above unchanged dock');
     assert.ok(activeTabResults.every(x=>Math.abs(x.dockDelta)<.08),
       'candidate paints must not affect shared five-item dock');
+
+
+    /* PHASE 2 — measure the committed PRODUCTION CSS, never only the
+       winning injected study variant; exact same real DOM, source and frame. */
+    const activeTabBaselineFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(activeTabSelector)+')).filter');
+    await evalJs('document.documentElement.classList.remove("work8-missions-active-tab-enamel-ab-baseline");true');
+    await delay(160);
+    const activeTabProductionFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(activeTabSelector)+')).filter');
+    const activeTabProductionLayout=await headingLayout();
+    const activeTabProductionShot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const activeTabProductionPair=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(activeTabRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        'data:image/png;base64,'+activeTabShots[0],'data:image/png;base64,'+activeTabProductionShot])));
+    assert.equal(activeTabProductionPair.length,2);
+    const tabProdBefore=activeTabProductionPair[0],tabProdAfter=activeTabProductionPair[1];
+    const tabProdDelta=Object.fromEntries(Object.keys(tabProdBefore)
+      .map(k=>[k,tabProdAfter[k as keyof typeof tabProdAfter]-tabProdBefore[k as keyof typeof tabProdBefore]]));
+    const tabProdOverlays=await evalJs(source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+activeTabShots[0]))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+activeTabProductionShot)));
+    saveTone('missions-active-tab-final-render-384x512.png',activeTabProductionShot);
+    saveTone('missions-active-tab-final-original-before-overlay-384x512.png',tabProdOverlays.overlays[0]);
+    saveTone('missions-active-tab-final-original-render-overlay-384x512.png',tabProdOverlays.overlays[1]);
+    const tabProdReport={
+      issue:104,baseHead:'39c15fb699a1974a80921cad03192aa8a0428a9b',
+      scope:'07 Missões genuine selected tab paint only',
+      refs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(n=>'assets/design-approved/'+n),
+      source:'assets/design-approved/07-missoes.webp',
+      method:'same real native Chromium scene/frame at DPR1 with frozen animations and decoded WebPs',
+      before:tabProdBefore,after:tabProdAfter,delta:tabProdDelta,
+      css:'filter:brightness(.84) saturate(1.12) on selected real Mission tab',
+      filters:{before:activeTabBaselineFilter,after:activeTabProductionFilter},
+      geometry:{before:tabLayoutBefore,after:activeTabProductionLayout,selectedTabRect:activeTabRects[0]},
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-active-tab-final-production-ab.json'),
+      JSON.stringify(tabProdReport,null,2));
+    console.log('WORK8 #104 ACTUAL PRODUCTION active tab ORIGINAL|RENDER|OVERLAY RGB MAE '+JSON.stringify(tabProdReport));
+    assert.notEqual(activeTabBaselineFilter,activeTabProductionFilter,'real committed enamel must change');
+    assert.equal(activeTabProductionFilter,'brightness(0.84) saturate(1.12)',
+      'committed production enamel must exactly match selected native winner');
+    assert.deepEqual(tabLayoutBefore,activeTabProductionLayout,
+      'selected tab paint cannot move real mission targets, daily rewards or dock');
+    assert.ok(tabProdDelta.meters<-.20&&tabProdDelta.full<-.01,
+      'committed active tab must measurably improve source ROI AND complete source frame');
+    assert.ok(Math.abs(tabProdDelta.quests)<.08&&Math.abs(tabProdDelta.chests)<.08&&
+      Math.abs(tabProdDelta.daily)<.08&&Math.abs(tabProdDelta.dockDelta)<.08,
+      'unchanged three missions, seven rewards and shared WORK0 dock must not regress');
+    assert.equal(activeTabProductionLayout.questCount,3);
+    assert.equal(activeTabProductionLayout.dayCount,7);
+    assert.equal(activeTabProductionLayout.dockCount,5);
+    assert.ok(activeTabProductionLayout.chests.every((c:any)=>c.bottom<=activeTabProductionLayout.nav.top+2),
+      'all seven real reward paintings visible above dock at 384x512');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
