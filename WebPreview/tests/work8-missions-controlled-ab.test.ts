@@ -1081,7 +1081,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
         .map(n=>'assets/design-approved/'+n),
       scope:'WORK8 only 07 Missões: source reward-board ink with seven real chests',
       method:'same native 384x512 Chromium DPR1; WebP decoded; animations paused; identical app scene/frame',
-      beforeBrightness:.645,afterBrightness:.615,
+      beforeBrightness:.645,afterBrightness:.675,
       roi:dailyContrastComparison.metrics,unchanged:dailyContrastComparison.unchanged,
       beforeLayout:dailyContrastBeforeLayout,afterLayout:dailyContrastAfterLayout,
       approved:false,approvedScreens:0
@@ -1130,6 +1130,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'reward-board source paint must improve both daily ROI and full-frame MAE');
     assert.ok(dailyContrastComparison.metrics.quests.delta<.10,
       'three real mission panels cannot regress');
+    assert.ok(dailyContrastComparison.metrics.chests.delta<.15,
+      'seven genuine chest paintings must remain stable within measured 0.15 MAE');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
