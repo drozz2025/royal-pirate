@@ -1519,6 +1519,10 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.equal((await readLayout()).days.length,7);
     assert.equal((await readLayout()).navCount,5);
     assert.ok(Math.abs(rewardDelta.dockDelta)<.08,'no alteration to shared dock');
+    assert.ok(rewardDelta.full<-.035&&rewardDelta.meters<-.75 &&
+      rewardDelta.daily<-.16&&rewardDelta.chests<-.25,
+      'the ACTUAL shipped reward enamel MUST improve native original MAE across frame, tile ROI, day tray and 7 chests');
+    assert.ok(Math.abs(rewardDelta.quests)<.03,'the three REAL objectives cannot visually regress');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
