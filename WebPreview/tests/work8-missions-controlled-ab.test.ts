@@ -1098,6 +1098,34 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'all seven chest paintings stay clear of dock');
     assert.ok(dailyContrastComparison.unchanged.header<.10&&dailyContrastComparison.unchanged.dock<.10,
       'the header and shared Porto-owned dock must be pixel-identical');
+
+    // Reproducible same-scene native Chromium sweep: DATA ONLY. The candidate
+    // remains fixed in CSS until a measured, human-reviewable source match wins.
+    // This never changes real reward balances, state or public user UI.
+    const sweepBrightness=[.595,.605,.615,.625,.635,.645,.655,.665,.675,.685,.70,.72];
+    const sweepMetrics=[];
+    for(const luminance of sweepBrightness){
+      const actualFilter=await evalJs('(()=>{const el=document.querySelector(".w8-approved-missions .w8-approved-daily");if(!el)return null;el.style.filter='+JSON.stringify('brightness('+luminance+') saturate(1.055)')+';return getComputedStyle(el).filter})()');
+      assert.ok(actualFilter,'reward panel CSS test must address the real daily element');
+      await delay(100);
+      const sweepCapture=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      const sweepSource=source
+        .replace(JSON.stringify('data:image/png;base64,'+before),'"__WORK8_SWEEP_BASELINE__"')
+        .replace(JSON.stringify('data:image/png;base64,'+after),'"__WORK8_SWEEP_CANDIDATE__"')
+        .replace('"__WORK8_SWEEP_BASELINE__"',JSON.stringify('data:image/png;base64,'+dailyContrastBefore))
+        .replace('"__WORK8_SWEEP_CANDIDATE__"',JSON.stringify('data:image/png;base64,'+sweepCapture));
+      const measurements=await evalJs(sweepSource);
+      sweepMetrics.push({brightness:luminance,full:measurements.metrics.full,
+        daily:measurements.metrics.daily,chests:measurements.metrics.chests,
+        quests:measurements.metrics.quests});
+    }
+    await evalJs('document.querySelector(".w8-approved-missions .w8-approved-daily").style.removeProperty("filter");true');
+    writeFileSync(join(evidence,'work8-missions-daily-source-sweep.json'),JSON.stringify({
+      source:'assets/design-approved/07-missoes.webp',size:'Chromium 384x512 DPR1',
+      sameScene:true,pausedAnimations:true,baselineBrightness:.645,
+      approved:false,approvedScreens:0,results:sweepMetrics
+    },null,2));
+    console.log('WORK8 reward-board candidate source sweep '+JSON.stringify(sweepMetrics));
     assert.ok(dailyContrastComparison.metrics.daily.delta<-.03 && dailyContrastComparison.metrics.full.delta<-.001,
       'reward-board source paint must improve both daily ROI and full-frame MAE');
     assert.ok(dailyContrastComparison.metrics.quests.delta<.10,
