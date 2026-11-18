@@ -802,6 +802,12 @@ export class OceanScene {
       centralRecoil.rotation.y=-this.battle.yaw*Math.PI/180*.20;
     }
     for(const [index,flare] of this.batteryFlashes.entries()){flare.visible=this.battleBattery.visible&&batteryFx.visible&&index===this.activeBatteryMuzzle;flare.scale.setScalar(Math.max(.05,batteryFx.flashScale*.75));(flare.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity;}
+    const centralBlast=this.battleBattery.getObjectByName('first-person-central-blast-ring') as T.Mesh|undefined;
+    if(centralBlast){
+      centralBlast.visible=this.battleBattery.visible&&batteryFx.visible;
+      centralBlast.scale.setScalar(.54+batteryFx.flashScale*.74);
+      (centralBlast.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity*.64;
+    }
     this.foam.forEach((f,i)=>{(f.material as T.MeshBasicMaterial).opacity=.3+Math.sin(pictureTime*2+i)*.12;f.scale.x=2.25+Math.sin(pictureTime)*.09;});
     for(let i=this.ripples.length-1;i>=0;i--){const ripple=this.ripples[i];ripple.age+=dt;const state=rippleState(ripple.age,ripple.life);
       if(state.finished){ripple.mesh.visible=false;this.ripplePool.push(ripple.mesh);this.ripples.splice(i,1);continue;}
