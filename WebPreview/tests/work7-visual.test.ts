@@ -436,6 +436,45 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           }
         }
 
+        // Experiment with live availability-bar enamel. Original artwork uses
+        // bright gold/violet/green card-footers; changing preview labels cannot
+        // fabricate rarity, currency or progress. DO NOT commit a guess: log the
+        // native full-frame and ROI error for every candidate then remove it.
+        if(kind==='cards' && width===384 && height===512) {
+          const refSource='data:image/webp;base64,'+references.cards.toString('base64');
+          for(const layer of ['small','border'] as const){
+            for(const magnitude of [.75,.95,1.15,1.35,1.55,1.8,2.15]){
+              const styleText=layer==='small'?
+                '@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+                '.w7-screen[data-work7-screen="cards"] .w7-approved-slot small'+
+                '{filter:brightness('+magnitude+') saturate(1.3)!important}}':
+                '@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+                '.w7-screen[data-work7-screen="cards"] .w7-approved-slot'+
+                '{box-shadow:inset 0 0 '+Math.round(magnitude*2)+'px '+Math.round(magnitude*2)+
+                  'px #f1bd76aa,0 3px 0 #06142b!important}}';
+              await evaluate("(()=>{const s=document.createElement('style');s.id='w7-enamel-sweep';s.textContent="+
+                JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
+              await sleep(80);
+              const sample=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+              const metrics=await evaluate("(async()=>{"+
+                "const load=src=>new Promise((ok,fail)=>{let i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+                "const [reference,render]=await Promise.all([load("+JSON.stringify(refSource)+"),load("+
+                  JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(sample.data)+")]);"+
+                "const c=document.createElement('canvas');c.width=384;c.height=512;const ctx=c.getContext('2d');"+
+                "ctx.drawImage(reference,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
+                "ctx.clearRect(0,0,384,512);ctx.drawImage(render,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
+                "let global=0,roi=0,n=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){"+
+                "let p=(y*384+x)*4;for(let k=0;k<3;k++){let e=Math.abs(a[p+k]-b[p+k]);global+=e;"+
+                "if(x>=18&&x<365&&y>=195&&y<428){roi+=e;n++}}}"+
+                "return {global:Math.round(global/(384*512*3)*1000)/1000,"+
+                "roi:Math.round(roi/n*1000)/1000}})()");
+              console.log('WORK7 ENAMEL SWEEP layer='+layer+' magnitude='+magnitude+' '+JSON.stringify(metrics));
+              await evaluate("(()=>{document.getElementById('w7-enamel-sweep')?.remove();return true})()");
+              await sleep(40);
+            }
+          }
+        }
+
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
