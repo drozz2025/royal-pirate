@@ -376,17 +376,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "first.getContext('2d').drawImage(reference,0,0);second.getContext('2d').drawImage(live,0,0);"+
           "const a=first.getContext('2d').getImageData(0,0,w,h).data,b=second.getContext('2d').getImageData(0,0,w,h).data;"+
           "let diff=0;for(let p=0;p<a.length;p+=4){diff+=Math.abs(a[p]-b[p])+Math.abs(a[p+1]-b[p+1])+Math.abs(a[p+2]-b[p+2])}"+
-          "mae=Math.round(diff/(w*h*3)*100)/100;"+
+          "mae=Math.round(diff/(w*h*3)*10000)/10000;"+
           "const baselineUrl="+JSON.stringify(beforeUrl)+";"+
           "if(baselineUrl){const baseline=await load(baselineUrl);"+
           "const third=document.createElement('canvas');third.width=w;third.height=h;"+
           "const tctx=third.getContext('2d');tctx.drawImage(baseline,0,0);"+
           "const b0=tctx.getImageData(0,0,w,h).data;let diff0=0;"+
           "for(let p=0;p<a.length;p+=4){diff0+=Math.abs(a[p]-b0[p])+Math.abs(a[p+1]-b0[p+1])+Math.abs(a[p+2]-b0[p+2])}"+
-          "maeBefore=Math.round(diff0/(w*h*3)*100)/100;"+
+          "maeBefore=Math.round(diff0/(w*h*3)*10000)/10000;"+
 "const patches="+JSON.stringify(kind==='shop'?[[18,175,173,309],[18,329,365,427]]:[[18,195,365,428]])+";"+
 "let sumA=0,sumB=0,pixels=0;for(const [x0,y0,x1,y1] of patches){for(let y=y0;y<y1;y++){for(let x=x0;x<x1;x++){const p=(y*w+x)*4;for(let k=0;k<3;k++){sumA+=Math.abs(a[p+k]-b0[p+k]);sumB+=Math.abs(a[p+k]-b[p+k]);pixels++}}}}"+
-"roiBefore=Math.round(sumA/pixels*100)/100;roiAfter=Math.round(sumB/pixels*100)/100;}}"+
+"roiBefore=Math.round(sumA/pixels*10000)/10000;roiAfter=Math.round(sumB/pixels*10000)/10000;}}"+
           "return {png:c.toDataURL('image/png').slice(22),mae,maeBefore,roiBefore,roiAfter,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
