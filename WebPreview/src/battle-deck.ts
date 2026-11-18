@@ -52,7 +52,79 @@ function paintedDeckTimber(base:string, seed:number): T.MeshStandardMaterial {
  * Decorative geometry only: aiming, damage and shots remain in Battle.
  * Never displayed in Porto, never replaces the real moving ships.
  */
-export function makeBattleDeck(): {group: T.Group; flashes: T.Mesh[]; muzzles: T.Vector3[]} {
+/** Perspective-only alternative requested on 18 November: ONE big cannon,
+ * seen by its gunner from the real deck. The ball, flash and smoke share this
+ * single animated muzzle. Existing 2-cannon geometry remains a testable legacy
+ * fallback and the original Porto ship is never modified. */
+export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzles:T.Vector3[]} {
+  const group=new T.Group();
+  group.name='battle-foreground-cannons';
+  group.userData.firstPersonCentral=true;
+  const deck=paintedDeckTimber('#95613c',201);
+  const alternate=paintedDeckTimber('#bc8651',333);
+  const dark=new T.MeshStandardMaterial({color:'#493022',roughness:.87});
+  const iron=new T.MeshStandardMaterial({color:'#263c4d',roughness:.36,metalness:.61});
+  const gold=new T.MeshStandardMaterial({color:'#dbaf62',roughness:.39,metalness:.62});
+  const bore=new T.MeshBasicMaterial({color:'#07131d',side:T.DoubleSide});
+  const flame=new T.MeshBasicMaterial({color:'#ffd16d',transparent:true,opacity:0,
+    depthWrite:false,blending:T.AdditiveBlending});
+  const box=new T.BoxGeometry(1,1,1);
+  const plank=(x:number,y:number,z:number,sx:number,sy:number,sz:number,material:T.Material)=>{
+    const m=new T.Mesh(box,material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);group.add(m);return m;
+  };
+  // Perspective teak boards and low gunwales: the visible front half of the
+  // user's OWN deck, without a second exterior ship or a black sail wall.
+  for(let i=-4;i<=4;i++)
+    plank(i*1.33,.22,64,1.28,.37,24,(i&1)?deck:alternate);
+  for(const x of [-6.3,6.3]){
+    plank(x,1.00,64,.36,1.40,21,dark);
+    for(const z of [55.5,62,68,75])plank(x,1.69,z,.43,.23,.6,gold);
+  }
+  plank(0,.53,53,13,.32,.4,dark);
+  // One gun carriage. Its wheels are entirely below the target's silhouette.
+  plank(0,1.04,66,2.9,.66,6.4,deck);
+  for(const x of [-1.56,1.56]){
+    const wheel=new T.Mesh(new T.CylinderGeometry(.91,.91,.35,18),dark);
+    wheel.position.set(x,.90,66);wheel.rotation.z=Math.PI/2;group.add(wheel);
+    const cap=new T.Mesh(new T.CylinderGeometry(.30,.30,.38,12),gold);
+    cap.position.set(x+Math.sign(x)*.20,.90,66);cap.rotation.z=Math.PI/2;group.add(cap);
+  }
+  // The recoil group owns every visible barrel piece, including the TRUE
+  // mouth marker. scene.ts transforms this group's live matrix for shot+smoke.
+  const recoil=new T.Group();
+  recoil.name='first-person-central-recoil';
+  group.add(recoil);
+  const breech=new T.Vector3(0,1.80,68);
+  const mouth=new T.Vector3(0,4.80,50);
+  const direction=mouth.clone().sub(breech).normalize();
+  const rotation=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),direction);
+  const mouthFace=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,0,1),direction);
+  const tube=new T.Mesh(new T.CylinderGeometry(1.12,1.53,breech.distanceTo(mouth),28,1),iron);
+  tube.name='first-person-central-cannon';
+  tube.position.copy(breech).add(mouth).multiplyScalar(.5);tube.quaternion.copy(rotation);recoil.add(tube);
+  const breechCap=new T.Mesh(new T.SphereGeometry(1.45,18,12),iron);
+  breechCap.position.copy(breech);recoil.add(breechCap);
+  for(const t of [.22,.60,.86,1]){
+    const radius=1.53-(1.53-1.12)*t;
+    const ring=new T.Mesh(new T.TorusGeometry(radius,.11,10,30),gold);
+    ring.position.copy(breech).lerp(mouth,t);ring.quaternion.copy(mouthFace);recoil.add(ring);
+  }
+  const darkMouth=new T.Mesh(new T.CircleGeometry(1.02,32),bore);
+  darkMouth.name='first-person-central-muzzle';
+  darkMouth.position.copy(mouth).addScaledVector(direction,.065);
+  darkMouth.quaternion.copy(mouthFace);recoil.add(darkMouth);
+  const flash=new T.Mesh(new T.SphereGeometry(1.36,14,10),flame);
+  flash.name='first-person-central-flash';
+  flash.position.copy(mouth).addScaledVector(direction,.22);
+  flash.visible=false;recoil.add(flash);
+  // Keep the legacy group's initial offset; battleCameraPose overrides it on
+  // every Batalha entry and resize, without touching Porto.
+  group.position.z=-15;
+  return {group,flashes:[flash],muzzles:[mouth]};
+}
+
+export function makeBattleDeck(singleCentered=false): {group: T.Group; flashes: T.Mesh[]; muzzles: T.Vector3[]} {
+  if(singleCentered)return makeSingleBattleDeck();
   const group = new T.Group();
   group.name = 'battle-foreground-cannons';
   const wood = paintedDeckTimber('#91522f',73);
