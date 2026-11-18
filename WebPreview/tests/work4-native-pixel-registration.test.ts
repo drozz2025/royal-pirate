@@ -524,6 +524,120 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         writeFileSync(join(folder,'work4-forge-smoke-iron-pigment-study.json'),
           JSON.stringify(proof,null,2)+'\n');
         console.log('WORK4_FORGE_SMOKE_STUDY '+JSON.stringify(proof));
+        // WORK4/#104 — controlled source-cannon edge experiment, 18 Nov 13h.
+        // Every candidate is the same native Chromium frame; no mask touches
+        // the hearth, live levels, cost cells or the WORK0 dock. Only a measured
+        // winner may become shipping CSS in a later commit on this draft.
+        const edgeCandidates=[
+          {id:'HEAD',radial:'ellipse 125% 115% at 37% 49%',opaque:77,bottom:96},
+          {id:'merged-head',radial:'ellipse 106% 105% at 37% 49%',opaque:69,bottom:91},
+          {id:'edge-soft',radial:'ellipse 106% 105% at 37% 49%',opaque:75,bottom:91},
+          {id:'edge-tight',radial:'ellipse 100% 102% at 37% 49%',opaque:69,bottom:91},
+          {id:'edge-wide',radial:'ellipse 113% 110% at 37% 49%',opaque:72,bottom:91},
+          {id:'edge-natural',radial:'ellipse 109% 107% at 37% 49%',opaque:76,bottom:94},
+          {id:'lower-cannon',radial:'ellipse 106% 105% at 37% 49%',opaque:69,bottom:95},
+          {id:'lower-fade',radial:'ellipse 106% 105% at 37% 49%',opaque:69,bottom:85},
+          {id:'warm-side',radial:'ellipse 106% 105% at 33% 49%',opaque:72,bottom:91},
+          {id:'full-coast',radial:'ellipse 125% 115% at 37% 49%',opaque:77,bottom:96},
+          {id:'focused-barrel',radial:'ellipse 97% 109% at 34% 49%',opaque:73,bottom:93}
+        ];
+        const edgeSelector='.w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon';
+        const geomTest="(()=>{const rect=s=>{const x=document.querySelector(s)?.getBoundingClientRect();"+
+          "return x?[x.x,x.y,x.width,x.height]:null;};return {cannon:rect('.w4-reference-cannon'),"+
+          "costs:rect('.w4-materials'),button:rect('.w4-improve-button'),"+
+          "dock:rect('.harbour-nav.app-dock-porto'),"+
+          "items:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "prices:document.querySelectorAll('.w4-resource-grid>div').length};})()";
+        const edgeGeom=await evaluate(geomTest);
+        assert.equal(edgeGeom.items,5);
+        assert.equal(edgeGeom.prices,3);
+        const edgeShots:Record<string,string>={HEAD:screenshot};
+        for(const c of edgeCandidates.slice(1)){
+          const radial='radial-gradient('+c.radial+',#000 0%,#000 '+c.opaque+'%,transparent 99%)';
+          const vertical='linear-gradient(to bottom,#000 0%,#000 '+c.bottom+'%,transparent 100%)';
+          const mask=radial+','+vertical;
+          const patch=edgeSelector+'{-webkit-mask-image:'+mask+'!important;mask-image:'+mask+
+            '!important;-webkit-mask-composite:source-in!important;mask-composite:intersect!important;}';
+          assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
+            "s.id='work4-104-cannon-edge-sweep';s.textContent="+JSON.stringify(patch)+
+            ";document.head.appendChild(s);return true;})()"));
+          await sleep(80);
+          assert.deepEqual(await evaluate(geomTest),edgeGeom,
+            'mask cannot alter cannon geometry, real costs, touch or dock');
+          edgeShots[c.id]=(await command('Page.captureScreenshot',{
+            format:'png',fromSurface:true,captureBeyondViewport:false
+          })).data as string;
+          assert.ok(await evaluate("(()=>{document.getElementById('work4-104-cannon-edge-sweep')?.remove();return true;})()"));
+        }
+        const edgeData={original:references.forge,edgeShots};
+        const edgeJS="(async()=>{const raw="+JSON.stringify(edgeData)+";"+
+          "const load=async(type,b)=>{const i=new Image();i.src='data:image/'+type+';base64,'+b;await i.decode();return i};"+
+          "const px=i=>{if(i.width!==384||i.height!==512)throw Error('native 384x512 only');"+
+          "const c=document.createElement('canvas');c.width=384;c.height=512;"+
+          "const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(i,0,0);"+
+          "return x.getImageData(0,0,384,512).data};"+
+          "const ref=px(await load('webp',raw.original));"+
+          "const rois={global:[0,0,384,512],cannon:[30,220,176,313],"+
+          "seam:[147,150,216,311],hearth:[115,217,180,307],"+
+          "costs:[16,320,369,378],dock:[0,430,384,512]};"+
+          "const mae=(a,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
+          "const k=(y*384+x)*4;for(let j=0;j<3;j++){sum+=Math.abs(ref[k+j]-a[k+j]);n++;}}return sum/n;};"+
+          "const scores=[];for(const [id,b64] of Object.entries(raw.edgeShots)){const im=px(await load('png',b64));"+
+          "const score={id};for(const [k,r] of Object.entries(rois))score[k]=mae(im,r);scores.push(score);}"+
+          "return {rois,scores};})()";
+        const edgeMetrics=await evaluate(edgeJS);
+        assert.equal(edgeMetrics.scores.length,edgeCandidates.length);
+        const edgeHead=edgeMetrics.scores.find((x:any)=>x.id==='HEAD');
+        assert.ok(edgeHead,'current render must be the untouched screenshot');
+        const priorMask=edgeMetrics.scores.find((x:any)=>x.id==='merged-head');
+        assert.ok(priorMask,'previous release 384x512 cannon mask sampled');
+        assert.ok(edgeHead.cannon < priorMask.cannon-3,
+          'single source cannon ROI must significantly improve');
+        assert.ok(edgeHead.hearth < priorMask.hearth-2,
+          'the approved source hearth must become MORE visible');
+        assert.ok(edgeHead.global < priorMask.global-.15,
+          'source crop change must improve full-screen native RGB MAE');
+        for(const key of ['costs','dock']){
+          assert.ok(Math.abs(edgeHead[key]-priorMask[key])<.04,
+            'preserve live '+key+' pixels exactly');
+        }
+        for(const c of edgeMetrics.scores){
+          for(const key of ['costs','dock']){
+            assert.ok(Math.abs(c[key]-edgeHead[key])<.04,'protected '+key+' ROI cannot change');
+          }
+        }
+        const edgeSorted=[...edgeMetrics.scores].sort((a:any,b:any)=>
+          (a.cannon*.6+a.seam*.25+a.hearth*.15)-
+          (b.cannon*.6+b.seam*.25+b.hearth*.15));
+        const evidence={original:references.forge,before:edgeShots['merged-head'],
+          render:screenshot};
+        const proofAB=await evaluate("(async()=>{const r="+JSON.stringify(evidence)+";"+
+          "const load=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;"+
+          "await i.decode();if(i.width!==384||i.height!==512)throw Error('native proof');return i;};"+
+          "const [a,b,c]=await Promise.all([load('webp',r.original),load('png',r.before),load('png',r.render)]);"+
+          "const o=document.createElement('canvas');o.width=1536;o.height=512;const g=o.getContext('2d');"+
+          "g.drawImage(a,0,0);g.drawImage(b,384,0);g.drawImage(c,768,0);"+
+          "g.drawImage(a,1152,0);g.globalAlpha=.5;g.drawImage(c,1152,0);"+
+          "return o.toDataURL('image/png').split(',')[1];})()");
+        writeFileSync(join(folder,'original-before-render-overlay-forge-cannon-384x512.png'),
+          Buffer.from(proofAB,'base64'));
+        writeFileSync(join(folder,'before-forge-cannon-384x512.png'),
+          Buffer.from(edgeShots['merged-head'],'base64'));
+        writeFileSync(join(folder,'render-forge-cannon-384x512.png'),
+          Buffer.from(screenshot,'base64'));
+        const finalAB={source:'assets/design-approved/04-melhorias-forja.webp',
+          viewport:'384x512',sameReactFrame:true,
+          before:priorMask,after:edgeHead,approved:false,approvedScreens:0};
+        writeFileSync(join(folder,'work4-forge-cannon-controlled-ab.json'),
+          JSON.stringify(finalAB,null,2)+'\n');
+        console.log('WORK4_FORGE_CANNON_AB '+JSON.stringify(finalAB));
+        const edgeRecord={...edgeMetrics,ranking:edgeSorted.map((x:any)=>x.id),
+          sameReactFrame:true,viewport:'384x512',source:'assets/design-approved/04-melhorias-forja.webp',
+          baseSHA:"16d67fcd16c2bb174e02f594e804e52c2566dc78",
+          approved:false,approvedScreens:0,shipped:'HEAD (full-coast mask, current PR)'};
+        writeFileSync(join(folder,'work4-forge-cannon-mask-candidates.json'),
+          JSON.stringify(edgeRecord,null,2)+'\n');
+        console.log('WORK4_FORGE_CANNON_MASK_STUDY '+JSON.stringify(edgeRecord));
       }
 
       // WORK4/#104 native Forge stage: real original/before/render/overlay.
@@ -1780,4 +1894,14 @@ test('WORK4 Forge native charcoal only changes local material paint, never compo
   assert.match(block,/border-color:#364750/);
   assert.match(block,/background-color:#4a352f!important/);
   assert.doesNotMatch(block.split('*/')[1]||'',/(?:\.app-|\.porto-|\.harbour-nav|\.bottom-nav|contain:paint|translateZ|position:fixed)/);
+});
+
+
+test('WORK4 native source-cannon contour stays isolated from costs, navigation and compositor',()=>{
+  const suffix=css.split('WORK4/#104 — native 384x512 Forge source cannon feather')[1];
+  assert.ok(suffix,'a source-measured native cannon contour is required');
+  assert.match(suffix,/@media \(width:384px\) and \(height:512px\)/);
+  assert.match(suffix,/radial-gradient\(ellipse 125% 115% at 37% 49%/);
+  assert.match(suffix,/linear-gradient\(to bottom,#000 0%,#000 96%,transparent 100%\)/);
+  assert.doesNotMatch(suffix,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-resource-grid|contain:paint|translateZ)/);
 });

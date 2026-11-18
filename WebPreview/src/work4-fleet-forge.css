@@ -2975,3 +2975,23 @@
    The one Royal Crown, actual sea source, four slots, WORK0 dock and touch
    regions remain pixel-identical. Existing geometry, water mask and 390/430
    fixes are unchanged. Human visual approval remains false. */
+
+
+
+/* WORK4/#104 — native 384x512 Forge source cannon feather, 18 Nov 13h.
+   Controlled Chromium A/B of ten masks from the verified release HEAD
+   demonstrated that the 125% x 115% organic source contour and 96% lower
+   feather preserve more REAL 04 source pixels around the single cannon and
+   the lit hearth. Geometry, compositor isolation #158, materials, prices,
+   44px action, Porto and 5-item dock remain unchanged; 320/390/430 keep
+   their established responsive treatment. Artistic approval is still false. */
+@media (width:384px) and (height:512px) {
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {
+    -webkit-mask-image:
+      radial-gradient(ellipse 125% 115% at 37% 49%,#000 0%,#000 77%,transparent 99%),
+      linear-gradient(to bottom,#000 0%,#000 96%,transparent 100%);
+    mask-image:
+      radial-gradient(ellipse 125% 115% at 37% 49%,#000 0%,#000 77%,transparent 99%),
+      linear-gradient(to bottom,#000 0%,#000 96%,transparent 100%);
+  }
+}
