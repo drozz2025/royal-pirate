@@ -41,8 +41,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
     'New WORK7 eight-card short-viewport art treatment exists without screenshot backgrounds');
-  assert.ok(cssText.includes('18 Nov 17:28 UTC. Native 05 source-enamel calibration.'),
-    'WORK7 05 lower-row source painting is the only new native candidate');
+  assert.ok(cssText.includes('18 Nov 17:56 UTC. Native 05 original card-3 pigment study.'),
+    'WORK7 native card-3 source painting is the only new candidate');
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
@@ -392,32 +392,16 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           Buffer.from(comparison.png,'base64'));
 
 
-        // WORK7 v0.1.94 native controlled diagnostic: isolate each single
-        // physical card color against exact merged HEAD, never old PR values.
-        // Trial styles are removed after each real same-frame screenshot.
+        // WORK7 native single-card pigment sweep. Test-only exploration;
+        // production CSS remains unchanged during these transient trials.
         if(kind==='cards' && width===384 && height===512){
-          const baseFilters:Record<number,string>={
-            5:'brightness(.45) saturate(2.00) contrast(.85)',
-            6:'brightness(.65) saturate(1.30) contrast(.92)',
-            7:'brightness(.42) saturate(1.75) contrast(.79)',
-            8:'brightness(.64) saturate(1.90) contrast(.88)'
-          };
-          const scan:Array<{slot:number;bright:number;sat:number;contrast:number}>=[];
-          for(const [slot,base,sat,contrast] of [
-            [5,.45,2,.85],[6,.65,1.3,.92],[7,.42,1.75,.79],[8,.64,1.9,.88]
-          ])for(const offset of [-.08,-.05,-.03,-.015,.015,.03,.05,.08]){
-            scan.push({slot,bright:Number((base+offset).toFixed(3)),sat,contrast});
-          }
-          for(const entry of scan){
-            const styles=Object.entries(baseFilters).map(([slot,value])=>
-              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+slot+'){filter:'+value+'!important}'
-            ).join('');
-            const override='.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+entry.slot+')'+
-              '{filter:brightness('+entry.bright+') saturate('+entry.sat+') contrast('+entry.contrast+')!important}';
-            const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+styles+override+'}';
+          for(const bright of [.30,.34,.36,.38,.40,.42,.44,.46,.48,.52,.56]){
+            const override='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3)'+
+              '{filter:brightness('+bright+') saturate(1.20) contrast(.74)!important}}';
             await evaluate("(()=>{const s=document.createElement('style');s.id='w7-card-sweep';s.textContent="+
-              JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
-            await sleep(50);
+              JSON.stringify(override)+";document.head.appendChild(s);return true})()");
+            await sleep(70);
             const shot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
             const metrics=await evaluate("(async()=>{"+
               "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
@@ -430,7 +414,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               "const p=(y*384+x)*4;for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;"+
               "if(x>=18&&x<365&&y>=195&&y<428){roi+=v;roiCount++}}}"+
               "return {full:Number((sum/(384*512*3)).toFixed(5)),roi:Number((roi/roiCount).toFixed(5))}})()");
-            console.log('WORK7 NATIVE CARD SWEEP '+JSON.stringify({...entry,...metrics}));
+            console.log('WORK7 NATIVE CARD3 SWEEP '+JSON.stringify({bright,...metrics}));
             await evaluate("(()=>{document.getElementById('w7-card-sweep')?.remove();return true})()");
           }
         }
