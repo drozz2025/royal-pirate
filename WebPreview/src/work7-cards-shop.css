@@ -4173,3 +4173,19 @@
   .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.32) drop-shadow(0 4px 3px #041327a8)}
   .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.59) drop-shadow(0 4px 3px #041327a8)}
 }
+
+
+/* WORK7/#104 — 18 Nov 07:20 UTC. Native 05/06 relief-value registration.
+ * Only material exposure of four existing hand-painted concept card surrounds
+ * and the single existing Captain pack. Earlier 05/06 true WEBP crop exposure,
+ * 4×2 layout, three chest crops, labels, economy, navigation and touch areas
+ * are untouched. Native Chromium 384×512 only; no 320px/tall overrides.
+ * Original reference: 00-referencia-original-aprovada, 00-painel-oito-ecras,
+ * 05-cartas and 06-loja. Human approval remains false: 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.71)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.51)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.64)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.50)}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.82)}
+}
