@@ -4332,12 +4332,12 @@
  * must improve before WORK0 may integrate. approved:false, 0/8. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
-    filter:brightness(.42) saturate(2.00) contrast(.85);
+    filter:brightness(.49) saturate(2.00) contrast(.85);
   }
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
-    filter:brightness(.61) saturate(1.30) contrast(.92);
+    filter:brightness(.70) saturate(1.30) contrast(.92);
   }
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
-    filter:brightness(.60) saturate(1.90) contrast(.88);
+    filter:brightness(.68) saturate(1.90) contrast(.88);
   }
 }
