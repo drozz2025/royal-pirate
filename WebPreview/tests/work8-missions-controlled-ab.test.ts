@@ -1130,6 +1130,6 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(180);
     if(browser?.exitCode===null)browser.kill('SIGKILL');
     if(vite.exitCode===null)vite.kill('SIGKILL');
-    rmSync(profile,{recursive:true,force:true});
+    rmSync(profile,{recursive:true,force:true,maxRetries:12,retryDelay:150});
   }
 });
