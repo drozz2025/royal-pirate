@@ -93,9 +93,12 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
   // mouth marker. scene.ts transforms this group's live matrix for shot+smoke.
   const recoil=new T.Group();
   recoil.name='first-person-central-recoil';
+  // The pivot is the rear trunnion: aim/recoil move the barrel and its mouth
+  // together instead of rotating a tube around the world's water origin.
+  recoil.position.z=68;
   group.add(recoil);
-  const breech=new T.Vector3(0,1.80,68);
-  const mouth=new T.Vector3(0,4.80,50);
+  const breech=new T.Vector3(0,1.80,0);
+  const mouth=new T.Vector3(0,4.80,-18);
   const direction=mouth.clone().sub(breech).normalize();
   const rotation=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),direction);
   const mouthFace=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,0,1),direction);
