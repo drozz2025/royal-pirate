@@ -2894,7 +2894,7 @@
     inset:0 0 auto auto;
     width:37%;
     height:22%;
-    background:linear-gradient(180deg,#04121ff7 0%,#071b2bed 44%,#092a4000 100%);
+    background:linear-gradient(180deg,#051a30f7 0%,#072a42ed 44%,#092a4000 100%);
     -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 13%,#000 100%);
     mask-image:linear-gradient(to right,transparent 0%,#000 13%,#000 100%);
     pointer-events:none;
@@ -2967,3 +2967,11 @@
     mask-image:linear-gradient(to bottom,transparent 0%,#000 8%,#000 100%);
   }
 }
+
+/* WORK4/#104, 18 Nov 12h: 384x512 REAL source-sky seam A/B.
+   Ten same-frame Chromium pigment samples against 03-frota.webp found the
+   source-colour sea-night underlay best: sky 42.2515->41.5163, upper edge
+   34.2045->32.5886, full 49.7384->49.7170 RGB MAE (lower is closer).
+   The one Royal Crown, actual sea source, four slots, WORK0 dock and touch
+   regions remain pixel-identical. Existing geometry, water mask and 390/430
+   fixes are unchanged. Human visual approval remains false. */

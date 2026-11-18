@@ -222,6 +222,95 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       const screenshot=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
 
+      // WORK4/#104: exploratory native sky/photographic-edge A/B. Same paused
+      // React scene, exact approved 03 WebP, no changes to ship/water/dock.
+      // Only the measured winner is shipped; the prior HEAD is recomputed as
+      // BEFORE and verified against RENDER. No claim of artistic approval.
+      if(screen==='fleet'&&width===384&&height===512){
+        const skyOptions=[
+          {id:'HEAD-sea-night',top:'#051a30f7',middle:'#072a42ed'},
+          {id:'prior-HEAD',top:'#04121ff7',middle:'#071b2bed'},
+          {id:'deep-navy',top:'#020e1df7',middle:'#071729ed'},
+          {id:'navy',top:'#091b2cf7',middle:'#0b2839ed'},
+          {id:'steel',top:'#0d2737f7',middle:'#143447ed'},
+          {id:'nocturne',top:'#071a2cf7',middle:'#0b2233ed'},
+          {id:'muted-teal',top:'#072335f7',middle:'#0d3445ed'},
+          {id:'blue-ash',top:'#122c3df7',middle:'#153549ed'},
+          {id:'warm-coal',top:'#121d29f7',middle:'#142a37ed'},
+          {id:'coal',top:'#080f1bf7',middle:'#131d2aed'}
+        ];
+        const geometryJS="(()=>{const box=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null};return {"+
+          "ship:box('.w4-reference-ship'),sea:box('.w4-reference-sea'),"+
+          "stage:box('.w4-harbour-stage'),roster:box('.w4-ship-roster'),"+
+          "dock:box('.harbour-nav.app-dock-porto'),"+
+          "count:document.querySelectorAll('[data-work4-crop=\"fleet\"]').length,"+
+          "menu:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        const initialGeometry=await evaluate(geometryJS);
+        assert.equal(initialGeometry.count,1,'one approved Royal Crown only');
+        assert.equal(initialGeometry.menu,5,'five WORK0 dock items');
+        const frames:[string,string][]=[['HEAD-sea-night',screenshot]];
+        for(const option of skyOptions.slice(1)){
+          const paint='.w4-fleet #w4-fleet-panel > .w4-harbour-stage::after{'+
+            'background:linear-gradient(180deg,'+option.top+' 0%,'+
+            option.middle+' 44%,#092a4000 100%)!important;}';
+          await evaluate("(()=>{const s=document.createElement('style');s.id='work4-sky-candidate';"+
+            "s.textContent="+JSON.stringify(paint)+";document.head.appendChild(s);return true;})()");
+          await sleep(100);
+          frames.push([option.id,(await command('Page.captureScreenshot',{
+            format:'png',fromSurface:true,captureBeyondViewport:false
+          })).data as string]);
+          await evaluate("(()=>{document.getElementById('work4-sky-candidate')?.remove();return true})()");
+          assert.deepEqual(await evaluate(geometryJS),initialGeometry,
+            'sky pigment must not move a ship, sea, stage, roster or dock');
+        }
+        const calc="(async()=>{const input="+JSON.stringify({approved:references.fleet,frames})+";"+
+          "const load=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;await i.decode();return i};"+
+          "const source=await load('webp',input.approved);const rgba=i=>{const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+          "const g=cv.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data};"+
+          "const ref=rgba(source),rois={full:[0,0,384,512],sky:[240,135,369,180],"+
+          "seam:[240,135,369,159],ship:[65,205,175,307],water:[28,313,238,358],"+
+          "roster:[18,350,374,429],dock:[0,430,384,512]};"+
+          "const mae=(v,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
+          "const p=(y*384+x)*4;for(let c=0;c<3;c++){sum+=Math.abs(ref[p+c]-v[p+c]);n++}}return sum/n};"+
+          "const scores=[];for(const [id,raw] of input.frames){const img=await load('png',raw);"+
+          "if(img.width!==384||img.height!==512)throw Error('native 384x512 required');"+
+          "const px=rgba(img),item={id};for(const [k,rect] of Object.entries(rois))item[k]=mae(px,rect);scores.push(item)}"+
+          "return {rois,scores};})()";
+        const study=await evaluate(calc);
+        const head=study.scores[0];
+        const prior=study.scores.find(x=>x.id==='prior-HEAD');
+        assert.ok(prior,'the 18 Nov merged source-sky pigment must be measured');
+        assert.ok(head.sky<prior.sky-.5,'real native sky MAE must improve');
+        assert.ok(head.seam<prior.seam-1,'hard photographic top seam must improve');
+        assert.ok(head.full<prior.full-.015,'source-pixel full RGB MAE must improve');
+        for(const candidate of study.scores){
+          for(const protectedRoi of ['ship','water','roster','dock']){
+            assert.ok(Math.abs(candidate[protectedRoi]-head[protectedRoi])<0.15,
+              'sky-only paint protects '+protectedRoi+' ROI');
+          }
+        }
+        const ranked=[...study.scores].sort((a,b)=>
+          (a.sky*.65+a.seam*.35)-(b.sky*.65+b.seam*.35));
+        const eligible=ranked.filter(x=>x.full<=head.full+.02);
+        const winner=eligible[0]||head;
+        assert.ok(winner,'the best-scoring eligible pigment must be identified');
+        const montage="(async()=>{const input="+JSON.stringify({
+          source:references.fleet,before:frames.find(x=>x[0]==='prior-HEAD')![1],render:screenshot
+        })+";const img=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;await i.decode();return i};"+
+          "const [a,b,c]=await Promise.all([img('webp',input.source),img('png',input.before),img('png',input.render)]);"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
+          "g.drawImage(a,0,0);g.drawImage(b,384,0);g.drawImage(c,768,0);g.drawImage(a,1152,0);"+
+          "g.globalAlpha=.5;g.drawImage(c,1152,0);return out.toDataURL('image/png').split(',')[1];})()";
+        writeFileSync(join(folder,'prospective-original-before-render-overlay-sky-384x512.png'),
+          Buffer.from(await evaluate(montage),'base64'));
+        const output={...study,head,winner,ranked,eligible,initialGeometry,
+          source:'assets/design-approved/03-frota.webp',samePausedFrame:true,
+          candidateOnly:false,shippedCSS:'sea-night',prior,approved:false,approvedScreens:0};
+        writeFileSync(join(folder,'work4-native-sky-candidates.json'),JSON.stringify(output,null,2)+'\n');
+        console.log('WORK4_NATIVE_SKY_CANDIDATES '+JSON.stringify(output));
+      }
+
+
       // WORK4/#104: controlled prospective sea-edge mask study against ORIGINAL 03.
       // All variants run in ONE paused React/Chromium frame at native 384x512;
       // the shipped CSS stays unchanged until a measured improvement is chosen.
