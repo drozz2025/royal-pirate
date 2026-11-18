@@ -4133,3 +4133,19 @@
     filter:saturate(1.27) contrast(1.12) brightness(1.40) drop-shadow(0 4px 3px #041327a8)
   }
 }
+
+/* WORK7/#104 — 18 Nov 03h, native 06 tonal registration (draft candidate).
+ * Exact approved sources: assets/design-approved/00-referencia-original-aprovada.webp,
+ * 00-painel-oito-ecras.webp and 01-08; native Loja reference 06-loja.webp.
+ * Constrain to the 384×512 reference class: leave 320×568 (incl. #263),
+ * taller screens, 05 Cartas, dock and header untouched.
+ * Model light absorption on the original ONE pack and THREE native relief
+ * surrounds; retain real cropped original art, labels, layout and tap regions.
+ * Never use screenshots as backgrounds or imply checkout is available.
+ * approved:false / 0/8 until owner approves; CI decides merit. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.75)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.74)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.60)}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.82)}
+}
