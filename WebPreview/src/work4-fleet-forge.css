@@ -2880,3 +2880,23 @@
     border-color:#2e485a;
   }
 }
+
+/* WORK4 06h/native sky seam — #104, source-approved Frota 03 only.
+   A synthetic upper-right cyan rectangle betrayed the photographic edge of
+   the single Royal Crown crop. Shade only the top of the empty underlay
+   BELOW the approved ship and LIVE stats, never another water wave.
+   384x512 exclusive; preserve #255/#260 and other Workers verbatim. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage::after {
+    content:"";
+    position:absolute;
+    z-index:0;
+    inset:0 0 auto auto;
+    width:37%;
+    height:22%;
+    background:linear-gradient(180deg,#04121ff7 0%,#071b2bed 44%,#092a4000 100%);
+    -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 13%,#000 100%);
+    mask-image:linear-gradient(to right,transparent 0%,#000 13%,#000 100%);
+    pointer-events:none;
+  }
+}
