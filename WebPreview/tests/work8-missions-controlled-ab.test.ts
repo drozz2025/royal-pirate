@@ -1652,6 +1652,64 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(Math.abs(earlyDelta.quests)<.05 && Math.abs(earlyDelta.dockDelta)<.05,
       'no regressions in the three missions or WORK0 dock');
 
+
+    /* WORK8/#104: test only the actual new early-green lacquer against the
+       integrated v0.1.98 paint. Same REAL paused Chromium scene/frame,
+       native 384x512 DPR1; switching only its production root class. */
+    const lacquerFlag='work8-missions-early-tile-lacquer-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(lacquerFlag)+');true');
+    await delay(170);
+    const lacquerBeforeLayout=await headingLayout();
+    const lacquerBeforeCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-days li:first-child")).backgroundImage');
+    const lacquerBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(lacquerFlag)+');true');
+    await delay(170);
+    const lacquerAfterLayout=await headingLayout();
+    const lacquerAfterCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-days li:first-child")).backgroundImage');
+    const lacquerAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    assert.notEqual(lacquerBeforeCss,lacquerAfterCss,'actual candidate must change the authentic green reward enamel');
+    const lacquerScores=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(earlyRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        'data:image/png;base64,'+lacquerBefore,'data:image/png;base64,'+lacquerAfter])));
+    const lacquerDelta=Object.fromEntries(Object.keys(lacquerScores[0])
+      .map(k=>[k,lacquerScores[1][k]-lacquerScores[0][k]]));
+    const lacquerOverlaySource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+lacquerBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+lacquerAfter));
+    assert.notEqual(lacquerOverlaySource,source);
+    const lacquerOverlays=await evalJs(lacquerOverlaySource);
+    saveTone('missions-lacquer-original-384x512.webp',orig);
+    saveTone('missions-lacquer-before-384x512.png',lacquerBefore);
+    saveTone('missions-lacquer-render-384x512.png',lacquerAfter);
+    saveTone('missions-lacquer-original-before-overlay-384x512.png',lacquerOverlays.overlays[0]);
+    saveTone('missions-lacquer-original-render-overlay-384x512.png',lacquerOverlays.overlays[1]);
+    const lacquerReport={
+      issue:104,baseHead:'abe5788aad9a08a42e9332107c219eb6cd7f0461',
+      references:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(n=>'assets/design-approved/'+n),
+      scope:'only paint of the three genuine early daily reward tiles; zero fabricated state',
+      viewport:'Chromium native 384x512 DPR1, same decoded, paused DOM/frame',
+      roi:earlyRects,before:lacquerScores[0],render:lacquerScores[1],
+      delta:lacquerDelta,geometry:{before:lacquerBeforeLayout,render:lacquerAfterLayout},
+      css:{before:lacquerBeforeCss,render:lacquerAfterCss},
+      overlays:lacquerOverlays.metrics,approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-lacquer-native-ab.json'),JSON.stringify(lacquerReport,null,2));
+    console.log('WORK8 #104 REAL lacquer MAE '+JSON.stringify(lacquerReport));
+    assert.deepEqual(lacquerBeforeLayout,lacquerAfterLayout,'all 3 missions, 7 rewards, dock and hitboxes fixed');
+    assert.equal(lacquerAfterLayout.questCount,3);
+    assert.equal(lacquerAfterLayout.dayCount,7);
+    assert.equal(lacquerAfterLayout.dockCount,5);
+    assert.ok(lacquerAfterLayout.chests.every((c:any)=>c.bottom<=lacquerAfterLayout.nav.top+2),
+      'seven authentic chest paintings visible above dock at 384');
+    assert.ok(lacquerDelta.meters < -.01 && lacquerDelta.full < -.0002 && lacquerDelta.daily < -.001,
+      'shipping enamel must improve original ROI, daily board and full 384x512 MAE');
+    assert.ok(Math.abs(lacquerDelta.quests)<.06 && Math.abs(lacquerDelta.dockDelta)<.06,
+      'no other WORK or shared dock visual regression');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
