@@ -201,6 +201,46 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       const screenshot=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
 
+      // WORK4 06h: compare actual HEAD before/after sky shade in ONE paused frame.
+      if(screen==='fleet'&&width===384&&height===512){
+        const geom=()=>evaluate("(()=>{const box=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null};return {ship:box('.w4-reference-ship'),sea:box('.w4-reference-sea'),stage:box('.w4-harbour-stage'),roster:box('.w4-ship-roster'),dock:box('.harbour-nav.app-dock-porto'),nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,cards:document.querySelectorAll('.w4-ship-slot').length};})()");
+        const afterGeom=await geom();
+        assert.equal(afterGeom.nav,5);assert.equal(afterGeom.cards,4);
+        const oldPaint='.w4-fleet #w4-fleet-panel > .w4-harbour-stage::after{background:none!important;}';
+        await evaluate("(()=>{const s=document.createElement('style');s.id='w4-before-sky';s.textContent="+JSON.stringify(oldPaint)+";document.head.appendChild(s);return true;})()");
+        await sleep(150);
+        assert.deepEqual(await geom(),afterGeom,'sky-only paint keeps geometry intact');
+        const oldShot=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
+        writeFileSync(join(folder,'before-fleet-sky-384x512.png'),Buffer.from(oldShot,'base64'));
+        await evaluate("(()=>{document.getElementById('w4-before-sky').remove();return true})()");
+        const calc="(async()=>{"+
+          "const img=async u=>{const i=new Image();i.src=u;await i.decode();return i};"+
+          "const [ref,bef,now]=await Promise.all(["+
+          "img('data:image/webp;base64,"+references.fleet+"'),"+
+          "img('data:image/png;base64,"+oldShot+"'),"+
+          "img('data:image/png;base64,"+screenshot+"')]);"+
+          "if([ref,bef,now].some(i=>i.width!==384||i.height!==512))throw Error('non-native');"+
+          "const px=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data};"+
+          "const r=px(ref),b=px(bef),n=px(now);"+
+          "const rois={global:[0,0,384,512],sky:[240,135,369,180],topSeam:[240,135,369,159],ship:[65,205,175,307],water:[18,306,218,356],roster:[18,350,374,429],dock:[0,430,384,512]};"+
+          "const mae=(a,v,q)=>{let s=0,k=0;for(let y=q[1];y<q[3];y++)for(let x=q[0];x<q[2];x++){const p=(y*384+x)*4;for(let j=0;j<3;j++){s+=Math.abs(a[p+j]-v[p+j]);k++}}return s/k};"+
+          "const before={},after={};for(const [key,q] of Object.entries(rois)){before[key]=mae(r,b,q);after[key]=mae(r,n,q)};"+
+          "const cv=document.createElement('canvas');cv.width=1536;cv.height=512;const g=cv.getContext('2d');g.drawImage(ref,0,0);g.drawImage(bef,384,0);g.drawImage(now,768,0);g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(now,1152,0);"+
+          "return {rois,before,after,png:cv.toDataURL('image/png').split(',')[1]};})()";
+        const ab=await evaluate(calc);
+        writeFileSync(join(folder,'original-before-render-overlay-sky-384x512.png'),Buffer.from(ab.png,'base64'));
+        delete ab.png;
+        const result={...ab,source:'assets/design-approved/03-frota.webp',samePausedFrame:true,approved:false,approvedScreens:0,geometry:afterGeom};
+        writeFileSync(join(folder,'fleet-sky-controlled-ab.json'),JSON.stringify(result,null,2)+'\n');
+        console.log('WORK4_SKYSEAM_AB '+JSON.stringify(result));
+        assert.ok(ab.after.sky<ab.before.sky,'upper-right seam improves against source');
+        assert.ok(ab.after.global<ab.before.global,'whole-frame MAE improves');
+        for(const key of ['ship','water','roster','dock']){
+          assert.ok(Math.abs(ab.after[key]-ab.before[key])<.2,'protected '+key+' ROI');
+        }
+      }
+
+
 
 
       // WORK4/#104: pigment-only native A/B with the actual three priced
