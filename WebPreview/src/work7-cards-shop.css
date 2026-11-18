@@ -4133,3 +4133,21 @@
     filter:saturate(1.27) contrast(1.12) brightness(1.40) drop-shadow(0 4px 3px #041327a8)
   }
 }
+
+
+/* WORK7/#104 — source-art pigment + native treasure relief; HEAD v0.1.81.
+ * The eight conceptual cards keep their genuine 4×2 frames, the single
+ * Captain pack and three honest unavailable chests stay live HTML. Only
+ * original illustration light and native treasure relief are recalibrated.
+ * Same-frame A/B; 320px and tall screens untouched; approved:false (0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.36)
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.20)
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.73)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.74)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.60)}
+}
