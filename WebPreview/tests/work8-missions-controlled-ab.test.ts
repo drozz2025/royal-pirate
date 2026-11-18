@@ -1212,6 +1212,60 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(toneCompare.metrics.daily.delta<.10 && toneCompare.metrics.chests.delta<.10,
       'cannot degrade seven daily chests or board');
 
+
+    /* WORK8/#104 — the only new visual change: the authentic painted
+       daily-heading ink in the SAME Chromium DOM, state, viewport and frame.
+       Both images are sourced from native CDP, not from rescaled mocks. */
+    const dailyTitleFlag='work8-missions-daily-title-luma-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(dailyTitleFlag)+');true');
+    await delay(160);
+    const dailyTitleBeforeLayout=await headingLayout();
+    const dailyTitleBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(dailyTitleFlag)+');true');
+    await delay(160);
+    const dailyTitleAfterLayout=await headingLayout();
+    const dailyTitleAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const dailyTitleSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+dailyTitleBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+dailyTitleAfter))
+      .replace('quests:[12,155,372,321],daily:',
+        'quests:[12,155,372,321],dailyTitleInk:[45,326,339,353],daily:');
+    assert.notEqual(dailyTitleSource,source,'isolated daily heading needs genuine CDP before/after frames');
+    const dailyTitleComparison=await evalJs(dailyTitleSource);
+    saveTone('missions-daily-title-original-384x512.webp',orig);
+    saveTone('missions-daily-title-before-384x512.png',dailyTitleBefore);
+    saveTone('missions-daily-title-render-384x512.png',dailyTitleAfter);
+    saveTone('missions-daily-title-overlay-before-384x512.png',dailyTitleComparison.overlays[0]);
+    saveTone('missions-daily-title-overlay-after-384x512.png',dailyTitleComparison.overlays[1]);
+    const dailyTitleReport={
+      baseHead:'d1d6aae24228929643bf7c4dfae7b11d21309139',
+      source:'assets/design-approved/07-missoes.webp',
+      referenceFiles:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(x=>'assets/design-approved/'+x),
+      viewport:'native Chromium 384x512 DPR1, decoded images, frozen animations, same document/state/frame',
+      scope:'07 Missões DAILY existing title luminosity ONLY',
+      roi:dailyTitleComparison.metrics,unchanged:dailyTitleComparison.unchanged,
+      geometry:{before:dailyTitleBeforeLayout,after:dailyTitleAfterLayout},
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-daily-title-controlled-ab.json'),JSON.stringify(dailyTitleReport,null,2));
+    console.log('WORK8 #104 native 07 daily title A/B '+JSON.stringify(dailyTitleReport.roi));
+    assert.deepEqual(dailyTitleBeforeLayout,dailyTitleAfterLayout,'paint-only title cannot move mission or chest coordinates');
+    assert.equal(dailyTitleAfterLayout.questCount,3,'preserve 3 true local mission objectives');
+    assert.equal(dailyTitleAfterLayout.dayCount,7,'preserve 7 real daily rewards');
+    assert.equal(dailyTitleAfterLayout.dockCount,5,'preserve five global navigation items');
+    assert.ok(dailyTitleAfterLayout.chests.every((c:any)=>c.bottom<=dailyTitleAfterLayout.nav.top+2),
+      'all seven genuine chest illustrations stay above the dock');
+    assert.ok(dailyTitleComparison.unchanged.header<.10 && dailyTitleComparison.unchanged.dock<.10,
+      'shared header and dock must be pixel-identical');
+    assert.ok(dailyTitleComparison.metrics.dailyTitleInk.delta<-.08 &&
+      dailyTitleComparison.metrics.full.delta<-.002,
+      'approved source title ROI and full-screen MAE must both measurably improve');
+    assert.ok(dailyTitleComparison.metrics.chests.delta<.08 && dailyTitleComparison.metrics.quests.delta<.08,
+      'seven real chests and three genuine quests cannot regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
