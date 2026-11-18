@@ -4173,3 +4173,18 @@
   .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.32) drop-shadow(0 4px 3px #041327a8)}
   .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.59) drop-shadow(0 4px 3px #041327a8)}
 }
+
+
+/* WORK7/#104 — 18 Nov 07:35 UTC. Verified Cartas 05 relief, Loja 06 untouched.
+ * Original 00 + eight-screen mosaic + 01–08 references remain the fidelity
+ * contract. Rejected both shop candidate variants because REAL pack/chest
+ * ROI worsened; preserve integrated HEAD 06 exactly.
+ * Only three real physical 05 cards' carved backing values change on the
+ * native short viewport. Eight actual original images 4×2, PRÉVIA, all
+ * real data and five-button dock remain; no 320px/tall-screen changes.
+ * approved:false (0/8), WORK0 alone may integrate after verified CI. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.71)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.56)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.58)}
+}
