@@ -201,6 +201,66 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       const screenshot=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
 
+      // WORK4/#104 native Forge stage: real original/before/render/overlay.
+      // Old and new pigments are toggled in the same paused Chromium frame.
+      if(screen==='forge'&&width===384&&height===512){
+        const bounds="(()=>{const b=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null;};"+
+          "return {stage:b('.w4-forge-stage'),cannon:b('.w4-reference-cannon'),"+
+          "furnace:b('.w4-forge-scene'),costs:b('.w4-materials'),button:b('.w4-improve-button'),"+
+          "dock:b('.harbour-nav.app-dock-porto'),prices:document.querySelectorAll('.w4-resource-grid>div').length,"+
+          "menu:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        const afterGeometry=await evaluate(bounds);
+        assert.equal(afterGeometry.prices,3,'three true costs');
+        assert.equal(afterGeometry.menu,5,'five original navigation items');
+        const oldPaint='.w4-forge #w4-forge-panel > .w4-forge-stage {border-color:#e6b872!important;}'+
+          '.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene {background-color:#b77f4c!important;}';
+        await evaluate("(()=>{const x=document.createElement('style');x.id='w4-before-stage';"+
+          "x.textContent="+JSON.stringify(oldPaint)+";document.head.appendChild(x);return true;})()");
+        await sleep(120);
+        assert.deepEqual(await evaluate(bounds),afterGeometry,'no cannon, costs, action or dock movement');
+        const previous=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-forge-stage-384x512.png'),Buffer.from(previous,'base64'));
+        await evaluate("(()=>{document.getElementById('w4-before-stage').remove();return true;})()");
+        const compare="(async()=>{const d="+JSON.stringify({source:references.forge,before:previous,after:screenshot})+";"+
+          "const load=async(type,s)=>{const i=new Image();i.src='data:image/'+type+';base64,'+s;await i.decode();return i;};"+
+          "const [a,b,c]=await Promise.all([load('webp',d.source),load('png',d.before),load('png',d.after)]);"+
+          "if([a,b,c].some(i=>i.width!==384||i.height!==512))throw Error('native dimensions');"+
+          "const px=i=>{const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+          "const g=cv.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+          "const ref=px(a),old=px(b),now=px(c);"+
+          "const regions={global:[0,0,384,512],workshop:[14,150,377,327],"+
+          "cannon:[30,230,166,309],furnace:[116,225,171,302],"+
+          "materials:[16,320,369,378],dock:[0,430,384,512]};"+
+          "const mae=(img,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
+          "const p=(y*384+x)*4;for(let t=0;t<3;t++){sum+=Math.abs(ref[p+t]-img[p+t]);n++;}}return sum/n;};"+
+          "const before={},after={};for(const [k,r] of Object.entries(regions)){before[k]=mae(old,r);after[k]=mae(now,r);}"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
+          "g.drawImage(a,0,0);g.drawImage(b,384,0);g.drawImage(c,768,0);"+
+          "g.drawImage(a,1152,0);g.globalAlpha=.5;g.drawImage(c,1152,0);"+
+          "return {regions,before,after,proof:out.toDataURL('image/png').split(',')[1]};})()";
+        const evidence=await evaluate(compare);
+        assert.ok(Number.isFinite(evidence?.before?.global)&&Number.isFinite(evidence?.after?.workshop),
+          'native RGB MAE for both states');
+        assert.ok(evidence.after.global<evidence.before.global-0.7,
+          'charcoal native workshop must lower the approved-source global MAE');
+        assert.ok(evidence.after.workshop<evidence.before.workshop-1.0,
+          'true cannon workshop ROI must approach the original art');
+        for(const protectedRoi of ['cannon','furnace','materials','dock']){
+          assert.ok(Math.abs(evidence.after[protectedRoi]-evidence.before[protectedRoi])<0.15,
+            'protect native '+protectedRoi+' source pixels');
+        }
+        writeFileSync(join(folder,'original-before-render-overlay-forge-stage-384x512.png'),
+          Buffer.from(evidence.proof,'base64'));
+        delete evidence.proof;
+        const output={...evidence,source:'assets/design-approved/04-melhorias-forja.webp',
+          geometry:afterGeometry,viewport:'384x512',samePausedFrame:true,
+          approved:false,approvedScreens:0};
+        writeFileSync(join(folder,'forge-stage-controlled-ab.json'),JSON.stringify(output,null,2)+'\\n');
+        console.log('WORK4_NATIVE_FORGE_STAGE_AB '+JSON.stringify(output));
+      }
+
       // WORK4 06h: compare actual HEAD before/after sky shade in ONE paused frame.
       if(screen==='fleet'&&width===384&&height===512){
         const geom=()=>evaluate("(()=>{const box=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null};return {ship:box('.w4-reference-ship'),sea:box('.w4-reference-sea'),stage:box('.w4-harbour-stage'),roster:box('.w4-ship-roster'),dock:box('.harbour-nav.app-dock-porto'),nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,cards:document.querySelectorAll('.w4-ship-slot').length};})()");
@@ -1305,4 +1365,13 @@ test('WORK4 native Forge avoids painting a second furnace glow onto approved sou
   assert.ok(css.includes('native Forge 04: eliminate a duplicate glow'));
   assert.match(css, /@media \(width:384px\) and \(height:512px\)[\s\S]*?svg\.w4-cannon-art\.w4-reference-cannon > ellipse \{\s*opacity:0;/);
   assert.doesNotMatch(css.split('native Forge 04: eliminate a duplicate glow')[1], /\.app-|\.harbour-nav|\.w4-resource-grid/);
+});
+
+test('WORK4 Forge native charcoal only changes local material paint, never compositor or menu',()=>{
+  const block=css.split('WORK4/#104 — 18 Nov native Forge stage:')[1];
+  assert.ok(block);
+  assert.match(block,/@media \(width:384px\) and \(height:512px\)/);
+  assert.match(block,/border-color:#364750/);
+  assert.match(block,/background-color:#4a352f!important/);
+  assert.doesNotMatch(block.split('*/')[1]||'',/(?:\.app-|\.porto-|\.harbour-nav|\.bottom-nav|contain:paint|translateZ|position:fixed)/);
 });

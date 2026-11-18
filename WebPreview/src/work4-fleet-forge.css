@@ -2900,3 +2900,21 @@
     pointer-events:none;
   }
 }
+
+
+/* WORK4/#104 — 18 Nov native Forge stage: restore the dark timber/iron
+   workshop around the ONE approved source cannon. The previous flat ochre
+   paint and gilded rectangle made a false halo around the live 04 crop.
+   A narrow smoked-steel edge and charcoal wood underpaint complement the
+   approved image's own hearth lighting, without painting over its flame,
+   iron barrel, real resource figures or upgrade control.
+   At 384x512 only. Preserve WORK0's isolated scene compositor,
+   original source-image crop, Porto, shell and five-item dock. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage {
+    border-color:#364750;
+  }
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene {
+    background-color:#4a352f!important;
+  }
+}
