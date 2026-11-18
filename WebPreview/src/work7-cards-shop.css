@@ -4270,3 +4270,30 @@
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.14)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.67)}
 }
+
+
+/* WORK7/#104 — 18 Nov 13:26 UTC, native carved-wood value registration.
+ * Ref: 00 original, 00 eight-screen mosaic and ORIGINAL 01–08 WebP artwork.
+ * Refine ONLY physical relief of five genuine 05 cards (4×2) at 384×512.
+ * Preserve all eight source crops, their titles, live PRÉVIA, 06 unique pack
+ * and three honest EM BREVE chests. No geometry, dock/header, 320px or tall
+ * viewport differences. Never replace the screen with a source screenshot.
+ * Before/after compared on the exact currently integrated #404 HEAD.
+ * Human approval: false (0/8); WORK0 owns merges/releases/HTTP. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
+    filter:brightness(.39) saturate(1.20) contrast(.74);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.40) saturate(2.00) contrast(.85);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+    filter:brightness(.59) saturate(1.30) contrast(.92);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+    filter:brightness(.38) saturate(1.75) contrast(.79);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
+    filter:brightness(.58) saturate(1.90) contrast(.88);
+  }
+}
