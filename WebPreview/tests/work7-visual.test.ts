@@ -41,7 +41,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
     'New WORK7 eight-card short-viewport art treatment exists without screenshot backgrounds');
-  assert.ok(cssText.includes('18 Nov 17:56 UTC. Native 05 original card-3 pigment study.'),
+  assert.ok(cssText.includes('18 Nov 17:56 UTC. Native 05 source-card-3 confirmed pigment calibration.'),
     'WORK7 native card-3 source painting is the only new candidate');
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
