@@ -967,9 +967,9 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     writeFileSync(join(evidence,'work8-missions-pewter-controlled-ab.json'),JSON.stringify(edgeReport,null,2));
     console.log('WORK8 07 pewter-edges original/live A/B '+JSON.stringify(edgeReport.roi));
     assert.deepEqual(edgeBeforeLayout,edgeAfterLayout,'three painted borders must not move layout');
-    assert.equal(edgeGeometry.questCount,3);
-    assert.equal(edgeGeometry.dayCount,7);
-    assert.equal(edgeGeometry.dockCount,5);
+    assert.equal(edgeGeometry.quests,3);
+    assert.equal(edgeGeometry.days.length,7);
+    assert.equal(edgeGeometry.navCount,5);
     assert.ok(edgeGeometry.documentWidth<=386);
     assert.ok(edgeCompare.unchanged.header<.10&&edgeCompare.unchanged.dock<.10,'global header/dock unchanged');
     assert.ok(edgeCompare.metrics.questEdges.delta<0&&edgeCompare.metrics.full.delta<0,
