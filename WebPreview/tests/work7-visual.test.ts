@@ -43,26 +43,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // Exact CSS on that HEAD, not an obsolete older uniform .72 baseline.
   // Restoring it in the SAME Chromium frame isolates ONLY this PR's
   // four optical changes, including preserving original 320px rules.
+  // Exact shop pigment values on integrated HEAD b1b7433a: before/after in
+  // the identical Chromium scene. NO older PR candidate as control.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.63)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.77)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.61)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.65)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.80)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.80)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.65)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop,
-      .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.11) drop-shadow(0 4px 3px #041327a8)!important
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.16) drop-shadow(0 4px 3px #041327a8)!important
-      }
       .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.88)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)!important
-      }
     }`;
   const cssBaseline = currentHeadBaseline;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -222,6 +210,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         assert.equal(walletAfter,walletBefore,'WORK7 tab navigation cannot mutate genuine currency');
         await waitFor("(()=>{const imgs=[...document.querySelectorAll('[data-work7-screen=\\\""+kind+"\\\"] .w7-approved-crop img')];return imgs.length==="+(kind==='cards'?8:4)+"&&imgs.every(img=>img.complete&&img.naturalWidth>0)})()");
         await sleep(100);
+        // Hold CSS artwork/frame animations for both A/B captures on the
+        // SAME live React scene and frame. The app's actual buttons have
+        // already received real Chromium touchscreen events above.
+        await evaluate("(()=>{if(!document.getElementById('w7-native-qa-freeze')){const el=document.createElement('style');el.id='w7-native-qa-freeze';el.textContent='*,*::before,*::after{animation-play-state:paused!important;transition-duration:0s!important}';document.head.appendChild(el)}document.getAnimations().forEach(a=>a.pause());return true})()");
 
         const geometry = await evaluate("(()=>{"+
           "const rect=e=>{if(!e)return null;const b=e.getBoundingClientRect();return {x:Math.round(b.x),y:Math.round(b.y),width:Math.round(b.width),height:Math.round(b.height),bottom:Math.round(b.bottom)}};"+
@@ -426,9 +418,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(report.screens.length,8,'All four viewports must capture both screens');
   const native=report.screens.filter(screen=>screen.width===384&&screen.height===512);
   assert.equal(native.length,2,'Both real native screens must be available');
-  assert.ok(native.every(screen=>
-    screen.maeRgbAfter<screen.maeRgbBefore&&screen.roiMaeAfter<screen.roiMaeBefore),
-    'Both live 05/06 screens must strictly improve global RGB MAE and artwork ROI against merged HEAD: '+
-    JSON.stringify(native.map(s=>({kind:s.kind,global:[s.maeRgbBefore,s.maeRgbAfter],
-      roi:[s.roiMaeBefore,s.roiMaeAfter]}))));
+  // Shop-only candidate: Cartas 05 is intentionally unchanged while its
+  // separate PR #346 awaits WORK0. Require real, nonrounded native MAE and
+  // ROI improvements for Loja 06, never take credit for unchanged Cartas.
+  const cards=native.find(screen=>screen.kind==='cards');
+  const shop=native.find(screen=>screen.kind==='shop');
+  assert.ok(cards&&shop,'Both approved native scenes must be captured');
+  assert.ok(Math.abs(cards.maeRgbAfter-cards.maeRgbBefore)<=.01&&
+    Math.abs(cards.roiMaeAfter-cards.roiMaeBefore)<=.01,
+    'Cartas 05 must be identical to integrated HEAD, without duplicated PR #346 edits');
+  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore&&shop.roiMaeAfter<shop.roiMaeBefore,
+    'Loja 06 must STRICTLY improve both native MAE and pack/chest ROI: '+
+    JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],
+      roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
