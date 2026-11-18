@@ -164,6 +164,24 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       // Do not bypass clicks, screenshots, actual costs or visual assertions.
       const portLink='.harbour-screen .harbour-nav-item:nth-child(2)';
       let portReady=false,navDiagnostic:unknown=null;
+      // One genuine navigation back to Porto is both cheaper and more realistic
+      // than tearing down the WebGL app for each Forge screen. Eight hard
+      // reloads of the same SwiftShader tab exhausted headless Chromium on
+      // Forge 430x932, leaving readyState=complete but no mounted React dock.
+      // This is NOT a screenshot skip: require the real five-button dock,
+      // activate its real touch handler, then verify Porto before proceeding.
+      if(screen==='forge'){
+        const previousFleet=await evaluate("(()=>!!document.querySelector('.w4-fleet .w4-reference-ship')&&document.querySelectorAll('.app-sheet .harbour-nav.app-dock-porto .harbour-nav-item').length===5)()");
+        if(previousFleet){
+          await touch('.app-sheet .harbour-nav.app-dock-porto .harbour-nav-item:nth-child(1)');
+          for(let poll=0;poll<90;poll++){
+            const livePorto=await evaluate("(()=>!!document.querySelector('.harbour-screen .harbour-nav-item:nth-child(2)')&&!document.querySelector('.app-sheet'))()");
+            if(livePorto){portReady=true;break;}
+            await sleep(120);
+          }
+          navDiagnostic={transition:'real dock touch to Porto',portReady};
+        }
+      }
       for(let retry=0;retry<3&&!portReady;retry++){
         const url=origin+'?work4='+screen+'-'+width+(retry?'&navRetry='+retry:'');
         const navigation=await command('Page.navigate',{url});
