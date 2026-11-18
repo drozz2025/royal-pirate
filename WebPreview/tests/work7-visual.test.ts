@@ -49,8 +49,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.80)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.80)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.65)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.88)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{filter:none!important}
     }`;
   const cssBaseline = currentHeadBaseline;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
