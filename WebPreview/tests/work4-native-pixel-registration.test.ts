@@ -158,8 +158,26 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
     });
     await command('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:2});
     for(const screen of ['fleet','forge'] as const){
-      await command('Page.navigate',{url:origin+'?work4='+screen+'-'+width});
-      await wait("!!document.querySelector('.harbour-screen .harbour-nav-item:nth-child(2)')");
+      // CI occasionally opens chrome-error://chromewebdata/ while the local
+      // production preview is starting under parallel Chromium load. Recover
+      // ONLY by reloading the real page and requiring the real nav to render.
+      // Do not bypass clicks, screenshots, actual costs or visual assertions.
+      const portLink='.harbour-screen .harbour-nav-item:nth-child(2)';
+      let portReady=false,navDiagnostic:unknown=null;
+      for(let retry=0;retry<3&&!portReady;retry++){
+        const url=origin+'?work4='+screen+'-'+width+(retry?'&navRetry='+retry:'');
+        const navigation=await command('Page.navigate',{url});
+        if(navigation.errorText)navDiagnostic={error:navigation.errorText,url};
+        for(let poll=0;poll<90;poll++){
+          const state=await evaluate("(()=>({url:location.href,ready:document.readyState,has:!!document.querySelector('.harbour-screen .harbour-nav-item:nth-child(2)')}))()");
+          navDiagnostic=state;
+          if(state?.has){portReady=true;break;}
+          if(typeof state?.url==='string'&&state.url.startsWith('chrome-error:'))break;
+          await sleep(120);
+        }
+        if(!portReady&&retry<2)await sleep(450*(retry+1));
+      }
+      assert.ok(portReady,'Production harbour nav must actually render after Chrome navigation recovery: '+JSON.stringify(navDiagnostic));
       await touch('.harbour-screen .harbour-nav-item:nth-child(2)');
       await wait("!!document.querySelector('.w4-fleet .w4-reference-ship')");
       if(screen==='forge'){
