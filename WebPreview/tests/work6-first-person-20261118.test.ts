@@ -5,7 +5,7 @@ import * as T from 'three';
 import {battleCameraPose,battleDeckMuzzleWorld,battleEnemyBroadsideYaw} from '../src/battle-framing';
 import {makeBattleDeck} from '../src/battle-deck';
 import {Battle} from '../src/battle';
-import {projectileFromMuzzle} from '../src/battle-shot-presentation';
+import {projectileFromMuzzle,firstPersonArc,firstPersonShotPosition} from '../src/battle-shot-presentation';
 
 const view=(w:number,h:number,xyz:T.Vector3)=>{
   const pose=battleCameraPose(w/h);
@@ -64,4 +64,26 @@ test('WORK6 one-cannon rig preserves live firing, recoil, HUD and approved Porto
   assert.match(main,/engine\.current\.fire\(\)/);
   assert.match(main,/value=\{yaw\}/);
   assert.match(main,/value=\{power\}/);
+});
+
+test('WORK6: rendered reticle and flying ball follow the SAME mouth-to-impact arc',()=>{
+ const battle=new Battle(1261);battle.aim(7,65);assert.equal(battle.fire(),true);
+ const shot=battle.shot!;
+ const mouth={x:2,y:4.8,z:32};
+ const impact={x:10,y:.4,z:-3};
+ const flightTime=1.7;
+ assert.deepEqual(firstPersonShotPosition(shot,mouth,impact,flightTime),mouth);
+ for(const age of [.1,.4,.85,1.2,1.7]){
+   const point=firstPersonShotPosition({...shot,age},mouth,impact,flightTime);
+   assert.deepEqual(point,firstPersonArc(mouth,impact,age/flightTime));
+   assert.ok(point.x>=mouth.x&&point.x<=impact.x);
+   assert.ok(point.z>=impact.z&&point.z<=mouth.z);
+ }
+ assert.deepEqual(firstPersonShotPosition({...shot,age:flightTime},mouth,impact,flightTime),impact);
+ assert.deepEqual(firstPersonShotPosition({...shot,side:'enemy'},mouth,impact,flightTime),shot.position,
+   'enemy ship keeps its original independent physics renderer');
+ const scene=readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
+ assert.match(scene,/const p=firstPersonArc\(mouth,impact/);
+ assert.match(scene,/firstPersonShotPosition\(s,visibleMuzzle,this.playerArcTarget,this.playerArcDuration\)/);
+ assert.match(scene,/this.playerArcTarget=end\?new T.Vector3/);
 });
