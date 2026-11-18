@@ -109,12 +109,15 @@ export class OceanScene {
                         smoothstep(.10,.62,ridge);
           float crestShine=smoothstep(.63,.95,
             sin(vWorld.x*2.5+vWorld.z*1.25-time*2.3))*breaker;
-          float foam=clamp(ridge*.27+whiteCap*.56+
-            breaker*.37+crestShine*.29,0.,1.)*(.73+.27*proximity);
+          // WORK0/#104: reduce repetitive white ribbons that swallowed the
+          // opponent and cannon silhouette in the verified 384x512 capture.
+          // Same physical waves, wakes and shot coordinates, more open indigo.
+          float foam=clamp(ridge*.18+whiteCap*.28+
+            breaker*.20+crestShine*.12,0.,.72)*(.74+.26*proximity);
           // Long broken painterly crests, not a periodic checkerboard. A
           // warped, almost continuous ridge is interrupted by irregular
           // transverse currents like the approved illustrated battle sea.
-          float paintedSwell=sin(vWorld.z*.72-time*.88+
+          float paintedSwell=sin(vWorld.z*.54-time*.88+
             sin(vWorld.x*.33+time*.17)*1.58+
             sin(vWorld.x*.81-vWorld.z*.16)*.24);
           float brokenEdges=.55+.45*sin(vWorld.x*1.31+
@@ -124,7 +127,7 @@ export class OceanScene {
           float stipple=smoothstep(.32,.94,
             sin(vWorld.x*3.73+vWorld.z*1.26-time*2.46))*
             foamyLip;
-          foam=max(foam,clamp(foamyLip*.73+stipple*.27,0.,.86));
+          foam=max(foam,clamp(foamyLip*.43+stipple*.15,0.,.58));
           float shadowLip=(smoothstep(.16,.60,paintedSwell)-
             smoothstep(.70,.96,paintedSwell))*.18;
           // Animated surf around the actual battle hull locations. These white
@@ -142,14 +145,14 @@ export class OceanScene {
           float streamB=exp(-pow((vWorld.x-10.)/4.7,2.))
             *smoothstep(1.5,6.5,-3.-vWorld.z)*(1.-smoothstep(12.,38.,-3.-vWorld.z));
           float streamRipples=.54+.46*sin(vWorld.z*2.5-time*3.4+sin(vWorld.x*.92));
-          foam=max(foam,clamp(hullSurf*.68+(streamA+streamB)*streamRipples*.33,0.,.83));
+          foam=max(foam,clamp(hullSurf*.57+(streamA+streamB)*streamRipples*.26,0.,.76));
           // Indigo troughs and turquoise crests: tonal VOLUME, not just an
           // overlaid blue tint. Wave shadows follow the painted wave ridge.
           vec3 deep=mix(vec3(.006,.10,.29),vec3(.017,.49,.70),
                         clamp(.49+vWave*1.38+swell*.23+cross*.09,0.,1.));
           deep*=1.-shadowLip;
           deep=mix(deep,vec3(.24,.75,.84),fres*.42);
-          col=mix(deep,vec3(.88,.97,.97),foam);
+          col=mix(deep,vec3(.82,.95,.97),foam*.86);
           col+=vec3(.89,.96,.82)*spec*.4;
           col=mix(col,vec3(.30,.66,.84),fog*.42);
         }
