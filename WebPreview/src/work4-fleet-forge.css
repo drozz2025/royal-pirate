@@ -2865,3 +2865,18 @@
     background:linear-gradient(170deg,#172b36ed,#061827f8 70%,#04101ff9);
   }
 }
+
+
+/* WORK0/#104 — isolate validated source-pixel Fleet 03 painting from WORK4 #357
+   without reverting or deleting any prior Forge QA assertions. Chromium 384x512
+   A/B in #357: stage 32.74→29.04, sea 30.34→25.47, full 52.29→50.92.
+   Only 384x512 visual paint, preserves real Royal Crown / 4 slots / 5-item dock.
+   Artistic approval remains false pending human reference review. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    background:linear-gradient(155deg,#09263cfb,#031b30fa)!important;
+  }
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage {
+    border-color:#2e485a;
+  }
+}
