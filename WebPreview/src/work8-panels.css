@@ -5347,3 +5347,17 @@
     background-image:linear-gradient(145deg,#483252,#151b32);
   }
 }
+
+
+/* WORK8/#104 — 07 MISSÕES ONLY, genuine seventh daily reward enamel.
+   The original approved source has a restrained royal/gold inlay rather than
+   a flat luminous tile. Retune ONLY the seventh existing day background.
+   Preserve all 3 live quests, 7 real rewards, scroll, claim state, Ranking 08,
+   Porto and the WORK0 five-item dock. Root toggle provides native same-frame
+   BEFORE/RENDER evidence without synthetic rewards or any box movement. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-day7-ground-ab-baseline)
+  .w8-approved-missions .w8-approved-days li:nth-child(7) {
+    background-image:linear-gradient(145deg,#77512f,#262536);
+  }
+}
