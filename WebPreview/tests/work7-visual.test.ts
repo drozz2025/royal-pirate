@@ -37,7 +37,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  assert.ok(cssText.includes('18 Nov 15:26 UTC: native 06 chest source-painted highlights.'),
+  assert.ok(cssText.includes('18 Nov 15:26 UTC: native 06 legendary chest highlight.'),
     'Only the genuine legendary 06 chest crop is retuned; live labels and click targets stay intact');
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
