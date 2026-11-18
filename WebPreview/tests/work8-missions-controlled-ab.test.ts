@@ -1319,6 +1319,63 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(chestInkComparison.metrics.quests.delta<.08,
       'the three live missions cannot regress with a chest-only change');
 
+
+    /* WORK8 07 / #104: genuine icon artwork illumination, not a mock image.
+       SAME actual Chromium 384x512 DPR1 document, progress, seven days,
+       animation frame and viewport. Only the isolated CSS paint is toggled. */
+    const iconFlag='work8-missions-quest-art-luma-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(iconFlag)+');true');
+    await delay(160);
+    const iconBeforeGeometry=await headingLayout();
+    const iconBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const iconBeforeFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-art > svg.w8-approved-painting")).filter');
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(iconFlag)+');true');
+    await delay(160);
+    const iconAfterGeometry=await headingLayout();
+    const iconAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const iconAfterFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-art > svg.w8-approved-painting")).filter');
+    assert.notEqual(iconBeforeFilter,iconAfterFilter,'native icon A/B must change actual art filters');
+    const iconSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+iconBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+iconAfter))
+      .replace('quests:[12,155,372,321],daily:',
+        'quests:[12,155,372,321],artIcons:[18,155,68,322],daily:');
+    assert.notEqual(iconSource,source,'native icon A/B must use independent screenshots');
+    const iconComparison=await evalJs(iconSource);
+    saveTone('missions-quest-icons-original-384x512.webp',orig);
+    saveTone('missions-quest-icons-before-384x512.png',iconBefore);
+    saveTone('missions-quest-icons-render-384x512.png',iconAfter);
+    saveTone('missions-quest-icons-before-overlay-384x512.png',iconComparison.overlays[0]);
+    saveTone('missions-quest-icons-render-overlay-384x512.png',iconComparison.overlays[1]);
+    const iconReport={
+      issue:104,baseHead:'84caf039d1cdfe13aad13dc17c17787ffa573cc8',
+      source:'assets/design-approved/07-missoes.webp',
+      references:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(f=>'assets/design-approved/'+f),
+      scope:'07 Missões real quest source-art icons only; no Ranking 08 or other WORK',
+      method:'native Chromium 384x512 DPR1, same DOM/frame/animation, single CSS root opt-out',
+      beforeFilter:iconBeforeFilter,afterFilter:iconAfterFilter,
+      roi:iconComparison.metrics,unchanged:iconComparison.unchanged,
+      geometry:{before:iconBeforeGeometry,after:iconAfterGeometry},
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-quest-icons-controlled-ab.json'),JSON.stringify(iconReport,null,2));
+    console.log('WORK8 #104 native real quest art icons A/B '+JSON.stringify(iconReport.roi));
+    assert.deepEqual(iconBeforeGeometry,iconAfterGeometry,'icons paint cannot move quests, seven chests or dock');
+    assert.equal(iconAfterGeometry.questCount,3);
+    assert.equal(iconAfterGeometry.dayCount,7);
+    assert.equal(iconAfterGeometry.dockCount,5);
+    assert.ok(iconAfterGeometry.chests.every((c:any)=>c.bottom<=iconAfterGeometry.nav.top+2),
+      'all seven chest illustrations remain above WORK0 dock');
+    assert.ok(iconComparison.unchanged.header<.10&&iconComparison.unchanged.dock<.10,
+      'WORK0 header and five-item dock must remain pixel identical');
+    assert.ok(iconComparison.metrics.artIcons.delta<-.005&&iconComparison.metrics.full.delta<-.001,
+      'genuine quest icon ROI and full scene must measurably improve versus approved 07');
+    assert.ok(iconComparison.metrics.chests.delta<.08&&iconComparison.metrics.daily.delta<.08,
+      'seven genuine daily rewards must never regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
