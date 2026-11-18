@@ -780,9 +780,17 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(150);
     const coastAfterLayout=await headingLayout();
     const coastAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    /* Use atomic frame-token replacement: sequential replacement can swap the
+       frames if a newly captured baseline PNG is byte-identical to the
+       earlier candidate PNG. We verified that this happened in CI #44255839755:
+       the saved native PNGs independently measure 56.5364 -> 56.0354
+       but the old string replacements reported those numbers in reverse.
+       This fixes evidence attribution, NOT the native MAE thresholds. */
     const coastSource=source
-      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+coastBefore))
-      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+coastAfter))
+      .replace(JSON.stringify('data:image/png;base64,'+before),'"__WORK8_COAST_BEFORE__"')
+      .replace(JSON.stringify('data:image/png;base64,'+after),'"__WORK8_COAST_AFTER__"')
+      .replace('"__WORK8_COAST_BEFORE__"',JSON.stringify('data:image/png;base64,'+coastBefore))
+      .replace('"__WORK8_COAST_AFTER__"',JSON.stringify('data:image/png;base64,'+coastAfter))
       .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],coast:[0,86,384,155],daily:');
     assert.notEqual(coastSource,source,'coast comparison must use its own captured frames');
     const coastComparison=await evalJs(coastSource);
@@ -996,8 +1004,10 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     const actionAfterLayout=await headingLayout();
     const actionAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     const actionSource=source
-      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+actionBefore))
-      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+actionAfter))
+      .replace(JSON.stringify('data:image/png;base64,'+before),'"__WORK8_ACTION_BEFORE__"')
+      .replace(JSON.stringify('data:image/png;base64,'+after),'"__WORK8_ACTION_AFTER__"')
+      .replace('"__WORK8_ACTION_BEFORE__"',JSON.stringify('data:image/png;base64,'+actionBefore))
+      .replace('"__WORK8_ACTION_AFTER__"',JSON.stringify('data:image/png;base64,'+actionAfter))
       .replace('quests:[12,155,372,321],daily:',
         'quests:[12,155,372,321],actions:[294,158,370,318],daily:');
     assert.notEqual(actionSource,source,'native Missions action A/B must compare fresh Chromium frames');
