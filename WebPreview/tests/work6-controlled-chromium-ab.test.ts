@@ -100,10 +100,13 @@ async function verifyCausalIsolation(
     'const a=pix(before),b=pix(after),ref=pix(original);',
     // This fixed rectangle covers the right foreground cannon and its carriage,
     // not the left cannon, ship hull/upper sails, header or buttons.
-    // Real 384x512 difference PNG shows the starboard carriage's lower silhouette
-    // reaches y=507: the prior y1=490 falsely classified 30 cannon pixels as
-    // background. Keep x>=210 and y>=270 isolation; protect all other pixels.
-    'const foreground={x0:210,y0:270,x1:384,y1:512};',
+    // The structural battle framing repositions both REAL first-person guns
+    // via pose.batteryOffsetX. A fixed x0=210 envelope incorrectly classified
+    // 783 pixels of the right carriage at x=198..209 as "background" even
+    // though the left gun, HUD and enemy are intact. Protect x<190 and y<270
+    // exactly; this remains a static, conservative RIGHT-gun-only envelope.
+    // The pixel-difference CI must still reject every change outside it.
+    'const foreground={x0:190,y0:270,x1:384,y1:512};',
     'const inForeground=(x,y)=>x>=foreground.x0&&x<foreground.x1&&y>=foreground.y0&&y<foreground.y1;',
     'let outsideChangedPixels=0,changedPixels=0,minX=384,minY=512,maxX=-1,maxY=-1;',
     'const visual=document.createElement("canvas");visual.width=384;visual.height=512;',
