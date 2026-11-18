@@ -1325,6 +1325,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        Styling applies ONLY to the three local real progress bars, never to
        Ranking 08, shared shell, buttons, reward data or seven chest tiles.
        This study determines a measured source-colour choice before shipping CSS. */
+    await evalJs('document.documentElement.classList.add("work8-missions-meter-ink-ab-baseline");true');
     const meterStudySelector='.w8-approved-missions .w8-approved-quest .w8-approved-meter';
     const meterRects=await evalJs('(()=>[...document.querySelectorAll('+JSON.stringify(meterStudySelector)+')].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
     assert.equal(meterRects.length,3,'three actual mission meters, no mock progress');
@@ -1349,6 +1350,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       meterShots.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     }
     await evalJs('document.getElementById('+JSON.stringify(meterStyleId)+')?.remove();true');
+    await evalJs('document.documentElement.classList.remove("work8-missions-meter-ink-ab-baseline");true');
     const meterStudySource=String.raw`(async()=>{
       const imgs=await Promise.all(__IMAGES__.map(s=>new Promise((resolve,reject)=>{let i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=s})));
       const w=384,h=512;if(imgs.some(i=>i.width!==w||i.height!==h))throw Error('unscaled native-only inputs');
