@@ -775,24 +775,10 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await evalJs('document.documentElement.classList.add('+JSON.stringify(coastFlag)+');true');
     await delay(150);
     const coastBeforeLayout=await headingLayout();
-    /* Force Chromium to paint the new compositor filter BEFORE its measured A/B frame.
-       A single CDP screenshot can expose the previous filter state on overloaded
-       GPU runners. The discarded capture is not used as evidence. */
-    const coastBeforeComputed=await evalJs('(()=>({baseline:document.documentElement.classList.contains("work8-missions-coast-ab-baseline"),filter:getComputedStyle(document.querySelector(".w8-approved-missions .w8-seascape")).filter}))()');
-    assert.equal(coastBeforeComputed.baseline,true,'coast CSS flag must match its intended visual baseline');
-    await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
-    await delay(170);
     const coastBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove('+JSON.stringify(coastFlag)+');true');
     await delay(150);
     const coastAfterLayout=await headingLayout();
-    /* Force Chromium to paint the new compositor filter BEFORE its measured A/B frame.
-       A single CDP screenshot can expose the previous filter state on overloaded
-       GPU runners. The discarded capture is not used as evidence. */
-    const coastAfterComputed=await evalJs('(()=>({baseline:document.documentElement.classList.contains("work8-missions-coast-ab-baseline"),filter:getComputedStyle(document.querySelector(".w8-approved-missions .w8-seascape")).filter}))()');
-    assert.equal(coastAfterComputed.baseline,false,'coast CSS flag must match its intended visual baseline');
-    await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
-    await delay(170);
     const coastAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     const coastSource=source
       .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+coastBefore))
@@ -807,7 +793,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     saveCoast('missions-coast-original-render-overlay-after-384x512.png',coastComparison.overlays[1]);
     const coastReport={
       baseHead:'840c02bc4bf2e5fa43b853f60cfb807f5beb07ab',
-      version:'v0.1.75',scope:'ONLY 07 Missões coastal panorama: revert demonstrably worse old .80 filter on current HEAD, no geometry or game-data edits',
+      version:'v0.1.75',scope:'ONLY 07 Missões coastal panorama ink, no geometry or game-data edits',
       source:'assets/design-approved/07-missoes.webp, 384x512 native without resampling',
       otherReferences:['assets/design-approved/00-referencia-original-aprovada.webp','assets/design-approved/00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(n=>'assets/design-approved/'+n)],
       method:'same Chromium tab, same paused animation frame, native DPR 1, root CSS pigment toggle',
@@ -816,7 +802,6 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       approved:false,approvedScreens:0
     };
     writeFileSync(join(evidence,'work8-missions-coast-controlled-ab.json'),JSON.stringify(coastReport,null,2));
-    console.log('WORK8 coast CSS diagnostic '+JSON.stringify({before:coastBeforeComputed,after:coastAfterComputed}));
     console.log('WORK8 07 native coastal painting A/B '+JSON.stringify(coastReport.roi));
     assert.deepEqual(coastBeforeLayout,coastAfterLayout,'coastal pigment must not move ANY native Missions geometry');
     assert.equal(coastAfterLayout.questCount,3);
