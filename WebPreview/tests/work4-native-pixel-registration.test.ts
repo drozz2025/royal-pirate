@@ -187,6 +187,93 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
 
 
+
+      // WORK4 #104 — compare approved source with the merged color and 7
+      // controlled alternatives in ONE paused native Chromium scene/frame.
+      if(screen==='forge'&&width===384&&height===512){
+        const palette=[
+          ['merged','linear-gradient(170deg,#183b51d9,#071e35f4 70%,#071728f4)'],
+          ['slate','linear-gradient(170deg,#143247e0,#061a2ef4 70%,#051427f8)'],
+          ['darker','linear-gradient(170deg,#102c40e7,#061a30f5 70%,#041422fa)'],
+          ['blue','linear-gradient(170deg,#1c465adb,#0b2a45f1 70%,#071c32f6)'],
+          ['amber','linear-gradient(170deg,#302e2adf,#10242df2 70%,#071b2af6)'],
+          ['navy','linear-gradient(170deg,#123c5bdd,#092638f4 70%,#071728f4)'],
+          ['charcoal','linear-gradient(170deg,#172b36ed,#061827f8 70%,#04101ff9)'],
+          ['warm','linear-gradient(170deg,#263c45dc,#0b2535f4 70%,#071728f5)']
+        ];
+        const selector='.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description';
+        const geomExpr="(()=>{const b=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null;};"+
+          "return {plaque:b('.w4-forge-description'),cannon:b('.w4-reference-cannon'),"+
+          "costs:b('.w4-resource-grid'),dock:b('.harbour-nav.app-dock-porto'),"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "costCount:document.querySelectorAll('.w4-resource-grid>div').length};})()";
+        const geometry=await evaluate(geomExpr);
+        assert.equal(geometry.nav,5,'five menu items retained');
+        assert.equal(geometry.costCount,3,'three true cost cells retained');
+        const screenshots:Record<string,string>={};
+        for(const [key,background] of palette){
+          assert.ok(await evaluate("(()=>{let s=document.getElementById('w4-ink-palette');"+
+            "if(!s){s=document.createElement('style');s.id='w4-ink-palette';document.head.appendChild(s);}"+
+            "s.textContent="+JSON.stringify(selector+'{background:'+background+'!important}')+";return true;})()"));
+          await sleep(100);
+          assert.deepEqual(await evaluate(geomExpr),geometry,'no movement of art, prices, menu');
+          screenshots[key]=(await command('Page.captureScreenshot',{
+            format:'png',fromSurface:true,captureBeyondViewport:false
+          })).data as string;
+        }
+        assert.ok(await evaluate("(()=>{document.getElementById('w4-ink-palette')?.remove();return true;})()"));
+        const data={source:references.forge,screenshots};
+        const expr="(async()=>{const input="+JSON.stringify(data)+";"+
+          "const load=async(fmt,b64)=>{const i=new Image();i.src='data:image/'+fmt+';base64,'+b64;await i.decode();return i;};"+
+          "const px=i=>{if(i.width!==384||i.height!==512)throw Error('native dimensions');"+
+          "const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});"+
+          "g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+          "const refImg=await load('webp',input.source);const ref=px(refImg);"+
+          "const rois={global:[0,0,384,512],plaque:[174,145,374,314],"+
+          "identity:[174,145,374,255],cannon:[32,225,170,312],"+
+          "hearth:[116,225,173,302],costs:[16,320,369,378],dock:[0,430,384,512]};"+
+          "const mae=(a,b,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
+          "const p=(y*384+x)*4;for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++;}}return sum/n;};"+
+          "const out={};for(const [name,b64] of Object.entries(input.screenshots)){const img=await load('png',b64);const pic=px(img);"+
+          "out[name]={};for(const [k,r] of Object.entries(rois))out[name][k]=mae(ref,pic,r);}return out;})()";
+        const measurements=await evaluate(expr);
+        const record={measurements,palette,geometry,viewport:'384x512',sameFrame:true,
+          original:'assets/design-approved/04-melhorias-forja.webp',approved:false,approvedScreens:0};
+        console.log('WORK4_FORGE_INK_SWEEP '+JSON.stringify(record));
+        writeFileSync(join(folder,'forge-ink-palette-same-frame.json'),JSON.stringify(record,null,2)+'\n');
+        writeFileSync(join(folder,'before-forge-ink-384x512.png'),Buffer.from(screenshots.merged,'base64'));
+        writeFileSync(join(folder,'render-forge-ink-384x512.png'),Buffer.from(screenshots.charcoal,'base64'));
+
+        // FINAL, source-measured candidate: charcoal wins all 3 illustrated
+        // ROIs in this exact-frame sweep; do not accept the prior grid layout.
+        const dataForProof={source:references.forge,before:screenshots.merged,after:screenshots.charcoal};
+        const proof="(async()=>{const data="+JSON.stringify(dataForProof)+";"+
+          "const load=async(type,b64)=>{const i=new Image();i.src='data:image/'+type+';base64,'+b64;await i.decode();return i;};"+
+          "const [original,before,render]=await Promise.all([load('webp',data.source),load('png',data.before),load('png',data.after)]);"+
+          "if([original,before,render].some(i=>i.width!==384||i.height!==512))throw Error('native pixels only');"+
+          "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;"+
+          "const g=canvas.getContext('2d');"+
+          "g.drawImage(original,0,0);g.drawImage(before,384,0);g.drawImage(render,768,0);"+
+          "g.drawImage(original,1152,0);g.globalAlpha=.5;g.drawImage(render,1152,0);"+
+          "return canvas.toDataURL('image/png').split(',')[1];})()";
+        const proofData=await evaluate(proof);
+        writeFileSync(join(folder,'compare-forge-source-ink-384x512.png'),Buffer.from(proofData,'base64'));
+        assert.ok(measurements.charcoal.global<measurements.merged.global-0.30,
+          'native global MAE must materially improve');
+        assert.ok(measurements.charcoal.plaque<measurements.merged.plaque-1.5,
+          'live plaque ROI must approach original');
+        assert.ok(measurements.charcoal.identity<measurements.merged.identity-2.5,
+          'real medallion/status identity region must improve');
+        for(const roi of ['cannon','hearth','costs','dock'] as const)
+          assert.ok(Math.abs(measurements.merged[roi]-measurements.charcoal[roi])<0.03,
+            'unchanged protected '+roi+' pixels');
+
+        assert.equal(Object.keys(measurements).length,8,'8 native paint samples recorded');
+        for(const roi of ['cannon','hearth','costs','dock'] as const)
+          assert.ok(Math.abs(measurements.merged[roi]-measurements.slate[roi])<0.05,
+            'must preserve protected '+roi+' pixels');
+      }
+
       // WORK4/#104 — Forge 04: one real plaque over the approved right inset.
       // A/B must be native, within this SAME paused React/Chromium frame:
       // ORIGINAL | MERGED HEAD (43%) | RENDER (53%) | OVERLAY.
