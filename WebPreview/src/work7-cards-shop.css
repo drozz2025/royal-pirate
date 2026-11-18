@@ -4301,3 +4301,18 @@
     filter:saturate(1.05) contrast(1.06) brightness(1.16) drop-shadow(0 6px 5px #14062ca3);
   }
 }
+
+/* WORK7/#104 — 18 Nov 19:20 UTC. Independent 384x512 two-frame enamel pass.
+ * The approved 05 source and original 4x2 frames remain native, never a
+ * screenshot backdrop. Correct only the illustrated 5th/6th frame material
+ * luminance. No 320px corrections, global shell/header/nav or Shop edits.
+ * Same-frame MAE+eight-card ROI must BOTH improve in Chromium before review;
+ * unmodified 06 must remain identical. approved:false (0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.467) saturate(2.00) contrast(.85);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+    filter:brightness(.624) saturate(1.30) contrast(.92);
+  }
+}
