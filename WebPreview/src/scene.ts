@@ -174,7 +174,7 @@ export class OceanScene {
     this.environment();this.scene.add(this.worldScenery);this.buildHarbourDock();this.buildPortBackdrop();this.buildHarbourDetails();this.scene.add(this.harbourDock);
     // A real low-poly teak deck and pair of cannons frame the battle in portrait.
     // This geometry is never shown over the already-approved Porto scene.
-    const battery=makeBattleDeck();this.battleBattery=battery.group;this.batteryFlashes=battery.flashes;this.batteryMuzzles=battery.muzzles;this.battleBattery.visible=false;this.scene.add(this.battleBattery);
+    const battery=makeBattleDeck(true);this.battleBattery=battery.group;this.batteryFlashes=battery.flashes;this.batteryMuzzles=battery.muzzles;this.battleBattery.visible=false;this.scene.add(this.battleBattery);
     this.dressBattleDeck();
     // The black near-field player sail matches the approved Batalha composition;
     // it is never part of Porto or the physics ships, and cannot block DOM HUD.
@@ -288,6 +288,9 @@ export class OceanScene {
   }
 
   private dressBattleDeck(){
+    // The new first-person rig has ONE central cannon and its own gunwales.
+    // Do not dress it with the rejected pair of side-cannon supports.
+    if(this.batteryMuzzles.length===1)return;
     const dressing=new T.Group();
     dressing.name='battle-only-wooden-bulwark';
     const oak=new T.MeshStandardMaterial({color:'#945a2f',roughness:.77,metalness:.03});
@@ -635,7 +638,8 @@ export class OceanScene {
     // Keep the player's physics ship active for HP, firing, collisions and scars;
     // hide only its exterior hull from this camera (never from Porto).
     this.ships.player.root.visible=false;
-    this.battleForegroundSail.visible=true;
+    // The black sail wall is no longer in the first-person mobile sightline.
+    this.battleForegroundSail.visible=false;
     // Comparison at 390x844 showed that the tighter off-axis lens clips the
     // live player ship. Restore both hulls fully inside the playable viewport.
     this.camera.fov=42;this.camera.updateProjectionMatrix();
@@ -648,6 +652,7 @@ export class OceanScene {
     // The giant black left sail hid the enemy and half the arena on mobile.
     // Keep a thin rigged foreground silhouette, freeing the central ocean.
     this.battleForegroundSail.scale.set(pose.sailScaleX,pose.sailScaleY,1);
+    this.battleForegroundSail.visible=!pose.showBattery;
     // A fixed forward-looking viewpoint, not the rejected moving camera.
     // The battle-only camera targets the actual fixed pose in battle-framing.ts.
     // On 320/384 the starboard enemy is closer, right-of-centre and framed
@@ -713,7 +718,12 @@ export class OceanScene {
   /** The same muzzle point used for real 3D flash geometry and ball render. */
   private playerMuzzleWorld():T.Vector3|null {
     const muzzle=this.batteryMuzzles[this.activeBatteryMuzzle];
-    return muzzle?battleDeckMuzzleWorld(this.battleBattery,muzzle):null;
+    if(!muzzle)return null;
+    const central=this.battleBattery.getObjectByName('first-person-central-recoil');
+    // Recoil, flash, smoke and projectile follow the exact animated barrel
+    // transform, not a guessed position on the invisible physics ship.
+    return central?battleDeckMuzzleWorld(central,muzzle)
+      :battleDeckMuzzleWorld(this.battleBattery,muzzle);
   }
   private effect(event:BattleEvent){
     this.pirateAudio.play(event);
@@ -776,6 +786,8 @@ export class OceanScene {
     }
     // A live broadside briefly illuminates the real foreground cannon muzzles.
     const batteryFx=cannonFxState(this.recoilAge.player);
+    const centralRecoil=this.battleBattery.getObjectByName('first-person-central-recoil');
+    if(centralRecoil)centralRecoil.position.z=batteryFx.recoil*.62;
     for(const [index,flare] of this.batteryFlashes.entries()){flare.visible=this.battleBattery.visible&&batteryFx.visible&&index===this.activeBatteryMuzzle;flare.scale.setScalar(Math.max(.05,batteryFx.flashScale*.75));(flare.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity;}
     this.foam.forEach((f,i)=>{(f.material as T.MeshBasicMaterial).opacity=.3+Math.sin(pictureTime*2+i)*.12;f.scale.x=2.25+Math.sin(pictureTime)*.09;});
     for(let i=this.ripples.length-1;i>=0;i--){const ripple=this.ripples[i];ripple.age+=dt;const state=rippleState(ripple.age,ripple.life);
