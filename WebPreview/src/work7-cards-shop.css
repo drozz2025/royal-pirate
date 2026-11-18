@@ -4175,19 +4175,16 @@
 }
 
 
-/* WORK7/#104 — 18 Nov 07:31 UTC. Native 05/06 physical material correction.
- * Rejected first sweep: cards 61.61→61.64 and ROI 56.99→57.07;
- * shop 63.24→63.08 but ROI 37.87→38.41, so never integrate it.
- * Second candidate: constrain carving changes to three portrait surrounds,
- * while restoring the pack frame and gently lifting ONLY the true illustrated
- * WEBP crop. Preserve original 4×2 and 1-pack/3-chest arrangement, live
- * PREVIA/EM BREVE states, real data and unchanged 320/tall viewport paint.
- * Source references 00 original + mosaic + 01–08 remain mandatory. */
+/* WORK7/#104 — 18 Nov 07:35 UTC. Verified Cartas 05 relief, Loja 06 untouched.
+ * Original 00 + eight-screen mosaic + 01–08 references remain the fidelity
+ * contract. Rejected both shop candidate variants because REAL pack/chest
+ * ROI worsened; preserve integrated HEAD 06 exactly.
+ * Only three real physical 05 cards' carved backing values change on the
+ * native short viewport. Eight actual original images 4×2, PRÉVIA, all
+ * real data and five-button dock remain; no 320px/tall-screen changes.
+ * approved:false (0/8), WORK0 alone may integrate after verified CI. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.71)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.56)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.58)}
-  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-    filter:saturate(1.2) contrast(1.06) brightness(1.14) drop-shadow(0 6px 5px #14062ca3)
-  }
 }
