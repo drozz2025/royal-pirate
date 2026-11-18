@@ -271,7 +271,7 @@ function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
  * The existing live SVG remains behind each image as an offline/failure fallback.
  * Never use the approved screenshot as a panel background or a player data source.
  */
-type W8ApprovedCrop = 'title-missions'|'title-ranking'|'quest-swords'|'quest-ship'|'quest-target'|'captain'|'league-badge'|'chest-silver'|'chest-gold'|'chest-violet'|'chest-royal'|'daily-heading';
+type W8ApprovedCrop = 'title-missions'|'title-ranking'|'quest-swords'|'quest-ship'|'quest-target'|'captain'|'league-badge'|'chest-silver'|'chest-gold'|'chest-violet'|'chest-royal'|'chest-claimed-1'|'chest-claimed-2'|'chest-claimed-3'|'daily-heading';
 const W8_ART_CROPS:Record<W8ApprovedCrop,{rect:string;frame:'missions'|'ranking'}>={
   // The original engraved plaques replace only the two existing static decorative headers.
   'title-missions':{rect:'98 74 189 45',frame:'missions'},
@@ -283,6 +283,9 @@ const W8_ART_CROPS:Record<W8ApprovedCrop,{rect:string;frame:'missions'|'ranking'
   'quest-target':{rect:'15 268 51 50',frame:'missions'},
   'captain':{rect:'19 155 89 78',frame:'ranking'},
   'league-badge':{rect:'244 160 54 61',frame:'ranking'},
+  'chest-claimed-1':{rect:'25 362 44 46',frame:'missions'},
+  'chest-claimed-2':{rect:'73 362 44 46',frame:'missions'},
+  'chest-claimed-3':{rect:'121 362 44 46',frame:'missions'},
   'chest-silver':{rect:'165 362 41 46',frame:'missions'},
   'chest-gold':{rect:'213 362 42 46',frame:'missions'},
   'chest-violet':{rect:'257 362 44 46',frame:'missions'},
@@ -574,13 +577,36 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
             background:linear-gradient(180deg,rgba(7,25,42,.93),rgba(7,25,42,.96));
             border-radius:2px;
           }
+          /* Only display the actual original green-check chest if the saved
+             local daily streak confirms this day was claimed. Never paint a
+             pre-claimed chest for a new or lapsed player. A controlled QA
+             root class permits same-frame original-vs-candidate A/B. */
+          :root:not(.work8-missions-claimed-chests-ab-baseline) .w8-approved-missions
+          .w8-approved-days li.is-claimed:nth-child(-n+3) .w8-approved-chest > svg.w8-approved-painting {
+            top:0;
+            left:calc(50% + 3px);
+            right:auto;
+            width:44px;
+            height:46px;
+            transform:translateX(-50%);
+            border-radius:0;
+            -webkit-mask-image:radial-gradient(ellipse 78% 76% at 50% 50%,#000 82%,transparent 100%);
+            mask-image:radial-gradient(ellipse 78% 76% at 50% 50%,#000 82%,transparent 100%);
+          }
+          :root:not(.work8-missions-claimed-chests-ab-baseline) .w8-approved-missions
+          .w8-approved-days li.is-claimed:nth-child(-n+3) .w8-approved-chest > b {
+            top:0;
+            right:0;
+            transform:scale(.52);
+            transform-origin:top right;
+          }
         }
       `}</style>
       <section className="w8-approved-daily" aria-label="7-day supply route" title={canClaim?'Next claim earns '+(15+next*5)+' coins':'Recompensa de hoje já recolhida'}>
         <h3>Recompensa Diária<W8ApprovedPainting art="daily-heading"/></h3>
         <ol className="w8-approved-days" aria-label="Seven consecutive daily rewards">
           {Array.from({length:7},(_,i)=>i+1).map(n=><li key={n} aria-label={'DAY '+n} className={'app-week-day'+(n<=visibleStreak?' is-claimed':canClaim&&n===next?' is-next':'')}>
-            <span className="w8-approved-chest" aria-hidden="true"><W8Art kind="chest"/>{n>=4&&<W8ApprovedPainting art={n===4?'chest-silver':n===5?'chest-gold':n===6?'chest-violet':'chest-royal'}/>} {n<=visibleStreak&&<b>✓</b>}</span>
+            <span className="w8-approved-chest" aria-hidden="true"><W8Art kind="chest"/>{n<=3&&n<=visibleStreak&&<W8ApprovedPainting art={n===1?'chest-claimed-1':n===2?'chest-claimed-2':'chest-claimed-3'}/>}{n>=4&&<W8ApprovedPainting art={n===4?'chest-silver':n===5?'chest-gold':n===6?'chest-violet':'chest-royal'}/>} {n<=visibleStreak&&<b>✓</b>}</span>
             <small>Dia {n}</small>
           </li>)}
         </ol>
