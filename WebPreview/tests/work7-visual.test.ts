@@ -395,20 +395,20 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         // Never change production styles from a sweep without a separate
         // full-run strict MAE+ROI comparison to the merged #411 HEAD.
         if (kind==='cards' && width===384 && height===512) {
-          const originalBrightness=[.45,.65,.42,.64];
+          const originalBrightness=[.50,.65,.43,.42,.45,.65,.42,.64];
           const candidateBrightness=[
-            [.37,.40,.43,.45,.47,.50],
-            [.56,.60,.63,.65,.68,.72],
-            [.35,.38,.40,.42,.45,.48],
-            [.55,.59,.62,.64,.68,.72]
+            [.42,.46,.49,.50,.52,.55,.59],
+            [.56,.60,.63,.65,.68,.71,.75],
+            [.34,.38,.41,.43,.45,.48,.51],
+            [.34,.38,.41,.42,.45,.48,.51]
           ];
-          for(let slot=5;slot<=8;slot++) {
-            for(const brightness of candidateBrightness[slot-5]) {
-              const values=[...originalBrightness]; values[slot-5]=brightness;
+          for(let slot=1;slot<=4;slot++) {
+            for(const brightness of candidateBrightness[slot-1]) {
+              const values=[...originalBrightness]; values[slot-1]=brightness;
               const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
                 values.map((v,j)=>'.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+
-                  (j+5)+'){filter:brightness('+v+') saturate('+
-                  [2.00,1.30,1.75,1.90][j]+') contrast('+[.85,.92,.79,.88][j]+')!important}').join('')+'}';
+                  (j+1)+'){filter:brightness('+v+') saturate('+
+                  [1.70,1.75,1.20,2.30,2.00,1.30,1.75,1.90][j]+') contrast('+[.87,.75,.74,.76,.85,.92,.79,.88][j]+')!important}').join('')+'}';
               await evaluate("(()=>{const s=document.createElement('style');s.id='w7-slot-sweep';s.textContent="+
                 JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
               await sleep(75);
