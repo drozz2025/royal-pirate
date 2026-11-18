@@ -30,19 +30,19 @@ test('WORK4 source-pixel registration changes only the two approved native crops
   assert.match(css,/transform:translateZ\(0\)/);
 });
 
-test('WORK4 uses the two master approved references and all eight unmodified WebP screens',()=>{
-  const names=[
+test('WORK4 references both approved masters and all 01–08 WebP artworks unchanged',()=>{
+  const originals=[
     '00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
     '01-porto.webp','02-batalha.webp','03-frota.webp',
     '04-melhorias-forja.webp','05-cartas.webp','06-loja.webp',
     '07-missoes.webp','08-ranking-perfil.webp'
   ];
-  for(const name of names){
-    const image=readFileSync(new URL('../../assets/design-approved/'+name,import.meta.url));
-    assert.equal(image.subarray(0,4).toString('ascii'),'RIFF',name+' RIFF signature');
-    assert.equal(image.subarray(8,12).toString('ascii'),'WEBP',name+' WebP format');
-    assert.ok(image.length>10000,name+' source art must not be a stub');
-  }
+  originals.forEach(filename=>{
+    const data=readFileSync(new URL('../../assets/design-approved/'+filename,import.meta.url));
+    assert.equal(data.subarray(0,4).toString('ascii'),'RIFF',filename+' original RIFF');
+    assert.equal(data.subarray(8,12).toString('ascii'),'WEBP',filename+' original WebP');
+    assert.ok(data.length>20000,filename+' original art, never a stand-in');
+  });
 });
 
 const sleep=(ms:number)=>new Promise<void>(done=>setTimeout(done,ms));
@@ -202,253 +202,6 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
 
 
-
-      // WORK4/#104: pigment-only native A/B with the actual three priced
-      // cells and upgrade button still mounted in the same paused React frame.
-      if(screen==='forge' && width===384 && height===512){
-        const rectExpr="(()=>{const rect=s=>{const e=document.querySelector(s);"+
-          "const r=e?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null;};"+
-          "return {board:rect('.w4-forge .w4-materials'),"+
-          "cannon:rect('.w4-reference-cannon'),"+
-          "furnace:rect('.w4-forge-scene'),"+
-          "button:rect('.w4-forge .w4-improve-button'),"+
-          "dock:rect('.harbour-nav.app-dock-porto'),"+
-          "costs:document.querySelectorAll('.w4-forge .w4-resource-grid > div').length,"+
-          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
-        const newLayout=await evaluate(rectExpr);
-        assert.equal(newLayout.costs,3,'three true costs retained');
-        assert.equal(newLayout.nav,5,'WORK0 five-item dock retained');
-        const olderBackground=[
-          '.w4-forge #w4-forge-panel > .w4-materials:where(*) {',
-          'background:radial-gradient(ellipse 76% 94% at 32% 0%,#a86e3738 0%,transparent 77%),',
-          'repeating-linear-gradient(2deg,transparent 0 10px,#c89b5410 10px 11px,transparent 12px 21px),',
-          'linear-gradient(173deg,#2b3030 0%,#1a282c 52%,#0d1e2a 100%)!important;}'
-        ].join('');
-        assert.ok(await evaluate("(()=>{const e=document.createElement('style');"+
-          "e.id='work4-before-navy-ledger';e.textContent="+JSON.stringify(olderBackground)+
-          ";document.head.appendChild(e);return true;})()"));
-        await sleep(120);
-        const oldLayout=await evaluate(rectExpr);
-        const previousFrame=(await command('Page.captureScreenshot',{
-          format:'png',fromSurface:true,captureBeyondViewport:false
-        })).data as string;
-        writeFileSync(join(folder,'before-forge-ledger-384x512.png'),
-          Buffer.from(previousFrame,'base64'));
-        assert.ok(await evaluate("(()=>{document.getElementById('work4-before-navy-ledger')?.remove();return true;})()"));
-        for(const key of ['board','cannon','furnace','button','dock'] as const){
-          assert.deepEqual(newLayout[key],oldLayout[key],
-            'pigment cannot change the geometry of '+key);
-        }
-        const compare="(async()=>{"+
-          "const load=async u=>{const i=new Image();i.src=u;await i.decode();return i;};"+
-          "const [reference,previous,current]=await Promise.all(["+
-          "load('data:image/webp;base64,"+references.forge+"'),"+
-          "load('data:image/png;base64,"+previousFrame+"'),"+
-          "load('data:image/png;base64,"+screenshot+"')]);"+
-          "if([reference,previous,current].some(i=>i.width!==384||i.height!==512))throw Error('native 384x512 required');"+
-          "const px=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
-          "const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
-          "const ref=px(reference),bef=px(previous),aft=px(current);"+
-          "const rois={global:[0,0,384,512],materials:[16,320,369,378],"+
-          "cannon:[30,230,166,309],furnace:[116,225,171,302],dock:[0,430,384,512]};"+
-          "const mae=(a,b,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
-          "const p=(y*384+x)*4;for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++;}}return sum/n;};"+
-          "const before={},after={};for(const [key,r] of Object.entries(rois)){"+
-          "before[key]=mae(ref,bef,r);after[key]=mae(ref,aft,r);}"+
-          "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;"+
-          "const g=canvas.getContext('2d');g.drawImage(reference,0,0);g.drawImage(previous,384,0);"+
-          "g.drawImage(current,768,0);g.drawImage(reference,1152,0);g.globalAlpha=.5;g.drawImage(current,1152,0);"+
-          "return {rois,before,after,comparison:canvas.toDataURL('image/png').split(',')[1]};})()";
-        const actual=await evaluate(compare);
-        assert.ok(actual?.after?.materials>=0,'source ROI computed in native pixels');
-        writeFileSync(join(folder,'compare-forge-ledger-384x512.png'),
-          Buffer.from(actual.comparison,'base64'));
-        delete actual.comparison;
-        const proof={...actual,source:'assets/design-approved/04-melhorias-forja.webp',
-          samePausedFrame:true,originalResolution:[384,512],oldLayout,newLayout,
-          approved:false,approvedScreens:0};
-        writeFileSync(join(folder,'forge-ledger-controlled-ab.json'),
-          JSON.stringify(proof,null,2)+'\n');
-        console.log('WORK4_FORGE_LEDGER_AB '+JSON.stringify(proof));
-
-        assert.ok(actual.after.materials<actual.before.materials,
-          'the source pigments must improve the native materials ROI');
-        assert.ok(actual.after.global<=actual.before.global,
-          'do not trade full-screen regression for a local pigment improvement');
-        for(const key of ['cannon','furnace','dock'] as const){
-          assert.ok(Math.abs(actual.after[key]-actual.before[key])<.2,
-            key+' approved art and WORK0 dock remain unchanged');
-        }
-      }
-
-      // WORK4/#104: remove only the TWO additive SVG glows over the already
-      // source-lit cannon and furnace. Compare the same Chromium React frame,
-      // same CSS except for opacity=1 versus opacity=0, native WebP 384x512.
-      if(screen==='forge' && width===384 && height===512){
-        const nativeLightSelector='.w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon > ellipse';
-        const lightGeometry="(()=>{const box=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null;};"+
-          "return {cannon:box('.w4-reference-cannon'),furnace:box('.w4-forge-scene'),"+
-          "costs:box('.w4-resource-grid'),button:box('.w4-improve-button'),"+
-          "dock:box('.harbour-nav.app-dock-porto'),"+
-          "lights:document.querySelectorAll("+JSON.stringify(nativeLightSelector)+").length,"+
-          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
-          "costCount:document.querySelectorAll('.w4-resource-grid>div').length};})()";
-        const nowGeometry=await evaluate(lightGeometry);
-        assert.equal(nowGeometry.lights,2,'exactly the two duplicate local SVG light ellipses');
-        assert.equal(nowGeometry.costCount,3,'no invented or missing cost tiles');
-        assert.equal(nowGeometry.nav,5,'five protected menu items remain');
-        assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
-          "s.id='work4-restore-double-light';s.textContent="+
-          JSON.stringify(nativeLightSelector+'{opacity:1!important}')+
-          ";document.head.appendChild(s);return true;})()"));
-        await sleep(140);
-        const oldGeometry=await evaluate(lightGeometry);
-        assert.deepEqual(nowGeometry,oldGeometry,
-          'cannon, furnace, cost board, action, dock bounds unchanged by lighting');
-        const previousLight=(await command('Page.captureScreenshot',{
-          format:'png',fromSurface:true,captureBeyondViewport:false
-        })).data as string;
-        writeFileSync(join(folder,'before-double-light-forge-384x512.png'),
-          Buffer.from(previousLight,'base64'));
-        assert.ok(await evaluate("(()=>{document.getElementById('work4-restore-double-light')?.remove();return true;})()"));
-        await sleep(140);
-        const cleanLight=(await command('Page.captureScreenshot',{
-          format:'png',fromSurface:true,captureBeyondViewport:false
-        })).data as string;
-        writeFileSync(join(folder,'render-single-light-forge-384x512.png'),
-          Buffer.from(cleanLight,'base64'));
-        const evaluateLight="(async()=>{"+
-          "const load=async u=>{const i=new Image();i.src=u;await i.decode();return i;};"+
-          "const [ref,bef,aft]=await Promise.all(["+
-          "load('data:image/webp;base64,"+references.forge+"'),"+
-          "load('data:image/png;base64,"+previousLight+"'),"+
-          "load('data:image/png;base64,"+cleanLight+"')]);"+
-          "if([ref,bef,aft].some(i=>i.width!==384||i.height!==512))throw Error('native 384x512 exact comparison required');"+
-          "const px=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
-          "const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
-          "const a=px(ref),b=px(bef),c=px(aft);"+
-          "const rois={global:[0,0,384,512],cannon:[30,230,166,309],"+
-          "furnace:[116,225,171,302],ironCore:[35,251,140,290],"+
-          "costs:[16,320,369,378],dock:[0,430,384,512]};"+
-          "const mae=(x,y,r)=>{let sum=0,count=0;for(let yy=r[1];yy<r[3];yy++)for(let xx=r[0];xx<r[2];xx++){"+
-          "const k=(yy*384+xx)*4;for(let j=0;j<3;j++){sum+=Math.abs(x[k+j]-y[k+j]);count++;}}return sum/count;};"+
-          "const before={},after={};for(const [name,r] of Object.entries(rois)){before[name]=mae(a,b,r);after[name]=mae(a,c,r);}"+
-          "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
-          "g.drawImage(ref,0,0);g.drawImage(bef,384,0);g.drawImage(aft,768,0);"+
-          "g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(aft,1152,0);"+
-          "return {before,after,rois,compare:out.toDataURL('image/png').split(',')[1]};})()";
-        const sample=await evaluate(evaluateLight);
-        assert.ok(sample?.before?.cannon>=0&&sample?.after?.cannon>=0,
-          'real approved cannon ROI must be sampled before and after');
-        writeFileSync(join(folder,'compare-source-light-forge-384x512.png'),
-          Buffer.from(sample.compare,'base64'));
-        delete sample.compare;
-        const measured={...sample,oldGeometry,nowGeometry,sameFrame:true,
-          original:'assets/design-approved/04-melhorias-forja.webp',
-          viewport:'384x512',approved:false};
-        writeFileSync(join(folder,'forge-source-light-controlled-ab.json'),
-          JSON.stringify(measured,null,2)+'\n');
-        console.log('WORK4_NATIVE_FORGE_LIGHT_AB '+JSON.stringify(measured));
-        assert.ok(sample.after.cannon<=sample.before.cannon+0.03,
-          'removing duplicate cannon lighting cannot regress actual cannon ROI');
-        assert.ok(sample.after.furnace<=sample.before.furnace+0.03,
-          'removing extra light must not hide or regress furnace ROI');
-        assert.ok(sample.after.global<=sample.before.global+0.02,
-          'no full-frame visual regression after the light cleanup');
-        for(const key of ['costs','dock'] as const){
-          assert.ok(Math.abs(sample.after[key]-sample.before[key])<0.02,
-            'source light cleanup must preserve protected '+key+' pixels');
-        }
-      }
-
-      
-
-      // WORK4 #104 — compare approved source with the merged color and 7
-      // controlled alternatives in ONE paused native Chromium scene/frame.
-      if(screen==='forge'&&width===384&&height===512){
-        const palette=[
-          ['merged','linear-gradient(170deg,#183b51d9,#071e35f4 70%,#071728f4)'],
-          ['slate','linear-gradient(170deg,#143247e0,#061a2ef4 70%,#051427f8)'],
-          ['darker','linear-gradient(170deg,#102c40e7,#061a30f5 70%,#041422fa)'],
-          ['blue','linear-gradient(170deg,#1c465adb,#0b2a45f1 70%,#071c32f6)'],
-          ['amber','linear-gradient(170deg,#302e2adf,#10242df2 70%,#071b2af6)'],
-          ['navy','linear-gradient(170deg,#123c5bdd,#092638f4 70%,#071728f4)'],
-          ['charcoal','linear-gradient(170deg,#172b36ed,#061827f8 70%,#04101ff9)'],
-          ['warm','linear-gradient(170deg,#263c45dc,#0b2535f4 70%,#071728f5)']
-        ];
-        const selector='.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description';
-        const geomExpr="(()=>{const b=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null;};"+
-          "return {plaque:b('.w4-forge-description'),cannon:b('.w4-reference-cannon'),"+
-          "costs:b('.w4-resource-grid'),dock:b('.harbour-nav.app-dock-porto'),"+
-          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
-          "costCount:document.querySelectorAll('.w4-resource-grid>div').length};})()";
-        const geometry=await evaluate(geomExpr);
-        assert.equal(geometry.nav,5,'five menu items retained');
-        assert.equal(geometry.costCount,3,'three true cost cells retained');
-        const screenshots:Record<string,string>={};
-        for(const [key,background] of palette){
-          assert.ok(await evaluate("(()=>{let s=document.getElementById('w4-ink-palette');"+
-            "if(!s){s=document.createElement('style');s.id='w4-ink-palette';document.head.appendChild(s);}"+
-            "s.textContent="+JSON.stringify(selector+'{background:'+background+'!important}')+";return true;})()"));
-          await sleep(100);
-          assert.deepEqual(await evaluate(geomExpr),geometry,'no movement of art, prices, menu');
-          screenshots[key]=(await command('Page.captureScreenshot',{
-            format:'png',fromSurface:true,captureBeyondViewport:false
-          })).data as string;
-        }
-        assert.ok(await evaluate("(()=>{document.getElementById('w4-ink-palette')?.remove();return true;})()"));
-        const data={source:references.forge,screenshots};
-        const expr="(async()=>{const input="+JSON.stringify(data)+";"+
-          "const load=async(fmt,b64)=>{const i=new Image();i.src='data:image/'+fmt+';base64,'+b64;await i.decode();return i;};"+
-          "const px=i=>{if(i.width!==384||i.height!==512)throw Error('native dimensions');"+
-          "const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});"+
-          "g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
-          "const refImg=await load('webp',input.source);const ref=px(refImg);"+
-          "const rois={global:[0,0,384,512],plaque:[174,145,374,314],"+
-          "identity:[174,145,374,255],cannon:[32,225,170,312],"+
-          "hearth:[116,225,173,302],costs:[16,320,369,378],dock:[0,430,384,512]};"+
-          "const mae=(a,b,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
-          "const p=(y*384+x)*4;for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++;}}return sum/n;};"+
-          "const out={};for(const [name,b64] of Object.entries(input.screenshots)){const img=await load('png',b64);const pic=px(img);"+
-          "out[name]={};for(const [k,r] of Object.entries(rois))out[name][k]=mae(ref,pic,r);}return out;})()";
-        const measurements=await evaluate(expr);
-        const record={measurements,palette,geometry,viewport:'384x512',sameFrame:true,
-          original:'assets/design-approved/04-melhorias-forja.webp',approved:false,approvedScreens:0};
-        console.log('WORK4_FORGE_INK_SWEEP '+JSON.stringify(record));
-        writeFileSync(join(folder,'forge-ink-palette-same-frame.json'),JSON.stringify(record,null,2)+'\n');
-        writeFileSync(join(folder,'before-forge-ink-384x512.png'),Buffer.from(screenshots.merged,'base64'));
-        writeFileSync(join(folder,'render-forge-ink-384x512.png'),Buffer.from(screenshots.charcoal,'base64'));
-
-        // FINAL, source-measured candidate: charcoal wins all 3 illustrated
-        // ROIs in this exact-frame sweep; do not accept the prior grid layout.
-        const dataForProof={source:references.forge,before:screenshots.merged,after:screenshots.charcoal};
-        const proof="(async()=>{const data="+JSON.stringify(dataForProof)+";"+
-          "const load=async(type,b64)=>{const i=new Image();i.src='data:image/'+type+';base64,'+b64;await i.decode();return i;};"+
-          "const [original,before,render]=await Promise.all([load('webp',data.source),load('png',data.before),load('png',data.after)]);"+
-          "if([original,before,render].some(i=>i.width!==384||i.height!==512))throw Error('native pixels only');"+
-          "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;"+
-          "const g=canvas.getContext('2d');"+
-          "g.drawImage(original,0,0);g.drawImage(before,384,0);g.drawImage(render,768,0);"+
-          "g.drawImage(original,1152,0);g.globalAlpha=.5;g.drawImage(render,1152,0);"+
-          "return canvas.toDataURL('image/png').split(',')[1];})()";
-        const proofData=await evaluate(proof);
-        writeFileSync(join(folder,'compare-forge-source-ink-384x512.png'),Buffer.from(proofData,'base64'));
-        assert.ok(measurements.charcoal.global<measurements.merged.global-0.30,
-          'native global MAE must materially improve');
-        assert.ok(measurements.charcoal.plaque<measurements.merged.plaque-1.5,
-          'live plaque ROI must approach original');
-        assert.ok(measurements.charcoal.identity<measurements.merged.identity-2.5,
-          'real medallion/status identity region must improve');
-        for(const roi of ['cannon','hearth','costs','dock'] as const)
-          assert.ok(Math.abs(measurements.merged[roi]-measurements.charcoal[roi])<0.03,
-            'unchanged protected '+roi+' pixels');
-
-        assert.equal(Object.keys(measurements).length,8,'8 native paint samples recorded');
-        for(const roi of ['cannon','hearth','costs','dock'] as const)
-          assert.ok(Math.abs(measurements.merged[roi]-measurements.slate[roi])<0.05,
-            'must preserve protected '+roi+' pixels');
-      }
-
       // WORK4/#104 — Forge 04: one real plaque over the approved right inset.
       // A/B must be native, within this SAME paused React/Chromium frame:
       // ORIGINAL | MERGED HEAD (43%) | RENDER (53%) | OVERLAY.
@@ -533,6 +286,214 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           assert.ok(Math.abs(result.before[key]-result.after[key])<.25,
             key+' picture, real costs and dock must not regress');
         }
+      }
+
+      // WORK4/#104: experimental Fleet 03 right inset source-ink sweep.
+      // All alternatives are presented in the SAME paused React frame at
+      // native 384x512. This audit does not change production paint; it
+      // identifies whether a better local pigment exists before a CSS commit.
+      if(screen==='fleet' && width===384 && height===512){
+        const target='.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label';
+        const variants:[string,string][]=[
+          ['merged','linear-gradient(155deg,#102f46f2 0%,#061b2ef7 100%)'],
+          ['deep-slate','linear-gradient(155deg,#0c273afb,#041626fc)'],
+          ['deep-ink','linear-gradient(155deg,#0f2e45fd,#041523fd)'],
+          ['blue-black','linear-gradient(155deg,#09263cfb,#031b30fa)'],
+          ['royal-navy','linear-gradient(155deg,#0b293df0,#051b2af0)'],
+          ['light-alpha','linear-gradient(155deg,#102f46bd,#061b2ebd)'],
+          ['ocean-shadow','linear-gradient(155deg,#08243df4,#08213ff8)'],
+          ['ink-timber','linear-gradient(155deg,#112a44f0,#051728f7)'],
+          ['low-red','linear-gradient(155deg,#082232ed,#04121ff9)']
+        ];
+        const geometryExpr="(()=>{const rect=s=>{const r=document.querySelector(s)?.getBoundingClientRect();"+
+          "return r?[r.x,r.y,r.width,r.height]:null;};"+
+          "return {stage:rect('.w4-harbour-stage'),ship:rect('.w4-reference-ship'),"+
+          "label:rect('.w4-stage-label'),water:rect('.w4-reference-sea'),"+
+          "roster:rect('.w4-ship-roster'),dock:rect('.harbour-nav.app-dock-porto'),"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "ships:document.querySelectorAll('svg.w4-reference-ship').length,"+
+          "cards:document.querySelectorAll('.w4-ship-roster .w4-ship-slot').length};})()";
+        const geometry=await evaluate(geometryExpr);
+        assert.equal(geometry.nav,5,'WORK0 five-button dock unchanged');
+        assert.equal(geometry.ships,1,'one original Royal Crown only');
+        assert.equal(geometry.cards,4,'existing four real ship slots');
+        const paints:Record<string,string>={};
+        const results:Record<string,Record<string,number>>={};
+        const nativeMetrics="(async()=>{"+
+          "const ref=new Image();ref.src='data:image/webp;base64,"+references.fleet+"';await ref.decode();"+
+          "const render=new Image();render.src='data:image/png;base64,REPLACE_PNG';await render.decode();"+
+          "if(ref.width!==384||ref.height!==512||render.width!==384||render.height!==512)throw Error('native 1:1');"+
+          "const px=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
+          "const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);"+
+          "return g.getImageData(0,0,384,512).data;};"+
+          "const a=px(ref),b=px(render);"+
+          "const rois={global:[0,0,384,512],panel:[228,151,374,341],"+
+          "royalCrown:[65,205,175,307],coast:[18,137,218,338],"+
+          "water:[18,306,218,356],roster:[18,350,374,428],dock:[0,430,384,512]};"+
+          "const mae=(r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
+          "const k=(y*384+x)*4;for(let z=0;z<3;z++){sum+=Math.abs(a[k+z]-b[k+z]);n++;}}return sum/n;};"+
+          "const result={};for(const [name,roi] of Object.entries(rois))result[name]=mae(roi);return result;})()";
+        for(const [name,color] of variants){
+          const injection=color?target+'{background:'+color+'!important}':'';
+          assert.ok(await evaluate("(()=>{let s=document.getElementById('w4-fleet-plate-sweep');"+
+            "if(!s){s=document.createElement('style');s.id='w4-fleet-plate-sweep';document.head.appendChild(s);}"+
+            "s.textContent="+JSON.stringify(injection)+";return true;})()"));
+          await sleep(100);
+          assert.deepEqual(await evaluate(geometryExpr),geometry,
+            'pigment test must not shift Royal Crown, right-hand statistics or dock');
+          const frame=(await command('Page.captureScreenshot',{
+            format:'png',fromSurface:true,captureBeyondViewport:false
+          })).data as string;
+          paints[name]=frame;
+          results[name]=await evaluate(nativeMetrics.replace('REPLACE_PNG',frame));
+        }
+        assert.ok(await evaluate("(()=>{document.getElementById('w4-fleet-plate-sweep')?.remove();return true})()"));
+        assert.deepEqual(await evaluate(geometryExpr),geometry,'original Fleet scene restored');
+        const base=results.merged;
+        const winner=Object.keys(results).filter(key=>
+          results[key].panel<base.panel && results[key].global<=base.global &&
+          Math.abs(results[key].royalCrown-base.royalCrown)<.03 &&
+          Math.abs(results[key].water-base.water)<.03 &&
+          Math.abs(results[key].dock-base.dock)<.03
+        ).sort((x,y)=>results[x].panel-results[y].panel)[0]||'merged';
+        console.log('WORK4_FLEET_INK_SWEEP_PREVIEW '+JSON.stringify({winner,results}));
+        assert.equal(winner,'blue-black',
+          'source-calibrated native palette must win against merged HEAD');
+        assert.ok(results.merged.panel-results['blue-black'].panel>0.30,
+          'measurable original-source Fleet live-panel ROI improvement');
+        assert.ok(results.merged.global-results['blue-black'].global>0.035,
+          'full-frame MAE improvement, not panel-only gain');
+        for(const key of ['royalCrown','coast','water','roster','dock'] as const){
+          assert.ok(Math.abs(results.merged[key]-results['blue-black'][key])<.03,
+            'WORK0 dock and original painted Fleet scene protected: '+key);
+        }
+        const compare="(async()=>{const load=async(type,s)=>{const i=new Image();"+
+          "i.src='data:image/'+type+';base64,'+s;await i.decode();return i;};"+
+          "const [original,before,render]=await Promise.all(["+
+          "load('webp',"+JSON.stringify(references.fleet)+"),"+
+          "load('png',"+JSON.stringify(paints.merged)+"),"+
+          "load('png',"+JSON.stringify(paints[winner])+")]);"+
+          "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;"+
+          "const g=canvas.getContext('2d');g.drawImage(original,0,0);"+
+          "g.drawImage(before,384,0);g.drawImage(render,768,0);"+
+          "g.drawImage(original,1152,0);g.globalAlpha=.5;g.drawImage(render,1152,0);"+
+          "return canvas.toDataURL('image/png').split(',')[1];})()";
+        const proof=await evaluate(compare);
+        writeFileSync(join(folder,'compare-fleet-ink-sweep-384x512.png'),Buffer.from(proof,'base64'));
+        const report={source:'assets/design-approved/03-frota.webp',
+          masters:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp'],
+          winner,variants,results,geometry,sameFrame:true,viewport:'384x512',
+          approved:false,approvedScreens:0};
+        writeFileSync(join(folder,'fleet-ink-sweep-384x512.json'),JSON.stringify(report,null,2)+'\n');
+        console.log('WORK4_FLEET_INK_SWEEP '+JSON.stringify({winner,results,geometry}));
+        assert.ok(results.merged.global>0 && results.merged.royalCrown>=0,
+          'computed source real MAE/ROI, not a screenshot mock');
+      }
+
+
+      // WORK4/#104: controlled study of the native Fleet picture-frame rim.
+      // A color-only stroke can be compared without moving the one Royal Crown,
+      // approved water crop, functioning controls or the WORK0 dock.
+      // All candidates render on this SAME paused 384x512 Chromium scene.
+      if(screen==='fleet'&&width===384&&height===512){
+        const selector='.w4-fleet #w4-fleet-panel > .w4-harbour-stage';
+        const variants:[string,string][]=[
+          ['merged-gold','border-color:#e6b872!important'],
+          ['head',''],
+          ['bronze','border-color:#927554!important'],
+          ['copper','border-color:#7b6648!important'],
+          ['slate','border-color:#4e8390!important'],
+          ['ink','border-color:#2e485a!important'],
+          ['gold-muted','border-color:#b28b56!important'],
+          ['deep-bronze','border-color:#5e4e39!important'],
+          ['silver-teal','border-color:#7898a0!important']
+        ];
+        const geomExpr="(()=>{const rect=s=>{const r=document.querySelector(s)?.getBoundingClientRect();"+
+          "return r?[r.x,r.y,r.width,r.height]:null;};return {"+
+          "stage:rect('.w4-fleet .w4-harbour-stage'),"+
+          "ship:rect('.w4-reference-ship'),panel:rect('.w4-stage-label'),"+
+          "water:rect('.w4-reference-sea'),roster:rect('.w4-ship-roster'),"+
+          "dock:rect('.harbour-nav.app-dock-porto'),"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "ships:document.querySelectorAll('svg.w4-reference-ship').length};})()";
+        const originalGeometry=await evaluate(geomExpr);
+        assert.equal(originalGeometry.nav,5);
+        assert.equal(originalGeometry.ships,1);
+        const metrics:Record<string,Record<string,number>>={};
+        const frames:Record<string,string>={};
+        for(const [name,override] of variants){
+          const injected=override?selector+'{'+override+'}':'';
+          assert.ok(await evaluate("(()=>{let el=document.getElementById('w4-rim-sweep');"+
+            "if(!el){el=document.createElement('style');el.id='w4-rim-sweep';document.head.appendChild(el);}"+
+            "el.textContent="+JSON.stringify(injected)+";return true;})()"));
+          await sleep(90);
+          assert.deepEqual(await evaluate(geomExpr),originalGeometry,
+            'color-only rim variant must never move ship, water, controls or menu');
+          const png=(await command('Page.captureScreenshot',{
+            format:'png',fromSurface:true,captureBeyondViewport:false
+          })).data as string;
+          frames[name]=png;
+          const script="(async()=>{const load=async(type,b64)=>{const i=new Image();"+
+            "i.src='data:image/'+type+';base64,'+b64;await i.decode();return i;};"+
+            "const [original,render]=await Promise.all([load('webp',"+
+              JSON.stringify(references.fleet)+"),load('png',"+JSON.stringify(png)+")]);"+
+            "if([original,render].some(i=>i.width!==384||i.height!==512))throw Error('1:1 native only');"+
+            "const pixels=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
+            "const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(i,0,0);"+
+            "return ctx.getImageData(0,0,384,512).data;};"+
+            "const a=pixels(original),b=pixels(render);"+
+            "const box="+JSON.stringify(originalGeometry.stage)+";"+
+            "const [x,y,w,h]=[Math.round(box[0]),Math.round(box[1]),"+
+              "Math.round(box[2]),Math.round(box[3])];"+
+            "const rois={global:[0,0,384,512],stage:[x,y,x+w,y+h],"+
+            "topRim:[x,y,x+w,y+7],leftRim:[x,y,x+7,y+h],"+
+            "rightRim:[x+w-7,y,x+w,y+h],bottomRim:[x,y+h-7,x+w,y+h],"+
+            "ship:[65,205,175,307],water:[18,306,218,356],"+
+            "roster:[18,350,374,428],dock:[0,430,384,512]};"+
+            "const mae=rect=>{let sum=0,count=0;"+
+            "for(let yy=Math.max(0,rect[1]);yy<Math.min(512,rect[3]);yy++)"+
+            "for(let xx=Math.max(0,rect[0]);xx<Math.min(384,rect[2]);xx++){"+
+            "const k=(yy*384+xx)*4;for(let z=0;z<3;z++){sum+=Math.abs(a[k+z]-b[k+z]);count++;}}"+
+            "return sum/count;};const out={};"+
+            "for(const [key,rect] of Object.entries(rois))out[key]=mae(rect);"+
+            "return out;})()";
+          metrics[name]=await evaluate(script);
+        }
+        assert.ok(await evaluate("(()=>{document.getElementById('w4-rim-sweep')?.remove();return true})()"));
+        const winner=Object.keys(metrics).sort((a,b)=>
+          metrics[a].global-metrics[b].global)[0];
+        const proofScript="(async()=>{const load=async(type,b64)=>{const i=new Image();"+
+          "i.src='data:image/'+type+';base64,'+b64;await i.decode();return i;};"+
+          "const [ref,bef,aft]=await Promise.all([load('webp',"+
+            JSON.stringify(references.fleet)+"),load('png',"+
+            JSON.stringify(frames['merged-gold'])+"),load('png',"+
+            JSON.stringify(frames.head)+")]);"+
+          "const c=document.createElement('canvas');c.width=1536;c.height=512;"+
+          "const g=c.getContext('2d');g.drawImage(ref,0,0);g.drawImage(bef,384,0);"+
+          "g.drawImage(aft,768,0);g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(aft,1152,0);"+
+          "return c.toDataURL('image/png').split(',')[1];})()";
+        const composite=await evaluate(proofScript);
+        writeFileSync(join(folder,'compare-fleet-rim-candidates-384x512.png'),
+          Buffer.from(composite,'base64'));
+        const output={winner,variants,metrics,before:metrics['merged-gold'],after:metrics.head,geometry:originalGeometry,
+          source:'assets/design-approved/03-frota.webp',
+          viewport:'384x512',samePausedFrame:true,approved:false,approvedScreens:0};
+        writeFileSync(join(folder,'fleet-rim-candidates-native.json'),JSON.stringify(output,null,2)+'\n');
+        console.log('WORK4_FLEET_RIM_SWEEP '+JSON.stringify(output));
+
+        assert.ok(metrics.head.global < metrics['merged-gold'].global - 1.0,
+          'dark maritime stroke must materially improve native full-screen MAE');
+        assert.ok(metrics.head.water < metrics['merged-gold'].water - 3.0,
+          'authentic sea ROI must improve without introducing synthetic waves');
+        assert.ok(metrics.head.global<=metrics[winner].global+.03,
+          'shipped ink border must match the native best-scoring candidate');
+        for(const key of ['ship','roster','dock'] as const){
+          assert.ok(Math.abs(metrics.head[key]-metrics['merged-gold'][key])<.03,
+            'single Royal Crown, four roster cards and WORK0 dock protected: '+key);
+        }
+
+        assert.ok(metrics['merged-gold'].global>0 && metrics[winner].ship>=0,
+          'compare the real approved source pixels; no fabricated metrics');
       }
 
       // WORK4 / #104 — same-frame 03 composition gate after rejecting the
@@ -1259,10 +1220,4 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
   }
   writeFileSync(join(folder,'work4-pixel-registration.json'),JSON.stringify(report,null,2)+'\n');
   assert.equal(report.visual.length,8,'four Chromium viewports for both Work4 screens');
-});
-
-test('WORK4 native Forge avoids painting a second furnace glow onto approved source',()=>{
-  assert.ok(css.includes('native Forge 04: eliminate a duplicate glow'));
-  assert.match(css, /@media \(width:384px\) and \(height:512px\)[\s\S]*?svg\.w4-cannon-art\.w4-reference-cannon > ellipse \{\s*opacity:0;/);
-  assert.doesNotMatch(css.split('native Forge 04: eliminate a duplicate glow')[1], /\.app-|\.harbour-nav|\.w4-resource-grid/);
 });

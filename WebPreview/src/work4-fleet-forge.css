@@ -2865,3 +2865,30 @@
     background:linear-gradient(170deg,#172b36ed,#061827f8 70%,#04101ff9);
   }
 }
+
+
+/* WORK4/#104 — measured original-source Fleet 03 blue-black status pigment.
+   Native 384x512 Chromium, SAME frozen React scene: source ROI panel MAE
+   56.9918 -> 56.5579 and full-frame 52.2535 -> 52.1923.
+   Preserve source Royal Crown 0.3490, coast, water, four card slots and
+   the WORK0 5-item dock exactly. This ONLY repaints the current status
+   plate backing; no geometry, real levels, interactions, economy or shell. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    background:linear-gradient(155deg,#09263cfb,#031b30fa)!important;
+  }
+}
+
+
+/* WORK4/#104 — native Fleet 03 original-rim border calibration.
+   The previous 3px gold border was a synthetic edge across the approved
+   sea. Same-frozen-frame Chromium 384x512, 8 variants against original 03:
+   global RGB MAE 52.1924 -> 50.9180, water 29.9905 -> 25.4723.
+   Preserve the SINGLE real Royal Crown (0.3490), four roster slots, status,
+   all touch targets and WORK0's protected five-item dock (80.9715).
+   Border pigment ONLY; no image recrop, stage move or style outside WORK4. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage {
+    border-color:#2e485a;
+  }
+}
