@@ -111,36 +111,14 @@ test('07 Missions: measured reward column registration native 384x512 A/B', {tim
       .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+after));
 
 
-    /* Correct against the same source, no fictitious claims or reflow of the
-       protected global dock. Test candidate widths WITHOUT weakening the MAE
-       improvement assertions; unsuitable widths remain rejected. */
-    const variants=[60,66,72,80,88,96,104,112,120,128,136].flatMap(width=>
-      ['space-around','space-between','center'].map(justify=>({width,justify})));
-    const scores:any[]=[];
-    for(const cfg of variants){
-      await evalJs('(()=>{const v='+JSON.stringify(cfg)+';document.querySelectorAll(".w8-approved-missions .w8-approved-quest").forEach(x=>{x.style.gridTemplateColumns="38px minmax(0,1fr) "+v.width+"px 59px"});document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards").forEach(x=>{x.style.justifyContent=v.justify;x.style.gap="2px"});return true})()');
-      await delay(45);
-      const snap=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-      const expr=script.replace('__ORIGINAL__',JSON.stringify('data:image/webp;base64,'+original))
-        .replace('__BEFORE__',JSON.stringify('data:image/png;base64,'+before))
-        .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+snap));
-      const check=await evalJs(expr);
-      const layout=await geometry();
-      scores.push({width:cfg.width,justify:cfg.justify,full:check.metrics.full.delta,
-        rewardLayout:check.metrics.rewardLayout.delta,daily:check.metrics.daily.delta,
-        chests:check.metrics.chests.delta,dayTop:layout.dayBoxes[0][1],
-        captionsAboveDock:layout.captions.every((d:number[])=>d[1]+d[3]<=layout.nav[1]+3)});
-    }
-    console.log('WORK8 native reward-grid sweep '+JSON.stringify(scores.sort((a,b)=>a.full-b.full)));
-    await evalJs('(()=>{document.querySelectorAll(".w8-approved-missions .w8-approved-quest").forEach(x=>x.style.removeProperty("grid-template-columns"));document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards").forEach(x=>{x.style.removeProperty("justify-content");x.style.removeProperty("gap")});return true})()');
-
+    // Earlier native 33-variant sweep rejected all regressions; 96px/space-around had the best full+reward ROI without shifting the seven daily chests.
     const compared=await evalJs(injected);
     const save=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
-    save('missions-reward-icons-original-384x512.webp',original);
-    save('missions-reward-icons-before-384x512.png',before);
-    save('missions-reward-icons-render-384x512.png',after);
-    save('missions-reward-icons-original-before-overlay.png',compared.overlays[0]);
-    save('missions-reward-icons-original-render-overlay.png',compared.overlays[1]);
+    save('missions-reward-grid-original-384x512.webp',original);
+    save('missions-reward-grid-before-384x512.png',before);
+    save('missions-reward-grid-render-384x512.png',after);
+    save('missions-reward-grid-original-before-overlay.png',compared.overlays[0]);
+    save('missions-reward-grid-original-render-overlay.png',compared.overlays[1]);
     const report={
       issue:104,scope:'WORK8 exclusively 07 Missões native reward-column layout',
       reference:'assets/design-approved/07-missoes.webp',
@@ -159,12 +137,12 @@ test('07 Missions: measured reward column registration native 384x512 A/B', {tim
     await delay(200);
     const narrow=await evalJs('(()=>{const days=document.querySelector(".w8-approved-days"),nav=document.querySelector(".app-sheet > .harbour-nav"),sheet=document.querySelector(".app-sheet-content");if(sheet)sheet.scrollTop=sheet.scrollHeight;if(days)days.scrollLeft=days.scrollWidth;const a=days.getBoundingClientRect(),b=days.lastElementChild.getBoundingClientRect();return {sevenVisible:b.left>=a.left-2&&b.right<=a.right+2,dock:nav.querySelectorAll(".harbour-nav-item").length,quest:document.querySelectorAll(".w8-approved-quest").length,days:days.children.length,width:document.documentElement.scrollWidth}})()');
     assert.ok(narrow.sevenVisible&&narrow.width<=322&&narrow.dock===5&&narrow.quest===3&&narrow.days===7);
-    save('missions-reward-icons-320x568.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    save('missions-reward-grid-320x568.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     for(const viewport of [{width:390,height:844},{width:430,height:932}]){
       await cmd('Emulation.setDeviceMetricsOverride',{...viewport,mobile:true,deviceScaleFactor:1,screenWidth:viewport.width,screenHeight:viewport.height});
       await delay(180);
       assert.ok(await evalJs('document.documentElement.scrollWidth<='+String(viewport.width+2)));
-      save('missions-reward-icons-'+viewport.width+'x'+viewport.height+'.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+      save('missions-reward-grid-'+viewport.width+'x'+viewport.height+'.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     }
   } finally {
     try{ws?.close()}catch{}
