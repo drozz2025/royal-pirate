@@ -2951,3 +2951,19 @@
     background-color:#2d2929!important;
   }
 }
+
+/* WORK4/#104 — native 384x512 source-water feather, controlled Chromium A/B
+   of ten masks against the original approved Frota 03 in one paused frame.
+   Prior 34% fade vs. 8% keeps a short natural feather, but shows more
+   AUTHENTIC source sea: water MAE 23.87065 -> 23.85362, bridge
+   4.37057 -> 4.30977, whole frame 49.74177 -> 49.73905.
+   Although a hard zero-percent edge scored marginally lower MAE, keep
+   the 8% soft join to avoid a new photographic rectangle. Royal Crown,
+   all four cards, touch targets, and WORK0 dock remain pixel-identical.
+   Only this native original viewport is affected. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > svg.w4-reference-sea {
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 8%,#000 100%);
+    mask-image:linear-gradient(to bottom,transparent 0%,#000 8%,#000 100%);
+  }
+}
