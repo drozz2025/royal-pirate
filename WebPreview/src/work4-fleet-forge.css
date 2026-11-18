@@ -3018,3 +3018,20 @@
     mask-composite:intersect;
   }
 }
+
+
+/* WORK4/#104 — native 384×512 Fleet roster text visibility, 18 Nov 18h.
+   Chromium verified the four ORIGINAL roster cards end at 447.48px while
+   WORK0's protected five-item dock begins at y430. Card downsizing to
+   80–92px badly damaged the approved source art (global MAE +3.5 to +4);
+   keep all card/crop dimensions unchanged and lift only the TWO label
+   text baselines 11px (smallest reliably visible lift), leaving the 4 real card taps, one Royal Crown,
+   nautical painting, source sea, dock and all nonnative viewports intact.
+   Same-frame reference comparison in WORK4 pixel-registration CI.
+   No artificial water, new ships, inventory, or global styles. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel .w4-ship-roster > .w4-ship-slot > strong,
+  .w4-fleet #w4-fleet-panel .w4-ship-roster > .w4-ship-slot > small {
+    transform:translateY(-11px);
+  }
+}

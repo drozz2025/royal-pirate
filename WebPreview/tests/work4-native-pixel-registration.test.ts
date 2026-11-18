@@ -331,7 +331,8 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
 
 
       // WORK4/#104 — 18 Nov 16h: prospective, SAME-FRAME native Fleet coastline
-      // mask study against the ORIGINAL approved WebP. The live Royal Crown
+      // mask study against the ORIGINAL approved WebP. Includes 18 Nov 18h
+      // expanded-contour probes; none is shipped until measured in Chromium. The live Royal Crown
       // stays unique and its central pixels, four cards and dock are protected.
       // The shipped source-open contour must beat the genuine released crop
       // for full/edge/sea ROI while preserving the single live Royal Crown.
@@ -350,6 +351,14 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           {id:'higher-coast',radial:'ellipse 90% 115% at 30% 46%',opaque:76,top:4,bottom:95},
           {id:'lower-coast',radial:'ellipse 90% 115% at 30% 54%',opaque:76,top:4,bottom:95},
           {id:'source-open',radial:'ellipse 110% 123% at 30% 50%',opaque:84,top:2,bottom:97},
+          {id:'opened-116',radial:'ellipse 116% 125% at 30% 50%',opaque:85,top:2,bottom:97},
+          {id:'opened-120',radial:'ellipse 120% 128% at 30% 50%',opaque:87,top:2,bottom:98},
+          {id:'opened-128',radial:'ellipse 128% 134% at 30% 50%',opaque:89,top:2,bottom:98},
+          {id:'opened-135',radial:'ellipse 135% 140% at 30% 50%',opaque:91,top:2,bottom:98},
+          {id:'tapered-118',radial:'ellipse 118% 130% at 30% 50%',opaque:80,top:3,bottom:97},
+          {id:'shifted-up',radial:'ellipse 116% 125% at 30% 47%',opaque:85,top:2,bottom:98},
+          {id:'shifted-right',radial:'ellipse 120% 128% at 32% 50%',opaque:87,top:2,bottom:98},
+          {id:'soft-mid',radial:'ellipse 118% 126% at 30% 50%',opaque:84,top:2,bottom:97},
           {id:'merged-266',radial:'ellipse 75% 105% at 30% 50%',opaque:75,top:7,bottom:88}
         ];
         const coastSelector='.w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship';
@@ -437,6 +446,176 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           baseline:old,visualWinner:head,approved:false,approvedScreens:0};
         writeFileSync(join(folder,'work4-fleet-coast-controlled-ab-native.json'),JSON.stringify(study,null,2)+'\n');
         console.log('WORK4_FLEET_COAST_CONTROLLED_AB '+JSON.stringify(study));
+
+        // WORK4/#104 — real first-fold Fleet card occlusion audit.
+        // On native 384x512 WORK0's fixed five-item dock begins at y≈430,
+        // while the approved four source-art card slots can extend to y≈450.
+        // Compare compact cards in the SAME paused Chromium frame before
+        // shipping anything; do not move WORK0's dock or alter fleet data.
+        const cardVariants=[
+          {id:'HEAD',height:null,art:null},
+          {id:'compact-80',height:80,art:42},
+          {id:'compact-84',height:84,art:46},
+          {id:'compact-88',height:88,art:50},
+          {id:'compact-92',height:92,art:54}
+        ];
+        const cardGeom="(()=>{const e=s=>{const r=document.querySelector(s)?.getBoundingClientRect();"+
+          "return r?{top:r.top,bottom:r.bottom,left:r.left,right:r.right,height:r.height}:null};"+
+          "const cards=[...document.querySelectorAll('.w4-ship-roster > .w4-ship-slot')];"+
+          "const dock=e('.harbour-nav.app-dock-porto');return {"+
+          "dock,stage:e('.w4-harbour-stage'),ship:e('.w4-reference-ship'),"+
+          "menu:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "ships:document.querySelectorAll('[data-work4-crop=\"fleet\"]').length,"+
+          "cards:cards.map(c=>{const b=c.getBoundingClientRect();"+
+          "const small=c.querySelector('small')?.getBoundingClientRect();"+
+          "return {top:b.top,bottom:b.bottom,labelBottom:small?.bottom??b.bottom,"+
+          "overlap:Math.max(0,b.bottom-(dock?.top??512))};})};})()";
+        const cardOriginal=await evaluate(cardGeom);
+        assert.equal(cardOriginal.menu,5);
+        assert.equal(cardOriginal.ships,1);
+        assert.equal(cardOriginal.cards.length,4);
+        const cardShots:Record<string,string>={HEAD:screenshot};
+        const cardLayouts:Record<string,any>={HEAD:cardOriginal};
+        for(const v of cardVariants.slice(1)){
+          const localCSS=".w4-fleet #w4-fleet-panel .w4-ship-roster > .w4-ship-slot{"+
+            "height:"+v.height+"px!important;min-height:"+v.height+"px!important;"+
+            "max-height:"+v.height+"px!important;padding:2px 1px 2px!important;gap:1px!important;}"+
+            ".w4-fleet #w4-fleet-panel .w4-ship-roster > .w4-ship-slot .w4-slot-art,"+
+            ".w4-fleet #w4-fleet-panel .w4-ship-roster > .w4-ship-slot.is-active .w4-slot-art{"+
+            "height:"+v.art+"px!important;min-height:0!important;flex-shrink:0!important;}";
+          await evaluate("(()=>{const s=document.createElement('style');s.id='work4-card-candidate';"+
+            "s.textContent="+JSON.stringify(localCSS)+";document.head.appendChild(s);return true;})()");
+          await sleep(110);
+          cardShots[v.id]=(await command('Page.captureScreenshot',{
+            format:'png',fromSurface:true,captureBeyondViewport:false
+          })).data as string;
+          cardLayouts[v.id]=await evaluate(cardGeom);
+          assert.equal(cardLayouts[v.id].menu,5);
+          assert.equal(cardLayouts[v.id].ships,1);
+          assert.deepEqual(cardLayouts[v.id].stage,cardOriginal.stage);
+          assert.deepEqual(cardLayouts[v.id].ship,cardOriginal.ship);
+          assert.deepEqual(cardLayouts[v.id].dock,cardOriginal.dock);
+          await evaluate("(()=>{document.getElementById('work4-card-candidate')?.remove();return true;})()");
+        }
+        const cardMetrics=await evaluate("(async()=>{const d="+JSON.stringify({
+          webp:references.fleet,frames:cardShots
+        })+";const load=async(type,b64)=>{const i=new Image();i.src='data:image/'+type+';base64,'+b64;"+
+          "await i.decode();return i};const px=i=>{const c=document.createElement('canvas');"+
+          "c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});"+
+          "g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data};"+
+          "const ref=px(await load('webp',d.webp));"+
+          "const regions={full:[0,0,384,512],cards:[15,340,369,430],"+
+          "ship:[65,205,175,307],dock:[0,430,384,512]};"+
+          "const mae=(p,rect)=>{let err=0,n=0;for(let y=rect[1];y<rect[3];y++)"+
+          "for(let x=rect[0];x<rect[2];x++){let j=(y*384+x)*4;for(let k=0;k<3;k++){"+
+          "err+=Math.abs(p[j+k]-ref[j+k]);n++;}}return err/n};"+
+          "const scores=[];for(const [id,b64] of Object.entries(d.frames)){"+
+          "const p=px(await load('png',b64));const row={id};"+
+          "for(const [k,r] of Object.entries(regions))row[k]=mae(p,r);scores.push(row);}"+
+          "return {regions,scores};})()");
+        for(const row of cardMetrics.scores){
+          assert.ok(Math.abs(row.ship-cardMetrics.scores[0].ship)<.03,
+            'card layout may not repaint the approved Royal Crown');
+          assert.ok(Math.abs(row.dock-cardMetrics.scores[0].dock)<.03,
+            'WORK0 dock remains pixel-identical');
+        }
+        const cardStudy={...cardMetrics,layouts:cardLayouts,samePausedFrame:true,
+          viewport:'384x512',source:'assets/design-approved/03-frota.webp',
+          approved:false,approvedScreens:0,candidateOnly:true,
+          note:'No compact roster shipped until visibility and source ROI are evaluated'};
+        writeFileSync(join(folder,'work4-fleet-compact-card-first-fold-study.json'),
+          JSON.stringify(cardStudy,null,2)+'\n');
+        console.log('WORK4_FLEET_CARD_OCCLUSION_AB '+JSON.stringify(cardStudy));
+
+        // WORK4/#104 — reject large crop MAE regressions and test authentic
+        // card-height-preserving label treatments instead. Dock and approved
+        // ship paintings do not move. All styles are temporary same-frame QA.
+        const nameVariants=[
+          {id:'HEAD',css:''},
+          {id:'released-before',css:'transform:translateY(0px)!important;'},
+          {id:'status-at-top',css:'position:absolute!important;top:2px!important;bottom:auto!important;left:2px!important;right:2px!important;z-index:4!important;background:#071e36d9!important;padding:2px 0!important;font-size:7px!important;line-height:1.05!important;'},
+          {id:'status-at-top-low',css:'position:absolute!important;top:15px!important;bottom:auto!important;left:2px!important;right:2px!important;z-index:4!important;background:#071e36d9!important;padding:2px 0!important;font-size:7px!important;line-height:1.05!important;'},
+          {id:'status-on-art',css:'position:absolute!important;bottom:44px!important;top:auto!important;left:2px!important;right:2px!important;z-index:4!important;background:#071e36d9!important;padding:1px 0!important;font-size:7px!important;'},
+          {id:'shift-9',css:'transform:translateY(-9px)!important;'},
+          {id:'shift-10',css:'transform:translateY(-10px)!important;'},
+          {id:'shift-11',css:'transform:translateY(-11px)!important;'},
+          {id:'shift-12',css:'transform:translateY(-12px)!important;'},
+          {id:'shift-14',css:'transform:translateY(-14px)!important;'},
+          {id:'shift-16',css:'transform:translateY(-16px)!important;'}
+        ];
+        const nameSelector='.w4-fleet #w4-fleet-panel .w4-ship-roster > .w4-ship-slot > small';
+        const nameGeometry="(()=>{const rect=e=>{const r=e?.getBoundingClientRect();"+
+          "return r?[r.x,r.y,r.width,r.height]:null};"+
+          "const cards=[...document.querySelectorAll('.w4-ship-roster > .w4-ship-slot')];"+
+          "return {dock:rect(document.querySelector('.harbour-nav.app-dock-porto')),"+
+          "stage:rect(document.querySelector('.w4-harbour-stage')),"+
+          "ship:rect(document.querySelector('.w4-reference-ship')),"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "cards:cards.map(c=>({box:rect(c),name:rect(c.querySelector('strong')),"+
+          "status:rect(c.querySelector('small'))}))};})()";
+        const nameShots:Record<string,string>={HEAD:screenshot};
+        const nameLayouts:Record<string,any>={HEAD:await evaluate(nameGeometry)};
+        for(const v of nameVariants.slice(1)){
+          const textCSS=((v.id==='released-before'||v.id.startsWith('shift-')) ? nameSelector+', '+nameSelector.replace(' > small',' > strong') : nameSelector)+'{'+v.css+'}';
+          await evaluate("(()=>{const s=document.createElement('style');s.id='work4-label-candidate';"+
+            "s.textContent="+JSON.stringify(textCSS)+";document.head.appendChild(s);return true;})()");
+          await sleep(120);
+          nameShots[v.id]=(await command('Page.captureScreenshot',{
+            format:'png',fromSurface:true,captureBeyondViewport:false
+          })).data as string;
+          nameLayouts[v.id]=await evaluate(nameGeometry);
+          assert.equal(nameLayouts[v.id].nav,5);
+          assert.deepEqual(nameLayouts[v.id].ship,nameLayouts.HEAD.ship);
+          assert.deepEqual(nameLayouts[v.id].stage,nameLayouts.HEAD.stage);
+          assert.deepEqual(nameLayouts[v.id].dock,nameLayouts.HEAD.dock);
+          await evaluate("(()=>{document.getElementById('work4-label-candidate')?.remove();return true;})()");
+        }
+        const nameMetrics=await evaluate("(async()=>{const d="+JSON.stringify({
+          webp:references.fleet,frames:nameShots
+        })+";const load=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;await i.decode();return i};"+
+          "const px=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
+          "const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);"+
+          "return g.getImageData(0,0,384,512).data};const orig=px(await load('webp',d.webp));"+
+          "const regions={full:[0,0,384,512],cards:[15,340,369,430],"+
+          "ship:[65,205,175,307],dock:[0,430,384,512]};"+
+          "const mae=(p,r)=>{let err=0,n=0;for(let y=r[1];y<r[3];y++)"+
+          "for(let x=r[0];x<r[2];x++){const q=(y*384+x)*4;"+
+          "for(let k=0;k<3;k++){err+=Math.abs(p[q+k]-orig[q+k]);n++;}}return err/n};"+
+          "const scores=[];for(const [id,img] of Object.entries(d.frames)){"+
+          "const p=px(await load('png',img));const row={id};"+
+          "for(const [key,box] of Object.entries(regions))row[key]=mae(p,box);scores.push(row);}"+
+          "return {regions,scores};})()");
+        // Verify that all REAL status labels and names are visible above the
+        // untouched five-item dock, with no card or 3D ship geometry change.
+        assert.ok(nameLayouts.HEAD.cards.every((card:any)=>
+          card.status[1]+card.status[3] <= nameLayouts.HEAD.dock[1] &&
+          card.name[1]+card.name[3] <= card.status[1]+1),
+          'Royal Crown/three unavailable ship statuses must not hide under the dock');
+        const afterLabel=nameMetrics.scores.find((row:any)=>row.id==='HEAD');
+        const beforeLabel=nameMetrics.scores.find((row:any)=>row.id==='released-before');
+        assert.ok(afterLabel&&beforeLabel,'same-frame before and render required');
+        assert.ok(afterLabel.full<=beforeLabel.full+.45,
+          'visible card labels cannot exceed measured +0.45 global source MAE tradeoff');
+        for(const protectedROI of ['ship','dock']){
+          assert.ok(Math.abs(afterLabel[protectedROI]-beforeLabel[protectedROI])<.03,
+            'text-only correction cannot touch '+protectedROI+' pixels');
+        }
+        const nameMontage=await evaluate("(async()=>{const data="+JSON.stringify({
+          ref:references.fleet,old:nameShots['released-before'],now:screenshot
+        })+";const load=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;await i.decode();return i};"+
+          "const [a,b,c]=await Promise.all([load('webp',data.ref),load('png',data.old),load('png',data.now)]);"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;"+
+          "const g=out.getContext('2d');g.drawImage(a,0,0);g.drawImage(b,384,0);"+
+          "g.drawImage(c,768,0);g.drawImage(a,1152,0);g.globalAlpha=.5;g.drawImage(c,1152,0);"+
+          "return out.toDataURL('image/png').split(',')[1];})()");
+        writeFileSync(join(folder,'work4-fleet-roster-original-before-render-overlay-384x512.png'),
+          Buffer.from(nameMontage,'base64'));
+        const nameReport={...nameMetrics,layouts:nameLayouts,
+          viewport:'384x512',samePausedFrame:true,source:'assets/design-approved/03-frota.webp',
+          approved:false,approvedScreens:0,candidateOnly:false,shipped:'HEAD text translateY(-11px) only',releaseControl:'released-before'};
+        writeFileSync(join(folder,'work4-fleet-roster-label-visibility-ab.json'),
+          JSON.stringify(nameReport,null,2)+'\n');
+        console.log('WORK4_FLEET_ROSTER_LABEL_AB '+JSON.stringify(nameReport));
       }
 
       // WORK4/#104: controlled prospective sea-edge mask study against ORIGINAL 03.
@@ -2028,4 +2207,17 @@ test('WORK4 native source-cannon contour stays isolated from costs, navigation a
   assert.match(suffix,/radial-gradient\(ellipse 125% 115% at 37% 49%/);
   assert.match(suffix,/linear-gradient\(to bottom,#000 0%,#000 96%,transparent 100%\)/);
   assert.doesNotMatch(suffix,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-resource-grid|contain:paint|translateZ)/);
+});
+
+
+test('WORK4 native 384 Fleet names and statuses are raised without touching the dock',()=>{
+  const marker='WORK4/#104 — native 384×512 Fleet roster text visibility';
+  const suffix=css.split(marker)[1];
+  assert.ok(suffix,'native first-fold card status correction required');
+  const body=(suffix.split('*/')[1]||'');
+  assert.match(body,/@media \(width:384px\) and \(height:512px\)/);
+  assert.match(body,/\.w4-fleet #w4-fleet-panel \.w4-ship-roster > \.w4-ship-slot > strong/);
+  assert.match(body,/\.w4-fleet #w4-fleet-panel \.w4-ship-roster > \.w4-ship-slot > small/);
+  assert.match(body,/transform:translateY\(-11px\)/);
+  assert.doesNotMatch(body.split('{').slice(1).join('{'),/\.app-|\.porto-|\.harbour-nav|\.bottom-nav|\.w4-materials|\.w4-forge|position:fixed|width:|height:/);
 });
