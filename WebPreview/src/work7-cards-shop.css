@@ -4144,8 +4144,12 @@
  * Never use screenshots as backgrounds or imply checkout is available.
  * approved:false / 0/8 until owner approves; CI decides merit. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  /* Preserve the genuine highlighted art and vibrant treasure: the first
+     actual CI run rejected darkening the entire pack (ROI +0.43) and gold
+     legendary chest (+0.21); correct ONLY the two winning native inlays. */
   .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.75)}
   .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.74)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.60)}
-  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.82)}
+  /* Darken only the information column, leaving the real painted pack crop
+     and truthful disabled CTA independent, visible and fully interactive. */
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{filter:brightness(.86)}
 }
