@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawn,spawnSync} from 'node:child_process';
-import {readFileSync,mkdirSync,mkdtempSync,writeFileSync,readFileSync as read,rmSync} from 'node:fs';
+import {readFileSync,readdirSync,mkdirSync,mkdtempSync,writeFileSync,readFileSync as read,rmSync} from 'node:fs';
 import {join,resolve} from 'node:path';
 import {tmpdir} from 'node:os';
 import {createServer} from 'node:net';
@@ -257,7 +257,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         const output={...evidence,source:'assets/design-approved/04-melhorias-forja.webp',
           geometry:afterGeometry,viewport:'384x512',samePausedFrame:true,
           approved:false,approvedScreens:0};
-        writeFileSync(join(folder,'forge-stage-controlled-ab.json'),JSON.stringify(output,null,2)+'\\n');
+        writeFileSync(join(folder,'forge-stage-controlled-ab.json'),JSON.stringify(output,null,2)+'\n');
         console.log('WORK4_NATIVE_FORGE_STAGE_AB '+JSON.stringify(output));
       }
 
@@ -623,7 +623,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         delete result.compare;
         const proof={...result,oldGeom,newGeom,sameReactFrame:true,native:'384x512',
           source:'assets/design-approved/04-melhorias-forja.webp',approved:false};
-        writeFileSync(join(folder,'forge-inset-controlled-ab.json'),JSON.stringify(proof,null,2)+'\\n');
+        writeFileSync(join(folder,'forge-inset-controlled-ab.json'),JSON.stringify(proof,null,2)+'\n');
         console.log('WORK4_FORGE_INSET_AB '+JSON.stringify(proof));
         assert.ok(result.after.panel<result.before.panel,
           'wider authentic status inset must improve Forge panel ROI MAE');
@@ -703,7 +703,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           previousGeometry:oldGeo,newGeometry:nowGeo,
           sameReactFrame:true,native:true,approved:false};
         writeFileSync(join(folder,'fleet-panel-controlled-ab.json'),
-          JSON.stringify(evidence,null,2)+'\\n');
+          JSON.stringify(evidence,null,2)+'\n');
         console.log('WORK4_FLEET_PANEL_AB '+JSON.stringify(evidence));
         assert.ok(Math.abs(ab.after.ship-ab.before.ship)<.2,
           'single approved Royal Crown ROI must not move or regress');
@@ -1358,6 +1358,14 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
     }
   }
   writeFileSync(join(folder,'work4-pixel-registration.json'),JSON.stringify(report,null,2)+'\n');
+  // The Chromium A/B artifact is the review deliverable: all JSON records
+  // must actually parse (a trailing literal backslash-n is not valid JSON).
+  for(const filename of readdirSync(folder).filter(name=>name.endsWith('.json'))){
+    const proof=JSON.parse(readFileSync(join(folder,filename),'utf8'));
+    if(Object.hasOwn(proof,'approved')){
+      assert.equal(proof.approved,false,filename+' requires human artistic sign-off');
+    }
+  }
   assert.equal(report.visual.length,8,'four Chromium viewports for both Work4 screens');
 });
 
