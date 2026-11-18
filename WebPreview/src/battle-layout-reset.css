@@ -139,3 +139,59 @@
   .in-battle .command-deck .sliders .scale {font-size:6px}
   .in-battle .command-deck .fire-button {width:88px;height:88px;bottom:27px}
 }
+
+
+/* WORK 0 / #104 · Battle 02, stage-first structural mobile pass.
+   320×568 / native 384×512 / 390×844 / 430×932: the active turn
+   belongs with captain HP, not halfway across the opposing ship.
+   Move the EXISTING non-interactive status cue beside the HP hierarchy;
+   simplify the lower interaction surfaces so the moving 3D stage is dominant.
+   No new controls, fake coins, screenshot art, Porto or shared dock changes.
+   Do not consider this visually approved until real Chromium A/B review. */
+@media (max-width:600px) {
+  .in-battle .battle-hud {
+    top:max(49px,calc(env(safe-area-inset-top) + 46px));
+  }
+  .in-battle .health-card {
+    min-height:44px;
+    border-color:#8e865f;
+    box-shadow:0 2px 5px #06192e88;
+  }
+  .in-battle .command-deck {
+    height:150px;
+    background:linear-gradient(180deg,transparent 0%,#112a3433 36%,#16262c9c 100%);
+    box-shadow:none;
+  }
+  .in-battle .command-deck .turn-line {
+    position:fixed;
+    top:max(107px,calc(env(safe-area-inset-top) + 103px));
+    left:50%;right:auto;bottom:auto;
+    transform:translateX(-50%);
+    width:max-content;max-width:calc(100vw - 54px);
+    height:24px;min-height:24px;padding:4px 10px;
+    border:1px solid #93865c;border-radius:12px;
+    background:#092944db;box-shadow:0 2px 6px #06182b88;
+    gap:7px;
+  }
+  .in-battle .command-deck .turn-line strong {font-size:11px}
+  .in-battle .command-deck .turn-line .message {
+    max-width:48vw;margin-left:0;font-size:10px;
+  }
+  .in-battle .command-deck .sliders {
+    bottom:15px;min-height:68px;
+  }
+  .in-battle .command-deck .sliders label {
+    padding:6px 6px 4px;
+    border:1px solid #9d8c69;
+    background:linear-gradient(180deg,#092942d6,#0a2335a1);
+    box-shadow:none;
+  }
+  .in-battle .command-deck .fire-button {
+    bottom:21px;
+    box-shadow:0 0 0 2px #4f3628,0 5px 12px #03172888;
+  }
+}
+@media (max-width:350px) {
+  .in-battle .command-deck .sliders {bottom:14px}
+  .in-battle .command-deck .fire-button {bottom:24px}
+}
