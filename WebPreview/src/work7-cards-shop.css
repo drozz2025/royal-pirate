@@ -4306,10 +4306,12 @@
  * Move the three EXISTING genuine preview chests closer to the approved dark
  * beveled backgrounds, without touching images, text, 320px clearance,
  * geometry, five-item dock, currency, shared shell or gameplay.
+ * First darker trial (.64/.65/.48) failed 63.08→63.33 and ROI 37.32→38.10;
+ * reject. Calibrate subtle physical enamel values near the measured 06 reference.
  * Only native short screens. Validate against exact v0.1.94 HEAD in a single
  * Chromium scene; do not infer approval from a lower pixel error. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.64)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.65)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.48)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.72)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.73)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.62)}
 }
