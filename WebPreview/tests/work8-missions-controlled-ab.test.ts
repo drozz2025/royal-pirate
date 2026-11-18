@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1159,6 +1159,58 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'candidate must strictly improve 07 original Mission plate ROI and full-frame MAE');
     assert.ok(questInkCompare.metrics.daily.delta<.10 && questInkCompare.metrics.chests.delta<.10,
       'seven reward chests and daily panel cannot regress');
+
+
+    /* WORK8 / #104 — THIS PR only. Same decoded Chromium document and static
+       384x512 frame as the real source; toggle only the quest-list tone CSS.
+       No fake progress/claims, no geometry, no shared WORK0 changes. */
+    const toneFlag='work8-missions-quest-tone-ab-baseline';
+    const toneBeforeLayout=await headingLayout();
+    const toneBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(toneFlag)+');true');
+    await delay(160);
+    const toneAfterLayout=await headingLayout();
+    const toneAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const toneSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),'"__WORK8_TONE_BEFORE__"')
+      .replace(JSON.stringify('data:image/png;base64,'+after),'"__WORK8_TONE_AFTER__"')
+      .replace('"__WORK8_TONE_BEFORE__"',JSON.stringify('data:image/png;base64,'+toneBefore))
+      .replace('"__WORK8_TONE_AFTER__"',JSON.stringify('data:image/png;base64,'+toneAfter))
+      .replace('quests:[12,155,372,321],daily:',
+        'quests:[12,155,372,321],questBoard:[14,184,371,322],daily:');
+    assert.notEqual(toneSource,source,'new native tonal gate must compare independent frames');
+    const toneCompare=await evalJs(toneSource);
+    const saveTone=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
+    saveTone('missions-tone-original-384x512.webp',orig);
+    saveTone('missions-tone-before-384x512.png',toneBefore);
+    saveTone('missions-tone-render-384x512.png',toneAfter);
+    saveTone('missions-tone-original-before-overlay-384x512.png',toneCompare.overlays[0]);
+    saveTone('missions-tone-original-render-overlay-384x512.png',toneCompare.overlays[1]);
+    const toneReport={
+      issue:104,baseHead:"f3fdcdd07c4e71b37e0eaa9f8238136e9f0dbc54",
+      references:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(f=>'assets/design-approved/'+f),
+      scope:'WORK8 only 07 Missions true quest-board tone; no Ranking, Porto or shared dock',
+      method:'same real Chromium 384x512 decoded source and DOM, animations paused, root class isolates .64 vs .59',
+      roi:toneCompare.metrics,unchanged:toneCompare.unchanged,
+      geometry:{before:toneBeforeLayout,after:toneAfterLayout},
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-tone-controlled-ab.json'),JSON.stringify(toneReport,null,2));
+    console.log('WORK8 #104 native 07 quest board tone A/B '+JSON.stringify(toneReport.roi));
+    assert.deepEqual(toneBeforeLayout,toneAfterLayout,'tone-only adjustment cannot move targets or seven chests');
+    assert.equal(toneAfterLayout.questCount,3,'preserve three real objectives');
+    assert.equal(toneAfterLayout.dayCount,7,'preserve seven real rewards');
+    assert.equal(toneAfterLayout.dockCount,5,'preserve five dock items');
+    assert.ok(toneAfterLayout.documentWidth<=386,'no 384 horizontal overflow');
+    assert.ok(toneCompare.unchanged.header<.10&&toneCompare.unchanged.dock<.10,
+      'the shared header and dock must remain pixel-identical');
+    assert.ok(toneCompare.metrics.questBoard.delta<-.01 && toneCompare.metrics.full.delta<-.001,
+      'new board tone must measurably improve original-source ROI and full-screen MAE');
+    assert.ok(toneCompare.metrics.daily.delta<.10 && toneCompare.metrics.chests.delta<.10,
+      'cannot degrade seven daily chests or board');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
