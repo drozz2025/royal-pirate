@@ -44,7 +44,9 @@ test('enemy galleon is red, three-masted and billowed geometry, not an overlay',
 
 test('enemy battle-only presentation leaves the tested camera and Porto intact',()=>{
   const source=readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
-  assert.match(source,/this\.ships\.enemy\.root\.rotation\.y=battleEnemyBroadsideYaw\(battleAspect\)/);\n  assert.equal(battleEnemyBroadsideYaw(384/512),-1.30);\n  assert.equal(battleEnemyBroadsideYaw(1.4),-.95,'desktop yaw is unchanged');
+  assert.match(source,/this\.ships\.enemy\.root\.rotation\.y=battleEnemyBroadsideYaw\(battleAspect\)/);
+  assert.equal(battleEnemyBroadsideYaw(384/512),-1.30);
+  assert.equal(battleEnemyBroadsideYaw(1.4),-.95,'desktop yaw is unchanged');
   assert.match(source,/this\.ships\.enemy\.root\.scale\.setScalar\(battleEnemyScale\(battleAspect\)\)/);
   assert.match(source,/this\.ships\.player\.root\.scale\.setScalar\(1\);this\.ships\.enemy\.root\.scale\.setScalar\(1\)/);
   assert.match(source,/this\.battleForegroundSail\.visible=false;this\.worldScenery\.visible=true/);
