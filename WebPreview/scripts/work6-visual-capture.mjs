@@ -12,7 +12,7 @@ try {
     const ctx=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,reducedMotion:'reduce'});
     const page=await ctx.newPage();
     page.on('pageerror',error=>{throw error;});
-    await page.goto('http://127.0.0.1:5173/',{waitUntil:'domcontentloaded'});
+    await page.goto('http://127.0.0.1:5173/?work6shots=1',{waitUntil:'domcontentloaded'});
     await page.locator('.harbour-battle-button').waitFor({state:'visible',timeout:20000});
     await page.waitForTimeout(2200);
     await page.screenshot({path:resolve(root,`porto-${width}x${height}.png`),animations:'disabled'});
@@ -67,9 +67,39 @@ try {
       await page.screenshot({path:resolve(root,file),animations:'disabled'});
       shotSeries.push({stage:label,elapsedWallMs:Date.now()-shotStarted,file});
     }
+    // Consume the exact GPU framebuffer pixels recorded synchronously on the
+    // live renderer's requestAnimationFrame. Playwright postclick screenshots
+    // are often >1s late on SwiftShader and must NOT be treated as flash proof.
+    const gpuFrames=await page.evaluate(()=>{
+      const stored=window.__royalShotFrames??[];
+      return stored.map((f,i)=>{
+        const canvas=document.createElement('canvas');
+        canvas.width=f.width;canvas.height=f.height;
+        const ctx=canvas.getContext('2d');
+        if(!ctx)throw new Error('No 2D context for live WebGL framebuffer');
+        const image=ctx.createImageData(f.width,f.height),row=f.width*4;
+        for(let y=0;y<f.height;y++){
+          // WebGL readPixels has bottom-left origin; PNG uses top-left.
+          image.data.set(f.rgba.subarray((f.height-y-1)*row,(f.height-y)*row),y*row);
+        }
+        ctx.putImageData(image,0,0);
+        return {ageSec:f.ageSec,width:f.width,height:f.height,
+          stage:i,base64:canvas.toDataURL('image/png').split(',')[1]};
+      });
+    });
+    if(gpuFrames.length<1||!gpuFrames.some(f=>f.ageSec<.31))
+      throw new Error(`No genuine muzzle flash framebuffer captured at ${width}x${height}`);
+    const liveFrames=[];
+    for(const frame of gpuFrames){
+      const file=`battle-gpu-real-${frame.stage}-${width}x${height}.png`;
+      await writeFile(resolve(root,file),Buffer.from(frame.base64,'base64'));
+      liveFrames.push({ageSec:frame.ageSec,file,width:frame.width,height:frame.height,
+        kind:'actual WebGL framebuffer read on live firing frame'});
+    }
     await writeFile(resolve(root,`battle-shot-sequence-${width}x${height}.json`),
       JSON.stringify({viewport:{width,height},realCanvas:true,stages:shotSeries,
-        approval:false,note:'WebGL timing is not deterministic; inspect each captured muzzle frame'},null,2));
+        actualGpuFrames:liveFrames,approval:false,
+        note:'Image evidence is exact renderer frames; artistic approval still requires review.'},null,2));
     console.log(`WORK6 ${width}x${height}: real WebGL 4-frame blast/muzzle evidence, five menu actions, sliders and DISPARAR confirmed`);
     await ctx.close();
   }
