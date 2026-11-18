@@ -150,6 +150,14 @@ test('07 Missions: measured reward column registration native 384x512 A/B', {tim
     await delay(150);
     if(browser?.exitCode===null)browser.kill('SIGKILL');
     if(vite.exitCode===null)vite.kill('SIGKILL');
-    rmSync(profile,{recursive:true,force:true,maxRetries:12,retryDelay:150});
+    // A dying Chromium process may keep recreating Default/* while Node
+    // recursively removes the temporary profile, yielding ENOTEMPTY even
+    // though all visual assertions and gameplay checks have passed.
+    // Cleanup must remain best effort; ephemeral CI runner removes /tmp.
+    try {
+      rmSync(profile,{recursive:true,force:true,maxRetries:24,retryDelay:250});
+    } catch(error) {
+      console.warn('WORK8 ephemeral Chromium profile cleanup deferred:',String(error));
+    }
   }
 });
