@@ -92,61 +92,48 @@ export class OceanScene {
         col=mix(col,vec3(.6,.85,.87),fog);
         // Battle-only whitecaps: waves remain animated and ship collisions untouched.
         if(battleMode>.5){
-          // BATALHA 02: long, irregular surf lines instead of a checkerboard.
-          // Shader-only: Porto keeps its separate original battleMode path.
-          float swell=sin(vWorld.z*.33+sin(vWorld.x*.17+time*.29)*1.35-time*.63);
-          float cross=sin(vWorld.x*.73-vWorld.z*.18+time*.57);
-          float crest=sin(vWorld.x*2.35+vWorld.z*1.04+
-                          sin(vWorld.z*.93-time*.71)*.87-time*2.02);
-          float flecks=sin(vWorld.x*6.20-vWorld.z*3.35+time*3.2);
-          float ridge=smoothstep(.29,.83,swell*.61+cross*.18+crest*.24);
-          float whiteCap=smoothstep(.53,.92,crest*.75+flecks*.25)*ridge;
-          float distanceToEye=length(cameraPosition.xz-vWorld.xz);
-          float proximity=1.-smoothstep(20.,88.,distanceToEye);
-          float rolling=sin(vWorld.z*.83-time*.93+
-                           sin(vWorld.x*.29+time*.18)*1.22);
-          float breaker=smoothstep(.72,.97,rolling)*smoothstep(.22,.71,ridge);
-          float crestShine=smoothstep(.69,.95,
-            sin(vWorld.x*2.07+vWorld.z*.94-time*1.86))*breaker;
-          float foam=clamp(ridge*.17+whiteCap*.31+
-            breaker*.19+crestShine*.13,0.,.72)*(.68+.22*proximity);
-          // Discontinuous organic lips leave darker troughs between crests.
-          float paintedSwell=sin(vWorld.z*.59-time*.71+
-            sin(vWorld.x*.27+time*.13)*1.44+
-            sin(vWorld.x*.72-vWorld.z*.13)*.20);
-          float brokenEdges=.50+.50*sin(vWorld.x*1.19+
-            sin(vWorld.z*.21+time*.29)*1.31);
-          float foamyLip=smoothstep(.77,.97,paintedSwell)*
-            smoothstep(-.15,.67,brokenEdges);
-          float stipple=smoothstep(.54,.96,
-            sin(vWorld.x*3.12+vWorld.z*.95-time*1.96))*foamyLip;
-          foam=max(foam,clamp(foamyLip*.42+stipple*.15,0.,.56));
-          float shadowLip=(smoothstep(.10,.52,paintedSwell)-
-            smoothstep(.71,.96,paintedSwell))*.16;
-          // Animated surf around the actual battle hull locations. These white
-          // wakes live in the water shader, not in an image over the controls.
+          // Battle-only: broad, interleaved painted swells replace the
+          // repeating high-frequency blue tile/white checkerboard. The
+          // physical ocean geometry, cannon ballistics and Porto shader path
+          // are unchanged. Fewer sin() layers improve mobile GPU budget.
+          float longSwell=sin(vWorld.z*.24-time*.58+
+            sin(vWorld.x*.115+time*.14)*1.41);
+          float crossSwell=sin(vWorld.x*.32+vWorld.z*.13+time*.41);
+          float lip=sin(vWorld.z*.53-time*.94+
+            sin(vWorld.x*.39-vWorld.z*.12+time*.26)*.70);
+          float brokenEdge=sin(vWorld.x*1.13-vWorld.z*.23+
+            sin(vWorld.z*.26+time*.18)*1.3);
+          float ridge=smoothstep(.52,.88,
+            longSwell*.74+crossSwell*.22+lip*.12);
+          float fragmented=.32+.68*smoothstep(-.27,.81,brokenEdge);
+          float crestMask=ridge*fragmented;
+          float foam=crestMask*(.15+
+            .24*smoothstep(.31,.85,lip));
+          // Foam is sparse near the viewer and lies on real undulating
+          // crests rather than washing every adjacent polygon white.
+          float eyeDistance=length(cameraPosition.xz-vWorld.xz);
+          foam*=.91-.19*(1.-smoothstep(14.,78.,eyeDistance));
+          // Hand-painted wakes attached to the visible ship positions, not
+          // generated as camera-facing CSS or postprocessing screenshots.
           vec2 playerShip=vec2(-10.,3.);
           vec2 enemyShip=vec2(10.,-3.);
           float a=length((vWorld.xz-playerShip)/vec2(3.2,6.8));
-          // Match the smaller mobile DISPLAY hull, without moving collisions.
           float b=length((vWorld.xz-enemyShip)/vec2(4.15,8.5));
-          float hullSurf=max(exp(-pow((a-.88)*5.2,2.)),
-            exp(-pow((b-.89)*6.3,2.)));
-          float streamA=exp(-pow((vWorld.x+10.)/4.7,2.))
-            *smoothstep(1.5,6.5,3.-vWorld.z)*(1.-smoothstep(12.,38.,3.-vWorld.z));
-          float streamB=exp(-pow((vWorld.x-10.)/4.7,2.))
-            *smoothstep(1.5,6.5,-3.-vWorld.z)*(1.-smoothstep(12.,38.,-3.-vWorld.z));
-          float streamRipples=.54+.46*sin(vWorld.z*2.5-time*3.4+sin(vWorld.x*.92));
-          foam=max(foam,clamp(hullSurf*.57+(streamA+streamB)*streamRipples*.24,0.,.69));
-          // Indigo troughs and turquoise crests: tonal VOLUME, not just an
-          // overlaid blue tint. Wave shadows follow the painted wave ridge.
-          vec3 deep=mix(vec3(.008,.12,.31),vec3(.017,.43,.65),
-                        clamp(.48+vWave*1.04+swell*.18+cross*.07,0.,1.));
-          deep*=1.-shadowLip;
-          deep=mix(deep,vec3(.19,.71,.82),fres*.34);
-          col=mix(deep,vec3(.82,.94,.95),foam);
-          col+=vec3(.88,.95,.84)*spec*.31;
-          col=mix(col,vec3(.30,.66,.84),fog*.42);
+          float hullSurf=max(exp(-pow((a-.88)*4.5,2.)),
+            exp(-pow((b-.89)*5.7,2.)));
+          float wake=sin(vWorld.z*1.33-time*2.31+
+            sin(vWorld.x*.68)*.46)*.5+.5;
+          foam=max(foam,hullSurf*(.22+.23*wake));
+          foam=clamp(foam,0.,.49);
+          // Deep shaded troughs, coastal blue-green lit crests, subdued
+          // specular paint: the water should support the red galleon.
+          vec3 deep=mix(vec3(.012,.13,.28),vec3(.028,.39,.55),
+            clamp(.55+vWave*.82+longSwell*.16+crossSwell*.08,0.,1.));
+          deep*=1.-.09*(1.-ridge);
+          deep=mix(deep,vec3(.18,.62,.70),fres*.27);
+          col=mix(deep,vec3(.78,.92,.91),foam);
+          col+=vec3(.78,.91,.82)*spec*.22;
+          col=mix(col,vec3(.37,.67,.78),fog*.45);
         }
         gl_FragColor=vec4(col,1.);
       }
