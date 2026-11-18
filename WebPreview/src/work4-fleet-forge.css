@@ -3074,3 +3074,16 @@
     background:linear-gradient(90deg,#075684ec 0%,#0a4b74ed 12%,#0b3655f6 28%,#06263ff9 44%,#031b30fa 70%,#031729fb 100%)!important;
   }
 }
+
+/* WORK4/#104 — 18 Nov 22h: source-dark inset interior with a preserved ocean-blue rim
+   The approved 03 source places deep indigo just behind the LIVE stats but
+   translucent ocean blue at the left join. The previous broad aqua band
+   remained too bright across the text area. Sharpen ONLY the inner pigment
+   falloff; keep the left sea-blue lip, one approved Royal Crown, source water,
+   3 real levels, 4 slots, hit targets and WORK0 dock unchanged. Native
+   384x512 only; A/B is tested on one paused Chromium frame against source. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    background:linear-gradient(90deg,#075684ec 0%,#075080ed 6%,#09263ef5 16%,#04182af9 27%,#042039f9 45%,#031b30fa 68%,#031729fb 100%)!important;
+  }
+}
