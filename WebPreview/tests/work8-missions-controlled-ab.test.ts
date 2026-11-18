@@ -1328,12 +1328,12 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(150);
     const starterBeforeLayout=await headingLayout();
     const starterBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    const starterBeforeInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li.is-starter .w8-approved-chest")).filter');
+    const starterBeforeInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:nth-child(1) .w8-approved-chest")).filter');
     await evalJs('document.documentElement.classList.remove('+JSON.stringify(starterFlag)+');true');
     await delay(150);
     const starterAfterLayout=await headingLayout();
     const starterAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    const starterAfterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li.is-starter .w8-approved-chest")).filter');
+    const starterAfterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:nth-child(1) .w8-approved-chest")).filter');
     assert.notEqual(starterBeforeInk,starterAfterInk,'first-three real reward paintings must change');
     const starterSource=source
       .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+starterBefore))
