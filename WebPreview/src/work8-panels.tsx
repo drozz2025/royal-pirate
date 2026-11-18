@@ -271,7 +271,7 @@ function W8SeaBackdrop({variant}:{variant:'missions'|'ranking'}){
  * The existing live SVG remains behind each image as an offline/failure fallback.
  * Never use the approved screenshot as a panel background or a player data source.
  */
-type W8ApprovedCrop = 'title-missions'|'title-ranking'|'quest-swords'|'quest-ship'|'quest-target'|'captain'|'league-badge'|'chest-silver'|'chest-gold'|'chest-violet'|'chest-royal'|'daily-heading'|'reward-coin'|'reward-gem';
+type W8ApprovedCrop = 'title-missions'|'title-ranking'|'quest-swords'|'quest-ship'|'quest-target'|'captain'|'league-badge'|'chest-silver'|'chest-gold'|'chest-violet'|'chest-royal'|'daily-heading';
 const W8_ART_CROPS:Record<W8ApprovedCrop,{rect:string;frame:'missions'|'ranking'}>={
   // The original engraved plaques replace only the two existing static decorative headers.
   'title-missions':{rect:'98 74 189 45',frame:'missions'},
@@ -287,9 +287,6 @@ const W8_ART_CROPS:Record<W8ApprovedCrop,{rect:string;frame:'missions'|'ranking'
   'chest-gold':{rect:'213 362 42 46',frame:'missions'},
   'chest-violet':{rect:'257 362 44 46',frame:'missions'},
   'chest-royal':{rect:'305 353 62 57',frame:'missions'},
-  // Purely decorative source-painted icons: never crop values, claim marks or prices.
-  'reward-coin':{rect:'206 191 31 34',frame:'missions'},
-  'reward-gem':{rect:'245 191 31 34',frame:'missions'},
 };
 function W8ApprovedPainting({art}:{art:W8ApprovedCrop}){
   const {rect,frame}=W8_ART_CROPS[art];
@@ -536,8 +533,8 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
               </div>
             </div>
             <div className="w8-approved-quest-rewards">
-              <span className="w8-approved-coin" title="Moedas locais"><span className="w8-reward-fallback" aria-hidden="true">●</span><W8ApprovedPainting art="reward-coin"/><strong>{mission.reward}</strong></span>
-              <span className="w8-approved-gem" title="Gemas indisponíveis"><span className="w8-reward-fallback" aria-hidden="true">◆</span><W8ApprovedPainting art="reward-gem"/><strong>—</strong></span>
+              <span className="w8-approved-coin" title="Moedas locais"><span className="w8-reward-fallback" aria-hidden="true">●</span><strong>{mission.reward}</strong></span>
+              <span className="w8-approved-gem" title="Gemas indisponíveis"><span className="w8-reward-fallback" aria-hidden="true">◆</span><strong>—</strong></span>
             </div>
             <button type="button" disabled={claimed} onClick={()=>{
               if(canCollect){onMission(id);setMessage('Recompensa de '+titles[id]+' recolhida neste dispositivo.');}
@@ -579,40 +576,22 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
           }
         }
 
-        /* WORK8 #104 · 07 Missões only. The approved first-row coin and gem
-           are static original artwork, not player balances. Real numeric
-           rewards and unavailable-gem markers remain live and unchanged.
-           Use the SVG source crop only on short native mobile framing;
-           the legacy glyph stays as a fallback and A/B baseline. */
+        /* WORK8 / #104 — 07 Missões real mission reward-column alignment.
+           The native 384px reference has a narrow progress meter and TWO
+           distinct reward symbols before the genuine mission action. Current
+           grid reserved just 40px for both rewards. Rebalance the *three real*
+           rows only; preserve actual saved progress, text, monetary rewards,
+           five-item dock, seven daily chest slots and every interaction.
+           Root class provides a strict same-frame Chromium HEAD A/B. */
         @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
-          .w8-approved-missions .w8-approved-quest-rewards > span {
-            position:relative;
-            isolation:isolate;
+          :root:not(.work8-missions-reward-grid-ab-baseline)
+            .w8-approved-missions .w8-approved-quest {
+            grid-template-columns:38px minmax(0,1fr) 80px 59px;
           }
-          .w8-approved-missions .w8-approved-quest-rewards > span > svg.w8-approved-painting-reward-coin,
-          .w8-approved-missions .w8-approved-quest-rewards > span > svg.w8-approved-painting-reward-gem {
-            display:none;
-          }
-          :root:not(.work8-missions-reward-icon-ab-baseline)
-            .w8-approved-missions .w8-approved-quest-rewards > span > svg.w8-approved-painting-reward-coin,
-          :root:not(.work8-missions-reward-icon-ab-baseline)
-            .w8-approved-missions .w8-approved-quest-rewards > span > svg.w8-approved-painting-reward-gem {
-            position:absolute;
-            z-index:2;
-            pointer-events:none;
-            display:block;
-            width:27px;
-            height:27px;
-            top:-5px;
-            left:50%;
-            transform:translateX(-50%);
-            border-radius:0;
-            overflow:hidden;
-            filter:drop-shadow(0 1px 1px #01182a);
-          }
-          :root:not(.work8-missions-reward-icon-ab-baseline)
-            .w8-approved-missions .w8-approved-quest-rewards .w8-reward-fallback {
-            opacity:0;
+          :root:not(.work8-missions-reward-grid-ab-baseline)
+            .w8-approved-missions .w8-approved-quest-rewards {
+            justify-content:space-around;
+            gap:2px;
           }
         }
       `}</style>
