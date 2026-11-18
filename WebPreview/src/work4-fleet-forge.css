@@ -3087,3 +3087,14 @@
     background:linear-gradient(90deg,#075684ec 0%,#075080ed 6%,#09263ef5 16%,#04182af9 27%,#042039f9 45%,#031b30fa 68%,#031729fb 100%)!important;
   }
 }
+
+/* WORK4/#104 — 18 Nov 23h: native source-depth inset A/B v2
+   One controlled native-frame experiment: shorten the blue lip of the REAL
+   Fleet upgrade inset and deepen the timber/navy pigment behind the actual
+   progression rows. No ship/water crop, geometry, cards or shared UI edits.
+   All gradients belong to 03 Frota at 384x512 only. Human approval pending. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    background:linear-gradient(90deg,#075684ec 0%,#075080ed 4%,#071f36f5 11%,#031626f9 22%,#032036f9 42%,#02192dfa 68%,#021426fb 100%)!important;
+  }
+}
