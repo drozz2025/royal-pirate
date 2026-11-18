@@ -566,7 +566,7 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
           :root:not(.work8-missions-mid-chests-ab-baseline) .w8-approved-missions
           .w8-approved-days li:nth-child(5) .w8-approved-chest > svg.w8-approved-painting-chest-gold { width:42px; }
           :root:not(.work8-missions-mid-chests-ab-baseline) .w8-approved-missions
-          .w8-approved-days li:nth-child(6) .w8-approved-chest > svg.w8-approved-painting-chest-violet { width:44px; left:calc(50% - 10px); }
+          .w8-approved-days li:nth-child(6):nth-child(6) .w8-approved-chest > svg.w8-approved-painting-chest-violet { width:44px; left:calc(50% - 10px); }
           :root:not(.work8-missions-mid-chests-ab-baseline) .w8-approved-missions
           .w8-approved-days li:nth-child(n+4):nth-child(-n+6) > small {
             position:relative;
