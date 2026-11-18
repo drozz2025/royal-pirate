@@ -3061,3 +3061,16 @@
     mask-composite:intersect;
   }
 }
+
+/* WORK4/#104 — 18 Nov 21h: connect the ONE original Royal Crown to the live
+   inset at native 384×512. Source 03 has translucent ocean-blue behind the
+   inset's left lip; the previous near-black rectangular paint made a stark
+   vertical edge where its photograph meets live levels. A short blue-to-ink
+   pigment transition changes ONLY the existing live inset BACKGROUND. No new
+   crop, fake wave, dummy stats, ship, hitbox, stage size or shared shell.
+   The measured Chromium A/B in the Work4-native test freezes one real frame. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    background:linear-gradient(90deg,#075684ec 0%,#0a4b74ed 12%,#0b3655f6 28%,#06263ff9 44%,#031b30fa 70%,#031729fb 100%)!important;
+  }
+}
