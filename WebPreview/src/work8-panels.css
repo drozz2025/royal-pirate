@@ -5179,15 +5179,16 @@
 }
 
 
-/* WORK8/#104 · 07 MISSÕES ONLY · source-frame maritime painting.
-   The original approved 384x512 artwork has a subdued deep-blue coastal
-   panorama around the real mission tabs. The existing scene SVG was
-   over-brightened and oversaturated by the general 07/08 pigment rules.
-   Retune ONLY the Missions SVG backdrop: the authentic three objective
-   rows, seven chest claims, Ranking 08, shared dock, Porto and shell are
-   unaffected. An isolated root flag permits controlled same-frame A/B. */
+/* WORK0/#104 · 07 MISSÕES ONLY · fix visual QA / coastal backdrop.
+   Real 384x512 Chromium measurements against approved 07-missoes.webp
+   rejected the old permanent .80 dimmer: compared with unfiltered art,
+   it INCREASED coastal MAE by 2.154 and full-screen MAE by 0.501.
+   Ship the more faithful unfiltered original SVG. Retain the rejected
+   dimmer ONLY behind an A/B baseline class so the existing browser test
+   can compare old vs new on the same decoded, paused live scene.
+   This does not touch mission state, rewards, layout, Porto, dock or Ranking. */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
-  :root:not(.work8-missions-coast-ab-baseline) .w8-approved-missions .w8-approved-scene .w8-seascape {
+  :root.work8-missions-coast-ab-baseline .w8-approved-missions .w8-approved-scene .w8-seascape {
     filter:saturate(1.02) contrast(1.08) brightness(.80)
       drop-shadow(0 3px 2px rgba(2,25,45,.32));
   }
