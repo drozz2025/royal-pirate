@@ -227,7 +227,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       // the shipped CSS stays unchanged until a measured improvement is chosen.
       if(screen==='fleet'&&width===384&&height===512){
         const maskFadeOptions=[
-          {id:'HEAD-34',fade:null},
+          {id:'HEAD-8',fade:null},
           {id:'opaque-0',fade:0},{id:'fade-8',fade:8},
           {id:'fade-16',fade:16},{id:'fade-24',fade:24},
           {id:'fade-28',fade:28},{id:'fade-34',fade:34},
