@@ -391,6 +391,50 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
+
+        // WORK7 v0.1.94 native controlled diagnostic: isolate each single
+        // physical card color against exact merged HEAD, never old PR values.
+        // Trial styles are removed after each real same-frame screenshot.
+        if(kind==='cards' && width===384 && height===512){
+          const baseFilters:Record<number,string>={
+            5:'brightness(.45) saturate(2.00) contrast(.85)',
+            6:'brightness(.65) saturate(1.30) contrast(.92)',
+            7:'brightness(.42) saturate(1.75) contrast(.79)',
+            8:'brightness(.64) saturate(1.90) contrast(.88)'
+          };
+          const scan:Array<{slot:number;bright:number;sat:number;contrast:number}>=[];
+          for(const [slot,base,sat,contrast] of [
+            [5,.45,2,.85],[6,.65,1.3,.92],[7,.42,1.75,.79],[8,.64,1.9,.88]
+          ])for(const offset of [-.08,-.05,-.03,-.015,.015,.03,.05,.08]){
+            scan.push({slot,bright:Number((base+offset).toFixed(3)),sat,contrast});
+          }
+          for(const entry of scan){
+            const styles=Object.entries(baseFilters).map(([slot,value])=>
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+slot+'){filter:'+value+'!important}'
+            ).join('');
+            const override='.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+entry.slot+')'+
+              '{filter:brightness('+entry.bright+') saturate('+entry.sat+') contrast('+entry.contrast+')!important}';
+            const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+styles+override+'}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-card-sweep';s.textContent="+
+              JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
+            await sleep(50);
+            const shot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+            const metrics=await evaluate("(async()=>{"+
+              "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "const ref=await load("+JSON.stringify(refUrl)+"),img=await load("+
+                 JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+");"+
+              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+              "const ctx=cv.getContext('2d');ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
+              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
+              "let sum=0,roi=0,roiCount=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){"+
+              "const p=(y*384+x)*4;for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;"+
+              "if(x>=18&&x<365&&y>=195&&y<428){roi+=v;roiCount++}}}"+
+              "return {full:Number((sum/(384*512*3)).toFixed(5)),roi:Number((roi/roiCount).toFixed(5))}})()");
+            console.log('WORK7 NATIVE CARD SWEEP '+JSON.stringify({...entry,...metrics}));
+            await evaluate("(()=>{document.getElementById('w7-card-sweep')?.remove();return true})()");
+          }
+        }
+
         // WORK7 experimental tuning grid, never applied to the production UI:
         // same 384x512 screenshot frame and same approved artwork for every
         // real-chest brightness candidate; log absolute native MAE/ROI and
