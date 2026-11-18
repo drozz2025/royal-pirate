@@ -813,6 +813,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       approved:false,approvedScreens:0
     };
     writeFileSync(join(evidence,'work8-missions-coast-controlled-ab.json'),JSON.stringify(coastReport,null,2));
+    console.log('WORK8 coast CSS diagnostic '+JSON.stringify({before:coastBeforeComputed,after:coastAfterComputed}));
     console.log('WORK8 07 native coastal painting A/B '+JSON.stringify(coastReport.roi));
     assert.deepEqual(coastBeforeLayout,coastAfterLayout,'coastal pigment must not move ANY native Missions geometry');
     assert.equal(coastAfterLayout.questCount,3);
