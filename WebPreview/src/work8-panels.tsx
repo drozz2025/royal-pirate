@@ -533,8 +533,8 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
               </div>
             </div>
             <div className="w8-approved-quest-rewards">
-              <span className="w8-approved-coin" title="Moedas locais">●<strong>{mission.reward}</strong></span>
-              <span className="w8-approved-gem" title="Gemas indisponíveis">◆<strong>—</strong></span>
+              <span className="w8-approved-coin" title="Moedas locais"><span className="w8-reward-fallback" aria-hidden="true">●</span><strong>{mission.reward}</strong></span>
+              <span className="w8-approved-gem" title="Gemas indisponíveis"><span className="w8-reward-fallback" aria-hidden="true">◆</span><strong>—</strong></span>
             </div>
             <button type="button" disabled={claimed} onClick={()=>{
               if(canCollect){onMission(id);setMessage('Recompensa de '+titles[id]+' recolhida neste dispositivo.');}
@@ -573,6 +573,25 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
             z-index:4;
             background:linear-gradient(180deg,rgba(7,25,42,.93),rgba(7,25,42,.96));
             border-radius:2px;
+          }
+        }
+
+        /* WORK8 / #104 — 07 Missões real mission reward-column alignment.
+           The native 384px reference has a narrow progress meter and TWO
+           distinct reward symbols before the genuine mission action. Current
+           grid reserved just 40px for both rewards. Rebalance the *three real*
+           rows only; preserve actual saved progress, text, monetary rewards,
+           five-item dock, seven daily chest slots and every interaction.
+           Root class provides a strict same-frame Chromium HEAD A/B. */
+        @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+          :root:not(.work8-missions-reward-grid-ab-baseline)
+            .w8-approved-missions .w8-approved-quest {
+            grid-template-columns:38px minmax(0,1fr) 96px 59px;
+          }
+          :root:not(.work8-missions-reward-grid-ab-baseline)
+            .w8-approved-missions .w8-approved-quest-rewards {
+            justify-content:space-around;
+            gap:2px;
           }
         }
       `}</style>
