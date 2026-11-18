@@ -646,10 +646,10 @@ export class OceanScene {
     // Native 384x512 artwork: the player's large black sail is cropped by the
     // LEFT edge, not parked in the center. Tall phone framing stays unchanged.
     // This is one existing battle-only sail, never a third ship or a new jib.
-    this.battleForegroundSail.position.x=compactBattle?-5.25:-3.6;
+    this.battleForegroundSail.position.x=pose.sailX;
     // The giant black left sail hid the enemy and half the arena on mobile.
     // Keep a thin rigged foreground silhouette, freeing the central ocean.
-    this.battleForegroundSail.scale.set(.48,.72,1);
+    this.battleForegroundSail.scale.set(pose.sailScaleX,pose.sailScaleY,1);
     // A fixed forward-looking viewpoint, not the rejected moving camera.
     // The battle-only camera targets the actual fixed pose in battle-framing.ts.
     // On 320/384 the starboard enemy is closer, right-of-centre and framed
@@ -658,6 +658,7 @@ export class OceanScene {
     this.controls.target.set(...pose.target);
     this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;
     this.battleBattery.visible=pose.showBattery;
+    this.battleBattery.position.x=pose.batteryOffsetX;
     this.battleBattery.position.z=pose.batteryOffsetZ;
     this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}

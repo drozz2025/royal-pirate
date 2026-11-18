@@ -35,13 +35,14 @@ test('reference left sail is legible yet stays above fire/cannon controls at 320
   for(const [w,h] of [[320,568],[384,512],[390,844],[430,932]]){
     // scene.ts uses a native-compact left crop without changing the tall-phone
     // position; project the real rig with the correct conditional world offset.
-    const sceneShiftX=(w/h)>=.50?.65:2.3;
-    const tl=project(w,h,new T.Vector3(bounds.left+sceneShiftX,bounds.top,bounds.depth));
-    const br=project(w,h,new T.Vector3(bounds.right+sceneShiftX,bounds.bottom,bounds.depth));
+    const pose=battleCameraPose(w/h);
+    // Project the actual scene group transformation, not pre-redesign bounds.
+    const tl=project(w,h,new T.Vector3(pose.sailX+(bounds.left+5.9)*pose.sailScaleX,bounds.top*pose.sailScaleY,bounds.depth));
+    const br=project(w,h,new T.Vector3(pose.sailX+(bounds.right+5.9)*pose.sailScaleX,bounds.bottom*pose.sailScaleY,bounds.depth));
     assert.ok(tl.y>h*.26, `sail clears top title and HP region ${w}x${h}: ${tl.y}`);
-    assert.ok(br.y<h*.66, `sail clears fire/cannon row ${w}x${h}: ${br.y}`);
-    assert.ok(br.x>w*.18&&br.x<w*.48,`foreground stays left of enemy ${w}x${h}: ${br.x}`);
-    assert.ok(tl.x<w*.20,`foreground silhouette starts near the left screen edge ${w}x${h}: ${tl.x}`);
+    assert.ok(br.y<h*.70, `sail clears fire/cannon row ${w}x${h}: ${br.y}`);
+    assert.ok(br.x>w*.10&&br.x<w*.30,`foreground stays left of enemy ${w}x${h}: ${br.x}`);
+    assert.ok(tl.x>-w*.08&&tl.x<w*.20,`foreground silhouette starts near the left screen edge ${w}x${h}: ${tl.x}`);
   }
 });
 

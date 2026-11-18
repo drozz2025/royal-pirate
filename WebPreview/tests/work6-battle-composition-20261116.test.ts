@@ -22,7 +22,7 @@ test('WORK6: enemy scale and left sail crop are strictly battle-only, Porto rest
   const home=scene.split('  home(){')[1]?.split('  deck(){')[0]??'';
   const porto=scene.split('  showHarbour(){')[1]?.split('  /** Harbour only:')[0]??'';
   assert.match(home,/compactBattle\?1\.88:1\.82/);
-  assert.match(home,/battleForegroundSail\.position\.x=compactBattle\?-5\.25:-3\.6/);
+  assert.match(home,/battleForegroundSail\.position\.x=pose\.sailX/);
   assert.match(home,/this\.ships\.player\.root\.visible=false/);
   assert.match(porto,/this\.ships\.player\.root\.scale\.setScalar\(1\);this\.ships\.enemy\.root\.scale\.setScalar\(1\)/);
   assert.match(porto,/this\.battleBattery\.visible=false;this\.battleForegroundSail\.visible=false/);
