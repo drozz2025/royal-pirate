@@ -926,6 +926,59 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(midCompare.metrics.quests.delta<.10&&midCompare.metrics.daily.delta<.25,
       'three real quests and overall daily reward board must not regress');
 
+
+    /* WORK8/#104: human-approved native frame 07. Search paint-only palettes,
+       never synthetic mission data. Every candidate is compared against the
+       identical 384×512 Chromium page with all animations frozen. This run
+       reports evidence, and NEVER marks a candidate as approved. */
+    const paintStartLayout=await headingLayout();
+    const paintStart=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const paintSpecs:{name:string,selector:string,decl:string}[]=[];
+    for(const c of ['#54778a','#4b7285','#648d99','#72929d','#536c79','#75877c','#314d65','#42667b','#507889'])
+      paintSpecs.push({name:'quest-border-'+c,selector:'.w8-approved-quest',decl:'border-color:'+c+'!important'});
+    for(const c of ['#708c90','#809b98','#aec2c1','#d1b177','#5c7e91','#51738c','#6c838b','#77978b'])
+      paintSpecs.push({name:'meter-border-'+c,selector:'.w8-approved-meter',decl:'border-color:'+c+'!important'});
+    for(const c of ['#041a2e','#061f32','#09283a','#0a2d45','#071b32','#061b2a'])
+      paintSpecs.push({name:'meter-bg-'+c,selector:'.w8-approved-meter',decl:'background:'+c+'!important'});
+    for(const n of [1.04,1.08,1.12,1.16,1.20,1.24])
+      paintSpecs.push({name:'icon-brightness-'+n,selector:'.w8-approved-quest-art > svg.w8-approved-painting',decl:'filter:brightness('+n+') saturate(1.03) drop-shadow(0 2px 1px #041a2b9e)!important'});
+    for(const c of ['#6f91a3','#567c8e','#92aab7','#acc1c8','#719d98','#52738f'])
+      paintSpecs.push({name:'cta-border-'+c,selector:'.w8-approved-quest[data-state=active]>button',decl:'border-color:'+c+'!important'});
+    for(const c of ['#b1a17f','#a3a8a4','#77929d','#8b9da0','#c0a97e','#b5c2be'])
+      paintSpecs.push({name:'daily-outline-'+c,selector:'.w8-approved-daily',decl:'border-color:'+c+'!important'});
+    for(const c of ['#e7d49b','#ffdda1','#f8c875','#f3d9a1','#d5bc84'])
+      paintSpecs.push({name:'daily-heading-'+c,selector:'.w8-approved-daily h3',decl:'color:'+c+'!important'});
+    for(const c of ['#1c4c65','#1a4c68','#1d5067','#1a4b63','#184b69','#1e4b69','#1b4b65'])
+      paintSpecs.push({name:'quest-blue-'+c,selector:'.w8-approved-quest',decl:'background:radial-gradient(ellipse 100% 85% at 0% 38%,#438a9770,transparent 69%),linear-gradient(171deg,'+c+',#10334f 49%,#071e35)!important'});
+    const paintResults:any[]=[];let bestPaintShot:string|undefined,bestPaintDelta=0,bestPaintName='';
+    for(const spec of paintSpecs){
+      await evalJs('(()=>{let s=document.getElementById("work8-paint-probe");if(!s){s=document.createElement("style");s.id="work8-paint-probe";document.head.append(s)}s.textContent='+JSON.stringify('.w8-approved-missions '+spec.selector+'{'+spec.decl+'}')+';return true})()');
+      await delay(22);
+      const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      const probe=source
+        .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+paintStart))
+        .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+shot))
+        .replace('quests:[12,155,372,321],daily:',
+          'quests:[12,155,372,321],questIcons:[14,157,72,318],questPlates:[14,156,371,318],questMeters:[74,174,224,310],daily:');
+      const result=await evalJs(probe);
+      const m=result.metrics;
+      paintResults.push({name:spec.name,full:+m.full.delta.toFixed(5),quests:+m.quests.delta.toFixed(5),questPlates:+m.questPlates.delta.toFixed(5),icons:+m.questIcons.delta.toFixed(5),meters:+m.questMeters.delta.toFixed(5),daily:+m.daily.delta.toFixed(5),chests:+m.chests.delta.toFixed(5)});
+      if(m.full.delta<bestPaintDelta&&m.quests.delta<0&&m.daily.delta<=.05&&m.chests.delta<=.05){
+        bestPaintDelta=m.full.delta;bestPaintShot=shot;bestPaintName=spec.name;
+      }
+    }
+    await evalJs('document.getElementById("work8-paint-probe")?.remove();true');
+    const paintEndLayout=await headingLayout();
+    assert.deepEqual(paintStartLayout,paintEndLayout,'all palette probes must leave real 07 geometry fixed');
+    paintResults.sort((a,b)=>a.full-b.full);
+    console.log('WORK8 native 07 palette probe BEST '+JSON.stringify({bestPaintName,bestPaintDelta,top:paintResults.slice(0,20)}));
+    writeFileSync(join(evidence,'work8-missions-07-palette-search.json'),JSON.stringify({
+      base:'732093858b070f240e70f6c96fee0e678632cdb4',reference:'assets/design-approved/07-missoes.webp',allReferences:'assets/design-approved/00-referencia-original-aprovada.webp,00-painel-oito-ecras.webp,01-08',
+      method:'native 384x512 DPR1 one DOM/frame, paused animations and real data',results:paintResults,
+      bestPaintName,bestPaintDelta,approved:false,approvedScreens:0
+    },null,2));
+    if(bestPaintShot)writeFileSync(join(evidence,'work8-07-palette-best-render-384x512.png'),Buffer.from(bestPaintShot,'base64'));
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
