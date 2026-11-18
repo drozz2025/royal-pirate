@@ -23,9 +23,17 @@ test('WORK6 native 384 and mobile 320/390/430 show a right-side enemy broadside 
   assert.equal(pose.showBattery,true,`deck visible at ${w}x${h}`);
   const enemy=screen(w,h,[10,0,-3]);
   const mast=screen(w,h,[10,1.72*8.4,-3]);
-  const portCannon=screen(w,h,[-2.45,1.85,66+pose.batteryOffsetZ]);
-  const starboardCannon=screen(w,h,[2.45,1.85,66+pose.batteryOffsetZ]);
-  const blackSail=screen(w,h,[-3.6,8.85,42]);
+  // Test each REAL barrel-mouth mesh in scene world space; the battery
+  // comes from makeBattleDeck at z=-15, then scene.ts applies pose x/z.
+  // Do not project guessed hardcoded cannon coordinates that ignore parent
+  // transform — this would miss a visually displaced cannonball.
+  const muzzleWorld=(i:number):[number,number,number]=>{
+    const m=battery.muzzles[i];
+    return [m.x+pose.batteryOffsetX,m.y,m.z+battery.group.position.z+pose.batteryOffsetZ];
+  };
+  const portCannon=screen(w,h,muzzleWorld(0));
+  const starboardCannon=screen(w,h,muzzleWorld(1));
+  const blackSail=screen(w,h,[pose.sailX,8.85,42]);
 
   assert.ok(enemy.x>w*.56 && enemy.x<w*.82,
     `enemy starboard not central or offscreen at ${w}x${h}: ${enemy.x}`);
@@ -33,9 +41,9 @@ test('WORK6 native 384 and mobile 320/390/430 show a right-side enemy broadside 
     `enemy galleon height is legible at ${w}x${h}`);
   assert.ok(mast.y>h*.22 && mast.y<h*.44,
     `enemy top clears the health HUD at ${w}x${h}: ${mast.y}`);
-  assert.ok(blackSail.x>=0 && blackSail.x<w*.34,
+  assert.ok(blackSail.x>=-w*.08 && blackSail.x<w*.26,
     `player's own black sail stays on LEFT at ${w}x${h}: ${blackSail.x}`);
-  assert.ok(portCannon.x>w*.12 && starboardCannon.x<w*.88,
+  assert.ok(portCannon.x>w*.10 && starboardCannon.x<w*.90 && starboardCannon.x>w*.56,
     `both cannon muzzles stay visible at ${w}x${h}`);
   assert.ok(portCannon.y>h*.52 && portCannon.y<h*.79,
     `first-person cannons remain below opponent at ${w}x${h}`);
@@ -44,14 +52,23 @@ test('WORK6 native 384 and mobile 320/390/430 show a right-side enemy broadside 
  }
 });
 
-test('384x512 is in the compact first-person camera regime, without shifting 390/430 views',()=>{
+test('reference-native, small mobile and tall iPhone crops have independent tested art direction',()=>{
  const native=battleCameraPose(384/512);
- assert.deepEqual(native.position,[0,10.3,78]);
- assert.deepEqual(native.target,[1,4.2,0]);
+ assert.deepEqual(native.position,[0,10.3,75]);
+ assert.deepEqual(native.target,[-1.8,4.2,0]);
  assert.equal(native.batteryOffsetZ,-26);
- assert.equal(battleCameraPose(320/568).batteryOffsetZ,-26);
- assert.deepEqual(battleCameraPose(390/844).target,[5,4.95,0]);
- assert.equal(battleCameraPose(430/932).batteryOffsetZ,-35);
+ assert.equal(native.batteryOffsetX,-2);
+ assert.equal(native.sailX,-7.8);
+ assert.equal(native.sailScaleX,.41);
+ const short=battleCameraPose(320/568);
+ assert.deepEqual(short.target,[1,4.2,0]);
+ assert.equal(short.batteryOffsetX,0);
+ assert.equal(short.sailX,-5.25);
+ const tall=battleCameraPose(390/844);
+ assert.deepEqual(tall.target,[3.8,4.95,0]);
+ assert.equal(tall.batteryOffsetZ,-35);
+ assert.equal(tall.batteryOffsetX,-.6);
+ assert.equal(battleCameraPose(430/932).sailScaleX,.42);
  assert.equal(battleCameraPose(1.4).showBattery,false);
 });
 

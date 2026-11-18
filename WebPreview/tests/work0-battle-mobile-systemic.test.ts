@@ -60,5 +60,5 @@ test('WORK0: cannonball begins at chosen muzzle, joins simulated flight smoothly
   assert.match(scene,/this\.batteryMuzzles=battery\.muzzles/);
   assert.match(scene,/index===this\.activeBatteryMuzzle/);
   assert.match(scene,/projectileFromMuzzle\(s,visibleMuzzle\)/);
-  assert.match(scene,/this\.battleForegroundSail\.scale\.set\(\.48,\.72,1\)/);
+  assert.match(scene,/this\.battleForegroundSail\.scale\.set\(pose\.sailScaleX,pose\.sailScaleY,1\)/);
 });
