@@ -2826,3 +2826,22 @@
     box-shadow:inset 0 1px #f6ddb06b,0 3px 7px #06101a9c;
   }
 }
+
+
+/* WORK4 / #104 — native 384x512 Fleet card-caption clearance.
+   The approved miniature names belong ABOVE the five-item dock. The real
+   card elements already extend behind that protected dock at native height;
+   do not re-run the rejected #302 card compaction (it worsened image MAE).
+   Move ONLY the existing live name and availability captions into the
+   miniature's lower paint band: preserve original four cards, artwork,
+   button geometry, status semantics and the entire source-registered sea. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet .w4-ship-roster > .w4-ship-slot > strong,
+  .w4-fleet .w4-ship-roster > .w4-ship-slot > small {
+    position:relative;
+    z-index:3;
+    transform:translateY(-19px);
+    text-shadow:0 1px 2px #06172d,0 0 5px #06172d;
+    pointer-events:none;
+  }
+}
