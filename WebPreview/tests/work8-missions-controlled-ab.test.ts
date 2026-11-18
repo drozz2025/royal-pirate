@@ -1319,6 +1319,78 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(chestInkComparison.metrics.quests.delta<.08,
       'the three live missions cannot regress with a chest-only change');
 
+
+    /* WORK8/#104 — independent mission-meter pigment study. The original approved
+       384x512 source and every candidate use ONE paused native Chromium DOM/frame.
+       Styling applies ONLY to the three local real progress bars, never to
+       Ranking 08, shared shell, buttons, reward data or seven chest tiles.
+       This study determines a measured source-colour choice before shipping CSS. */
+    const meterStudySelector='.w8-approved-missions .w8-approved-quest .w8-approved-meter';
+    const meterRects=await evalJs('(()=>[...document.querySelectorAll('+JSON.stringify(meterStudySelector)+')].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
+    assert.equal(meterRects.length,3,'three actual mission meters, no mock progress');
+    const meterStyleId='work8-meter-study-only';
+    const meterVariants=[
+      ['released',''],
+      ['darker-94','filter:brightness(.94)!important'],
+      ['darker-88','filter:brightness(.88)!important'],
+      ['brighter-106','filter:brightness(1.06)!important'],
+      ['brighter-112','filter:brightness(1.12)!important'],
+      ['pewter-edge','border-color:#748d97!important'],
+      ['deep-edge','border-color:#546e80!important'],
+      ['warm-edge','border-color:#a08b70!important'],
+      ['deep-sea','background:#061b2c!important'],
+      ['quiet-green','filter:saturate(.86)!important'],
+      ['rich-green','filter:saturate(1.12)!important']
+    ] as const;
+    const meterShots:string[]=[];
+    for(const [name,paint] of meterVariants){
+      await evalJs('(()=>{let s=document.getElementById('+JSON.stringify(meterStyleId)+');if(!s){s=document.createElement("style");s.id='+JSON.stringify(meterStyleId)+';document.head.append(s)}s.textContent='+JSON.stringify(paint?meterStudySelector+'{'+paint+'}':'')+';return true})()');
+      await delay(110);
+      meterShots.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    }
+    await evalJs('document.getElementById('+JSON.stringify(meterStyleId)+')?.remove();true');
+    const meterStudySource=String.raw`(async()=>{
+      const imgs=await Promise.all(__IMAGES__.map(s=>new Promise((resolve,reject)=>{let i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=s})));
+      const w=384,h=512;if(imgs.some(i=>i.width!==w||i.height!==h))throw Error('unscaled native-only inputs');
+      const px=imgs.map(i=>{const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.drawImage(i,0,0);return ctx.getImageData(0,0,w,h).data});
+      const rectangles=__RECTS__, clamp=n=>Math.max(0,Math.min(n,384));
+      function mae(a,b,rs){let sum=0,n=0;for(const [l,t,r,bo] of rs)for(let y=Math.max(0,Math.floor(t));y<Math.min(h,Math.ceil(bo));y++)for(let x=clamp(Math.floor(l));x<clamp(Math.ceil(r));x++){let p=(y*w+x)*4;for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++}}return sum/n}
+      const source=px[0], scores=px.slice(1).map(img=>({
+        full:mae(source,img,[[0,0,384,512]]),
+        meters:mae(source,img,rectangles),
+        quests:mae(source,img,[[12,155,372,321]]),
+        daily:mae(source,img,[[13,325,373,436]]),
+        chests:mae(source,img,[[20,356,370,427]]),
+        dockDelta:mae(px[1],img,[[0,451,384,512]])
+      }));
+      return scores;
+    })()`;
+    const meterComparison=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(meterRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,...meterShots.map(s=>'data:image/png;base64,'+s)])));
+    const meterResults=meterVariants.map(([name],i)=>({name,...meterComparison[i],
+      meterDelta:meterComparison[i].meters-meterComparison[0].meters,
+      fullDelta:meterComparison[i].full-meterComparison[0].full}));
+    const meterWinners=meterResults.filter(s=>s.meterDelta<-.001&&s.fullDelta<-.001&&Math.abs(s.dockDelta)<.08)
+      .sort((a,b)=>a.fullDelta-b.fullDelta);
+    const meterChosen=meterWinners[0]??meterResults[0];
+    const meterChosenIndex=meterResults.findIndex(s=>s.name===meterChosen.name);
+    writeFileSync(join(evidence,'work8-missions-meter-study-native-ab.json'),JSON.stringify({
+      issue:104,baseHead:'1e4ecc50ba815886848fb9ef948c63f0f98c57a1',
+      reference:'assets/design-approved/07-missoes.webp',
+      refs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(s=>'assets/design-approved/'+s),
+      native:'Chromium 384x512 DPR1, single real paused DOM/frame, 3 actual meter boxes',
+      meterRects,results:meterResults,winner:meterChosen,approved:false,approvedScreens:0
+    },null,2));
+    saveTone('missions-meter-original-384x512.webp',orig);
+    saveTone('missions-meter-before-384x512.png',meterShots[0]);
+    saveTone('missions-meter-study-render-384x512.png',meterShots[meterChosenIndex]);
+    console.log('WORK8 #104 genuine-meter native Chromium pigment sweep '+JSON.stringify({winner:meterChosen,results:meterResults}));
+    assert.equal(meterResults.length,11);
+    assert.ok(meterResults.every(s=>s.dockDelta<.08),'meter paint must never alter global dock');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
