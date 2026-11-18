@@ -5375,3 +5375,17 @@
     background-image:linear-gradient(145deg,#195f3f 0%,#10432f 58%,#062429 100%);
   }
 }
+
+
+/* WORK8 / issue #104 — 07 Missões ONLY (v0.1.98 HEAD).
+   A second restrained deep-green lacquer on the same THREE genuine early
+   rewards. Retain all original chest paintings, 7 reward/claim states, 3 live
+   quests, geometry, hit targets and the shared dock. The root opt-out flag
+   switches only this production candidate in same-frame 384x512 Chromium A/B.
+   The preceding enamel historical A/B flag also disables this newer pass. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-early-tile-lacquer-ab-baseline):not(.work8-missions-early-tile-enamel-ab-baseline)
+  .w8-approved-missions .w8-approved-days li:nth-child(-n+3) {
+    background-image:linear-gradient(145deg,#165c3e 0%,#0e3e2d 58%,#052329 100%);
+  }
+}
