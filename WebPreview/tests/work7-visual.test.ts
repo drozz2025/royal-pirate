@@ -396,6 +396,46 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
 
 
 
+        // WORK7-only candidate survey: do not promote a guessed frame colour.
+        // Every candidate is captured on the same live mounted React scene,
+        // with true approved 05 reference pixels and unaltered 5-item dock.
+        // The temporary CSS is removed before the post-sweep report/test.
+        if(kind==='cards' && width===384 && height===512){
+          const sourceFields:[number,number,number][]=[
+            [.50,1.70,.87],[.65,1.75,.75],[.39,1.20,.74],[.42,2.30,.76],
+            [.40,2.00,.85],[.59,1.30,.92],[.38,1.75,.79],[.58,1.90,.88]
+          ];
+          const loadData='data:image/webp;base64,'+references.cards.toString('base64');
+          for(let idx=0;idx<8;idx++){
+            const [value,sat,contrast]=sourceFields[idx];
+            for(const fraction of [.78,.87,.94,1.06,1.14,1.25]){
+              const next=Number((value*fraction).toFixed(4));
+              const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+                '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+(idx+1)+')'+
+                '{filter:brightness('+next+') saturate('+sat+') contrast('+contrast+')!important}}';
+              await evaluate("(()=>{const s=document.createElement('style');s.id='w7-card-sweep';s.textContent="+
+                JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
+              await sleep(60);
+              const sample=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+              const metrics=await evaluate("(async()=>{"+
+                "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+                "const [reference,render]=await Promise.all([load("+JSON.stringify(loadData)+"),load("+
+                   JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(sample.data)+")]);"+
+                "const c=document.createElement('canvas');c.width=384;c.height=512;const context=c.getContext('2d');"+
+                "context.drawImage(reference,0,0);const a=context.getImageData(0,0,384,512).data;"+
+                "context.clearRect(0,0,384,512);context.drawImage(render,0,0);const b=context.getImageData(0,0,384,512).data;"+
+                "const x0="+([18,107,195,284,18,107,195,284][idx])+", y0="+([196,196,196,196,319,319,319,319][idx])+";"+
+                "let sum=0, n=0;for(let y=y0;y<y0+115;y++){for(let x=x0;x<x0+83;x++){const p=(y*384+x)*4;"+
+                "for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++}}}"+
+                "return Math.round(sum/n*1000)/1000})()");
+              console.log('WORK7 CARD-ROI SWEEP slot='+(idx+1)+
+                ' brightness='+next+' mae='+metrics);
+              await evaluate("(()=>{document.getElementById('w7-card-sweep')?.remove();return true})()");
+              await sleep(30);
+            }
+          }
+        }
+
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
