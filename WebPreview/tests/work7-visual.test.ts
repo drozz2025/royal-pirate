@@ -50,79 +50,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
   // All eight image sublayers also restore their actual pre-PR values.
   // These !important overrides exist ONLY for controlled same-frame A/B screenshots.
-  const currentHeadBaseline = `
+  // SAME-FRAME A/B: actual v0.1.94 merged HEAD (39c15fb), not the
+  // historical #392/#404 baseline. Undo ONLY the three native chest
+  // filters introduced by THIS branch; every previous WORK7 improvement,
+  // live ART, images, geometry, labels and tab state remain identical.
+  // This prevents counting older PRs' MAE gains as this candidate's work.
+  const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.50) saturate(1.70) contrast(.87)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.65) saturate(1.75) contrast(.75)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.43) saturate(1.20) contrast(.74)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.42) saturate(2.30) contrast(.76)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.45) saturate(2.00) contrast(.85)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.65) saturate(1.30) contrast(.92)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.42) saturate(1.75) contrast(.79)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.64) saturate(1.90) contrast(.88)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.49)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.20)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.05)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.03)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.55)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.30)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.31)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.73)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.74)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.60)!important}
     }`;
-  // Restore actual merged WORK0 v0.1.89 + #395 crop values for BEFORE,
-  // not #392: both images are captured in the same Chromium frame / viewport.
-  const merged395Baseline = currentHeadBaseline + `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.95)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.27)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.11)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.86)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.45)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.52)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.60)!important}
-    }`;
-  // Actual merged v0.1.90 HEAD incorporates WORK7 #400 over #395.
-  // Do not compare the candidate against a stale pre-#400 crop state.
-  const merged400Baseline = merged395Baseline + `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.09)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.37)!important}
-    }`;
-  // WORK0 has integrated #404 into the actual branch HEAD; restoring #400
-  // would falsely attribute #404's previous improvement to this new PR.
-  const merged404Baseline = merged400Baseline + `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.14)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.67)!important}
-    }`;
-  // Restore the exact last integrated #404 metallic shell. The new native
-  // 2px inlay is *not* allowed into the before/HEAD render.
-  const actual404FrameShadow = `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-        box-shadow:inset 0 1px #fff7ce,inset 0 0 0 1px #fbe0a1b3,
-          inset 0 -4px #4d2c22a3,0 0 0 1px #513319,
-          0 4px 0 #07162b,0 8px 11px #020d249c!important;
-      }
-    }`;
-  // ACTUAL latest merged HEAD: #411 changed the carved inlay after #404.
-  // Retain that inlay unchanged in both same-frame screenshots; reverse ONLY
-  // this candidate's Captain art pigment to the real v0.1.93 base value.
-  const actual411Inlay = `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
-        box-shadow:inset 0 0 2px 2px #f1bd76aa,0 3px 0 #06142b!important;
-      }
-    }`;
-  const actualPackHEAD = `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        transform:translate(-4px,7px) scale(1.01)!important;
-        filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)!important;
-      }
-    }`;
-  const cssBaseline = merged404Baseline + actual411Inlay + actualPackHEAD;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
     { cwd: process.cwd(), stdio: 'ignore' });
