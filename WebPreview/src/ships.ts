@@ -24,16 +24,20 @@ function sealTexture(red: boolean, flag = false) {
   // Royal/Porto material (red=false), flags, hull, draw calls and physics stay intact.
   if(red && !flag){
     const cloth=c.createLinearGradient(0,0,512,512);
-    cloth.addColorStop(0,'#f17856');cloth.addColorStop(.24,'#b73d38');
-    cloth.addColorStop(.48,'#6f2534');cloth.addColorStop(.70,'#ca4b47');
-    cloth.addColorStop(1,'#6a2530');
-    c.fillStyle=cloth;c.fillRect(0,0,512,512);
+    if(cloth){
+      cloth.addColorStop(0,'#f17856');cloth.addColorStop(.24,'#b73d38');
+      cloth.addColorStop(.48,'#6f2534');cloth.addColorStop(.70,'#ca4b47');
+      cloth.addColorStop(1,'#6a2530');
+      c.fillStyle=cloth;c.fillRect(0,0,512,512);
+    }
     const edgeShade=c.createLinearGradient(0,0,512,0);
-    edgeShade.addColorStop(0,'rgba(32,14,27,.56)');
-    edgeShade.addColorStop(.16,'rgba(27,9,22,0)');
-    edgeShade.addColorStop(.78,'rgba(28,9,23,0)');
-    edgeShade.addColorStop(1,'rgba(29,12,24,.50)');
-    c.fillStyle=edgeShade;c.fillRect(0,0,512,512);
+    if(edgeShade){
+      edgeShade.addColorStop(0,'rgba(32,14,27,.56)');
+      edgeShade.addColorStop(.16,'rgba(27,9,22,0)');
+      edgeShade.addColorStop(.78,'rgba(28,9,23,0)');
+      edgeShade.addColorStop(1,'rgba(29,12,24,.50)');
+      c.fillStyle=edgeShade;c.fillRect(0,0,512,512);
+    }
     // Broad alternating sunlit and shadowed billows make the original sail
     // geometry legible in the 384x512 mobile crop, without adding a mesh.
     for(let band=0;band<9;band++){
