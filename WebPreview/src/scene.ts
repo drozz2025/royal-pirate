@@ -660,6 +660,8 @@ export class OceanScene {
     // fixed pose; this never moves the camera while the battle runs.
     this.controls.target.set(...pose.target);
     this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;
+    // Keep the real gunner's eye aligned behind the single cannon on phones.
+    this.controls.enableRotate=!pose.showBattery;
     this.battleBattery.visible=pose.showBattery;
     this.battleBattery.position.x=pose.batteryOffsetX;
     this.battleBattery.position.z=pose.batteryOffsetZ;
@@ -795,7 +797,10 @@ export class OceanScene {
     // A live broadside briefly illuminates the real foreground cannon muzzles.
     const batteryFx=cannonFxState(this.recoilAge.player);
     const centralRecoil=this.battleBattery.getObjectByName('first-person-central-recoil');
-    if(centralRecoil)centralRecoil.position.z=batteryFx.recoil*.62;
+    if(centralRecoil){
+      centralRecoil.position.z=68+batteryFx.recoil*.62;
+      centralRecoil.rotation.y=-this.battle.yaw*Math.PI/180*.20;
+    }
     for(const [index,flare] of this.batteryFlashes.entries()){flare.visible=this.battleBattery.visible&&batteryFx.visible&&index===this.activeBatteryMuzzle;flare.scale.setScalar(Math.max(.05,batteryFx.flashScale*.75));(flare.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity;}
     this.foam.forEach((f,i)=>{(f.material as T.MeshBasicMaterial).opacity=.3+Math.sin(pictureTime*2+i)*.12;f.scale.x=2.25+Math.sin(pictureTime)*.09;});
     for(let i=this.ripples.length-1;i>=0;i--){const ripple=this.ripples[i];ripple.age+=dt;const state=rippleState(ripple.age,ripple.life);
