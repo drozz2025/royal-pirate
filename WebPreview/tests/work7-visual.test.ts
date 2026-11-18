@@ -38,7 +38,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   assert.ok(cssText.includes('18 Nov 15:26 UTC: native 06 chest source-painted highlights.'),
-    'Only three genuine approved 06 chest crops are retuned; live labels and click targets stay intact');
+    'Only the genuine legendary 06 chest crop is retuned; live labels and click targets stay intact');
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
@@ -50,16 +50,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // A/B against CURRENT actual merged v0.1.92 HEAD, not a historic Cards
   // candidate. This PR changes ONLY three Shop crop filters. Nothing is
   // undone on Cards (so Cards BEFORE and AFTER must be pixel-identical).
-  // For Shop, temporarily restore the exact three pre-PR crop filters in the
+  // For Shop, temporarily restore the exact pre-PR legendary crop filter in the
   // very same Chromium page with the same images, viewport, fonts and state.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.32) drop-shadow(0 4px 3px #041327a8)!important
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.32) drop-shadow(0 4px 3px #041327a8)!important
-      }
       .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
         filter:saturate(1.27) contrast(1.12) brightness(1.59) drop-shadow(0 4px 3px #041327a8)!important
       }
