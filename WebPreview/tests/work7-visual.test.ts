@@ -234,6 +234,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await waitFor("(()=>{const imgs=[...document.querySelectorAll('[data-work7-screen=\\\""+kind+"\\\"] .w7-approved-crop img')];return imgs.length==="+(kind==='cards'?8:4)+"&&imgs.every(img=>img.complete&&img.naturalWidth>0)})()");
         await sleep(100);
 
+        // Freeze decorative CSS/Web Animations after real touchscreen navigation.
+        // HEAD and RENDER now share identical timeline, DOM, assets and frame.
+        await evaluate("(()=>{const s=document.createElement('style');s.id='work7-qa-frozen-frame';"+
+          "s.textContent='*,*::before,*::after{animation-play-state:paused!important;transition-duration:0s!important}';"+
+          "document.head.appendChild(s);document.getAnimations().forEach(a=>a.pause());return true})()");
+        await sleep(100);
         const geometry = await evaluate("(()=>{"+
           "const rect=e=>{if(!e)return null;const b=e.getBoundingClientRect();return {x:Math.round(b.x),y:Math.round(b.y),width:Math.round(b.width),height:Math.round(b.height),bottom:Math.round(b.bottom)}};"+
           "const root=document.querySelector('[data-work7-screen=\""+kind+"\"]');"+
