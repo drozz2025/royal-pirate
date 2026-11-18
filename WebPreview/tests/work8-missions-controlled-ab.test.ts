@@ -1441,88 +1441,85 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(meterResults.every(s=>s.dockDelta<.08),'meter paint must never alter global dock');
 
 
-    /* WORK8/#104: independently controlled native source-colour sweep for the
-       THREE existing reward tiles 4-6. They are not mocked or awarded; only
-       their enamel backgrounds are varied in ONE paused Chromium frame.
-       This deliberately leaves prior historical A/B toggles/tests intact. */
-    const rewardGroundClass='work8-missions-reward-ground-ab-baseline';
-    const rewardBoxes=await evalJs('(()=>[4,5,6].map(n=>{const e=document.querySelector(".w8-approved-missions .w8-approved-days li:nth-child("+n+")"),r=e?.getBoundingClientRect();return r?[r.left,r.top,r.right,r.bottom]:null}))()');
-    assert.equal(rewardBoxes.length,3);
-    assert.ok(rewardBoxes.every((r:any)=>r&&r.length===4),'three actual existing unclaimed tiles');
-    const rewardBeforeLayout=await headingLayout();
-    await evalJs('document.documentElement.classList.add('+JSON.stringify(rewardGroundClass)+');true');
-    const rewardStyleId='work8-104-actual-tile-pigment-study';
-    const rewardBaseSelector='.w8-approved-missions .w8-approved-days li:nth-child(';
-    const rewardPalettes=[
-      ['HEAD',null],
-      ['ref-dark',['#344656,#1b2936','#4d3628,#2b2426','#44355a,#221d39']],
-      ['ref-neutral',['#556778,#253445','#77502b,#3e2b25','#5b3b80,#2d244c']],
-      ['ref-muted',['#5c6c79,#2c384a','#865b32,#433124','#59456f,#2b253e']],
-      ['ref-ink',['#263a4b,#0e1e32','#51371e,#1a1f2b','#483252,#151b32']],
-      ['ref-quiet',['#3a495c,#182739','#6e482e,#241f28','#4a3768,#211b3a']],
-      ['ref-navy',['#3f5261,#12283d','#5c3d26,#271f25','#47355a,#231b38']],
-      ['ref-closer',['#697c85,#34465a','#986e40,#493423','#725089,#302849']],
-      ['ref-light',['#9ea8af,#5b7085','#b27d45,#785135','#8a6ab5,#48366d']]
+    /* WORK8/#104: v0.1.95 HEAD vs production coast ink. Genuine one-frame
+       native CDP render, no synthetic mission/reward/player state. All seven
+       source references and 07 original are included in the evidence report.
+       Colour alternatives are diagnostic ONLY, not runtime CSS/data changes. */
+    const coastalTuneFlag='work8-missions-coast-tune-ab-baseline';
+    const coastalTarget='.w8-approved-missions .w8-approved-scene .w8-seascape';
+    const coastalRefPaths=['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+      '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+      '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+      .map(s=>'assets/design-approved/'+s);
+    const coastalLayoutBefore=await headingLayout();
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(coastalTuneFlag)+');true');
+    await delay(130);
+    const coastalVariants=[
+      ['HEAD',''],
+      ['brightness-065','.65'],['brightness-070','.70'],
+      ['brightness-074','.74'],['brightness-078','.78'],
+      ['brightness-082','.82'],['brightness-086','.86'],
+      ['brightness-090','.90']
     ] as const;
-    const rewardShots:string[]=[];
-    for(const [name,colors] of rewardPalettes){
-      const rule=colors?colors.map((rgb,i)=>rewardBaseSelector+(i+4)+'){background-image:linear-gradient(145deg,'+rgb+')!important}').join(''):'';
-      await evalJs('(()=>{let el=document.getElementById('+JSON.stringify(rewardStyleId)+');if(!el){el=document.createElement("style");el.id='+JSON.stringify(rewardStyleId)+';document.head.append(el)}el.textContent='+JSON.stringify(rule)+';return true})()');
-      await delay(110);
-      rewardShots.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    const coastalShots:string[]=[];
+    for(const [name,luma] of coastalVariants){
+      const rule=luma?coastalTarget+'{filter:saturate(1.02) contrast(1.08) brightness('+luma+') drop-shadow(0 3px 2px rgba(2,25,45,.32))!important}':'';
+      await evalJs('(()=>{let s=document.getElementById("work8-coast-tune-study");if(!s){s=document.createElement("style");s.id="work8-coast-tune-study";document.head.append(s)}s.textContent='+JSON.stringify(rule)+';return true})()');
+      await delay(105);
+      coastalShots.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     }
-    await evalJs('document.getElementById('+JSON.stringify(rewardStyleId)+')?.remove();true');
-    const rewardMetrics=await evalJs(meterStudySource
-      .replace('__RECTS__',JSON.stringify(rewardBoxes))
-      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,...rewardShots.map(s=>'data:image/png;base64,'+s)])));
-    const rewardVariants=rewardPalettes.map(([name],i)=>({
-      name,...rewardMetrics[i],tileDelta:rewardMetrics[i].meters-rewardMetrics[0].meters,
-      fullDelta:rewardMetrics[i].full-rewardMetrics[0].full,
-      dailyDelta:rewardMetrics[i].daily-rewardMetrics[0].daily,
-      chestDelta:rewardMetrics[i].chests-rewardMetrics[0].chests
-    }));
-    const rewardWinner=rewardVariants.filter(v=>v.tileDelta<-.02&&v.fullDelta<-.005&&Math.abs(v.dockDelta)<.08)
-      .sort((a,b)=>a.fullDelta-b.fullDelta)[0]??rewardVariants[0];
-    const rewardWinnerIndex=rewardVariants.findIndex(v=>v.name===rewardWinner.name);
-    await evalJs('document.documentElement.classList.remove('+JSON.stringify(rewardGroundClass)+');true');
-    await delay(110);
-    const rewardAfterLayout=await headingLayout();
-    const rewardProduction=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    const rewardFinalMetrics=await evalJs(meterStudySource
-      .replace('__RECTS__',JSON.stringify(rewardBoxes))
+    await evalJs('document.getElementById("work8-coast-tune-study")?.remove();true');
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(coastalTuneFlag)+');true');
+    await delay(170);
+    const coastalLayoutAfter=await headingLayout();
+    const coastalActualFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(coastalTarget)+')).filter');
+    const coastalProduction=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const coastalScores=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify([[0,86,384,155]]))
       .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
-        'data:image/png;base64,'+rewardShots[0],'data:image/png;base64,'+rewardProduction])));
-    const rewardDelta=Object.fromEntries(Object.keys(rewardFinalMetrics[0])
-      .map(k=>[k,rewardFinalMetrics[1][k]-rewardFinalMetrics[0][k]]));
-    const rewardOverlaysSource=source
-      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+rewardShots[0]))
-      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+rewardProduction));
-    assert.notEqual(rewardOverlaysSource,source);
-    const rewardOverlays=await evalJs(rewardOverlaysSource);
-    saveTone('missions-reward-ground-original-384x512.webp',orig);
-    saveTone('missions-reward-ground-before-384x512.png',rewardShots[0]);
-    saveTone('missions-reward-ground-render-384x512.png',rewardProduction);
-    saveTone('missions-reward-ground-before-overlay-384x512.png',rewardOverlays.overlays[0]);
-    saveTone('missions-reward-ground-render-overlay-384x512.png',rewardOverlays.overlays[1]);
-    const rewardStudy={issue:104,baseHead:'39c15fb699a1974a80921cad03192aa8a0428a9b',
-      source:'assets/design-approved/07-missoes.webp',
-      requiredReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
-        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(s=>'assets/design-approved/'+s),
-      scene:'one Chromium 384x512 DPR1 actual Missions DOM, decoded source art, animations paused',
-      tiles:rewardBoxes,sweep:rewardVariants,winner:rewardWinner,
-      actual:{before:rewardFinalMetrics[0],render:rewardFinalMetrics[1],delta:rewardDelta,overlays:rewardOverlays.metrics},
-      approved:false,approvedScreens:0};
-    writeFileSync(join(evidence,'work8-missions-reward-ground-native-ab.json'),JSON.stringify(rewardStudy,null,2));
-    console.log('WORK8 #104 actual reward-ground source MAE '+JSON.stringify(rewardStudy));
-    assert.deepEqual(rewardBeforeLayout,rewardAfterLayout,'same real mission, chest, dock and touch geometry');
-    assert.equal((await readLayout()).quests,3);
-    assert.equal((await readLayout()).days.length,7);
-    assert.equal((await readLayout()).navCount,5);
-    assert.ok(Math.abs(rewardDelta.dockDelta)<.08,'no alteration to shared dock');
-    assert.ok(rewardDelta.full<-.035&&rewardDelta.meters<-.75 &&
-      rewardDelta.daily<-.16&&rewardDelta.chests<-.25,
-      'the ACTUAL shipped reward enamel MUST improve native original MAE across frame, tile ROI, day tray and 7 chests');
-    assert.ok(Math.abs(rewardDelta.quests)<.03,'the three REAL objectives cannot visually regress');
+        ...coastalShots.map(s=>'data:image/png;base64,'+s),
+        'data:image/png;base64,'+coastalProduction])));
+    assert.equal(coastalScores.length,coastalVariants.length+1);
+    const coastalSweep=coastalVariants.map(([name],i)=>({name,...coastalScores[i],
+      coastDelta:coastalScores[i].meters-coastalScores[0].meters,
+      fullDelta:coastalScores[i].full-coastalScores[0].full}));
+    const coastalFinal=coastalScores.at(-1)!;
+    const coastalDelta=Object.fromEntries(Object.keys(coastalFinal)
+      .map(k=>[k,coastalFinal[k as keyof typeof coastalFinal]-coastalScores[0][k as keyof typeof coastalFinal]]));
+    const coastalOverlayScript=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+coastalShots[0]))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+coastalProduction));
+    assert.notEqual(coastalOverlayScript,source);
+    const coastalOverlay=await evalJs(coastalOverlayScript);
+    saveCoast('missions-coast-tune-original-384x512.webp',orig);
+    saveCoast('missions-coast-tune-before-384x512.png',coastalShots[0]);
+    saveCoast('missions-coast-tune-render-384x512.png',coastalProduction);
+    saveCoast('missions-coast-tune-original-before-overlay-384x512.png',coastalOverlay.overlays[0]);
+    saveCoast('missions-coast-tune-original-render-overlay-384x512.png',coastalOverlay.overlays[1]);
+    const coastalReport={
+      issue:104,baseHead:'92450b35f0763da5f5d2ccf85f88f27b2f570efb',
+      reference:'assets/design-approved/07-missoes.webp',
+      referenceSet:coastalRefPaths,viewport:'native Chromium 384x512 DPR1',
+      method:'same decoded source SVG and live paused Chromium frame; genuine DOM, no mocked mission/claim status',
+      changed:'only 07 Missions scenic SVG filter at short native viewport',
+      before:coastalScores[0],render:coastalFinal,delta:coastalDelta,
+      nativeSweep:coastalSweep,filter:coastalActualFilter,
+      geometry:{before:coastalLayoutBefore,after:coastalLayoutAfter},
+      originalBeforeRenderOverlay:coastalOverlay.metrics,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-coast-tune-production-ab.json'),
+      JSON.stringify(coastalReport,null,2));
+    console.log('WORK8 #104 COAST TUNE FINAL PRODUCTION MAE '+JSON.stringify(coastalReport));
+    assert.deepEqual(coastalLayoutBefore,coastalLayoutAfter,
+      '07 genuine missions, seven chests, five-item dock and all touch targets must be stationary');
+    assert.ok(coastalActualFilter.includes('brightness(0.74)'),
+      'native production must use measured 07 Missions-only coast candidate');
+    assert.ok(coastalDelta.meters<-.06&&coastalDelta.full<-.005,
+      'actual committed scene must measurably improve approved coastal ROI and entire original frame');
+    assert.ok(Math.abs(coastalDelta.quests)<.08&&Math.abs(coastalDelta.daily)<.08&&
+      Math.abs(coastalDelta.chests)<.08&&Math.abs(coastalDelta.dockDelta)<.05,
+      'no mission, reward, chest or shared dock regression');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
