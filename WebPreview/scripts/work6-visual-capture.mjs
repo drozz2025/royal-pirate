@@ -1,5 +1,5 @@
 import {chromium} from 'playwright';
-import {mkdir} from 'node:fs/promises';
+import {mkdir,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 
 const root=resolve('work6-qa');
@@ -55,8 +55,22 @@ try {
     await page.screenshot({path:resolve(root,`battle-${width}x${height}.png`),animations:'disabled'});
     await page.locator('.fire-button').click();
     await page.locator('.fire-button:disabled').waitFor({state:'visible',timeout:2500});
-    await page.screenshot({path:resolve(root,`battle-shot-${width}x${height}.png`),animations:'disabled'});
-    console.log(`WORK6 ${width}x${height}: Porto/Batalha, mobile utility disclosure, sliders and DISPARAR flight confirmed`);
+    // A screenshot of a random animation frame is NOT evidence of an actual
+    // muzzle flash. Capture the same real WebGL viewport through the entire
+    // blast/recoil/smoke window, and record observed (not invented) elapsed
+    // wall-clock times for human comparison of mouth, ball, flame and smoke.
+    const shotStarted=Date.now();
+    const shotSeries=[];
+    for(const [label,delay] of [['immediate',0],['early',105],['mid',115],['smoke',215]]){
+      if(delay)await page.waitForTimeout(delay);
+      const file=`battle-shot-${label}-${width}x${height}.png`;
+      await page.screenshot({path:resolve(root,file),animations:'disabled'});
+      shotSeries.push({stage:label,elapsedWallMs:Date.now()-shotStarted,file});
+    }
+    await writeFile(resolve(root,`battle-shot-sequence-${width}x${height}.json`),
+      JSON.stringify({viewport:{width,height},realCanvas:true,stages:shotSeries,
+        approval:false,note:'WebGL timing is not deterministic; inspect each captured muzzle frame'},null,2));
+    console.log(`WORK6 ${width}x${height}: real WebGL 4-frame blast/muzzle evidence, five menu actions, sliders and DISPARAR confirmed`);
     await ctx.close();
   }
 } finally {await browser.close();}
