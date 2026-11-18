@@ -1108,32 +1108,32 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* WORK8 #104 / merged v0.1.88 native Mission 07 board depth.
        Restore ALL integrated artwork (no mock state or duplicated Ranking 08)
        and toggle ONLY the new quest ink on the same paused Chromium frame. */
-    const depthFlag='work8-missions-quest-depth-ab-baseline';
+    const questInkFlag='work8-missions-quest-depth-ab-baseline';
     await evalJs('document.documentElement.classList.remove("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline");true');
-    await evalJs('document.documentElement.classList.add('+JSON.stringify(depthFlag)+');true');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(questInkFlag)+');true');
     await delay(160);
-    const depthBeforeLayout=await headingLayout();
-    const depthBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    await evalJs('document.documentElement.classList.remove('+JSON.stringify(depthFlag)+');true');
+    const questInkBeforeLayout=await headingLayout();
+    const questInkBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(questInkFlag)+');true');
     await delay(160);
-    const depthAfterLayout=await headingLayout();
-    const depthAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    const depthSource=source
+    const questInkAfterLayout=await headingLayout();
+    const questInkAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const questInkSource=source
       .replace(JSON.stringify('data:image/png;base64,'+before),'"__WORK8_DEPTH_BEFORE__"')
       .replace(JSON.stringify('data:image/png;base64,'+after),'"__WORK8_DEPTH_AFTER__"')
-      .replace('"__WORK8_DEPTH_BEFORE__"',JSON.stringify('data:image/png;base64,'+depthBefore))
-      .replace('"__WORK8_DEPTH_AFTER__"',JSON.stringify('data:image/png;base64,'+depthAfter))
+      .replace('"__WORK8_DEPTH_BEFORE__"',JSON.stringify('data:image/png;base64,'+questInkBefore))
+      .replace('"__WORK8_DEPTH_AFTER__"',JSON.stringify('data:image/png;base64,'+questInkAfter))
       .replace('quests:[12,155,372,321],daily:',
         'quests:[12,155,372,321],questBoard:[14,184,371,322],daily:');
-    assert.notEqual(depthSource,source,'quest ink gate must use two new real Chromium screenshots');
-    const depthCompare=await evalJs(depthSource);
-    const saveDepth=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
-    saveDepth('missions-depth-original-384x512.webp',orig);
-    saveDepth('missions-depth-before-384x512.png',depthBefore);
-    saveDepth('missions-depth-render-384x512.png',depthAfter);
-    saveDepth('missions-depth-original-before-overlay-384x512.png',depthCompare.overlays[0]);
-    saveDepth('missions-depth-original-render-overlay-384x512.png',depthCompare.overlays[1]);
-    const depthReport={
+    assert.notEqual(questInkSource,source,'quest ink gate must use two new real Chromium screenshots');
+    const questInkCompare=await evalJs(questInkSource);
+    const saveQuestInk=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
+    saveQuestInk('missions-depth-original-384x512.webp',orig);
+    saveQuestInk('missions-depth-before-384x512.png',questInkBefore);
+    saveQuestInk('missions-depth-render-384x512.png',questInkAfter);
+    saveQuestInk('missions-depth-original-before-overlay-384x512.png',questInkCompare.overlays[0]);
+    saveQuestInk('missions-depth-original-render-overlay-384x512.png',questInkCompare.overlays[1]);
+    const questInkReport={
       issue:104,baseHead:'563d7abc666fd43c23e2170420fe4dca53ef4a7e',
       reference:'assets/design-approved/07-missoes.webp',
       mandatoryRefs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
@@ -1142,22 +1142,22 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
         .map(n=>'assets/design-approved/'+n)],
       method:'one Chromium native 384x512 frame, same real mission DOM, decoded art, paused animations, only quest CSS class toggled',
       scope:'WORK8 07 Missions quest board enamel depth .70 versus .64; no fake rewards, Ranking, Porto or dock changes',
-      roi:depthCompare.metrics,unchanged:depthCompare.unchanged,
-      geometry:{before:depthBeforeLayout,after:depthAfterLayout},
+      roi:questInkCompare.metrics,unchanged:questInkCompare.unchanged,
+      geometry:{before:questInkBeforeLayout,after:questInkAfterLayout},
       approved:false,approvedScreens:0
     };
-    writeFileSync(join(evidence,'work8-missions-depth-controlled-ab.json'),JSON.stringify(depthReport,null,2));
-    console.log('WORK8 #104 native 07 quest enamel depth A/B '+JSON.stringify(depthReport.roi));
-    assert.deepEqual(depthBeforeLayout,depthAfterLayout,'quest color cannot move a single live UI element');
-    assert.equal(depthAfterLayout.questCount,3,'three real objectives remain intact');
-    assert.equal(depthAfterLayout.dayCount,7,'seven real daily rewards remain intact');
-    assert.equal(depthAfterLayout.dockCount,5,'five real dock buttons remain intact');
-    assert.ok(depthAfterLayout.documentWidth<=386,'no mobile horizontal overflow');
-    assert.ok(depthCompare.unchanged.header<.10&&depthCompare.unchanged.dock<.10,
+    writeFileSync(join(evidence,'work8-missions-depth-controlled-ab.json'),JSON.stringify(questInkReport,null,2));
+    console.log('WORK8 #104 native 07 quest enamel depth A/B '+JSON.stringify(questInkReport.roi));
+    assert.deepEqual(questInkBeforeLayout,questInkAfterLayout,'quest color cannot move a single live UI element');
+    assert.equal(questInkAfterLayout.questCount,3,'three real objectives remain intact');
+    assert.equal(questInkAfterLayout.dayCount,7,'seven real daily rewards remain intact');
+    assert.equal(questInkAfterLayout.dockCount,5,'five real dock buttons remain intact');
+    assert.ok(questInkAfterLayout.documentWidth<=386,'no mobile horizontal overflow');
+    assert.ok(questInkCompare.unchanged.header<.10&&questInkCompare.unchanged.dock<.10,
       'shared HUD and WORK0 five-button dock must stay pixel-identical');
-    assert.ok(depthCompare.metrics.questBoard.delta<-.025 && depthCompare.metrics.full.delta<-.003,
+    assert.ok(questInkCompare.metrics.questBoard.delta<-.025 && questInkCompare.metrics.full.delta<-.003,
       'candidate must strictly improve 07 original Mission plate ROI and full-frame MAE');
-    assert.ok(depthCompare.metrics.daily.delta<.10 && depthCompare.metrics.chests.delta<.10,
+    assert.ok(questInkCompare.metrics.daily.delta<.10 && questInkCompare.metrics.chests.delta<.10,
       'seven reward chests and daily panel cannot regress');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
