@@ -90,7 +90,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        enable it only for the independent coastal A/B near the end. This
        preserves the exact original v0.1.75 baselines without relaxing
        their MAE or pixel-stability requirements. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-deep-hull-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -925,6 +925,52 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'genuine original day 4-6 source art must measurably improve both ROI and full-frame MAE');
     assert.ok(midCompare.metrics.quests.delta<.10&&midCompare.metrics.daily.delta<.25,
       'three real quests and overall daily reward board must not regress');
+
+
+    /* WORK8/#104: quest hull relief only, native source/real Chromium A/B.
+       Same decoded page, same frozen frame, identical real progress and state;
+       previous experiment flags are unchanged on both sides. */
+    const hullFlag='work8-missions-deep-hull-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(hullFlag)+');true');
+    await delay(125);
+    const hullBeforeLayout=await headingLayout();
+    const hullBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(hullFlag)+');true');
+    await delay(125);
+    const hullAfterLayout=await headingLayout();
+    const hullAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const hullSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+hullBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+hullAfter))
+      .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],questPlates:[14,156,371,318],daily:');
+    assert.notEqual(hullSource,source,'new quest A/B must use fresh native Chromium screenshots');
+    const hullCompare=await evalJs(hullSource);
+    const saveHull=(name:string,value:string)=>writeFileSync(join(evidence,name),Buffer.from(value,'base64'));
+    saveHull('missions-hull-original-384x512.webp',orig);
+    saveHull('missions-hull-before-384x512.png',hullBefore);
+    saveHull('missions-hull-render-384x512.png',hullAfter);
+    saveHull('missions-hull-overlay-before-384x512.png',hullCompare.overlays[0]);
+    saveHull('missions-hull-overlay-after-384x512.png',hullCompare.overlays[1]);
+    const hullGeometry=await evalJs('(()=>{const box=e=>{const r=e?.getBoundingClientRect();return r?{x:r.x,y:r.y,right:r.right,bottom:r.bottom}:null};const days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],nav=document.querySelector(".app-sheet > .harbour-nav");const taps=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button,.w8-approved-missions .w8-approved-quest>button,.app-sheet>.harbour-nav .harbour-nav-item")];return {quests:document.querySelectorAll(".w8-approved-missions .w8-approved-quest").length,days:days.length,navItems:document.querySelectorAll(".app-sheet>.harbour-nav .harbour-nav-item").length,chests:days.map(d=>box(d.querySelector(".w8-approved-chest"))),labels:days.map(d=>box(d.querySelector("small"))),dock:box(nav),taps:taps.map(b=>{const r=b.getBoundingClientRect(),p=document.elementFromPoint((r.left+r.right)/2,(r.top+r.bottom)/2);return p===b||b.contains(p)}),scrollWidth:document.documentElement.scrollWidth}})()');
+    const hullReport={
+      baseSha:'11abb13c1689106c5319ce9e97819e0071e3a76b',
+      scope:'07 Missões three real quests only; untouched Ranking 08, Porto, shell, economy, dock',
+      method:'native 384×512 DPR1, original approved WebP, same Chromium page, decoded artwork and paused animation',
+      references:['assets/design-approved/00-referencia-original-aprovada.webp','assets/design-approved/00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(p=>'assets/design-approved/'+p)],
+      roi:hullCompare.metrics,unchanged:hullCompare.unchanged,beforeLayout:hullBeforeLayout,afterLayout:hullAfterLayout,geometry:hullGeometry,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-deep-hull-controlled-ab.json'),JSON.stringify(hullReport,null,2));
+    console.log('WORK8 07 native deep hull A/B '+JSON.stringify(hullReport.roi));
+    assert.deepEqual(hullBeforeLayout,hullAfterLayout,'paint-only must not move real missions or seven rewards');
+    assert.equal(hullGeometry.quests,3);assert.equal(hullGeometry.days,7);assert.equal(hullGeometry.navItems,5);
+    assert.equal(hullGeometry.taps.length,11);assert.ok(hullGeometry.taps.every(Boolean),'all eleven controls must remain hittable');
+    assert.ok(hullGeometry.scrollWidth<=386,'no horizontal overflow');
+    assert.ok(hullGeometry.chests.every((r:any)=>r&&r.bottom<=hullGeometry.dock.y));
+    assert.ok(hullGeometry.labels.every((r:any)=>r&&r.bottom<=hullGeometry.dock.y+3));
+    assert.ok(hullCompare.unchanged.header<.1&&hullCompare.unchanged.dock<.1,'global header/dock pixel-identical');
+    assert.ok(hullCompare.metrics.questPlates.delta<-.05&&hullCompare.metrics.full.delta<-.01,'quest relief must improve native MAE in target ROI and full frame');
+    assert.ok(hullCompare.metrics.daily.delta<.1&&hullCompare.metrics.chests.delta<.1,'seven reward art cannot regress');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
