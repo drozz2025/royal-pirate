@@ -203,9 +203,15 @@ test('WORK6: controlled genuine Chromium 384x512 A/B with fixed wave and camera'
     for(const [name,roi] of Object.entries(isolation.scenery)){
       assert.ok(Math.abs(roi.delta)<1e-8,name+' unoccluded scenery must be pixel-identical');
     }
-    assert.ok(delta.right_cannon<-0.05,'right cannon must improve');
-    assert.ok(delta.left_cannon<0.5,'port cannon must not regress');
-    assert.ok(delta.global<-0.02,'global reference MAE must improve before merge');
+    // This LEGACY local ?work6ab= switch varied only the now-retired second
+    // gun. With the new single-barrel stage neither probe may silently switch
+    // back to twin cannons, and the screen should be visually deterministic.
+    // Actual 4-viewport before/after screenshots are gated separately by the
+    // battle-visual GitHub workflow; this old historical ROI is no longer the
+    // acceptance metric for a structural redesign.
+    assert.ok(Math.abs(delta.global)<.03,'legacy A/B URL must not change the one-cannon composition');
+    assert.ok(Math.abs(delta.left_cannon)<.03);
+    assert.ok(Math.abs(delta.right_cannon)<.03);
   }finally{
     socket?.close();vite.kill('SIGTERM');browser?.kill('SIGTERM');
     await sleep(600);try{rmSync(profile,{force:true,recursive:true,maxRetries:5,retryDelay:80});}catch{}
