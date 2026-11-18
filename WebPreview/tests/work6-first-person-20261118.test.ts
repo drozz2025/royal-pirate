@@ -32,7 +32,7 @@ test('WORK6 18 Nov: battle mobile is a deck-level TRUE first-person single-canno
     assert.ok(pose.position[1]<=8,'camera belongs on player deck, not a high external ship view');
     group.position.set(pose.batteryOffsetX,0,pose.batteryOffsetZ);
     group.scale.setScalar(pose.batteryScale);
-    recoil.position.z=0;
+    assert.equal(recoil.position.z,68,'camera test must respect the live rear-trunnion pivot');
     const muzzle=battleDeckMuzzleWorld(recoil,muzzles[0]);
     const m=view(w,h,muzzle);
     assert.ok(m.x>w*.40 && m.x<w*.60, `central cannon muzzle at ${w}x${h}: ${m.x}`);
