@@ -222,6 +222,99 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       const screenshot=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
 
+      // WORK4/#104 18 Nov 10h: prospective Forge smoke/iron pigments measured
+      // against ORIGINAL 04, with exact 384x512 and the SAME React frame.
+      // Every variant is reverted before any existing checks; no shipping CSS
+      // is changed until a true ROI winner is shown by Chromium.
+      if(screen==='forge'&&width===384&&height===512){
+        const candidates=[
+          {id:'head',ink:'#2d2929'},
+          {id:'merged-head',ink:'#4a352f'},
+          {id:'smoked-wood',ink:'#382d2a'},
+          {id:'iron-coal',ink:'#343338'},
+          {id:'umber',ink:'#43352e'},
+          {id:'warm-iron',ink:'#54413a'},
+          {id:'deep-timber',ink:'#2d2929'},
+          {id:'bronze-shadow',ink:'#50372b'},
+          {id:'graphite',ink:'#292d32'},
+          {id:'soft-coal',ink:'#414044'}
+        ];
+        const geometryJS="(()=>{const b=s=>{const e=document.querySelector(s);"+
+          "if(!e)return null;const r=e.getBoundingClientRect();return [r.x,r.y,r.width,r.height]};"+
+          "return {cannon:b('.w4-reference-cannon'),furnace:b('.w4-forge-scene'),"+
+          "costs:b('.w4-materials'),button:b('.w4-improve-button'),"+
+          "dock:b('.harbour-nav.app-dock-porto'),"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        const oldGeometry=await evaluate(geometryJS);
+        assert.equal(oldGeometry.nav,5);
+        const variants:[string,string][]=[];
+        for(const c of candidates){
+          if(c.id!=='head'){
+            const pigment='.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene{background-color:'+c.ink+'!important;}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='work4-smoke-variant';s.textContent="+JSON.stringify(pigment)+";document.head.appendChild(s);return true;})()");
+            await sleep(90);
+          }
+          const frame=c.id==='head'?screenshot:(await command('Page.captureScreenshot',{
+            format:'png',fromSurface:true,captureBeyondViewport:false
+          })).data as string;
+          variants.push([c.id,frame]);
+          if(c.id!=='head'){
+            await evaluate("(()=>{document.getElementById('work4-smoke-variant')?.remove();return true;})()");
+          }
+          assert.deepEqual(await evaluate(geometryJS),oldGeometry,
+            'colour variants may not move the cannon, real costs, action or WORK0 dock');
+        }
+        const analyze="(async()=>{const raw="+JSON.stringify({
+          original:references.forge,variants
+        })+";const load=async(type,b)=>{const i=new Image();i.src='data:image/'+type+';base64,'+b;await i.decode();return i};"+
+          "const ref=await load('webp',raw.original);const pixels=i=>{const c=document.createElement('canvas');"+
+          "c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});"+
+          "g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data};"+
+          "const a=pixels(ref),r={full:[0,0,384,512],workshop:[14,150,377,327],"+
+          "smoke:[18,148,370,230],cannon:[30,230,166,309],furnace:[116,225,171,302],"+
+          "materials:[16,320,369,378],dock:[0,430,384,512]};"+
+          "const mae=(b,z)=>{let d=0,n=0;for(let y=z[1];y<z[3];y++)for(let x=z[0];x<z[2];x++){"+
+          "const k=(y*384+x)*4;for(let t=0;t<3;t++){d+=Math.abs(a[k+t]-b[k+t]);n++}}return d/n};"+
+          "const scores=[];for(const [id,frame] of raw.variants){const im=await load('png',frame);"+
+          "if(im.width!==384||im.height!==512)throw Error('non-native variant');"+
+          "const b=pixels(im),scoresFor={};for(const [name,roi] of Object.entries(r))scoresFor[name]=mae(b,roi);"+
+          "scores.push({id,...scoresFor});}return {roi:r,scores};})()";
+        const study=await evaluate(analyze);
+        assert.equal(study.scores.length,candidates.length);
+        for(const metric of ['cannon','furnace','materials','dock']){
+          for(const item of study.scores){
+            assert.ok(Math.abs(item[metric]-study.scores[0][metric])<.15,
+              'colour variant cannot damage protected '+metric+' reference pixels');
+          }
+        }
+        const current=study.scores.find(x=>x.id==='head');
+        const mergedHead=study.scores.find(x=>x.id==='merged-head');
+        assert.ok(current&&mergedHead,'real current and merged-HEAD samples exist');
+        assert.ok(current!.workshop<mergedHead!.workshop-.04,
+          'new native charcoal must lower the original workshop ROI MAE');
+        assert.ok(current!.full<mergedHead!.full-.01,
+          'new native charcoal must lower full-frame MAE');
+        const proofImage=await evaluate("(async()=>{const x="+JSON.stringify({
+          source:references.forge,before:variants.find(x=>x[0]==='merged-head')?.[1],
+          after:screenshot
+        })+";"+
+          "const load=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;await i.decode();return i};"+
+          "const [a,b,c]=await Promise.all([load('webp',x.source),load('png',x.before),load('png',x.after)]);"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
+          "g.drawImage(a,0,0);g.drawImage(b,384,0);g.drawImage(c,768,0);"+
+          "g.drawImage(a,1152,0);g.globalAlpha=.5;g.drawImage(c,1152,0);"+
+          "return out.toDataURL('image/png').split(',')[1];})()");
+        writeFileSync(join(folder,'original-before-render-overlay-forge-smoke-384x512.png'),
+          Buffer.from(proofImage,'base64'));
+        const ranking=[...study.scores].sort((a,b)=>a.workshop-b.workshop);
+        const proof={...study,baseCommit:'563d7abc666fd43c23e2170420fe4dca53ef4a7e',
+          viewport:'384x512',sameSceneFrame:true,approved:false,
+          approvedScreens:0,rankedByWorkshop:ranking.map(x=>x.id)};
+        writeFileSync(join(folder,'work4-forge-smoke-iron-pigment-study.json'),
+          JSON.stringify(proof,null,2)+'\n');
+        console.log('WORK4_FORGE_SMOKE_STUDY '+JSON.stringify(proof));
+      }
+
       // WORK4/#104 native Forge stage: real original/before/render/overlay.
       // Old and new pigments are toggled in the same paused Chromium frame.
       if(screen==='forge'&&width===384&&height===512){

@@ -2939,3 +2939,15 @@
     opacity:1;
   }
 }
+
+/* WORK4/#104 — native Forge 04 iron-smoke pigment A/B, 18 Nov 10h.
+   Nine same-frame 384x512 Chromium candidates measured against 04 source:
+   dark timber #2d2929 improves workshop ROI 29.9914 -> 29.9053 and full
+   frame 54.3653 -> 54.3359. Cannon/furnace deltas <0.03 MAE;
+   real material prices, 44px action, furnace and WORK0 dock stay intact.
+   This is an underlay pigment only: no duplicate glow or cannon crop. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene {
+    background-color:#2d2929!important;
+  }
+}
