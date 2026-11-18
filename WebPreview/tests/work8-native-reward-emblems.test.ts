@@ -11,7 +11,7 @@ import {setTimeout as delay} from 'node:timers/promises';
  * WebP crops. Real progress, numerical values, gem availability and five-item
  * shared dock MUST be identical. No mocked app state, image backdrop or
  * APPROVED flag. */
-test('07 Missions: original painted coin/gem emblems native 384x512 A/B', {timeout:220000}, async()=>{
+test('07 Missions: measured reward column registration native 384x512 A/B', {timeout:220000}, async()=>{
   await delay(50000); // do not overload shared GitHub runner Chromium sessions
   const chromeBin=process.env.CHROME_BIN || spawnSync('sh',['-c','command -v chromium || command -v google-chrome'],{encoding:'utf8'}).stdout.trim();
   assert.ok(chromeBin,'native Chromium is mandatory; never silently skip MAE QA');
@@ -70,7 +70,7 @@ test('07 Missions: original painted coin/gem emblems native 384x512 A/B', {timeo
     await cmd('Emulation.setDeviceMetricsOverride',{width:384,height:512,mobile:true,deviceScaleFactor:1,screenWidth:384,screenHeight:512});
     await cmd('Page.navigate',{url:'http://127.0.0.1:4199/'});
     await wait('.harbour-screen .harbour-nav-item');
-    await evalJs('document.documentElement.classList.add("work8-missions-reward-icon-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-reward-grid-ab-baseline");true');
     const clicked=await evalJs('(()=>{const b=[...document.querySelectorAll(".harbour-screen button")].find(x=>x.textContent?.includes("MISSÕES"));b?.click();return !!b})()');
     assert.ok(clicked,'real Porto->Missões navigation required');
     await wait('.w8-approved-missions .w8-approved-quest-list');
@@ -79,16 +79,18 @@ test('07 Missions: original painted coin/gem emblems native 384x512 A/B', {timeo
     const geometry=()=>evalJs('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const nav=document.querySelector(".app-sheet > .harbour-nav");const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")],days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],buttons=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button, .w8-approved-missions .w8-approved-quest > button")],dockButtons=[...nav.querySelectorAll(".harbour-nav-item")];return {questCount:quests.length,days:days.length,dockCount:dockButtons.length,tabAndActionCount:buttons.length,questBoxes:quests.map(rect),dayBoxes:days.map(rect),rewardBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(rect),nav:rect(nav),captions:days.map(d=>rect(d.querySelector("small"))),documentWidth:document.documentElement.scrollWidth,labels:quests.map(q=>q.querySelector(".w8-approved-quest-core strong")?.textContent),rewards:quests.map(q=>[...q.querySelectorAll(".w8-approved-quest-rewards strong")].map(s=>s.textContent)),glyphs:document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem").length}})()');
     const beforeLayout=await geometry();
     const before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    await evalJs('document.documentElement.classList.remove("work8-missions-reward-icon-ab-baseline");true');
+    await evalJs('document.documentElement.classList.remove("work8-missions-reward-grid-ab-baseline");true');
     await delay(180);
     const afterLayout=await geometry();
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    assert.deepEqual(afterLayout,beforeLayout,'original art changes must preserve every position, value and hit target');
+    assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
+    assert.deepEqual(afterLayout.labels,beforeLayout.labels,'real mission objective labels unchanged');
+    assert.deepEqual(afterLayout.rewards,beforeLayout.rewards,'real mission rewards unchanged');
     assert.equal(afterLayout.questCount,3);
     assert.equal(afterLayout.days,7);
     assert.equal(afterLayout.dockCount,5);
     assert.equal(afterLayout.tabAndActionCount,6);
-    assert.equal(afterLayout.glyphs,6,'three real coin emblems and three unavailable gem emblems');
+    assert.equal(afterLayout.glyphs,0,'do not use source screenshot icon overlays or fake currency');
     assert.ok(afterLayout.dayBoxes.every((d:number[])=>d[0]>=-1&&d[0]+d[2]<=385));
     assert.ok(afterLayout.captions.every((d:number[])=>d[1]+d[3]<=afterLayout.nav[1]+3),'seven day labels must not be hidden by dock');
     const original=readFileSync(new URL('../../assets/design-approved/07-missoes.webp',import.meta.url)).toString('base64');
@@ -97,7 +99,7 @@ test('07 Missions: original painted coin/gem emblems native 384x512 A/B', {timeo
       const images=await Promise.all([__ORIGINAL__,__BEFORE__,__AFTER__].map(make));
       const w=384,h=512;if(images.some(x=>x.width!==w||x.height!==h))throw Error('native images required');
       const px=images.map(i=>{const c=document.createElement('canvas');c.width=w;c.height=h;const t=c.getContext('2d');t.drawImage(i,0,0);return t.getImageData(0,0,w,h).data});
-      const roi={full:[0,0,384,512],rewardIcons:[202,184,287,321],missions:[12,155,372,321],daily:[12,326,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,451,384,512]};
+      const roi={full:[0,0,384,512],rewardLayout:[185,155,292,321],missions:[12,155,372,321],daily:[12,326,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,451,384,512]};
       function mae(a,b,r){let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=(y*w+x)*4;for(let z=0;z<3;z++){total+=Math.abs(a[p+z]-b[p+z]);n++}}return total/n}
       const metrics={};for(const [k,r] of Object.entries(roi)){const baseline=mae(px[0],px[1],r),candidate=mae(px[0],px[2],r);metrics[k]={baseline,candidate,delta:candidate-baseline}}
       const unchanged={header:mae(px[1],px[2],roi.header),dock:mae(px[1],px[2],roi.dock)};
@@ -108,39 +110,29 @@ test('07 Missions: original painted coin/gem emblems native 384x512 A/B', {timeo
       .replace('__BEFORE__',JSON.stringify('data:image/png;base64,'+before))
       .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+after));
 
-    /* Diagnostic sweep: no acceptance criteria are relaxed; rejected candidates
-       are never deployed. Real same-frame captures quantify pigment masks. */
-    const variants=[
-      {name:'screen',blend:'screen',mask:'none',opacity:1,shift:0,top:0},
-      {name:'lighten',blend:'lighten',mask:'none',opacity:1,shift:0,top:0},
-      {name:'multiply',blend:'multiply',mask:'none',opacity:1,shift:0,top:0},
-      {name:'screen-60',blend:'screen',mask:'none',opacity:.6,shift:0,top:0},
-      {name:'lighten-60',blend:'lighten',mask:'none',opacity:.6,shift:0,top:0},
-      {name:'screen-shift-5',blend:'screen',mask:'none',opacity:1,shift:-5,top:0},
-      {name:'lighten-shift-5',blend:'lighten',mask:'none',opacity:1,shift:-5,top:0},
-      {name:'mask',blend:'normal',mask:'radial-gradient(ellipse 65% 65% at 50% 50%,#000 58%,transparent 90%)',opacity:1,shift:0,top:0},
-      {name:'screen-mask',blend:'screen',mask:'radial-gradient(ellipse 65% 65% at 50% 50%,#000 58%,transparent 90%)',opacity:1,shift:0,top:0},
-      {name:'screen-mask-shift',blend:'screen',mask:'radial-gradient(ellipse 65% 65% at 50% 50%,#000 58%,transparent 90%)',opacity:1,shift:-5,top:0},
-      {name:'screen-shift-down',blend:'screen',mask:'none',opacity:1,shift:-5,top:3},
-      {name:'screen-shift-up',blend:'screen',mask:'none',opacity:1,shift:-5,top:-3}
-    ];
+
+    /* Correct against the same source, no fictitious claims or reflow of the
+       protected global dock. Test candidate widths WITHOUT weakening the MAE
+       improvement assertions; unsuitable widths remain rejected. */
+    const variants=[60,66,72,80,88,96,104,112,120,128,136].flatMap(width=>
+      ['space-around','space-between','center'].map(justify=>({width,justify})));
     const scores:any[]=[];
     for(const cfg of variants){
-      await evalJs('(()=>{const x='+JSON.stringify(cfg)+';for(const el of document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem")){el.style.mixBlendMode=x.blend;el.style.opacity=x.opacity;el.style.webkitMaskImage=x.mask;el.style.maskImage=x.mask;el.style.left="calc(50% + "+x.shift+"px)";el.style.top=(-5+x.top)+"px"}return true})()');
-      await delay(65);
+      await evalJs('(()=>{const v='+JSON.stringify(cfg)+';document.querySelectorAll(".w8-approved-missions .w8-approved-quest").forEach(x=>{x.style.gridTemplateColumns="38px minmax(0,1fr) "+v.width+"px 59px"});document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards").forEach(x=>{x.style.justifyContent=v.justify;x.style.gap="2px"});return true})()');
+      await delay(45);
       const snap=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
       const expr=script.replace('__ORIGINAL__',JSON.stringify('data:image/webp;base64,'+original))
         .replace('__BEFORE__',JSON.stringify('data:image/png;base64,'+before))
         .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+snap));
       const check=await evalJs(expr);
-      const sample={name:cfg.name,full:check.metrics.full.delta,rewardIcons:check.metrics.rewardIcons.delta,missions:check.metrics.missions.delta,daily:check.metrics.daily.delta};
-      scores.push(sample);
-      if(sample.full<-.005&&sample.rewardIcons<-.15){
-        writeFileSync(join(evidence,'missions-reward-icons-sweep-'+cfg.name+'.png'),Buffer.from(snap,'base64'));
-      }
+      const layout=await geometry();
+      scores.push({width:cfg.width,justify:cfg.justify,full:check.metrics.full.delta,
+        rewardLayout:check.metrics.rewardLayout.delta,daily:check.metrics.daily.delta,
+        chests:check.metrics.chests.delta,dayTop:layout.dayBoxes[0][1],
+        captionsAboveDock:layout.captions.every((d:number[])=>d[1]+d[3]<=layout.nav[1]+3)});
     }
-    console.log('WORK8 original reward-icon pigment sweep '+JSON.stringify(scores));
-    await evalJs('(()=>{for(const el of document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem")){el.style.removeProperty("mix-blend-mode");el.style.removeProperty("opacity");el.style.removeProperty("-webkit-mask-image");el.style.removeProperty("mask-image");el.style.removeProperty("left");el.style.removeProperty("top")}return true})()');
+    console.log('WORK8 native reward-grid sweep '+JSON.stringify(scores.sort((a,b)=>a.full-b.full)));
+    await evalJs('(()=>{document.querySelectorAll(".w8-approved-missions .w8-approved-quest").forEach(x=>x.style.removeProperty("grid-template-columns"));document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards").forEach(x=>{x.style.removeProperty("justify-content");x.style.removeProperty("gap")});return true})()');
 
     const compared=await evalJs(injected);
     const save=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
@@ -150,18 +142,18 @@ test('07 Missions: original painted coin/gem emblems native 384x512 A/B', {timeo
     save('missions-reward-icons-original-before-overlay.png',compared.overlays[0]);
     save('missions-reward-icons-original-render-overlay.png',compared.overlays[1]);
     const report={
-      issue:104,scope:'WORK8 exclusively 07 Missões source-painted reward emblems',
+      issue:104,scope:'WORK8 exclusively 07 Missões native reward-column layout',
       reference:'assets/design-approved/07-missoes.webp',
       mandatoryRefs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']].map(n=>'assets/design-approved/'+n),
-      viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-reward-icon-ab-baseline',
+      viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-reward-grid-ab-baseline',
       metrics:compared.metrics,unchanged:compared.unchanged,
       geometry:{before:beforeLayout,after:afterLayout},approved:false,approvedScreens:0
     };
-    writeFileSync(join(evidence,'work8-missions-reward-icons-native-ab.json'),JSON.stringify(report,null,2));
-    console.log('WORK8 07 reward icons controlled Chromium A/B '+JSON.stringify(compared.metrics));
+    writeFileSync(join(evidence,'work8-missions-reward-grid-native-ab.json'),JSON.stringify(report,null,2));
+    console.log('WORK8 07 reward grid controlled Chromium A/B '+JSON.stringify(compared.metrics));
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
-    assert.ok(compared.metrics.rewardIcons.delta<-.15,'source reward icons must improve targeted MAE');
-    assert.ok(compared.metrics.full.delta<-.005,'real source-painted reward icons must improve full frame');
+    assert.ok(compared.metrics.rewardLayout.delta<-.15,'genuine reward column registration must improve target ROI');
+    assert.ok(compared.metrics.full.delta<-.005,'genuine three-row reward alignment must improve full frame');
     assert.ok(compared.metrics.daily.delta<.10&&compared.metrics.chests.delta<.10,'daily reward strip cannot regress');
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
