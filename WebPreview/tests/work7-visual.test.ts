@@ -42,7 +42,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
     'New WORK7 eight-card short-viewport art treatment exists without screenshot backgrounds');
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
-    'Current WORK7 candidate must modify genuine imagery without changing shared UI');
+    'Previous integrated true-image correction remains present');
+  assert.ok(cssText.includes('18 Nov 13:26 UTC, native carved-wood value registration.'),
+    'The new WORK7 candidate changes only actual native 05 relief materials');
     // The only admissible before-image is the actual merged #392 v0.1.88 field.
   // Art and frames are restored with temporary CSS, never with older #384 values.
   // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
@@ -87,7 +89,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.09)!important}
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.37)!important}
     }`;
-  const cssBaseline = merged400Baseline;
+  // WORK0 has integrated #404 into the actual branch HEAD; restoring #400
+  // would falsely attribute #404's previous improvement to this new PR.
+  const merged404Baseline = merged400Baseline + `
+    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.14)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.67)!important}
+    }`;
+  const cssBaseline = merged404Baseline;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
     { cwd: process.cwd(), stdio: 'ignore' });
@@ -271,7 +280,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         let headScreenshotData: string | null = null;
         let baselineGeometry: any = null;
         if ((width===384 && height===512)||(width===320 && height===568)) {
-          // Temporarily undo only this PR's eight native-only material filters via precise
+          // Temporarily undo only this PR's five native-only material filters via precise
           // overrides. Keep HEAD assets, state, earlier visual passes, browser
           // viewport and font rendering identical before/after.
           const enabled = await evaluate("(()=>{const s=document.createElement('style');s.id='work7-css-baseline';s.textContent="+JSON.stringify(cssBaseline)+";document.head.appendChild(s);return true})()");
@@ -293,8 +302,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           await sleep(200);
           if (width===384 && height===512) {
             // Actual current HEAD, not the older pre-#268 baseline: the only
-            // difference from the new render is this PR's eight Cartas-only crop filters.
-            await evaluate("(()=>{const s=document.createElement('style');s.id='work7-head-baseline';s.textContent="+JSON.stringify(merged400Baseline)+";document.head.appendChild(s);return true})()");
+            // difference from the new render is this PR's five native card-relief filters.
+            await evaluate("(()=>{const s=document.createElement('style');s.id='work7-head-baseline';s.textContent="+JSON.stringify(merged404Baseline)+";document.head.appendChild(s);return true})()");
             await sleep(200);
             const currentHead = await command('Page.captureScreenshot', {
               format:'png',fromSurface:true,captureBeyondViewport:false
@@ -464,7 +473,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
   assert.ok(card.maeRgbAfter<card.maeRgbBefore&&card.roiMaeAfter<card.roiMaeBefore,
-    'Real 05 Cartas must strictly improve global MAE and source-art ROI vs merged #400 HEAD: '+
+    'Real 05 Cartas must strictly improve global MAE and source-art ROI vs real integrated #404 HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
   assert.ok(shop.maeRgbAfter<=shop.maeRgbBefore&&shop.roiMaeAfter<=shop.roiMaeBefore,
     'Unmodified 06 Loja cannot regress relative to actual HEAD: '+
