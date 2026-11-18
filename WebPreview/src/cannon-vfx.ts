@@ -8,11 +8,11 @@ export function cannonFxState(age: number): CannonFxFrame {
   const t = age / CANNON_FX_DURATION;
   // Quick kick, damped return: all values resolve exactly to zero.
   const recoil = Math.sin(Math.PI * t) * Math.pow(1 - t, 0.6) * 0.42;
-  const flashT = Math.min(1, t / 0.33);
+  // A 150 ms flash was practically invisible on low-FPS mobile Chromium.\n  // Keep the *visual* muzzle flare readable for ~300 ms; recoil, damage,\n  // flight time and the .46 s presentation envelope remain unchanged.\n  const flashT = Math.min(1, t / 0.67);
   return {
     recoil,
-    flashScale: 0.32 + flashT * 0.92,
-    flashOpacity: Math.pow(1 - flashT, 1.6) * 0.93,
+    flashScale: 0.44 + flashT * 0.96,
+    flashOpacity: Math.pow(1 - flashT, 1.1) * 0.93,
     visible: flashT < 1
   };
 }
