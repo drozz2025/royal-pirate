@@ -4133,3 +4133,23 @@
     filter:saturate(1.27) contrast(1.12) brightness(1.40) drop-shadow(0 4px 3px #041327a8)
   }
 }
+
+/* WORK7 / issue #104 — 18 Nov 04h: approved-image pigment + carved-relief study.
+ * The ORIGINAL 384×512 approved eight artworks and three authentic treasure
+ * illustrations remain image crops, never page screenshot backgrounds.
+ * This native-only filter pass increases individual source pigment separation
+ * in the 4×2 physical card frames and rebalances the legendary chest relief.
+ * Only 05/06; 320px/#263 and tall phones retain exactly their prior CSS.
+ * No changes to state, purchases, PRÉVIA/EM BREVE, Porto or global dock.
+ * Not human approved: approved:false / 0 of 8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.585) saturate(.80)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.715) saturate(1.40)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.580) saturate(.70)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.589) saturate(1.60)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.519) saturate(1.60)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.653) saturate(1.40)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.546) saturate(1.60)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.682) saturate(1.60)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.488) saturate(1.80)}
+}
