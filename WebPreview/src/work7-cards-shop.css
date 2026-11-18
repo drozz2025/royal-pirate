@@ -4133,3 +4133,22 @@
     filter:saturate(1.27) contrast(1.12) brightness(1.40) drop-shadow(0 4px 3px #041327a8)
   }
 }
+
+/* WORK7/#104 — 18 Nov: restore pictorial exposure without changing the
+ * darker carved frames, geometry, state, nav or truthful availability labels.
+ * Eight authentic cropped approved artworks remain live DOM elements.
+ * The current HEAD's individual panel filters remain unchanged. At the
+ * reference's native 384×512 only, brighten cropped artwork INSIDE them
+ * (contrast/saturation unmodified); the 320px dock and tall viewports do
+ * not receive this pass. CI must compare against the exact merged HEAD in
+ * the same paused Chromium scene; approved:false, 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+ .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.58)}
+ .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.24)}
+ .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.16)}
+ .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.16)}
+ .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.42)}
+ .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.33)}
+ .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.26)}
+ .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)}
+}
