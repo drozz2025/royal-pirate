@@ -19,8 +19,48 @@ function sealTexture(red: boolean, flag = false) {
   const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 512;
   const c = canvas.getContext('2d')!;
   c.fillStyle = flag ? '#151923' : red ? '#a7342f' : '#101923'; c.fillRect(0, 0, 512, 512);
-  c.strokeStyle = red ? '#d6634d' : '#303741'; c.lineWidth = 2;
-  for (let x = 16; x < 512; x += 48) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, 512); c.stroke(); }
+  // WORK0/#104 Batalha 02: a painted oxblood canvas, not a flat red rectangle.
+  // This is a SINGLE existing CanvasTexture on the two live enemy sail meshes.
+  // Royal/Porto material (red=false), flags, hull, draw calls and physics stay intact.
+  if(red && !flag){
+    const cloth=c.createLinearGradient(0,0,512,512);
+    cloth.addColorStop(0,'#f17856');cloth.addColorStop(.24,'#b73d38');
+    cloth.addColorStop(.48,'#6f2534');cloth.addColorStop(.70,'#ca4b47');
+    cloth.addColorStop(1,'#6a2530');
+    c.fillStyle=cloth;c.fillRect(0,0,512,512);
+    const edgeShade=c.createLinearGradient(0,0,512,0);
+    edgeShade.addColorStop(0,'rgba(32,14,27,.56)');
+    edgeShade.addColorStop(.16,'rgba(27,9,22,0)');
+    edgeShade.addColorStop(.78,'rgba(28,9,23,0)');
+    edgeShade.addColorStop(1,'rgba(29,12,24,.50)');
+    c.fillStyle=edgeShade;c.fillRect(0,0,512,512);
+    // Broad alternating sunlit and shadowed billows make the original sail
+    // geometry legible in the 384x512 mobile crop, without adding a mesh.
+    for(let band=0;band<9;band++){
+      const x=18+band*59;
+      c.beginPath();c.moveTo(x-20,-12);
+      c.bezierCurveTo(x+25,115,x-24,342,x+17,524);
+      c.lineWidth=band%2===0?29:19;
+      c.strokeStyle=band%2===0?'rgba(255,177,130,.15)':'rgba(36,10,29,.22)';
+      c.stroke();
+    }
+    // Worn horizontal seams follow the fabric instead of a rigid grid.
+    for(let y=98;y<500;y+=112){
+      c.beginPath();c.moveTo(14,y);
+      c.bezierCurveTo(130,y+17,315,y-14,498,y+8);
+      c.lineWidth=2.2;c.strokeStyle='rgba(247,193,143,.25)';c.stroke();
+      c.beginPath();c.moveTo(14,y+5);
+      c.bezierCurveTo(130,y+22,315,y-9,498,y+13);
+      c.lineWidth=1;c.strokeStyle='rgba(51,19,29,.35)';c.stroke();
+    }
+  }
+  c.strokeStyle = red ? 'rgba(247,169,125,.24)' : '#303741'; c.lineWidth = 2;
+  for (let x = 16; x < 512; x += 48) {
+    c.beginPath();c.moveTo(x, 0);
+    if(red&&!flag)c.bezierCurveTo(x+14,146,x-14,332,x+8,512);
+    else c.lineTo(x,512);
+    c.stroke();
+  }
   c.strokeStyle = '#d5bf8c'; c.lineWidth = 4; c.strokeRect(12, 12, 488, 488);
   if(!red && !flag){
     // Fine woven seams and gold-edged corner stitching stay on the actual
