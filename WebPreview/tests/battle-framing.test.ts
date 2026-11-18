@@ -23,8 +23,16 @@ test('WORK6 native 384 and mobile 320/390/430 show a right-side enemy broadside 
   assert.equal(pose.showBattery,true,`deck visible at ${w}x${h}`);
   const enemy=screen(w,h,[10,0,-3]);
   const mast=screen(w,h,[10,1.72*8.4,-3]);
-  const portCannon=screen(w,h,[-3.15+pose.batteryOffsetX,4.86,65.35+pose.batteryOffsetZ]);
-  const starboardCannon=screen(w,h,[5.72+pose.batteryOffsetX,3,66.8+pose.batteryOffsetZ]);
+  // Test each REAL barrel-mouth mesh in scene world space; the battery
+  // comes from makeBattleDeck at z=-15, then scene.ts applies pose x/z.
+  // Do not project guessed hardcoded cannon coordinates that ignore parent
+  // transform — this would miss a visually displaced cannonball.
+  const muzzleWorld=(i:number):[number,number,number]=>{
+    const m=battery.muzzles[i];
+    return [m.x+pose.batteryOffsetX,m.y,m.z+battery.group.position.z+pose.batteryOffsetZ];
+  };
+  const portCannon=screen(w,h,muzzleWorld(0));
+  const starboardCannon=screen(w,h,muzzleWorld(1));
   const blackSail=screen(w,h,[pose.sailX,8.85,42]);
 
   assert.ok(enemy.x>w*.56 && enemy.x<w*.82,
