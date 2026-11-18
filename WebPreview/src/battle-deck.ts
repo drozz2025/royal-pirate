@@ -120,6 +120,18 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
   flash.name='first-person-central-flash';
   flash.position.copy(mouth).addScaledVector(direction,.22);
   flash.visible=false;recoil.add(flash);
+  // A single warm 3D blast disc, coaxial with the REAL muzzle: no floating
+  // VFX sprite, screen-space fake or overlay on the firing controls. Its live
+  // parent is the recoil/yaw group, so the shot, ring and flash move together.
+  const blast=new T.Mesh(
+    new T.RingGeometry(1.06,1.68,28),
+    new T.MeshBasicMaterial({color:'#ffd276',side:T.DoubleSide,
+      transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending})
+  );
+  blast.name='first-person-central-blast-ring';
+  blast.position.copy(mouth).addScaledVector(direction,.36);
+  blast.quaternion.copy(mouthFace);
+  blast.visible=false;recoil.add(blast);
   // Keep the legacy group's initial offset; battleCameraPose overrides it on
   // every Batalha entry and resize, without touching Porto.
   group.position.z=-15;

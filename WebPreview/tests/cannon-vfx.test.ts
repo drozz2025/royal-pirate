@@ -45,3 +45,17 @@ test('actual battle fire event can drive presentation effects without altering d
  assert.equal(battle.power,65);
  assert.equal(cannonFxState(0).visible,true);
 });
+
+test('WORK0 #104: muzzle flash stays legible at low mobile FPS without changing physics',()=>{
+ const at180=cannonFxState(.18),at260=cannonFxState(.26),gone=cannonFxState(.32);
+ assert.equal(at180.visible,true,'a frame 180ms after DISPARAR must still show muzzle light');
+ assert.ok(at180.flashOpacity>.2,'the late first-frame flash needs visible alpha');
+ assert.equal(at260.visible,true,'low-FPS capture can sample the warm light after 250ms');
+ assert.equal(gone.visible,false,'blast light must disappear before the recoil ends');
+ assert.ok(cannonFxState(.35).recoil>0,'the original cannon still recoils after its light fades');
+ const battle=new Battle(1261);
+ assert.equal(battle.fire(),true);
+ assert.equal(battle.shotsFired,1);
+ assert.equal(battle.health.enemy,100);
+ assert.ok(battle.shot,'live projectile simulation remains untouched');
+});

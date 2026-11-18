@@ -802,6 +802,12 @@ export class OceanScene {
       centralRecoil.rotation.y=-this.battle.yaw*Math.PI/180*.20;
     }
     for(const [index,flare] of this.batteryFlashes.entries()){flare.visible=this.battleBattery.visible&&batteryFx.visible&&index===this.activeBatteryMuzzle;flare.scale.setScalar(Math.max(.05,batteryFx.flashScale*.75));(flare.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity;}
+    const centralBlast=this.battleBattery.getObjectByName('first-person-central-blast-ring') as T.Mesh|undefined;
+    if(centralBlast){
+      centralBlast.visible=this.battleBattery.visible&&batteryFx.visible;
+      centralBlast.scale.setScalar(.54+batteryFx.flashScale*.74);
+      (centralBlast.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity*.64;
+    }
     this.foam.forEach((f,i)=>{(f.material as T.MeshBasicMaterial).opacity=.3+Math.sin(pictureTime*2+i)*.12;f.scale.x=2.25+Math.sin(pictureTime)*.09;});
     for(let i=this.ripples.length-1;i>=0;i--){const ripple=this.ripples[i];ripple.age+=dt;const state=rippleState(ripple.age,ripple.life);
       if(state.finished){ripple.mesh.visible=false;this.ripplePool.push(ripple.mesh);this.ripples.splice(i,1);continue;}
@@ -834,7 +840,31 @@ export class OceanScene {
       this.trail.geometry.setFromPoints([p,p.clone().addScaledVector(v,-1.2)]);}else{this.ball.visible=false;this.trail.visible=false;}
     for(let i=this.particles.length-1;i>=0;i--){const p=this.particles[i];p.age+=dt;if(p.age>=p.life){p.mesh.visible=false;this.pool.push(p.mesh);this.particles.splice(i,1);continue;}p.mesh.position.addScaledVector(p.velocity,dt);if(!p.smoke)p.velocity.y-=8*dt;const alpha=1-p.age/p.life;(p.mesh.material as T.MeshBasicMaterial).opacity=alpha;p.mesh.scale.setScalar(p.size*(p.smoke?1+p.age*2:Math.max(.2,alpha)));}
     this.controls.update();if(this.shake>0){this.camera.position.y+=Math.sin(timestamp*.1)*this.shake;this.shake*=.86;}
-    const renderStart=performance.now();this.renderer.render(this.scene,this.camera);this.renderMs=performance.now()-renderStart;this.onFrame();if(timestamp-this.metricsAt>1000){this.metricsAt=timestamp;this.onMetrics(this.getMetrics());}
+    const renderStart=performance.now();this.renderer.render(this.scene,this.camera);this.renderMs=performance.now()-renderStart;
+    // LOCAL CHROMIUM EVIDENCE ONLY: a Playwright screenshot can take >1 second
+    // on SwiftShader and miss a 300ms muzzle blast entirely. Capture the real
+    // GPU drawing buffer DURING the exact frames of the animated firing event.
+    // No frame reads, state changes or allocations on the published website.
+    const shotQA=(window.location.hostname==='127.0.0.1'||window.location.hostname==='localhost')
+      &&new URLSearchParams(window.location.search).has('work6shots');
+    if(shotQA&&this.cameraMode==='battle'&&this.battleBattery.visible
+      &&this.recoilAge.player>=0&&this.recoilAge.player<CANNON_FX_DURATION
+      &&this.renderer instanceof T.WebGLRenderer){
+      const diagnostics=window as typeof window & {
+        __royalShotFrames?: {ageSec:number;width:number;height:number;rgba:Uint8Array}[]
+      };
+      const frames=diagnostics.__royalShotFrames??(diagnostics.__royalShotFrames=[]);
+      const milestones=[0,.08,.16,.25,.34];
+      if(frames.length<milestones.length&&this.recoilAge.player>=milestones[frames.length]){
+        const gl=this.renderer.getContext(),width=gl.drawingBufferWidth,height=gl.drawingBufferHeight;
+        if(width>0&&height>0&&width<=1280&&height<=1280){
+          const rgba=new Uint8Array(width*height*4);
+          gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,rgba);
+          if(gl.getError()===gl.NO_ERROR)frames.push({ageSec:this.recoilAge.player,width,height,rgba});
+        }
+      }
+    }
+    this.onFrame();if(timestamp-this.metricsAt>1000){this.metricsAt=timestamp;this.onMetrics(this.getMetrics());}
   };
   dispose(){this.disposed=true;cancelAnimationFrame(this.raf);this.resizeObserver.disconnect();document.removeEventListener('visibilitychange',this.onVisibility);this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.canvas.removeEventListener('pointerdown',this.shipPointerDown,true);this.canvas.removeEventListener('pointermove',this.shipPointerMove,true);this.canvas.removeEventListener('pointerup',this.shipPointerUp,true);this.canvas.removeEventListener('pointercancel',this.shipPointerUp,true);this.controls.dispose();const geometries=new Set<T.BufferGeometry>(),materials=new Set<T.Material>(),textures=new Set<T.Texture>();this.scene.traverse(o=>{if(o instanceof T.Mesh||o instanceof T.Line){geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:[o.material]){materials.add(m);for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);}}});geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());this.battleSky.dispose();this.renderer.dispose();this.canvas.remove();this.pirateAudio.dispose();}
 }
