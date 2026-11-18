@@ -58,7 +58,7 @@ function sealTexture(red: boolean, flag = false) {
       c.lineWidth=1;c.strokeStyle='rgba(51,19,29,.35)';c.stroke();
     }
   }
-  c.strokeStyle = red ? 'rgba(247,169,125,.24)' : '#303741'; c.lineWidth = 2;
+  c.strokeStyle = red && !flag ? 'rgba(247,169,125,.24)' : red ? '#d6634d' : '#303741'; c.lineWidth = 2;
   for (let x = 16; x < 512; x += 48) {
     c.beginPath();c.moveTo(x, 0);
     if(red&&!flag)c.bezierCurveTo(x+14,146,x-14,332,x+8,512);
