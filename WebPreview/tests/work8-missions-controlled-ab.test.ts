@@ -90,7 +90,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        enable it only for the independent coastal A/B near the end. This
        preserves the exact original v0.1.75 baselines without relaxing
        their MAE or pixel-stability requirements. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-pewter-edge-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -925,6 +925,59 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'genuine original day 4-6 source art must measurably improve both ROI and full-frame MAE');
     assert.ok(midCompare.metrics.quests.delta<.10&&midCompare.metrics.daily.delta<.25,
       'three real quests and overall daily reward board must not regress');
+
+
+    /* WORK8/#104: THREE REAL MISSION CARDS only. Compare unmodified and
+       painted edge relief in the same fully decoded, frozen 384x512 Chromium
+       scene. No page reload, changing data, scrolling or false rewards. */
+    const edgeFlag='work8-missions-pewter-edge-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(edgeFlag)+');true');
+    await delay(135);
+    const edgeBeforeLayout=await headingLayout();
+    const edgeBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(edgeFlag)+');true');
+    await delay(135);
+    const edgeAfterLayout=await headingLayout();
+    const edgeAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const edgeSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+edgeBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+edgeAfter))
+      .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],questEdges:[12,157,372,318],daily:');
+    assert.notEqual(edgeSource,source,'edge A/B must use two native live captures');
+    const edgeCompare=await evalJs(edgeSource);
+    const saveEdge=(name:string,value:string)=>writeFileSync(join(evidence,name),Buffer.from(value,'base64'));
+    saveEdge('missions-pewter-ORIGINAL-384x512.webp',orig);
+    saveEdge('missions-pewter-BEFORE-384x512.png',edgeBefore);
+    saveEdge('missions-pewter-RENDER-384x512.png',edgeAfter);
+    saveEdge('missions-pewter-OVERLAY-BEFORE-384x512.png',edgeCompare.overlays[0]);
+    saveEdge('missions-pewter-OVERLAY-AFTER-384x512.png',edgeCompare.overlays[1]);
+    const edgeGeometry=await readLayout();
+    const edgeReport={
+      baseHead:'4aea475e08a015ce5f0a2bb71cb1527332084f52',
+      scope:'07 Missões — three real objective borders only, 08 Ranking protected',
+      references:['assets/design-approved/00-referencia-original-aprovada.webp',
+        'assets/design-approved/00-painel-oito-ecras.webp',
+        ...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+           '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(n=>'assets/design-approved/'+n)],
+      method:'one same live, decoded and paused Chromium scene; native DPR1 384x512; isolated CSS flag',
+      roi:edgeCompare.metrics,unchanged:edgeCompare.unchanged,
+      beforeLayout:edgeBeforeLayout,afterLayout:edgeAfterLayout,
+      geometry:edgeGeometry,approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-pewter-controlled-ab.json'),JSON.stringify(edgeReport,null,2));
+    console.log('WORK8 07 pewter-edges original/live A/B '+JSON.stringify(edgeReport.roi));
+    assert.deepEqual(edgeBeforeLayout,edgeAfterLayout,'three painted borders must not move layout');
+    assert.equal(edgeGeometry.questCount,3);
+    assert.equal(edgeGeometry.dayCount,7);
+    assert.equal(edgeGeometry.dockCount,5);
+    assert.ok(edgeGeometry.documentWidth<=386);
+    assert.ok(edgeCompare.unchanged.header<.10&&edgeCompare.unchanged.dock<.10,'global header/dock unchanged');
+    assert.ok(edgeCompare.metrics.questEdges.delta<0&&edgeCompare.metrics.full.delta<0,
+      'pewter edging must improve both 3 quest ROI and native full-frame MAE');
+    assert.ok(edgeCompare.metrics.chests.delta<.1&&edgeCompare.metrics.daily.delta<.1,
+      'seven reward chests and daily panel cannot regress');
+    assert.ok(edgeGeometry.dayContent.every((items:any)=>items.every((p:any)=>p&&p.bottom<=edgeGeometry.nav.y+2)),
+      'all seven actual chests and their captions remain before dock');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
