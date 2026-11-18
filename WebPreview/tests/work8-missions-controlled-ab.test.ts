@@ -90,7 +90,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        enable it only for the independent coastal A/B near the end. This
        preserves the exact original v0.1.75 baselines without relaxing
        their MAE or pixel-stability requirements. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -810,6 +810,65 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'coastal pigment must measurably improve native approved art and full-frame MAE');
     assert.ok(coastComparison.metrics.daily.delta<.12&&coastComparison.metrics.chests.delta<.12&&coastComparison.metrics.quests.delta<.12,
       'existing genuine mission and daily reward ROIs cannot materially regress');
+
+
+    /* WORK8/#104: isolated native painted royal chest, same decoded+paused
+       Chromium document, same DPR1 384x512 frame. Earlier gated A/B runs
+       used the original 41x38 royal crop on both sides. */
+    const royalFlag='work8-missions-royal-chest-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(royalFlag)+');true');
+    await delay(130);
+    const royalBeforeLayout=await headingLayout();
+    const royalBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(royalFlag)+');true');
+    await delay(130);
+    const royalAfterLayout=await headingLayout();
+    const royalAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const royalSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+royalBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+royalAfter))
+      .replace('quests:[12,155,372,321],daily:','quests:[12,155,372,321],royal:[300,349,372,412],daily:');
+    assert.notEqual(royalSource,source,'royal A/B must compare actual independent Chromium frames');
+    const royalComparison=await evalJs(royalSource);
+    const saveRoyal=(name:string,value:string)=>writeFileSync(join(evidence,name),Buffer.from(value,'base64'));
+    saveRoyal('missions-royal-original-384x512.png',orig);
+    saveRoyal('missions-royal-before-384x512.png',royalBefore);
+    saveRoyal('missions-royal-render-384x512.png',royalAfter);
+    saveRoyal('missions-royal-overlay-before-384x512.png',royalComparison.overlays[0]);
+    saveRoyal('missions-royal-overlay-after-384x512.png',royalComparison.overlays[1]);
+    const royalGeometry=await evalJs('(()=>{const rect=e=>{const r=e?.getBoundingClientRect();return r?{left:r.left,right:r.right,top:r.top,bottom:r.bottom}:null};const chests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")];const dock=document.querySelector(".app-sheet > .harbour-nav");const hit=e=>{const r=e.getBoundingClientRect(),p=document.elementFromPoint((r.left+r.right)/2,(r.top+r.bottom)/2);return !!p&&(p===e||e.contains(p))};return {chests:chests.map(e=>rect(e.querySelector(".w8-approved-chest"))),captions:chests.map(e=>rect(e.querySelector("small"))),royalArt:rect(chests[6]?.querySelector("svg.w8-approved-painting-chest-royal")),dock:rect(dock),buttons:[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button,.w8-approved-missions .w8-approved-quest > button,.app-sheet > .harbour-nav .harbour-nav-item")].map(hit),countQuest:document.querySelectorAll(".w8-approved-missions .w8-approved-quest").length,countDay:chests.length,countDock:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,width:document.documentElement.scrollWidth}})()');
+    const royalReport={baseHead:'5e8a6d2f8d7a9dec1efa6053d8d173ade2fa560f',version:'v0.1.76',
+      scope:'07 Missões only; native approved original painted royal chest, no state, Porto, Ranking or dock changes',
+      references:['assets/design-approved/00-referencia-original-aprovada.webp',
+        'assets/design-approved/00-painel-oito-ecras.webp',
+        ...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+          '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(n=>'assets/design-approved/'+n)],
+      method:'same real Chromium page DPR1 384x512, decoded image, paused animation, same frame CSS-only toggle',
+      roi:royalComparison.metrics,unchanged:royalComparison.unchanged,
+      beforeLayout:royalBeforeLayout,afterLayout:royalAfterLayout,geometry:royalGeometry,
+      approved:false,approvedScreens:0};
+    writeFileSync(join(evidence,'work8-missions-royal-chest-controlled-ab.json'),JSON.stringify(royalReport,null,2));
+    console.log('WORK8 07 native royal chest A/B '+JSON.stringify(royalReport.roi));
+    assert.deepEqual(royalBeforeLayout,royalAfterLayout,'art adjustment must not move any other UI geometry');
+    assert.equal(royalGeometry.countQuest,3);
+    assert.equal(royalGeometry.countDay,7);
+    assert.equal(royalGeometry.countDock,5);
+    assert.equal(royalGeometry.buttons.length,11);
+    assert.ok(royalGeometry.buttons.every(Boolean),'3 tabs, 3 actions and 5 dock buttons must remain reachable');
+    assert.ok(royalGeometry.width<=386,'native 384px viewport cannot gain horizontal overflow');
+    assert.ok(royalGeometry.chests.every((p:any)=>p&&p.top>=350&&p.bottom<=royalGeometry.dock.top),
+      'all 7 real chest containers must end before unchanged dock');
+    assert.ok(royalGeometry.captions.every((p:any)=>p&&p.bottom<=royalGeometry.dock.top+3),
+      'all 7 day captions must remain above dock');
+    assert.ok(royalGeometry.royalArt&&royalGeometry.royalArt.left>=303&&royalGeometry.royalArt.right<=370&&
+      royalGeometry.royalArt.top>=350&&royalGeometry.royalArt.bottom<=412,
+      'raised source art must stay within original 07 coordinates');
+    assert.ok(royalComparison.unchanged.header<.10&&royalComparison.unchanged.dock<.10,
+      'Porto HUD and dock must be pixel identical');
+    assert.ok(royalComparison.metrics.royal.delta<0&&royalComparison.metrics.full.delta<0,
+      'authentic royal art must improve both target ROI and full-frame MAE');
+    assert.ok(royalComparison.metrics.quests.delta<.12&&royalComparison.metrics.daily.delta<.20,
+      'no significant regression in 3 genuine objectives or 7 daily rewards');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
