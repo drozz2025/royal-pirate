@@ -43,26 +43,21 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // Exact CSS on that HEAD, not an obsolete older uniform .72 baseline.
   // Restoring it in the SAME Chromium frame isolates ONLY this PR's
   // four optical changes, including preserving original 320px rules.
+
+  // Baseline from EXACT work6/web-3d-preview commit 4aea475e08a015ce5f0a2bb71cb1527332084f52, not an older
+  // PR trial. Inline !important overrides ONLY this branch's nine filters
+  // in the same live Chromium scene/frame. Other CSS remains identical.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.63)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.77)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.61)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.65)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.80)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.80)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.65)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop,
-      .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.11) drop-shadow(0 4px 3px #041327a8)!important
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.16) drop-shadow(0 4px 3px #041327a8)!important
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.88)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)!important
-      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.585)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.745)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.580)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.640)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.590)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.710)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.620)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.710)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.650)!important}
     }`;
   const cssBaseline = currentHeadBaseline;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
