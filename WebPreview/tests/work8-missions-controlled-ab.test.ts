@@ -926,6 +926,62 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(midCompare.metrics.quests.delta<.10&&midCompare.metrics.daily.delta<.25,
       'three real quests and overall daily reward board must not regress');
 
+
+    /* WORK8/#104: independent A/B of the THREE real quest-emblem paintings.
+       Source 07 is read as the native 384x512 WebP; BEFORE and AFTER are
+       captured in one loaded Chromium scene, with the same paused animation
+       frame. Only the new icon-tone CSS flag is toggled. */
+    const questArtFlag='work8-missions-quest-art-tone-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(questArtFlag)+');true');
+    await delay(140);
+    const artBeforeLayout=await headingLayout();
+    const artBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(questArtFlag)+');true');
+    await delay(140);
+    const artAfterLayout=await headingLayout();
+    const artAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const artSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+artBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+artAfter))
+      .replace('quests:[12,155,372,321],daily:',
+        'quests:[12,155,372,321],questIcons:[14,157,72,318],daily:');
+    assert.notEqual(artSource,source,'new quest-art A/B must capture new real frames');
+    const artCompare=await evalJs(artSource);
+    const saveArt=(name:string,value:string)=>writeFileSync(join(evidence,name),Buffer.from(value,'base64'));
+    saveArt('missions-quest-art-original-384x512.webp',orig);
+    saveArt('missions-quest-art-before-384x512.png',artBefore);
+    saveArt('missions-quest-art-render-384x512.png',artAfter);
+    saveArt('missions-quest-art-overlay-before-384x512.png',artCompare.overlays[0]);
+    saveArt('missions-quest-art-overlay-after-384x512.png',artCompare.overlays[1]);
+    const artGeometry=await evalJs('(()=>{const r=e=>{const a=e?.getBoundingClientRect();return a?{x:a.x,y:a.y,right:a.right,bottom:a.bottom}:null};const content=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")];const nav=document.querySelector(".app-sheet > .harbour-nav");const touch=e=>{const a=e.getBoundingClientRect(),x=document.elementFromPoint((a.left+a.right)/2,(a.top+a.bottom)/2);return !!x&&(x===e||e.contains(x))};return {questArts:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-art > svg.w8-approved-painting")].map(r),quests:document.querySelectorAll(".w8-approved-missions .w8-approved-quest").length,days:content.length,chests:content.map(el=>r(el.querySelector(".w8-approved-chest"))),labels:content.map(el=>r(el.querySelector("small"))),nav:r(nav),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,buttons:[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button,.w8-approved-missions .w8-approved-quest > button,.app-sheet > .harbour-nav .harbour-nav-item")].map(touch),width:document.documentElement.scrollWidth}})()');
+    const artReport={baseHead:'b1b7433af0b083e01640a0ab70166249bb5ce20f',
+      scope:'07 Missions genuine quest emblem tone; Ranking08 / Porto / dock / rewards untouched',
+      references:['assets/design-approved/00-referencia-original-aprovada.webp','assets/design-approved/00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(n=>'assets/design-approved/'+n)],
+      method:'single real Chromium DOM/frame, paused animations, decoded source, native unscaled 384x512 DPR1',
+      roi:artCompare.metrics,unchanged:artCompare.unchanged,
+      beforeLayout:artBeforeLayout,afterLayout:artAfterLayout,
+      geometry:artGeometry,approved:false,approvedScreens:0};
+    writeFileSync(join(evidence,'work8-missions-quest-art-controlled-ab.json'),JSON.stringify(artReport,null,2));
+    console.log('WORK8 07 quest-emblem source A/B '+JSON.stringify(artReport.roi));
+    assert.deepEqual(artBeforeLayout,artAfterLayout,'painting tones cannot move geometry');
+    assert.equal(artGeometry.quests,3);
+    assert.equal(artGeometry.days,7);
+    assert.equal(artGeometry.navCount,5);
+    assert.equal(artGeometry.questArts.length,3);
+    assert.equal(artGeometry.buttons.length,11);
+    assert.ok(artGeometry.buttons.every(Boolean),'all 3 mission categories, 3 objectives and 5 dock actions remain hittable');
+    assert.ok(artGeometry.chests.every((p:any)=>p&&p.y>=350&&p.bottom<=artGeometry.nav.y),
+      'all seven chest containers remain above the dock');
+    assert.ok(artGeometry.labels.every((p:any)=>p&&p.bottom<=artGeometry.nav.y+3),
+      'the seven real day labels remain above the dock');
+    assert.ok(artGeometry.width<=386);
+    assert.ok(artCompare.unchanged.header<.1&&artCompare.unchanged.dock<.1,
+      'header and shared five-item dock must be pixel identical');
+    assert.ok(artCompare.metrics.questIcons.delta<-.015&&artCompare.metrics.full.delta<-.003,
+      'quest emblem correction must improve original-source icon ROI and full MAE');
+    assert.ok(artCompare.metrics.daily.delta<.08&&artCompare.metrics.chests.delta<.08,
+      'no daily-reward or seven-chest regression');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
