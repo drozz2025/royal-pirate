@@ -2918,3 +2918,24 @@
     background-color:#4a352f!important;
   }
 }
+
+/* WORK4/#104 — native 384x512 sea-source registration, 18 Nov 09h.
+   The approved sea is an actual 213x31 source-pixel strip (x24..237,
+   y308..339), not a 384x56 stretched wallpaper. Match those source
+   dimensions in the ORIGINAL native viewport. The stage content origin is
+   (18,*) in Chromium, so left 6px registers source x24; bottom -2px
+   registers source y308 against the measured native first fold. The organic top mask still fades the join.
+   Do not create waves, clone Royal Crown or touch WORK0 dock/layout.
+   Non-native mobile resolutions retain the previously validated bridge. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > svg.w4-reference-sea {
+    width:213px;
+    height:31px;
+    max-height:none;
+    aspect-ratio:213 / 31;
+    left:6px;
+    right:auto;
+    bottom:-2px;
+    opacity:1;
+  }
+}
