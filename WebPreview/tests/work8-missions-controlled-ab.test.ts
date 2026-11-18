@@ -1390,6 +1390,45 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       saveCoast('missions-coast-'+viewport.width+'x'+viewport.height+'.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     }
 
+
+    /* WORK8 07 — real CDP touchscreen regression at 320 (not JS .click).
+       Drive one horizontal finger swipe through the genuine 7-day strip and
+       a finger tap on the existing Porto dock item. Do not alter navigation. */
+    await cmd('Emulation.setDeviceMetricsOverride',{
+      width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568
+    });
+    await cmd('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
+    await delay(220);
+    const stripTouch=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),box=d.getBoundingClientRect();d.scrollLeft=0;return {left:box.left,right:box.right,top:box.top,bottom:box.bottom,scrollWidth:d.scrollWidth,clientWidth:d.clientWidth}})()');
+    assert.ok(stripTouch.scrollWidth>stripTouch.clientWidth+5,'320 daily strip must be finger-scrollable');
+    const swipeY=Math.round((stripTouch.top+stripTouch.bottom)/2);
+    const swipeStart=Math.floor(stripTouch.right-18);
+    const swipeEnd=Math.max(Math.ceil(stripTouch.left+18),swipeStart-155);
+    await cmd('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:swipeStart,y:swipeY}]});
+    for(let n=1;n<=6;n++){
+      const x=Math.round(swipeStart+(swipeEnd-swipeStart)*n/6);
+      await cmd('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:swipeY}]});
+      await delay(25);
+    }
+    await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await delay(320);
+    const actualTouchScroll=await evalJs('document.querySelector(".w8-approved-days").scrollLeft');
+    assert.ok(actualTouchScroll>5,'physical 320 finger swipe should scroll existing seven rewards');
+    const dockTap=await evalJs('(()=>{const b=document.querySelector(".app-sheet > .harbour-nav .harbour-nav-item:first-child"),r=b.getBoundingClientRect();return {x:Math.round((r.left+r.right)/2),y:Math.round((r.top+r.bottom)/2),count:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length}})()');
+    assert.equal(dockTap.count,5,'touch must preserve exactly five global dock items');
+    await cmd('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:dockTap.x,y:dockTap.y}]});
+    await delay(75);
+    await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await delay(300);
+    const portReturned=await evalJs('!!document.querySelector(".harbour-screen")');
+    assert.ok(portReturned,'physical touch on PORTO must return to the existing Porto screen');
+    writeFileSync(join(evidence,'work8-missions-320-real-touch.json'),JSON.stringify({
+      issue:104,source:'real Chromium CDP touch events',viewport:[320,568],
+      swipe:{from:swipeStart,to:swipeEnd,y:swipeY,scrollLeft:actualTouchScroll},
+      dockCount:dockTap.count,returnedToPorto:portReturned,
+      approved:false,approvedScreens:0
+    },null,2));
+
   } finally {
     try{ws?.close();}catch{}
     browser?.kill('SIGTERM');vite.kill('SIGTERM');
