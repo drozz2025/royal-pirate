@@ -1652,6 +1652,96 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(Math.abs(earlyDelta.quests)<.05 && Math.abs(earlyDelta.dockDelta)<.05,
       'no regressions in the three missions or WORK0 dock');
 
+
+    /* WORK8/#104 — Day 7 REAL chest inlay: visually select a source-pigment
+       variation using the actual approved 07 frame (other 01–08 files
+       verified by the previous gate). One paused real Chromium tab, same
+       frame, 384x512 DPR1; no synthetic mission or fake reward. */
+    const day7Flag='work8-missions-day7-finish-ab-baseline';
+    const day7Selector='.w8-approved-missions .w8-approved-days li:nth-child(7)';
+    const day7Rects=await evalJs('(()=>[...document.querySelectorAll('+JSON.stringify(day7Selector)+')].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
+    assert.equal(day7Rects.length,1,'seventh authentic reward tile exists once');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(day7Flag)+');true');
+    await delay(120);
+    const day7BeforeGeometry=await headingLayout();
+    const day7BeforeCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(day7Selector)+')).backgroundImage');
+    const day7Before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const day7Variants=[
+      ['integrated',null],
+      ['slightly-darker','#73502f,#242535'],
+      ['warm-muted','#70502f,#222337'],
+      ['warm-dark','#6e4d2f,#222337'],
+      ['gold-bright','#7b542f,#282538'],
+      ['blue-deeper','#77512f,#202334'],
+      ['blue-neutral','#77512f,#24273b'],
+      ['gold-deep','#6c482c,#202132'],
+      ['soft-blue','#765330,#2b2b3c'],
+      ['gold-ink','#70482d,#252437'],
+      ['warm-olive','#6c502c,#262536']
+    ] as const;
+    const day7StyleId='work8-day7-native-pigment-study';
+    const day7Shots:string[]=[];
+    for(const [name,gradient] of day7Variants){
+      await evalJs('(()=>{let s=document.getElementById('+JSON.stringify(day7StyleId)+');if(!s){s=document.createElement("style");s.id='+JSON.stringify(day7StyleId)+';document.head.append(s)}s.textContent='+JSON.stringify(gradient?day7Selector+'{background-image:linear-gradient(145deg,'+gradient+')!important;}':'')+';return true})()');
+      await delay(80);
+      day7Shots.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    }
+    await evalJs('document.getElementById('+JSON.stringify(day7StyleId)+')?.remove();true');
+    const day7Sweep=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(day7Rects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        ...day7Shots.map(s=>'data:image/png;base64,'+s)])));
+    const day7Rank=day7Variants.map(([name],i)=>({name,...day7Sweep[i],
+      roiDelta:day7Sweep[i].meters-day7Sweep[0].meters,
+      fullDelta:day7Sweep[i].full-day7Sweep[0].full}));
+    console.log('WORK8 #104 day7 native REAL inlay pigments '+JSON.stringify(day7Rank));
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(day7Flag)+');true');
+    await delay(130);
+    const day7AfterGeometry=await headingLayout();
+    const day7AfterCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(day7Selector)+')).backgroundImage');
+    const day7After=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const day7Scores=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(day7Rects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        'data:image/png;base64,'+day7Before,'data:image/png;base64,'+day7After])));
+    const day7Delta=Object.fromEntries(Object.keys(day7Scores[0])
+      .map(k=>[k,day7Scores[1][k]-day7Scores[0][k]]));
+    const day7OverlayScript=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+day7Before))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+day7After));
+    assert.notEqual(day7OverlayScript,source,'capture real ORIGINAL vs both native frame renders');
+    const day7Overlays=await evalJs(day7OverlayScript);
+    saveTone('missions-day7-original-384x512.webp',orig);
+    saveTone('missions-day7-before-384x512.png',day7Before);
+    saveTone('missions-day7-render-384x512.png',day7After);
+    saveTone('missions-day7-original-before-overlay-384x512.png',day7Overlays.overlays[0]);
+    saveTone('missions-day7-original-render-overlay-384x512.png',day7Overlays.overlays[1]);
+    const day7Report={
+      issue:104,baseHead:'abe5788aad9a08a42e9332107c219eb6cd7f0461',
+      reference:'assets/design-approved/07-missoes.webp',referenceSet:earlyReferenceSet,
+      method:'one real paused native Chromium 384x512 DPR1 scene/frame; source artwork decoded',
+      scope:'solely seventh authentic daily reward background pigment',
+      before:{style:day7BeforeCss,mae:day7Scores[0]},
+      render:{style:day7AfterCss,mae:day7Scores[1]},
+      delta:day7Delta,roi:{seventhTile:day7Rects},
+      geometry:{before:day7BeforeGeometry,render:day7AfterGeometry},
+      variants:day7Rank,overlay:day7Overlays.metrics,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-day7-native-ab.json'),JSON.stringify(day7Report,null,2));
+    console.log('WORK8 #104 ACTUAL day7 inlay MAE '+JSON.stringify(day7Report));
+    assert.notEqual(day7BeforeCss,day7AfterCss,'actual production CSS must change the seventh genuine tile');
+    assert.deepEqual(day7BeforeGeometry,day7AfterGeometry,'keep layout of all three missions, seven rewards and dock');
+    assert.equal(day7AfterGeometry.questCount,3);
+    assert.equal(day7AfterGeometry.dayCount,7);
+    assert.equal(day7AfterGeometry.dockCount,5);
+    assert.ok(day7AfterGeometry.chests.every((c:any)=>c.bottom<=day7AfterGeometry.nav.top+2),
+      'all seven painted chests remain above the dock');
+    assert.ok(day7Delta.meters<-.001&&day7Delta.full<-.0002&&day7Delta.daily<-.0002,
+      'genuine day 7 pigment must measurably improve its ROI, daily tray and full native source');
+    assert.ok(Math.abs(day7Delta.quests)<.06&&Math.abs(day7Delta.dockDelta)<.06,
+      'no WORK0 dock or live mission regression');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
