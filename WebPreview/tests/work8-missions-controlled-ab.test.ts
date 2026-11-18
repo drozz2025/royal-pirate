@@ -1565,7 +1565,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       JSON.stringify(tabProdReport,null,2));
     console.log('WORK8 #104 ACTUAL PRODUCTION active tab ORIGINAL|RENDER|OVERLAY RGB MAE '+JSON.stringify(tabProdReport));
     assert.notEqual(activeTabBaselineFilter,activeTabProductionFilter,'real committed enamel must change');
-    const filterNums=[...activeTabProductionFilter.matchAll(/(?:brightness|saturate)\\(([0-9.]+)\\)/g)]
+    const filterNums=[...activeTabProductionFilter.matchAll(/(?:brightness|saturate)\(([0-9.]+)\)/g)]
       .map(m=>Number(m[1]));
     assert.equal(filterNums.length,2,'real selected tab retains BOTH calibrated filter operations');
     assert.ok(Math.abs(filterNums[0]-.84)<.005 && Math.abs(filterNums[1]-1.12)<.005,
