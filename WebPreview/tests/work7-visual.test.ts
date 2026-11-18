@@ -106,7 +106,28 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           0 4px 0 #07162b,0 8px 11px #020d249c!important;
       }
     }`;
-  const cssBaseline = merged404Baseline + actual404FrameShadow;
+  // The WORK0 integration of #411 is already in the ACTUAL v0.1.92 HEAD.
+  // Restore exactly that 2px inlay and the pre-candidate lower-card pigments.
+  // Never attribute the merged #411 gain (vs #404) to this WORK7 candidate.
+  const integrated411Baseline = `
+    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+        box-shadow:inset 0 0 2px 2px #f1bd76aa,0 3px 0 #06142b!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+        filter:brightness(.45) saturate(2.00) contrast(.85)!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+        filter:brightness(.65) saturate(1.30) contrast(.92)!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+        filter:brightness(.42) saturate(1.75) contrast(.79)!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
+        filter:brightness(.64) saturate(1.90) contrast(.88)!important;
+      }
+    }`;
+  const cssBaseline = merged404Baseline + actual404FrameShadow + integrated411Baseline;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
     { cwd: process.cwd(), stdio: 'ignore' });
@@ -483,7 +504,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
   assert.ok(card.maeRgbAfter<card.maeRgbBefore&&card.roiMaeAfter<card.roiMaeBefore,
-    'Real 05 Cartas must strictly improve global MAE and source-art ROI vs real integrated #404 HEAD: '+
+    'Real 05 Cartas must strictly improve global MAE and source-art ROI vs actual merged #411 + v0.1.92 HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
   assert.ok(shop.maeRgbAfter<=shop.maeRgbBefore&&shop.roiMaeAfter<=shop.roiMaeBefore,
     'Unmodified 06 Loja cannot regress relative to actual HEAD: '+
