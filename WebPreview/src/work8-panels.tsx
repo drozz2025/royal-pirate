@@ -586,7 +586,7 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
         @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
           :root:not(.work8-missions-reward-grid-ab-baseline)
             .w8-approved-missions .w8-approved-quest {
-            grid-template-columns:38px minmax(0,1fr) 80px 59px;
+            grid-template-columns:38px minmax(0,1fr) 96px 59px;
           }
           :root:not(.work8-missions-reward-grid-ab-baseline)
             .w8-approved-missions .w8-approved-quest-rewards {
