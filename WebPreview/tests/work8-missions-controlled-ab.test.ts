@@ -913,8 +913,10 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.deepEqual(midBeforeLayout,midAfterLayout,'art only must not move the three missions, rewards, labels or dock');
     assert.equal(midGeometry.quests,3);assert.equal(midGeometry.dayCount,7);assert.equal(midGeometry.dockCount,5);
     assert.ok(midGeometry.width<=386,'384px must not gain horizontal overflow');
-    assert.ok(midGeometry.midArt.every((x:any)=>x&&x.width===undefined&&x.left>=158&&x.right<=309&&x.top>=348&&x.bottom<=417),
-      'silver/gold/violet source crops stay in original art region');
+    const originalChestBounds=[[165,206],[213,255],[257,301]];
+    assert.ok(midGeometry.midArt.every((x:any,i:number)=>x&&x.left>=originalChestBounds[i][0]-2 &&
+      x.right<=originalChestBounds[i][1]+3&&x.top>=360&&x.bottom<=410),
+      'source-painted chests 4-6 must be within 2-3px of their real unscaled 07 source crops');
     assert.ok(midGeometry.captions.every((x:any)=>x&&x.bottom<=midGeometry.dock.top+3),
       'seven original labels remain visible before dock');
     assert.ok(midCompare.unchanged.header<.1&&midCompare.unchanged.dock<.1,
