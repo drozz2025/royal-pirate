@@ -1440,6 +1440,87 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.equal(meterResults.length,11);
     assert.ok(meterResults.every(s=>s.dockDelta<.08),'meter paint must never alter global dock');
 
+
+    /* WORK8/#104: v0.1.95 HEAD vs production coast ink. Genuine one-frame
+       native CDP render, no synthetic mission/reward/player state. All seven
+       source references and 07 original are included in the evidence report.
+       Colour alternatives are diagnostic ONLY, not runtime CSS/data changes. */
+    const coastalTuneFlag='work8-missions-coast-tune-ab-baseline';
+    const coastalTarget='.w8-approved-missions .w8-approved-scene .w8-seascape';
+    const coastalRefPaths=['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+      '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+      '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+      .map(s=>'assets/design-approved/'+s);
+    const coastalLayoutBefore=await headingLayout();
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(coastalTuneFlag)+');true');
+    await delay(130);
+    const coastalVariants=[
+      ['HEAD',''],
+      ['brightness-065','.65'],['brightness-070','.70'],
+      ['brightness-074','.74'],['brightness-078','.78'],
+      ['brightness-082','.82'],['brightness-086','.86'],
+      ['brightness-090','.90']
+    ] as const;
+    const coastalShots:string[]=[];
+    for(const [name,luma] of coastalVariants){
+      const rule=luma?coastalTarget+'{filter:saturate(1.02) contrast(1.08) brightness('+luma+') drop-shadow(0 3px 2px rgba(2,25,45,.32))!important}':'';
+      await evalJs('(()=>{let s=document.getElementById("work8-coast-tune-study");if(!s){s=document.createElement("style");s.id="work8-coast-tune-study";document.head.append(s)}s.textContent='+JSON.stringify(rule)+';return true})()');
+      await delay(105);
+      coastalShots.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    }
+    await evalJs('document.getElementById("work8-coast-tune-study")?.remove();true');
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(coastalTuneFlag)+');true');
+    await delay(170);
+    const coastalLayoutAfter=await headingLayout();
+    const coastalActualFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(coastalTarget)+')).filter');
+    const coastalProduction=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const coastalScores=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify([[0,86,384,155]]))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        ...coastalShots.map(s=>'data:image/png;base64,'+s),
+        'data:image/png;base64,'+coastalProduction])));
+    assert.equal(coastalScores.length,coastalVariants.length+1);
+    const coastalSweep=coastalVariants.map(([name],i)=>({name,...coastalScores[i],
+      coastDelta:coastalScores[i].meters-coastalScores[0].meters,
+      fullDelta:coastalScores[i].full-coastalScores[0].full}));
+    const coastalFinal=coastalScores.at(-1)!;
+    const coastalDelta=Object.fromEntries(Object.keys(coastalFinal)
+      .map(k=>[k,coastalFinal[k as keyof typeof coastalFinal]-coastalScores[0][k as keyof typeof coastalFinal]]));
+    const coastalOverlayScript=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+coastalShots[0]))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+coastalProduction));
+    assert.notEqual(coastalOverlayScript,source);
+    const coastalOverlay=await evalJs(coastalOverlayScript);
+    saveCoast('missions-coast-tune-original-384x512.webp',orig);
+    saveCoast('missions-coast-tune-before-384x512.png',coastalShots[0]);
+    saveCoast('missions-coast-tune-render-384x512.png',coastalProduction);
+    saveCoast('missions-coast-tune-original-before-overlay-384x512.png',coastalOverlay.overlays[0]);
+    saveCoast('missions-coast-tune-original-render-overlay-384x512.png',coastalOverlay.overlays[1]);
+    const coastalReport={
+      issue:104,baseHead:'92450b35f0763da5f5d2ccf85f88f27b2f570efb',
+      reference:'assets/design-approved/07-missoes.webp',
+      referenceSet:coastalRefPaths,viewport:'native Chromium 384x512 DPR1',
+      method:'same decoded source SVG and live paused Chromium frame; genuine DOM, no mocked mission/claim status',
+      changed:'only 07 Missions scenic SVG filter at short native viewport',
+      before:coastalScores[0],render:coastalFinal,delta:coastalDelta,
+      nativeSweep:coastalSweep,filter:coastalActualFilter,
+      geometry:{before:coastalLayoutBefore,after:coastalLayoutAfter},
+      originalBeforeRenderOverlay:coastalOverlay.metrics,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-coast-tune-production-ab.json'),
+      JSON.stringify(coastalReport,null,2));
+    console.log('WORK8 #104 COAST TUNE FINAL PRODUCTION MAE '+JSON.stringify(coastalReport));
+    assert.deepEqual(coastalLayoutBefore,coastalLayoutAfter,
+      '07 genuine missions, seven chests, five-item dock and all touch targets must be stationary');
+    assert.ok(coastalActualFilter.includes('brightness(0.74)'),
+      'native production must use measured 07 Missions-only coast candidate');
+    assert.ok(coastalDelta.meters<-.06&&coastalDelta.full<-.005,
+      'actual committed scene must measurably improve approved coastal ROI and entire original frame');
+    assert.ok(Math.abs(coastalDelta.quests)<.08&&Math.abs(coastalDelta.daily)<.08&&
+      Math.abs(coastalDelta.chests)<.08&&Math.abs(coastalDelta.dockDelta)<.05,
+      'no mission, reward, chest or shared dock regression');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
