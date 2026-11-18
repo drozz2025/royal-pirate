@@ -4319,3 +4319,20 @@
     filter:brightness(.40) saturate(1.75) contrast(.79);
   }
 }
+
+
+/* WORK7/#104 — 18 Nov 23:19 UTC. Native 06 legendary relief pigment A/B.
+ * Slightly recover approved golden highlights in the ORIGINAL, genuine
+ * legendary chest illustration only; no panel/gutter/label or box change.
+ * The approved source is assets/design-approved/06-loja.webp; the true
+ * original four-by-two cards and unique Captain pack are unchanged.
+ * Active only on short native-width screens (NOT 320 or tall mobiles).
+ * Same-frame Chromium 384x512 must confirm strict global and pack/chest
+ * ROI MAE improvement or WORK0 must not merge. No screenshot backdrop,
+ * pricing, inventory, Porto, dock or shared UI changes.
+ * approved:false / 0-8 until explicit human approval. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(1.79) drop-shadow(0 4px 3px #041327a8);
+  }
+}
