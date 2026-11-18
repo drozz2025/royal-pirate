@@ -4304,23 +4304,14 @@
 
 
 
-/* WORK7/#104 — 18 Nov 17:28 UTC. Native 05 source-enamel calibration.
- * Chromium same-scene 384x512 four-slot sweep gave lower MAE/ROI at
- * these actual 05 approved-card relief values against v0.1.94 HEAD.
- * Real art 4x2, live PRÉVIA, DOM labels/hitboxes preserved. No 06 Shop,
- * 320px, tall screens, shared header/dock/economy or other WORK touched.
- * Human approval pending: approved:false, 0/8. WORK0 owns merge/release. */
+/* WORK7/#104 — 18 Nov 17:56 UTC. Native 05 original card-3 pigment study.
+ * Controlled native A/B relative to WORK0 v0.1.94; no inherited 05/06
+ * edits, no screenshot background. Final merge only if Chromium gate proves
+ * both global and 8-card ROI improvement with unchanged geometry.
+ * 06 Loja, 320px, dock, header, other WORKs untouched.
+ * approved:false / 0 of 8; WORK0 owns merge/release/publication. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
-    filter:brightness(.435) saturate(2.00) contrast(.85);
-  }
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
-    filter:brightness(.635) saturate(1.30) contrast(.92);
-  }
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
-    filter:brightness(.405) saturate(1.75) contrast(.79);
-  }
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
-    filter:brightness(.625) saturate(1.90) contrast(.88);
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
+    filter:brightness(.40) saturate(1.20) contrast(.74);
   }
 }
