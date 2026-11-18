@@ -7,7 +7,7 @@ import { makeShip, type ShipArt } from './ships';
 import { hullImpactPlacement } from './impact-visuals';
 import { rippleState } from './water-vfx';
 import { cannonFxState, CANNON_FX_DURATION } from './cannon-vfx';
-import { battleCameraPose, battleEnemyScale } from './battle-framing';
+import { battleCameraPose, battleEnemyScale, battleDeckMuzzleWorld } from './battle-framing';
 import { makeBattleDeck } from './battle-deck';
 import { projectileFromMuzzle } from './battle-shot-presentation';
 import { makeBattleForegroundSail } from './battle-foreground-sail';
@@ -663,6 +663,10 @@ export class OceanScene {
     this.battleBattery.visible=pose.showBattery;
     this.battleBattery.position.x=pose.batteryOffsetX;
     this.battleBattery.position.z=pose.batteryOffsetZ;
+    // Both full 3D cannon assemblies shrink together on mobile, freeing
+    // the lower ocean/target. Visible muzzle coordinates follow the same
+    // transform, preserving live projectile/fire-smoke continuity.
+    this.battleBattery.scale.setScalar(pose.batteryScale);
     this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
   /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
@@ -714,7 +718,7 @@ export class OceanScene {
   /** The same muzzle point used for real 3D flash geometry and ball render. */
   private playerMuzzleWorld():T.Vector3|null {
     const muzzle=this.batteryMuzzles[this.activeBatteryMuzzle];
-    return muzzle?muzzle.clone().add(this.battleBattery.position):null;
+    return muzzle?battleDeckMuzzleWorld(this.battleBattery,muzzle):null;
   }
   private effect(event:BattleEvent){
     this.pirateAudio.play(event);
