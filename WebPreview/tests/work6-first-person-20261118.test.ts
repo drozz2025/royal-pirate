@@ -25,6 +25,10 @@ test('WORK6 18 Nov: battle mobile is a deck-level TRUE first-person single-canno
   assert.equal(group.getObjectByName('first-person-central-muzzle') instanceof T.Mesh,true);
   assert.ok(group.children.length<60,'bounded mobile render mesh budget');
   assert.ok(muzzles[0].distanceTo(flashes[0].position)<.3,'flash must be on the true mouth');
+  const blast=group.getObjectByName('first-person-central-blast-ring')!;
+  assert.ok(blast instanceof T.Mesh,'a real warm 3D muzzle ring must exist');
+  assert.equal(blast.parent,recoil,'blast, recoil and barrel MUST transform together');
+  assert.ok(blast.position.distanceTo(muzzles[0])<.5,'blast sits at the one true muzzle');
 
   for(const [w,h] of [[320,568],[384,512],[390,844],[430,932]]){
     const pose=battleCameraPose(w/h);
