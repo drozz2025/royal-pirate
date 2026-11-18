@@ -150,6 +150,6 @@ test('07 Missions: measured reward column registration native 384x512 A/B', {tim
     await delay(150);
     if(browser?.exitCode===null)browser.kill('SIGKILL');
     if(vite.exitCode===null)vite.kill('SIGKILL');
-    rmSync(profile,{recursive:true,force:true});
+    rmSync(profile,{recursive:true,force:true,maxRetries:12,retryDelay:150});
   }
 });

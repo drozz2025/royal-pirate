@@ -1048,6 +1048,62 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(actionComparison.metrics.daily.delta<.10 && actionComparison.metrics.chests.delta<.10,
       'seven reward chests and daily panel must not regress');
 
+
+    /* WORK8 #104: original-approved mission title enamel, NO mock state.
+       This independent test reuses the exact real Chromium page, paused
+       animations, loaded 07 reference, and native 384x512 captured frame.
+       Toggle only our new CSS rule. Reject MAE regression and any movement. */
+    const typeFlag='work8-missions-copy-contrast-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(typeFlag)+');true');
+    await delay(130);
+    const typeBeforeLayout=await headingLayout();
+    const typeBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(typeFlag)+');true');
+    await delay(130);
+    const typeAfterLayout=await headingLayout();
+    const typeAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const typeSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),'"__WORK8_TYPE_BEFORE__"')
+      .replace(JSON.stringify('data:image/png;base64,'+after),'"__WORK8_TYPE_AFTER__"')
+      .replace('"__WORK8_TYPE_BEFORE__"',JSON.stringify('data:image/png;base64,'+typeBefore))
+      .replace('"__WORK8_TYPE_AFTER__"',JSON.stringify('data:image/png;base64,'+typeAfter))
+      .replace('quests:[12,155,372,321],daily:',
+        'quests:[12,155,372,321],questText:[75,185,229,315],daily:');
+    assert.notEqual(typeSource,source,'new title contrast must use live native frames');
+    const typeCompare=await evalJs(typeSource);
+    const saveType=(file:string,b64:string)=>writeFileSync(join(evidence,file),Buffer.from(b64,'base64'));
+    saveType('missions-type-original-384x512.webp',orig);
+    saveType('missions-type-before-384x512.png',typeBefore);
+    saveType('missions-type-render-384x512.png',typeAfter);
+    saveType('missions-type-overlay-before-384x512.png',typeCompare.overlays[0]);
+    saveType('missions-type-overlay-render-384x512.png',typeCompare.overlays[1]);
+    const typeReport={
+      baseHead:'b391c7cb699b27f7a953fe1639fba543f6f25a0f',
+      reference:'assets/design-approved/07-missoes.webp',
+      requiredReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        ...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+          '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(n=>'assets/design-approved/'+n)],
+      method:'same exact native 384x512 Chromium page, same decoded source, paused animation, only 07 title CSS toggled',
+      scope:'07 Missões true objective headings only; no mock data, no Ranking 08 or shared WORK0 surfaces',
+      roi:typeCompare.metrics,unchanged:typeCompare.unchanged,
+      beforeLayout:typeBeforeLayout,afterLayout:typeAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-type-contrast-ab.json'),JSON.stringify(typeReport,null,2));
+    console.log('WORK8 07 original ivory titles controlled native A/B '+JSON.stringify(typeReport.roi));
+    assert.deepEqual(typeBeforeLayout,typeAfterLayout,'only title paint can change, never geometry');
+    assert.equal(typeAfterLayout.questCount,3,'all three real objectives remain intact');
+    assert.equal(typeAfterLayout.dayCount,7,'seven daily rewards intact');
+    assert.equal(typeAfterLayout.dockCount,5,'shared five-item dock intact');
+    assert.ok(typeAfterLayout.documentWidth<=386,'no horizontal overflow');
+    assert.ok(typeCompare.unchanged.header<.10&&typeCompare.unchanged.dock<.10,
+      'WORK0 header and dock pixel-identical');
+    assert.ok(typeCompare.metrics.questText.delta < -.08 && typeCompare.metrics.full.delta < -.005,
+      '07 objective headings must measurably improve source MAE in ROI and full frame');
+    assert.ok(typeCompare.metrics.daily.delta < .10&&typeCompare.metrics.chests.delta < .10,
+      'seven approved original chests and daily panel must not regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
@@ -1074,6 +1130,6 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(180);
     if(browser?.exitCode===null)browser.kill('SIGKILL');
     if(vite.exitCode===null)vite.kill('SIGKILL');
-    rmSync(profile,{recursive:true,force:true});
+    rmSync(profile,{recursive:true,force:true,maxRetries:12,retryDelay:150});
   }
 });
