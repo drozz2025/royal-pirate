@@ -6,7 +6,7 @@ import { PirateAudio } from './audio';
 import { makeShip, type ShipArt } from './ships';
 import { hullImpactPlacement } from './impact-visuals';
 import { rippleState } from './water-vfx';
-import { cannonFxState, CANNON_FX_DURATION } from './cannon-vfx';
+import { cannonFxState, cannonSmokeState, CANNON_FX_DURATION, CANNON_SMOKE_DURATION } from './cannon-vfx';
 import { battleCameraPose, battleEnemyScale, battleEnemyBroadsideYaw, battleDeckMuzzleWorld } from './battle-framing';
 import { makeBattleDeck } from './battle-deck';
 import { projectileFromMuzzle, firstPersonArc, firstPersonShotPosition } from './battle-shot-presentation';
@@ -765,7 +765,7 @@ export class OceanScene {
       this.particles.push({mesh,velocity:new T.Vector3(Math.cos(angle)*speed*(.3+Math.random()),smoke?1.5:2+Math.random()*4,Math.sin(angle)*speed*(.3+Math.random())),age:0,life:smoke?2.4:1.1+Math.random()*.4,size,smoke});
     }
   }
-  reset(){this.battle.reset();this.recoilAge={player:Infinity,enemy:Infinity};for(const flash of Object.values(this.muzzleFlash))flash.visible=false;this.impactCounts={player:0,enemy:0};for(const ship of Object.values(this.ships))ship.scars.forEach(m=>m.visible=false);for(const p of this.particles){p.mesh.visible=false;this.pool.push(p.mesh);}this.particles=[];for(const ripple of this.ripples){ripple.mesh.visible=false;this.ripplePool.push(ripple.mesh);}this.ripples=[];this.ball.visible=false;this.trail.visible=false;this.shake=0;this.lastAim='';this.activeBatteryMuzzle=0;this.playerArcTarget=null;this.playerArcDuration=1;for(const flare of this.batteryFlashes)flare.visible=false;this.home();}
+  reset(){this.battle.reset();this.recoilAge={player:Infinity,enemy:Infinity};for(const flash of Object.values(this.muzzleFlash))flash.visible=false;this.impactCounts={player:0,enemy:0};for(const ship of Object.values(this.ships))ship.scars.forEach(m=>m.visible=false);for(const p of this.particles){p.mesh.visible=false;this.pool.push(p.mesh);}this.particles=[];for(const ripple of this.ripples){ripple.mesh.visible=false;this.ripplePool.push(ripple.mesh);}this.ripples=[];this.ball.visible=false;this.trail.visible=false;this.shake=0;this.lastAim='';this.activeBatteryMuzzle=0;this.playerArcTarget=null;this.playerArcDuration=1;for(const flare of this.batteryFlashes)flare.visible=false;const smokeRig=this.battleBattery.getObjectByName('first-person-central-smoke');if(smokeRig)smokeRig.visible=false;this.home();}
   getMetrics():Metrics{const info=this.renderer.info;const perf=performance as Performance & {memory?:{usedJSHeapSize:number}};return{fps:this.frameSamples.length?Math.round(1000/(this.frameSamples.reduce((a,b)=>a+b,0)/this.frameSamples.length)):0,renderMs:Math.round(this.renderMs),calls:info.render.calls,triangles:info.render.triangles,geometries:info.memory.geometries,textures:info.memory.textures,effects:this.particles.length,heapMB:perf.memory?Math.round(perf.memory.usedJSHeapSize/1048576):undefined};}
   private animate=(timestamp:number)=>{
     if(this.disposed)return;this.raf=requestAnimationFrame(this.animate);if(document.hidden||this.paused){this.previous=0;return;}
@@ -784,7 +784,7 @@ export class OceanScene {
       art.root.position.y=Math.sin(pictureTime*1.1+(side==='player'?0:2))*.075-(health===0?1.3:0);art.root.rotation.z=Math.sin(pictureTime*.9)*.018+(health===0?(side==='enemy'?-.23:.23):damage*.035);
       art.root.rotation.x=Math.sin(pictureTime*.75+2)*.014;art.rig.rotation.z=damage>.5?damage*.14:0;
       art.sails.forEach((s,i)=>{s.rotation.y=Math.sin(pictureTime*1.3+i)*.035;s.scale.y=health<=42?.86:1;});art.flags.forEach((f,i)=>f.rotation.y=Math.sin(pictureTime*3+i)*.18);
-      if(this.recoilAge[side]<CANNON_FX_DURATION)this.recoilAge[side]+=dt;
+      if(this.recoilAge[side]<(side==='player'?CANNON_SMOKE_DURATION:CANNON_FX_DURATION))this.recoilAge[side]+=dt;
       const cannonFx=cannonFxState(this.recoilAge[side]),flash=this.muzzleFlash[side],direction=side==='player'?1:-1;
       if(flash){flash.visible=cannonFx.visible;flash.scale.set(cannonFx.flashScale,cannonFx.flashScale*.58,cannonFx.flashScale*.58);
         (flash.material as T.MeshBasicMaterial).opacity=cannonFx.flashOpacity;}
@@ -807,6 +807,16 @@ export class OceanScene {
       centralBlast.visible=this.battleBattery.visible&&batteryFx.visible;
       centralBlast.scale.setScalar(.54+batteryFx.flashScale*.74);
       (centralBlast.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity*.64;
+    }
+    // Powder smoke hangs briefly in front of the ACTUAL moving muzzle. Six
+    // instanced puffs = one bounded draw call, zero per-shot mesh allocations.
+    const smokeRig=this.battleBattery.getObjectByName('first-person-central-smoke') as T.Group|undefined;
+    if(smokeRig){
+      const plume=cannonSmokeState(this.recoilAge.player);
+      smokeRig.visible=this.battleBattery.visible&&plume.visible;
+      smokeRig.scale.setScalar(plume.scale);
+      const wisps=smokeRig.getObjectByName('first-person-central-smoke-puffs') as T.InstancedMesh|undefined;
+      if(wisps)(wisps.material as T.MeshBasicMaterial).opacity=plume.opacity;
     }
     this.foam.forEach((f,i)=>{(f.material as T.MeshBasicMaterial).opacity=.3+Math.sin(pictureTime*2+i)*.12;f.scale.x=2.25+Math.sin(pictureTime)*.09;});
     for(let i=this.ripples.length-1;i>=0;i--){const ripple=this.ripples[i];ripple.age+=dt;const state=rippleState(ripple.age,ripple.life);
