@@ -29,7 +29,7 @@ test('WORK6 #104: visual enemy surf follows the enlarged render hull, never phys
   assert.match(scene,/vec2 enemyShip=vec2\(10\.,-3\.\)/);
   assert.match(scene,/vec2\(4\.8,10\.2\)/);
   assert.match(scene,/float hullSurf=max/);
-  assert.match(scene,/this\.ships\.enemy\.root\.scale\.setScalar\(compactBattle\?1\.88:1\.82\)/);
+  assert.match(scene,/this\.ships\.enemy\.root\.scale\.setScalar\(battleEnemyScale\(battleAspect\)\)/);
   assert.match(scene,/this\.ships\.player\.root\.visible=false/);
   assert.match(scene,/this\.ships\.player\.root\.scale\.setScalar\(1\);this\.ships\.enemy\.root\.scale\.setScalar\(1\)/,
     'return to Porto keeps original rendering scale');

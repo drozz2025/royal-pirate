@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import * as T from 'three';
 import {readFileSync} from 'node:fs';
 import {makeShip} from '../src/ships.ts';
-import {battleCameraPose} from '../src/battle-framing';
+import {battleCameraPose, battleEnemyScale} from '../src/battle-framing';
 
 function withFakeCanvas<TValue>(fn:()=>TValue):TValue {
   const original=Object.getOwnPropertyDescriptor(globalThis,'document');
@@ -45,7 +45,7 @@ test('enemy galleon is red, three-masted and billowed geometry, not an overlay',
 test('enemy battle-only presentation leaves the tested camera and Porto intact',()=>{
   const source=readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
   assert.match(source,/this\.ships\.enemy\.root\.rotation\.y=-\.95/);
-  assert.match(source,/this\.ships\.enemy\.root\.scale\.setScalar\(compactBattle\?1\.88:1\.82\)/);
+  assert.match(source,/this\.ships\.enemy\.root\.scale\.setScalar\(battleEnemyScale\(battleAspect\)\)/);
   assert.match(source,/this\.ships\.player\.root\.scale\.setScalar\(1\);this\.ships\.enemy\.root\.scale\.setScalar\(1\)/);
   assert.match(source,/this\.battleForegroundSail\.visible=false;this\.worldScenery\.visible=true/);
   for(const [w,h] of [[320,568],[390,844],[430,932]]){
@@ -54,7 +54,8 @@ test('enemy battle-only presentation leaves the tested camera and Porto intact',
     camera.position.set(...pose.position);
     camera.lookAt(...pose.target);
     camera.updateMatrixWorld();
-    const battleScale=(w/h)>=.50?1.88:1.82;
+    const battleScale=battleEnemyScale(w/h);
+    assert.ok(battleScale>=1.35&&battleScale<=1.45,'portrait enemy size is reduced structurally');
     const points=[
       new T.Vector3(10,0,-3),
       new T.Vector3(10,battleScale*8.4,-3),
@@ -107,4 +108,21 @@ test('live first-person Batalha has a 3D deck rail and keeps Porto styling isola
     'only the external playable hull is hidden while firing stays live');
   assert.match(scene,/this\.ships\.player\.root\.visible=true/,
     'royal ship must become visible on return to Porto');
+});
+
+test('WORK0/#104: the live red galleon stops occupying the mobile sky in 4 reference viewports',()=>{
+  for(const [w,h] of [[320,568],[384,512],[390,844],[430,932]]) {
+    const pose=battleCameraPose(w/h);
+    const camera=new T.PerspectiveCamera(42,w/h,.1,220);
+    camera.position.set(...pose.position);
+    camera.lookAt(...pose.target);
+    camera.updateMatrixWorld();
+    const screenY=(y:number)=> (1-new T.Vector3(10,y,-3).project(camera).y)*h/2;
+    const yTop=screenY(8.4*battleEnemyScale(w/h));
+    const yHull=screenY(0);
+    assert.ok(yTop>h*.32&&yTop<h*.48,
+      'enemy must leave clear sky below compact HP header at '+w+'x'+h+': '+yTop);
+    assert.ok(yHull-yTop>h*.16&&yHull-yTop<h*.27,
+      'galleon must be legible, but not cover the foreground guns at '+w+'x'+h);
+  }
 });

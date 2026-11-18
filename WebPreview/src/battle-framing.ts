@@ -15,6 +15,15 @@ export type CameraPose = {
   sailScaleX: number;
   sailScaleY: number;
 };
+/** Battle-only enemy presentation size. Scale the LIVE 3D model, not its
+ * simulation/hitboxes: the old 1.88x red ship swallowed the centre on phones.
+ * The 02 reference has clear sky, a starboard opponent and open sea between guns.
+ * Desktop remains unchanged; Porto's 1x model is restored by showHarbour(). */
+export function battleEnemyScale(aspect:number):number {
+  if(aspect<.50)return 1.38; // tall phones: ship no longer occupies the middle of the sky
+  if(aspect<.80)return 1.42; // reference-native 384x512 and compact portrait
+  return 1.82; // do not change non-portrait framing
+}
 export function battleCameraPose(aspect: number): CameraPose {
   if (aspect < .50) {
     // Tall iPhone: reveal more enemy starboard silhouette without changing the

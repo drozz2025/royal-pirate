@@ -7,7 +7,7 @@ import { makeShip, type ShipArt } from './ships';
 import { hullImpactPlacement } from './impact-visuals';
 import { rippleState } from './water-vfx';
 import { cannonFxState, CANNON_FX_DURATION } from './cannon-vfx';
-import { battleCameraPose } from './battle-framing';
+import { battleCameraPose, battleEnemyScale } from './battle-framing';
 import { makeBattleDeck } from './battle-deck';
 import { projectileFromMuzzle } from './battle-shot-presentation';
 import { makeBattleForegroundSail } from './battle-foreground-sail';
@@ -626,9 +626,12 @@ export class OceanScene {
     // Reset to the original size in Porto so its approved composition/touch remain identical.
     // Slightly enlarge ONLY the enemy's existing live render mesh in Batalha.
     // Its world position, actual hull collision, HP and projectile origins remain unchanged.
-    const compactBattle=this.host.clientWidth/Math.max(1,this.host.clientHeight)>=.50;
+    const battleAspect=this.host.clientWidth/Math.max(1,this.host.clientHeight);
     this.ships.player.root.scale.setScalar(1.25);
-    this.ships.enemy.root.scale.setScalar(compactBattle?1.88:1.82);
+    // Mobile enemy is deliberately smaller in this FIRST PERSON stage so
+    // its red sails stop masking sky/ocean; body geometry stays real and hit
+    // locations are unchanged. The Porto model resets to 1x in showHarbour().
+    this.ships.enemy.root.scale.setScalar(battleEnemyScale(battleAspect));
     // Battle-only broadside: reveal the enemy's three-dimensional port flank
     // instead of aiming its narrow bow straight at the camera. No camera
     // movement, hit-point changes, altered controls or Porto composition.

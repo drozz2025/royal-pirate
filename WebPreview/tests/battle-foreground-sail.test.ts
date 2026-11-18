@@ -52,5 +52,5 @@ test('battle foreground is hidden in Porto, with original camera and controls re
   assert.match(scene,/this\.battleForegroundSail\.visible=true;/);
   assert.match(scene,/this\.camera\.position\.set\(\.\.\.pose\.position\)/);
   assert.match(scene,/this\.ships\.player\.root\.scale\.setScalar\(1\);this\.ships\.enemy\.root\.scale\.setScalar\(1\)/);
-  assert.match(scene,/this\.ships\.enemy\.root\.scale\.setScalar\(compactBattle\?1\.88:1\.82\)/);
+  assert.match(scene,/this\.ships\.enemy\.root\.scale\.setScalar\(battleEnemyScale\(battleAspect\)\)/);
 });
