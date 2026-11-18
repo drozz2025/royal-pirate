@@ -4288,22 +4288,17 @@
 }
 
 
-/* WORK7/#104 — 18 Nov 15:26 UTC: native 06 chest source-painted highlights.
- * Reference: design-approved 00 original, 00 eight-panel and true 01-08.
- * Three distinct genuine chest crops, NOT a screenshot panel. A controlled
- * 384×512 ROI sweep of the current merged v0.1.92 screenshot predicts better
- * color registration. CI Chromium's SAME FRAME A/B makes the final decision.
- * At 320×568 and tall devices keep previously approved spacing untouched.
- * One pack and three unavailable chests; preserve live EM BREVE + real data.
- * No Porto, dock, shell, economy, Unity or other WORK selectors.
- * approved:false (0/8); WORK0 is the sole merge/release owner. */
+/* WORK7/#104 — 18 Nov 15:26 UTC: native 06 legendary chest highlight.
+ * References: 00 original, 00 mosaic, and 01-08 approved WebP sources.
+ * Controlled Chromium first run revealed epic chest image change REGRESSED
+ * (ROI +0.215) whereas legendary source crop improved (ROI -0.217).
+ * Remove the regressing epic/rare changes; retain ONLY genuine legendary art.
+ * Fixed DOM artwork; not a screenshot background. 8x 4x2 true cards, one
+ * real pack, three live EM BREVE chests, no invented prices or game data.
+ * Native 384x512 ONLY; 320px and tall screens unchanged. No dock, header,
+ * Porto, shell, economy, Unity or other WORK modifications.
+ * approved:false / 0 of 8. WORK0 sole merge/release/HTTP owner. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-  .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{
-    filter:saturate(1.27) contrast(1.12) brightness(1.373) drop-shadow(0 4px 3px #041327a8)
-  }
-  .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
-    filter:saturate(1.27) contrast(1.12) brightness(1.399) drop-shadow(0 4px 3px #041327a8)
-  }
   .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
     filter:saturate(1.27) contrast(1.12) brightness(1.813) drop-shadow(0 4px 3px #041327a8)
   }
