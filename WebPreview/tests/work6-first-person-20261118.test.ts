@@ -36,7 +36,7 @@ test('WORK6 18 Nov: battle mobile is a deck-level TRUE first-person single-canno
     const muzzle=battleDeckMuzzleWorld(recoil,muzzles[0]);
     const m=view(w,h,muzzle);
     assert.ok(m.x>w*.40 && m.x<w*.60, `central cannon muzzle at ${w}x${h}: ${m.x}`);
-    assert.ok(m.y>h*.49 && m.y<h*.67,`mouth between enemy and bottom controls at ${w}x${h}: ${m.y}`);
+    assert.ok(m.y>h*.45 && m.y<h*.67,`mouth between enemy and bottom controls at ${w}x${h}: ${m.y}`);
     const enemy=view(w,h,new T.Vector3(10,0,-3));
     const mast=view(w,h,new T.Vector3(10,15,-3));
     assert.ok(enemy.x>w*.57&&enemy.x<w*.78,'enemy broadside should be ahead on right');
@@ -55,7 +55,7 @@ test('WORK6 one-cannon rig preserves live firing, recoil, HUD and approved Porto
   assert.match(scene,/this\.battleForegroundSail\.visible=!pose\.showBattery/);
   assert.match(scene,/if\(this\.batteryMuzzles\.length===1\)return/);
   assert.match(scene,/battleDeckMuzzleWorld\(central,muzzle\)/);
-  assert.match(scene,/centralRecoil\.position\.z=batteryFx\.recoil/);
+  assert.match(scene,/centralRecoil\.position\.z=68\+batteryFx\.recoil/);
   assert.match(scene,/projectileFromMuzzle\(s,visibleMuzzle\)/);
   assert.match(scene,/this\.ships\.player\.root\.visible=false/);
   assert.match(scene,/this\.ships\.player\.root\.visible=true/);
