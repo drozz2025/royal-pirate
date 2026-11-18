@@ -46,23 +46,23 @@ export function battleEnemyBroadsideYaw(aspect:number):number {
 }
 
 export function battleCameraPose(aspect: number): CameraPose {
-  if (aspect < .50) {
-    // Tall iPhone: reveal more enemy starboard silhouette without changing the
-    // vertical HUD or exposing the black sail over the centre of the arena.
-    return {position:[0,11,78],target:[3.8,4.95,0],showBattery:true,
-      batteryOffsetZ:-35,batteryOffsetX:-.6,batteryScale:.81,sailX:-3.9,sailScaleX:.42,sailScaleY:.68};
-  }
-  if (aspect < .68) {
-    // Small/short 320px devices: preserve the validated enemy and muzzle crop.
-    return {position:[0,10.3,78],target:[1,4.2,0],showBattery:true,
-      batteryOffsetZ:-26,batteryOffsetX:0,batteryScale:.88,sailX:-5.25,sailScaleX:.48,sailScaleY:.72};
-  }
   if (aspect < .80) {
-    // Native approved 384x512: enemy should occupy the starboard third, not the
-    // centre. Shift the DECORATIVE gun deck back to port to keep both real
-    // muzzles visible when the camera looks farther left toward the ocean.
-    return {position:[0,10.3,75],target:[-1.8,4.2,0],showBattery:true,
-      batteryOffsetZ:-26,batteryOffsetX:-2,batteryScale:1,sailX:-7.8,sailScaleX:.41,sailScaleY:.66};
+    // 18 Nov: first-person cannon camera, on the player's deck and aligned
+    // down ONE central gun barrel. The opponent remains ahead at starboard,
+    // showing its long hull in profile. This changes only battle presentation.
+    // Full perspective makes the enemy grow when zooming toward its hull.
+    return {
+      position: [0, 7.4, 67],
+      target: [4.2, 4.1, -3],
+      showBattery: true,
+      batteryOffsetZ: -18,
+      batteryOffsetX: 2,
+      batteryScale: 1,
+      // Legacy optional edge rig is now HIDDEN for portrait battle.
+      sailX: -11,
+      sailScaleX: .33,
+      sailScaleY: .50,
+    };
   }
   const distance=aspect<1.2?43:34;
   return {position:[distance*.20,distance*.56,distance*.88],target:[0,2,0],

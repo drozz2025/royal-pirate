@@ -7,7 +7,7 @@ import {OceanScene} from '../src/scene';
 // Exercise the actual battle-only builder, without a WebGL canvas, fake
 // gameplay instance or side effects on the approved harbour.
 test('first-person 3D gunwales converge into the distance without a full-width fence',()=>{
-  const fake={battleBattery:new T.Group()};
+  const fake={battleBattery:new T.Group(),batteryMuzzles:[new T.Vector3(-3,4,65),new T.Vector3(5,3,66)]};
   const build=OceanScene.prototype as unknown as {
     dressBattleDeck:(this:typeof fake)=>void;
   };
@@ -46,7 +46,7 @@ test('battle-only rails never change physics, HP, cannon flashes or Porto/nav',(
   assert.match(source,/this\.battleBattery\.visible=pose\.showBattery/);
 });
 
-test('both existing visual cannons have long iron barrels and legible mouths on 320/384/390/430',async ()=>{
+test('legacy geometry retains two real cannons, while the LIVE mobile battle presents one central gun',async ()=>{
   const {makeBattleDeck}=await import('../src/battle-deck');
   const {battleCameraPose}=await import('../src/battle-framing');
   const {group,flashes}=makeBattleDeck();
@@ -64,15 +64,22 @@ test('both existing visual cannons have long iron barrels and legible mouths on 
       'a long tapered 3D barrel must read as an actual naval cannon');
     assert.ok(barrel.geometry.parameters.radiusBottom>barrel.geometry.parameters.radiusTop);
   }
+  const central=makeBattleDeck(true);
+  assert.equal(central.flashes.length,1);
+  assert.equal(central.muzzles.length,1);
   for(const [w,h] of [[320,568],[384,512],[390,844],[430,932]]){
     const pose=battleCameraPose(w/h);
     const camera=new T.PerspectiveCamera(42,w/h,.1,220);
     camera.position.set(...pose.position);camera.lookAt(...pose.target);camera.updateMatrixWorld();
-    for(const muzzle of muzzles){
-      const ndc=muzzle.position.clone().add(new T.Vector3(0,0,pose.batteryOffsetZ)).project(camera);
+    const centralGroup=central.group;
+    centralGroup.position.set(pose.batteryOffsetX,0,pose.batteryOffsetZ);
+    const barrel=centralGroup.getObjectByName('first-person-central-recoil')!;
+    barrel.updateWorldMatrix(true,false);
+    for(const muzzle of central.muzzles.map(v=>v.clone().applyMatrix4(barrel.matrixWorld))){
+      const ndc=muzzle.project(camera);
       const x=(1+ndc.x)*w/2,y=(1-ndc.y)*h/2;
-      assert.ok(x>w*.08&&x<w*.92,`muzzle inside phone width ${w}x${h}: ${x}`);
-      assert.ok(y>h*.50&&y<h*.68,`first-person muzzle above controls ${w}x${h}: ${y}`);
+      assert.ok(x>w*.40&&x<w*.60,`ONE centered muzzle inside phone width ${w}x${h}: ${x}`);
+      assert.ok(y>h*.49&&y<h*.68,`first-person muzzle above controls ${w}x${h}: ${y}`);
     }
   }
 });

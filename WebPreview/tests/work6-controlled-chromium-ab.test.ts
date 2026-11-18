@@ -195,6 +195,22 @@ test('WORK6: controlled genuine Chromium 384x512 A/B with fixed wave and camera'
     mkdirSync('work6-qa',{recursive:true});
     writeFileSync('work6-qa/ab-same-frame-metrics.json',JSON.stringify(metrics,null,2));
     console.log('WORK6 CONTROLLED A/B MAE:',JSON.stringify(metrics));
+    // Real React interaction evidence: press the existing DISPARAR control
+    // after the frozen same-frame comparisons (never during MAE capture).
+    // Capture the live central-gun muzzle effect and early projectile in the
+    // SAME real 384x512 Chromium scene. This screenshot is evidence only;
+    // it does not claim human approval or a particular GPU framerate.
+    const shotClick=await send('Runtime.evaluate',{
+      expression:'(()=>{const b=document.querySelector(".in-battle .fire-button");if(!b)return false;b.click();return true})()',
+      returnByValue:true
+    });
+    assert.equal(shotClick.result?.value,true,'the functional existing DISPARAR button must be present');
+    await sleep(180);
+    const fired=await send('Page.captureScreenshot',{
+      format:'png',fromSurface:true,captureBeyondViewport:false
+    });
+    writeFileSync('work6-qa/central-cannon-after-real-fire-384x512.png',Buffer.from(fired.data,'base64'));
+
     // Software WebGL can differ by 1 isolated antialias pixel across fresh CDP
     // navigations even with fixed sea time. Reject any material non-cannon
     // change: <=4 pixels out of 196,608, plus exact unoccluded scenery MAE.
@@ -203,9 +219,15 @@ test('WORK6: controlled genuine Chromium 384x512 A/B with fixed wave and camera'
     for(const [name,roi] of Object.entries(isolation.scenery)){
       assert.ok(Math.abs(roi.delta)<1e-8,name+' unoccluded scenery must be pixel-identical');
     }
-    assert.ok(delta.right_cannon<-0.05,'right cannon must improve');
-    assert.ok(delta.left_cannon<0.5,'port cannon must not regress');
-    assert.ok(delta.global<-0.02,'global reference MAE must improve before merge');
+    // This LEGACY local ?work6ab= switch varied only the now-retired second
+    // gun. With the new single-barrel stage neither probe may silently switch
+    // back to twin cannons, and the screen should be visually deterministic.
+    // Actual 4-viewport before/after screenshots are gated separately by the
+    // battle-visual GitHub workflow; this old historical ROI is no longer the
+    // acceptance metric for a structural redesign.
+    assert.ok(Math.abs(delta.global)<.03,'legacy A/B URL must not change the one-cannon composition');
+    assert.ok(Math.abs(delta.left_cannon)<.03);
+    assert.ok(Math.abs(delta.right_cannon)<.03);
   }finally{
     socket?.close();vite.kill('SIGTERM');browser?.kill('SIGTERM');
     await sleep(600);try{rmSync(profile,{force:true,recursive:true,maxRetries:5,retryDelay:80});}catch{}
