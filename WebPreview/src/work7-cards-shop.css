@@ -4257,3 +4257,16 @@
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.09)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.37)}
 }
+
+
+/* WORK7/#104 — 18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.
+ * Re-measure against integrated WORK0 v0.1.90 + #400, NOT v0.1.89.
+ * Two source crop luminances adjusted (not frames, geometry or labels).
+ * Visual target is the ORIGINAL 384x512 approved image, not screenshot UI.
+ * Only 384x512 short viewport; 320px and tall phones unaffected.
+ * Keep 4x2 eight REAL art images, PRÉVIA, unique pack and 3 unavailable
+ * chests. WORK0 owns merges, versioning and publishing. approved:false 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.14)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.67)}
+}
