@@ -39,8 +39,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  assert.ok(cssText.includes('Native card 4 inlay/exposure candidate'),
-    'Only card 4 physical artwork/filter is recalibrated in this branch');
+  assert.ok(cssText.includes('Native card 4+7 inlay/exposure candidate'),
+    'Only cards 4 and 7 physical artwork filters are recalibrated in this branch');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
     'New WORK7 eight-card short-viewport art treatment exists without screenshot backgrounds');
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
@@ -60,6 +60,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
         filter:brightness(.52) saturate(2.00) contrast(.79)!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+        filter:brightness(.42) saturate(1.75) contrast(.79)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -438,7 +441,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
   assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
-    'Only native genuine 05 slot 4 may improve strict full-frame+eight-card ROI vs current merged v0.1.96 HEAD: '+
+    'Only native genuine 05 slots 4 and 7 may improve strict full-frame+eight-card ROI vs current merged v0.1.96 HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
   assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
     '06 Shop global image must be pixel-identical to merged HEAD');
