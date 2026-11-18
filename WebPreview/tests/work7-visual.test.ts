@@ -391,6 +391,47 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         // same 384x512 screenshot frame and same approved artwork for every
         // real-chest brightness candidate; log absolute native MAE/ROI and
         // only commit a verified winner in a separate revision.
+        // WORK7 diagnostic only: native artwork 05, same real Chromium frame.
+        // Never change production styles from a sweep without a separate
+        // full-run strict MAE+ROI comparison to the merged #411 HEAD.
+        if (kind==='cards' && width===384 && height===512) {
+          const originalBrightness=[.45,.65,.42,.64];
+          const candidateBrightness=[
+            [.37,.40,.43,.45,.47,.50],
+            [.56,.60,.63,.65,.68,.72],
+            [.35,.38,.40,.42,.45,.48],
+            [.55,.59,.62,.64,.68,.72]
+          ];
+          for(let slot=5;slot<=8;slot++) {
+            for(const brightness of candidateBrightness[slot-5]) {
+              const values=[...originalBrightness]; values[slot-5]=brightness;
+              const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+                values.map((v,j)=>'.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+
+                  (j+5)+'){filter:brightness('+v+') saturate('+
+                  [2.00,1.30,1.75,1.90][j]+') contrast('+[.85,.92,.79,.88][j]+')!important}').join('')+'}';
+              await evaluate("(()=>{const s=document.createElement('style');s.id='w7-slot-sweep';s.textContent="+
+                JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
+              await sleep(75);
+              const shot=await command('Page.captureScreenshot',
+                {format:'png',fromSurface:true,captureBeyondViewport:false});
+              const m=await evaluate("(async()=>{"+
+                "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+                "const ref=await load("+JSON.stringify(refUrl)+"),live=await load("+
+                  JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+");"+
+                "const c=document.createElement('canvas');c.width=384;c.height=512;const ctx=c.getContext('2d');"+
+                "ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
+                "ctx.clearRect(0,0,384,512);ctx.drawImage(live,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
+                "let sum=0,count=0,roi=0,rc=0;"+
+                "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
+                "for(let k=0;k<3;k++){const d=Math.abs(a[p+k]-b[p+k]);sum+=d;count++;"+
+                "if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=d;rc++}}}"+
+                "return {global:Math.round(sum/count*1000)/1000,roi:Math.round(roi/rc*1000)/1000}})()");
+              console.log('WORK7 SLOT SWEEP '+slot+'='+brightness+' '+JSON.stringify(m));
+              await evaluate("(()=>{document.getElementById('w7-slot-sweep')?.remove();return true})()");
+            }
+          }
+        }
+
         if (kind==='shop' && width===384 && height===512) {
           const candidates:[string,number][]=[
             ['crop',.98],['crop',1.02],['crop',1.05],['crop',1.07],
