@@ -362,6 +362,10 @@ export function makeShip(red = false): ShipArt {
   // The smaller topsails are dark woven cloth. Keep the crowned skull emblem
   // on the two full main sails and on the flags, not repeated four times.
   const topsailMat=new T.MeshStandardMaterial({color:red?'#713331':'#19232d',side:T.DoubleSide,roughness:.88});
+  // WORK0/#104 candidate: the enemy's THREE red sails now have deeply billowed
+  // geometry and tapered canvas edges, rather than flat rectangular panels.
+  // The royal/player cloth path, mesh count, physics, guns and Porto are unchanged.
+  // No additional draw calls, UI elements or textures are introduced.
   for(const [z,h,w] of [[.9,8.3,4.5],[-2.1,7.1,3.5]]){
     // Rig is a separate group for damage. Static ropes stay attached to the hull.
     const mast=new T.Mesh(new T.CylinderGeometry(.07,.16,h-.6,10),honey);
@@ -380,10 +384,10 @@ export function makeShip(red = false): ShipArt {
       // Taper the hem while leaving the yard full-width. Layered folds and
       // canvas bulge read as cloth rather than a rigid rectangular billboard.
       upperPositions.setZ(i,red
-        ? .045+.11*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)+.017*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI)
+        ? .06+.42*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)+.06*Math.sin(u*4*Math.PI)*Math.sin(v*Math.PI)
         : .12+Math.sin(u*Math.PI)*(.24+.35*Math.sin(v*Math.PI))
           +.045*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
-      upperPositions.setX(i,upperPositions.getX(i)*(red ? (.96+.035*Math.sin(v*Math.PI)) : (.77+.19*Math.sin(v*Math.PI)+.04*v)));
+      upperPositions.setX(i,upperPositions.getX(i)*(red ? (.73+.27*Math.sin(v*Math.PI)) : (.77+.19*Math.sin(v*Math.PI)+.04*v)));
     }
     upperGeometry.computeVertexNormals();
     const upperSail=new T.Mesh(upperGeometry,topsailMat);
@@ -394,9 +398,14 @@ export function makeShip(red = false): ShipArt {
       const belly=Math.sin(u*Math.PI)*Math.sin(v*Math.PI);
       // Rounded shoulders, narrowed foot and alternating curved canvas
       // panels create a three-dimensional galleon silhouette from either side.
-      p.setX(i,p.getX(i)*(.84+.13*Math.sin(v*Math.PI)+.03*v));
-      p.setZ(i,.05+.74*belly+.10*Math.sin(u*Math.PI)
-        +.065*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
+      p.setX(i,p.getX(i)*(red
+        ? .68+.30*Math.sin(v*Math.PI)+.02*v
+        : .84+.13*Math.sin(v*Math.PI)+.03*v));
+      p.setZ(i,red
+        ? .09+1.16*belly+.14*Math.sin(u*Math.PI)
+          +.09*Math.sin(u*4*Math.PI)*Math.sin(v*Math.PI)
+        : .05+.74*belly+.10*Math.sin(u*Math.PI)
+          +.065*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
     }
     g.computeVertexNormals();const sail=new T.Mesh(g,sailMat);sail.position.set(0,h-2.3,z);rig.add(sail);sails.push(sail);
     // A slender rope along the lower canvas edge gives a readable curved
@@ -458,10 +467,10 @@ export function makeShip(red = false): ShipArt {
       const u=verts.getX(i)/2.95+.5;
       const v=verts.getY(i)/2.48+.5;
       // The loose foot and rounded belly expand the visible red silhouette.
-      verts.setX(i,verts.getX(i)*(.79+.17*Math.sin(v*Math.PI)+.04*v));
-      verts.setZ(i,.09+.26*Math.sin(u*Math.PI)
-        +.36*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)
-        +.045*Math.sin(u*5*Math.PI)*Math.sin(v*Math.PI));
+      verts.setX(i,verts.getX(i)*(.61+.37*Math.sin(v*Math.PI)+.02*v));
+      verts.setZ(i,.09+.22*Math.sin(u*Math.PI)
+        +.67*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)
+        +.065*Math.sin(u*5*Math.PI)*Math.sin(v*Math.PI));
     }
     redForeGeometry.computeVertexNormals();
     // Put the existing Jolly Roger cloth on the *visible* forward canvas.
