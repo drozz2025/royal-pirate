@@ -58,15 +58,16 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   // as at sea level. The earlier texture only put clouds in its lowest band,
   // leaving most of a 390x844 live battle as a featureless blue rectangle.
   // Original procedural paint, not a screenshot or a transparent UI layer.
+  // WORK0/#104: stage-first silhouette. The 21 dense broad puffs used to
+  // occlude the centre and compete with the enemy rig on narrow screens.
+  // Twelve smaller asymmetric banks let the live galleon own the horizon.
+  // Painted once into the same existing CanvasTexture (zero extra 3D draws).
   const banks: [number, number, number][] = [
-    [-52, 192, 65], [186, 217, 57], [438, 172, 72],
-    [706, 227, 58], [1032, 193, 78],
-    [24, 340, 74], [272, 319, 83], [531, 348, 68],
-    [818, 308, 89], [1081, 358, 79],
-    [-38, 460, 78], [157, 478, 69], [371, 429, 88],
-    [615, 474, 76], [868, 442, 82], [1058, 476, 78],
-    [65, 568, 56], [315, 566, 64], [585, 580, 59],
-    [831, 568, 61], [1044, 577, 65]
+    [-52, 192, 44], [186, 217, 41], [438, 172, 51],
+    [706, 227, 40], [1032, 193, 49],
+    [24, 340, 43], [272, 319, 47], [531, 348, 40],
+    [818, 308, 48], [1081, 358, 47],
+    [157, 478, 41], [615, 474, 44]
   ];
   for (let i = 0; i < banks.length; i++) {
     const [cx, cy, size] = banks[i];
@@ -184,9 +185,11 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   }
   // Opposing masses leave a warm opening behind the live enemy galleon.
   // Each mass is purposefully asymmetric, so they do not read as tiled puffs.
-  cloudFront(-65, 315, 495, 170, .4);
-  cloudFront(956, 272, 555, 198, 1.8);
-  cloudFront(535, 544, 580, 110, 3.2);
+  // Smaller weather masses retain three-layer depth without gigantic opaque
+  // cloud blocks behind the live sails. Original Porto sky is unchanged.
+  cloudFront(-65, 315, 465, 104, .4);
+  cloudFront(956, 272, 520, 118, 1.8);
+  cloudFront(535, 544, 540, 72, 3.2);
 
   // A broad warm glow, not geometric beams: the live galleon remains the
   // visual focus and the approved HUD stays fully legible at 320 pixels.
