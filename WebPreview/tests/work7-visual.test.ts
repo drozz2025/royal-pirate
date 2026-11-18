@@ -124,12 +124,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       }
     }`;
   // Base HEAD 6466a86a2a3a only; do not undo gains from earlier merged PRs.
-  // Reset precisely the two CSS filters introduced by this proposal.
+  // Reset precisely the single CSS filter introduced by this proposal.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
-        filter:brightness(.65) saturate(1.30) contrast(.92)!important;
-      }
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
         filter:brightness(.64) saturate(1.90) contrast(.88)!important;
       }
