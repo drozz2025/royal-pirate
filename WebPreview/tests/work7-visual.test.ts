@@ -39,8 +39,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  assert.ok(cssText.includes('Native card 4+7 inlay/exposure candidate'),
-    'Only cards 4 and 7 physical artwork filters are recalibrated in this branch');
+  assert.ok(cssText.includes('Native 06 legendary relief pigment A/B.'),
+    'Only 06 genuine legendary chest source art is retuned in this branch');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
     'New WORK7 eight-card short-viewport art treatment exists without screenshot backgrounds');
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
@@ -56,13 +56,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // frame filter. Previous #411/#422 and live artwork stay untouched.
   // The override is installed on the SAME page and animation frame.
   // It is inert for Shop and for 320/tall viewports.
+  // Controlled baseline: undo ONLY this native legendary crop brightness.
+  // Prior merged 05/06 material values, assets, DOM and animation frame remain.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
-        filter:brightness(.52) saturate(2.00) contrast(.79)!important;
-      }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
-        filter:brightness(.42) saturate(1.75) contrast(.79)!important;
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+        filter:saturate(1.27) contrast(1.12) brightness(1.59) drop-shadow(0 4px 3px #041327a8)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -446,11 +445,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const card=native.find(screen=>screen.kind==='cards');
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
-  assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
-    'Only native genuine 05 slots 4 and 7 may improve strict full-frame+eight-card ROI vs current merged v0.1.96 HEAD: '+
-    JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
-  assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
-    '06 Shop global image must be pixel-identical to merged HEAD');
-  assert.equal(shop.roiMaeAfter,shop.roiMaeBefore,
-    '06 pack/chests ROI must not change from this 05-only candidate');
+  assert.equal(card.maeRgbAfter,card.maeRgbBefore,
+    '05 Cards global image must be pixel-identical to the exact HEAD');
+  assert.equal(card.roiMaeAfter,card.roiMaeBefore,
+    '05 genuine 4x2 artwork ROI must remain pixel-identical to HEAD');
+  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
+    '06 real legendary crop must improve both global and pack/chests native MAE from the real merged HEAD: '+
+    JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
