@@ -4135,15 +4135,19 @@
 }
 
 
-/* WORK7/#104 — independent 05/06 frame-value calibration from v0.1.81 HEAD.
- * Trial only: native 384×512 material shadows of the actual 4×2 cards and
- * three real treasure chests. Retain all source paintings and readable DOM
- * PRÉVIA/EM BREVE labels; never use a screenshot background.
- * 320×568 and tall portrait viewports are not affected. approved:false. */
+/* WORK7/#104 — source-art pigment + native treasure relief; HEAD v0.1.81.
+ * The eight conceptual cards keep their genuine 4×2 frames, the single
+ * Captain pack and three honest unavailable chests stay live HTML. Only
+ * original illustration light and native treasure relief are recalibrated.
+ * Same-frame A/B; 320px and tall screens untouched; approved:false (0/8). */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.54)}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.51)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.64)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.66)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.55)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.36)
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.20)
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.73)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.74)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.60)}
 }
