@@ -44,10 +44,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // Restoring it in the SAME Chromium frame isolates ONLY this PR's
   // four optical changes, including preserving original 320px rules.
   const currentHeadBaseline = `
-    /* Exact latest merged HEAD v0.1.81: undo only this branch's 5 filters. */
+    /* Exact v0.1.81 merged HEAD, undo only five optical properties. */
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.62)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.62)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{
+        filter:saturate(1.25) contrast(1.13) brightness(1.075)!important
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{
+        filter:saturate(1.25) contrast(1.13) brightness(.96)!important
+      }
       .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.80)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.80)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.65)!important}
