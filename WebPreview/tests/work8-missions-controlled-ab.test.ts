@@ -926,6 +926,72 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(midCompare.metrics.quests.delta<.10&&midCompare.metrics.daily.delta<.25,
       'three real quests and overall daily reward board must not regress');
 
+
+    /* WORK8/#104: native-source green checked chests are conditional on the
+       ACTUAL saved daily-streak state. Seed only a controlled, clearly labeled
+       QA localStorage fixture (never production content), then compare HEAD
+       fallback artwork against original sourced artwork in one decoded,
+       animation-paused 384x512 Chromium frame. Existing 3 quest definitions,
+       7 reward slots, daily claim rules and five-tab shared dock remain real. */
+    const qaSeed=await evalJs('(()=>{const key="royal-pirate:local-profile:v1";const raw=localStorage.getItem(key);if(!raw)return false;const p=JSON.parse(raw);p.dailyStreak=3;p.lastDailyDay=new Date().toISOString().slice(0,10);localStorage.setItem(key,JSON.stringify(p));return true;})()');
+    assert.ok(qaSeed,'seed deterministic 3-day collected fixture in isolated Chromium only');
+    await cmd('Page.navigate',{url:'http://127.0.0.1:4186/?work8=claimed-chests-qa'});
+    await wait('.harbour-screen .harbour-nav-item');
+    await delay(200);
+    assert.ok(await evalJs('(()=>{const b=[...document.querySelectorAll(".harbour-screen button")].find(b=>b.textContent?.includes("MISSÕES"));b?.click();return !!b})()'),'navigate real Missions on claimed-streak fixture');
+    await wait('.w8-approved-missions svg.w8-approved-painting-chest-claimed-3');
+    const claimedDecoded=await evalJs('(async()=>{const refs=[...document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting image")].map(e=>e.getAttribute("href")).filter(Boolean);await Promise.all([...new Set(refs)].map(src=>{const i=new Image();i.src=src;return i.decode()}));await document.fonts.ready;return refs.length;})()');
+    assert.ok(claimedDecoded>=11,'authentic art for 3 claimed days, 4 remaining chests, 3 quests and title');
+    await delay(350);
+    await evalJs('document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));true');
+    const claimedFlag='work8-missions-claimed-chests-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(claimedFlag)+');true');
+    await delay(170);
+    const claimedBeforeLayout=await readLayout();
+    const claimedBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(claimedFlag)+');true');
+    await delay(170);
+    const claimedAfterLayout=await readLayout();
+    const claimedAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const claimedSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+claimedBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+claimedAfter))
+      .replace('chests:[20,356,370,427],dock:','chests:[20,356,370,427],claimedChests:[19,351,165,418],dock:');
+    assert.notEqual(claimedSource,source,'claimed chest A/B must use the same real Chromium frame');
+    const claimedComparison=await evalJs(claimedSource);
+    const saveClaimed=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
+    saveClaimed('missions-claimed-01-03-original-384x512.webp',orig);
+    saveClaimed('missions-claimed-01-03-head-384x512.png',claimedBefore);
+    saveClaimed('missions-claimed-01-03-render-384x512.png',claimedAfter);
+    saveClaimed('missions-claimed-01-03-overlay-head-384x512.png',claimedComparison.overlays[0]);
+    saveClaimed('missions-claimed-01-03-overlay-render-384x512.png',claimedComparison.overlays[1]);
+    const claimedGeometry=await evalJs('(()=>{const r=e=>{const x=e?.getBoundingClientRect();return x?{left:x.left,top:x.top,right:x.right,bottom:x.bottom}:null};const days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")];const nav=document.querySelector(".app-sheet > .harbour-nav");return {claimed:days.filter(d=>d.classList.contains("is-claimed")).length,claimedPainting:days.slice(0,3).map(d=>r(d.querySelector("svg.w8-approved-painting"))),dayCount:days.length,questCount:document.querySelectorAll(".w8-approved-missions .w8-approved-quest").length,dockCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,days:days.map(r),captions:days.map(d=>r(d.querySelector("small"))),dock:r(nav),documentWidth:document.documentElement.scrollWidth}})()');
+    const claimedReport={baseSha:'5d672271d145fd826474142de188e15f6a3daa56',version:'v0.1.79',
+      condition:'truthful local three-day claimed fixture, no fabricated app data',
+      scope:'only 07 Missions day 1-3 original green chest paintings, all other WORKs unchanged',
+      references:['assets/design-approved/00-referencia-original-aprovada.webp',
+        'assets/design-approved/00-painel-oito-ecras.webp',
+        ...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+          '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(p=>'assets/design-approved/'+p)],
+      sameFrame:'384x512 Chromium DPR1, decoded source WebP, paused animations, CSS flag only',
+      roi:claimedComparison.metrics,unchanged:claimedComparison.unchanged,
+      geometry:claimedGeometry,beforeLayout:claimedBeforeLayout,afterLayout:claimedAfterLayout,
+      approved:false,approvedScreens:0};
+    writeFileSync(join(evidence,'work8-missions-claimed-01-03-ab.json'),JSON.stringify(claimedReport,null,2));
+    console.log('WORK8 07 claimed 1-3 native original art A/B '+JSON.stringify(claimedReport.roi));
+    assert.deepEqual(claimedBeforeLayout,claimedAfterLayout,'original crop cannot move any reward, objective, header or dock');
+    assert.equal(claimedGeometry.claimed,3);
+    assert.equal(claimedGeometry.dayCount,7);
+    assert.equal(claimedGeometry.questCount,3);
+    assert.equal(claimedGeometry.dockCount,5);
+    assert.ok(claimedGeometry.documentWidth<=386,'no horizontal overflow at native 384');
+    assert.ok(claimedGeometry.captions.every((d:any)=>d&&d.bottom<=claimedGeometry.dock.top+3),
+      'all seven reward captions remain above dock');
+    assert.ok(claimedComparison.unchanged.header<.1&&claimedComparison.unchanged.dock<.1,
+      'HUD and five-item dock pixel-identical');
+    assert.ok(claimedComparison.metrics.claimedChests.delta<0&&claimedComparison.metrics.full.delta<0,
+      'conditional authentic checked chest art must lower both day 1-3 ROI and global MAE');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
