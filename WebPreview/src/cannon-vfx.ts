@@ -19,3 +19,15 @@ export function cannonFxState(age: number): CannonFxFrame {
     visible: flashT < 1
   };
 }
+
+/** Single-draw-call, gun-mounted powder plume; only the visual lifetime is
+ * longer than the flash. No projectile/hit-box or combat-timer changes. */
+export const CANNON_SMOKE_DURATION = 1.35;
+export type CannonSmokeFrame = Readonly<{ visible: boolean; scale: number; opacity: number }>;
+export function cannonSmokeState(age: number): CannonSmokeFrame {
+  if(!Number.isFinite(age)||age<0||age>=CANNON_SMOKE_DURATION)
+    return {visible:false,scale:0,opacity:0};
+  const t=age/CANNON_SMOKE_DURATION;
+  const opacity=0.53*Math.min(1,age/.12)*Math.pow(1-t,1.65);
+  return {visible:opacity>.012,scale:.67+2.05*t,opacity};
+}
