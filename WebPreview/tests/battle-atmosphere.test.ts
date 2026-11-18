@@ -47,8 +47,8 @@ test('battle-only cloudfront is painted to a real 1024 square sky texture, witho
 
 test('cloudfront remains battle-only and does not introduce image fetches or gameplay edits', () => {
   const source = readFileSync(new URL('../src/battle-atmosphere.ts',import.meta.url), 'utf8');
-  assert.match(source,/cloudFront\(-65, 315, 495/);
-  assert.match(source,/cloudFront\(956, 272, 555/);
+  assert.match(source,/cloudFront\(-75, 326, 420/);
+  assert.match(source,/cloudFront\(975, 298, 438/);
   assert.doesNotMatch(source,/fetch\(|https?:\/\//);
   const scene = readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
   assert.match(scene,/this\.scene\.background=this\.battleSky/);
