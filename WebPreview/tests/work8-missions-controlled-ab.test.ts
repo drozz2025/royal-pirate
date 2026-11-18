@@ -90,7 +90,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        enable it only for the independent coastal A/B near the end. This
        preserves the exact original v0.1.75 baselines without relaxing
        their MAE or pixel-stability requirements. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-daily-contrast-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1044,6 +1044,64 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'the unclaimed real action enamel must improve native actions ROI and full-frame MAE');
     assert.ok(actionComparison.metrics.daily.delta<.10 && actionComparison.metrics.chests.delta<.10,
       'seven reward chests and daily panel must not regress');
+
+
+    /* WORK8/#104 — independent A/B of the genuine daily reward board on
+       the SAME decoded, paused Chromium scene. All other already-integrated
+       paints remain identical; only the 07 daily contrast flag is switched. */
+    const dailyContrastFlag='work8-missions-daily-contrast-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(dailyContrastFlag)+');true');
+    await delay(140);
+    const dailyContrastBeforeLayout=await headingLayout();
+    const dailyContrastBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(dailyContrastFlag)+');true');
+    await delay(140);
+    const dailyContrastAfterLayout=await headingLayout();
+    const dailyContrastAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const dailyContrastSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),'"__WORK8_DAILY_SOURCE_BEFORE__"')
+      .replace(JSON.stringify('data:image/png;base64,'+after),'"__WORK8_DAILY_SOURCE_AFTER__"')
+      .replace('"__WORK8_DAILY_SOURCE_BEFORE__"',JSON.stringify('data:image/png;base64,'+dailyContrastBefore))
+      .replace('"__WORK8_DAILY_SOURCE_AFTER__"',JSON.stringify('data:image/png;base64,'+dailyContrastAfter))
+      .replace('chests:[20,356,370,427],dock:',
+        'chests:[20,356,370,427],rewardInterior:[16,343,370,426],dock:');
+    assert.notEqual(dailyContrastSource,source,'daily depth A/B requires its own actual Chromium screenshots');
+    const dailyContrastComparison=await evalJs(dailyContrastSource);
+    const saveDaily=(name:string,data:string)=>writeFileSync(join(evidence,name),Buffer.from(data,'base64'));
+    saveDaily('missions-daily-contrast-original-384x512.webp',orig);
+    saveDaily('missions-daily-contrast-before-384x512.png',dailyContrastBefore);
+    saveDaily('missions-daily-contrast-render-384x512.png',dailyContrastAfter);
+    saveDaily('missions-daily-contrast-original-before-overlay-384x512.png',dailyContrastComparison.overlays[0]);
+    saveDaily('missions-daily-contrast-original-render-overlay-384x512.png',dailyContrastComparison.overlays[1]);
+    const dailyContrastReport={
+      reference:'assets/design-approved/07-missoes.webp',
+      references:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(n=>'assets/design-approved/'+n),
+      scope:'WORK8 only 07 Missões: source reward-board ink with seven real chests',
+      method:'same native 384x512 Chromium DPR1; WebP decoded; animations paused; identical app scene/frame',
+      beforeBrightness:.645,afterBrightness:.615,
+      roi:dailyContrastComparison.metrics,unchanged:dailyContrastComparison.unchanged,
+      beforeLayout:dailyContrastBeforeLayout,afterLayout:dailyContrastAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-daily-contrast-controlled-ab.json'),JSON.stringify(dailyContrastReport,null,2));
+    console.log('WORK8 native 07 genuine daily ink A/B '+JSON.stringify(dailyContrastReport.roi));
+    assert.deepEqual(dailyContrastBeforeLayout,dailyContrastAfterLayout,
+      'daily painting cannot move missions, reward slots, captions, tabs, buttons or dock');
+    assert.equal(dailyContrastAfterLayout.questCount,3,'three genuine quests');
+    assert.equal(dailyContrastAfterLayout.dayCount,7,'seven genuine reward chests');
+    assert.equal(dailyContrastAfterLayout.dockCount,5,'five immutable dock destinations');
+    assert.ok(dailyContrastAfterLayout.documentWidth<=386,'no 384px horizontal overflow');
+    assert.ok(dailyContrastAfterLayout.chests.every((c:any)=>c&&c.bottom<=dailyContrastAfterLayout.nav.top+2),
+      'all seven chest paintings stay clear of dock');
+    assert.ok(dailyContrastComparison.unchanged.header<.10&&dailyContrastComparison.unchanged.dock<.10,
+      'the header and shared Porto-owned dock must be pixel-identical');
+    assert.ok(dailyContrastComparison.metrics.daily.delta<-.03 && dailyContrastComparison.metrics.full.delta<-.001,
+      'reward-board source paint must improve both daily ROI and full-frame MAE');
+    assert.ok(dailyContrastComparison.metrics.quests.delta<.10,
+      'three real mission panels cannot regress');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
