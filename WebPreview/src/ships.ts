@@ -384,7 +384,7 @@ export function makeShip(red = false): ShipArt {
       // Taper the hem while leaving the yard full-width. Layered folds and
       // canvas bulge read as cloth rather than a rigid rectangular billboard.
       upperPositions.setZ(i,red
-        ? .06+.42*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)+.06*Math.sin(u*4*Math.PI)*Math.sin(v*Math.PI)
+        ? .05+.15*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)+.025*Math.sin(u*4*Math.PI)*Math.sin(v*Math.PI)
         : .12+Math.sin(u*Math.PI)*(.24+.35*Math.sin(v*Math.PI))
           +.045*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
       upperPositions.setX(i,upperPositions.getX(i)*(red ? (.73+.27*Math.sin(v*Math.PI)) : (.77+.19*Math.sin(v*Math.PI)+.04*v)));
