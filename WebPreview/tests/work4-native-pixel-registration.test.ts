@@ -30,6 +30,21 @@ test('WORK4 source-pixel registration changes only the two approved native crops
   assert.match(css,/transform:translateZ\(0\)/);
 });
 
+test('WORK4 uses the two master approved references and all eight unmodified WebP screens',()=>{
+  const names=[
+    '00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+    '01-porto.webp','02-batalha.webp','03-frota.webp',
+    '04-melhorias-forja.webp','05-cartas.webp','06-loja.webp',
+    '07-missoes.webp','08-ranking-perfil.webp'
+  ];
+  for(const name of names){
+    const image=readFileSync(new URL('../../assets/design-approved/'+name,import.meta.url));
+    assert.equal(image.subarray(0,4).toString('ascii'),'RIFF',name+' RIFF signature');
+    assert.equal(image.subarray(8,12).toString('ascii'),'WEBP',name+' WebP format');
+    assert.ok(image.length>10000,name+' source art must not be a stub');
+  }
+});
+
 const sleep=(ms:number)=>new Promise<void>(done=>setTimeout(done,ms));
 const chrome=[process.env.CHROME_BIN,'google-chrome','chromium'].filter(Boolean)
   .find(p=>spawnSync('which',[p!],{encoding:'utf8'}).status===0);
@@ -186,6 +201,253 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       const screenshot=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
 
+
+
+      // WORK4/#104: pigment-only native A/B with the actual three priced
+      // cells and upgrade button still mounted in the same paused React frame.
+      if(screen==='forge' && width===384 && height===512){
+        const rectExpr="(()=>{const rect=s=>{const e=document.querySelector(s);"+
+          "const r=e?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null;};"+
+          "return {board:rect('.w4-forge .w4-materials'),"+
+          "cannon:rect('.w4-reference-cannon'),"+
+          "furnace:rect('.w4-forge-scene'),"+
+          "button:rect('.w4-forge .w4-improve-button'),"+
+          "dock:rect('.harbour-nav.app-dock-porto'),"+
+          "costs:document.querySelectorAll('.w4-forge .w4-resource-grid > div').length,"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        const newLayout=await evaluate(rectExpr);
+        assert.equal(newLayout.costs,3,'three true costs retained');
+        assert.equal(newLayout.nav,5,'WORK0 five-item dock retained');
+        const olderBackground=[
+          '.w4-forge #w4-forge-panel > .w4-materials:where(*) {',
+          'background:radial-gradient(ellipse 76% 94% at 32% 0%,#a86e3738 0%,transparent 77%),',
+          'repeating-linear-gradient(2deg,transparent 0 10px,#c89b5410 10px 11px,transparent 12px 21px),',
+          'linear-gradient(173deg,#2b3030 0%,#1a282c 52%,#0d1e2a 100%)!important;}'
+        ].join('');
+        assert.ok(await evaluate("(()=>{const e=document.createElement('style');"+
+          "e.id='work4-before-navy-ledger';e.textContent="+JSON.stringify(olderBackground)+
+          ";document.head.appendChild(e);return true;})()"));
+        await sleep(120);
+        const oldLayout=await evaluate(rectExpr);
+        const previousFrame=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-forge-ledger-384x512.png'),
+          Buffer.from(previousFrame,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-before-navy-ledger')?.remove();return true;})()"));
+        for(const key of ['board','cannon','furnace','button','dock'] as const){
+          assert.deepEqual(newLayout[key],oldLayout[key],
+            'pigment cannot change the geometry of '+key);
+        }
+        const compare="(async()=>{"+
+          "const load=async u=>{const i=new Image();i.src=u;await i.decode();return i;};"+
+          "const [reference,previous,current]=await Promise.all(["+
+          "load('data:image/webp;base64,"+references.forge+"'),"+
+          "load('data:image/png;base64,"+previousFrame+"'),"+
+          "load('data:image/png;base64,"+screenshot+"')]);"+
+          "if([reference,previous,current].some(i=>i.width!==384||i.height!==512))throw Error('native 384x512 required');"+
+          "const px=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
+          "const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+          "const ref=px(reference),bef=px(previous),aft=px(current);"+
+          "const rois={global:[0,0,384,512],materials:[16,320,369,378],"+
+          "cannon:[30,230,166,309],furnace:[116,225,171,302],dock:[0,430,384,512]};"+
+          "const mae=(a,b,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
+          "const p=(y*384+x)*4;for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++;}}return sum/n;};"+
+          "const before={},after={};for(const [key,r] of Object.entries(rois)){"+
+          "before[key]=mae(ref,bef,r);after[key]=mae(ref,aft,r);}"+
+          "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;"+
+          "const g=canvas.getContext('2d');g.drawImage(reference,0,0);g.drawImage(previous,384,0);"+
+          "g.drawImage(current,768,0);g.drawImage(reference,1152,0);g.globalAlpha=.5;g.drawImage(current,1152,0);"+
+          "return {rois,before,after,comparison:canvas.toDataURL('image/png').split(',')[1]};})()";
+        const actual=await evaluate(compare);
+        assert.ok(actual?.after?.materials>=0,'source ROI computed in native pixels');
+        writeFileSync(join(folder,'compare-forge-ledger-384x512.png'),
+          Buffer.from(actual.comparison,'base64'));
+        delete actual.comparison;
+        const proof={...actual,source:'assets/design-approved/04-melhorias-forja.webp',
+          samePausedFrame:true,originalResolution:[384,512],oldLayout,newLayout,
+          approved:false,approvedScreens:0};
+        writeFileSync(join(folder,'forge-ledger-controlled-ab.json'),
+          JSON.stringify(proof,null,2)+'\n');
+        console.log('WORK4_FORGE_LEDGER_AB '+JSON.stringify(proof));
+
+        assert.ok(actual.after.materials<actual.before.materials,
+          'the source pigments must improve the native materials ROI');
+        assert.ok(actual.after.global<=actual.before.global,
+          'do not trade full-screen regression for a local pigment improvement');
+        for(const key of ['cannon','furnace','dock'] as const){
+          assert.ok(Math.abs(actual.after[key]-actual.before[key])<.2,
+            key+' approved art and WORK0 dock remain unchanged');
+        }
+      }
+
+      // WORK4/#104: remove only the TWO additive SVG glows over the already
+      // source-lit cannon and furnace. Compare the same Chromium React frame,
+      // same CSS except for opacity=1 versus opacity=0, native WebP 384x512.
+      if(screen==='forge' && width===384 && height===512){
+        const nativeLightSelector='.w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon > ellipse';
+        const lightGeometry="(()=>{const box=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null;};"+
+          "return {cannon:box('.w4-reference-cannon'),furnace:box('.w4-forge-scene'),"+
+          "costs:box('.w4-resource-grid'),button:box('.w4-improve-button'),"+
+          "dock:box('.harbour-nav.app-dock-porto'),"+
+          "lights:document.querySelectorAll("+JSON.stringify(nativeLightSelector)+").length,"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "costCount:document.querySelectorAll('.w4-resource-grid>div').length};})()";
+        const nowGeometry=await evaluate(lightGeometry);
+        assert.equal(nowGeometry.lights,2,'exactly the two duplicate local SVG light ellipses');
+        assert.equal(nowGeometry.costCount,3,'no invented or missing cost tiles');
+        assert.equal(nowGeometry.nav,5,'five protected menu items remain');
+        assert.ok(await evaluate("(()=>{const s=document.createElement('style');"+
+          "s.id='work4-restore-double-light';s.textContent="+
+          JSON.stringify(nativeLightSelector+'{opacity:1!important}')+
+          ";document.head.appendChild(s);return true;})()"));
+        await sleep(140);
+        const oldGeometry=await evaluate(lightGeometry);
+        assert.deepEqual(nowGeometry,oldGeometry,
+          'cannon, furnace, cost board, action, dock bounds unchanged by lighting');
+        const previousLight=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'before-double-light-forge-384x512.png'),
+          Buffer.from(previousLight,'base64'));
+        assert.ok(await evaluate("(()=>{document.getElementById('work4-restore-double-light')?.remove();return true;})()"));
+        await sleep(140);
+        const cleanLight=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
+        writeFileSync(join(folder,'render-single-light-forge-384x512.png'),
+          Buffer.from(cleanLight,'base64'));
+        const evaluateLight="(async()=>{"+
+          "const load=async u=>{const i=new Image();i.src=u;await i.decode();return i;};"+
+          "const [ref,bef,aft]=await Promise.all(["+
+          "load('data:image/webp;base64,"+references.forge+"'),"+
+          "load('data:image/png;base64,"+previousLight+"'),"+
+          "load('data:image/png;base64,"+cleanLight+"')]);"+
+          "if([ref,bef,aft].some(i=>i.width!==384||i.height!==512))throw Error('native 384x512 exact comparison required');"+
+          "const px=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
+          "const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+          "const a=px(ref),b=px(bef),c=px(aft);"+
+          "const rois={global:[0,0,384,512],cannon:[30,230,166,309],"+
+          "furnace:[116,225,171,302],ironCore:[35,251,140,290],"+
+          "costs:[16,320,369,378],dock:[0,430,384,512]};"+
+          "const mae=(x,y,r)=>{let sum=0,count=0;for(let yy=r[1];yy<r[3];yy++)for(let xx=r[0];xx<r[2];xx++){"+
+          "const k=(yy*384+xx)*4;for(let j=0;j<3;j++){sum+=Math.abs(x[k+j]-y[k+j]);count++;}}return sum/count;};"+
+          "const before={},after={};for(const [name,r] of Object.entries(rois)){before[name]=mae(a,b,r);after[name]=mae(a,c,r);}"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;const g=out.getContext('2d');"+
+          "g.drawImage(ref,0,0);g.drawImage(bef,384,0);g.drawImage(aft,768,0);"+
+          "g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(aft,1152,0);"+
+          "return {before,after,rois,compare:out.toDataURL('image/png').split(',')[1]};})()";
+        const sample=await evaluate(evaluateLight);
+        assert.ok(sample?.before?.cannon>=0&&sample?.after?.cannon>=0,
+          'real approved cannon ROI must be sampled before and after');
+        writeFileSync(join(folder,'compare-source-light-forge-384x512.png'),
+          Buffer.from(sample.compare,'base64'));
+        delete sample.compare;
+        const measured={...sample,oldGeometry,nowGeometry,sameFrame:true,
+          original:'assets/design-approved/04-melhorias-forja.webp',
+          viewport:'384x512',approved:false};
+        writeFileSync(join(folder,'forge-source-light-controlled-ab.json'),
+          JSON.stringify(measured,null,2)+'\n');
+        console.log('WORK4_NATIVE_FORGE_LIGHT_AB '+JSON.stringify(measured));
+        assert.ok(sample.after.cannon<=sample.before.cannon+0.03,
+          'removing duplicate cannon lighting cannot regress actual cannon ROI');
+        assert.ok(sample.after.furnace<=sample.before.furnace+0.03,
+          'removing extra light must not hide or regress furnace ROI');
+        assert.ok(sample.after.global<=sample.before.global+0.02,
+          'no full-frame visual regression after the light cleanup');
+        for(const key of ['costs','dock'] as const){
+          assert.ok(Math.abs(sample.after[key]-sample.before[key])<0.02,
+            'source light cleanup must preserve protected '+key+' pixels');
+        }
+      }
+
+      
+
+      // WORK4 #104 — compare approved source with the merged color and 7
+      // controlled alternatives in ONE paused native Chromium scene/frame.
+      if(screen==='forge'&&width===384&&height===512){
+        const palette=[
+          ['merged','linear-gradient(170deg,#183b51d9,#071e35f4 70%,#071728f4)'],
+          ['slate','linear-gradient(170deg,#143247e0,#061a2ef4 70%,#051427f8)'],
+          ['darker','linear-gradient(170deg,#102c40e7,#061a30f5 70%,#041422fa)'],
+          ['blue','linear-gradient(170deg,#1c465adb,#0b2a45f1 70%,#071c32f6)'],
+          ['amber','linear-gradient(170deg,#302e2adf,#10242df2 70%,#071b2af6)'],
+          ['navy','linear-gradient(170deg,#123c5bdd,#092638f4 70%,#071728f4)'],
+          ['charcoal','linear-gradient(170deg,#172b36ed,#061827f8 70%,#04101ff9)'],
+          ['warm','linear-gradient(170deg,#263c45dc,#0b2535f4 70%,#071728f5)']
+        ];
+        const selector='.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description';
+        const geomExpr="(()=>{const b=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null;};"+
+          "return {plaque:b('.w4-forge-description'),cannon:b('.w4-reference-cannon'),"+
+          "costs:b('.w4-resource-grid'),dock:b('.harbour-nav.app-dock-porto'),"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,"+
+          "costCount:document.querySelectorAll('.w4-resource-grid>div').length};})()";
+        const geometry=await evaluate(geomExpr);
+        assert.equal(geometry.nav,5,'five menu items retained');
+        assert.equal(geometry.costCount,3,'three true cost cells retained');
+        const screenshots:Record<string,string>={};
+        for(const [key,background] of palette){
+          assert.ok(await evaluate("(()=>{let s=document.getElementById('w4-ink-palette');"+
+            "if(!s){s=document.createElement('style');s.id='w4-ink-palette';document.head.appendChild(s);}"+
+            "s.textContent="+JSON.stringify(selector+'{background:'+background+'!important}')+";return true;})()"));
+          await sleep(100);
+          assert.deepEqual(await evaluate(geomExpr),geometry,'no movement of art, prices, menu');
+          screenshots[key]=(await command('Page.captureScreenshot',{
+            format:'png',fromSurface:true,captureBeyondViewport:false
+          })).data as string;
+        }
+        assert.ok(await evaluate("(()=>{document.getElementById('w4-ink-palette')?.remove();return true;})()"));
+        const data={source:references.forge,screenshots};
+        const expr="(async()=>{const input="+JSON.stringify(data)+";"+
+          "const load=async(fmt,b64)=>{const i=new Image();i.src='data:image/'+fmt+';base64,'+b64;await i.decode();return i;};"+
+          "const px=i=>{if(i.width!==384||i.height!==512)throw Error('native dimensions');"+
+          "const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});"+
+          "g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+          "const refImg=await load('webp',input.source);const ref=px(refImg);"+
+          "const rois={global:[0,0,384,512],plaque:[174,145,374,314],"+
+          "identity:[174,145,374,255],cannon:[32,225,170,312],"+
+          "hearth:[116,225,173,302],costs:[16,320,369,378],dock:[0,430,384,512]};"+
+          "const mae=(a,b,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
+          "const p=(y*384+x)*4;for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++;}}return sum/n;};"+
+          "const out={};for(const [name,b64] of Object.entries(input.screenshots)){const img=await load('png',b64);const pic=px(img);"+
+          "out[name]={};for(const [k,r] of Object.entries(rois))out[name][k]=mae(ref,pic,r);}return out;})()";
+        const measurements=await evaluate(expr);
+        const record={measurements,palette,geometry,viewport:'384x512',sameFrame:true,
+          original:'assets/design-approved/04-melhorias-forja.webp',approved:false,approvedScreens:0};
+        console.log('WORK4_FORGE_INK_SWEEP '+JSON.stringify(record));
+        writeFileSync(join(folder,'forge-ink-palette-same-frame.json'),JSON.stringify(record,null,2)+'\n');
+        writeFileSync(join(folder,'before-forge-ink-384x512.png'),Buffer.from(screenshots.merged,'base64'));
+        writeFileSync(join(folder,'render-forge-ink-384x512.png'),Buffer.from(screenshots.charcoal,'base64'));
+
+        // FINAL, source-measured candidate: charcoal wins all 3 illustrated
+        // ROIs in this exact-frame sweep; do not accept the prior grid layout.
+        const dataForProof={source:references.forge,before:screenshots.merged,after:screenshots.charcoal};
+        const proof="(async()=>{const data="+JSON.stringify(dataForProof)+";"+
+          "const load=async(type,b64)=>{const i=new Image();i.src='data:image/'+type+';base64,'+b64;await i.decode();return i;};"+
+          "const [original,before,render]=await Promise.all([load('webp',data.source),load('png',data.before),load('png',data.after)]);"+
+          "if([original,before,render].some(i=>i.width!==384||i.height!==512))throw Error('native pixels only');"+
+          "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;"+
+          "const g=canvas.getContext('2d');"+
+          "g.drawImage(original,0,0);g.drawImage(before,384,0);g.drawImage(render,768,0);"+
+          "g.drawImage(original,1152,0);g.globalAlpha=.5;g.drawImage(render,1152,0);"+
+          "return canvas.toDataURL('image/png').split(',')[1];})()";
+        const proofData=await evaluate(proof);
+        writeFileSync(join(folder,'compare-forge-source-ink-384x512.png'),Buffer.from(proofData,'base64'));
+        assert.ok(measurements.charcoal.global<measurements.merged.global-0.30,
+          'native global MAE must materially improve');
+        assert.ok(measurements.charcoal.plaque<measurements.merged.plaque-1.5,
+          'live plaque ROI must approach original');
+        assert.ok(measurements.charcoal.identity<measurements.merged.identity-2.5,
+          'real medallion/status identity region must improve');
+        for(const roi of ['cannon','hearth','costs','dock'] as const)
+          assert.ok(Math.abs(measurements.merged[roi]-measurements.charcoal[roi])<0.03,
+            'unchanged protected '+roi+' pixels');
+
+        assert.equal(Object.keys(measurements).length,8,'8 native paint samples recorded');
+        for(const roi of ['cannon','hearth','costs','dock'] as const)
+          assert.ok(Math.abs(measurements.merged[roi]-measurements.slate[roi])<0.05,
+            'must preserve protected '+roi+' pixels');
+      }
 
       // WORK4/#104 — Forge 04: one real plaque over the approved right inset.
       // A/B must be native, within this SAME paused React/Chromium frame:
@@ -997,4 +1259,10 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
   }
   writeFileSync(join(folder,'work4-pixel-registration.json'),JSON.stringify(report,null,2)+'\n');
   assert.equal(report.visual.length,8,'four Chromium viewports for both Work4 screens');
+});
+
+test('WORK4 native Forge avoids painting a second furnace glow onto approved source',()=>{
+  assert.ok(css.includes('native Forge 04: eliminate a duplicate glow'));
+  assert.match(css, /@media \(width:384px\) and \(height:512px\)[\s\S]*?svg\.w4-cannon-art\.w4-reference-cannon > ellipse \{\s*opacity:0;/);
+  assert.doesNotMatch(css.split('native Forge 04: eliminate a duplicate glow')[1], /\.app-|\.harbour-nav|\.w4-resource-grid/);
 });
