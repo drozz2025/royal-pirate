@@ -222,6 +222,110 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       const screenshot=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
 
+      // WORK4/#104: controlled prospective sea-edge mask study against ORIGINAL 03.
+      // All variants run in ONE paused React/Chromium frame at native 384x512;
+      // the shipped CSS stays unchanged until a measured improvement is chosen.
+      if(screen==='fleet'&&width===384&&height===512){
+        const maskFadeOptions=[
+          {id:'HEAD-34',fade:null},
+          {id:'opaque-0',fade:0},{id:'fade-8',fade:8},
+          {id:'fade-16',fade:16},{id:'fade-24',fade:24},
+          {id:'fade-28',fade:28},{id:'fade-34',fade:34},
+          {id:'fade-40',fade:40},{id:'fade-48',fade:48},
+          {id:'fade-62',fade:62}
+        ];
+        const staticParts="(()=>{const b=s=>{const r=document.querySelector(s)?.getBoundingClientRect();"+
+          "return r?[r.x,r.y,r.width,r.height]:null};return {"+
+          "ship:b('.w4-reference-ship'),sea:b('.w4-reference-sea'),"+
+          "stats:b('.w4-stage-label'),roster:b('.w4-ship-roster'),"+
+          "dock:b('.harbour-nav.app-dock-porto'),"+
+          "ships:document.querySelectorAll('[data-work4-crop=\"fleet\"]').length,"+
+          "menus:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        const startingGeometry=await evaluate(staticParts);
+        assert.equal(startingGeometry.ships,1,'exactly one source Royal Crown');
+        assert.equal(startingGeometry.menus,5,'original five-item dock stays');
+        const samples:[string,string][]=[];
+        for(const option of maskFadeOptions){
+          if(option.fade!==null){
+            const fade="linear-gradient(to bottom,transparent 0%,#000 "+option.fade+"%,#000 100%)";
+            const paint=".w4-fleet #w4-fleet-panel > .w4-harbour-stage > svg.w4-reference-sea{"+
+              "-webkit-mask-image:"+fade+"!important;mask-image:"+fade+"!important;}";
+            await evaluate("(()=>{const s=document.createElement('style');s.id='work4-sea-mask-probe';"+
+              "s.textContent="+JSON.stringify(paint)+";document.head.appendChild(s);return true})()");
+            await sleep(85);
+          }
+          const frame=option.fade===null?screenshot:(await command('Page.captureScreenshot',{
+            format:'png',fromSurface:true,captureBeyondViewport:false
+          })).data as string;
+          samples.push([option.id,frame]);
+          if(option.fade!==null){
+            await evaluate("(()=>{document.getElementById('work4-sea-mask-probe')?.remove();return true})()");
+          }
+          assert.deepEqual(await evaluate(staticParts),startingGeometry,
+            'the sea alpha probe cannot move the ship, stats, roster or global dock');
+        }
+        const studyJS="(async()=>{const input="+JSON.stringify({
+          original:references.fleet,samples
+        })+";"+
+          "const load=async(type,b)=>{const i=new Image();i.src='data:image/'+type+';base64,'+b;await i.decode();return i};"+
+          "const source=await load('webp',input.original);const pixels=i=>{"+
+          "const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+          "const g=cv.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);"+
+          "return g.getImageData(0,0,384,512).data};const original=pixels(source);"+
+          "const rois={full:[0,0,384,512],water:[28,313,238,358],"+
+          "bridge:[23,300,243,340],ship:[65,205,175,307],"+
+          "roster:[18,350,374,429],dock:[0,430,384,512]};"+
+          "const mae=(now,r)=>{let d=0,n=0;for(let y=r[1];y<r[3];y++)"+
+          "for(let x=r[0];x<r[2];x++){const p=(y*384+x)*4;"+
+          "for(let k=0;k<3;k++){d+=Math.abs(now[p+k]-original[p+k]);n++}}return d/n};"+
+          "const scores=[];for(const [id,encoded] of input.samples){"+
+          "const im=await load('png',encoded);if(im.width!==384||im.height!==512)"+
+          "throw Error('Non-native A/B frame');const pix=pixels(im);"+
+          "const row={id};for(const [key,r] of Object.entries(rois))row[key]=mae(pix,r);"+
+          "scores.push(row)}return {rois,scores};})()";
+        const results=await evaluate(studyJS);
+        assert.equal(results.scores.length,maskFadeOptions.length);
+        const headScore=results.scores[0];
+        const priorFade=results.scores.find(item=>item.id==='fade-34');
+        assert.ok(priorFade,'original 34-percent sea-mask baseline must be measured');
+        assert.ok(headScore.bridge<priorFade.bridge-.03,
+          'native eight-percent feather must improve sea/ship bridge ROI');
+        assert.ok(headScore.water<priorFade.water-.01,
+          'native sea source pixels must improve water ROI');
+        assert.ok(headScore.full<priorFade.full-.001,
+          'native sea feather must not worsen whole-frame MAE');
+        for(const item of results.scores){
+          for(const protectedROI of ['ship','roster','dock']){
+            assert.ok(Math.abs(item[protectedROI]-headScore[protectedROI])<0.02,
+              'mask cannot modify protected '+protectedROI+' RGB pixels');
+          }
+        }
+        const ranked=[...results.scores].sort((a,b)=>
+          (a.water+a.bridge)/2-(b.water+b.bridge)/2);
+        const winner=ranked[0];
+        const priorFrame=samples.find(item=>item[0]==='fade-34')![1];
+        const montageJS="(async()=>{const d="+JSON.stringify({
+          original:references.fleet,before:priorFrame,after:screenshot
+        })+";"+
+          "const load=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;await i.decode();return i};"+
+          "const [a,b,c]=await Promise.all([load('webp',d.original),load('png',d.before),load('png',d.after)]);"+
+          "const out=document.createElement('canvas');out.width=1536;out.height=512;"+
+          "const g=out.getContext('2d');g.drawImage(a,0,0);g.drawImage(b,384,0);"+
+          "g.drawImage(c,768,0);g.drawImage(a,1152,0);g.globalAlpha=.5;"+
+          "g.drawImage(c,1152,0);return out.toDataURL('image/png').split(',')[1];})()";
+        const montage=await evaluate(montageJS);
+        writeFileSync(join(folder,'original-before-render-overlay-fleet-sea-mask-384x512.png'),
+          Buffer.from(montage,'base64'));
+        const reportMask={source:'assets/design-approved/03-frota.webp',
+          frame:'same paused Chromium 384x512 scene',baseline:'prior 34-percent fade',
+          applied:'HEAD 8-percent feather, not hard opaque zero-percent edge',
+          approved:false,approvedScreens:0,priorFade,head:headScore,winner,ranked,
+          rois:results.rois,scores:results.scores};
+        writeFileSync(join(folder,'work4-sea-native-mask-study.json'),
+          JSON.stringify(reportMask,null,2)+'\n');
+        console.log('WORK4_SOURCE_SEA_MASK_STUDY '+JSON.stringify(reportMask));
+      }
+
       // WORK4/#104 18 Nov 10h: prospective Forge smoke/iron pigments measured
       // against ORIGINAL 04, with exact 384x512 and the SAME React frame.
       // Every variant is reverted before any existing checks; no shipping CSS
