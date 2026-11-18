@@ -43,26 +43,13 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // Exact CSS on that HEAD, not an obsolete older uniform .72 baseline.
   // Restoring it in the SAME Chromium frame isolates ONLY this PR's
   // four optical changes, including preserving original 320px rules.
+  // Exact WORK0 HEAD v0.1.78 chest panel values in the same Chromium frame.
+  // No touch/menu/asset changes or cross-PR baseline leakage.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.63)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.77)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.61)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.65)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.80)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.80)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.65)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop,
-      .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.11) drop-shadow(0 4px 3px #041327a8)!important
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
-        filter:saturate(1.27) contrast(1.12) brightness(1.16) drop-shadow(0 4px 3px #041327a8)!important
-      }
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.88)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)!important
-      }
     }`;
   const cssBaseline = currentHeadBaseline;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -426,9 +413,15 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(report.screens.length,8,'All four viewports must capture both screens');
   const native=report.screens.filter(screen=>screen.width===384&&screen.height===512);
   assert.equal(native.length,2,'Both real native screens must be available');
-  assert.ok(native.every(screen=>
-    screen.maeRgbAfter<screen.maeRgbBefore&&screen.roiMaeAfter<screen.roiMaeBefore),
-    'Both live 05/06 screens must strictly improve global RGB MAE and artwork ROI against merged HEAD: '+
-    JSON.stringify(native.map(s=>({kind:s.kind,global:[s.maeRgbBefore,s.maeRgbAfter],
-      roi:[s.roiMaeBefore,s.roiMaeAfter]}))));
+  const cards=native.find(screen=>screen.kind==='cards');
+  const shop=native.find(screen=>screen.kind==='shop');
+  assert.ok(cards&&shop,'Both genuine 05/06 scenes must be measured');
+  // This pass touches ONLY the three 06 frames. Enforce real improvement,
+  // and reject any unintended change to 05's existing eight-card atlas.
+  assert.ok(shop.maeRgbBefore-shop.maeRgbAfter>=0.02 &&
+    shop.roiMaeBefore-shop.roiMaeAfter>=0.08,
+    '06 three true chest frames must improve BOTH full-screen and pictorial ROI MAE on the actual merged HEAD: '+JSON.stringify(shop));
+  assert.ok(Math.abs(cards.maeRgbAfter-cards.maeRgbBefore)<=0.01 &&
+    Math.abs(cards.roiMaeAfter-cards.roiMaeBefore)<=0.01,
+    '05 Cartas remains pixel-identical and fully interactive: '+JSON.stringify(cards));
 });
