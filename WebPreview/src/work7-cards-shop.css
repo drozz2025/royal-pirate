@@ -4319,3 +4319,18 @@
     filter:brightness(.40) saturate(1.75) contrast(.79);
   }
 }
+
+
+/* WORK7/#104 — 18 Nov 22:23 UTC. Native 05 carved atlas material registration.
+ * Source: 00 original, eight-screen mosaic and genuine 01–08 WebP.
+ * The earlier diffuse cyan glaze between the eight real portraits is absent
+ * from the charcoal/ink carved album in the approved 05 original.
+ * Replace ONLY the translucent grid finish, retaining its existing physical
+ * frame, real four-by-two artwork, live PRÉVIA and untouched 06 Loja.
+ * 320×568 and tall mobile screens keep exactly the merged CSS.
+ * Chromium same-frame HEAD/R​ENDER/ROI gate required. approved:false 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    background:linear-gradient(180deg,rgba(32,27,34,.12),rgba(6,14,28,0) 76%);
+  }
+}
