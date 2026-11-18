@@ -37,20 +37,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
-  const marker = '/* WORK7/#104 — 18 Nov 07:20 UTC. Native 05/06 relief-value registration.';
+  const marker = '/* WORK7/#104 — 18 Nov 07:31 UTC. Native 05/06 physical material correction.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
-  // Compare to ACTUAL WORK0-integrated HEAD 717efc83 / v0.1.84.
-  // These five !important declarations restore exactly the five original
-  // computed material filters before THIS branch; they do not roll back
-  // WORK7 #374's already-merged genuine source-art luminance.
-  // Both shots use the same React state, tab, device, paused animation frame.
+  // HEAD 717efc83 / v0.1.84 includes integrated WORK7 #374.
+  // Inline !important overrides restore ONLY this branch's 4 properties
+  // from the exact current HEAD, in the same Chromium screen and frame.
   const currentHeadBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.745)!important}
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.59)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.71)!important}
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.62)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.88)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)!important}
     }`;
   const cssBaseline = currentHeadBaseline;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -236,7 +233,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         let headScreenshotData: string | null = null;
         let baselineGeometry: any = null;
         if ((width===384 && height===512)||(width===320 && height===568)) {
-          // Temporarily undo only this PR's five native-only material filters via precise
+          // Temporarily undo only this PR's four native-only material filters via precise
           // overrides. Keep HEAD assets, state, earlier visual passes, browser
           // viewport and font rendering identical before/after.
           const enabled = await evaluate("(()=>{const s=document.createElement('style');s.id='work7-css-baseline';s.textContent="+JSON.stringify(cssBaseline)+";document.head.appendChild(s);return true})()");
@@ -258,7 +255,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           await sleep(200);
           if (width===384 && height===512) {
             // Actual current HEAD, not the older pre-#268 baseline: the only
-            // difference from the new render is this PR's five genuine material-value filters.
+            // difference from the new render is this PR's four WORK7-only material-value filters.
             await evaluate("(()=>{const s=document.createElement('style');s.id='work7-head-baseline';s.textContent="+JSON.stringify(currentHeadBaseline)+";document.head.appendChild(s);return true})()");
             await sleep(200);
             const currentHead = await command('Page.captureScreenshot', {
