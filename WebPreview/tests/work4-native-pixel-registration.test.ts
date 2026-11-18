@@ -2152,7 +2152,7 @@ test('WORK4 source-cannon visual refinement is native-only and cost/dock-safe',(
   const marker='WORK4/#104 — 18 Nov 15h: source-cannon contour refinement';
   const suffix=css.split(marker)[1];
   assert.ok(suffix,'final measured cannon contour must survive rebase');
-  const rules=suffix.split('*/')[1]||'';
+  const rules=(suffix.split('*/')[1]||'').split('/* WORK4/#104 — 20:00 source-forge cannon edge:')[0];
   assert.match(rules,/@media \(width:384px\) and \(height:512px\)/);
   assert.match(rules,/radial-gradient\(ellipse 140% 122% at 37% 49%,#000 0%,#000 84%,transparent 99%\)/);
   assert.match(rules,/linear-gradient\(to bottom,#000 0%,#000 98%,transparent 100%\)/);
