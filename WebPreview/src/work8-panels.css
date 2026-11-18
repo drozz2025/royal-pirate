@@ -5216,14 +5216,14 @@
 }
 
 
-/* WORK8/#104 — 07 MISSÕES ONLY. Register darker waterline enamel
+/* WORK8/#104 — 07 MISSÕES ONLY. Register brighter hand-painted waterline enamel
    of the three existing real quest plates against native source #07.
    Paint only, no mission data, reward, claim, geometry, dock or Ranking
    changes. The root flag provides a genuine same-frame A/B in Chromium. */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
   :root:not(.work8-missions-deep-hull-ab-baseline) .w8-approved-missions .w8-approved-quest {
     background:
-      radial-gradient(ellipse 92% 75% at 7% 32%,#326a8760,transparent 62%),
-      linear-gradient(175deg,#163e58 0%,#0b2a44 54%,#061d32 100%);
+      radial-gradient(ellipse 100% 85% at 0% 38%,#5399aa78,transparent 69%),
+      linear-gradient(171deg,#235973 0%,#16415e 49%,#0a2b46 100%);
   }
 }
