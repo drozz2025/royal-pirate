@@ -5214,3 +5214,5 @@
     mask-image:radial-gradient(ellipse 72% 70% at 50% 50%,#000 78%,transparent 100%);
   }
 }
+
+/* WORK8/#104: paint-only palette probe; no production design change before native Chromium validation. */
