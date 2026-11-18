@@ -195,6 +195,22 @@ test('WORK6: controlled genuine Chromium 384x512 A/B with fixed wave and camera'
     mkdirSync('work6-qa',{recursive:true});
     writeFileSync('work6-qa/ab-same-frame-metrics.json',JSON.stringify(metrics,null,2));
     console.log('WORK6 CONTROLLED A/B MAE:',JSON.stringify(metrics));
+    // Real React interaction evidence: press the existing DISPARAR control
+    // after the frozen same-frame comparisons (never during MAE capture).
+    // Capture the live central-gun muzzle effect and early projectile in the
+    // SAME real 384x512 Chromium scene. This screenshot is evidence only;
+    // it does not claim human approval or a particular GPU framerate.
+    const shotClick=await send('Runtime.evaluate',{
+      expression:'(()=>{const b=document.querySelector(".in-battle .fire-button");if(!b)return false;b.click();return true})()',
+      returnByValue:true
+    });
+    assert.equal(shotClick.result?.value,true,'the functional existing DISPARAR button must be present');
+    await sleep(180);
+    const fired=await send('Page.captureScreenshot',{
+      format:'png',fromSurface:true,captureBeyondViewport:false
+    });
+    writeFileSync('work6-qa/central-cannon-after-real-fire-384x512.png',Buffer.from(fired.data,'base64'));
+
     // Software WebGL can differ by 1 isolated antialias pixel across fresh CDP
     // navigations even with fixed sea time. Reject any material non-cannon
     // change: <=4 pixels out of 196,608, plus exact unoccluded scenery MAE.
