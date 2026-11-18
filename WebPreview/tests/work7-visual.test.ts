@@ -43,8 +43,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'New WORK7 eight-card short-viewport art treatment exists without screenshot backgrounds');
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
-  assert.ok(cssText.includes('18 Nov 13:26 UTC, native carved-wood value registration.'),
-    'The new WORK7 candidate changes only actual native 05 relief materials');
+  assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
+    'The final WORK7 candidate changes only genuine 05 frame inlays');
     // The only admissible before-image is the actual merged #392 v0.1.88 field.
   // Art and frames are restored with temporary CSS, never with older #384 values.
   // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
@@ -96,7 +96,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.14)!important}
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.67)!important}
     }`;
-  const cssBaseline = merged404Baseline;
+  // Restore the exact last integrated #404 metallic shell. The new native
+  // 2px inlay is *not* allowed into the before/HEAD render.
+  const actual404FrameShadow = `
+    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+        box-shadow:inset 0 1px #fff7ce,inset 0 0 0 1px #fbe0a1b3,
+          inset 0 -4px #4d2c22a3,0 0 0 1px #513319,
+          0 4px 0 #07162b,0 8px 11px #020d249c!important;
+      }
+    }`;
+  const cssBaseline = merged404Baseline + actual404FrameShadow;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
     { cwd: process.cwd(), stdio: 'ignore' });
@@ -280,7 +290,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         let headScreenshotData: string | null = null;
         let baselineGeometry: any = null;
         if ((width===384 && height===512)||(width===320 && height===568)) {
-          // Temporarily undo only this PR's five native-only material filters via precise
+          // Temporarily undo only this PR's native-only inlay relief via precise
           // overrides. Keep HEAD assets, state, earlier visual passes, browser
           // viewport and font rendering identical before/after.
           const enabled = await evaluate("(()=>{const s=document.createElement('style');s.id='work7-css-baseline';s.textContent="+JSON.stringify(cssBaseline)+";document.head.appendChild(s);return true})()");
@@ -302,8 +312,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           await sleep(200);
           if (width===384 && height===512) {
             // Actual current HEAD, not the older pre-#268 baseline: the only
-            // difference from the new render is this PR's five native card-relief filters.
-            await evaluate("(()=>{const s=document.createElement('style');s.id='work7-head-baseline';s.textContent="+JSON.stringify(merged404Baseline)+";document.head.appendChild(s);return true})()");
+            // difference from the new render is this PR's eight inlay material values.
+            await evaluate("(()=>{const s=document.createElement('style');s.id='work7-head-baseline';s.textContent="+JSON.stringify(cssBaseline)+";document.head.appendChild(s);return true})()");
             await sleep(200);
             const currentHead = await command('Page.captureScreenshot', {
               format:'png',fromSurface:true,captureBeyondViewport:false
@@ -395,85 +405,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         }
 
 
-
-        // WORK7-only candidate survey: do not promote a guessed frame colour.
-        // Every candidate is captured on the same live mounted React scene,
-        // with true approved 05 reference pixels and unaltered 5-item dock.
-        // The temporary CSS is removed before the post-sweep report/test.
-        if(kind==='cards' && width===384 && height===512){
-          const sourceFields:[number,number,number][]=[
-            [.50,1.70,.87],[.65,1.75,.75],[.39,1.20,.74],[.42,2.30,.76],
-            [.40,2.00,.85],[.59,1.30,.92],[.38,1.75,.79],[.58,1.90,.88]
-          ];
-          const loadData='data:image/webp;base64,'+references.cards.toString('base64');
-          for(let idx=0;idx<8;idx++){
-            const [value,sat,contrast]=sourceFields[idx];
-            for(const fraction of [.78,.87,.94,1.06,1.14,1.25]){
-              const next=Number((value*fraction).toFixed(4));
-              const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
-                '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+(idx+1)+')'+
-                '{filter:brightness('+next+') saturate('+sat+') contrast('+contrast+')!important}}';
-              await evaluate("(()=>{const s=document.createElement('style');s.id='w7-card-sweep';s.textContent="+
-                JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
-              await sleep(60);
-              const sample=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
-              const metrics=await evaluate("(async()=>{"+
-                "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
-                "const [reference,render]=await Promise.all([load("+JSON.stringify(loadData)+"),load("+
-                   JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(sample.data)+")]);"+
-                "const c=document.createElement('canvas');c.width=384;c.height=512;const context=c.getContext('2d');"+
-                "context.drawImage(reference,0,0);const a=context.getImageData(0,0,384,512).data;"+
-                "context.clearRect(0,0,384,512);context.drawImage(render,0,0);const b=context.getImageData(0,0,384,512).data;"+
-                "const x0="+([18,107,195,284,18,107,195,284][idx])+", y0="+([196,196,196,196,319,319,319,319][idx])+";"+
-                "let sum=0, n=0;for(let y=y0;y<y0+115;y++){for(let x=x0;x<x0+83;x++){const p=(y*384+x)*4;"+
-                "for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++}}}"+
-                "return Math.round(sum/n*1000)/1000})()");
-              console.log('WORK7 CARD-ROI SWEEP slot='+(idx+1)+
-                ' brightness='+next+' mae='+metrics);
-              await evaluate("(()=>{document.getElementById('w7-card-sweep')?.remove();return true})()");
-              await sleep(30);
-            }
-          }
-        }
-
-        // Experiment with live availability-bar enamel. Original artwork uses
-        // bright gold/violet/green card-footers; changing preview labels cannot
-        // fabricate rarity, currency or progress. DO NOT commit a guess: log the
-        // native full-frame and ROI error for every candidate then remove it.
-        if(kind==='cards' && width===384 && height===512) {
-          const refSource='data:image/webp;base64,'+references.cards.toString('base64');
-          for(const layer of ['small','border'] as const){
-            for(const magnitude of [.75,.95,1.15,1.35,1.55,1.8,2.15]){
-              const styleText=layer==='small'?
-                '@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
-                '.w7-screen[data-work7-screen="cards"] .w7-approved-slot small'+
-                '{filter:brightness('+magnitude+') saturate(1.3)!important}}':
-                '@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
-                '.w7-screen[data-work7-screen="cards"] .w7-approved-slot'+
-                '{box-shadow:inset 0 0 '+Math.round(magnitude*2)+'px '+Math.round(magnitude*2)+
-                  'px #f1bd76aa,0 3px 0 #06142b!important}}';
-              await evaluate("(()=>{const s=document.createElement('style');s.id='w7-enamel-sweep';s.textContent="+
-                JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
-              await sleep(80);
-              const sample=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
-              const metrics=await evaluate("(async()=>{"+
-                "const load=src=>new Promise((ok,fail)=>{let i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
-                "const [reference,render]=await Promise.all([load("+JSON.stringify(refSource)+"),load("+
-                  JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(sample.data)+")]);"+
-                "const c=document.createElement('canvas');c.width=384;c.height=512;const ctx=c.getContext('2d');"+
-                "ctx.drawImage(reference,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
-                "ctx.clearRect(0,0,384,512);ctx.drawImage(render,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
-                "let global=0,roi=0,n=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){"+
-                "let p=(y*384+x)*4;for(let k=0;k<3;k++){let e=Math.abs(a[p+k]-b[p+k]);global+=e;"+
-                "if(x>=18&&x<365&&y>=195&&y<428){roi+=e;n++}}}"+
-                "return {global:Math.round(global/(384*512*3)*1000)/1000,"+
-                "roi:Math.round(roi/n*1000)/1000}})()");
-              console.log('WORK7 ENAMEL SWEEP layer='+layer+' magnitude='+magnitude+' '+JSON.stringify(metrics));
-              await evaluate("(()=>{document.getElementById('w7-enamel-sweep')?.remove();return true})()");
-              await sleep(40);
-            }
-          }
-        }
 
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
