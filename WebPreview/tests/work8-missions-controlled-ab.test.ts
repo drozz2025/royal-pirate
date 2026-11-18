@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1523,6 +1523,68 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       rewardDelta.daily<-.16&&rewardDelta.chests<-.25,
       'the ACTUAL shipped reward enamel MUST improve native original MAE across frame, tile ROI, day tray and 7 chests');
     assert.ok(Math.abs(rewardDelta.quests)<.03,'the three REAL objectives cannot visually regress');
+
+
+    /* WORK8/#104 — seventh genuine reward surface at native 384x512.
+       Single paused real Chromium frame, official 07 reference, no mock claim
+       or fake player progress. Previous A/B gates retain their source baseline.
+       Compare only the seven-day row's seventh background, never its artwork,
+       text, position, state or the WORK0 dock. */
+    const seventhFlag='work8-missions-day7-ground-ab-baseline';
+    const seventhRect=await evalJs('(()=>{const e=document.querySelector(".w8-approved-missions .w8-approved-days li:nth-child(7)");const r=e?.getBoundingClientRect();return r?[r.left,r.top,r.right,r.bottom]:null})()');
+    assert.ok(seventhRect&&seventhRect.length===4,'real seventh day exists');
+    const seventhBeforeLayout=await headingLayout();
+    const seventhBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const seventhBeforeCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:nth-child(7)")).backgroundImage');
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(seventhFlag)+');true');
+    await delay(160);
+    const seventhAfterLayout=await headingLayout();
+    const seventhAfterCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:nth-child(7)")).backgroundImage');
+    const seventhAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const seventhScores=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify([seventhRect]))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        'data:image/png;base64,'+seventhBefore,'data:image/png;base64,'+seventhAfter])));
+    const seventhDelta=Object.fromEntries(Object.keys(seventhScores[0])
+      .map(k=>[k,seventhScores[1][k]-seventhScores[0][k]]));
+    const seventhOverlaysSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+seventhBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+seventhAfter));
+    assert.notEqual(seventhOverlaysSource,source);
+    const seventhOverlays=await evalJs(seventhOverlaysSource);
+    saveTone('missions-day7-original-384x512.webp',orig);
+    saveTone('missions-day7-before-384x512.png',seventhBefore);
+    saveTone('missions-day7-render-384x512.png',seventhAfter);
+    saveTone('missions-day7-original-before-overlay-384x512.png',seventhOverlays.overlays[0]);
+    saveTone('missions-day7-original-render-overlay-384x512.png',seventhOverlays.overlays[1]);
+    const seventhReport={
+      issue:104,baseHead:'c92c8c821a8a0eabcafeb571705e2d79222a279f',
+      reference:'assets/design-approved/07-missoes.webp',
+      referenceSet:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(n=>'assets/design-approved/'+n),
+      viewport:'Chromium native 384x512 DPR1',
+      scene:'same genuine paused Chromium frame; 3 real missions, 7 real rewards and 5 dock items',
+      scope:'07 Missions seventh real day tile background only; no progress/claim/state changes',
+      roiRect:seventhRect,cssBefore:seventhBeforeCss,cssRender:seventhAfterCss,
+      before:seventhScores[0],render:seventhScores[1],delta:seventhDelta,
+      geometry:{before:seventhBeforeLayout,render:seventhAfterLayout},
+      overlays:seventhOverlays.metrics,approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-day7-native-controlled-ab.json'),JSON.stringify(seventhReport,null,2));
+    console.log('WORK8 #104 REAL seventh tile MAE '+JSON.stringify(seventhReport));
+    assert.deepEqual(seventhBeforeLayout,seventhAfterLayout,'no movement of real quests, seven rewards or dock');
+    assert.notEqual(seventhBeforeCss,seventhAfterCss,'the shipped CSS must change the authentic seventh day inlay');
+    assert.equal(seventhAfterLayout.questCount,3);
+    assert.equal(seventhAfterLayout.dayCount,7);
+    assert.equal(seventhAfterLayout.dockCount,5);
+    assert.ok(seventhAfterLayout.chests.every((c:any)=>c.bottom<=seventhAfterLayout.nav.top+2),
+      'all seven genuine chest artworks must remain above the dock');
+    assert.ok(seventhDelta.meters<-.02&&seventhDelta.full<-.002&&seventhDelta.daily<-.005,
+      'the committed seventh inlay must measurably improve native ROI, full frame and daily board');
+    assert.ok(Math.abs(seventhDelta.dockDelta)<.06&&Math.abs(seventhDelta.quests)<.06,
+      'no WORK0 dock or three real mission regression');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
