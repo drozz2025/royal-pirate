@@ -87,16 +87,26 @@ jobs:
           python3 scripts/assert-forge-visibility.py porto-qa/forge-mobile-390x844.png
       # Read-only probe. This is NOT a Sites deploy and cannot synchronize code.
       # An unavailable/private Site never blocks GitHub Pages publication.
-      - name: Probe pre-existing ChatGPT Sites endpoint (read-only)
+      - name: Probe pre-existing ChatGPT Sites endpoint and release marker (read-only)
         if: always()
         continue-on-error: true
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
         run: |
           set -uo pipefail
           SITE_URL="https://royal-pirate.ricardomalheiro.chatgpt.site/"
           code=$(curl --max-time 15 --location --silent --show-error \
             --output /tmp/royal-pirate-chatgpt-sites.html --write-out '%{http_code}' "$SITE_URL") || code="000"
           echo "CHATGPT SITES READ-ONLY HTTP: $code at $SITE_URL"
-          echo "ChatGPT Sites read-only HTTP probe: $code (not a deploy or sync)" >> "$GITHUB_STEP_SUMMARY"
+          echo "ChatGPT Sites HTTP: $code at $SITE_URL" >> "$GITHUB_STEP_SUMMARY"
+          if [[ "$code" == "200" ]] && grep -Fq "v${RELEASE_VERSION}" /tmp/royal-pirate-chatgpt-sites.html; then
+            echo "ChatGPT Sites: release marker v${RELEASE_VERSION} present in HTML." >> "$GITHUB_STEP_SUMMARY"
+            echo "Version marker found; this alone DOES NOT prove source-code equality or automatic sync."
+          else
+            echo "ChatGPT Sites: release marker v${RELEASE_VERSION} NOT VERIFIED in HTML." >> "$GITHUB_STEP_SUMMARY"
+            echo "No version parity proof and no authenticated GitHub Pages -> Sites deployment configured."
+          fi
+          echo "IMPORTANT: this workflow never updates ChatGPT Sites. HTTP 200 is not a sync confirmation." >> "$GITHUB_STEP_SUMMARY"
           test "$code" = "200"
 
       - name: Upload short-lived browser snapshot and mobile QA data
