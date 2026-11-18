@@ -1329,6 +1329,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     const meterStudySelector='.w8-approved-missions .w8-approved-quest .w8-approved-meter';
     const meterRects=await evalJs('(()=>[...document.querySelectorAll('+JSON.stringify(meterStudySelector)+')].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
     assert.equal(meterRects.length,3,'three actual mission meters, no mock progress');
+    const meterBaselineLayout=await headingLayout();
+    const meterBaselineBorder=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(meterStudySelector)+')).borderTopColor');
     const meterStyleId='work8-meter-study-only';
     const meterVariants=[
       ['released',''],
@@ -1390,6 +1392,51 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     saveTone('missions-meter-before-384x512.png',meterShots[0]);
     saveTone('missions-meter-study-render-384x512.png',meterShots[meterChosenIndex]);
     console.log('WORK8 #104 genuine-meter native Chromium pigment sweep '+JSON.stringify({winner:meterChosen,results:meterResults}));
+
+    /* Final production gate: measure the ACTUAL committed CSS with no injected
+       test-only declarations, not merely the candidate suggested by the sweep. */
+    const productionLayout=await headingLayout();
+    const productionBorder=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(meterStudySelector)+')).borderTopColor');
+    const productionShot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const productionMetrics=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(meterRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        'data:image/png;base64,'+meterShots[0],'data:image/png;base64,'+productionShot])));
+    assert.equal(productionMetrics.length,2,'the actual before/after must be decoded');
+    const productionBefore=productionMetrics[0],productionAfter=productionMetrics[1];
+    const productionDeltas=Object.fromEntries(Object.keys(productionBefore)
+      .map(k=>[k,productionAfter[k as keyof typeof productionAfter]-productionBefore[k as keyof typeof productionBefore]]));
+    const actualOverlaysSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+meterShots[0]))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+productionShot));
+    assert.notEqual(actualOverlaysSource,source,'real native before/after must be distinct frames');
+    const actualOverlays=await evalJs(actualOverlaysSource);
+    saveTone('missions-meter-render-384x512.png',productionShot);
+    saveTone('missions-meter-original-before-overlay-384x512.png',actualOverlays.overlays[0]);
+    saveTone('missions-meter-original-render-overlay-384x512.png',actualOverlays.overlays[1]);
+    const actualMeterReport={
+      issue:104,baseHead:'1e4ecc50ba815886848fb9ef948c63f0f98c57a1',
+      changedCss:'only .w8-approved-missions .w8-approved-quest .w8-approved-meter border-color:#546e80',
+      original:'assets/design-approved/07-missoes.webp',
+      method:'same actual Chromium 384x512 DPR1 loaded frame, animations frozen and all source crops decoded',
+      before:productionBefore,after:productionAfter,delta:productionDeltas,
+      originalOverlayRoi:actualOverlays.metrics,
+      beforeBorder:meterBaselineBorder,afterBorder:productionBorder,
+      geometry:{before:meterBaselineLayout,after:productionLayout,meters:meterRects},
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-meter-native-final-ab.json'),JSON.stringify(actualMeterReport,null,2));
+    console.log('WORK8 #104 FINAL PRODUCTION native meter MAE '+JSON.stringify(actualMeterReport));
+    assert.deepEqual(meterBaselineLayout,productionLayout,
+      'no movement of real missions, seven chests, five-item dock or interactive tab/quest buttons');
+    assert.notEqual(meterBaselineBorder,productionBorder,'actual production meter color must change');
+    assert.equal(productionBorder,'rgb(84, 110, 128)','the validated dark-blue native winning border is shipped');
+    assert.ok(productionDeltas.meters<-.5 && productionDeltas.full<-.01 && productionDeltas.quests<-.05,
+      'real committed meter border must improve source MAE: meter, three quests and entire frame');
+    assert.ok(Math.abs(productionDeltas.chests)<.03 && Math.abs(productionDeltas.daily)<.03 &&
+      Math.abs(productionDeltas.dockDelta)<.05,
+      'no visual regressions in seven chests, daily board or shared dock');
+
     assert.equal(meterResults.length,11);
     assert.ok(meterResults.every(s=>s.dockDelta<.08),'meter paint must never alter global dock');
 
