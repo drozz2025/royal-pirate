@@ -90,7 +90,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        enable it only for the independent coastal A/B near the end. This
        preserves the exact original v0.1.75 baselines without relaxing
        their MAE or pixel-stability requirements. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -925,6 +925,59 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'genuine original day 4-6 source art must measurably improve both ROI and full-frame MAE');
     assert.ok(midCompare.metrics.quests.delta<.10&&midCompare.metrics.daily.delta<.25,
       'three real quests and overall daily reward board must not regress');
+
+
+    /* WORK8/#104: one loaded real Missions page, frozen animations and original
+       384x512 WebP, toggle ONLY the new dark-navy quest border paint.
+       No DOM reload, fake state, altered mission/reward or layout. */
+    const navyFlag='work8-missions-navy-border-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(navyFlag)+');true');
+    await delay(140);
+    const navyBeforeLayout=await headingLayout();
+    const navyBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(navyFlag)+');true');
+    await delay(140);
+    const navyAfterLayout=await headingLayout();
+    const navyAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const navySource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+navyBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+navyAfter))
+      .replace('quests:[12,155,372,321],daily:',
+        'quests:[12,155,372,321],questPlates:[14,156,371,318],questIcons:[14,157,72,318],questMeters:[74,174,224,310],daily:');
+    assert.notEqual(navySource,source,'navy A/B must use new real Chromium frame captures');
+    const navyComparison=await evalJs(navySource);
+    saveCoast('missions-navy-original-384x512.webp',orig);
+    saveCoast('missions-navy-before-384x512.png',navyBefore);
+    saveCoast('missions-navy-render-384x512.png',navyAfter);
+    saveCoast('missions-navy-original-before-overlay-384x512.png',navyComparison.overlays[0]);
+    saveCoast('missions-navy-original-render-overlay-384x512.png',navyComparison.overlays[1]);
+    const navyReport={
+      baseHead:'732093858b070f240e70f6c96fee0e678632cdb4',
+      scope:'07 Missões ONLY: genuine navy quest plate border paint, three real missions, seven real rewards',
+      reference:'assets/design-approved/07-missoes.webp',
+      otherReferences:['assets/design-approved/00-referencia-original-aprovada.webp',
+        'assets/design-approved/00-painel-oito-ecras.webp',
+        ...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+          '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(p=>'assets/design-approved/'+p)],
+      viewport:'384x512 native Chromium DPR1',method:'same decoded DOM, same paused animations, CSS root flag only',
+      roi:navyComparison.metrics,unchanged:navyComparison.unchanged,
+      beforeLayout:navyBeforeLayout,afterLayout:navyAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-navy-border-ab.json'),JSON.stringify(navyReport,null,2));
+    console.log('WORK8 native 07 navy quest border A/B '+JSON.stringify(navyReport.roi));
+    assert.deepEqual(navyBeforeLayout,navyAfterLayout,'paint must not move three missions or seven chests');
+    assert.equal(navyAfterLayout.questCount,3,'keep three authentic quests');
+    assert.equal(navyAfterLayout.dayCount,7,'keep seven actual rewards');
+    assert.equal(navyAfterLayout.dockCount,5,'keep shared dock five buttons');
+    assert.ok(navyAfterLayout.documentWidth<=386,'no horizontal overflow at 384');
+    assert.ok(navyComparison.unchanged.dock<.10&&navyComparison.unchanged.header<.10,
+      'shared five-item dock and header must be pixel-identical');
+    assert.ok(navyComparison.metrics.full.delta<-.08 && navyComparison.metrics.quests.delta<-.20 &&
+      navyComparison.metrics.questPlates.delta<-.20,
+      'native source requires significant full-screen and quest-border ROI improvement');
+    assert.ok(navyComparison.metrics.daily.delta<.10&&navyComparison.metrics.chests.delta<.10,
+      'seven actual daily reward chests and panel must not regress');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
