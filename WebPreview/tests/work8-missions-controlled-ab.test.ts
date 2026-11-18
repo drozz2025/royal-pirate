@@ -1550,6 +1550,14 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(180);
     if(browser?.exitCode===null)browser.kill('SIGKILL');
     if(vite.exitCode===null)vite.kill('SIGKILL');
-    rmSync(profile,{recursive:true,force:true,maxRetries:12,retryDelay:150});
+    // Chromium may still flush GPU profile files after SIGTERM/SIGKILL.
+    // Removing this temporary directory is housekeeping, never a reason to
+    // fail a successful real-DOM/visual regression. CI's ephemeral /tmp is
+    // discarded with the runner if a late Windows/Linux file handle remains.
+    try {
+      rmSync(profile,{recursive:true,force:true,maxRetries:24,retryDelay:250});
+    } catch (error) {
+      console.warn('WORK8 temporary Chromium profile cleanup deferred:',String(error));
+    }
   }
 });
