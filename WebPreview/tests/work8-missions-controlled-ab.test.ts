@@ -1497,7 +1497,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     saveCoast('missions-coast-tune-original-before-overlay-384x512.png',coastalOverlay.overlays[0]);
     saveCoast('missions-coast-tune-original-render-overlay-384x512.png',coastalOverlay.overlays[1]);
     const coastalReport={
-      issue:104,baseHead:'92450b35f0763da5f5d2ccf85f88f27b2f570efb',
+      issue:104,baseHead:'c92c8c821a8a0eabcafeb571705e2d79222a279f',
       reference:'assets/design-approved/07-missoes.webp',
       referenceSet:coastalRefPaths,viewport:'native Chromium 384x512 DPR1',
       method:'same decoded source SVG and live paused Chromium frame; genuine DOM, no mocked mission/claim status',
