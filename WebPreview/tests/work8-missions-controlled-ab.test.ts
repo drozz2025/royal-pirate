@@ -85,12 +85,13 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(decoded>=8,'title, three quest illustrations and four source chest crops must have loaded');
     await delay(340); // allow SVG image paint following source decode
     await evalJs('(()=>{document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
-    /* Previous immutable WORK8 A/B gates compare their own historical art.
-       Keep the newly proposed coast treatment disabled for those gates;
-       enable it only for the independent coastal A/B near the end. This
-       preserves the exact original v0.1.75 baselines without relaxing
-       their MAE or pixel-stability requirements. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline");true');
+    /* Previous WORK8 A/B gates compare their own unchanged artwork.
+       The current production coastal SVG is now unfiltered because the old
+       dimmer demonstrably regressed native approved-art MAE. Keep it in
+       production mode for all earlier gates; activate ONLY the old dimmer
+       in the isolated coastal BEFORE capture below. All prior thresholds
+       and source WebP references remain unchanged. */
+    await evalJs('document.documentElement.classList.add("work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -764,10 +765,11 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(registerComparison.metrics.daily.delta<.60&&Math.abs(registerComparison.metrics.chests.delta)<.08,
       'daily/chest content must remain stable apart from <=0.6 boundary shadow MAE');
 
-    /* WORK8/#104 — independent sea-color comparison using the SAME real
-       decoded + paused 384x512 Chromium frame. No captured image is rendered
-       into the application, no state is forged. The original 07 WebP is used
-       only as the numerical A/B source. */
+    /* WORK0/#104 — isolated regression gate on the SAME live Chromium scene
+       and approved 07 WebP. BEFORE re-enables the rejected .80 coastal
+       dimmer; AFTER is the new, unfiltered production SVG. Both captures
+       use the same decoded assets, viewport, data and paused animations.
+       No screenshots are used as in-app backgrounds or fabricated data. */
     const coastFlag='work8-missions-coast-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(coastFlag)+');true');
     await delay(150);
@@ -790,7 +792,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     saveCoast('missions-coast-original-render-overlay-after-384x512.png',coastComparison.overlays[1]);
     const coastReport={
       baseHead:'840c02bc4bf2e5fa43b853f60cfb807f5beb07ab',
-      version:'v0.1.75',scope:'ONLY 07 Missões coastal panorama ink, no geometry or game-data edits',
+      version:'v0.1.84',scope:'ONLY 07 Missões: remove proven regressive coastal dimmer, no geometry or game-data edits',
       source:'assets/design-approved/07-missoes.webp, 384x512 native without resampling',
       otherReferences:['assets/design-approved/00-referencia-original-aprovada.webp','assets/design-approved/00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(n=>'assets/design-approved/'+n)],
       method:'same Chromium tab, same paused animation frame, native DPR 1, root CSS pigment toggle',
