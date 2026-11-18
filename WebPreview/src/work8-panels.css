@@ -5317,14 +5317,14 @@
 }
 
 /* WORK8/#104 — 07 Missões exclusively. The approved 384×512 reference has
-   significantly deeper green enamel around the genuine claimed rewards.
-   Darken ONLY the existing chest illustrations of actually claimed days,
-   never change the day state, checked mark, reward count, hitbox or caption.
+   significantly deeper green enamel around the three real starting-day chest figures.
+   Darken ONLY the first three genuine chest illustrations, without suggesting they were claimed,
+   never change claim state, conditional checked marks, value, hitbox or caption.
    A root opt-out permits exact same-frame Chromium A/B versus the current
    source art. No changes to Ranking, Porto, WORK0 shell/dock or economy. */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
-  :root:not(.work8-missions-claimed-engraving-ab-baseline) .w8-approved-missions
-  .w8-approved-days li.is-claimed .w8-approved-chest {
+  :root:not(.work8-missions-starter-engraving-ab-baseline) .w8-approved-missions
+  .w8-approved-days li:nth-child(-n+3) .w8-approved-chest {
     filter:brightness(.76) saturate(.95);
   }
 }
