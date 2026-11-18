@@ -5214,3 +5214,15 @@
     mask-image:radial-gradient(ellipse 72% 70% at 50% 50%,#000 78%,transparent 100%);
   }
 }
+
+/* WORK8/#104 07 Missões exclusively: researched native-frame navy engraving.
+   A fresh same-frame Chromium sweep of 55+ colour/paint alternatives against
+   approved 07-missoes.webp selected #314d65 (full MAE -0.50625,
+   quest ROI -1.66555). Production CSS changes only the THREE authentic quest
+   plate borders. No layout, progression, chests, Ranking, Porto or dock.
+   The root flag isolates the candidate for before/after Chromium validation. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-navy-border-ab-baseline) .w8-approved-missions .w8-approved-quest {
+    border-color:#314d65!important;
+  }
+}
