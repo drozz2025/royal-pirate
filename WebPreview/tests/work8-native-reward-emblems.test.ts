@@ -107,6 +107,41 @@ test('07 Missions: original painted coin/gem emblems native 384x512 A/B', {timeo
     const injected=script.replace('__ORIGINAL__',JSON.stringify('data:image/webp;base64,'+original))
       .replace('__BEFORE__',JSON.stringify('data:image/png;base64,'+before))
       .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+after));
+
+    /* Diagnostic sweep: no acceptance criteria are relaxed; rejected candidates
+       are never deployed. Real same-frame captures quantify pigment masks. */
+    const variants=[
+      {name:'screen',blend:'screen',mask:'none',opacity:1,shift:0,top:0},
+      {name:'lighten',blend:'lighten',mask:'none',opacity:1,shift:0,top:0},
+      {name:'multiply',blend:'multiply',mask:'none',opacity:1,shift:0,top:0},
+      {name:'screen-60',blend:'screen',mask:'none',opacity:.6,shift:0,top:0},
+      {name:'lighten-60',blend:'lighten',mask:'none',opacity:.6,shift:0,top:0},
+      {name:'screen-shift-5',blend:'screen',mask:'none',opacity:1,shift:-5,top:0},
+      {name:'lighten-shift-5',blend:'lighten',mask:'none',opacity:1,shift:-5,top:0},
+      {name:'mask',blend:'normal',mask:'radial-gradient(ellipse 65% 65% at 50% 50%,#000 58%,transparent 90%)',opacity:1,shift:0,top:0},
+      {name:'screen-mask',blend:'screen',mask:'radial-gradient(ellipse 65% 65% at 50% 50%,#000 58%,transparent 90%)',opacity:1,shift:0,top:0},
+      {name:'screen-mask-shift',blend:'screen',mask:'radial-gradient(ellipse 65% 65% at 50% 50%,#000 58%,transparent 90%)',opacity:1,shift:-5,top:0},
+      {name:'screen-shift-down',blend:'screen',mask:'none',opacity:1,shift:-5,top:3},
+      {name:'screen-shift-up',blend:'screen',mask:'none',opacity:1,shift:-5,top:-3}
+    ];
+    const scores:any[]=[];
+    for(const cfg of variants){
+      await evalJs('(()=>{const x='+JSON.stringify(cfg)+';for(const el of document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem")){el.style.mixBlendMode=x.blend;el.style.opacity=x.opacity;el.style.webkitMaskImage=x.mask;el.style.maskImage=x.mask;el.style.left="calc(50% + "+x.shift+"px)";el.style.top=(-5+x.top)+"px"}return true})()');
+      await delay(65);
+      const snap=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      const expr=script.replace('__ORIGINAL__',JSON.stringify('data:image/webp;base64,'+original))
+        .replace('__BEFORE__',JSON.stringify('data:image/png;base64,'+before))
+        .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+snap));
+      const check=await evalJs(expr);
+      const sample={name:cfg.name,full:check.metrics.full.delta,rewardIcons:check.metrics.rewardIcons.delta,missions:check.metrics.missions.delta,daily:check.metrics.daily.delta};
+      scores.push(sample);
+      if(sample.full<-.005&&sample.rewardIcons<-.15){
+        writeFileSync(join(evidence,'missions-reward-icons-sweep-'+cfg.name+'.png'),Buffer.from(snap,'base64'));
+      }
+    }
+    console.log('WORK8 original reward-icon pigment sweep '+JSON.stringify(scores));
+    await evalJs('(()=>{for(const el of document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem")){el.style.removeProperty("mix-blend-mode");el.style.removeProperty("opacity");el.style.removeProperty("-webkit-mask-image");el.style.removeProperty("mask-image");el.style.removeProperty("left");el.style.removeProperty("top")}return true})()');
+
     const compared=await evalJs(injected);
     const save=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
     save('missions-reward-icons-original-384x512.webp',original);
