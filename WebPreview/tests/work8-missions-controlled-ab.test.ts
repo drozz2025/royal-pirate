@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1318,6 +1318,127 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'authentic chest artwork must improve source MAE both in chest ROI and full scene');
     assert.ok(chestInkComparison.metrics.quests.delta<.08,
       'the three live missions cannot regress with a chest-only change');
+
+
+    /* WORK8/#104 — independent mission-meter pigment study. The original approved
+       384x512 source and every candidate use ONE paused native Chromium DOM/frame.
+       Styling applies ONLY to the three local real progress bars, never to
+       Ranking 08, shared shell, buttons, reward data or seven chest tiles.
+       This study determines a measured source-colour choice before shipping CSS. */
+    await evalJs('document.documentElement.classList.add("work8-missions-meter-ink-ab-baseline");true');
+    const meterStudySelector='.w8-approved-missions .w8-approved-quest .w8-approved-meter';
+    const meterRects=await evalJs('(()=>[...document.querySelectorAll('+JSON.stringify(meterStudySelector)+')].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
+    assert.equal(meterRects.length,3,'three actual mission meters, no mock progress');
+    const meterBaselineLayout=await headingLayout();
+    const meterBaselineBorder=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(meterStudySelector)+')).borderTopColor');
+    const meterStyleId='work8-meter-study-only';
+    const meterVariants=[
+      ['released',''],
+      ['darker-94','filter:brightness(.94)!important'],
+      ['darker-88','filter:brightness(.88)!important'],
+      ['brighter-106','filter:brightness(1.06)!important'],
+      ['brighter-112','filter:brightness(1.12)!important'],
+      ['pewter-edge','border-color:#748d97!important'],
+      ['deep-edge','border-color:#546e80!important'],
+      ['warm-edge','border-color:#a08b70!important'],
+      ['deep-sea','background:#061b2c!important'],
+      ['quiet-green','filter:saturate(.86)!important'],
+      ['rich-green','filter:saturate(1.12)!important']
+    ] as const;
+    const meterShots:string[]=[];
+    for(const [name,paint] of meterVariants){
+      await evalJs('(()=>{let s=document.getElementById('+JSON.stringify(meterStyleId)+');if(!s){s=document.createElement("style");s.id='+JSON.stringify(meterStyleId)+';document.head.append(s)}s.textContent='+JSON.stringify(paint?meterStudySelector+'{'+paint+'}':'')+';return true})()');
+      await delay(110);
+      meterShots.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    }
+    await evalJs('document.getElementById('+JSON.stringify(meterStyleId)+')?.remove();true');
+    await evalJs('document.documentElement.classList.remove("work8-missions-meter-ink-ab-baseline");true');
+    const meterStudySource=String.raw`(async()=>{
+      const imgs=await Promise.all(__IMAGES__.map(s=>new Promise((resolve,reject)=>{let i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=s})));
+      const w=384,h=512;if(imgs.some(i=>i.width!==w||i.height!==h))throw Error('unscaled native-only inputs');
+      const px=imgs.map(i=>{const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.drawImage(i,0,0);return ctx.getImageData(0,0,w,h).data});
+      const rectangles=__RECTS__, clamp=n=>Math.max(0,Math.min(n,384));
+      function mae(a,b,rs){let sum=0,n=0;for(const [l,t,r,bo] of rs)for(let y=Math.max(0,Math.floor(t));y<Math.min(h,Math.ceil(bo));y++)for(let x=clamp(Math.floor(l));x<clamp(Math.ceil(r));x++){let p=(y*w+x)*4;for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++}}return sum/n}
+      const source=px[0], scores=px.slice(1).map(img=>({
+        full:mae(source,img,[[0,0,384,512]]),
+        meters:mae(source,img,rectangles),
+        quests:mae(source,img,[[12,155,372,321]]),
+        daily:mae(source,img,[[13,325,373,436]]),
+        chests:mae(source,img,[[20,356,370,427]]),
+        dockDelta:mae(px[1],img,[[0,451,384,512]])
+      }));
+      return scores;
+    })()`;
+    const meterComparison=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(meterRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,...meterShots.map(s=>'data:image/png;base64,'+s)])));
+    const meterResults=meterVariants.map(([name],i)=>({name,...meterComparison[i],
+      meterDelta:meterComparison[i].meters-meterComparison[0].meters,
+      fullDelta:meterComparison[i].full-meterComparison[0].full}));
+    const meterWinners=meterResults.filter(s=>s.meterDelta<-.001&&s.fullDelta<-.001&&Math.abs(s.dockDelta)<.08)
+      .sort((a,b)=>a.fullDelta-b.fullDelta);
+    const meterChosen=meterWinners[0]??meterResults[0];
+    const meterChosenIndex=meterResults.findIndex(s=>s.name===meterChosen.name);
+    writeFileSync(join(evidence,'work8-missions-meter-study-native-ab.json'),JSON.stringify({
+      issue:104,baseHead:'1e4ecc50ba815886848fb9ef948c63f0f98c57a1',
+      reference:'assets/design-approved/07-missoes.webp',
+      refs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(s=>'assets/design-approved/'+s),
+      native:'Chromium 384x512 DPR1, single real paused DOM/frame, 3 actual meter boxes',
+      meterRects,results:meterResults,winner:meterChosen,approved:false,approvedScreens:0
+    },null,2));
+    saveTone('missions-meter-original-384x512.webp',orig);
+    saveTone('missions-meter-before-384x512.png',meterShots[0]);
+    saveTone('missions-meter-study-render-384x512.png',meterShots[meterChosenIndex]);
+    console.log('WORK8 #104 genuine-meter native Chromium pigment sweep '+JSON.stringify({winner:meterChosen,results:meterResults}));
+
+    /* Final production gate: measure the ACTUAL committed CSS with no injected
+       test-only declarations, not merely the candidate suggested by the sweep. */
+    const productionLayout=await headingLayout();
+    const productionBorder=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(meterStudySelector)+')).borderTopColor');
+    const productionShot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const productionMetrics=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(meterRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        'data:image/png;base64,'+meterShots[0],'data:image/png;base64,'+productionShot])));
+    assert.equal(productionMetrics.length,2,'the actual before/after must be decoded');
+    const productionBefore=productionMetrics[0],productionAfter=productionMetrics[1];
+    const productionDeltas=Object.fromEntries(Object.keys(productionBefore)
+      .map(k=>[k,productionAfter[k as keyof typeof productionAfter]-productionBefore[k as keyof typeof productionBefore]]));
+    const actualOverlaysSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+meterShots[0]))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+productionShot));
+    assert.notEqual(actualOverlaysSource,source,'real native before/after must be distinct frames');
+    const actualOverlays=await evalJs(actualOverlaysSource);
+    saveTone('missions-meter-render-384x512.png',productionShot);
+    saveTone('missions-meter-original-before-overlay-384x512.png',actualOverlays.overlays[0]);
+    saveTone('missions-meter-original-render-overlay-384x512.png',actualOverlays.overlays[1]);
+    const actualMeterReport={
+      issue:104,baseHead:'1e4ecc50ba815886848fb9ef948c63f0f98c57a1',
+      changedCss:'only .w8-approved-missions .w8-approved-quest .w8-approved-meter border-color:#546e80',
+      original:'assets/design-approved/07-missoes.webp',
+      method:'same actual Chromium 384x512 DPR1 loaded frame, animations frozen and all source crops decoded',
+      before:productionBefore,after:productionAfter,delta:productionDeltas,
+      originalOverlayRoi:actualOverlays.metrics,
+      beforeBorder:meterBaselineBorder,afterBorder:productionBorder,
+      geometry:{before:meterBaselineLayout,after:productionLayout,meters:meterRects},
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-meter-native-final-ab.json'),JSON.stringify(actualMeterReport,null,2));
+    console.log('WORK8 #104 FINAL PRODUCTION native meter MAE '+JSON.stringify(actualMeterReport));
+    assert.deepEqual(meterBaselineLayout,productionLayout,
+      'no movement of real missions, seven chests, five-item dock or interactive tab/quest buttons');
+    assert.notEqual(meterBaselineBorder,productionBorder,'actual production meter color must change');
+    assert.equal(productionBorder,'rgb(84, 110, 128)','the validated dark-blue native winning border is shipped');
+    assert.ok(productionDeltas.meters<-.5 && productionDeltas.full<-.01 && productionDeltas.quests<-.05,
+      'real committed meter border must improve source MAE: meter, three quests and entire frame');
+    assert.ok(Math.abs(productionDeltas.chests)<.03 && Math.abs(productionDeltas.daily)<.03 &&
+      Math.abs(productionDeltas.dockDelta)<.05,
+      'no visual regressions in seven chests, daily board or shared dock');
+
+    assert.equal(meterResults.length,11);
+    assert.ok(meterResults.every(s=>s.dockDelta<.08),'meter paint must never alter global dock');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
