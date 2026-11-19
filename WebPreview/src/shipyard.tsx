@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   DEFAULT_MODULES, SHIP_CLASSES, SHIP_MODULES, SLOTS, progressionTier, equipAccess,
-  mayEquip, validateOwnedLoadout, type ModuleSlot, type ShipClass, type ShipLoadout, type ResolvedShipLoadout
+  mayEquip, validateOwnedLoadoutForPlayer, type ModuleSlot, type ShipClass, type ShipLoadout, type ResolvedShipLoadout
 } from './ship-modules';
 
 /** Optional Work 4 interface: never infer entitlements from demo preview progress. */
@@ -9,6 +9,8 @@ type ShipyardProps={
  onClose:()=>void;
  onPreview:(loadout:ShipLoadout)=>void;
  ownedModuleIds?:ReadonlySet<string>;
+ /** Player's real, independently verified level; NEVER the preview slider. */
+ verifiedPlayerLevel?:number;
  onEquip?:(loadout:ResolvedShipLoadout)=>void;
 };
 const SLOT_NAMES:Record<ModuleSlot,string>={
@@ -18,7 +20,7 @@ const SLOT_NAMES:Record<ModuleSlot,string>={
 
 /** Interactive ship construction sandbox. Nothing here is purchased, owned,
  * persisted, awarded or injected into combat; only original 3D parts are previewed. */
-export function Shipyard({onClose,onPreview,ownedModuleIds,onEquip}:ShipyardProps){
+export function Shipyard({onClose,onPreview,ownedModuleIds,verifiedPlayerLevel,onEquip}:ShipyardProps){
  const [shipClass,setShipClass]=useState<ShipClass>('fighter');
  const [level,setLevel]=useState(1);
  const [slot,setSlot]=useState<ModuleSlot>('hull');
@@ -34,8 +36,18 @@ export function Shipyard({onClose,onPreview,ownedModuleIds,onEquip}:ShipyardProp
  const items=SHIP_MODULES.filter(m=>m.slot===slot);
  const active=selected[slot]??DEFAULT_MODULES[slot];
  const draftLoadout:ShipLoadout={shipClass,level,modules:selected};
- const equipEnabled=!!onEquip&&!!ownedModuleIds&&SLOTS.every(s=>mayEquip(selected[s]??DEFAULT_MODULES[s],level,ownedModuleIds));
- const equipVerified=()=>{if(onEquip&&ownedModuleIds&&equipEnabled)onEquip(validateOwnedLoadout(draftLoadout,ownedModuleIds));};
+ // The level slider is a preview-only control. It cannot authorize real upgrades.
+ // Any real equip action requires a separately verified player level AND ownership.
+ const verifiedLevelMatches=typeof verifiedPlayerLevel==='number'
+  &&Number.isInteger(verifiedPlayerLevel)&&verifiedPlayerLevel>=1
+  &&verifiedPlayerLevel<=20&&verifiedPlayerLevel===level;
+ const equipEnabled=!!onEquip&&!!ownedModuleIds&&verifiedLevelMatches
+  &&SLOTS.every(s=>mayEquip(selected[s]??DEFAULT_MODULES[s],verifiedPlayerLevel,ownedModuleIds));
+ const equipVerified=()=>{
+  if(onEquip&&ownedModuleIds&&equipEnabled&&verifiedPlayerLevel!==undefined){
+   onEquip(validateOwnedLoadoutForPlayer(draftLoadout,ownedModuleIds,verifiedPlayerLevel));
+  }
+ };
  return <section className="shipyard-screen" aria-label="Ship customisation 3D sandbox">
   <header className="shipyard-header">
    <button type="button" className="shipyard-back" onClick={onClose} aria-label="Return to harbour">‹ PORT</button>
@@ -84,9 +96,9 @@ export function Shipyard({onClose,onPreview,ownedModuleIds,onEquip}:ShipyardProp
     })}
    </div>
    {onEquip&&<button type="button" className="shipyard-equip" disabled={!equipEnabled} onClick={equipVerified} aria-label="Equip only fully owned and level-unlocked modules">
-    {equipEnabled?'EQUIP VERIFIED FLEET':'EQUIP UNAVAILABLE — OWNERSHIP REQUIRED'}
+    {equipEnabled?'EQUIP VERIFIED FLEET':!verifiedLevelMatches?'EQUIP UNAVAILABLE — VERIFIED LEVEL REQUIRED':'EQUIP UNAVAILABLE — OWNERSHIP REQUIRED'}
    </button>}
-   <p className="shipyard-legal">VISUAL SANDBOX ONLY · Level unlocks are not purchases or ownership. Preview changes are not saved and do not affect battle. {ownedModuleIds?'Ownership supplied by connected game service.':'Ownership verification is not connected.'}</p>
+   <p className="shipyard-legal">VISUAL SANDBOX ONLY · Level unlocks are not purchases or ownership. Preview changes are not saved and do not affect battle. {ownedModuleIds?'Ownership data supplied by the connected game service.':'Ownership verification is not connected.'} {verifiedLevelMatches?'Preview matches the verified player level.':'The preview slider cannot replace a verified player level.'}</p>
   </div>
  </section>;
 }
