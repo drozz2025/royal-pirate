@@ -80,7 +80,7 @@ test('WORK5 bottom dock: all twelve pages have five honest actions with correct 
     const buttons=descendants(tree,'button');
     assert.equal(buttons.length,5,'five approved dock controls: '+screen);
     const active=screen==='forge'?'fleet':screen==='profile'?'ranking':
-      tabDestinations.includes(screen)?screen:null;
+      tabDestinations.includes(screen)?screen:undefined;
     const expected:AppScreenId[]=[];
     for(let i=0;i<5;i++){
       const b=buttons[i],target=tabDestinations[i];
