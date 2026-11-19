@@ -23,6 +23,7 @@ test('WORK4 Forge workshop underlay sweep checks all 10 approved design referenc
  assert.match(css,/contain:paint/);
  assert.match(css,/transform:translateZ\(0\)/);
  assert.match(css,/background-color:#2d2929!important/);
+ assert.match(css,/background-color:#272324!important/);
 });
 
 const chrome=[process.env.CHROME_BIN,'chromium','google-chrome'].filter(Boolean)
@@ -150,7 +151,7 @@ test('WORK4 Forge native workshop underlay A/B: same-frame full/scene/cannon/hea
     "const records=shots.map((shot,i)=>{const roi={};for(const [name,box] of Object.entries(boxes))roi[name]={mae:mae(a,shot,box),changedPixels:count(shots[0],shot,box)};return {index:i,roi};});"+
     "const baseline=records[0];"+
     "const globalWinner=[...records].filter(r=>r.roi.costs.changedPixels===0&&r.roi.dock.changedPixels===0).sort((x,y)=>(x.roi.full.mae-y.roi.full.mae))[0];"+
-    "const valid=records.filter(r=>r.roi.costs.changedPixels===0&&r.roi.dock.changedPixels===0&&['full','workshop','seam','cannon','furnace'].every(name=>r.roi[name].mae<=baseline.roi[name].mae+0.005));"+
+    "const valid=records.filter(r=>r.roi.costs.changedPixels===0&&r.roi.dock.changedPixels===0&&['full','workshop','seam','cannon','furnace'].every(name=>r.roi[name].mae<=baseline.roi[name].mae));"+
     "valid.sort((x,y)=>(x.roi.full.mae-y.roi.full.mae)||(x.roi.workshop.mae-y.roi.workshop.mae)||(x.roi.furnace.mae-y.roi.furnace.mae));"+
     "const best=valid[0];if(!best)throw Error('baseline must remain an admissible candidate');"+
     "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;const g=canvas.getContext('2d');g.drawImage(original,0,0);g.drawImage(screens[0],384,0);g.drawImage(screens[best.index],768,0);g.drawImage(original,1152,0);g.globalAlpha=.5;g.drawImage(screens[best.index],1152,0);"+
@@ -164,13 +165,26 @@ test('WORK4 Forge native workshop underlay A/B: same-frame full/scene/cannon/hea
   assert.ok(candidate.roi.full.mae<=result.baseline.roi.full.mae+0.005);
   assert.equal(candidate.roi.costs.changedPixels,0);
   assert.equal(candidate.roi.dock.changedPixels,0);
+  // The actually proposed workshop pigment must beat the merged original
+  // in every relevant comparison, not merely win a global-only score.
+  const production=result.records[12]; // #272324, merged HEAD is index zero
+  assert.equal(variants[12].color,'#272324');
+  for(const roi of ['full','workshop','seam']){
+    assert.ok(production.roi[roi].mae < result.baseline.roi[roi].mae,
+      'production workshop pigment must improve '+roi+' source MAE');
+  }
+  for(const roi of ['cannon','furnace','costs','dock']){
+    assert.equal(production.roi[roi].changedPixels,0,
+      'production cannot repaint protected '+roi+' pixels');
+  }
   const report={approved:false,screensApproved:0,viewport:'384x512',reference:'04-melhorias-forja.webp',
     frame:'same real Forge screen and paused animation frame; source-approved cannon and furnace preserved; only workshop pigment swept',geometry,
     candidates:variants.map((paint,i)=>({...result.records[i],paint})),
     globalWinner:variants[result.globalWinnerIndex],safeWinner:variants[result.bestIndex],
-    decision:result.bestIndex===0?'Do not change released workshop paint: no safe measured improvement':'Candidate improves safe ROIs, not yet implemented; require a follow-up production commit and human approval'};
+    productionPigment:'#272324',production:result.records[12],
+    decision:'Source-matched underlay #272324 implemented in WORK4 CSS after safe per-ROI A/B; human artistic approval still required'};
   writeFileSync(join(qa,'work4-forge-workshop-underlay-384x512.json'),JSON.stringify(report,null,2)+'\n');
   writeFileSync(join(qa,'original-before-best-overlay-forge-workshop-384x512.png'),Buffer.from(result.grid,'base64'));
-  console.log('WORK4_FORGE_WORKSHOP_UNDERLAY_SWEEP '+JSON.stringify({globalWinner:report.globalWinner,safeWinner:report.safeWinner,decision:report.decision,baseline:report.candidates[0],winner:report.candidates[result.bestIndex],geometry,
+  console.log('WORK4_FORGE_WORKSHOP_UNDERLAY_SWEEP '+JSON.stringify({globalWinner:report.globalWinner,safeWinner:report.safeWinner,decision:report.decision,baseline:report.candidates[0],winner:report.candidates[result.bestIndex],production:report.candidates[12],geometry,
     roiSummary:report.candidates.map(x=>({paint:x.paint,full:x.roi.full.mae,workshop:x.roi.workshop.mae,seam:x.roi.seam.mae,cannon:x.roi.cannon.mae,furnace:x.roi.furnace.mae}))}));
 });
