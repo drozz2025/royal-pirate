@@ -15,7 +15,7 @@ test('WORK0: painted sea replaces tight tiled highlights in Batalha only',()=>{
   assert.match(battle,/broad, interleaved painted swells/);
   assert.match(battle,/float longSwell=/);
   assert.match(battle,/float hullSurf=/);
-  assert.match(battle,/foam=clamp\(foam,0\.,\.49\)/);
+  assert.match(battle,/foam=clamp\(foam,0\.,\.64\)/);
   assert.doesNotMatch(battle,/float flecks=|float stipple=|float pattern=/);
   assert.match(scene,/this\.water\.uniforms\.battleMode\.value=0/);
   assert.match(scene,/this\.water\.uniforms\.battleMode\.value=1/);
