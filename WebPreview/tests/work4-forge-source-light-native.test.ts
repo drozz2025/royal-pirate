@@ -21,8 +21,8 @@ test('WORK4 native source-light: mandatory originals, one scoped media rule, no 
    assert.equal(b.toString('ascii',8,12),'WEBP',n);
  }
  assert.match(own,/@media \(width:384px\) and \(height:512px\)/);
- assert.match(own,/svg\.w4-reference-cannon > ellipse:first-of-type/);
- assert.match(own,/svg\.w4-reference-cannon > ellipse:last-of-type/);
+ assert.match(own,/\.w4-forge-scene > svg\.w4-cannon-art\.w4-reference-cannon > ellipse:first-of-type/);
+ assert.match(own,/\.w4-forge-scene > svg\.w4-cannon-art\.w4-reference-cannon > ellipse:last-of-type/);
  assert.match(own,/opacity:\.20/);
  assert.match(own,/opacity:\.25/);
  const declarations=own.replace(/@media[^{}]*\{/g,'');
@@ -125,15 +125,15 @@ test('WORK4 Forge: authentic source hearth light A/B, fixed native frame and pro
     '.w4-forge svg.w4-reference-cannon > ellipse:first-of-type',
     '.w4-forge svg.w4-reference-cannon > ellipse:last-of-type'
   ];
-  const oldValues=[1,1],newValues=[.20,.25];
+  const oldValues=[0,0],newValues=[.20,.25],otherViewportValues=[1,1];
   const geometry=await evaluate("(()=>{const box=s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]};return {cannon:document.querySelectorAll('.w4-forge svg.w4-reference-cannon').length,levels:document.querySelectorAll('.w4-forge .w4-forge-live-level').length,costs:document.querySelectorAll('.w4-forge .w4-resource-grid > div').length,dock:document.querySelectorAll('.app-sheet .harbour-nav.app-dock-porto .harbour-nav-item').length,art:box('.w4-forge svg.w4-reference-cannon'),plaque:box('.w4-forge .w4-forge-description'),materials:box('.w4-forge .w4-materials'),action:box('.w4-forge .w4-improve-button'),dockBox:box('.app-sheet .harbour-nav.app-dock-porto')}})()");
   assert.equal(geometry.cannon,1,'no duplicate source cannon');
   assert.equal(geometry.levels,3,'three genuine saved upgrade levels');
   assert.equal(geometry.costs,3,'three genuine real cost cells');
   assert.equal(geometry.dock,5,'five shared navigation targets');
   await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const href=document.querySelector('svg.w4-reference-cannon image')?.getAttribute('href');if(!href||!(await fetch(href)).ok)throw Error('approved source image not loaded');return true;})()");
-  const legacy=".w4-forge svg.w4-reference-cannon > ellipse:first-of-type{opacity:1!important}"+
-    ".w4-forge svg.w4-reference-cannon > ellipse:last-of-type{opacity:1!important}";
+  const legacy=".w4-forge svg.w4-reference-cannon > ellipse:first-of-type{opacity:0!important}"+
+    ".w4-forge svg.w4-reference-cannon > ellipse:last-of-type{opacity:0!important}";
   await evaluate("(()=>{let s=document.createElement('style');s.id='work4-legacy-light-ab';s.textContent="+JSON.stringify(legacy)+";document.head.append(s);return true})()");
   const values=async()=>await evaluate("(()=>["+selectors.map(s=>"getComputedStyle(document.querySelector("+JSON.stringify(s)+")).opacity").join(",")+"])()");
   const baselineValues=await values();
@@ -163,7 +163,7 @@ test('WORK4 Forge: authentic source hearth light A/B, fixed native frame and pro
     "const cl=(v,hi)=>Math.max(0,Math.min(hi,Math.round(v)));"+
     "const rect=v=>v?[cl(v[0],384),cl(v[1],512),cl(v[2],384),cl(v[3],512)]:[0,0,0,0];"+
     "const g="+JSON.stringify(geometry)+";"+
-    "const boxes={full:[0,0,384,512],cannonArt:rect(g.art),plaque:rect(g.plaque),materials:rect(g.materials),action:rect(g.action),dock:rect(g.dockBox)};"+
+    "const boxes={full:[0,0,384,512],cannonArt:rect(g.art),cannonBarrel:[30,220,176,313],furnace:[115,217,180,307],plaque:rect(g.plaque),materials:rect(g.materials),action:rect(g.action),dock:rect(g.dockBox)};"+
     "const score=(u,v,box)=>{let sum=0,count=0,changed=0;for(let y=box[1];y<box[3];y++)for(let x=box[0];x<box[2];x++){const j=(384*y+x)*4;let diff=false;for(let k=0;k<3;k++){sum+=Math.abs(u[j+k]-v[j+k]);count++;if(u[j+k]!==v[j+k])diff=true;}if(diff)changed++;}return {mae:count?sum/count:null,changedPixels:changed,box};};"+
     "const roi={};for(const [name,box] of Object.entries(boxes)){const p=score(A,B,box),q=score(A,C,box),d=score(B,C,box);roi[name]={before:p.mae,after:q.mae,changedPixels:d.changedPixels,box};}"+
     "const cn=document.createElement('canvas');cn.width=1536;cn.height=512;const ct=cn.getContext('2d');"+
@@ -182,13 +182,13 @@ test('WORK4 Forge: authentic source hearth light A/B, fixed native frame and pro
   for(const [width,height] of [[320,568],[390,844],[430,932]]){
     await viewport(width,height);await delay(120);
     const v=await values();
-    v.forEach((s:string,i:number)=>assert.ok(Math.abs(Number(s)-oldValues[i])<.001,'other viewport must preserve legacy light '+width+' '+i));
+    v.forEach((s:string,i:number)=>assert.ok(Math.abs(Number(s)-otherViewportValues[i])<.001,'other viewport must preserve its original SVG light '+width+' '+i));
     const screenshot=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
     writeFileSync(join(qa,'work4-forge-source-light-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
     responsive.push({width,height,legacyValues:v});
   }
   const report={approved:false,screensApproved:0,source:'assets/design-approved/04-melhorias-forja.webp',viewport:'384x512',
-    control:'single Chromium scene, frozen animations, same data/geometry, legacy SVG stops vs new CSS stops',
+    control:'single Chromium scene, frozen animations, same data/geometry, released opacity:0 vs measured candidate opacity:.20/.25',
     originalReferenceSet:'00 original, 00 mosaic, 01–08',
     oldValues,newValues,geometry,roi:measured.roi,responsive,
     interpretation:'MAE is numeric distance only; human approval is still mandatory'};
