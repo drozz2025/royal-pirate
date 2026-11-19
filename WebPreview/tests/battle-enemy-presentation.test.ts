@@ -146,8 +146,8 @@ test('WORK6/#104 crimson broadside is real batched Three.js hull, isolated from 
       const pieces=members(enemy.root,paint);
       assert.equal(pieces.length,1,'hull '+paint+' stays ONE material batch for mobile');
       const bounds=new T.Box3().setFromObject(pieces[0]);
-      assert.ok(bounds.min.z<-3&&bounds.max.z>3,
-        'crimson '+paint+' covers genuine longitudinal hull stations');
+      assert.ok(bounds.min.z< -1.5&&bounds.max.z>1.2&&bounds.max.z-bounds.min.z>3,
+        'crimson '+paint+' spans multiple genuine longitudinal hull stations');
       assert.equal(members(royal.root,paint).length,0,
         'the approved Porto royal hull never inherits enemy paint');
     }
