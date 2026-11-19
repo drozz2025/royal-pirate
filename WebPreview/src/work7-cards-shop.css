@@ -4319,3 +4319,22 @@
     filter:brightness(.40) saturate(1.75) contrast(.79);
   }
 }
+
+
+/* WORK7/#104 — 19 Nov 00:23 UTC. Native carved-frame material: originals 05 slots 5 & 6.
+ * Ref: approved 00 master, eight-screen mosaic, 01–08 individual WebP.
+ * The lower true 4×2 card row remains the same source art and geometry.
+ * Deepen the *existing* purple/blue enamel illumination only on slots 5/6,
+ * retaining the physical carved rim, labels and interactive dimensions.
+ * No screenshot page backgrounds, no economy or shared layout changes.
+ * 384×512 ONLY: untouched 320×568, tall/mobile, 06, Porto/dock/shell.
+ * A/B injects exact pre-branch paint in the same frozen Chromium frame.
+ * Work0 owns merge/release. approved:false; 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.42) saturate(2.00) contrast(.85);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+    filter:brightness(.61) saturate(1.30) contrast(.92);
+  }
+}
