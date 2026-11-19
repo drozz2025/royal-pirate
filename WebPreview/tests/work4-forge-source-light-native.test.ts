@@ -142,6 +142,12 @@ test('WORK4 Forge: authentic source hearth light A/B, fixed native frame and pro
   const before=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
   await evaluate("document.getElementById('work4-legacy-light-ab')?.remove();true");
   const actual=await values();
+  console.log('WORK4_FORGE_LIGHT_CSS_DIAG '+JSON.stringify(await evaluate(
+    "(()=>({viewport:[innerWidth,innerHeight],media:matchMedia('(width:384px) and (height:512px)').matches,"+
+    "selectors:"+JSON.stringify([".w4-forge svg.w4-reference-cannon > ellipse:first-of-type",".w4-forge svg.w4-reference-cannon > ellipse:last-of-type"])+".map(s=>({selector:s,count:document.querySelectorAll(s).length,opacity:document.querySelector(s)&&getComputedStyle(document.querySelector(s)).opacity,outer:document.querySelector(s)?.outerHTML.slice(0,200)})),"+
+    "cssRulePresent:[...document.styleSheets].some(s=>{try{return [...s.cssRules].some(r=>r.cssText.includes('ellipse:first-of-type'))}catch{return false}})"+
+    "}))()"
+  )));
   actual.forEach((v:string,i:number)=>assert.ok(Math.abs(Number(v)-newValues[i])<.001,'new SVG glow value '+i));
   await delay(140);
   const after=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
