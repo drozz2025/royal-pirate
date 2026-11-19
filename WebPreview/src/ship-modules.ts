@@ -293,6 +293,49 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  }
  const sailColor=config.modules.sails==='sails-night'?'#1a2635':config.modules.sails==='sails-crimson'?'#b13f40':'#eadab7';
  const flagColor=config.modules.flag==='flag-black'?'#141b24':config.modules.flag==='flag-red'?'#a63336':'#245774';
+ // Class-specific original pennants. They add a recognisable upper-deck
+ // silhouette to each class without touching the battle rig, hitboxes or
+ // economy. Three tiny folded cloth meshes use the selected flag's colour;
+ // each class has its own cut, position and geometry (one draw call each).
+ // These objects are owned by the disposable accessory group, not the rig.
+ const pennantShapes:Record<ShipClass,{name:string;origin:[number,number,number];vertices:number[];indices:number[]}> = {
+  scout:{
+   name:'scout-swallow-pennant',origin:[0,5.32,5.73],
+   // A narrow, split-tailed scout streamer above the fast bowsprit.
+   vertices:[0,.16,0, .80,.14,.13, 1.16,0,.04, .84,-.06,-.13, 0,-.18,0],
+   indices:[0,4,1, 1,4,3, 1,3,2]
+  },
+  fighter:{
+   name:'fighter-forked-pennant',origin:[0,8.18,-2.10],
+   // Broad, notched fighting pennant above the aft yardarm.
+   vertices:[0,.29,0, 1.28,.20,.22, .92,0,.10, 1.28,-.23,-.14, 0,-.29,0],
+   indices:[0,4,1, 1,4,2, 2,4,3]
+  },
+  warship:{
+   name:'warship-royal-pennant',origin:[0,9.00,.90],
+   // Long two-tipped admiral's banner, cambered in depth.
+   vertices:[0,.36,0, .90,.29,.18, 1.82,.17,.08, 1.42,-.04,-.22,
+    1.84,-.31,-.04, .85,-.30,.16, 0,-.36,0],
+   indices:[0,6,1, 1,6,5, 1,5,3, 1,3,2, 3,5,4]
+  }
+ };
+ const banner=pennantShapes[config.shipClass];
+ const bannerGeometry=new T.BufferGeometry();
+ bannerGeometry.setAttribute('position',new T.Float32BufferAttribute(banner.vertices,3));
+ bannerGeometry.setIndex(banner.indices);
+ bannerGeometry.computeVertexNormals();
+ const bannerCloth=paint(flagColor,0);
+ bannerCloth.roughness=.9;
+ bannerCloth.side=T.DoubleSide;
+ const pennant=part(bannerGeometry,bannerCloth,...banner.origin);
+ pennant.name=banner.name;
+ // The preview flag colour is never interpreted as ownership or inventory.
+ pennant.userData.moduleId=config.modules.flag;
+ // A restrained gilded seam makes the small flag readable over the water,
+ // reusing the existing unit-box buffer and brass accessory material.
+ const clasp=cube(brass,banner.origin[0]+.12,banner.origin[1],banner.origin[2]+.035,.06,
+  config.shipClass==='scout'?.31:config.shipClass==='fighter'?.52:.64,.025);
+ clasp.name=config.shipClass+'-pennant-clasp';
  // Scout-only original fore-and-aft jib. Its curved center is a third
  // vertex ridge, producing a recognisable light raider silhouette instead
  // of just recolouring or rescaling the frigate sails. Visual sandbox only.

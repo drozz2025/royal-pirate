@@ -5,9 +5,11 @@ on:
     branches:
       - work2/shipyard-ownership-class-polish-20261119
       - work2/verified-player-level-gate-20261119
+      - work2/shared-preview-geometries-20261119
       - work2/fabric-lifecycle-class-silhouette-20261119
       - work2/class-ownership-gpu-cleanup-20261119
       - work2/shared-preview-geometries-20261119
+      - work2/class-pennants-20261119
   pull_request:
     branches:
       - work2/modular-ships-levels-1-20

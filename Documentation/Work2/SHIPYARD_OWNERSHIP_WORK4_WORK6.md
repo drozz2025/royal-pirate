@@ -80,3 +80,13 @@ Review visually on 360/390px mobile before merging. Do not confuse unit-test suc
 - WORK 4 remains the only owner of trusted ownership/equipment persistence; WORK 6 retains the Porto 1:1 layout. WORK 5 should check 360/390px mobile UI and GPU resources after repeated class/module swaps.
 
 The current PR stack must remain **draft** until isolated CI is green and WORK 6 / WORK 5 complete visual integration QA. No auto-merge into `work6/web-3d-preview` or `main`.
+
+## Class pennants — 18:00 UTC, 19 Nov 2026 (stack after PR #549)
+
+- New **original 3D folded cloth pennants** for each of the three classes: narrow split-tail Scout streamers above the forward bowsprit, short forked Fighter flags above the stern yardarm, and longer two-tip Warship admiral banners above the mainmast. Geometry is real triangulated Two-Sided Three.js mesh, not a PNG, CSS substitute or class recolour alone.
+- The pennant fabric takes the chosen `flag` module colour (navy, crimson or black) as a preview. A subtle gilded seam reuses the shared low-poly box geometry and brass material. Both objects belong only to `modular-ship-accessories` and are disposed upon a preview change. No rig or battle hitbox is modified, and no flag ownership is inferred.
+- Added regression tests for original geometry vertices/folds, classes, cloth colour and module ID, gold seam and safe one-time GPU resource cleanup on class change; existing mobile budget tests still apply. This is **a visual enhancement**, not a measured FPS gain.
+- **WORK 4:** UI can continue to use `ShipLoadout.modules.flag` and the separate entitlement validator; no schema change and no grants/purchases.
+- **WORK 6:** no changes to Porto or battle files. The new class silhouettes are exclusive to the Shipyard preview. Integrate only after resolving historical PR #29 conflicts, QA and CI.
+- **WORK 5:** perform screenshot/mobile comparison at 360/390 px, especially occlusion, rear and side ship angles, flag seam clipping and rapid class switching. Static tests cannot establish mobile visual quality or iPhone FPS.
+- Stack order: draft PR #29 → #522 → #530 → #536 → #543 → #549 → **class-pennants follow-up**. Branch `work2/class-pennants-20261119`; `main` and live deployment unchanged. No Unity tests; cost €0.

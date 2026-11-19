@@ -307,3 +307,49 @@ test('mobile modular previews pool repeating box, cylinder and gunport buffers w
  assert.equal(root.children.filter(o=>o.name==='modular-ship-accessories').length,1);
  assert.equal(next.userData.level,1);
 });
+
+test('three classes have original lightweight folded pennants, tinted by the selected flag',()=>{
+ const cases=[
+  {shipClass:'scout' as const,level:1,flag:'flag-navy',name:'scout-swallow-pennant',color:'245774',vertices:5},
+  {shipClass:'fighter' as const,level:4,flag:'flag-red',name:'fighter-forked-pennant',color:'a63336',vertices:5},
+  {shipClass:'warship' as const,level:11,flag:'flag-black',name:'warship-royal-pennant',color:'141b24',vertices:7}
+ ];
+ for(const c of cases){
+  const root=new T.Group(),rig=new T.Group();root.add(rig);
+  const preview=applyShipModules(root,rig,{shipClass:c.shipClass,level:c.level,modules:{flag:c.flag}});
+  const pennants=preview.children.filter(obj=>obj.name.endsWith('-pennant'));
+  assert.equal(pennants.length,1,'one class-specific pennant mesh per preview');
+  const banner=pennants[0] as T.Mesh;
+  assert.equal(banner.name,c.name,'scout, fighter and warship have different flag silhouettes');
+  assert.equal(banner.geometry.getAttribute('position').count,c.vertices);
+  assert.ok(banner.geometry.index && banner.geometry.index.count>=9,'real triangulated fabric');
+  const z=banner.geometry.getAttribute('position');
+  assert.ok(new Set(Array.from({length:z.count},(_,i)=>z.getZ(i))).size>1,'cloth is folded in 3D');
+  const material=banner.material as T.MeshStandardMaterial;
+  assert.equal(material.color.getHexString(),c.color,'module selection controls fabric colour');
+  assert.equal(material.side,T.DoubleSide,'both sides visible during orbit');
+  assert.equal(banner.userData.moduleId,c.flag);
+  const seam=preview.children.find(obj=>obj.name===c.shipClass+'-pennant-clasp');
+  assert.ok(seam instanceof T.Mesh,'gold-seamed cloth silhouette is a real 3D mesh');
+  assert.equal(seam.geometry.type,'BoxGeometry','gilded seam reuses the pooled box buffer');
+  assert.equal(rig.children.some(obj=>obj===banner),false,'accessories stay isolated from battle rig');
+  assert.ok(preview.children.length<125,'mobile accessory mesh budget remains bounded');
+ }
+});
+
+test('changing flag or hull retires only the previous class pennant GPU assets',()=>{
+ const root=new T.Group(),rig=new T.Group();root.add(rig);
+ const first=applyShipModules(root,rig,{shipClass:'warship',level:11,modules:{flag:'flag-black'}});
+ const original=first.children.find(obj=>obj.name==='warship-royal-pennant') as T.Mesh;
+ assert.ok(original);
+ let geometryDispose=0,materialDispose=0;
+ original.geometry.addEventListener('dispose',()=>geometryDispose++);
+ (original.material as T.Material).addEventListener('dispose',()=>materialDispose++);
+ const next=applyShipModules(root,rig,{shipClass:'scout',level:4,modules:{flag:'flag-red'}});
+ assert.equal(geometryDispose,1);
+ assert.equal(materialDispose,1);
+ assert.equal(root.children.filter(obj=>obj.name==='modular-ship-accessories').length,1);
+ assert.equal(next.children.some(obj=>obj.name==='warship-royal-pennant'),false);
+ const newBanner=next.children.find(obj=>obj.name==='scout-swallow-pennant') as T.Mesh;
+ assert.equal((newBanner.material as T.MeshStandardMaterial).color.getHexString(),'a63336');
+});
