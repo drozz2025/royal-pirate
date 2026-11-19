@@ -192,6 +192,12 @@ test('WORK4 Forge authentic hearth bounce-light A/B: one paused frame, furnace/c
 
   // Exercise actual mobile touch targets at all required non-native viewports.
   await evaluate("document.getElementById('work4-forge-source-light-candidate')?.remove();true");
+  const nativeStyle=await evaluate("(()=>{const e=document.querySelector('.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene');const c=getComputedStyle(e);return {backgroundImage:c.backgroundImage,backgroundColor:c.backgroundColor}})()");
+  assert.equal(nativeStyle.backgroundImage,'none',
+    'do not introduce synthetic 04 furnace glare into production without source ROI proof');
+  assert.equal(nativeStyle.backgroundColor,'rgb(45, 41, 41)',
+    'source-validated charcoal underpaint must remain unchanged');
+
   for(const [width,height] of [[320,568],[390,844],[430,932]] as const){
     await cmd('Emulation.setDeviceMetricsOverride',{
       width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height
