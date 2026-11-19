@@ -57,16 +57,17 @@ export function battleCameraPose(aspect: number): CameraPose {
     // the single muzzle remains centred while the broadside stays visible.
     // Never move the simulated ships, physics, Porto or five-item dock.
     const ultraTall = aspect < .50;
+    const compact = aspect >= .50 && aspect < .62; // 320x568: guard the galleon's stern
     return {
       // Move the EYE and physical first-person gun deck forward as one unit.
       // This enlarges the live enemy's apparent broadside by perspective,
       // not by scaling its collision-inaccurate visual root. A matching pan
       // preserves the stern margin on 320 / 384 / 390 / 430 portrait viewports.
       position: [0, 7.4, 55],
-      target: [ultraTall ? 7.65 : 5.15, 4.1, -3],
+      target: [ultraTall ? 7.65 : compact ? 6.5 : 5.15, 4.1, -3],
       showBattery: true,
       batteryOffsetZ: -30,
-      batteryOffsetX: ultraTall ? 3.6 : 2,
+      batteryOffsetX: ultraTall ? 3.6 : compact ? 2.7 : 2,
       batteryScale: 1,
       // Legacy optional edge rig is now HIDDEN for portrait battle.
       sailX: -11,
