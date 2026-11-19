@@ -9,7 +9,7 @@ import {setTimeout as delay} from 'node:timers/promises';
 /** WORK8/#104: native same-scene source MAE for seven REAL day captions.
  * The candidate root flag toggles only native lettering pigment while keeping
  * real claim state, real rewards, chest artwork and five WORK0 dock controls. */
-test('07 Missions: genuine seven-day caption ivory calibration / Chromium native', {timeout:220000}, async()=>{
+test('07 Missions: genuine seven-day source-calibrated caption ink / Chromium native', {timeout:220000}, async()=>{
   await delay(1500); // CI serializes visual suites; allow fonts and imagery to load
   for(const file of ['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']) {
     assert.ok(existsSync(new URL('../../assets/design-approved/'+file,import.meta.url)),'required reference '+file);
@@ -86,7 +86,7 @@ test('07 Missions: genuine seven-day caption ivory calibration / Chromium native
     const afterLayout=await geometry();
     const afterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li small")).filter');
     assert.notEqual(afterInk,beforeInk,'proposed caption tint must differ from baseline');
-    assert.equal(afterInk,'brightness(1.4)','native 07 caption ink must be applied');
+    assert.equal(afterInk,'brightness(0.6)','native 07 caption ink must be applied');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
     assert.deepEqual(afterLayout.labels,beforeLayout.labels,'real mission objective labels unchanged');
@@ -125,7 +125,7 @@ test('07 Missions: genuine seven-day caption ivory calibration / Chromium native
     save('missions-day-caption-ink-original-before-overlay.png',compared.overlays[0]);
     save('missions-day-caption-ink-original-render-overlay.png',compared.overlays[1]);
     const report={
-      issue:104,scope:'WORK8 exclusively 07 Missões, seven actual day-caption ivory pigments; no invented claims or rewards',
+      issue:104,scope:'WORK8 exclusively 07 Missões, seven real day captions calibrated against approved painting; no invented claims or rewards',
       reference:'assets/design-approved/07-missoes.webp',
       mandatoryRefs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']].map(n=>'assets/design-approved/'+n),
       viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-day-caption-ink-ab-baseline',
