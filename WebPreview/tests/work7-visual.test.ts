@@ -65,8 +65,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // It is inert for Shop and for 320/tall viewports.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
-        filter:brightness(.64) saturate(1.90) contrast(.88)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+        filter:brightness(.42) saturate(1.75) contrast(.79)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -338,34 +338,40 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
-        // WORK7/#104 native exploratory gate, never shipped as game CSS:
-        // exactly the same frozen frame, artwork and 4x2 live card geometry.
+        // WORK7 native same-frame material candidates; never shipped as CSS.
         if(kind==='cards' && width===384 && height===512){
-          for (const value of [.48,.50,.52,.54,.56,.57,.58,.59,.60,.62,.64,.66,.70]) {
+          const values:[number,number,number][]=[
+            [.30,1.75,.79],[.32,1.75,.79],[.34,1.75,.79],
+            [.36,1.75,.79],[.38,1.75,.79],[.40,1.75,.79],
+            [.42,1.75,.79],[.44,1.75,.79],
+            [.34,1.55,.74],[.34,1.75,.74],[.34,1.90,.74],[.34,2.10,.74],
+            [.36,1.55,.74],[.36,1.75,.74],[.36,1.90,.74],[.36,2.10,.74],
+            [.38,1.55,.74],[.38,1.75,.74],[.38,1.90,.74],[.38,2.10,.74],
+            [.40,1.55,.74],[.40,1.75,.74],[.40,1.90,.74],[.40,2.10,.74],
+            [.36,1.75,.68],[.36,1.75,.72],[.36,1.75,.77],[.36,1.75,.84],
+            [.38,1.75,.68],[.38,1.75,.72],[.38,1.75,.77],[.38,1.75,.84]
+          ];
+          for(const [b,s,c] of values){
             const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
-              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8)'+
-              '{filter:brightness('+value+') saturate(1.90) contrast(.88)!important}}';
-            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-sweep';s.textContent="+
-              JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
-            await sleep(90);
-            const shot=await command('Page.captureScreenshot',{
-              format:'png',fromSurface:true,captureBeyondViewport:false
-            });
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7)'+
+              '{filter:brightness('+b+') saturate('+s+') contrast('+c+')!important}}';
+            await evaluate("(()=>{const t=document.createElement('style');t.id='w7-sweep';t.textContent="+JSON.stringify(styleText)+";document.head.appendChild(t);return true})()");
+            await sleep(80);
+            const shot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
             const metrics=await evaluate("(async()=>{"+
-              "const load=src=>new Promise((ok,fail)=>{let i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
-              "const ref=await load("+JSON.stringify(refUrl)+"),img=await load("+
-                JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+");"+
-              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
-              "const ctx=cv.getContext('2d');ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
-              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
-              "let sum=0,count=0,roi=0,roiCount=0;"+
-              "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
-              "for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
-              "if(x>=18&&x<365&&y>=195&&y<428){roi+=v;roiCount++}}}"+
-              "return {global:Math.round(sum/count*1000)/1000,roi:Math.round(roi/roiCount*1000)/1000}})()");
-            console.log('WORK7 CARD8 SWEEP brightness='+value+' '+JSON.stringify(metrics));
+              "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "const ref=await load("+JSON.stringify(refUrl)+"),live=await load("+
+              JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+");"+
+              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;const ctx=cv.getContext('2d');"+
+              "ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
+              "ctx.clearRect(0,0,384,512);ctx.drawImage(live,0,0);const z=ctx.getImageData(0,0,384,512).data;"+
+              "let total=0,n=0,roi=0,nroi=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){"+
+              "const p=(y*384+x)*4;for(let k=0;k<3;k++){const d=Math.abs(a[p+k]-z[p+k]);"+
+              "total+=d;n++;if(x>=18&&x<365&&y>=195&&y<428){roi+=d;nroi++}}}"+
+              "return {global:Math.round(total/n*1000)/1000,roi:Math.round(roi/nroi*1000)/1000}})()");
+            console.log('WORK7 CARD7 SWEEP b='+b+' s='+s+' c='+c+' '+JSON.stringify(metrics));
             await evaluate("(()=>{document.getElementById('w7-sweep')?.remove();return true})()");
-            await sleep(55);
+            await sleep(30);
           }
         }
 
@@ -446,7 +452,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
   assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
-    'Native 05 Mina Explosiva carved frame must improve strict global MAE AND authentic eight-card ROI vs exact HEAD: '+
+    'Native 05 Tripulação Élite carved frame must improve strict global MAE AND authentic eight-card ROI vs exact HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
   assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
     '06 Shop must remain pixel-identical to actual source HEAD');
