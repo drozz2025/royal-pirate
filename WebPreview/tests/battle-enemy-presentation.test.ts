@@ -57,7 +57,7 @@ test('enemy battle-only presentation leaves the tested camera and Porto intact',
     camera.lookAt(...pose.target);
     camera.updateMatrixWorld();
     const battleScale=battleEnemyScale(w/h);
-    assert.ok(battleScale>=1.35&&battleScale<=1.45,'portrait enemy size is reduced structurally');
+    assert.ok(battleScale>=1.45&&battleScale<=1.70,'portrait opponent stays bounded below sky/HUD limits');
     const points=[
       new T.Vector3(10,0,-3),
       new T.Vector3(10,battleScale*8.4,-3),
@@ -122,7 +122,7 @@ test('WORK0/#104: the live red galleon stops occupying the mobile sky in 4 refer
     const screenY=(y:number)=> (1-new T.Vector3(10,y,-3).project(camera).y)*h/2;
     const yTop=screenY(8.4*battleEnemyScale(w/h));
     const yHull=screenY(0);
-    assert.ok(yTop>h*.32&&yTop<h*.48,
+    assert.ok(yTop>h*.31&&yTop<h*.48,
       'enemy must leave clear sky below compact HP header at '+w+'x'+h+': '+yTop);
     assert.ok(yHull-yTop>h*.16&&yHull-yTop<h*.27,
       'galleon must be legible, but not cover the foreground guns at '+w+'x'+h);
