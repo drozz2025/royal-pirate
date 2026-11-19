@@ -156,3 +156,18 @@ test('WORK6/#104 crimson broadside is real batched Three.js hull, isolated from 
     assert.equal(royal.sails.length,6);
   });
 });
+
+
+test('WORK6/#104 battle-only burgundy sail and trim stay independent of royal Porto materials',()=>{
+  withFakeCanvas(()=>{
+    const enemy=makeShip(true),royal=makeShip(false);
+    assert.equal(enemy.trim.color.getHexString(),'b43048');
+    assert.equal(royal.trim.color.getHexString(),'5b321f');
+    assert.equal((enemy.sails[1].material as T.MeshStandardMaterial).map?.userData.backgroundColor,'#8f1f39');
+    assert.equal((royal.sails[1].material as T.MeshStandardMaterial).map?.userData.backgroundColor,'#203952');
+    assert.equal((enemy.sails[0].material as T.MeshStandardMaterial).color.getHexString(),'8c2440');
+    assert.equal((royal.sails[0].material as T.MeshStandardMaterial).color.getHexString(),'19232d');
+    assert.equal(enemy.sails.length,5);
+    assert.equal(royal.sails.length,6);
+  });
+});
