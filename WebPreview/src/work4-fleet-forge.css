@@ -3094,22 +3094,3 @@
     border-color:#725a46;
   }
 }
-
-
-/* WORK4/#104 — 19 Nov 17h: native source-light, Forja 04.
-   The merged 384x512 rule already suppresses both SVG glow ellipses (opacity:0).
-   Test a controlled subtle 20%/25% added hearth/iron illumination against
-   that actual released baseline, not the obsolete opacity:1 assumption.
-   The selector is deliberately more specific than the earlier suppressor;
-   do not use !important or touch any other viewport. Keep this candidate
-   ONLY if a same-frame Chromium source ROI comparison justifies it.
-   Never change the source bitmap, barrel framing, furnace, compositor,
-   real levels/costs, 44px action, Porto, shell, dock or 320/390/430 CSS. */
-@media (width:384px) and (height:512px) {
-  .w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon > ellipse:first-of-type {
-    opacity:.20;
-  }
-  .w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon > ellipse:last-of-type {
-    opacity:.25;
-  }
-}
