@@ -51,6 +51,16 @@ export function availableModules(level:number,slot?:ModuleSlot):ShipModule[]{
  progressionTier(level);
  return SHIP_MODULES.filter(m=>m.minLevel<=level&&(!slot||m.slot===slot));
 }
+/** Highest level-unlocked pieces for a visual sandbox preset only.
+ * Unlock availability NEVER implies inventory, ownership, purchases or equip rights.
+ * This is deterministic for every integer level 1–20 and every module slot. */
+export function highestUnlockedPreviewModules(level:number):Record<ModuleSlot,string>{
+ progressionTier(level);
+ return Object.fromEntries(SLOTS.map(slot=>{
+  const options=availableModules(level,slot);
+  return [slot,options[options.length-1].id];
+ })) as Record<ModuleSlot,string>;
+}
 export function resolveLoadout(input:ShipLoadout):ResolvedShipLoadout{
  progressionTier(input.level);
  if(!['scout','fighter','warship'].includes(input.shipClass))throw new Error('Unknown ship class');
@@ -233,6 +243,34 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
    window.name='warship-stern-window';
    cube(brass,x,3.32,-5.00,.57,.055,.11);
   }
+ }
+ // Original class-specific helm assembly at the quarterdeck. A slim tiller
+ // steers the Scout; the broadside Fighter has a four-spoke wheel; the royal
+ // flagship has a larger eight-spoke wheel. These are preview ornaments only:
+ // they do not change turning, collision, equipment rights or combat physics.
+ if(config.shipClass==='scout'){
+  const tiller=cube(warm,0,2.97,-2.15,.13,.13,1.03);
+  tiller.name='scout-steering-tiller';
+  const grip=cube(brass,0,3.01,-1.67,.24,.15,.19);
+  grip.name='scout-tiller-grip';
+ }else{
+  const flagship=config.shipClass==='warship';
+  const helmY=flagship?3.39:3.18,helmZ=flagship?-2.60:-2.45;
+  const radius=flagship?.47:.36;
+  const wheel=part(sharedGeometry(flagship?'royal-helm-ring':'fighter-helm-ring',
+   ()=>new T.TorusGeometry(radius,.047,5,14)),brass,0,helmY,helmZ);
+  wheel.name=flagship?'warship-royal-helm':'fighter-broadside-helm';
+  const hub=part(sharedGeometry('helm-hub',()=>new T.CylinderGeometry(.105,.105,.14,8)),
+   warm,0,helmY,helmZ);
+  hub.rotation.x=Math.PI/2;
+  const spokeCount=flagship?8:4;
+  for(let i=0;i<spokeCount;i++){
+   const angle=2*Math.PI*i/spokeCount;
+   const spoke=tube(warm,Math.sin(angle)*radius*.5,helmY+Math.cos(angle)*radius*.5,
+    helmZ,.034,radius);
+   spoke.rotation.z=-angle;
+  }
+  cube(iron,0,helmY-.52,helmZ,.13,.50,.22);
  }
  const hull=config.modules.hull,armor=config.modules.armor;
  if(hull!=='hull-oak')for(const side of [-1,1])for(const z of [-2.6,-1,1,2.6])
