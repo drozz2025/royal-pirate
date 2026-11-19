@@ -343,47 +343,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
-        // WORK7 #104: isolated native same-frame sweep of TRUE chest light
-        // fields, not a change to geometry or to real labels. Compare every
-        // trial with actual merged original using identical React state/frame.
-        // Unchanged baseline is included to rule out screenshot drift.
-        if(kind==='shop' && width===384 && height===512) {
-          const trials:[string,string][]=[
-            ['head','radial-gradient(ellipse 66% 55% at 50% 55%,var(--w7-glow),transparent 100%),radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda557,transparent 100%)'],
-            ['gold45','radial-gradient(ellipse 66% 55% at 50% 55%,var(--w7-glow),transparent 100%),radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda545,transparent 100%)'],
-            ['gold65','radial-gradient(ellipse 66% 55% at 50% 55%,var(--w7-glow),transparent 100%),radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda565,transparent 100%)'],
-            ['gold75','radial-gradient(ellipse 66% 55% at 50% 55%,var(--w7-glow),transparent 100%),radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda575,transparent 100%)'],
-            ['gold85','radial-gradient(ellipse 66% 55% at 50% 55%,var(--w7-glow),transparent 100%),radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda585,transparent 100%)'],
-            ['golda0','radial-gradient(ellipse 66% 55% at 50% 55%,var(--w7-glow),transparent 100%),radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda5a0,transparent 100%)'],
-            ['field60','radial-gradient(ellipse 66% 60% at 50% 55%,var(--w7-glow),transparent 100%),radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda557,transparent 100%)'],
-            ['field50','radial-gradient(ellipse 66% 50% at 50% 55%,var(--w7-glow),transparent 100%),radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda557,transparent 100%)'],
-            ['fieldleft','radial-gradient(ellipse 66% 55% at 48% 55%,var(--w7-glow),transparent 100%),radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda557,transparent 100%)'],
-            ['fieldright','radial-gradient(ellipse 66% 55% at 52% 55%,var(--w7-glow),transparent 100%),radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda557,transparent 100%)'],
-            ['fieldhigh','radial-gradient(ellipse 66% 55% at 50% 49%,var(--w7-glow),transparent 100%),radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda557,transparent 100%)'],
-            ['fieldlow','radial-gradient(ellipse 66% 55% at 50% 61%,var(--w7-glow),transparent 100%),radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda557,transparent 100%)']
-          ];
-          for(const [name,value] of trials){
-            const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){.w7-screen[data-work7-screen="shop"] .w7-chest-art{background:'+value+'!important}}';
-            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-sweep';s.textContent="+JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
-            await sleep(70);
-            const shot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
-            const metrics=await evaluate("(async()=>{"+
-              "const load=src=>new Promise((ok,fail)=>{let i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
-              "const ref=await load("+JSON.stringify(refUrl)+"),img=await load("+
-                JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+");"+
-              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
-              "const ctx=cv.getContext('2d');ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
-              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
-              "let sum=0,count=0,roi=0,roiCount=0;"+
-              "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
-              "for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
-              "if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=v;roiCount++}}}"+
-              "return {global:Math.round(sum/count*10000)/10000,roi:Math.round(roi/roiCount*10000)/10000}})()");
-            console.log('WORK7 LIGHTFIELD SWEEP '+name+' '+JSON.stringify(metrics));
-            await evaluate("(()=>{document.getElementById('w7-sweep')?.remove();return true})()");
-          }
-        }
-
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
@@ -465,6 +424,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(card.roiMaeAfter,card.roiMaeBefore,
     'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
   assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 chest art light field must improve strict global MAE AND pack/chests ROI vs merged HEAD: '+
+    'Native 06 lower chest reflection must improve both global RGB MAE and shop pack/chests ROI versus exact HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
