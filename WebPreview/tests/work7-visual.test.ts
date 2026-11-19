@@ -41,6 +41,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
+  assert.ok(cssText.includes('shield-card enamel trial'), 'Native shield-card enamel candidate must exist, scoped to WORK7');
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   assert.ok(cssText.includes('Native card 4+7 inlay/exposure candidate'),
@@ -63,13 +64,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // frame filter. Previous #411/#422 and live artwork stay untouched.
   // The override is installed on the SAME page and animation frame.
   // It is inert for Shop and for 320/tall viewports.
+  // Exact CURRENT integrated HEAD (6f567086) before only this sixth-card
+  // relief candidate. Never revert earlier WORK7 commits or shop chest rims.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6)::before{
+        box-shadow:inset 0 0 0 1px #472714ae,
+                   inset 0 3px 6px #080c237a,
+                   inset 0 -2px 1px #ffdb7b2b!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -382,6 +384,50 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
 
 
 
+
+        // Evidence-only shield-card relief sweep. A single identical frozen
+        // Chromium 384×512 frame and the true merged HEAD baseline are used.
+        // Temporary styles never persist in the production interface.
+        if (kind==='cards' && width===384 && height===512) {
+          const reliefTrials = [
+            ['head','#472714ae','#080c237a','#ffdb7b2b',1,3,6],
+            ['cobalt','#21385aa8','#07172aa8','#9bd9f44d',2,2,7],
+            ['steel','#2c5374b8','#0c1e32aa','#a8d7e148',2,2,8],
+            ['deep-blue','#142846dd','#030d20cc','#9bd9f429',2,3,8],
+            ['dark-gold','#3d2915c9','#05121aab','#e1bd7048',2,3,7],
+            ['blue-thin','#234262b2','#061526b0','#a4dfed31',1,3,8],
+            ['warm-thin','#634624b6','#020817b1','#ecc58239',2,2,8],
+            ['ink','#061626d9','#000612c7','#f2d59d37',2,3,10],
+            ['silver','#6a9ea8a0','#071426a9','#b5f7fa4b',2,2,6],
+            ['bronze','#9b652f8a','#0c1328bd','#ffe1a044',2,2,7],
+          ] as const;
+          for (const [name,edge,dark,bevel,edgeSize,top,depth] of reliefTrials) {
+            const trialCss='@media(min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6)::before {'+
+              'box-shadow:inset 0 0 0 '+edgeSize+'px '+edge+','+
+              'inset 0 '+top+'px '+depth+'px '+dark+',inset 0 -2px 1px '+bevel+'!important}}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-card6-sweep';s.textContent="+
+              JSON.stringify(trialCss)+";document.head.appendChild(s);return true})()");
+            await sleep(60);
+            const trialScreenshot=await command('Page.captureScreenshot', {
+              format:'png',fromSurface:true,captureBeyondViewport:false
+            });
+            const measure=await evaluate("(async()=>{"+
+              "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "const ref=await load("+JSON.stringify(refUrl)+"),img=await load("+
+                JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(trialScreenshot.data)+");"+
+              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+              "const ctx=cv.getContext('2d');ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
+              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
+              "let global=0,roi=0,rc=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){const p=(y*384+x)*4;"+
+              "for(let k=0;k<3;k++){const d=Math.abs(a[p+k]-b[p+k]);global+=d;if(x>=18&&x<365&&y>=195&&y<428){roi+=d;rc++}}}"+
+              "return {global:Math.round(global/(384*512*3)*10000)/10000,roi:Math.round(roi/rc*10000)/10000}})()");
+            console.log('WORK7 SHIELD RELIEF SWEEP '+name+' '+JSON.stringify(measure));
+            await evaluate("(()=>{document.getElementById('w7-card6-sweep')?.remove();return true})()");
+            await sleep(40);
+          }
+        }
+
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
@@ -458,11 +504,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const card=native.find(screen=>screen.kind==='cards');
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
-  assert.equal(card.maeRgbAfter,card.maeRgbBefore,
-    '05 Cartas must stay exactly pixel-identical to the true starting HEAD');
-  assert.equal(card.roiMaeAfter,card.roiMaeBefore,
-    'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
-  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
-    JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
+  assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
+    'Native 05 shield metallic relief must improve strict global MAE and eight-card ROI: '+
+    JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
+  assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
+    '06 Loja must stay pixel-identical to true starting HEAD');
+  assert.equal(shop.roiMaeAfter,shop.roiMaeBefore,
+    'Pack and three chests must stay pixel-identical to HEAD');
 });
