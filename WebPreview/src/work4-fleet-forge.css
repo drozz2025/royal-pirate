@@ -3074,3 +3074,23 @@
     background:linear-gradient(90deg,#075684ec 0%,#0a4b74ed 12%,#0b3655f6 28%,#06263ff9 44%,#031b30fa 70%,#031729fb 100%)!important;
   }
 }
+
+
+/* WORK4/#104 — native Forge genuine metal plaque rim, 19 Nov 02h.
+   Same-frame Chromium 384x512 A/B of 16 material pigments (PR #466).
+   The merged blue-grey #8a9ba1 frame reads as a false photo edge;
+   tested iron/timber #725a46 preserves the ONE approved cannon and lit
+   furnace while giving the existing live level plaque a more source-faithful
+   warm metal rim. Measured RGB MAE (release BEFORE -> proposed RENDER):
+   full 53.76040 -> 53.37462; plaque 44.95587 -> 43.19476;
+   plaque boundary 45.26379 -> 43.53057. Cannon 0.27613, furnace
+   0.15986, all three costs, and the 5-item dock are pixel-identical.
+   Exactly 1388 pixels changed in the full frame, all within WORK4.
+   No geometry, second barrel, fake content, Porto, shell, navigation,
+   economy, Unity, multiplayer, 320/390/430 overrides or other WORK files.
+   Human artistic approval stays false until explicit sign-off. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+    border-color:#725a46;
+  }
+}
