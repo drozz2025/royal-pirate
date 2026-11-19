@@ -40,7 +40,7 @@ function createWorker() {
         async addAll(urls) {
           for (const url of urls) {
             added.push(url);
-            store.set(key(url), new Response('precache:' + key(url)));
+            store.set(key(url), new Response(key(url) === SCOPE ? HTML : 'precache:' + key(url)));
           }
         },
         async put(request, response) {
@@ -69,7 +69,7 @@ function createWorker() {
     const url = key(request);
     fetched.push(url);
     if (offline) throw new Error('Network unavailable');
-    if (url === SCOPE) return new Response(HTML, { status: rootStatus });
+    if (url === SCOPE || (typeof request !== 'string' && request.mode === 'navigate')) return new Response(HTML, { status: rootStatus });
     const response = new Response('network:' + url);
     Object.defineProperty(response, 'type', { value: assetType });
     return response;
@@ -146,6 +146,28 @@ test('navigation uses network when online and the cached app shell when offline'
   const offline = await worker.dispatch('fetch', request);
   assert.equal(await offline.text(), HTML);
   assert.ok(worker.fetched.includes(request.url), 'online navigation not attempted');
+});
+
+test('offline first launch opens a valid cached shell before any online navigation', async () => {
+  const worker = createWorker();
+  await worker.dispatch('install');
+  worker.setOffline(true);
+  const request = { method: 'GET', mode: 'navigate', url: SCOPE + 'rewards?from=porto' };
+  const fallback = await worker.dispatch('fetch', request);
+  assert.equal(await fallback.text(), HTML);
+  assert.ok(worker.fetched.includes(request.url), 'offline navigation must first try network');
+});
+
+test('unavailable HTTP navigation is not silently saved as a healthy app shell', async () => {
+  const worker = createWorker();
+  await worker.dispatch('install');
+  worker.setRootStatus(503);
+  const request = { method: 'GET', mode: 'navigate', url: SCOPE + 'fleet' };
+  const unavailable = await worker.dispatch('fetch', request);
+  assert.equal(unavailable.status, 503);
+  const cached = await worker.storage.match(SCOPE);
+  assert.ok(cached);
+  assert.equal(await cached.text(), HTML, 'a 503 response must not replace the valid shell');
 });
 
 test('same-origin assets are cache-first offline, while non-basic responses are not stored', async () => {
