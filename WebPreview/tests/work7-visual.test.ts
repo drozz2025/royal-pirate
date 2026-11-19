@@ -58,21 +58,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'The final WORK7 candidate changes only genuine 05 frame inlays');
     // The only admissible before-image is the actual merged #392 v0.1.88 field.
   // Art and frames are restored with temporary CSS, never with older #384 values.
-  // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
-  // All eight image sublayers also restore their actual pre-PR values.
-  // These !important overrides exist ONLY for controlled same-frame A/B screenshots.
-  // Exact merged WORK0 v0.1.96 HEAD: undo ONLY THIS PR's fourth
-  // frame filter. Previous #411/#422 and live artwork stay untouched.
-  // The override is installed on the SAME page and animation frame.
-  // It is inert for Shop and for 320/tall viewports.
+  // Controlled A/B: restore ONLY the two new 05 card filters to their
+  // exact verified WORK0 HEAD values. The 06 Loja original integrated HEAD
+  // must remain pixel-identical before/after this WORK7 card-only candidate.
+  // Both states share one frozen native Chromium scene, font and timeline.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.50) saturate(1.70) contrast(.87)!important}\n      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
-      }
+
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/', '--outDir', privateBuildDir],
@@ -463,7 +456,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
     'Native 05 first/fifth enamel exposure must improve strict full-frame MAE and genuine 8-card ROI versus true HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
-  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
-    JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
+  assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
+    '06 Loja must be globally pixel-identical to the untouched merged HEAD');
+  assert.equal(shop.roiMaeAfter,shop.roiMaeBefore,
+    'The unique Captain pack and all three chests must stay pixel-identical to merged HEAD');
 });
