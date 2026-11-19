@@ -2835,8 +2835,11 @@
 @media (width:384px) and (height:512px) {
   .w4-forge #w4-forge-panel > .w4-materials:where(*) {
     background:
-      radial-gradient(ellipse 76% 94% at 32% 0%,#a86e3738 0%,transparent 77%),
-      repeating-linear-gradient(2deg,transparent 0 10px,#c89b5410 10px 11px,transparent 12px 21px),
+      /* WORK4: measured source-approved lower double-wood grain and ember opacity.
+         NATIVE A/B 384x512: full 53.380661 -> 53.367549 RGB MAE;
+         material board 46.010686 -> 45.946421, resource 38.643287 -> 38.595306.
+         No source cannon/furnace, prices, button/dock changes. approved:false. */
+      radial-gradient(ellipse 76% 94% at 32% 0%,#a86e371e 0%,transparent 77%),
       linear-gradient(173deg,#1a1f23 0%,#131c24 52%,#0b161e 100%);
   }
 }
