@@ -368,6 +368,56 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           }
         }
 
+
+        // WORK7/#104: diagnose physical source-crop light and carved material,
+        // always restoring actual integrated HEAD before each temporary variant.
+        // No diagnostic candidate reaches the production CSS.
+        if (kind==='cards' && width===384 && height===512) {
+          const basePaint='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+            '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.45) saturate(2.00) contrast(.85)!important}'+
+            '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.65) saturate(1.30) contrast(.92)!important}}';
+          const variations:{name:string;paint:string}[]=[];
+          for(const slot of [5,6]){
+            const old=slot===5?1.86:1.45;
+            for(const value of (slot===5?[1.54,1.62,1.70,1.78,1.82,1.86,1.90,1.94,1.98,2.04,2.12,2.20]:[1.16,1.24,1.32,1.38,1.42,1.45,1.48,1.52,1.56,1.62,1.68,1.78])){
+              variations.push({name:'source-crop '+slot+' brightness '+value,
+                paint:'.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+slot+') .w7-approved-crop'+
+                  '{filter:saturate(1.25) contrast(1.13) brightness('+value+')!important}'});
+            }
+            // Source-code-only painted relief: never paste the screenshot as a background.
+            for(const enamel of ['#f1bd76aa','#e7aeffaa','#ffda9aaa','#9b77bba9','#4d256eab','#ffcc70dd','#07142bcc','#59417ecc']){
+              variations.push({name:'carved-rim '+slot+' '+enamel,
+                paint:'.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+slot+')'+
+                  '{box-shadow:inset 0 0 2px 2px '+enamel+',0 3px 0 #06142b!important}'});
+            }
+            for(const inlay of ['#e7aeff','#f4a2eb','#c38bee','#e4baff','#ab84f0','#ffd2ac','#c17fdf','#8f63b1']){
+              variations.push({name:'pigmented-frame '+slot+' '+inlay,
+                paint:'.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+slot+')'+
+                  '{--w7-inlay:'+inlay+'!important}'});
+            }
+          }
+          for(const variant of variations){
+            const styleText=basePaint+'@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+variant.paint+'}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-relief-sweep';s.textContent="+JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
+            await sleep(70);
+            const snap=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+            const metric=await evaluate("(async()=>{"+
+              "const load=u=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=u});"+
+              "const [ref,img]=await Promise.all([load("+JSON.stringify(refUrl)+"),load("+
+              JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(snap.data)+")]);"+
+              "const c=document.createElement('canvas');c.width=384;c.height=512;const x=c.getContext('2d');"+
+              "x.drawImage(ref,0,0);const a=x.getImageData(0,0,384,512).data;"+
+              "x.clearRect(0,0,384,512);x.drawImage(img,0,0);const b=x.getImageData(0,0,384,512).data;"+
+              "let err=0,roi=0,np=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){"+
+              "let p=(y*384+x)*4;for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);err+=v;"+
+              "if(x>=18&&x<365&&y>=195&&y<428){roi+=v;np++}}}"+
+              "return {global:+(err/(384*512*3)).toFixed(5),roi:+(roi/np).toFixed(5)}})()");
+            console.log('WORK7 RELIEF SWEEP '+variant.name+' '+JSON.stringify(metric));
+            await evaluate("(()=>{document.getElementById('w7-relief-sweep')?.remove();return true})()");
+            await sleep(35);
+          }
+        }
+
         // WORK7 experimental tuning grid, never applied to the production UI:
         // same 384x512 screenshot frame and same approved artwork for every
         // real-chest brightness candidate; log absolute native MAE/ROI and
