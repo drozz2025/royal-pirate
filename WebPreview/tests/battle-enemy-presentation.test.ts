@@ -128,3 +128,31 @@ test('WORK0/#104: the live red galleon stops occupying the mobile sky in 4 refer
       'galleon must be legible, but not cover the foreground guns at '+w+'x'+h);
   }
 });
+
+
+test('WORK6/#104 crimson broadside is real batched Three.js hull, isolated from Porto',()=>{
+  withFakeCanvas(()=>{
+    const enemy=makeShip(true),royal=makeShip(false);
+    const paints=['34232c','792d3b','532636'];
+    const members=(ship:T.Group,color:string)=>{
+      const found:T.Mesh[]=[];
+      ship.traverse(part=>{
+        if(part instanceof T.Mesh && part.material instanceof T.MeshStandardMaterial &&
+          part.material.color.getHexString()===color)found.push(part);
+      });
+      return found;
+    };
+    for(const paint of paints){
+      const pieces=members(enemy.root,paint);
+      assert.equal(pieces.length,1,'hull '+paint+' stays ONE material batch for mobile');
+      const bounds=new T.Box3().setFromObject(pieces[0]);
+      assert.ok(bounds.min.z<-3&&bounds.max.z>3,
+        'crimson '+paint+' covers genuine longitudinal hull stations');
+      assert.equal(members(royal.root,paint).length,0,
+        'the approved Porto royal hull never inherits enemy paint');
+    }
+    assert.equal(enemy.guns.length,6);
+    assert.equal(enemy.sails.length,5);
+    assert.equal(royal.sails.length,6);
+  });
+});
