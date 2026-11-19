@@ -172,11 +172,34 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
   const ring=part(new T.TorusGeometry(.24,.07,6,12),config.modules.cannons==='cannons-gold'?brass:iron,side*2.6,1.56,z);
   ring.rotation.y=Math.PI/2;
  }
+ // The lion and crown must be genuinely different sculptures, not recoloured cones.
+ // All parts are small, original low-poly geometry, built only for the isolated editor.
  const head=config.modules.figurehead;
- if(head!=='figurehead-anchor'){
-  const crest=part(new T.ConeGeometry(head==='figurehead-crown'?.51:.36,.78,7),brass,0,4.5,5.9);
-  crest.rotation.z=Math.PI;
-  if(head==='figurehead-crown')for(const x of [-.3,0,.3])tube(brass,x,4.88,5.9,.065,.25);
+ if(head==='figurehead-lion'){
+  const mane=part(new T.IcosahedronGeometry(.43,0),brass,0,4.49,6.12);
+  mane.scale.set(1,.97,.55);
+  const face=part(new T.SphereGeometry(.31,8,6),warm,0,4.45,6.39);
+  face.scale.set(.86,1,.52);
+  const muzzle=part(new T.SphereGeometry(.16,8,5),brass,0,4.33,6.59);
+  muzzle.scale.set(1,.64,.48);
+  for(const side of [-1,1]){
+   const ear=part(new T.ConeGeometry(.13,.3,5),brass,side*.28,4.76,6.32);
+   ear.rotation.z=-side*.28;
+   part(new T.SphereGeometry(.047,6,4),dark,side*.13,4.49,6.565);
+   const whisker=part(new T.CylinderGeometry(.018,.018,.26,5),brass,side*.23,4.28,6.60);
+   whisker.rotation.z=side*.9;
+  }
+  part(new T.SphereGeometry(.07,6,4),dark,0,4.32,6.67);
+ }else if(head==='figurehead-crown'){
+  // Distinctive heraldic crown: raised base, pointed teeth and inset ruby studs.
+  const ruby=paint('#b83037',.18);
+  tube(brass,0,4.42,6.2,.40,.23);
+  for(const x of [-.28,0,.28]){
+   const spike=part(new T.ConeGeometry(.14,x===0?.48:.38,6),brass,x,x===0?4.86:4.81,6.2);
+   spike.rotation.y=Math.PI/6;
+   part(new T.SphereGeometry(.075,6,5),ruby,x,4.52,6.53);
+  }
+  cube(brass,0,4.34,6.21,.78,.09,.34);
  }
  if(config.modules.masts!=='masts-standard'){
   const royal=config.modules.masts==='masts-royal';
