@@ -4351,3 +4351,17 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 19 Nov 10:55 UTC, genuine sixth-card pigment scan.
+ * Only the Sixth of the EIGHT genuine approved concept portraits changes
+ * exposure behind its own true engraved frame at native 384x512.
+ * 00 original + mosaic and 01–08 are the authoritative visuals.
+ * 4x2 authentic artwork, live PRÉVIA/EM BREVE, pack and three genuine
+ * chests, touch areas, menu, Porto, economy, 320 and tall are unchanged.
+ * Use same-frame browser test against exact integrated HEAD 36f57ee.
+ * No screenshot background. approved:false (0/8), WORK0 only integrates. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.62);
+  }
+}
