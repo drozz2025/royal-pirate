@@ -5485,3 +5485,16 @@
     visibility:hidden;
   }
 }
+
+/* WORK8 / issue #104 — 07 Missões only, original daily-tab enamel.
+   The approved native 384x512 source uses a quieter sea-blue active plaque.
+   Retune ONLY the existing selected category's background. Live pressed state,
+   lettering, gold outline, hitbox, three real objectives, seven authentic
+   rewards, claims and scrolling remain untouched. Same-frame Chromium baseline
+   class is test-only; no Ranking 08, dock, Porto, shared shell or economy. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-active-tab-enamel-ab-baseline)
+  .w8-approved-missions .w8-approved-tabs button[aria-pressed=true] {
+    background:linear-gradient(180deg,#4d9fbe 0%,#125a84 54%,#063a59 100%);
+  }
+}
