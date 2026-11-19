@@ -2,6 +2,7 @@ import * as T from 'three';
 import { createPreviewStandingRigging, type PreviewMastModule } from './ship-rigging';
 import { createPreviewSternHeraldry, type PreviewOrnamentModule } from './ship-heraldry';
 import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
+import { createPreviewCabinGallery, type PreviewCabinModule } from './ship-cabin';
 
 /** Original modular ship system. All 20 levels are supported by progression gates,
  * not 20 duplicated meshes. Neither currency nor ownership is fabricated here. */
@@ -285,6 +286,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // A single merged 3D stern crest per class; selected trim tier changes its
  // sculpture without altering equipment rights or ship combat statistics.
  additions.add(createPreviewSternHeraldry(config.shipClass,config.modules.ornaments as PreviewOrnamentModule));
+ // Raised-quarterdeck and admiral cabin silhouettes are preview-only meshes.
+ // They never alter the persistent fleet, resources or battle ship geometry.
+ additions.add(createPreviewCabinGallery(config.shipClass,config.modules.cabin as PreviewCabinModule));
  // Three hull-specific low-poly armour profiles attach only to the temporary
  // editor preview. They have no hitboxes, stat changes or ownership semantics.
  const shieldPlates=createPreviewArmour(config.shipClass,config.modules.armor as PreviewArmorModule);
