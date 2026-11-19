@@ -5434,3 +5434,5 @@
       linear-gradient(170deg,#0b233f,#011935 62%,#000b1d)!important;
   }
 }
+
+/* WORK8/#104 test gate: historical Chromium A/B flags are re-isolated before native 07 production measurement; reference and live paint unchanged. */
