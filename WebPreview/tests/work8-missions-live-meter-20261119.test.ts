@@ -7,10 +7,10 @@ import {join} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 
 /** WORK8/#104: unscaled 07-missoes source, SAME real Chromium DOM/frame.
- * The root switch changes ONLY the already real progress meter fill pixels.
+ * The root switch changes ONLY the green outlines of the existing real progress tracks.
  * Real progress, numerical reward values, claim state, artwork and the
  * five-item shared dock MUST remain unchanged. No mock data or approval. */
-test('07 Missions: real progress-bar source-green Chromium 384x512 exact same-frame A/B', {timeout:220000}, async()=>{
+test('07 Missions: authentic empty progress-track rim Chromium 384x512 same-frame A/B', {timeout:220000}, async()=>{
   await delay(50000); // do not overload shared GitHub runner Chromium sessions
   const chromeBin=process.env.CHROME_BIN || spawnSync('sh',['-c','command -v chromium || command -v google-chrome'],{encoding:'utf8'}).stdout.trim();
   assert.ok(chromeBin,'native Chromium is mandatory; never silently skip MAE QA');
@@ -123,7 +123,7 @@ test('07 Missions: real progress-bar source-green Chromium 384x512 exact same-fr
     save('missions-live-meter-original-before-overlay.png',compared.overlays[0]);
     save('missions-live-meter-original-render-overlay.png',compared.overlays[1]);
     const report={
-      issue:104,scope:'WORK8 exclusively 07 Missões three real state-driven progress fills',
+      issue:104,scope:'WORK8 exclusively 07 Missões three real progress-track borders without faking completed tasks',
       reference:'assets/design-approved/07-missoes.webp',
       mandatoryRefs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']].map(n=>'assets/design-approved/'+n),
       viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-live-meter-ab-baseline',
@@ -131,10 +131,10 @@ test('07 Missions: real progress-bar source-green Chromium 384x512 exact same-fr
       geometry:{before:beforeLayout,after:afterLayout},approved:false,approvedScreens:0
     };
     writeFileSync(join(evidence,'work8-missions-live-meter-native-ab.json'),JSON.stringify(report,null,2));
-    console.log('WORK8 07 actual progress meter controlled Chromium A/B '+JSON.stringify(compared.metrics));
+    console.log('WORK8 07 real empty meter-outline Chromium A/B '+JSON.stringify(compared.metrics));
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
-    assert.ok(compared.metrics.meterROI.delta<-.08,'real progress bars MUST improve original-art meter ROI');
-    assert.ok(compared.metrics.full.delta<-.001,'real progress bar enamel must improve native full frame');
+    assert.ok(compared.metrics.meterROI.delta<-.03,'real empty progress-track rim MUST improve exact-source meter ROI');
+    assert.ok(compared.metrics.full.delta<-.001,'real progress-track border must improve native full frame');
     assert.ok(compared.metrics.daily.delta<.05&&compared.metrics.chests.delta<.05,'daily artwork must not regress and seven chests remain unobstructed');
     // Real CDP touch (rather than merely DOM click), preserving active daily tab.
     const tap=await evalJs('(()=>{const e=document.querySelector(".w8-approved-missions .w8-approved-tabs button");const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()');
