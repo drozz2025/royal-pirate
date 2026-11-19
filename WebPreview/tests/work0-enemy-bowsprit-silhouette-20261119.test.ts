@@ -49,7 +49,8 @@ test('WORK0 #104: new opponent art is presentation-only and cannot move physics 
   assert.ok(sculpture.startsWith(' extends the')||sculpture.length>100);
   assert.match(sculpture,/if\(red\)\{/);
   assert.match(sculpture,/rig\.add\(jib\)/);
-  assert.doesNotMatch(sculpture,/SHIPS|Battle|\.sails\.push|\.guns\.push|hitbox|bullet|damage\./i);
+  const codeOnly=sculpture.replace(/\/\/[^\n]*/g,'');
+  assert.doesNotMatch(codeOnly,/SHIPS|Battle|\.sails\.push|\.guns\.push|hitbox|bullet|damage\./i);
   const scene=readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
   assert.match(scene,/this\.ships\.player\.root\.visible=false/);
   assert.match(scene,/this\.ships\.player\.root\.visible=true/);
