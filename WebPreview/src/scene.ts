@@ -124,12 +124,26 @@ export class OceanScene {
           float wake=sin(vWorld.z*1.33-time*2.31+
             sin(vWorld.x*.68)*.46)*.5+.5;
           foam=max(foam,hullSurf*(.22+.23*wake));
+          // A second, diagonal breaker family gives the waves actual foamy
+          // irregular edges, rather than one endlessly repeated dark ridge.
+          // All calculations live INSIDE the battleMode block: the existing
+          // animated Porto water remains exactly as shipped.
+          float curling=sin(vWorld.x*.91+vWorld.z*.48-time*.82+
+            sin(vWorld.x*.17-vWorld.z*.25+time*.12)*1.38);
+          float edgeBreak=smoothstep(.69,.96,curling)*
+            smoothstep(.36,.72,longSwell*.73+crossSwell*.22+lip*.16);
+          float irregular=.46+.54*(.5+.5*
+            sin(vWorld.x*2.1-vWorld.z*1.63+sin(vWorld.z*.51)*.67));
+          foam=max(foam,edgeBreak*irregular*.43);
           foam=clamp(foam,0.,.49);
-          // Deep shaded troughs, coastal blue-green lit crests, subdued
-          // specular paint: the water should support the red galleon.
+          // Rich turquoise illuminated wave faces and pale foam are closer
+          // to the approved naval painting than uniform navy stripes.
+          // Keep the physically moving mesh, ripples and trajectories intact.
           vec3 deep=mix(vec3(.012,.13,.28),vec3(.028,.39,.55),
             clamp(.55+vWave*.82+longSwell*.16+crossSwell*.08,0.,1.));
           deep*=1.-.09*(1.-ridge);
+          // Turquoise is confined to genuine diagonal ridges, not a blanket colour tint.
+          deep=mix(deep,vec3(.11,.59,.70),clamp(edgeBreak*.33+ridge*.08,0.,.40));
           deep=mix(deep,vec3(.18,.62,.70),fres*.27);
           col=mix(deep,vec3(.78,.92,.91),foam);
           col+=vec3(.78,.91,.82)*spec*.22;
