@@ -24,10 +24,12 @@ test('Batalha 02: mobile red ship shows a broader genuine hull, without changing
 test('Batalha 02 ocean restyle remains isolated from original Porto and real ballistics',()=>{
   assert.match(scene,/if\(battleMode<\.5\)return harbour/,'Porto vertex waves must remain untouched');
   assert.match(scene,/if\(battleMode>\.5\)/,'new breaker shader must be battle-only');
-  assert.match(scene,/float foam=clamp\(ridge\*\.17\+whiteCap\*\.31/,
-    'new sparse breakers must replace the old checkerboard');
-  assert.match(scene,/vec3 deep=mix\(vec3\(\.008,\.12,\.31\)/,
-    'deep blue troughs restore visual depth in the open ocean');
+  assert.match(scene,/float foam=crestMask\*\(\.15\+/,
+    'battle foam must arise from irregular, fragmented long-wave crests');
+  assert.match(scene,/foam=clamp\(foam,0\.,\.49\)/,
+    'battle foam must stay sparse rather than reverting to tiled white patches');
+  assert.match(scene,/vec3 deep=mix\(vec3\(\.012,\.13,\.28\)/,
+    'deep blue troughs must remain in the new battle-only water material');
   assert.match(scene,/battleDeckMuzzleWorld\(this\.battleBattery,muzzle\)/,
     'the 3D cannon mouth, not a guessed offset, remains the projectile origin');
 });

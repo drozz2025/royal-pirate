@@ -20,9 +20,14 @@ test('WORK6 #104: rolling 3D battle sea stays gated away from approved Porto',()
     'near-field swells cannot obscure the first-person deck');
   assert.match(fragment,/if\(battleMode>\.5\)/,
     'illustrative foam and deep water are Batalha-only');
-  assert.match(fragment,/float paintedSwell=/);
-  assert.match(fragment,/float shadowLip=/);
-  assert.match(fragment,/deep\*=1\.-shadowLip/);
+  assert.match(fragment,/float longSwell=/,
+    'use broad swells instead of obsolete high-frequency foam');
+  assert.match(fragment,/float crestMask=ridge\*fragmented/,
+    'broken wave ridges must govern sparse sea foam');
+  assert.match(fragment,/deep\*=1\.-\.09\*\(1\.-ridge\)/,
+    'the new wave ridge must shade blue troughs');
+  assert.match(fragment,/foam=clamp\(foam,0\.,\.49\)/,
+    'limit whitewater density for first-person mobile visibility');
 });
 
 test('WORK6 #104: visual enemy surf follows the enlarged render hull, never physics',()=>{
