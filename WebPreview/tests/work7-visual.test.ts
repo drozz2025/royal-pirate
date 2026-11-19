@@ -59,18 +59,18 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
   // All eight image sublayers also restore their actual pre-PR values.
   // These !important overrides exist ONLY for controlled same-frame A/B screenshots.
-  // Exact merged WORK0 v0.1.96 HEAD: undo ONLY THIS PR's fourth
-  // frame filter. Previous #411/#422 and live artwork stay untouched.
-  // The override is installed on the SAME page and animation frame.
-  // It is inert for Shop and for 320/tall viewports.
+  // True current HEAD before this PR: undo only the second approved 05
+  // crop's new pigment value. The fifth card and legendary chest maintain
+  // exactly their already-integrated HEAD treatments. Same browser/frame,
+  // with no Shop, dock, geometry, 320px or tall-screen changes.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
         box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+                   inset 0 2px 8px 3px #020817a9,
+                   inset 0 -2px 2px #e7b77545!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -495,7 +495,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
     'Second real 05 portrait must improve global MAE AND eight-card ROI vs current merged HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
-  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
-    JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
+  assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
+    '06 Loja must be exactly pixel-identical to the true current HEAD in global MAE');
+  assert.equal(shop.roiMaeAfter,shop.roiMaeBefore,
+    '06 Loja pack and three chests must remain exactly pixel-identical to current HEAD ROI');
 });
