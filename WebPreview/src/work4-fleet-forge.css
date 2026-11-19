@@ -3094,3 +3094,25 @@
     border-color:#725a46;
   }
 }
+
+
+/* WORK4/#104 — 19 Nov 17h: native source-light, Forja 04.
+   The single approved 04 bitmap ALREADY contains its hearth and iron bounce.
+   The extra SVG ellipses overpaint those source pixels and create a second
+   flare that was not present in the approved still. At the exact source-pixel
+   Chromium frame only, retain a restrained 15–30% of that duplicate bloom.
+   Native 384x512 ONLY: never change canvas/paint isolation, barrel crop,
+   furnace visibility, level plaque, THREE real costs, action, navigation,
+   Porto or other responsive layouts. Compare the legacy stop-opacity values
+   against these using one paused Chromium frame and source 04 ROI evidence. */
+@media (width:384px) and (height:512px) {
+  .w4-forge .w4-reference-cannon #w4-approved-hearth-20261117 stop:first-child {
+    stop-opacity:.06;
+  }
+  .w4-forge .w4-reference-cannon #w4-approved-hearth-20261117 stop:nth-child(2) {
+    stop-opacity:.02;
+  }
+  .w4-forge .w4-reference-cannon #w4-approved-iron-20261117 stop:first-child {
+    stop-opacity:.04;
+  }
+}
