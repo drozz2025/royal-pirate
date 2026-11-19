@@ -477,6 +477,56 @@ export function makeShip(red = false): ShipArt {
         new T.Vector3(side*1.38,2.68,4.65),.019,rope);
     }
   }
+  // WORK0 / #104: a genuine billowed triangular staysail extends the
+  // enemy's forward silhouette into its bowsprit. The older red broadside
+  // ended abruptly at the third square sail; from the first-person gunner
+  // camera it looked like a stack of red rectangles rather than a galleon.
+  // Battle opponent ONLY: the royal Porto ship, live hitbox, gun arrays and
+  // sail-damage bookkeeping are not modified.
+  if(red){
+    const top=new T.Vector3(0,7.26,3.45);
+    const tip=new T.Vector3(0,3.23,8.14);
+    const tack=new T.Vector3(0,3.20,3.68);
+    const segments=10, vertices:number[]=[], indices:number[]=[], rowStarts:number[]=[];
+    for(let row=0;row<=segments;row++){
+      const v=row/segments;
+      rowStarts.push(vertices.length/3);
+      for(let column=0;column<=segments-row;column++){
+        const u=column/segments,w=1-u-v;
+        // Curved canvas, zero bulge along all three taut edges. The mesh
+        // has real normals, depth and silhouette in the live Three.js scene.
+        const belly=.82*27*u*v*w;
+        vertices.push(belly,
+          top.y*w+tip.y*u+tack.y*v,
+          top.z*w+tip.z*u+tack.z*v);
+      }
+    }
+    for(let row=0;row<segments;row++)for(let column=0;column<segments-row;column++){
+      const a=rowStarts[row]+column,b=a+1,c=rowStarts[row+1]+column;
+      indices.push(a,b,c);
+      if(column<segments-row-1)indices.push(b,rowStarts[row+1]+column+1,c);
+    }
+    const clothGeometry=new T.BufferGeometry();
+    clothGeometry.setAttribute('position',new T.Float32BufferAttribute(vertices,3));
+    clothGeometry.setIndex(indices);
+    clothGeometry.computeVertexNormals();
+    const crimsonLinen=new T.MeshStandardMaterial({
+      color:'#bf5147',side:T.DoubleSide,roughness:.91,metalness:0
+    });
+    const jib=new T.Mesh(clothGeometry,crimsonLinen);
+    jib.name='enemy-billowed-bowsprit-jib';
+    rig.add(jib);
+    // The real projecting spar reaches the cloth's forward corner. Taut
+    // rope edges and a diagonal seam preserve the triangular sail profile;
+    // decorative geometry is batched into the existing hull draw materials.
+    beam(new T.Vector3(0,2.98,5.72),tip,.074,darkWood);
+    beam(top,tip,.029,rope);
+    beam(top,tack,.023,rope);
+    beam(tack,tip,.024,rope);
+    beam(new T.Vector3(0,5.88,4.90),
+      new T.Vector3(.23,3.42,6.58),.022,gold);
+    put(sphere,gold,tip.x,tip.y,tip.z,.11,.11,.11);
+  }
   // Warm lanterns at bow and stern, an original anchor-shaped bow ornament.
   for(const [x,z] of [[-1.18,-4.15],[1.18,-4.15],[0,4.95]]){put(cube,metal,x,3.1,z,.30,.50,.30);put(cube,light,x,3.12,z,.23,.34,.23);put(cylinder,gold,x,3.43,z,.23,.1,.23);}
   // Tiny crew silhouettes give the deck a sense of scale.
