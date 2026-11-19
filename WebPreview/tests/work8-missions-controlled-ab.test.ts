@@ -1791,6 +1791,80 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'return data.slice(1).map((b,i)=>Object.fromEntries(Object.entries(rois).map(([name,r])=>[name,mae(data[0],b,r)])));'+
       '})()';
     const enamelScores=await evalJs(enamelSource);
+
+    /* WORK8 #104: further genuine source-constrained native enamel research.
+       No artificial mission data, no reference-as-background, no CSS production
+       selection before comparing the SAME frozen frame in Chromium.
+       Only the 07 Missions reward board is painted in the temporary style. */
+    const w8TonePaint=(shift:number,glow:number)=>{
+      const hex=(v:number[])=>'#'+v.map(n=>Math.max(0,Math.min(255,n+shift)).toString(16).padStart(2,'0')).join('');
+      return 'radial-gradient(ellipse at 50% -8%,rgba(116,169,179,'+glow+'),transparent 68%),'+
+        'linear-gradient(170deg,'+hex([23,47,75])+','+hex([13,37,65])+' 62%,'+hex([8,23,41])+')';
+    };
+    const w8ToneCandidates:{name:string,paint:string|null}[]=[{name:'integrated',paint:null}];
+    for(const shift of [-18,-12,-6,0,6,12,18])
+      for(const glow of [.12,.20,.26,.34,.42])
+        w8ToneCandidates.push({name:'shift'+shift+'-glow'+glow,paint:w8TonePaint(shift,glow)});
+    const w8ToneScreens:string[]=[];
+    const w8ToneScores:{full:number,daily:number,chests:number,quests:number,dock:number}[]=[];
+    const w8ReferenceInit='(async()=>{const im=new Image();im.src='+JSON.stringify('data:image/webp;base64,'+orig)+
+      ';await im.decode();if(im.width!==384||im.height!==512)throw Error("native original must be 384x512");'+
+      'const c=document.createElement("canvas");c.width=384;c.height=512;const p=c.getContext("2d");p.drawImage(im,0,0);window.__w8ToneReference=p.getImageData(0,0,384,512).data;return true})()';
+    assert.ok(await evalJs(w8ReferenceInit),'approved original must load');
+    for(const sample of w8ToneCandidates){
+      const paintRule=sample.paint?daySurfaceSelector+'{background:'+sample.paint+'!important}':'';
+      await evalJs('(()=>{let s=document.getElementById("work8-tone-native-study");'+
+        'if(!s){s=document.createElement("style");s.id="work8-tone-native-study";document.head.appendChild(s)}'+
+        's.textContent='+JSON.stringify(paintRule)+';return true})()');
+      await delay(95);
+      const png=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      w8ToneScreens.push(png);
+      const measure='(async()=>{const i=new Image();i.src='+JSON.stringify('data:image/png;base64,'+png)+
+        ';await i.decode();if(i.width!==384||i.height!==512)throw Error("native rendered size");'+
+        'const c=document.createElement("canvas");c.width=384;c.height=512;const x=c.getContext("2d");x.drawImage(i,0,0);'+
+        'const a=window.__w8ToneReference,b=x.getImageData(0,0,384,512).data;'+
+        'const roi={full:[0,0,384,512],daily:[13,325,373,436],chests:[20,356,370,427],quests:[12,155,372,321],dock:[0,451,384,512]};'+
+        'const mae=r=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=4*(384*y+x);for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++}}return sum/n};'+
+        'return Object.fromEntries(Object.entries(roi).map(([key,r])=>[key,mae(r)]))})()';
+      w8ToneScores.push(await evalJs(measure));
+    }
+    await evalJs('document.getElementById("work8-tone-native-study")?.remove();delete window.__w8ToneReference;true');
+    const w8ToneLayoutAfter=await headingLayout();
+    assert.deepEqual(w8ToneLayoutAfter,dailySampleGeometry,'native tone study must not move any 07 hitbox or dock');
+    const w8ToneRows=w8ToneCandidates.map((s,i)=>({
+      ...s,...w8ToneScores[i],
+      deltaFull:w8ToneScores[i].full-w8ToneScores[0].full,
+      deltaDaily:w8ToneScores[i].daily-w8ToneScores[0].daily,
+      deltaChests:w8ToneScores[i].chests-w8ToneScores[0].chests,
+      deltaQuests:w8ToneScores[i].quests-w8ToneScores[0].quests,
+      deltaDock:w8ToneScores[i].dock-w8ToneScores[0].dock
+    }));
+    const w8ToneWinner=w8ToneRows.filter(r=>r.deltaFull<-.003&&r.deltaDaily<-.012&&
+      Math.abs(r.deltaQuests)<.008&&Math.abs(r.deltaDock)<.008&&r.deltaChests<.20)
+      .sort((a,b)=>a.deltaDaily-b.deltaDaily)[0]||null;
+    const w8BestIdx=w8ToneWinner?w8ToneRows.indexOf(w8ToneWinner):0;
+    const w8ToneVisualScript='(async()=>{const data='+JSON.stringify([
+      'data:image/webp;base64,'+orig,
+      'data:image/png;base64,'+w8ToneScreens[0],
+      'data:image/png;base64,'+w8ToneScreens[w8BestIdx]
+    ])+';const a=await Promise.all(data.map(src=>new Promise((ok,no)=>{let im=new Image();im.onload=()=>ok(im);im.onerror=no;im.src=src})));'+
+      'const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");a.forEach((im,i)=>x.drawImage(im,384*i,0));'+
+      'x.drawImage(a[0],1152,0);x.globalAlpha=.5;x.drawImage(a[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()';
+    saveTone('missions-native-tone-original-before-best-overlay.png',await evalJs(w8ToneVisualScript));
+    saveTone('missions-native-tone-before.png',w8ToneScreens[0]);
+    saveTone('missions-native-tone-best.png',w8ToneScreens[w8BestIdx]);
+    writeFileSync(join(evidence,'work8-missions-native-tone-study.json'),JSON.stringify({
+      issue:104,scope:'07 Missões daily enamel only',base:'b0b3a13529eca5b5453b3342fd711e2f47b0bdf5',
+      references:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      controlled:true,viewport:'native Chromium 384x512 DPR1, identical frozen real scene',
+      roi:{full:[0,0,384,512],daily:[13,325,373,436],chests:[20,356,370,427],quests:[12,155,372,321],dock:[0,451,384,512]},
+      winner:w8ToneWinner,rows:w8ToneRows,geometry:w8ToneLayoutAfter,approved:false,approvedScreens:0
+    },null,2));
+    console.log('WORK8_NATIVE_TONE_WINNER '+JSON.stringify(w8ToneWinner));
+    /* This initial sweep is research. The candidate must be committed in a
+       separate scoped CSS edit and independently retested before review. */
     const enamelRows=enamelOptions.map(([name,background],i)=>({
       name,background,...enamelScores[i],
       deltaFull:enamelScores[i].full-enamelScores[0].full,
