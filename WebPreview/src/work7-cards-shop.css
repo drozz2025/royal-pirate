@@ -4351,3 +4351,23 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7 / issue #104 — 19 Nov 09:37 UTC, lighter engraved inlays on 8 genuine cards.
+ * Actual 384×512 Chrome per-card sweep of 32 finishes showed overly deep
+ * navy engraving FAILED on all eight cards, while the soft metallic treatment
+ * improved GLOBAL MAE and the whole eight-card ROI for EACH individual slot.
+ * Apply only the verified LIGHT treatment uniformly to 8 genuine source-art
+ * cards, preserving true 4×2 proportions and interactive PRÉVIA plaques.
+ * The existing complete metal corner material stays; only the bevel shadow
+ * gains a shallower groove and warm bottom edge. No screenshot backgrounds.
+ * 320×568, tall viewports, all Shop 06, shell and dock unaffected.
+ * Final same-frame eight-at-once gate must improve both metrics vs
+ * 6f567086 merged HEAD; approved:false 0/8, WORK0 only integrates. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot::before{
+    box-shadow:
+      inset 0 0 0 1px #47271480,
+      inset 0 2px 4px #080c235d,
+      inset 0 -2px 1px #ffdb7b43;
+  }
+}
