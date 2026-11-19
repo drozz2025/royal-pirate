@@ -272,3 +272,38 @@ test('repeated recolouring shares two fabric materials and disposes replaced tex
  assert.equal(sailTextureDisposals,1);
  assert.equal(flagTextureDisposals,1);
 });
+
+test('mobile modular previews pool repeating box, cylinder and gunport buffers without leaks',()=>{
+ const root=new T.Group(),rig=new T.Group();root.add(rig);
+ const loadout={shipClass:'warship' as const,level:20,modules:{
+  hull:'hull-royal',armor:'armor-royal',cannons:'cannons-gold',
+  masts:'masts-royal',cabin:'cabin-palace',ornaments:'ornaments-legendary'
+ }};
+ const group=applyShipModules(root,rig,loadout);
+ const meshes=group.children.filter((o):o is T.Mesh=>o instanceof T.Mesh);
+ const boxes=meshes.filter(o=>o.geometry.type==='BoxGeometry');
+ const cylinders=meshes.filter(o=>o.geometry.type==='CylinderGeometry' &&
+  (o.geometry as T.CylinderGeometry).parameters.radiusTop===1 &&
+  (o.geometry as T.CylinderGeometry).parameters.height===1);
+ const rings=meshes.filter(o=>o.geometry.type==='TorusGeometry');
+ assert.ok(boxes.length>25,'complex royal hull contains many independently scaled beams and plates');
+ assert.equal(new Set(boxes.map(o=>o.geometry)).size,1,'box meshes share one GPU buffer');
+ assert.ok(cylinders.length>=12,'mast and armour rivets require multiple cylinders');
+ assert.equal(new Set(cylinders.map(o=>o.geometry)).size,1,'cylinders share one GPU buffer');
+ assert.equal(rings.length,14,'eight flagship port rims plus six modular cannon rings');
+ assert.equal(new Set(rings.map(o=>o.geometry)).size,2,'each ring size has one shared buffer');
+ assert.ok(new Set(meshes.map(o=>o.geometry)).size<20,'accessory geometries stay bounded for mobile');
+ const sharedBox=boxes[0].geometry,sharedCylinder=cylinders[0].geometry;
+ const oldRing=rings[0].geometry;
+ let boxDisposes=0,cylinderDisposes=0,ringDisposes=0;
+ sharedBox.addEventListener('dispose',()=>boxDisposes++);
+ sharedCylinder.addEventListener('dispose',()=>cylinderDisposes++);
+ oldRing.addEventListener('dispose',()=>ringDisposes++);
+ const next=applyShipModules(root,rig,{shipClass:'scout',level:1,modules:{}});
+ assert.equal(boxDisposes,1,'reused box geometry is released once');
+ assert.equal(cylinderDisposes,1,'reused cylinder geometry is released once');
+ assert.equal(ringDisposes,1,'reused torus geometry is released once');
+ assert.equal(root.getObjectByName('modular-ship-accessories'),next);
+ assert.equal(root.children.filter(o=>o.name==='modular-ship-accessories').length,1);
+ assert.equal(next.userData.level,1);
+});
