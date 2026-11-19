@@ -38,7 +38,7 @@ test('Enemy cloth has real additional fold depth and coloured vertices',()=>{
   const row=6, step=9, z:number[]=[];
   for(let u=0;u<step;u++)z.push(vertices.getZ(row*step+u));
   assert.ok(Math.max(...z)-Math.min(...z)>.28,'sail has actual curved depth');
-  const values=new Set([...Array(step)].map((_,i)=>colours.getR(row*step+i).toFixed(3)));
+  const values=new Set([...Array(step)].map((_,i)=>colours.getX(row*step+i).toFixed(3)));
   assert.ok(values.size>=5,'sunlit and shadowed canvas panels are not flat blocks');
   assert.equal(rig.children.length,2,'no additional sails/draw-calls or fake foreground ships');
 });
