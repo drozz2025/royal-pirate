@@ -58,10 +58,14 @@ export function battleCameraPose(aspect: number): CameraPose {
     // Never move the simulated ships, physics, Porto or five-item dock.
     const ultraTall = aspect < .50;
     return {
-      position: [0, 7.4, 67],
-      target: [ultraTall ? 7.2 : 4.2, 4.1, -3],
+      // Move the EYE and physical first-person gun deck forward as one unit.
+      // This enlarges the live enemy's apparent broadside by perspective,
+      // not by scaling its collision-inaccurate visual root. A matching pan
+      // preserves the stern margin on 320 / 384 / 390 / 430 portrait viewports.
+      position: [0, 7.4, 55],
+      target: [ultraTall ? 7.65 : 5.15, 4.1, -3],
       showBattery: true,
-      batteryOffsetZ: -18,
+      batteryOffsetZ: -30,
       batteryOffsetX: ultraTall ? 3.6 : 2,
       batteryScale: 1,
       // Legacy optional edge rig is now HIDDEN for portrait battle.
