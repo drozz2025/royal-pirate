@@ -18,7 +18,7 @@ export class OceanScene {
   ships: Record<'player'|'enemy',ShipArt>; private water: T.ShaderMaterial; private raf=0; private previous=0; private elapsed=0;
   private canvas: HTMLCanvasElement; private resizeObserver: ResizeObserver; private trail: T.Line;
   private pathGeometry=new T.BufferGeometry().setAttribute('position',new T.BufferAttribute(new Float32Array(240*3),3)); private path: T.Line; private marker: T.Mesh;
-  private ball: T.Mesh; private particleGeometry=new T.IcosahedronGeometry(1,0); private particleMaterial=new T.MeshBasicMaterial({color:'#fff'});
+  private ball: T.Mesh; private ballAura: T.Mesh; private particleGeometry=new T.IcosahedronGeometry(1,0); private particleMaterial=new T.MeshBasicMaterial({color:'#fff'});
   private particles: { mesh:T.Mesh;velocity:T.Vector3;age:number;life:number;size:number;smoke:boolean }[]=[];
   private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private muzzleFlash:Partial<Record<'player'|'enemy',T.Mesh>>={}; private recoilAge:Record<'player'|'enemy',number>={player:Infinity,enemy:Infinity}; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'='battle'; private harbourDock=new T.Group(); private worldScenery=new T.Group(); private battleBattery=new T.Group(); private battleForegroundSail=new T.Group(); private batteryFlashes:T.Mesh[]=[]; private batteryMuzzles:T.Vector3[]=[]; private activeBatteryMuzzle=0; private playerArcTarget:T.Vector3|null=null; private playerArcDuration=1; private battleSky:T.CanvasTexture; private battleAccentLights=new T.Group(); private shake=0;
   private shipPointers=new Set<number>(); private shipStart: {x:number;y:number}|null=null; private shipMoved=false;
@@ -173,7 +173,13 @@ export class OceanScene {
     this.controls=new OrbitControls(this.camera,this.canvas);this.controls.enableDamping=true;this.controls.enablePan=false;this.controls.minDistance=18;this.controls.maxDistance=110;this.controls.minPolarAngle=.32;this.controls.maxPolarAngle=1.28;this.controls.target.set(0,2,0);this.controls.rotateSpeed=.5;
     this.path=new T.Line(this.pathGeometry,new T.LineDashedMaterial({color:'#f9e5a4',dashSize:.35,gapSize:.2,transparent:true,opacity:.85}));this.scene.add(this.path);
     this.marker=new T.Mesh(new T.RingGeometry(.48,.58,36),new T.MeshBasicMaterial({color:'#ffdf7e',side:T.DoubleSide,transparent:true,opacity:.9,depthTest:false}));this.marker.rotation.x=-Math.PI/2;this.scene.add(this.marker);
-    this.ball=new T.Mesh(new T.SphereGeometry(.22,12,8),new T.MeshStandardMaterial({color:'#262731',metalness:.8,roughness:.2,emissive:'#e87524',emissiveIntensity:.35}));this.ball.visible=false;this.scene.add(this.ball);
+    // A readable ember outline belongs to the one TRUE ball, not to a second
+    // simulated shot. Rendered in Batalha only, anchored to its live position.
+    this.ball=new T.Mesh(new T.SphereGeometry(.32,12,8),new T.MeshStandardMaterial({color:'#262731',metalness:.8,roughness:.2,emissive:'#e87524',emissiveIntensity:.55}));this.ball.visible=false;this.scene.add(this.ball);
+    this.ballAura=new T.Mesh(new T.SphereGeometry(.62,12,8),
+      new T.MeshBasicMaterial({color:'#ffae56',transparent:true,opacity:.38,
+        depthWrite:false,blending:T.AdditiveBlending}));
+    this.ballAura.visible=false;this.scene.add(this.ballAura);
     this.trail=new T.Line(new T.BufferGeometry(),new T.LineBasicMaterial({color:'#ffde8c',transparent:true,opacity:.9}));this.scene.add(this.trail);
     // All effects reuse a bounded mesh pool; no geometry/material allocation per shot.
     for(let i=0;i<160;i++){const mesh=new T.Mesh(this.particleGeometry,this.particleMaterial.clone());mesh.visible=false;this.scene.add(mesh);this.pool.push(mesh);}
@@ -666,7 +672,7 @@ export class OceanScene {
     this.ships.player.root.scale.setScalar(1);this.ships.enemy.root.scale.setScalar(1);
     this.ships.player.root.visible=true;
     this.shipPointers.clear();this.shipStart=null;this.battleBattery.visible=false;this.battleForegroundSail.visible=false;this.worldScenery.visible=true;this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
-    this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
+    this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.ballAura.visible=false;this.trail.visible=false;
     this.controls.enableRotate=false;this.controls.enableZoom=false;this.controls.maxPolarAngle=1.28;
     const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
     this.controls.target.set(ship.x,portrait?3.5:2.9,ship.z+(portrait?1:0));
@@ -752,7 +758,7 @@ export class OceanScene {
       this.particles.push({mesh,velocity:new T.Vector3(Math.cos(angle)*speed*(.3+Math.random()),smoke?1.5:2+Math.random()*4,Math.sin(angle)*speed*(.3+Math.random())),age:0,life:smoke?2.4:1.1+Math.random()*.4,size,smoke});
     }
   }
-  reset(){this.battle.reset();this.recoilAge={player:Infinity,enemy:Infinity};for(const flash of Object.values(this.muzzleFlash))flash.visible=false;this.impactCounts={player:0,enemy:0};for(const ship of Object.values(this.ships))ship.scars.forEach(m=>m.visible=false);for(const p of this.particles){p.mesh.visible=false;this.pool.push(p.mesh);}this.particles=[];for(const ripple of this.ripples){ripple.mesh.visible=false;this.ripplePool.push(ripple.mesh);}this.ripples=[];this.ball.visible=false;this.trail.visible=false;this.shake=0;this.lastAim='';this.activeBatteryMuzzle=0;this.playerArcTarget=null;this.playerArcDuration=1;for(const flare of this.batteryFlashes)flare.visible=false;const smokeRig=this.battleBattery.getObjectByName('first-person-central-smoke');if(smokeRig)smokeRig.visible=false;this.home();}
+  reset(){this.battle.reset();this.recoilAge={player:Infinity,enemy:Infinity};for(const flash of Object.values(this.muzzleFlash))flash.visible=false;this.impactCounts={player:0,enemy:0};for(const ship of Object.values(this.ships))ship.scars.forEach(m=>m.visible=false);for(const p of this.particles){p.mesh.visible=false;this.pool.push(p.mesh);}this.particles=[];for(const ripple of this.ripples){ripple.mesh.visible=false;this.ripplePool.push(ripple.mesh);}this.ripples=[];this.ball.visible=false;this.ballAura.visible=false;this.trail.visible=false;this.shake=0;this.lastAim='';this.activeBatteryMuzzle=0;this.playerArcTarget=null;this.playerArcDuration=1;for(const flare of this.batteryFlashes)flare.visible=false;const smokeRig=this.battleBattery.getObjectByName('first-person-central-smoke');if(smokeRig)smokeRig.visible=false;this.home();}
   getMetrics():Metrics{const info=this.renderer.info;const perf=performance as Performance & {memory?:{usedJSHeapSize:number}};return{fps:this.frameSamples.length?Math.round(1000/(this.frameSamples.reduce((a,b)=>a+b,0)/this.frameSamples.length)):0,renderMs:Math.round(this.renderMs),calls:info.render.calls,triangles:info.render.triangles,geometries:info.memory.geometries,textures:info.memory.textures,effects:this.particles.length,heapMB:perf.memory?Math.round(perf.memory.usedJSHeapSize/1048576):undefined};}
   private animate=(timestamp:number)=>{
     if(this.disposed)return;this.raf=requestAnimationFrame(this.animate);if(document.hidden||this.paused){this.previous=0;return;}
@@ -795,6 +801,14 @@ export class OceanScene {
       centralBlast.scale.setScalar(.54+batteryFx.flashScale*.74);
       (centralBlast.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity*.64;
     }
+    // The ignition jet uses the SAME animated recoil transform and barrel
+    // axis as the flash/smoke and is never visible outside the firing envelope.
+    const centralJet=this.battleBattery.getObjectByName('first-person-central-fire-jet') as T.Mesh|undefined;
+    if(centralJet){
+      centralJet.visible=this.battleBattery.visible&&batteryFx.visible;
+      centralJet.scale.setScalar(.55+batteryFx.flashScale*.7);
+      (centralJet.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity*.92;
+    }
     // Powder smoke hangs briefly in front of the ACTUAL moving muzzle. Six
     // instanced puffs = one bounded draw call, zero per-shot mesh allocations.
     const smokeRig=this.battleBattery.getObjectByName('first-person-central-smoke') as T.Group|undefined;
@@ -828,13 +842,21 @@ export class OceanScene {
         ?firstPersonShotPosition(s,visibleMuzzle,this.playerArcTarget,this.playerArcDuration)
         :visibleMuzzle?projectileFromMuzzle(s,visibleMuzzle):s.position;
       this.ball.position.set(rendered.x,rendered.y,rendered.z);
+      // The one moving ball receives a short, warm outline for ocean contrast.
+      // No extra hitbox, simulation launch, damage or changed turn timing.
+      this.ballAura.visible=s.side==='player'&&this.battleBattery.visible;
+      if(this.ballAura.visible){
+        this.ballAura.position.copy(this.ball.position);
+        this.ballAura.scale.setScalar(Math.max(.48,.92-Math.min(s.age,1.2)*.35));
+        (this.ballAura.material as T.MeshBasicMaterial).opacity=Math.max(.14,.4-Math.min(s.age,1.2)*.18);
+      }
       this.trail.visible=true;
       const p=this.ball.position.clone();
       const v=visibleMuzzle&&this.playerArcTarget&&this.batteryMuzzles.length===1
         ?(() => {const next=firstPersonArc(visibleMuzzle,this.playerArcTarget!,
           (s.age+.035)/this.playerArcDuration);return new T.Vector3(next.x,next.y,next.z).sub(p).normalize();})()
         :new T.Vector3(s.velocity.x,s.velocity.y-12*s.age,s.velocity.z).normalize();
-      this.trail.geometry.setFromPoints([p,p.clone().addScaledVector(v,-1.2)]);}else{this.ball.visible=false;this.trail.visible=false;}
+      this.trail.geometry.setFromPoints([p,p.clone().addScaledVector(v,-1.2)]);}else{this.ball.visible=false;this.ballAura.visible=false;this.trail.visible=false;}
     for(let i=this.particles.length-1;i>=0;i--){const p=this.particles[i];p.age+=dt;if(p.age>=p.life){p.mesh.visible=false;this.pool.push(p.mesh);this.particles.splice(i,1);continue;}p.mesh.position.addScaledVector(p.velocity,dt);if(!p.smoke)p.velocity.y-=8*dt;const alpha=1-p.age/p.life;(p.mesh.material as T.MeshBasicMaterial).opacity=alpha;p.mesh.scale.setScalar(p.size*(p.smoke?1+p.age*2:Math.max(.2,alpha)));}
     this.controls.update();if(this.shake>0){this.camera.position.y+=Math.sin(timestamp*.1)*this.shake;this.shake*=.86;}
     const renderStart=performance.now();this.renderer.render(this.scene,this.camera);this.renderMs=performance.now()-renderStart;
