@@ -49,6 +49,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'New WORK7 eight-card short-viewport art treatment exists without screenshot backgrounds');
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
+  assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Native 05 WORK7 candidate must exist');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
     'The final WORK7 candidate changes only genuine 05 frame inlays');
     // The only admissible before-image is the actual merged #392 v0.1.88 field.
@@ -62,12 +63,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // It is inert for Shop and for 320/tall viewports.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
-        filter:brightness(.52) saturate(2.00) contrast(.79)!important;
-      }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
-        filter:brightness(.42) saturate(1.75) contrast(.79)!important;
-      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.59)!important}
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/', '--outDir', privateBuildDir],
@@ -378,6 +374,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
 
 
 
+
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
@@ -455,7 +452,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
   assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
-    'Only native genuine 05 slots 4 and 7 may improve strict full-frame+eight-card ROI vs current merged v0.1.96 HEAD: '+
+    'Native 05 fifth true frame enamel must improve strict full-frame+eight-card ROI vs actual starting HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
   assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
     '06 Shop global image must be pixel-identical to merged HEAD');
