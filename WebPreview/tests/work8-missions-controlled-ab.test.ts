@@ -1742,6 +1742,94 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(Math.abs(glowDelta.daily)<.06 && Math.abs(glowDelta.chests)<.06 &&
       Math.abs(glowDelta.dockDelta)<.06,'no daily chest or WORK0 dock regression');
 
+
+    /* WORK8 #104 — exploratory genuine daily-board enamel calibration.
+       No mock UI or state changes: study only real 07 background paint.
+       Every sample is in the same 384x512 Chromium tab and frozen scene.
+       Keep other WORKs, Ranking, dock, three missions and 7 actual chests fixed. */
+    const daySurfaceClass='work8-missions-daily-surface-ab-baseline';
+    const daySurfaceSelector='.w8-approved-missions .w8-approved-daily';
+    await evalJs('(()=>{document.documentElement.classList.add('+JSON.stringify(daySurfaceClass)+');document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
+    await delay(120);
+    const dailySampleGeometry=await headingLayout();
+    assert.equal(dailySampleGeometry.questCount,3);
+    assert.equal(dailySampleGeometry.dayCount,7);
+    assert.equal(dailySampleGeometry.dockCount,5);
+    const enamelOptions=[
+      ['integrated',null],
+      ['ocean-light','radial-gradient(ellipse at 50% -8%,rgba(136,207,185,.37),transparent 68%),linear-gradient(170deg,#245876,#153b59 62%,#0c2440)'],
+      ['ocean-dark','radial-gradient(ellipse at 50% -8%,rgba(136,207,185,.37),transparent 68%),linear-gradient(170deg,#153e58,#0b2744 62%,#06182c)'],
+      ['ocean-ink','radial-gradient(ellipse at 50% -8%,rgba(136,207,185,.37),transparent 68%),linear-gradient(170deg,#194663,#0d2c4a 62%,#061b30)'],
+      ['aquamarine','radial-gradient(ellipse at 50% -8%,rgba(150,217,183,.43),transparent 68%),linear-gradient(170deg,#204d62,#12384f 62%,#092438)'],
+      ['navy-blue','radial-gradient(ellipse at 50% -8%,rgba(126,184,217,.30),transparent 68%),linear-gradient(170deg,#224969,#10304f 62%,#081d37)'],
+      ['night-steel','radial-gradient(ellipse at 50% -8%,rgba(116,169,179,.26),transparent 68%),linear-gradient(170deg,#172f4b,#0d2541 62%,#081729)'],
+      ['blue-green','radial-gradient(ellipse at 50% -8%,rgba(106,206,181,.38),transparent 68%),linear-gradient(170deg,#1a4c59,#0e334c 62%,#082335)'],
+      ['soft-sea','radial-gradient(ellipse at 50% -8%,rgba(155,208,200,.35),transparent 68%),linear-gradient(170deg,#26536b,#173c54 62%,#0b2740)'],
+      ['royal-deep','radial-gradient(ellipse at 50% -8%,rgba(114,164,210,.38),transparent 68%),linear-gradient(170deg,#193451,#112743 62%,#07162c)'],
+      ['muted-aqua','radial-gradient(ellipse at 50% -8%,rgba(110,183,179,.28),transparent 68%),linear-gradient(170deg,#1b405b,#102d48 62%,#071c32)'],
+      ['blue-cobalt','radial-gradient(ellipse at 50% -8%,rgba(120,175,195,.32),transparent 68%),linear-gradient(170deg,#244a70,#143557 62%,#0a2345)'],
+      ['light-gold','radial-gradient(ellipse at 50% -8%,rgba(216,194,135,.33),transparent 68%),linear-gradient(170deg,#224a63,#12344e 62%,#081b30)']
+    ] as const;
+    const enamelShots:string[]=[];
+    const enamelRects:any[]=[];
+    for(const [name,paint] of enamelOptions) {
+      await evalJs('(()=>{let s=document.getElementById("work8-daily-enamel-sweep");if(!s){s=document.createElement("style");s.id="work8-daily-enamel-sweep";document.head.appendChild(s)}s.textContent='+JSON.stringify(paint===null?'':daySurfaceSelector+'{background:'+paint+'!important}').replace(/\\/g,'\\\\')+';return true})()');
+      await delay(110);
+      enamelShots.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+      enamelRects.push(await headingLayout());
+    }
+    await evalJs('document.getElementById("work8-daily-enamel-sweep")?.remove();document.documentElement.classList.remove('+JSON.stringify(daySurfaceClass)+');true');
+    for(const geometry of enamelRects)assert.deepEqual(geometry,dailySampleGeometry,
+      'enamel samples cannot move mission buttons, 7 chests or five nav items');
+    const enamelSource='(async()=>{'+
+      'const urls='+JSON.stringify(['data:image/webp;base64,'+orig,...enamelShots.map(x=>'data:image/png;base64,'+x)])+';'+
+      'const loaded=await Promise.all(urls.map(s=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=s})));'+
+      'const w=384,h=512;if(loaded.some(im=>im.width!==w||im.height!==h))throw Error("no scaling permitted");'+
+      'const data=loaded.map(im=>{const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.drawImage(im,0,0);return x.getImageData(0,0,w,h).data});'+
+      'const rois={full:[0,0,384,512],daily:[13,325,373,436],chests:[20,356,370,427],quest:[12,155,372,321],dock:[0,451,384,512]};'+
+      'function mae(a,b,r){let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=4*(y*w+x);for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++}}return sum/n}'+
+      'return data.slice(1).map((b,i)=>Object.fromEntries(Object.entries(rois).map(([name,r])=>[name,mae(data[0],b,r)])));'+
+      '})()';
+    const enamelScores=await evalJs(enamelSource);
+    const enamelRows=enamelOptions.map(([name,background],i)=>({
+      name,background,...enamelScores[i],
+      deltaFull:enamelScores[i].full-enamelScores[0].full,
+      deltaDaily:enamelScores[i].daily-enamelScores[0].daily,
+      deltaChests:enamelScores[i].chests-enamelScores[0].chests,
+      deltaQuest:enamelScores[i].quest-enamelScores[0].quest,
+      deltaDock:enamelScores[i].dock-enamelScores[0].dock
+    }));
+    const viable=enamelRows.filter(r=>r.deltaDaily<-.01 && r.deltaFull<-.002 &&
+      Math.abs(r.deltaChests)<.3 && Math.abs(r.deltaQuest)<.02 && Math.abs(r.deltaDock)<.02);
+    const optimal=viable.sort((a,b)=>a.deltaDaily-b.deltaDaily)[0]||null;
+    const optimalIndex=optimal?enamelRows.findIndex(r=>r.name===optimal.name):0;
+    const mosaicExpression='(async()=>{const urls='+JSON.stringify([
+      'data:image/webp;base64,'+orig,
+      'data:image/png;base64,'+enamelShots[0],
+      'data:image/png;base64,'+enamelShots[optimalIndex]
+    ])+';const images=await Promise.all(urls.map(s=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=s})));const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");images.forEach((im,n)=>x.drawImage(im,384*n,0));x.drawImage(images[0],1152,0);x.globalAlpha=.5;x.drawImage(images[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()';
+    saveTone('missions-daily-surface-original-before-best-overlay-384x512.png',await evalJs(mosaicExpression));
+    saveTone('missions-daily-surface-before-384x512.png',enamelShots[0]);
+    saveTone('missions-daily-surface-best-research-384x512.png',enamelShots[optimalIndex]);
+    const dailyEnamelReport={
+      scope:'WORK8 07 Missions; real daily reward board background only',
+      baseHead:'ce76942e8cb17a1819daafb0ff34cd7a159fdc08',
+      source:'assets/design-approved/07-missoes.webp',
+      approvedReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      method:'chromium native 384x512 DPR1, same paused live scene, no scaling',
+      roi:'full, daily [13,325,373,436], seven chests [20,356,370,427], quest, dock',
+      samples:enamelRows,optimalResearch:optimal,realLayout:dailySampleGeometry,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-daily-surface-sweep.json'),JSON.stringify(dailyEnamelReport,null,2));
+    console.log('WORK8_DAILY_SURFACE_SWEEP '+JSON.stringify(enamelRows));
+    console.log('WORK8_DAILY_SURFACE_BEST '+JSON.stringify(optimal));
+    assert.ok(enamelShots.length===enamelOptions.length && enamelScores.length===enamelOptions.length);
+    /* This first research pass does not claim improvement or ship an unproven
+       pigment; a separate candidate gate must be measured before integration. */
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
