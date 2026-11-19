@@ -13,8 +13,10 @@ on:
       - work2/shipyard-class-presets-helm-20261119
       - work2/original-standing-rigging-20261119
       - work2/original-stern-heraldry-20261119
+      - work2/original-armour-20261119
   pull_request:
     branches:
+      - work2/original-stern-heraldry-20261119
       - work2/modular-ships-levels-1-20
       - work2/shipyard-ownership-class-polish-20261119
       - work2/verified-player-level-gate-20261119
