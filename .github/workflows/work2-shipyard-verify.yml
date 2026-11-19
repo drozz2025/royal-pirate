@@ -14,6 +14,7 @@ on:
       - work2/original-standing-rigging-20261119
       - work2/original-stern-heraldry-20261119
       - work2/original-armour-20261119
+      - work2/original-cabin-gallery-20261119
   pull_request:
     branches:
       - work2/original-stern-heraldry-20261119
@@ -21,6 +22,7 @@ on:
       - work2/shipyard-ownership-class-polish-20261119
       - work2/verified-player-level-gate-20261119
       - work2/original-standing-rigging-20261119
+      - work2/original-armour-20261119
     paths:
       - 'WebPreview/**'
       - '.github/workflows/work2-shipyard-verify.yml'
