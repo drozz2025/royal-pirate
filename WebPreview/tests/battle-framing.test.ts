@@ -47,8 +47,12 @@ test('deck-level portrait framing and original desktop pose are independently sc
  assert.equal(mobile.batteryOffsetZ,-18);
  assert.equal(mobile.batteryOffsetX,2);
  assert.equal(mobile.batteryScale,1);
- assert.deepEqual(battleCameraPose(390/844),mobile);
  assert.deepEqual(battleCameraPose(320/568),mobile);
+ const tall=battleCameraPose(390/844);
+ assert.deepEqual(tall.position,mobile.position);
+ assert.deepEqual(tall.target,[7.2,4.1,-3]);
+ assert.equal(tall.batteryOffsetX,3.6);
+ assert.deepEqual(battleCameraPose(430/932),tall);
  assert.equal(battleCameraPose(1.4).showBattery,false);
 });
 
@@ -70,4 +74,23 @@ test('genuine central cannon and old two-gun generator remain finite and battle-
  assert.equal(legacy.flashes.length,2,'legacy geometry remains isolated from approved Porto');
  assert.ok(central.flashes.every(f=>!f.visible));
  assert.ok(central.group.children.length<60);
+});
+
+test('WORK0/#104: ultra-tall mobile keeps one real muzzle centered while clearing enemy broadside from the edge',()=>{
+ const {group,muzzles}=makeBattleDeck(true);
+ for(const [w,h] of [[390,844],[430,932]]) {
+   const pose=battleCameraPose(w/h);
+   group.position.set(pose.batteryOffsetX,0,pose.batteryOffsetZ);
+   group.scale.setScalar(pose.batteryScale);
+   const barrel=group.getObjectByName('first-person-central-recoil')!;
+   const mouth=battleDeckMuzzleWorld(barrel,muzzles[0]);
+   const projectedMuzzle=screen(w,h,mouth);
+   const enemy=screen(w,h,new T.Vector3(10,0,-3));
+   assert.ok(projectedMuzzle.x>w*.42 && projectedMuzzle.x<w*.58,
+     'single cannon stays centred at '+w+'x'+h);
+   assert.ok(enemy.x>w*.54 && enemy.x<w*.72,
+     'enemy anchor must not sit at right screen edge '+w+'x'+h);
+ }
+ assert.deepEqual(battleCameraPose(384/512),battleCameraPose(320/568),
+   'native reference and compact portrait camera poses must not change');
 });
