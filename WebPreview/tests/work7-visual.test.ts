@@ -51,20 +51,19 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
     'The final WORK7 candidate changes only genuine 05 frame inlays');
-  assert.ok(cssText.includes('19 Nov 00:50 UTC. Native 05: original slot 6 carved-enamel depth.'),
+  assert.ok(cssText.includes('19 Nov 01:03 UTC. Native 05: slot 6 enamel INLAY material.'),
     'WORK7 native candidate changes only sixth physical 4x2 frame');
     // The only admissible before-image is the actual merged #392 v0.1.88 field.
   // Art and frames are restored with temporary CSS, never with older #384 values.
   // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
   // All eight image sublayers also restore their actual pre-PR values.
   // These !important overrides exist ONLY for controlled same-frame A/B screenshots.
-  // The only A/B delta is the sixth genuine frame depth. Restore the
-  // verified merged v0.1.99 value, never older PR #442 / open #455 CSS.
-  // Inject into the SAME frozen Chromium scene/frame; Shop is unchanged.
+  // The only A/B delta is slot six genuine inlay pigment, not a filter.
+  // Restore merged v0.1.99 #b8eaff in the same frozen real Chromium frame.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
-        filter:brightness(.65) saturate(1.30) contrast(.92)!important;
+        --w7-inlay:#b8eaff!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -341,10 +340,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         // original WEBP, with a temporary !important override; all samples
         // are removed before continuing regression and metric assertions.
         if (kind==='cards' && width===384 && height===512) {
-          for (const value of [.62,.65,.68,.70,.72,.74,.76,.78,.82,.86]) {
+          for (const value of ['#3977a6','#568eaf','#679fc5','#83b6d7','#96c9ee','#a8ddf2','#b8eaff','#d0f3ff','#e4fbff','#6ba5e9']) {
             const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
               '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6)'+
-              '{filter:brightness('+value+') saturate(1.30) contrast(.92)!important}}';
+              '{--w7-inlay:'+value+'!important}}';
             await evaluate("(()=>{const s=document.createElement('style');s.id='w7-card6-sweep';s.textContent="+JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
             await sleep(100);
             const frame=await command('Page.captureScreenshot',{
@@ -361,7 +360,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
               "for(let k=0;k<3;k++){const d=Math.abs(a[p+k]-b[p+k]);total+=d;if(x>=18&&x<365&&y>=195&&y<428){roi+=d;count++}}}"+
               "return {global:Math.round(total/(384*512*3)*10000)/10000,roi:Math.round(roi/count*10000)/10000}})()");
-            console.log('WORK7 CARD6 NATIVE SWEEP brightness='+value+' '+JSON.stringify(scores));
+            console.log('WORK7 CARD6 NATIVE SWEEP inlay='+value+' '+JSON.stringify(scores));
             await evaluate("(()=>{document.getElementById('w7-card6-sweep')?.remove();return true})()");
             await sleep(55);
           }
@@ -484,7 +483,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
   assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
-    'Only native genuine 05 slot 6 may improve strict full-frame+eight-card ROI vs current merged v0.1.99 HEAD: '+
+    'Only native genuine 05 slot-six painted-inlay may improve strict full-frame+eight-card ROI vs merged v0.1.99 HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
   assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
     '06 Shop global image must be pixel-identical to merged HEAD');
