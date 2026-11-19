@@ -81,6 +81,71 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
     for(const z of [55.5,62,68,75])plank(x,1.69,z,.43,.23,.6,gold);
   }
   plank(0,.53,53,13,.32,.4,dark);
+  // WORK0 #104 — a real, sculpted GUNNER'S DECK in the first-person stage.
+  // Before: one flat rectangle of wood and two undecorated side walls.
+  // These are actual 3D meshes attached ONLY to the isolated battle battery:
+  // the approved Porto ship, game physics, muzzle, HUD and dock cannot change.
+  // Keep the horizon and opponent open: every new rail and rope stays outboard
+  // of the centreline (|x| >= 3.8) and below eye level (y <= 3.05).
+  const dressing=new T.Group();
+  dressing.name='first-person-premium-gundeck';
+  group.add(dressing);
+  const oak=new T.MeshStandardMaterial({color:'#81502e',roughness:.78});
+  const oakEdge=new T.MeshStandardMaterial({color:'#bf8750',roughness:.70});
+  const brass=new T.MeshStandardMaterial({color:'#e5b46d',roughness:.37,metalness:.65});
+  const rope=new T.MeshStandardMaterial({color:'#dbc69b',roughness:.92});
+  const metal=new T.MeshStandardMaterial({color:'#2e363e',roughness:.43,metalness:.66});
+  const beam=(material:T.Material,x:number,y:number,z:number,sx:number,sy:number,sz:number,name:string)=>{
+    const m=new T.Mesh(box,material);
+    m.name=name;m.position.set(x,y,z);m.scale.set(sx,sy,sz);
+    m.castShadow=true;m.receiveShadow=true;dressing.add(m);return m;
+  };
+  // Perspective-converging gunwale caps; no old horizontal barrier across the sea.
+  for(const side of [-1,1]){
+    const label=side<0?'port':'starboard';
+    const rail=(y:number,material:T.Material,radius:number,name:string)=>{
+      const path=new T.CatmullRomCurve3([
+        new T.Vector3(side*6.05,y+.03,53.4),
+        new T.Vector3(side*6.18,y,57.5),
+        new T.Vector3(side*6.34,y-.04,62.4),
+        new T.Vector3(side*6.42,y-.09,66.4)
+      ]);
+      const mesh=new T.Mesh(new T.TubeGeometry(path,20,radius,8,false),material);
+      mesh.name=name;mesh.castShadow=true;dressing.add(mesh);
+    };
+    rail(2.63,oak,.24,'first-person-gunwale-'+label);
+    rail(2.88,brass,.062,'first-person-gunwale-gold-'+label);
+    rail(1.62,oakEdge,.11,'first-person-rubbing-strake-'+label);
+    for(const z of [54.5,57.3,60.1,62.9,65.7]){
+      const x=side*(6.10+(z-53.4)*.027);
+      beam(oak,x,2.08,z,.31,1.06,.29,'first-person-gunwale-stanchion');
+      beam(metal,x,2.26,z+side*.02,.12,.20,.14,'first-person-gunwale-fastener');
+      beam(brass,x,2.77,z,.34,.11,.34,'first-person-gunwale-cap');
+    }
+    // A tactile rope coil and bronze belaying cleat on each side of the cannon.
+    // They do not intersect the barrel or simulated projectiles.
+    const coil=new T.Mesh(new T.TorusGeometry(.54,.095,9,36,Math.PI*1.94),rope);
+    coil.name='first-person-breeching-rope-'+label;
+    coil.rotation.x=-Math.PI/2;
+    coil.position.set(side*4.52,.75,61.7);
+    dressing.add(coil);
+    beam(oak,side*4.68,.67,60.6,.74,.22,.24,'first-person-belaying-base');
+    beam(brass,side*4.68,.85,60.6,.16,.25,.16,'first-person-belaying-pin');
+    beam(brass,side*4.68,.97,60.6,.54,.10,.16,'first-person-belaying-cleat');
+  }
+  // Batched copper pinheads on the visible teak, not 18 independent draw calls.
+  const studs=new T.InstancedMesh(new T.SphereGeometry(.08,8,6),brass,18);
+  studs.name='first-person-deck-nails';
+  const studMatrix=new T.Object3D();let studId=0;
+  for(const x of [-5.2,-3.95,-2.68,2.68,3.95,5.2]){
+    for(const z of [56.3,59.2,62.1]){
+      studMatrix.position.set(x,.43,z);
+      studMatrix.scale.set(1,.32,1);
+      studMatrix.updateMatrix();
+      studs.setMatrixAt(studId++,studMatrix.matrix);
+    }
+  }
+  studs.instanceMatrix.needsUpdate=true;dressing.add(studs);
   // One gun carriage. Its wheels are entirely below the target's silhouette.
   plank(0,1.04,66,2.9,.66,6.4,deck);
   for(const x of [-1.56,1.56]){
