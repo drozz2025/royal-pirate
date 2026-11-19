@@ -1653,6 +1653,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'no regressions in the three missions or WORK0 dock');
 
 
+    {
     /* WORK8 #104 / 07 ONLY — test the ACTUAL icon-medallion relief against the
        approved 07 source using ONE live Chromium 384x512 DPR1 paused frame.
        No synthetic player values: the 3 live missions and 7 actual rewards
@@ -1757,6 +1758,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.equal(await evalJs('document.querySelectorAll(".w8-approved-tabs button")[0].getAttribute("aria-pressed")'),'true',
       'native touch returns to the 3 authentic missions');
     assert.equal(await evalJs('document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length'),5);
+
+    }
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
