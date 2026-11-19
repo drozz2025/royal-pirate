@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  DEFAULT_MODULES, SHIP_CLASSES, SHIP_MODULES, SLOTS, progressionTier, equipAccess,
+  DEFAULT_MODULES, SHIP_CLASSES, SHIP_MODULES, SLOTS, progressionTier, equipAccess, highestUnlockedPreviewModules,
   mayEquip, validateOwnedFleetForPlayer, type ModuleSlot, type ShipClass, type ShipLoadout, type ResolvedShipLoadout
 } from './ship-modules';
 
@@ -26,13 +26,29 @@ export function Shipyard({onClose,onPreview,ownedModuleIds,ownedShipClasses,veri
  const [shipClass,setShipClass]=useState<ShipClass>('fighter');
  const [level,setLevel]=useState(1);
  const [slot,setSlot]=useState<ModuleSlot>('hull');
- const [selected,setSelected]=useState<Partial<Record<ModuleSlot,string>>>({});
+ // Preserve sandbox designs independently per hull. A class change must not
+ // silently copy its ornaments, sails and guns to another ship.
+ // Preview-only React state: never a saved fleet inventory.
+ const [selectedByClass,setSelectedByClass]=useState<Record<ShipClass,Partial<Record<ModuleSlot,string>>>>({
+  scout:{},fighter:{},warship:{}
+ });
+ const selected=selectedByClass[shipClass];
+ const setSelected=useCallback((update:React.SetStateAction<Partial<Record<ModuleSlot,string>>>)=>{
+  setSelectedByClass(prev=>({...prev,[shipClass]:
+   typeof update==='function'?update(prev[shipClass]):update
+  }));
+ },[shipClass]);
  const [details,setDetails]=useState(true);
  const chooseLevel=useCallback((value:number)=>{
   setLevel(value);
-  setSelected(prev=>Object.fromEntries(
-   Object.entries(prev).filter(([key,id])=>SHIP_MODULES.some(m=>m.slot===key&&m.id===id&&m.minLevel<=value))
-  ) as Partial<Record<ModuleSlot,string>>);
+  // A lower sandbox level trims locked options for ALL class drafts,
+  // ensuring that a subsequent class switch always resolves to valid geometry.
+  setSelectedByClass(prev=>Object.fromEntries(
+   (Object.keys(prev) as ShipClass[]).map(cls=>[cls,Object.fromEntries(
+    Object.entries(prev[cls]).filter(([key,id])=>
+     SHIP_MODULES.some(m=>m.slot===key&&m.id===id&&m.minLevel<=value))
+   )])
+  ) as Record<ShipClass,Partial<Record<ModuleSlot,string>>>);
  },[]);
  useEffect(()=>{onPreview({shipClass,level,modules:selected});},[shipClass,level,selected,onPreview]);
  const items=SHIP_MODULES.filter(m=>m.slot===slot);
@@ -79,7 +95,9 @@ export function Shipyard({onClose,onPreview,ownedModuleIds,ownedShipClasses,veri
       className={slot===current?'active':''} onClick={()=>setSlot(current)}>{SLOT_NAMES[current]}</button>)}
    </div>
    <div className="shipyard-parts-header"><strong>{SLOT_NAMES[slot]} MODULES</strong><div className="shipyard-parts-tools">
-    <button type="button" onClick={()=>setSelected({})} aria-label="Reset all preview modules to their default designs">RESET PREVIEW</button>
+    <button type="button" onClick={()=>setSelected(highestUnlockedPreviewModules(level))}
+     aria-label="Preview highest unlocked modules at this demo level, without granting ownership">MAX LEVEL PREVIEW</button>
+    <button type="button" onClick={()=>setSelected({})} aria-label="Reset preview modules for this ship class only">RESET CLASS</button>
     <button type="button" onClick={()=>setDetails(!details)} aria-expanded={details}>{details?'HIDE INFO':'SHOW INFO'}</button>
    </div></div>
    <div className="shipyard-parts" role="group" aria-label={'Preview '+SLOT_NAMES[slot].toLowerCase()}>
@@ -100,7 +118,7 @@ export function Shipyard({onClose,onPreview,ownedModuleIds,ownedShipClasses,veri
    {onEquip&&<button type="button" className="shipyard-equip" disabled={!equipEnabled} onClick={equipVerified} aria-label="Equip only a verified owned ship class with fully owned and level-unlocked modules">
     {equipEnabled?'EQUIP VERIFIED FLEET':!verifiedLevelMatches?'EQUIP UNAVAILABLE — VERIFIED LEVEL REQUIRED':!ownedShipClasses?.has(shipClass)?'EQUIP UNAVAILABLE — SHIP CLASS NOT OWNED':'EQUIP UNAVAILABLE — MODULE OWNERSHIP REQUIRED'}
    </button>}
-   <p className="shipyard-legal">VISUAL SANDBOX ONLY · Level unlocks are not purchases or ownership. Preview changes are not saved and do not affect battle. {ownedModuleIds?'Ownership data supplied by the connected game service.':'Module ownership verification is not connected.'} {ownedShipClasses?.has(shipClass)?'Ship class ownership verified.':'Ship class ownership not verified.'} {verifiedLevelMatches?'Preview matches the verified player level.':'The preview slider cannot replace a verified player level.'}</p>
+   <p className="shipyard-legal">VISUAL SANDBOX ONLY · Each hull keeps its own preview parts until the editor closes. MAX LEVEL PREVIEW is not an inventory grant. Level unlocks are not purchases or ownership. Preview changes are not saved and do not affect battle. {ownedModuleIds?'Ownership data supplied by the connected game service.':'Module ownership verification is not connected.'} {ownedShipClasses?.has(shipClass)?'Ship class ownership verified.':'Ship class ownership not verified.'} {verifiedLevelMatches?'Preview matches the verified player level.':'The preview slider cannot replace a verified player level.'}</p>
   </div>
  </section>;
 }
