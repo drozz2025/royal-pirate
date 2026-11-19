@@ -4351,3 +4351,23 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 19 Nov 16:30 UTC. Native single-pack gemstone bloom.
+ * The approved 06 pack has a soft purple-magenta light pool beneath the
+ * original chest, not an opaque screenshot or fake purchase surface.
+ * Two CSS-only radial light fields sit beneath the GENUINE 06 WEBP art and
+ * live local-data labels; nothing is drawn over genuine controls.
+ * Layout, hitboxes, price honesty, one pack, three chests and PRÉVIA/EM BREVE
+ * are untouched. Applies only to native short 384×512 class, NOT 320×568 or
+ * taller phones. Controlled Chromium must prove strictly lower MAE + ROI.
+ * approved:false / 0-8; merge/publish/version only by WORK0. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    background:
+      radial-gradient(ellipse 40% 58% at 44% 77%,#e866cf86,transparent 94%),
+      radial-gradient(ellipse 66% 90% at 48% 36%,#ae46c985,transparent 88%),
+      radial-gradient(ellipse 66% 95% at 29% 42%,#a51c6655,transparent 88%),
+      linear-gradient(112deg,#360957 0%,#31065a 49%,#110839 100%);
+  }
+}
