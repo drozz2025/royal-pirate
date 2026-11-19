@@ -166,3 +166,17 @@ test('real equip button stays locked when only demo progression matches owned pa
  }));
  assert.match(equipTag(unownedHtml),/disabled/,'any unowned default part must prevent equipping');
 });
+
+test('lion and royal crown are distinct original procedural figurehead sculptures',()=>{
+ const root=new T.Group(),rig=new T.Group();root.add(rig);
+ const lion=applyShipModules(root,rig,{shipClass:'fighter',level:10,modules:{figurehead:'figurehead-lion'}});
+ const lionVertices=lion.children.filter(obj=>obj instanceof T.Mesh && obj.geometry.type==='IcosahedronGeometry').length;
+ assert.ok(lionVertices>=1,'lion mane must be a dedicated faceted sculpture');
+ const lionCount=lion.children.length;
+ const crown=applyShipModules(root,rig,{shipClass:'fighter',level:20,modules:{figurehead:'figurehead-crown'}});
+ assert.notEqual(lion,crown);
+ assert.equal(root.children.filter(obj=>obj.name==='modular-ship-accessories').length,1);
+ assert.notEqual(lionCount,crown.children.length,'crest variations must not share identical shapes');
+ assert.ok(crown.children.some(obj=>obj instanceof T.Mesh && obj.geometry.type==='ConeGeometry'),'crown points must have real 3D geometry');
+ assert.ok(crown.children.length<125,'mobile draw-call accessory budget');
+});
