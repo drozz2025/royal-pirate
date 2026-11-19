@@ -4351,3 +4351,15 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 19 Nov 12:23 UTC. Vento Favorável approved-source pigment calibration.
+ * Only the second authentic 05 painting, inside its existing native frame.
+ * Original WebP, eight 4×2 cards, one pack, three chests, PRÉVIA and EM BREVE
+ * remain live and unchanged. No screenshot background, geometry or mechanics.
+ * Measured against same-frame live HEAD at 384×512; 320/tall left untouched.
+ * Human approval required (approved:false, 0/8); WORK0 owns merge/release. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.32);
+  }
+}
