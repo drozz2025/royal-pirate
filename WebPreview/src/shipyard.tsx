@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   DEFAULT_MODULES, SHIP_CLASSES, SHIP_MODULES, SLOTS, progressionTier, equipAccess,
-  mayEquip, validateOwnedLoadout, type ModuleSlot, type ShipClass, type ShipLoadout
+  mayEquip, validateOwnedLoadout, type ModuleSlot, type ShipClass, type ShipLoadout, type ResolvedShipLoadout
 } from './ship-modules';
 
 /** Optional Work 4 interface: never infer entitlements from demo preview progress. */
@@ -9,7 +9,7 @@ type ShipyardProps={
  onClose:()=>void;
  onPreview:(loadout:ShipLoadout)=>void;
  ownedModuleIds?:ReadonlySet<string>;
- onEquip?:(loadout:Required<ShipLoadout>)=>void;
+ onEquip?:(loadout:ResolvedShipLoadout)=>void;
 };
 const SLOT_NAMES:Record<ModuleSlot,string>={
  hull:'HULL',sails:'SAILS',cannons:'CANNONS',armor:'ARMOUR',figurehead:'PROW',
