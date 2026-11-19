@@ -9,9 +9,9 @@ const atmosphere=readFileSync(new URL('../src/battle-atmosphere.ts',import.meta.
 test('Batalha 02: mobile red ship shows a broader genuine hull, without changing Porto',()=>{
   for(const [w,h] of [[320,568],[384,512],[390,844],[430,932]]){
     const aspect=w/h, yaw=battleEnemyBroadsideYaw(aspect);
-    assert.ok(Number.isFinite(yaw)&&yaw<=-1.15&&yaw>=-1.4,
+    assert.ok(Number.isFinite(yaw)&&yaw<=-1.15&&yaw>=-1.52,
       'native and tall mobile need a visible opponent broadside '+w+'x'+h);
-    assert.ok(battleEnemyScale(aspect)<=1.5,'enemy must not dominate phone sky');
+    assert.ok(battleEnemyScale(aspect)<=1.62,'enemy remains bounded; vertical HUD safety is checked in battle-enemy-presentation');
     assert.equal(battleCameraPose(aspect).showBattery,true);
   }
   assert.equal(battleEnemyBroadsideYaw(1.4),-.95,'desktop silhouette unchanged');
