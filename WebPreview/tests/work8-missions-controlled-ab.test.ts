@@ -1662,11 +1662,21 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     const reliefFlag='work8-missions-icon-relief-ab-baseline';
     await evalJs('(()=>{const d=document.documentElement;[...d.classList].filter(s=>s.startsWith("work8-missions-")&&s.endsWith("-ab-baseline")&&s!=='+JSON.stringify(reliefFlag)+').forEach(s=>d.classList.remove(s));return true})()');
     await delay(160);
+    await evalJs('document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));true');
     const reliefRects=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-art")].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
     assert.equal(reliefRects.length,3,'exactly three AUTHENTIC quest paintings in the same scene');
     const reliefBeforeGeometry=await headingLayout();
     const reliefBeforeCss=await evalJs('(()=>{const e=document.querySelector(".w8-approved-missions .w8-approved-quest-art");return [getComputedStyle(e,"::before").opacity,getComputedStyle(e,"::after").opacity]})()');
     const reliefBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+
+    // Capture actual shipping CSS immediately after BEFORE, on one paused frame.
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(reliefFlag)+');true');
+    await delay(100);
+    const reliefRenderGeometry=await headingLayout();
+    const reliefRenderCss=await evalJs('(()=>{const e=document.querySelector(".w8-approved-missions .w8-approved-quest-art");return [getComputedStyle(e,"::before").opacity,getComputedStyle(e,"::after").opacity]})()');
+    const reliefRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(reliefFlag)+');true');
+    await delay(100);
 
     const reliefVariants=[
       ['original',null,null],
@@ -1685,6 +1695,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       reliefShots.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     }
     await evalJs('document.getElementById('+JSON.stringify(reliefStudyStyleId)+')?.remove();true');
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(reliefFlag)+');true');
     const reliefStudy=await evalJs(meterStudySource
       .replace('__RECTS__',JSON.stringify(reliefRects))
       .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
@@ -1696,11 +1707,6 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     }));
     console.log('WORK8 #104 native icon relief real source sweep '+JSON.stringify(reliefSweep));
 
-    await evalJs('document.documentElement.classList.remove('+JSON.stringify(reliefFlag)+');true');
-    await delay(160);
-    const reliefRenderGeometry=await headingLayout();
-    const reliefRenderCss=await evalJs('(()=>{const e=document.querySelector(".w8-approved-missions .w8-approved-quest-art");return [getComputedStyle(e,"::before").opacity,getComputedStyle(e,"::after").opacity]})()');
-    const reliefRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     const reliefScores=await evalJs(meterStudySource
       .replace('__RECTS__',JSON.stringify(reliefRects))
       .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
