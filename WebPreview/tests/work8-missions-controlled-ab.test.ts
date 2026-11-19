@@ -10,7 +10,7 @@ import {setTimeout as delay} from 'node:timers/promises';
    The baseline root class disables ONLY this PR's frame-pigment CSS; integrated #269/#271 stay active in both frames.
    No fictional mission states, no screenshot replacement, no navigation edits.
    Each screenshot is native 384x512 and checked against 07-missoes.webp. */
-test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves ROI without dock or day regressions', {timeout:150000}, async()=>{
+test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves ROI without dock or day regressions', {timeout:240000}, async()=>{
   // Avoid overlapping Chrome GPU/CDP with the existing WORK7 test (Node runs test files concurrently).
   await delay(48000);
   const chromeBin=process.env.CHROME_BIN ||
@@ -1888,6 +1888,88 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(realDayDelta.chests<.02 && Math.abs(realDayDelta.quest)<.02 &&
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
+
+
+    /* WORK8 #104: research ONLY. Real native 384x512 same-frame, same-scene
+       colour sweep of two inactive mission tabs. No simulated reward data,
+       no Ranking 08, Porto, dock, shell, economy or release modifications.
+       Commit a production pigment only after independent source-ledger proof. */
+    const tabsTarget='.w8-approved-missions .w8-approved-tabs button:not([aria-pressed=true])';
+    const tabLayoutBefore=await headingLayout();
+    const paletteShift=(v:number)=>{
+      const hex=(a:number[])=>'#'+a.map(n=>Math.max(0,Math.min(255,n+v)).toString(16).padStart(2,'0')).join('');
+      return 'linear-gradient(180deg,'+hex([24,55,73])+' 0%,'+hex([7,30,50])+' 43%,'+hex([3,17,30])+' 100%)';
+    };
+    const tabSamples=[{name:'integrated',shift:null},...[-30,-24,-18,-12,-6,6,12,18,24,30,36,42].map(shift=>({name:'shift'+shift,shift}))];
+    const tabsShots:string[]=[];
+    const tabsScores:Array<Record<string,number>>=[];
+    const tabRois={full:[0,0,384,512],tabs:[12,115,373,157],quests:[12,157,372,321],
+      daily:[13,325,373,436],chests:[20,356,370,427],dock:[0,451,384,512]};
+    const tabOriginal='(async()=>{const ref=new Image();ref.src='+JSON.stringify('data:image/webp;base64,'+orig)+
+      ';await ref.decode();if(ref.width!==384||ref.height!==512)throw Error("not original native 384x512");'+
+      'const c=document.createElement("canvas");c.width=384;c.height=512;const p=c.getContext("2d");'+
+      'p.drawImage(ref,0,0);window.__w8TabOriginal=p.getImageData(0,0,384,512).data;return true})()';
+    assert.ok(await evalJs(tabOriginal),'unmodified original source must decode');
+    for(const candidate of tabSamples){
+      const rule=candidate.shift===null?'':':root '+tabsTarget+'{background:'+paletteShift(candidate.shift)+'!important}';
+      await evalJs('(()=>{let el=document.getElementById("w8-mission-tab-sweep");'+
+        'if(!el){el=document.createElement("style");el.id="w8-mission-tab-sweep";document.head.appendChild(el)}'+
+        'el.textContent='+JSON.stringify(rule)+';return true})()');
+      await delay(105);
+      const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      tabsShots.push(shot);
+      const compare='(async()=>{const im=new Image();im.src='+JSON.stringify('data:image/png;base64,'+shot)+
+        ';await im.decode();if(im.width!==384||im.height!==512)throw Error("not native Chromium 384x512");'+
+        'const c=document.createElement("canvas");c.width=384;c.height=512;const p=c.getContext("2d");'+
+        'p.drawImage(im,0,0);const a=window.__w8TabOriginal,b=p.getImageData(0,0,384,512).data;'+
+        'const regions='+JSON.stringify(tabRois)+';'+
+        'const score=r=>{let n=0,sum=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){'+
+        'const j=(y*384+x)*4;for(let k=0;k<3;k++){sum+=Math.abs(a[j+k]-b[j+k]);n++}}return sum/n};'+
+        'return Object.fromEntries(Object.entries(regions).map(([k,r])=>[k,score(r)]))})()';
+      tabsScores.push(await evalJs(compare));
+    }
+    await evalJs('document.getElementById("w8-mission-tab-sweep")?.remove();delete window.__w8TabOriginal;true');
+    const tabLayoutAfter=await headingLayout();
+    assert.deepEqual(tabLayoutAfter,tabLayoutBefore,'palette must not move quests, chests or dock');
+    const tabRows=tabSamples.map((v,i)=>({
+      ...v,...tabsScores[i],delta:Object.fromEntries(Object.keys(tabsScores[i])
+        .map(k=>[k,tabsScores[i][k]-tabsScores[0][k]]))
+    }));
+    const tabEligible=tabRows.slice(1).filter(r=>r.delta.full<-.002&&r.delta.tabs<-.025&&
+      Math.abs(r.delta.quests)<.02&&Math.abs(r.delta.daily)<.02&&Math.abs(r.delta.chests)<.02&&
+      Math.abs(r.delta.dock)<.02);
+    const tabWinner=tabEligible.sort((a,b)=>a.delta.tabs-b.delta.tabs)[0]||null;
+    const tabIndex=tabWinner?tabRows.findIndex(r=>r.name===tabWinner.name):0;
+    const tabCompareScript='(async()=>{const urls='+JSON.stringify([
+      'data:image/webp;base64,'+orig,
+      'data:image/png;base64,'+tabsShots[0],
+      'data:image/png;base64,'+tabsShots[tabIndex]
+    ])+';const a=await Promise.all(urls.map(s=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=s})));'+
+      'const c=document.createElement("canvas");c.width=1536;c.height=512;const p=c.getContext("2d");'+
+      'a.forEach((im,i)=>p.drawImage(im,i*384,0));p.drawImage(a[0],1152,0);p.globalAlpha=.5;'+
+      'p.drawImage(a[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()';
+    saveTone('missions-tabs-original-before-research-overlay-384x512.png',await evalJs(tabCompareScript));
+    saveTone('missions-tabs-before-384x512.png',tabsShots[0]);
+    saveTone('missions-tabs-best-research-384x512.png',tabsShots[tabIndex]);
+    writeFileSync(join(evidence,'work8-missions-tabs-research.json'),JSON.stringify({
+      issue:104,scope:'07 Missões unselected tab backgrounds only',
+      baselineHead:'b0b3a13529eca5b5453b3342fd711e2f47b0bdf5',
+      reference:'assets/design-approved/07-missoes.webp',
+      requiredReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      nativeViewport:[384,512],sameSceneFrame:true,pausesAllAnimations:true,
+      regions:tabRois,rows:tabRows,winner:tabWinner,
+      geometry:{before:tabLayoutBefore,after:tabLayoutAfter},
+      approved:false,approvedScreens:0
+    },null,2));
+    console.log('WORK8_MISSIONS_TABS_NATIVE_WINNER '+JSON.stringify(tabWinner));
+    console.log('WORK8_MISSIONS_TABS_NATIVE_ALL '+JSON.stringify(tabRows));
+    assert.ok(tabsShots.length===tabSamples.length&&tabRows.length===tabSamples.length);
+    assert.equal(tabLayoutAfter.questCount,3);assert.equal(tabLayoutAfter.dayCount,7);
+    assert.equal(tabLayoutAfter.dockCount,5);
+    assert.ok(tabLayoutAfter.chests.every((c:any)=>c.bottom<=tabLayoutAfter.nav.top+2),
+      'all seven painted chests clear the unchanged WORK0 dock');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
