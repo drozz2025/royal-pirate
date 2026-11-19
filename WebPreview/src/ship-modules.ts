@@ -331,6 +331,11 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  pennant.name=banner.name;
  // The preview flag colour is never interpreted as ownership or inventory.
  pennant.userData.moduleId=config.modules.flag;
+ // A restrained gilded seam makes the small flag readable over the water,
+ // reusing the existing unit-box buffer and brass accessory material.
+ const clasp=cube(brass,banner.origin[0]+.12,banner.origin[1],banner.origin[2]+.035,.06,
+  config.shipClass==='scout'?.31:config.shipClass==='fighter'?.52:.64,.025);
+ clasp.name=config.shipClass+'-pennant-clasp';
  // Scout-only original fore-and-aft jib. Its curved center is a third
  // vertex ridge, producing a recognisable light raider silhouette instead
  // of just recolouring or rescaling the frigate sails. Visual sandbox only.
