@@ -77,6 +77,6 @@ test('shipyard is a real 3D level/module preview separate from the battle',()=>{
  assert.match(shipyard,/SHIP_MODULES\.filter/);
  assert.match(shipyard,/min=\{1\} max=\{20\}/);
  assert.match(shipyard,/no player progress is saved/);
- assert.match(shipyard,/No purchases, module ownership/);
+ assert.match(shipyard,/Level unlocks are not purchases or ownership/);
  assert.match(shipyardCss,/safe-area-inset-bottom/);
 });

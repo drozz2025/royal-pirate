@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { SHIP_MODULES, SLOTS, availableModules, resolveLoadout, progressionTier, applyShipModules, mayEquip, SHIP_CLASSES } from '../src/ship-modules.ts';
+import { SHIP_MODULES, SLOTS, availableModules, resolveLoadout, progressionTier, applyShipModules, mayEquip, equipAccess, validateOwnedLoadout, SHIP_CLASSES } from '../src/ship-modules.ts';
 import { makeShip } from '../src/ships.ts';
 
 test('all ship levels 1–20 and all three ship classes are supported',()=>{
@@ -90,4 +90,49 @@ test('unlock progression alone never implies module ownership or a purchase',()=
  assert.equal(mayEquip('figurehead-crown',19,actualEntitlements),false);
  assert.equal(mayEquip('figurehead-crown',20,actualEntitlements),true);
  assert.equal(mayEquip('not-real',20,actualEntitlements),false);
+});
+
+test('the ownership interface never grants unlocked but unowned parts',()=>{
+ assert.equal(equipAccess('hull-oak',1),'ownership-unverified');
+ assert.equal(equipAccess('hull-oak',1,new Set()),'not-owned');
+ assert.equal(equipAccess('figurehead-crown',19,new Set(['figurehead-crown'])),'level-locked');
+ assert.equal(equipAccess('figurehead-crown',20,new Set(['figurehead-crown'])),'equippable');
+ assert.equal(equipAccess('not-a-module',20,new Set()),'unknown-module');
+ assert.equal(equipAccess('hull-oak',20,new Set(['hull-oak'])),'equippable');
+ assert.equal(mayEquip('hull-oak',20,new Set()),false);
+});
+test('equipping a fleet requires all nine real entitlements, including default parts',()=>{
+ const allDefault=new Set(Object.values(resolveLoadout({shipClass:'scout',level:1,modules:{}}).modules));
+ assert.equal(allDefault.size,9);
+ assert.equal(validateOwnedLoadout({shipClass:'scout',level:1,modules:{}},allDefault).modules.hull,'hull-oak');
+ assert.throws(()=>validateOwnedLoadout({shipClass:'scout',level:1,modules:{}},new Set(['hull-oak'])),/missing verified ownership/);
+ assert.throws(()=>validateOwnedLoadout({shipClass:'fighter',level:1,modules:{sails:'sails-night'}},allDefault),/not unlocked/);
+ const noNight=new Set([...allDefault,'sails-crimson']);
+ assert.throws(()=>validateOwnedLoadout({shipClass:'fighter',level:12,modules:{sails:'sails-night'}},noNight),/missing verified ownership/);
+});
+test('frigate has its own gunwale silhouettes, neither scout nor flagship scaling only',()=>{
+ const fighterRoot=new T.Group(),fighterRig=new T.Group();fighterRoot.add(fighterRig);
+ const fighter=applyShipModules(fighterRoot,fighterRig,{shipClass:'fighter',level:1,modules:{}});
+ assert.ok(fighter.children.length>=10,'fighter hull should have distinct original geometry');
+ const scoutRoot=new T.Group(),scoutRig=new T.Group();scoutRoot.add(scoutRig);
+ const scout=applyShipModules(scoutRoot,scoutRig,{shipClass:'scout',level:1,modules:{}});
+ assert.notEqual(scout.children.length,fighter.children.length,'different class geometry');
+});
+
+test('mobile shipyard preview stays within a bounded mesh budget across all 20 levels',()=>{
+ for(const shipClass of ['scout','fighter','warship'] as const){
+  const root=new T.Group(),rig=new T.Group();root.add(rig);
+  for(let level=1;level<=20;level++){
+   const modules=Object.fromEntries(SLOTS.map(slot=>{
+    const options=availableModules(level,slot);
+    return [slot,options[options.length-1].id];
+   }));
+   const accessories=applyShipModules(root,rig,{shipClass,level,modules});
+   assert.equal(root.children.filter(o=>o.name==='modular-ship-accessories').length,1,
+    'switching must not pile up old geometry');
+   assert.ok(accessories.children.length<125,
+    'single editable preview should have a bounded number of accessory draw-call objects');
+   assert.ok(Number.isFinite(root.scale.x)&&Number.isFinite(root.scale.z));
+  }
+ }
 });

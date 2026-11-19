@@ -1,0 +1,44 @@
+name: WORK 2 Shipyard — Feature verification (no deploy)
+
+on:
+  push:
+    branches:
+      - work2/shipyard-ownership-class-polish-20261119
+  pull_request:
+    branches:
+      - work2/modular-ships-levels-1-20
+    paths:
+      - 'WebPreview/**'
+      - '.github/workflows/work2-shipyard-verify.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: work2-shipyard-verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: npm ci / tests / TypeScript and Vite production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: WebPreview
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: WebPreview/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Execute all browser-free game unit tests
+        run: npm test
+      - name: Build WebPreview (do NOT publish)
+        run: npm run build

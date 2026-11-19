@@ -38,7 +38,11 @@
 .shipyard-slot-strip button.active{background:linear-gradient(#f9dc8a,#b57936);color:#102d4c;text-shadow:none;border-color:#ffe8a0}
 .shipyard-parts-header{display:flex;align-items:center;justify-content:space-between;max-width:720px;margin:0 auto}
 .shipyard-parts-header strong{font:900 13px 'Barlow Condensed',sans-serif;letter-spacing:1px;color:#f4d78a}
-.shipyard-parts-header button{color:#e4e6e3;background:none;text-decoration:underline;font-size:11px}
+.shipyard-parts-tools{display:flex;gap:12px;align-items:center}
+.shipyard-parts-tools button{color:#e4e6e3;background:none;border:0;text-decoration:underline;font-size:11px;min-height:38px}
+.shipyard-equip{display:block;width:min(96%,420px);margin:8px auto;border:2px solid #f4d78a;border-radius:12px;
+ padding:12px 10px;background:linear-gradient(#ebbe60,#a76c2b);color:#132a46;font:900 14px 'Barlow Condensed',sans-serif;text-shadow:none}
+.shipyard-equip:disabled{opacity:.6;background:#274765;color:#dce8e8;border-color:#738899;cursor:not-allowed}
 .shipyard-parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-width:720px;gap:7px;margin:8px auto}
 .shipyard-part{display:flex;min-width:0;flex-direction:column;align-items:center;gap:4px;justify-content:flex-start;
  padding:8px 5px;border:1px solid #507597;border-radius:10px;background:linear-gradient(#315474,#102d4c);

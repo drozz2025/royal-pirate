@@ -6,6 +6,8 @@ export type ModuleSlot = 'hull'|'sails'|'cannons'|'armor'|'figurehead'|'flag'|'m
 export type ShipClass = 'scout'|'fighter'|'warship';
 export type ShipModule = { id:string; slot:ModuleSlot; minLevel:number; name:string; description:string };
 export type ShipLoadout = { shipClass:ShipClass; level:number; modules:Partial<Record<ModuleSlot,string>> };
+/** Once resolved, every one of the nine slots has a concrete module ID. */
+export type ResolvedShipLoadout = Omit<ShipLoadout,'modules'> & { modules:Record<ModuleSlot,string> };
 export const SHIP_MODULES:readonly ShipModule[] = [
   {id:'hull-oak',slot:'hull',minLevel:1,name:'Oak hull',description:'Light planked hull'},
   {id:'hull-ironwood',slot:'hull',minLevel:6,name:'Ironwood hull',description:'Reinforced timbers'},
@@ -49,7 +51,7 @@ export function availableModules(level:number,slot?:ModuleSlot):ShipModule[]{
  progressionTier(level);
  return SHIP_MODULES.filter(m=>m.minLevel<=level&&(!slot||m.slot===slot));
 }
-export function resolveLoadout(input:ShipLoadout):Required<ShipLoadout>{
+export function resolveLoadout(input:ShipLoadout):ResolvedShipLoadout{
  progressionTier(input.level);
  if(!['scout','fighter','warship'].includes(input.shipClass))throw new Error('Unknown ship class');
  const modules={...DEFAULT_MODULES};
@@ -62,12 +64,32 @@ export function resolveLoadout(input:ShipLoadout):Required<ShipLoadout>{
  }
  return {shipClass:input.shipClass,level:input.level,modules};
 }
-/** Work 4 integration: level unlocks are NOT proof of ownership.
- * Genuine entitlements must be supplied by a game service; this demo has none. */
-export function mayEquip(id:string,level:number,ownedIds:ReadonlySet<string>):boolean{
+/** Work 4 handoff: preview unlocks never confer ownership. An omitted entitlement
+ * set means "unverified", NOT that a free item was granted. */
+export type EquipAccess = 'unknown-module'|'level-locked'|'ownership-unverified'|'not-owned'|'equippable';
+export function equipAccess(id:string,level:number,ownedIds?:ReadonlySet<string>):EquipAccess{
  progressionTier(level);
  const mod=SHIP_MODULES.find(m=>m.id===id);
- return !!mod&&mod.minLevel<=level&&ownedIds.has(id);
+ if(!mod)return 'unknown-module';
+ if(mod.minLevel>level)return 'level-locked';
+ if(!ownedIds)return 'ownership-unverified';
+ return ownedIds.has(mod.id)?'equippable':'not-owned';
+}
+export function mayEquip(id:string,level:number,ownedIds:ReadonlySet<string>):boolean{
+ return equipAccess(id,level,ownedIds)==='equippable';
+}
+/** Only accepts a complete, level-eligible loadout with every part truly owned.
+ * This is an in-app guard, not a substitute for server-side transaction checks.
+ * WORK 4 supplies authenticated ownedIds when real persistence exists. */
+export function validateOwnedLoadout(input:ShipLoadout,ownedIds:ReadonlySet<string>):ResolvedShipLoadout{
+ const resolved=resolveLoadout(input);
+ for(const slot of SLOTS){
+  const id=resolved.modules[slot];
+  if(equipAccess(id,resolved.level,ownedIds)!=='equippable'){
+   throw new Error('Cannot equip '+id+': missing verified ownership for '+slot);
+  }
+ }
+ return resolved;
 }
 export const SHIP_CLASSES={
  scout:{name:'Swift Scout',description:'Lean corsair silhouette',width:.82,length:.92,height:.95},
@@ -93,13 +115,33 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  function tube(material:T.Material,x:number,y:number,z:number,r:number,h:number){return part(new T.CylinderGeometry(r,r,h,8),material,x,y,z);}
  if(config.shipClass==='scout'){
   const prow=part(new T.ConeGeometry(.62,2.05,6),warm,0,2.35,5.2);prow.rotation.x=Math.PI/2;
-  for(const side of [-1,1])cube(brass,side*.95,2.65,-3.25,.14,.8,1.3);
+  // A distinctive fast-rig prow and slender bronze aft rails; original low-poly details.
+  for(const side of [-1,1]){
+   cube(brass,side*.95,2.65,-3.25,.14,.8,1.3);
+   cube(iron,side*.68,2.1,3.5,.075,.28,2.0);
+  }
+ }else if(config.shipClass==='fighter'){
+  // Frigate silhouette: raised gunwale shoulders and a broad aft fighting platform.
+  // Small separate details keep editing independent from the battle hitboxes.
+  for(const side of [-1,1]){
+   cube(warm,side*1.48,2.3,1.55,.25,.42,2.65);
+   cube(brass,side*1.58,2.54,1.55,.14,.09,2.85);
+   for(const z of [.6,1.85,2.8])cube(iron,side*1.62,2.17,z,.065,.22,.30);
+  }
+  cube(warm,0,3.53,-3.45,2.45,.30,1.85);
+  cube(brass,0,3.76,-3.45,2.65,.12,2.05);
  }else if(config.shipClass==='warship'){
   for(const side of [-1,1]){
    cube(warm,side*1.5,2.1,-1,.32,.9,5.5);
    for(const z of [-2.6,-.2,2.2])cube(brass,side*1.72,2.0,z,.07,.32,.46);
   }
   cube(warm,0,3.75,-3.25,2.6,.72,2.05);cube(brass,0,4.15,-3.25,2.75,.15,2.2);
+  // Flagship-only gunport rims accent the extra-long broadside silhouette.
+  // Keep the decoration inside the preview accessory group (never collision).
+  for(const side of [-1,1])for(const z of [-2.7,-1.1,.5,2.2]){
+   const rim=part(new T.TorusGeometry(.16,.042,4,9),brass,side*1.8,2.08,z);
+   rim.rotation.y=Math.PI/2;
+  }
  }
  const hull=config.modules.hull,armor=config.modules.armor;
  if(hull!=='hull-oak')for(const side of [-1,1])for(const z of [-2.6,-1,1,2.6])
