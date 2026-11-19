@@ -139,7 +139,7 @@ test('WORK4 Forge native source cannon registration sweep: same frame, full/meta
     "const screens=await Promise.all("+JSON.stringify(shots)+".map(s=>load(s,'image/png')));"+
     "if(original.width!==384||original.height!==512||screens.some(im=>im.width!==384||im.height!==512))throw Error('native 384x512 source required');"+
     "const pix=im=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);return g.getImageData(0,0,384,512).data;};"+
-    "const a=pix(original),shots=screens.map(pix),boxes={full:[0,0,384,512],workshop:[18,146,238,307],cannon:[18,153,190,305],furnace:[129,168,200,294],costs:[16,329,375,430],dock:[0,433,384,512]};"+
+    "const a=pix(original),shots=screens.map(pix),boxes={full:[0,0,384,512],workshop:[18,146,238,307],cannon:[18,153,190,305],furnace:[129,168,200,294],cannonSeam:[20,270,120,320],costs:[16,329,375,430],dock:[0,433,384,512]};"+
     "const mae=(x,y,b)=>{let sum=0,n=0;for(let yy=b[1];yy<b[3];yy++)for(let xx=b[0];xx<b[2];xx++){const k=(yy*384+xx)*4;for(let j=0;j<3;j++){sum+=Math.abs(x[k+j]-y[k+j]);n++;}}return sum/n;};"+
     "const count=(x,y,b)=>{let n=0;for(let yy=b[1];yy<b[3];yy++)for(let xx=b[0];xx<b[2];xx++){const k=(yy*384+xx)*4;if(x[k]!==y[k]||x[k+1]!==y[k+1]||x[k+2]!==y[k+2])n++;}return n;};"+
     "const records=shots.map((shot,i)=>{const roi={};for(const [name,box] of Object.entries(boxes))roi[name]={mae:mae(a,shot,box),changedPixels:count(shots[0],shot,box)};return {index:i,roi};});"+
