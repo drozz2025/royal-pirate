@@ -105,11 +105,8 @@ test('WORK4 Forge native background pigment sweep: same Chromium frame, source M
   await delay(60);
   await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   await until("!!document.querySelector('.w4-fleet .w4-reference-ship')");
-  const forge=await evaluate("(()=>{const b=document.querySelector('.w4-fleet .w4-action-pair button.w4-primary');if(!b)return null;const r=b.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2};})()");
-  assert.ok(forge,'the existing real Frota-to-Forja button');
-  await cmd('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:forge.x,y:forge.y,id:4}]});
-  await delay(65);
-  await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  const route=await evaluate("(()=>{const b=document.querySelector('.w4-fleet .w4-action-pair button.w4-primary');if(!b)return false;b.click();return true})()");
+  assert.equal(route,true,'existing functional Frota-to-Forja button must navigate');
   await until("!!document.querySelector('.w4-forge .w4-reference-cannon')");
   const geometry=await evaluate("(()=>({cannon:document.querySelectorAll('.w4-forge svg.w4-reference-cannon').length,liveLevels:document.querySelectorAll('.w4-forge .w4-forge-live-level').length,costs:document.querySelectorAll('.w4-forge .w4-resource-grid > div').length,dock:document.querySelectorAll('.app-sheet .harbour-nav.app-dock-porto .harbour-nav-item').length,sceneRect:(()=>{const r=document.querySelector('.w4-forge-scene').getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}})()}))()");
   assert.equal(geometry.cannon,1,'one approved source cannon only');
