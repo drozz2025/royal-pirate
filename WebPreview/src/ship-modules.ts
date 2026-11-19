@@ -91,6 +91,24 @@ export function validateOwnedLoadout(input:ShipLoadout,ownedIds:ReadonlySet<stri
  }
  return resolved;
 }
+/** A sandbox level slider is not a player's actual progression. Work 4 must
+ * inject a separately verified level along with verified module entitlements.
+ * Reject preview levels that do not exactly match it, even when every proposed
+ * module is owned. Work 4 must ALSO revalidate this on its trusted backend
+ * when actual equipping/persistence is implemented; UI data alone is not proof.
+ */
+export function validateOwnedLoadoutForPlayer(
+ input:ShipLoadout,
+ ownedIds:ReadonlySet<string>,
+ verifiedPlayerLevel:number
+):ResolvedShipLoadout{
+ progressionTier(verifiedPlayerLevel);
+ if(input.level!==verifiedPlayerLevel){
+  throw new Error('Preview ship level does not match verified player level');
+ }
+ return validateOwnedLoadout(input,ownedIds);
+}
+
 export const SHIP_CLASSES={
  scout:{name:'Swift Scout',description:'Lean corsair silhouette',width:.82,length:.92,height:.95},
  fighter:{name:'Sea Fighter',description:'Balanced broadside frigate',width:1,length:1,height:1},
