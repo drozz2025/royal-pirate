@@ -139,19 +139,24 @@ test('WORK4 Forge native background pigment sweep: same Chromium frame, source M
     "const mae=(x,y,b)=>{let sum=0,n=0;for(let yy=b[1];yy<b[3];yy++)for(let xx=b[0];xx<b[2];xx++){const k=(yy*384+xx)*4;for(let j=0;j<3;j++){sum+=Math.abs(x[k+j]-y[k+j]);n++;}}return sum/n;};"+
     "const count=(x,y,b)=>{let n=0;for(let yy=b[1];yy<b[3];yy++)for(let xx=b[0];xx<b[2];xx++){const k=(yy*384+xx)*4;if(x[k]!==y[k]||x[k+1]!==y[k+1]||x[k+2]!==y[k+2])n++;}return n;};"+
     "const records=shots.map((shot,i)=>{const roi={};for(const [name,box] of Object.entries(boxes))roi[name]={mae:mae(a,shot,box),changedPixels:count(shots[0],shot,box)};return {index:i,roi};});"+
-    "const valid=records.filter((r)=>r.roi.costs.changedPixels===0&&r.roi.dock.changedPixels===0);"+
-    "valid.sort((x,y)=>(x.roi.full.mae-y.roi.full.mae)||(x.roi.workshop.mae-y.roi.workshop.mae));"+
-    "const best=valid[0],baseline=records[0];"+
+    "const baseline=records[0];"+
+    "const globalWinner=[...records].filter(r=>r.roi.costs.changedPixels===0&&r.roi.dock.changedPixels===0).sort((x,y)=>(x.roi.full.mae-y.roi.full.mae))[0];"+
+    "const valid=records.filter(r=>r.roi.costs.changedPixels===0&&r.roi.dock.changedPixels===0&&['full','workshop','cannon','furnace'].every(name=>r.roi[name].mae<=baseline.roi[name].mae));"+
+    "valid.sort((x,y)=>(x.roi.full.mae-y.roi.full.mae)||(x.roi.cannon.mae-y.roi.cannon.mae)||(x.roi.furnace.mae-y.roi.furnace.mae));"+
+    "const best=valid[0];if(!best)throw Error('baseline must remain an admissible candidate');"+
     "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;const g=canvas.getContext('2d');g.drawImage(original,0,0);g.drawImage(screens[0],384,0);g.drawImage(screens[best.index],768,0);g.drawImage(original,1152,0);g.globalAlpha=.5;g.drawImage(screens[best.index],1152,0);"+
-    "return {records,bestIndex:best.index,baseline,geometry:"+JSON.stringify(geometry)+",grid:canvas.toDataURL('image/png').split(',')[1]};})()";
+    "return {records,bestIndex:best.index,globalWinnerIndex:globalWinner.index,baseline,geometry:"+JSON.stringify(geometry)+",grid:canvas.toDataURL('image/png').split(',')[1]};})()";
   const result=await evaluate(script);
   assert.equal(result.records.length,variants.length);
   assert.ok(Number.isFinite(result.baseline.roi.full.mae));
   assert.equal(result.bestIndex>=0,true);
   const report={approved:false,screensApproved:0,viewport:'384x512',reference:'04-melhorias-forja.webp',
     frame:'same Chromium 384x512 scene; paused animations and unchanged data',geometry,
-    candidates:variants.map((pigment,i)=>({...result.records[i],pigment})),best:variants[result.bestIndex]};
+    candidates:variants.map((pigment,i)=>({...result.records[i],pigment})),
+    globalWinner:variants[result.globalWinnerIndex],safeWinner:variants[result.bestIndex],
+    decision:result.bestIndex===0?'Reject pigment changes: at least one full/workshop/cannon/furnace ROI regressed for each improvement':'Native candidate passed strict no-regression ROI gate; pending human approval'};
   writeFileSync(join(qa,'work4-forge-pigment-study-384x512.json'),JSON.stringify(report,null,2)+'\n');
   writeFileSync(join(qa,'original-before-best-overlay-forge-pigment-384x512.png'),Buffer.from(result.grid,'base64'));
-  console.log('WORK4_FORGE_PIGMENT_STUDY '+JSON.stringify({best:report.best,baseline:report.candidates[0],winner:report.candidates[result.bestIndex],geometry}));
+  console.log('WORK4_FORGE_PIGMENT_STUDY '+JSON.stringify({globalWinner:report.globalWinner,safeWinner:report.safeWinner,decision:report.decision,baseline:report.candidates[0],winner:report.candidates[result.bestIndex],geometry,
+    roiSummary:report.candidates.map(x=>({pigment:x.pigment,full:x.roi.full.mae,workshop:x.roi.workshop.mae,cannon:x.roi.cannon.mae,furnace:x.roi.furnace.mae}))}));
 });
