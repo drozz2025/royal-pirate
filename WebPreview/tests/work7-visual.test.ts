@@ -50,7 +50,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Native 05 WORK7 candidate must exist');
-  assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
+  assert.ok(cssText.includes('19 Nov 15:20 UTC · second genuine 05 portrait optical depth'), 'Native second-card optical treatment exists');
+   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
     'Only genuine native 06 legendary physical rim is changed in this candidate');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
     'The final WORK7 candidate changes only genuine 05 frame inlays');
@@ -65,11 +66,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // It is inert for Shop and for 320/tall viewports.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{
+        filter:saturate(1.25) contrast(1.13) brightness(1.36)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -341,6 +339,28 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
+        if (kind==='cards' && width===384 && height===512) {
+          const values = [1.12,1.20,1.25,1.28,1.30,1.32,1.34,1.36,1.38,1.40,1.42,1.45,1.48,1.52,1.58,1.65];
+          for (const value of values) {
+            const rule = '@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop'+
+              '{filter:saturate(1.25) contrast(1.13) brightness('+value+')!important}}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-card2-sweep';s.textContent="+JSON.stringify(rule)+";document.head.appendChild(s);return true})()");
+            await sleep(45);
+            const candidate = await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+            const score = await evaluate("(async()=>{"+
+              "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "const [a,b]=await Promise.all([load("+JSON.stringify(refUrl)+"),load("+JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(candidate.data)+")]);"+
+              "const c=document.createElement('canvas');c.width=384;c.height=512;const x=c.getContext('2d');"+
+              "x.drawImage(a,0,0);const aa=x.getImageData(0,0,384,512).data;"+
+              "x.clearRect(0,0,384,512);x.drawImage(b,0,0);const bb=x.getImageData(0,0,384,512).data;"+
+              "let sum=0,roi=0,n=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){const p=4*(384*y+x);for(let j=0;j<3;j++){const v=Math.abs(aa[p+j]-bb[p+j]);sum+=v;if(x>=18&&x<365&&y>=195&&y<428){roi+=v;n++}}}"+
+              "return {mae:Math.round(sum/(384*512*3)*10000)/10000,roi:Math.round(roi/n*10000)/10000}})()");
+            console.log('WORK7 CARD2 SWEEP brightness='+value+' '+JSON.stringify(score));
+            await evaluate("(()=>{document.getElementById('w7-card2-sweep')?.remove();return true})()");
+          }
+        }
+
         // WORK7 experimental tuning grid, never applied to the production UI:
         // same 384x512 screenshot frame and same approved artwork for every
         // real-chest brightness candidate; log absolute native MAE/ROI and
@@ -458,11 +478,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const card=native.find(screen=>screen.kind==='cards');
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
-  assert.equal(card.maeRgbAfter,card.maeRgbBefore,
-    '05 Cartas must stay exactly pixel-identical to the true starting HEAD');
-  assert.equal(card.roiMaeAfter,card.roiMaeBefore,
-    'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
-  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
-    JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
+  assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
+    'Native 05 genuine Vento Favorável crop must improve strict global MAE AND eight-card ROI vs merged HEAD: '+
+    JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
+  assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
+    '06 Loja must stay pixel-identical to true merged HEAD');
+  assert.equal(shop.roiMaeAfter,shop.roiMaeBefore,
+    '06 Captain pack and genuine three chests stay pixel-identical to merged HEAD');
 });
