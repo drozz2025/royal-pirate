@@ -4351,3 +4351,17 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 19 Nov 14:24 UTC. Native 06 RARE genuine chest enamel.
+ * Tune ONLY the carved azure field behind the real approved 06 rare chest.
+ * The original approved WebP art remains live, no screenshot backgrounds;
+ * one truthful pack, three actual preview chests, honest EM BREVE, 8 authentic
+ * 05 cards, all genuine currency and touch targets untouched.
+ * Strict frozen-frame 384x512 source MAE and pack+chest ROI A/B vs exact
+ * 9d090a248568 HEAD; at 320x568 and tall mobile this rule is inactive.
+ * approved:false / 0-8; WORK0 alone owns merges, version, HTTP and release. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{
+    --w7-chest-field:#0a4271;
+  }
+}
