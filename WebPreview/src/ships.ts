@@ -7,6 +7,12 @@ const wood = mat('#69361f'), honey = mat('#a35e2e'), darkWood = mat('#3e251a'), 
 // Dark, varied strakes give the playable royal hull a black-and-gold broadside;
 // the enemy keeps its existing warm timber for instant combat recognition.
 const royalHull = mat('#293039'), royalPlank = mat('#493625');
+// The opposing galleon's actual curved hull, not a CSS/screenshot tint.
+// Three low-gloss lacquered red strakes alternate with deep gun-deck shadow.
+// These pooled materials belong ONLY to makeShip(true); Porto stays identical.
+const enemyHullInk=mat('#34232c',.04,.72);
+const enemyHullWine=mat('#792d3b',.08,.57);
+const enemyHullShade=mat('#532636',.05,.66);
 const gold = mat('#f5bd50', .62, .29), metal = mat('#263645', .7, .3), rope = mat('#e0b77b'), black = mat('#121b22');
 const light = new T.MeshStandardMaterial({ color: '#fff1a8', emissive: '#ffab35', emissiveIntensity: 1.5 });
 deck.side=T.DoubleSide;
@@ -157,7 +163,7 @@ export function makeShip(red = false): ShipArt {
   for(let i=0;i<7;i++){
     const y0=-.5+i*.35,y1=y0+.32;
     hullStrip(y0,y1,.53+i*.065,.53+(i+1)*.065,
-      red?(i%2?honey:wood):(i%2?royalPlank:royalHull));
+      red?(i%3===0?enemyHullInk:i%3===1?enemyHullWine:enemyHullShade):(i%2?royalPlank:royalHull));
   }
   hullStrip(1.97,2.35,1,1.01,trim); hullStrip(2.36,2.49,1.035,1.035,gold);
   hullStrip(.35,.48,.78,.8,gold);hullStrip(1.6,1.73,.96,.98,gold);
@@ -170,7 +176,7 @@ export function makeShip(red = false): ShipArt {
   }
   for(const side of [-1,1])for(let i=0;i<stations.length-1;i++)beam(new T.Vector3(side*widths[i],2.82,stations[i]),new T.Vector3(side*widths[i+1],2.82,stations[i+1]),.06,gold);
   // Stern cabin, stepped quarterdeck, framed windows.
-  put(cube,wood,0,2.67,-3.5,2.55,1.4,1.6);put(cube,trim,0,3.45,-3.5,2.85,.22,1.95);put(cube,gold,0,3.6,-3.5,2.96,.12,2.05);
+  put(cube,red?enemyHullWine:wood,0,2.67,-3.5,2.55,1.4,1.6);put(cube,trim,0,3.45,-3.5,2.85,.22,1.95);put(cube,gold,0,3.6,-3.5,2.96,.12,2.05);
   for(const side of [-1,1])for(const z of [-3.9,-3.2]){put(cube,gold,side*1.3,2.8,z,.09,.75,.5);put(cube,light,side*1.36,2.8,z,.02,.56,.31);put(cube,wood,side*1.38,2.8,z,.02,.06,.35);}
   for(const x of [-.8,0,.8]){put(cube,gold,x,2.8,-4.33,.54,.78,.08);put(cube,light,x,2.8,-4.39,.36,.57,.02);}
   for(let i=0;i<5;i++)put(cube,deck,0,2.05+i*.18,-2.1-i*.14,1.1,.15,.28);
