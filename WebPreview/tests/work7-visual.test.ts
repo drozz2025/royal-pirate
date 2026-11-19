@@ -51,6 +51,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Native 05 WORK7 baseline exists');
   assert.ok(cssText.includes('genuine sixth-card pigment scan'), 'Native sixth card candidate exists');
+  assert.ok(cssText.includes('brightness(1.32);'), 'The measured native winner 1.32 must be the final exposure');
   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
     'Only genuine native 06 legendary physical rim is changed in this candidate');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
@@ -342,39 +343,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
-        // Controlled diagnostic sweep: Chromium same 384x512 scene/frame,
-        // only native sixth-card ORIGINAL WebP exposure. Diagnostic only;
-        // selected candidate stays implemented in CSS, not via test injection.
-        if(kind==='cards' && width===384 && height===512) {
-          const scan:any[]=[];
-          for(const value of [1.20,1.32,1.40,1.45,1.50,1.56,1.62,1.70,1.82,1.95]){
-            const localCss='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
-              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop'+
-              '{filter:saturate(1.25) contrast(1.13) brightness('+value+')!important}}';
-            await evaluate("(()=>{const el=document.createElement('style');el.id='w7-card6-diagnostic';el.textContent="+
-              JSON.stringify(localCss)+";document.head.appendChild(el);return true})()");
-            await sleep(60);
-            const shot=await command('Page.captureScreenshot',{
-              format:'png',fromSurface:true,captureBeyondViewport:false
-            });
-            const measured=await evaluate("(async()=>{"+
-              "const load=src=>new Promise((yes,no)=>{const img=new Image();img.onload=()=>yes(img);img.onerror=no;img.src=src});"+
-              "const [ref,live]=await Promise.all([load("+JSON.stringify(refUrl)+"),load("+
-                JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+")]);"+
-              "const c=document.createElement('canvas');c.width=384;c.height=512;const ctx=c.getContext('2d');"+
-              "ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
-              "ctx.clearRect(0,0,384,512);ctx.drawImage(live,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
-              "let sum=0,rs=0,rc=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){const i=(y*384+x)*4;"+
-              "for(let k=0;k<3;k++){const d=Math.abs(a[i+k]-b[i+k]);sum+=d;"+
-              "if(x>=18&&x<365&&y>=195&&y<428){rs+=d;rc++}}}"+
-              "return {global:Math.round(sum/(384*512*3)*10000)/10000,roi:Math.round(rs/rc*10000)/10000}})()");
-            scan.push({brightness:value,...measured});
-            await evaluate("(()=>{document.getElementById('w7-card6-diagnostic')?.remove();return true})()");
-            await sleep(40);
-          }
-          console.log('WORK7 SIXTH-CARD TRUE-SOURCE SAME-FRAME SWEEP '+JSON.stringify(scan));
-          await writeFile(join(output,'card6-controlled-sweep.json'),JSON.stringify(scan,null,2)+'\n');
-        }
+        // Sixth-card 1.32 exposure was selected from a ten-variant, frozen
+        // true-source sweep on CI #44510690625 (trial 1.62 rejected).
+        // This final gate captures HEAD and rendered 05/06 without overrides
+        // except the precisely isolated prior HEAD baseline above.
 
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
