@@ -47,7 +47,11 @@ test('deck-level portrait framing and original desktop pose are independently sc
  assert.equal(mobile.batteryOffsetZ,-18);
  assert.equal(mobile.batteryOffsetX,1.25);
  assert.equal(mobile.batteryScale,1);
- assert.deepEqual(battleCameraPose(320/568),mobile);
+ const compact=battleCameraPose(320/568);
+ assert.deepEqual(compact.position,mobile.position);
+ assert.deepEqual(compact.target,[4.2,4.1,-3]);
+ assert.equal(compact.batteryOffsetX,2);
+ assert.equal(compact.showBattery,true);
  const tall=battleCameraPose(390/844);
  assert.deepEqual(tall.position,mobile.position);
  assert.deepEqual(tall.target,[7.2,4.1,-3]);
@@ -91,6 +95,6 @@ test('WORK0/#104: ultra-tall mobile keeps one real muzzle centered while clearin
    assert.ok(enemy.x>w*.54 && enemy.x<w*.72,
      'enemy anchor must not sit at right screen edge '+w+'x'+h);
  }
- assert.deepEqual(battleCameraPose(384/512),battleCameraPose(320/568),
-   'native reference and compact portrait camera poses must not change');
+ assert.notDeepEqual(battleCameraPose(384/512),battleCameraPose(320/568),
+   'narrow 320px view needs a distinct non-clipping camera without moving the ship');
 });
