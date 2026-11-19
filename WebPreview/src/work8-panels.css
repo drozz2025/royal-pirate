@@ -5487,6 +5487,7 @@
 }
 
 /* WORK8/#104 — ONLY 07 Missões: physically restrained quest-board enamel.
+   A source-pigment sweep of eight genuine Chromium candidate palettes selected #12384e / #0a273c / #061b2d: measured quest ROI -0.769 and full frame -0.234 MAE versus unchanged production.
    This pass paints only the background of the three existing live quest cards
    at the native approved 384x512 art viewport. The root opt-out is for
    same-DOM same-frame Chromium A/B, not gameplay. No quest counts, mission
@@ -5497,6 +5498,6 @@
   .w8-approved-missions .w8-approved-quest {
     background:
       radial-gradient(ellipse 45% 130% at 0 45%,#1b50696a,transparent 85%),
-      linear-gradient(180deg,#071d33 0%,#041628 53%,#020f1e 100%);
+      linear-gradient(180deg,#12384e 0%,#0a273c 53%,#061b2d 100%);
   }
 }
