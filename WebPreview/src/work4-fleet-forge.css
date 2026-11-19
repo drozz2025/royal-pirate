@@ -3094,3 +3094,16 @@
     border-color:#725a46;
   }
 }
+
+/* WORK4/#104 — native source-frame metallurgy (19 Nov 06h).
+   Controlled 20-tone same-frame Chromium A/B against approved 03 selected
+   smoke-iron #273640; the tempting brass #b79c67 made BOTH side rims worse.
+   Baseline #2e485a -> #273640 improves full, frame, left and right ROIs,
+   while the ONE Royal Crown, authentic sea and five WORK0 dock items stay
+   pixel-identical. Pigment only; no source crop/level/touch/shell change.
+   Keep WORK0 #255/#260 responsive work and all nonnative viewports intact. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage {
+    border-color:#273640;
+  }
+}
