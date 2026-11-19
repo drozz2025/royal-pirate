@@ -4358,10 +4358,10 @@
  * 00 original + mosaic and 01–08 are the authoritative visuals.
  * 4x2 authentic artwork, live PRÉVIA/EM BREVE, pack and three genuine
  * chests, touch areas, menu, Porto, economy, 320 and tall are unchanged.
- * Use same-frame browser test against exact integrated HEAD 36f57ee.
+ * Ten-variant real native Chromium sweep selected 1.32 (global 60.8304 → 60.8256;\n * eight-card ROI 55.0502 → 55.0385). Same-frame exact HEAD 36f57ee.
  * No screenshot background. approved:false (0/8), WORK0 only integrates. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{
-    filter:saturate(1.25) contrast(1.13) brightness(1.62);
+    filter:saturate(1.25) contrast(1.13) brightness(1.32);
   }
 }
