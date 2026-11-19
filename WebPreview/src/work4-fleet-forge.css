@@ -3094,3 +3094,25 @@
     border-color:#725a46;
   }
 }
+
+
+/* WORK4/#104 — natural two-axis water-source feather at native 384×512.
+   The approved source strip ends at x237, leaving a visible straight
+   photographic edge where it meets the live stage under the Royal Crown.
+   Soften only the *rightmost* strip pixels while retaining the existing 8%
+   upper coastal feather. This is an alpha mask on the ONE original WebP
+   water-only strip; no generated sea, no second ship, no UI or hitbox changes.
+   The 320/390/430 layout and WORK0 #255/#260 remain untouched.
+   A controlled Chromium original|before|render|overlay checks the local ROI. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > svg.w4-reference-sea {
+    -webkit-mask-image:
+      linear-gradient(to right,#000 0%,#000 86%,transparent 100%),
+      linear-gradient(to bottom,transparent 0%,#000 8%,#000 100%);
+    mask-image:
+      linear-gradient(to right,#000 0%,#000 86%,transparent 100%),
+      linear-gradient(to bottom,transparent 0%,#000 8%,#000 100%);
+    -webkit-mask-composite:source-in;
+    mask-composite:intersect;
+  }
+}
