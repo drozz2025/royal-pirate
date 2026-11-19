@@ -66,3 +66,17 @@ New Work 2 implementation (stack after the fabric lifecycle feature):
 Review visually on 360/390px mobile before merging. Do not confuse unit-test success with measured FPS or iPhone-native validation.
 
 - New original Scout-only triangular fore-and-aft jib geometry now matches the selected sail preview colour. It is an explicit low-poly Three.js cloth triangle mesh (not a static PNG), stays inside the modular accessory group, and is removed/disposed on class swaps. Tests assert it is present only on Scout, with two-sided cloth and a bounded mesh count. This is not part of battle hitboxes or combat mechanics.
+
+## Follow-up: shared preview geometry — 19 Nov 2026, 17h UTC
+
+**Branch:** `work2/shared-preview-geometries-20261119`, stacked over `work2/class-ownership-gpu-cleanup-20261119` (draft PR #543).
+
+- In `applyShipModules()`, repeated wood, brass and iron accessory boxes now use **one unit BoxGeometry buffer** with individual nonuniform mesh scales. Repeated rivets, masts and braces generated through `tube()` similarly use **one unit CylinderGeometry buffer**.
+- Each size of modular frigate gunport ring, flagship ring and modular cannon ring is created once per preview build and shared by every matching mesh.
+- Existing preview cleanup removes the previous `modular-ship-accessories` group and disposes each shared GPU geometry/material exactly once using Sets. Buffers are **not** shared with the Porto ship or battle and **not** cached beyond the life of a preview build.
+- Unit regression verifies a fully ornamented level-20 Warship has 14 torus instances with only 2 underlying torus geometries, multiple boxes/cylinders with one geometry each, a bounded number of unique accessory buffers, and exactly one dispose event per buffer on class change.
+- This reduces independent geometry uploads and JavaScript object creation when changing levels/classes; it **does not** reduce the number of individual mesh draw calls and is **not** a measured FPS or device-memory claim. Visual iPhone testing is still pending.
+- No change to preview progression (1–20), class entitlements, nine owned modules, 27 catalog variants, equip callbacks, gameplay physics, live Porto UI, or published builds.
+- WORK 4 remains the only owner of trusted ownership/equipment persistence; WORK 6 retains the Porto 1:1 layout. WORK 5 should check 360/390px mobile UI and GPU resources after repeated class/module swaps.
+
+The current PR stack must remain **draft** until isolated CI is green and WORK 6 / WORK 5 complete visual integration QA. No auto-merge into `work6/web-3d-preview` or `main`.

@@ -155,13 +155,34 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  const cls=SHIP_CLASSES[config.shipClass];
  root.scale.set(cls.width,cls.height,cls.length);
  const additions=new T.Group();additions.name='modular-ship-accessories';root.add(additions);
+ // Reuse identical low-poly primitives within one preview build. A mesh's own
+ // scale controls its dimensions, while the GPU uploads each shape only once.
+ // The previous preview's unique buffers are disposed by the cleanup above.
+ const geometryPool=new Map<string,T.BufferGeometry>();
+ function sharedGeometry(key:string,create:()=>T.BufferGeometry):T.BufferGeometry{
+  let geometry=geometryPool.get(key);
+  if(!geometry){geometry=create();geometryPool.set(key,geometry);}
+  return geometry;
+ }
  const paint=(hex:string,metalness=.25)=>new T.MeshStandardMaterial({color:hex,metalness,roughness:.48});
  const brass=paint('#eabb56',.72),iron=paint('#566775',.68),warm=paint('#a16b39'),dark=paint('#33283a');
  function part(geometry:T.BufferGeometry,material:T.Material,x:number,y:number,z:number){
   const mesh=new T.Mesh(geometry,material);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;additions.add(mesh);return mesh;
  }
- function cube(material:T.Material,x:number,y:number,z:number,w:number,h:number,d:number){return part(new T.BoxGeometry(w,h,d),material,x,y,z);}
- function tube(material:T.Material,x:number,y:number,z:number,r:number,h:number){return part(new T.CylinderGeometry(r,r,h,8),material,x,y,z);}
+ function cube(material:T.Material,x:number,y:number,z:number,w:number,h:number,d:number){
+  const mesh=part(sharedGeometry('unit-box',()=>new T.BoxGeometry(1,1,1)),material,x,y,z);
+  mesh.scale.set(w,h,d);return mesh;
+ }
+ function tube(material:T.Material,x:number,y:number,z:number,r:number,h:number){
+  const mesh=part(sharedGeometry('unit-cylinder',()=>new T.CylinderGeometry(1,1,1,8)),material,x,y,z);
+  mesh.scale.set(r,h,r);return mesh;
+ }
+ function ring(material:T.Material,x:number,y:number,z:number,
+  radius:number,pipeRadius:number,radialSegments:number,tubularSegments:number,name?:string){
+  const key=`ring-${radius}-${pipeRadius}-${radialSegments}-${tubularSegments}`;
+  const mesh=part(sharedGeometry(key,()=>new T.TorusGeometry(radius,pipeRadius,radialSegments,tubularSegments)),material,x,y,z);
+  mesh.rotation.y=Math.PI/2;if(name)mesh.name=name;return mesh;
+ }
  if(config.shipClass==='scout'){
   const prow=part(new T.ConeGeometry(.62,2.05,6),warm,0,2.35,5.2);prow.rotation.x=Math.PI/2;
   // A distinctive fast-rig prow and slender bronze aft rails; original low-poly details.
@@ -189,8 +210,7 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
   cube(brass,0,3.76,-3.45,2.65,.12,2.05);
   // A frigate's paired framed gunports distinguish it from a scaled scout.
   for(const side of [-1,1])for(const z of [-1.7,.15,1.95]){
-   const port=part(new T.TorusGeometry(.23,.048,5,9),brass,side*1.73,1.62,z);
-   port.rotation.y=Math.PI/2;port.name='fighter-gunport-frame';
+   ring(brass,side*1.73,1.62,z,.23,.048,5,9,'fighter-gunport-frame');
   }
  }else if(config.shipClass==='warship'){
   for(const side of [-1,1]){
@@ -201,8 +221,7 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
   // Flagship-only gunport rims accent the extra-long broadside silhouette.
   // Keep the decoration inside the preview accessory group (never collision).
   for(const side of [-1,1])for(const z of [-2.7,-1.1,.5,2.2]){
-   const rim=part(new T.TorusGeometry(.16,.042,4,9),brass,side*1.8,2.08,z);
-   rim.rotation.y=Math.PI/2;
+   ring(brass,side*1.8,2.08,z,.16,.042,4,9);
   }
   // A separate stern gallery with lit windows is unique to the flagship.
   // Low-poly box elements keep its outline readable on narrow phone screens.
@@ -223,8 +242,7 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
   for(const z of [-2.6,-1.2,.4,1.9])tube(brass,side*1.68,y,z,.065,.12);
  }
  if(config.modules.cannons!=='cannons-bronze')for(const side of [-1,1])for(const z of [-1.8,0,1.8]){
-  const ring=part(new T.TorusGeometry(.24,.07,6,12),config.modules.cannons==='cannons-gold'?brass:iron,side*2.6,1.56,z);
-  ring.rotation.y=Math.PI/2;
+  ring(config.modules.cannons==='cannons-gold'?brass:iron,side*2.6,1.56,z,.24,.07,6,12);
  }
  // The lion and crown must be genuinely different sculptures, not recoloured cones.
  // All parts are small, original low-poly geometry, built only for the isolated editor.
