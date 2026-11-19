@@ -7,6 +7,9 @@ const wood = mat('#69361f'), honey = mat('#a35e2e'), darkWood = mat('#3e251a'), 
 // Dark, varied strakes give the playable royal hull a black-and-gold broadside;
 // the enemy keeps its existing warm timber for instant combat recognition.
 const royalHull = mat('#293039'), royalPlank = mat('#493625');
+// Opposing battle galleon: deep oxblood and shadowed wine timber, rather than
+// flat alternating orange planks. Player/Porto materials are never changed.
+const enemyHull = mat('#83352f'), enemyPlank = mat('#38272c');
 const gold = mat('#f5bd50', .62, .29), metal = mat('#263645', .7, .3), rope = mat('#e0b77b'), black = mat('#121b22');
 const light = new T.MeshStandardMaterial({ color: '#fff1a8', emissive: '#ffab35', emissiveIntensity: 1.5 });
 deck.side=T.DoubleSide;
@@ -30,6 +33,19 @@ function sealTexture(red: boolean, flag = false) {
     c.strokeStyle='#d5a65e';c.lineWidth=3;
     for(const side of [26,486])for(let y=44;y<500;y+=36){
       c.beginPath();c.moveTo(side-6,y);c.lineTo(side+6,y+8);c.stroke();
+    }
+  }
+  // Large-scale crimson cloth treatment belongs exclusively to the opponent.
+  // Per-panel warm embroidery, darker gores and a broad stitched border stay
+  // attached to the 3D sail surface: no billboard, added overlay or HUD hitbox.
+  if(red && !flag){
+    c.fillStyle='rgba(41,8,19,0.16)';
+    for(let x=62;x<500;x+=94)c.fillRect(x,20,22,472);
+    c.strokeStyle='#e8a365';c.lineWidth=9;c.strokeRect(19,19,474,474);
+    c.strokeStyle='#70342f';c.lineWidth=3;c.strokeRect(31,31,450,450);
+    for(let x=91;x<480;x+=95){
+      c.strokeStyle='#e6a56f';c.lineWidth=3;
+      c.beginPath();c.moveTo(x,33);c.bezierCurveTo(x+12,165,x-12,360,x,478);c.stroke();
     }
   }
   // Original skull & crossed cutlasses emblem drawn as a texture, not a copied asset.
@@ -157,7 +173,7 @@ export function makeShip(red = false): ShipArt {
   for(let i=0;i<7;i++){
     const y0=-.5+i*.35,y1=y0+.32;
     hullStrip(y0,y1,.53+i*.065,.53+(i+1)*.065,
-      red?(i%2?honey:wood):(i%2?royalPlank:royalHull));
+      red?(i%2?enemyHull:enemyPlank):(i%2?royalPlank:royalHull));
   }
   hullStrip(1.97,2.35,1,1.01,trim); hullStrip(2.36,2.49,1.035,1.035,gold);
   hullStrip(.35,.48,.78,.8,gold);hullStrip(1.6,1.73,.96,.98,gold);
@@ -170,7 +186,7 @@ export function makeShip(red = false): ShipArt {
   }
   for(const side of [-1,1])for(let i=0;i<stations.length-1;i++)beam(new T.Vector3(side*widths[i],2.82,stations[i]),new T.Vector3(side*widths[i+1],2.82,stations[i+1]),.06,gold);
   // Stern cabin, stepped quarterdeck, framed windows.
-  put(cube,wood,0,2.67,-3.5,2.55,1.4,1.6);put(cube,trim,0,3.45,-3.5,2.85,.22,1.95);put(cube,gold,0,3.6,-3.5,2.96,.12,2.05);
+  put(cube,red?enemyHull:wood,0,2.67,-3.5,2.55,1.4,1.6);put(cube,trim,0,3.45,-3.5,2.85,.22,1.95);put(cube,gold,0,3.6,-3.5,2.96,.12,2.05);
   for(const side of [-1,1])for(const z of [-3.9,-3.2]){put(cube,gold,side*1.3,2.8,z,.09,.75,.5);put(cube,light,side*1.36,2.8,z,.02,.56,.31);put(cube,wood,side*1.38,2.8,z,.02,.06,.35);}
   for(const x of [-.8,0,.8]){put(cube,gold,x,2.8,-4.33,.54,.78,.08);put(cube,light,x,2.8,-4.39,.36,.57,.02);}
   for(let i=0;i<5;i++)put(cube,deck,0,2.05+i*.18,-2.1-i*.14,1.1,.15,.28);
@@ -361,7 +377,7 @@ export function makeShip(red = false): ShipArt {
   const flagMat=new T.MeshStandardMaterial({map:sealTexture(red,true),side:T.DoubleSide,roughness:1});
   // The smaller topsails are dark woven cloth. Keep the crowned skull emblem
   // on the two full main sails and on the flags, not repeated four times.
-  const topsailMat=new T.MeshStandardMaterial({color:red?'#713331':'#19232d',side:T.DoubleSide,roughness:.88});
+  const topsailMat=new T.MeshStandardMaterial({color:red?'#b44d44':'#19232d',side:T.DoubleSide,roughness:.88});
   for(const [z,h,w] of [[.9,8.3,4.5],[-2.1,7.1,3.5]]){
     // Rig is a separate group for damage. Static ropes stay attached to the hull.
     const mast=new T.Mesh(new T.CylinderGeometry(.07,.16,h-.6,10),honey);
@@ -380,10 +396,10 @@ export function makeShip(red = false): ShipArt {
       // Taper the hem while leaving the yard full-width. Layered folds and
       // canvas bulge read as cloth rather than a rigid rectangular billboard.
       upperPositions.setZ(i,red
-        ? .045+.11*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)+.017*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI)
+        ? .08+.39*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)+.06*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI)
         : .12+Math.sin(u*Math.PI)*(.24+.35*Math.sin(v*Math.PI))
           +.045*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
-      upperPositions.setX(i,upperPositions.getX(i)*(red ? (.96+.035*Math.sin(v*Math.PI)) : (.77+.19*Math.sin(v*Math.PI)+.04*v)));
+      upperPositions.setX(i,upperPositions.getX(i)*(red ? (.70+.29*Math.sin(v*Math.PI)+.04*v) : (.77+.19*Math.sin(v*Math.PI)+.04*v)));
     }
     upperGeometry.computeVertexNormals();
     const upperSail=new T.Mesh(upperGeometry,topsailMat);
@@ -394,9 +410,9 @@ export function makeShip(red = false): ShipArt {
       const belly=Math.sin(u*Math.PI)*Math.sin(v*Math.PI);
       // Rounded shoulders, narrowed foot and alternating curved canvas
       // panels create a three-dimensional galleon silhouette from either side.
-      p.setX(i,p.getX(i)*(.84+.13*Math.sin(v*Math.PI)+.03*v));
-      p.setZ(i,.05+.74*belly+.10*Math.sin(u*Math.PI)
-        +.065*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
+      p.setX(i,p.getX(i)*(red ? (.69+.29*Math.sin(v*Math.PI)+.055*v) : (.84+.13*Math.sin(v*Math.PI)+.03*v)));
+      p.setZ(i,(red?.09:.05)+(red?.98:.74)*belly+.10*Math.sin(u*Math.PI)
+        +(red?.12:.065)*Math.sin(u*6*Math.PI)*Math.sin(v*Math.PI));
     }
     g.computeVertexNormals();const sail=new T.Mesh(g,sailMat);sail.position.set(0,h-2.3,z);rig.add(sail);sails.push(sail);
     // A slender rope along the lower canvas edge gives a readable curved
