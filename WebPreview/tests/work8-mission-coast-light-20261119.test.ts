@@ -10,21 +10,21 @@ import {setTimeout as delay} from 'node:timers/promises';
  * The root switch changes ONLY the Missions SVG coastal brightness.
  * Real progress, numerical reward values, claim state, artwork and the
  * five-item shared dock MUST remain unchanged. No mock data or approval. */
-test('07 Missions: measured authentic coastal source lighting native 384x512 A/B', {timeout:220000}, async()=>{
+test('07 Missions: measured authentic existing day 4–7 source-metal edge native 384x512 A/B', {timeout:220000}, async()=>{
   await delay(50000); // do not overload shared GitHub runner Chromium sessions
   const chromeBin=process.env.CHROME_BIN || spawnSync('sh',['-c','command -v chromium || command -v google-chrome'],{encoding:'utf8'}).stdout.trim();
   assert.ok(chromeBin,'native Chromium is mandatory; never silently skip MAE QA');
   const evidence='work8-qa';mkdirSync(evidence,{recursive:true});
-  const build=spawnSync('npm',['run','build','--','--base=/','--outDir=work8-coast-dist'],{encoding:'utf8',timeout:120000});
+  const build=spawnSync('npm',['run','build','--','--base=/','--outDir=work8-late-dist'],{encoding:'utf8',timeout:120000});
   assert.equal(build.status,0,'isolated full TS+Vite build required: '+build.stdout+'\n'+build.stderr);
-  const profile=mkdtempSync(join(tmpdir(),'royal-w8-coast-'));
-  const vite=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--outDir','work8-coast-dist','--host','127.0.0.1','--port','4231','--strictPort'],{stdio:'ignore'});
+  const profile=mkdtempSync(join(tmpdir(),'royal-w8-late-'));
+  const vite=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--outDir','work8-late-dist','--host','127.0.0.1','--port','4243','--strictPort'],{stdio:'ignore'});
   let browser:ReturnType<typeof spawn>|undefined, ws:WebSocket|undefined;
-  const port=11000+(process.pid%1000);
+  const port=12200+(process.pid%1000);
   try {
     let ready=false;
     for(let n=0;n<120;n++){
-      try{const r=await fetch('http://127.0.0.1:4231/');if(r.ok){ready=true;break;}}catch{}
+      try{const r=await fetch('http://127.0.0.1:4243/');if(r.ok){ready=true;break;}}catch{}
       if(vite.exitCode!==null)break;
       await delay(120);
     }
@@ -67,9 +67,9 @@ test('07 Missions: measured authentic coastal source lighting native 384x512 A/B
     };
     await cmd('Page.enable');await cmd('Runtime.enable');
     await cmd('Emulation.setDeviceMetricsOverride',{width:384,height:512,mobile:true,deviceScaleFactor:1,screenWidth:384,screenHeight:512});
-    await cmd('Page.navigate',{url:'http://127.0.0.1:4231/'});
+    await cmd('Page.navigate',{url:'http://127.0.0.1:4243/'});
     await wait('.harbour-screen .harbour-nav-item');
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-luma-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-late-edge-ab-baseline");true');
     const clicked=await evalJs('(()=>{const b=[...document.querySelectorAll(".harbour-screen button")].find(x=>x.textContent?.includes("MISSÕES"));b?.click();return !!b})()');
     assert.ok(clicked,'real Porto->Missões navigation required');
     await wait('.w8-approved-missions .w8-approved-quest-list');
@@ -78,7 +78,7 @@ test('07 Missions: measured authentic coastal source lighting native 384x512 A/B
     const geometry=()=>evalJs('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const nav=document.querySelector(".app-sheet > .harbour-nav");const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")],days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],buttons=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button, .w8-approved-missions .w8-approved-quest > button")],dockButtons=[...nav.querySelectorAll(".harbour-nav-item")];return {questCount:quests.length,days:days.length,dockCount:dockButtons.length,tabAndActionCount:buttons.length,questBoxes:quests.map(rect),dayBoxes:days.map(rect),rewardBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(rect),nav:rect(nav),captions:days.map(d=>rect(d.querySelector("small"))),documentWidth:document.documentElement.scrollWidth,labels:quests.map(q=>q.querySelector(".w8-approved-quest-core strong")?.textContent),rewards:quests.map(q=>[...q.querySelectorAll(".w8-approved-quest-rewards strong")].map(s=>s.textContent)),glyphs:document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem").length}})()');
     const beforeLayout=await geometry();
     const before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    await evalJs('document.documentElement.classList.remove("work8-missions-coast-luma-ab-baseline");true');
+    await evalJs('document.documentElement.classList.remove("work8-missions-late-edge-ab-baseline");true');
     await delay(180);
     const afterLayout=await geometry();
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
@@ -101,7 +101,7 @@ test('07 Missions: measured authentic coastal source lighting native 384x512 A/B
       const images=await Promise.all([__ORIGINAL__,__BEFORE__,__AFTER__].map(make));
       const w=384,h=512;if(images.some(x=>x.width!==w||x.height!==h))throw Error('native images required');
       const px=images.map(i=>{const c=document.createElement('canvas');c.width=w;c.height=h;const t=c.getContext('2d');t.drawImage(i,0,0);return t.getImageData(0,0,w,h).data});
-      const roi={full:[0,0,384,512],coast:[0,74,384,156],missions:[12,155,372,321],daily:[12,326,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,451,384,512]};
+      const roi={full:[0,0,384,512],lastFour:[168,356,365,433],missions:[12,155,372,321],daily:[12,326,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,451,384,512]};
       function mae(a,b,r){let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=(y*w+x)*4;for(let z=0;z<3;z++){total+=Math.abs(a[p+z]-b[p+z]);n++}}return total/n}
       const metrics={};for(const [k,r] of Object.entries(roi)){const baseline=mae(px[0],px[1],r),candidate=mae(px[0],px[2],r);metrics[k]={baseline,candidate,delta:candidate-baseline}}
       const unchanged={header:mae(px[1],px[2],roi.header),dock:mae(px[1],px[2],roi.dock)};
@@ -119,53 +119,67 @@ test('07 Missions: measured authentic coastal source lighting native 384x512 A/B
        selects source-match pigments without guessing by eye. Production paint
        must be updated to match the best measured candidate before approval. */
     // Measured native source sweep, using one paused real scene, not mock images.
-    const sweepValues=[.64,.68,.72,.76,.80,.84,.88,.92,.96,1.0];
+    // Native same-loaded-frame comparison of real FOUR late-day metal rims.
+    const palettes=[
+      {id:'baseline',colors:['#718e96','#718e96','#718e96','#e5c283']},
+      {id:'muted',colors:['#899ba3','#b3a17e','#9487a8','#e9ca8e']},
+      {id:'candidate',colors:['#a2b5bd','#c5a979','#9f91bf','#f0cf8f']},
+      {id:'bright',colors:['#becbd4','#e3bd82','#c0a5de','#ffdb9a']},
+      {id:'cool',colors:['#a3bfca','#cdb79c','#ada3da','#e7b971']},
+      {id:'royal',colors:['#c1c4c6','#dbbd85','#b69dc9','#facd78']},
+      {id:'dark',colors:['#5d7c8a','#8c7351','#786a95','#b99b61']}
+    ];
     const sweepRows=[];
-    for(const value of sweepValues) {
-      const selector='.w8-approved-missions .w8-approved-scene .w8-seascape';
-      const rule=selector+'{filter:saturate(1.02) contrast(1.08) brightness('+value+') drop-shadow(0 3px 2px rgba(2,25,45,.32))!important}';
-      await evalJs('(()=>{let s=document.getElementById("w8-coast-luma-sweep");if(!s){s=document.createElement("style");s.id="w8-coast-luma-sweep";document.head.append(s)}s.textContent='+JSON.stringify(rule)+';return true})()');
+    for(const palette of palettes) {
+      const rule=palette.colors.map((color,i)=>'.w8-approved-missions .w8-approved-days li:nth-child('+(i+4)+'){border-color:'+color+'!important}').join('\n');
+      await evalJs('(()=>{let el=document.getElementById("w8-late-edge-sweep");if(!el){el=document.createElement("style");el.id="w8-late-edge-sweep";document.head.append(el)}el.textContent='+JSON.stringify(rule)+';return true})()');
       await delay(85);
       const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
       const sample=await evalJs(script.replace('__ORIGINAL__',JSON.stringify('data:image/webp;base64,'+original))
         .replace('__BEFORE__',JSON.stringify('data:image/png;base64,'+before))
         .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+shot)));
-      sweepRows.push({value,coast:sample.metrics.coast.delta,full:sample.metrics.full.delta,daily:sample.metrics.daily.delta});
+      sweepRows.push({id:palette.id,colors:palette.colors,lastFour:sample.metrics.lastFour.delta,
+        full:sample.metrics.full.delta,daily:sample.metrics.daily.delta,chests:sample.metrics.chests.delta});
     }
-    await evalJs('document.getElementById("w8-coast-luma-sweep")?.remove();true');
-    const best=[...sweepRows].sort((a,b)=>a.coast-b.coast)[0];
-    console.log('WORK8_COAST_SOURCE_SWEEP '+JSON.stringify({best,all:sweepRows}));
-    writeFileSync(join(evidence,'work8-missions-coast-luma-sweep.json'),JSON.stringify({best,all:sweepRows},null,2));
+    await evalJs('document.getElementById("w8-late-edge-sweep")?.remove();true');
+    const best=[...sweepRows].sort((a,b)=>a.lastFour-b.lastFour)[0];
+    console.log('WORK8_LATE_METAL_SWEEP '+JSON.stringify({best,all:sweepRows}));
+    writeFileSync(join(evidence,'work8-missions-late-edge-sweep.json'),JSON.stringify({best,all:sweepRows},null,2));
     const save=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
-    save('missions-coast-luma-original-384x512.webp',original);
-    save('missions-coast-luma-before-384x512.png',before);
-    save('missions-coast-luma-render-384x512.png',after);
-    save('missions-coast-luma-original-before-overlay.png',compared.overlays[0]);
-    save('missions-coast-luma-original-render-overlay.png',compared.overlays[1]);
+    save('missions-late-edge-original-384x512.webp',original);
+    save('missions-late-edge-before-384x512.png',before);
+    save('missions-late-edge-render-384x512.png',after);
+    save('missions-late-edge-original-before-overlay.png',compared.overlays[0]);
+    save('missions-late-edge-original-render-overlay.png',compared.overlays[1]);
     const report={
       issue:104,scope:'WORK8 exclusively 07 Missões native three genuine daily reward tile edges',
       reference:'assets/design-approved/07-missoes.webp',
       mandatoryRefs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']].map(n=>'assets/design-approved/'+n),
-      viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-coast-luma-ab-baseline',
+      viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-late-edge-ab-baseline',
       metrics:compared.metrics,unchanged:compared.unchanged,
       geometry:{before:beforeLayout,after:afterLayout},approved:false,approvedScreens:0
     };
-    writeFileSync(join(evidence,'work8-missions-coast-luma-native-ab.json'),JSON.stringify(report,null,2));
-    console.log('WORK8 07 original forest-green controlled Chromium A/B '+JSON.stringify(compared.metrics));
+    writeFileSync(join(evidence,'work8-missions-late-edge-native-ab.json'),JSON.stringify(report,null,2));
+    console.log('WORK8 07 late-day metal controlled Chromium A/B '+JSON.stringify(compared.metrics));
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
-    assert.ok(compared.metrics.coast.delta<-.005,'authentic coastal source lighting must improve actual ROI');
-    assert.ok(compared.metrics.full.delta<-.001,'genuine coastal-source light must improve full frame');
-    assert.ok(Math.abs(compared.metrics.daily.delta)<.05&&Math.abs(compared.metrics.chests.delta)<.05,'daily reward artwork and chests pixel-stable');
+    assert.ok(compared.metrics.lastFour.delta<-.01,'authentic existing day 4–7 source-metal edge must improve actual ROI');
+    assert.ok(compared.metrics.full.delta<-.001,'genuine day 4–7 original metal must improve full frame');
+    assert.ok(compared.metrics.daily.delta<.05&&compared.metrics.chests.delta<.05,'daily artwork must not regress and seven chests remain unobstructed');
+    // Real CDP touch (rather than merely DOM click), preserving active daily tab.
+    const tap=await evalJs('(()=>{const e=document.querySelector(".w8-approved-missions .w8-approved-tabs button");const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()');
+    await cmd('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:tap.x,y:tap.y}]});
+    await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    assert.ok(await evalJs('document.querySelector(".w8-approved-missions .w8-approved-tabs button[aria-pressed=true]")!==null'),'real touch preserves operable daily tab');
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const days=document.querySelector(".w8-approved-days"),nav=document.querySelector(".app-sheet > .harbour-nav"),sheet=document.querySelector(".app-sheet-content");if(sheet)sheet.scrollTop=sheet.scrollHeight;if(days)days.scrollLeft=days.scrollWidth;const a=days.getBoundingClientRect(),b=days.lastElementChild.getBoundingClientRect();return {sevenVisible:b.left>=a.left-2&&b.right<=a.right+2,dock:nav.querySelectorAll(".harbour-nav-item").length,quest:document.querySelectorAll(".w8-approved-quest").length,days:days.children.length,width:document.documentElement.scrollWidth}})()');
     assert.ok(narrow.sevenVisible&&narrow.width<=322&&narrow.dock===5&&narrow.quest===3&&narrow.days===7);
-    save('missions-coast-luma-320x568.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    save('missions-late-edge-320x568.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     for(const viewport of [{width:390,height:844},{width:430,height:932}]){
       await cmd('Emulation.setDeviceMetricsOverride',{...viewport,mobile:true,deviceScaleFactor:1,screenWidth:viewport.width,screenHeight:viewport.height});
       await delay(180);
       assert.ok(await evalJs('document.documentElement.scrollWidth<='+String(viewport.width+2)));
-      save('missions-coast-luma-'+viewport.width+'x'+viewport.height+'.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+      save('missions-late-edge-'+viewport.width+'x'+viewport.height+'.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     }
   } finally {
     try{ws?.close()}catch{}
