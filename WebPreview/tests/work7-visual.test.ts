@@ -51,7 +51,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Native 05 WORK7 candidate must exist');
   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
-    'Only genuine native 06 legendary physical rim is changed in this candidate');
+    'Merged WORK7 #467 legendary chest rim must be preserved');
+  assert.ok(cssText.includes('controlled native 06 legendary rim refinement'),
+    'New WORK7 native-only legendary depth material must exist');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
     'The final WORK7 candidate changes only genuine 05 frame inlays');
     // The only admissible before-image is the actual merged #392 v0.1.88 field.
@@ -68,8 +70,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
         box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+                   inset 0 2px 8px 3px #020817a9,
+                   inset 0 -2px 2px #e7b77545!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -463,6 +465,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(card.roiMaeAfter,card.roiMaeBefore,
     'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
   assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
+    'The NEW native 06 rim relief must improve both strict global MAE and pack/chests ROI vs v0.1.101 merged HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
