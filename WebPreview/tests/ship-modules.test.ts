@@ -118,3 +118,21 @@ test('frigate has its own gunwale silhouettes, neither scout nor flagship scalin
  const scout=applyShipModules(scoutRoot,scoutRig,{shipClass:'scout',level:1,modules:{}});
  assert.notEqual(scout.children.length,fighter.children.length,'different class geometry');
 });
+
+test('mobile shipyard preview stays within a bounded mesh budget across all 20 levels',()=>{
+ for(const shipClass of ['scout','fighter','warship'] as const){
+  const root=new T.Group(),rig=new T.Group();root.add(rig);
+  for(let level=1;level<=20;level++){
+   const modules=Object.fromEntries(SLOTS.map(slot=>{
+    const options=availableModules(level,slot);
+    return [slot,options[options.length-1].id];
+   }));
+   const accessories=applyShipModules(root,rig,{shipClass,level,modules});
+   assert.equal(root.children.filter(o=>o.name==='modular-ship-accessories').length,1,
+    'switching must not pile up old geometry');
+   assert.ok(accessories.children.length<125,
+    'single editable preview should have a bounded number of accessory draw-call objects');
+   assert.ok(Number.isFinite(root.scale.x)&&Number.isFinite(root.scale.z));
+  }
+ }
+});
