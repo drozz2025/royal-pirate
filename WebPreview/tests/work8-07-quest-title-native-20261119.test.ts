@@ -133,8 +133,8 @@ test('WORK8 07 authentic quest-title ink — source-ledger and mobile touch', {t
     assert.equal(afterGeometry.activeCount,3,'all three real quest heading glyph groups are present');
     assert.ok(afterGeometry.chests.every((c:any)=>c.bottom<=afterGeometry.nav.y+2),'seven genuine chests not hidden by dock');
     console.log('WORK8_07_LETTERING_SWEEP_WINNER '+JSON.stringify({brightness:win.shift,roi:win.score.titles}));
-    assert.ok(measured.roi.full.delta<-.001 && measured.roi.titles.delta<-.015,'source MAE must improve for real mission buttons');
-    assert.ok(measured.roi.missions.delta<-.001,'real mission title region must improve relative to source');
+    assert.ok(measured.roi.full.delta<-.02 && measured.roi.titles.delta<-.1,'source MAE must improve for real mission buttons');
+    assert.ok(measured.roi.missions.delta<-.08,'real mission title region must improve relative to source');
     for(const region of ['daily','chests','dock','header'])assert.ok(measured.roi[region].changed<.03,'no regression outside mission actions: '+region);
     for(const [w,h] of [[320,568],[390,844],[430,932]]){
       await setSize(w,h);await delay(170);
