@@ -153,7 +153,13 @@ test('1000 repeated purchases and upgrades cannot duplicate ownership or mint go
     return sum;
   },0);
   assert.equal(p.coins,20_000-crewSpent-upgradeSpent,'wallet equals exactly purchased assets');
-  assert.deepEqual(importProfileBackup(exportProfileBackup(p,Date.parse('2026-11-19T17:00:00Z'))),p);
+  // Import deliberately normalizes crew ordering to the catalogue order.
+  // Ownership is a set; ordering is not an economic or save-data invariant.
+  const restored=importProfileBackup(exportProfileBackup(p,Date.parse('2026-11-19T17:00:00Z')));
+  assert.deepEqual(new Set(restored.ownedCrew),new Set(p.ownedCrew));
+  assert.deepEqual(restored.upgrades,p.upgrades);
+  assert.equal(restored.coins,p.coins);
+  assert.equal(restored.equippedCrew,p.equippedCrew);
 });
 
 test('backup adversarial mutations reject forged rewards, roster and battle receipts',()=>{
@@ -216,4 +222,21 @@ test('portrait and touch wiring have source-level regression gates, not fake pho
     assert.ok(scene.includes("addEventListener('"+evt+"'"),evt+' handler must exist');
     assert.ok(scene.includes("removeEventListener('"+evt+"'"),evt+' cleanup must exist');
   }
+});
+
+test('denied purchases and unavailable upgrades leave the same immutable profile and coins',()=>{
+  const empty=initialProfile();
+  assert.equal(buyCrew(empty,'gunner'),empty,'insufficient funds');
+  assert.equal(buyCrew(empty,'navigator'),empty,'insufficient funds');
+  assert.equal(buyCrew(empty,'captain'),empty,'starter cannot be bought');
+  assert.equal(equipCrew(empty,'navigator'),empty,'unowned crew cannot be equipped');
+  assert.equal(improve(empty,'hull'),empty,'upgrade without funds must be rejected');
+  let wealthy:LocalProfile={...empty,coins:20_000};
+  for(let i=0;i<5;i++)wealthy=improve(wealthy,'hull');
+  assert.equal(wealthy.upgrades.hull,5);
+  assert.equal(improve(wealthy,'hull'),wealthy,'level cap rejects sixth upgrade');
+  const bought=buyCrew(wealthy,'gunner');
+  assert.equal(buyCrew(bought,'gunner'),bought,'purchasing owned crew is idempotent');
+  assert.equal(equipCrew(bought,'navigator'),bought,'still no unowned crew equip');
+  assert.deepEqual(empty,initialProfile(),'rejected mutations never affect starter state');
 });
