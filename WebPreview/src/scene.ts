@@ -103,12 +103,12 @@ export class OceanScene {
             sin(vWorld.x*.39-vWorld.z*.12+time*.26)*.70);
           float brokenEdge=sin(vWorld.x*1.13-vWorld.z*.23+
             sin(vWorld.z*.26+time*.18)*1.3);
-          float ridge=smoothstep(.52,.88,
+          float ridge=smoothstep(.43,.82,
             longSwell*.74+crossSwell*.22+lip*.12);
           float fragmented=.32+.68*smoothstep(-.27,.81,brokenEdge);
           float crestMask=ridge*fragmented;
-          float foam=crestMask*(.15+
-            .24*smoothstep(.31,.85,lip));
+          float foam=crestMask*(.21+
+            .31*smoothstep(.25,.78,lip));
           // Foam is sparse near the viewer and lies on real undulating
           // crests rather than washing every adjacent polygon white.
           float eyeDistance=length(cameraPosition.xz-vWorld.xz);
@@ -130,22 +130,22 @@ export class OceanScene {
           // animated Porto water remains exactly as shipped.
           float curling=sin(vWorld.x*.91+vWorld.z*.48-time*.82+
             sin(vWorld.x*.17-vWorld.z*.25+time*.12)*1.38);
-          float edgeBreak=smoothstep(.69,.96,curling)*
-            smoothstep(.36,.72,longSwell*.73+crossSwell*.22+lip*.16);
+          float edgeBreak=smoothstep(.56,.90,curling)*
+            smoothstep(.28,.67,longSwell*.73+crossSwell*.22+lip*.16);
           float irregular=.46+.54*(.5+.5*
             sin(vWorld.x*2.1-vWorld.z*1.63+sin(vWorld.z*.51)*.67));
-          foam=max(foam,edgeBreak*irregular*.43);
-          foam=clamp(foam,0.,.49);
+          foam=max(foam,edgeBreak*irregular*.59);
+          foam=clamp(foam,0.,.64);
           // Rich turquoise illuminated wave faces and pale foam are closer
           // to the approved naval painting than uniform navy stripes.
           // Keep the physically moving mesh, ripples and trajectories intact.
-          vec3 deep=mix(vec3(.012,.13,.28),vec3(.028,.39,.55),
+          vec3 deep=mix(vec3(.010,.14,.30),vec3(.024,.45,.62),
             clamp(.55+vWave*.82+longSwell*.16+crossSwell*.08,0.,1.));
           deep*=1.-.09*(1.-ridge);
           // Turquoise is confined to genuine diagonal ridges, not a blanket colour tint.
-          deep=mix(deep,vec3(.11,.59,.70),clamp(edgeBreak*.33+ridge*.08,0.,.40));
+          deep=mix(deep,vec3(.10,.64,.79),clamp(edgeBreak*.34+ridge*.12,0.,.48));
           deep=mix(deep,vec3(.18,.62,.70),fres*.27);
-          col=mix(deep,vec3(.78,.92,.91),foam);
+          col=mix(deep,vec3(.91,.98,.96),foam);
           col+=vec3(.78,.91,.82)*spec*.22;
           col=mix(col,vec3(.37,.67,.78),fog*.45);
         }
@@ -223,7 +223,7 @@ export class OceanScene {
     const rig=this.ships.enemy.rig;
     const cloth=new T.BufferGeometry();
     const positions:number[]=[],colors:number[]=[],indices:number[]=[];
-    const bright=new T.Color('#c85648'),shadow=new T.Color('#692632');
+    const bright=new T.Color('#d96758'),shadow=new T.Color('#53222c');
     const goldLine:number[]=[];
     // local coordinates: mast Z, cloth foot Y, height, original yard end X,
     // flank and wind extension. Each panel joins its ORIGINAL mast, never
@@ -249,6 +249,7 @@ export class OceanScene {
           sign*(edge+extension*u*belly),
           foot+height*v-sag,
           z+.09+.48*u*Math.sin(Math.PI*v)+.20*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)
+            +.105*Math.sin(u*Math.PI*5+.35*Math.sin(v*Math.PI))*Math.sin(v*Math.PI)
         ];
       };
       for(let iy=0;iy<=rows;iy++){
@@ -256,7 +257,8 @@ export class OceanScene {
         for(let ix=0;ix<=cols;ix++){
           const u=ix/cols;
           positions.push(...point(u,v));
-          const sun=.28+.48*(1-u)+.23*Math.sin(v*Math.PI*3+.5*p);
+          const fold=.5+.5*Math.cos(u*Math.PI*5+.35*Math.sin(v*Math.PI));
+          const sun=.20+.45*(1-u)+.20*Math.sin(v*Math.PI*3+.5*p)+.30*fold;
           const tone=shadow.clone().lerp(bright,Math.max(.10,Math.min(.89,sun)));
           colors.push(tone.r,tone.g,tone.b);
         }
