@@ -21,7 +21,6 @@ test('07 Missions: measured reward column registration native 384x512 A/B', {tim
   const profile=mkdtempSync(join(tmpdir(),'royal-w8-reward-'));
   const vite=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--outDir','work8-reward-dist','--host','127.0.0.1','--port','4199','--strictPort'],{stdio:'ignore'});
   let browser:ReturnType<typeof spawn>|undefined, ws:WebSocket|undefined;
-  const port=9700+(process.pid%1000);
   try {
     let ready=false;
     for(let n=0;n<120;n++){
@@ -30,17 +29,42 @@ test('07 Missions: measured reward column registration native 384x512 A/B', {tim
       await delay(120);
     }
     assert.ok(ready,'isolated Chromium preview must start');
-    browser=spawn(chromeBin,['--headless=new','--no-sandbox','--disable-dev-shm-usage',
-      '--enable-unsafe-swiftshader','--use-gl=angle','--use-angle=swiftshader',
-      '--remote-debugging-port='+port,'--remote-allow-origins=*','--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
-    let pages:any[];
-    for(let n=0;n<120;n++){
-      try{const r=await fetch('http://127.0.0.1:'+port+'/json/list');if(r.ok){pages=await r.json();break;}}catch{}
-      if(browser.exitCode!==null)break;
-      await delay(130);
+
+    // On a busy Actions runner other visual tests may launch Chromium at
+    // the same time. A PID-derived fixed CDP port can collide, leaving no
+    // inspectable tab although this test's actual DOM and image checks work.
+    // Chromium allocates an unused port and writes it to DevToolsActivePort.
+    // Retry only browser startup; never skip the native Chromium MAE gate.
+    let page:any;
+    for(let attempt=1;attempt<=3&&!page;attempt++){
+      const attemptProfile=join(profile,'launch-'+attempt);
+      browser=spawn(chromeBin,['--headless=new','--no-sandbox','--disable-dev-shm-usage',
+        '--enable-unsafe-swiftshader','--use-gl=angle','--use-angle=swiftshader',
+        '--remote-debugging-port=0','--remote-allow-origins=*',
+        '--user-data-dir='+attemptProfile,'about:blank'],{stdio:'ignore'});
+      for(let n=0;n<160;n++){
+        try{
+          const port=Number(readFileSync(join(attemptProfile,'DevToolsActivePort'),'utf8').split('\\n')[0].trim());
+          if(port>0){
+            const r=await fetch('http://127.0.0.1:'+port+'/json/list');
+            if(r.ok){
+              const pages=await r.json();
+              page=pages.find((p:any)=>p.type==='page'&&p.webSocketDebuggerUrl);
+              if(page)break;
+            }
+          }
+        }catch{}
+        if(browser.exitCode!==null||browser.signalCode!==null)break;
+        await delay(150);
+      }
+      if(!page){
+        browser.kill('SIGTERM');
+        await delay(250);
+        if(browser.exitCode===null)browser.kill('SIGKILL');
+        if(attempt<3)await delay(750*attempt);
+      }
     }
-    const page=pages?.find((p:any)=>p.type==='page');
-    assert.ok(page,'genuine native Chromium CDP page');
+    assert.ok(page,'genuine native Chromium CDP page after 3 isolated startup attempts');
     ws=new WebSocket(page.webSocketDebuggerUrl);
     await new Promise<void>((resolve,reject)=>{ws!.addEventListener('open',()=>resolve(),{once:true});ws!.addEventListener('error',reject,{once:true});});
     let id=0;
