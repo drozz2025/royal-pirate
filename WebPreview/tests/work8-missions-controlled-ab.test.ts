@@ -1792,6 +1792,9 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       '})()';
     const enamelScores=await evalJs(enamelSource);
 
+    // Earlier historic ROI tests clear all work8 A/B flags. Restore the real
+    // integrated baseline before sweeping new candidate paints.
+    await evalJs('document.documentElement.classList.add("work8-missions-native-tone-ab-baseline");true');
     /* WORK8 #104: further genuine source-constrained native enamel research.
        No artificial mission data, no reference-as-background, no CSS production
        selection before comparing the SAME frozen frame in Chromium.
