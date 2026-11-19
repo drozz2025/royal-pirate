@@ -4351,3 +4351,18 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 19 Nov, native 384x512 RARE chest inset experiment.
+ * Genuine 06 approved rare-chest relief only; unchanged WebP, one real
+ * pack, 3 chests, honest EM BREVE/PRÉVIA and all real economy state.
+ * No 320px/large-mobile rules, no global shell, dock, Porto, screenshots
+ * used as backgrounds, production publishing, or artificial payment data.
+ * Compare exact parent HEAD with frozen same-scene Chromium MAE + pack ROI.
+ * approved:false (0/8), WORK0 remains sole integrator. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare::before{
+    box-shadow:inset 0 0 0 3px #071321cd,
+               inset 0 2px 8px 3px #020817c5,
+               inset 0 -2px 1px #e7b77529;
+  }
+}
