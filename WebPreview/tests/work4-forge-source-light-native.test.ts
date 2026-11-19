@@ -8,8 +8,8 @@ import {tmpdir} from 'node:os';
 
 const css=readFileSync(new URL('../src/work4-fleet-forge.css',import.meta.url),'utf8');
 const reference=readFileSync(new URL('../../assets/design-approved/04-melhorias-forja.webp',import.meta.url)).toString('base64');
-const marker='WORK4/#104 — 19 Nov 17h: native source-light';
-const own=css.split(marker)[1]||'';
+const marker='WORK4/#104 — native Forge 04: eliminate a duplicate glow over approved-source pixels.';
+const own=css.split(marker)[1]?.split('/*')[0]||'';
 
 test('WORK4 native source-light: mandatory originals, one scoped media rule, no shared layout/economy edits',()=>{
  const refs=['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
@@ -21,10 +21,9 @@ test('WORK4 native source-light: mandatory originals, one scoped media rule, no 
    assert.equal(b.toString('ascii',8,12),'WEBP',n);
  }
  assert.match(own,/@media \(width:384px\) and \(height:512px\)/);
- assert.match(own,/\.w4-forge-scene > svg\.w4-cannon-art\.w4-reference-cannon > ellipse:first-of-type/);
- assert.match(own,/\.w4-forge-scene > svg\.w4-cannon-art\.w4-reference-cannon > ellipse:last-of-type/);
- assert.match(own,/opacity:\.20/);
- assert.match(own,/opacity:\.25/);
+ assert.match(own,/\.w4-forge-scene > svg\.w4-cannon-art\.w4-reference-cannon > ellipse/);
+ assert.match(own,/opacity:0/);
+ assert.doesNotMatch(css, /WORK4\/#104 — 19 Nov 17h: native source-light/);
  const declarations=own.replace(/@media[^{}]*\{/g,'');
  assert.doesNotMatch(declarations,/\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-improve-button|contain:paint|translateZ|(?:^|[;{\s])(?:height|width|position):/);
 });
@@ -132,17 +131,16 @@ test('WORK4 Forge: authentic source hearth light A/B, fixed native frame and pro
   assert.equal(geometry.costs,3,'three genuine real cost cells');
   assert.equal(geometry.dock,5,'five shared navigation targets');
   await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const href=document.querySelector('svg.w4-reference-cannon image')?.getAttribute('href');if(!href||!(await fetch(href)).ok)throw Error('approved source image not loaded');return true;})()");
-  const legacy=".w4-forge svg.w4-reference-cannon > ellipse:first-of-type{opacity:0!important}"+
-    ".w4-forge svg.w4-reference-cannon > ellipse:last-of-type{opacity:0!important}";
-  await evaluate("(()=>{let s=document.createElement('style');s.id='work4-legacy-light-ab';s.textContent="+JSON.stringify(legacy)+";document.head.append(s);return true})()");
+  const candidate=".w4-forge svg.w4-reference-cannon > ellipse:first-of-type{opacity:.20!important}"+
+    ".w4-forge svg.w4-reference-cannon > ellipse:last-of-type{opacity:.25!important}";
   const values=async()=>await evaluate("(()=>["+selectors.map(s=>"getComputedStyle(document.querySelector("+JSON.stringify(s)+")).opacity").join(",")+"])()");
   const baselineValues=await values();
-  baselineValues.forEach((v:string,i:number)=>assert.ok(Math.abs(Number(v)-oldValues[i])<.001,'legacy SVG glow value '+i));
+  baselineValues.forEach((v:string,i:number)=>assert.ok(Math.abs(Number(v)-oldValues[i])<.001,'released SVG glow opacity '+i));
   await delay(140);
   const before=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
-  await evaluate("document.getElementById('work4-legacy-light-ab')?.remove();true");
+  await evaluate("(()=>{let s=document.createElement('style');s.id='work4-rejected-light-ab';s.textContent="+JSON.stringify(candidate)+";document.head.append(s);return true})()");
   const actual=await values();
-  console.log('WORK4_FORGE_LIGHT_CSS_DIAG '+JSON.stringify(await evaluate(
+  console.log('WORK4_FORGE_REJECTED_LIGHT_CSS_DIAG '+JSON.stringify(await evaluate(
     "(()=>({viewport:[innerWidth,innerHeight],media:matchMedia('(width:384px) and (height:512px)').matches,"+
     "selectors:"+JSON.stringify([".w4-forge svg.w4-reference-cannon > ellipse:first-of-type",".w4-forge svg.w4-reference-cannon > ellipse:last-of-type"])+".map(s=>({selector:s,count:document.querySelectorAll(s).length,opacity:document.querySelector(s)&&getComputedStyle(document.querySelector(s)).opacity,outer:document.querySelector(s)?.outerHTML.slice(0,200)})),"+
     "cssRulePresent:[...document.styleSheets].some(s=>{try{return [...s.cssRules].some(r=>r.cssText.includes('ellipse:first-of-type'))}catch{return false}})"+
@@ -174,10 +172,15 @@ test('WORK4 Forge: authentic source hearth light A/B, fixed native frame and pro
   assert.ok(measured?.roi?.cannonArt,'art ROI must exist');
   console.log('WORK4_FORGE_SOURCE_LIGHT_PRECHECK '+JSON.stringify({roi:measured.roi,geometry,oldValues,newValues}));
   assert.ok(measured.roi.cannonArt.changedPixels>0,'source light must produce real visible pixels');
-  for(const name of ['materials','action','dock','plaque']) {
+  for(const name of ['materials','action','dock']) {
     assert.equal(measured.roi[name].changedPixels,0,name+' must be pixel-identical');
   }
-  writeFileSync(join(qa,'work4-original-before-render-overlay-forge-source-light-384x512.png'),Buffer.from(measured.comparison,'base64'));
+  assert.ok(measured.roi.full.after>measured.roi.full.before,'do not integrate candidate that worsens full-frame MAE');
+  assert.ok(measured.roi.cannonBarrel.after>measured.roi.cannonBarrel.before,'rejected candidate loses cannon fidelity');
+  assert.ok(measured.roi.furnace.after>measured.roi.furnace.before,'rejected candidate loses furnace fidelity');
+  assert.ok(measured.roi.plaque.changedPixels>0,'glow contaminates neighboring live plaque pixels');
+  writeFileSync(join(qa,'work4-original-release-rejected-overlay-forge-source-light-384x512.png'),Buffer.from(measured.comparison,'base64'));
+  await evaluate("document.getElementById('work4-rejected-light-ab')?.remove();true");
   const responsive=[];
   for(const [width,height] of [[320,568],[390,844],[430,932]]){
     await viewport(width,height);await delay(120);
@@ -187,11 +190,11 @@ test('WORK4 Forge: authentic source hearth light A/B, fixed native frame and pro
     writeFileSync(join(qa,'work4-forge-source-light-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
     responsive.push({width,height,legacyValues:v});
   }
-  const report={approved:false,screensApproved:0,source:'assets/design-approved/04-melhorias-forja.webp',viewport:'384x512',
-    control:'single Chromium scene, frozen animations, same data/geometry, released opacity:0 vs measured candidate opacity:.20/.25',
+  const report={approved:false,screensApproved:0,decision:'REJECT candidate: it worsens full, cannon and furnace MAE and overlays live plaque',source:'assets/design-approved/04-melhorias-forja.webp',viewport:'384x512',
+    control:'single Chromium scene, frozen animations, same data/geometry: RELEASED opacity:0 vs REJECTED candidate opacity:.20/.25',
     originalReferenceSet:'00 original, 00 mosaic, 01–08',
     oldValues,newValues,geometry,roi:measured.roi,responsive,
     interpretation:'MAE is numeric distance only; human approval is still mandatory'};
-  writeFileSync(join(qa,'work4-forge-source-light-native-ab.json'),JSON.stringify(report,null,2)+'\n');
-  console.log('WORK4_FORGE_SOURCE_LIGHT_NATIVE_AB '+JSON.stringify({roi:report.roi,geometry,oldValues,newValues,responsive}));
+  writeFileSync(join(qa,'work4-forge-rejected-light-native-ab.json'),JSON.stringify(report,null,2)+'\n');
+  console.log('WORK4_FORGE_REJECTED_LIGHT_NATIVE_AB '+JSON.stringify({roi:report.roi,geometry,oldValues,newValues,responsive}));
 });
