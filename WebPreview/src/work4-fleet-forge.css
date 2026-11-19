@@ -3094,3 +3094,19 @@
     border-color:#725a46;
   }
 }
+
+/* WORK4/#104 — verified native 384x512 Royal Crown live inset, 19 Nov.
+   Source 03-frota.webp and the ONLY real Crown remain pixel-identical,
+   as do the four live roster cards and five WORK0 dock controls.
+   Chromium same-paused-frame 14-way ROI A/B (PR #574) against the fresh
+   v0.1.112 base: full RGB MAE 48.12350 -> 48.09639, local inset
+   51.78290 -> 51.73029, source-photo seam 1.40387 -> 1.35491.
+   Change is pigment and drop shadow of the existing real stats plaque,
+   not geometry or a fake water layer. No 320/390/430 override.
+   approved:false; WORK0 only may merge, version, publish or check HTTP. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    border-color:#21465f!important;
+    box-shadow:inset 0 1px #76a9ba45!important;
+  }
+}
