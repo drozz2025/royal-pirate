@@ -45,7 +45,7 @@ test('enemy galleon is red, three-masted and billowed geometry, not an overlay',
 test('enemy battle-only presentation leaves the tested camera and Porto intact',()=>{
   const source=readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
   assert.match(source,/this\.ships\.enemy\.root\.rotation\.y=battleEnemyBroadsideYaw\(battleAspect\)/);
-  assert.equal(battleEnemyBroadsideYaw(384/512),-1.30);
+  assert.equal(battleEnemyBroadsideYaw(384/512),-1.50);
   assert.equal(battleEnemyBroadsideYaw(1.4),-.95,'desktop yaw is unchanged');
   assert.match(source,/this\.ships\.enemy\.root\.scale\.setScalar\(battleEnemyScale\(battleAspect\)\)/);
   assert.match(source,/this\.ships\.player\.root\.scale\.setScalar\(1\);this\.ships\.enemy\.root\.scale\.setScalar\(1\)/);
@@ -57,7 +57,7 @@ test('enemy battle-only presentation leaves the tested camera and Porto intact',
     camera.lookAt(...pose.target);
     camera.updateMatrixWorld();
     const battleScale=battleEnemyScale(w/h);
-    assert.ok(battleScale>=1.35&&battleScale<=1.45,'portrait enemy size is reduced structurally');
+    assert.ok(battleScale>=1.45&&battleScale<=1.65,'portrait enemy retains visible broadside on mobile');
     const points=[
       new T.Vector3(10,0,-3),
       new T.Vector3(10,battleScale*8.4,-3),
@@ -122,9 +122,9 @@ test('WORK0/#104: the live red galleon stops occupying the mobile sky in 4 refer
     const screenY=(y:number)=> (1-new T.Vector3(10,y,-3).project(camera).y)*h/2;
     const yTop=screenY(8.4*battleEnemyScale(w/h));
     const yHull=screenY(0);
-    assert.ok(yTop>h*.32&&yTop<h*.48,
+    assert.ok(yTop>h*.27&&yTop<h*.36,
       'enemy must leave clear sky below compact HP header at '+w+'x'+h+': '+yTop);
-    assert.ok(yHull-yTop>h*.16&&yHull-yTop<h*.27,
+    assert.ok(yHull-yTop>h*.23&&yHull-yTop<h*.33,
       'galleon must be legible, but not cover the foreground guns at '+w+'x'+h);
   }
 });
