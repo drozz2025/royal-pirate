@@ -15,6 +15,21 @@ export function battleDeckMuzzleWorld(deck:T.Object3D,muzzle:T.Vector3):T.Vector
   return muzzle.clone().applyMatrix4(deck.matrixWorld);
 }
 
+/** Aim the single first-person cannon down the same horizontal bearing as
+ * the PREVIEWED landing point. The recoil pivot, barrel, muzzle, flash, smoke
+ * and visible projectile all remain attached to the same real 3D object.
+ * Unlike a yaw multiplier, this includes the camera/deck's actual offset.
+ * Return radians for Three.js; positive screen-right targets require -Y yaw. */
+export function battleCentralCannonYaw(
+  pivot:Pick<T.Vector3,'x'|'z'>,
+  impact:Pick<T.Vector3,'x'|'z'>
+):number {
+  const dx=impact.x-pivot.x, forward=pivot.z-impact.z;
+  if(!Number.isFinite(dx)||!Number.isFinite(forward)||forward<=0)return 0;
+  // A safe presentation bound keeps the whole barrel in the mobile viewport.
+  return Math.max(-Math.PI/4,Math.min(Math.PI/4,-Math.atan2(dx,forward)));
+}
+
 export type CameraPose = {
   position: [number, number, number];
   target: [number, number, number];
