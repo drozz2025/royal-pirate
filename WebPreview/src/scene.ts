@@ -7,7 +7,7 @@ import { makeShip, type ShipArt } from './ships';
 import { hullImpactPlacement } from './impact-visuals';
 import { rippleState } from './water-vfx';
 import { cannonFxState, cannonSmokeState, CANNON_FX_DURATION, CANNON_SMOKE_DURATION } from './cannon-vfx';
-import { battleCameraPose, battleEnemyScale, battleEnemyBroadsideYaw, battleDeckMuzzleWorld } from './battle-framing';
+import { battleCameraPose, battleEnemyScale, battleEnemyBroadsideYaw, battleDeckMuzzleWorld, battleCentralCannonYaw } from './battle-framing';
 import { makeBattleDeck } from './battle-deck';
 import { projectileFromMuzzle, firstPersonArc, firstPersonShotPosition } from './battle-shot-presentation';
 import { makeBattleForegroundSail } from './battle-foreground-sail';
@@ -806,7 +806,8 @@ export class OceanScene {
     const centralRecoil=this.battleBattery.getObjectByName('first-person-central-recoil');
     if(centralRecoil){
       centralRecoil.position.z=68+batteryFx.recoil*.62;
-      centralRecoil.rotation.y=-this.battle.yaw*Math.PI/180*.20;
+      // Actual bearing is computed below from the live target and deck pivot.
+      // The earlier 0.20 yaw multiplier visually contradicted the touch HUD.
     }
     for(const [index,flare] of this.batteryFlashes.entries()){flare.visible=this.battleBattery.visible&&batteryFx.visible&&index===this.activeBatteryMuzzle;flare.scale.setScalar(Math.max(.05,batteryFx.flashScale*.75));(flare.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity;}
     const centralBlast=this.battleBattery.getObjectByName('first-person-central-blast-ring') as T.Mesh|undefined;
@@ -843,8 +844,16 @@ export class OceanScene {
     if(aimKey!==this.lastAim){
       this.lastAim=aimKey;
       const physics=predict(this.battle.yaw,this.battle.power);
-      const mouth=this.batteryMuzzles.length===1&&this.battleBattery.visible?this.playerMuzzleWorld():null;
       const impact=physics[physics.length-1];
+      if(centralRecoil&&this.battleBattery.visible&&impact){
+        // Recompute on each user aim change (not on every animation frame).
+        // Align the visible ONE cannon with the same real simulated target
+        // that already drives the aim path and rendered projectile.
+        const pivot=centralRecoil.getWorldPosition(new T.Vector3());
+        centralRecoil.rotation.y=battleCentralCannonYaw(pivot,impact);
+        centralRecoil.updateWorldMatrix(true,true);
+      }
+      const mouth=this.batteryMuzzles.length===1&&this.battleBattery.visible?this.playerMuzzleWorld():null;
       const points=mouth?physics.map((_,i)=>{
         const p=firstPersonArc(mouth,impact,i/Math.max(1,physics.length-1));
         return new T.Vector3(p.x,p.y,p.z);
