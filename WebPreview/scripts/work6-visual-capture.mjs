@@ -111,4 +111,88 @@ try {
     console.log(`WORK6 ${width}x${height}: real WebGL 4-frame blast/muzzle evidence, five menu actions, sliders and DISPARAR confirmed`);
     await ctx.close();
   }
+
+  // WORK0/WORK6 #104: real native Chromium TOUCH interaction, not simulated React callbacks.
+  // Keep the original 4-viewport image suite above unchanged; this second
+  // context uses mobile touch emulation to audit actual finger movement.
+  for (const [width,height] of [[320,568],[390,844]]) {
+    const ctx=await browser.newContext({
+      viewport:{width,height},deviceScaleFactor:1,isMobile:true,hasTouch:true,
+      reducedMotion:'reduce'
+    });
+    const page=await ctx.newPage();
+    await page.goto('http://127.0.0.1:5173/?work6shots=1',{waitUntil:'domcontentloaded'});
+    await page.locator('.harbour-battle-button').waitFor({state:'visible',timeout:20000});
+    await page.locator('.harbour-battle-button').click();
+    await page.locator('.fire-button').waitFor({state:'visible',timeout:15000});
+    const canvas=page.locator('.in-battle .ocean canvas');
+    await canvas.waitFor({state:'visible'});
+    const start=await page.evaluate(()=>{
+      const canvas=document.querySelector('.in-battle .ocean canvas');
+      const width=innerWidth,height=innerHeight;
+      for(let y=Math.round(height*.34);y<height*.59;y+=9){
+        for(let x=Math.round(width*.25);x<width*.62;x+=9){
+          if(document.elementFromPoint(x,y)===canvas)return {x,y};
+        }
+      }
+      throw new Error('No finger-accessible canvas amid HUD/deck overlays');
+    });
+    const cdp=await ctx.newCDPSession(page);
+    const gesture=async (a,b)=>{
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',
+        touchPoints:[{x:Math.round(a.x),y:Math.round(a.y),id:1}]});
+      for(let i=1;i<=5;i++){
+        const x=a.x+(b.x-a.x)*i/5,y=a.y+(b.y-a.y)*i/5;
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',
+          touchPoints:[{x:Math.round(x),y:Math.round(y),id:1}]});
+      }
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    };
+    const initialScroll=await page.evaluate(()=>({x:scrollX,y:scrollY}));
+    const beforeYaw=Number(await page.locator('#bearing').inputValue());
+    const beforePower=Number(await page.locator('#power').inputValue());
+    await gesture(start,{x:Math.min(width-24,start.x+width*.26),y:start.y});
+    const yaw=Number(await page.locator('#bearing').inputValue());
+    if(!(yaw>beforeYaw+5&&yaw<=25))
+      throw Error('Touch drag failed to update live yaw '+JSON.stringify({width,height,beforeYaw,yaw,start}));
+    const afterAimPower=Number(await page.locator('#power').inputValue());
+    if(afterAimPower!==beforePower)throw Error('Horizontal aiming must NOT adjust power');
+
+    const bar=await page.locator('#power').boundingBox();
+    if(!bar||bar.height<43)throw Error('Power touch target below 44px');
+    const y=bar.y+bar.height/2;
+    await gesture({x:bar.x+bar.width*.1,y},{x:bar.x+bar.width*.8,y});
+    const power=Number(await page.locator('#power').inputValue());
+    if(power<76||power>90)throw Error('Direct power touch/drag not reflected '+power);
+    if(Number(await page.locator('#bearing').inputValue())!==yaw)
+      throw Error('Power drag must NOT affect bearing');
+
+    // Keyboard remains functional after touch. Pointer capture never steals FIRE.
+    await page.locator('#power').focus();
+    await page.keyboard.press('ArrowRight');
+    const powerAfterKeyboard=Number(await page.locator('#power').inputValue());
+    if(powerAfterKeyboard!==Math.min(100,power+1))
+      throw Error('Native slider keyboard interaction regressed');
+    const currentScroll=await page.evaluate(()=>({
+      x:scrollX,y:scrollY,overflowX:document.documentElement.scrollWidth>innerWidth+1,
+      fireAtCenter:(()=>{
+        const b=document.querySelector('.fire-button').getBoundingClientRect();
+        return !!document.elementFromPoint(b.x+b.width/2,b.y+b.height/2)?.closest('.fire-button');
+      })()
+    }));
+    if(currentScroll.x!==initialScroll.x||currentScroll.y!==initialScroll.y||
+       currentScroll.overflowX||!currentScroll.fireAtCenter)
+       throw Error('Touch moved page/obstructed FIRE '+JSON.stringify(currentScroll));
+    await page.screenshot({path:resolve(root,`battle-touch-${width}x${height}.png`),animations:'disabled'});
+    await page.locator('.fire-button').click();
+    await page.waitForFunction(()=>Array.isArray(window.__royalShotFrames)&&
+      window.__royalShotFrames.some(f=>f.ageSec<.31),null,{timeout:7000});
+    await writeFile(resolve(root,`battle-touch-${width}x${height}.json`),
+      JSON.stringify({viewport:{width,height},touchEmulation:'Chromium CDP native touch',
+        beforeYaw,yaw,beforePower,power,powerAfterKeyboard,
+        scroll:currentScroll,fire:'actual WebGL frame verified',elevation:'fixed (not power)',
+        approved:false,safariPhysicalDeviceTested:false},null,2));
+    console.log(`WORK0 TOUCH ${width}x${height}: real canvas drag yaw=${yaw}, power=${power}%, keyboard and gun shot confirmed`);
+    await ctx.close();
+  }
 } finally {await browser.close();}
