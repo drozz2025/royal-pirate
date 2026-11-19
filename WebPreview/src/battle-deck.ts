@@ -95,10 +95,14 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
   const brass=new T.MeshStandardMaterial({color:'#e5b46d',roughness:.37,metalness:.65});
   const rope=new T.MeshStandardMaterial({color:'#dbc69b',roughness:.92});
   const metal=new T.MeshStandardMaterial({color:'#2e363e',roughness:.43,metalness:.66});
-  const beam=(material:T.Material,x:number,y:number,z:number,sx:number,sy:number,sz:number,name:string)=>{
-    const m=new T.Mesh(box,material);
-    m.name=name;m.position.set(x,y,z);m.scale.set(sx,sy,sz);
-    m.castShadow=true;m.receiveShadow=true;dressing.add(m);return m;
+  // The 36 oak/iron/bronze fittings were previously 36 draw calls on iPhones.
+  // Keep their exact real transforms/materials but instance by material: only
+  // three draw calls. No geometry, hull, muzzle, recoil or Porto change.
+  const beamMatrices=new Map<T.Material,T.Matrix4[]>();
+  const beam=(material:T.Material,x:number,y:number,z:number,sx:number,sy:number,sz:number,_name:string)=>{
+    const tr=new T.Object3D();tr.position.set(x,y,z);tr.scale.set(sx,sy,sz);tr.updateMatrix();
+    const matrices=beamMatrices.get(material)??[];
+    matrices.push(tr.matrix.clone());beamMatrices.set(material,matrices);
   };
   // Perspective-converging gunwale caps; no old horizontal barrier across the sea.
   for(const side of [-1,1]){
@@ -132,6 +136,16 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
     beam(oak,side*4.68,.67,60.6,.74,.22,.24,'first-person-belaying-base');
     beam(brass,side*4.68,.85,60.6,.16,.25,.16,'first-person-belaying-pin');
     beam(brass,side*4.68,.97,60.6,.54,.10,.16,'first-person-belaying-cleat');
+  }
+  for(const [material,matrices] of beamMatrices){
+    const batch=new T.InstancedMesh(box,material,matrices.length);
+    batch.name=material===oak?'first-person-deck-oak-batch':
+      material===metal?'first-person-deck-iron-batch':'first-person-deck-brass-batch';
+    matrices.forEach((matrix,i)=>batch.setMatrixAt(i,matrix));
+    batch.instanceMatrix.needsUpdate=true;
+    batch.computeBoundingSphere();
+    batch.castShadow=true;batch.receiveShadow=true;
+    dressing.add(batch);
   }
   // Batched copper pinheads on the visible teak, not 18 independent draw calls.
   const studs=new T.InstancedMesh(new T.SphereGeometry(.08,8,6),brass,18);
