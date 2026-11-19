@@ -5496,5 +5496,7 @@
   :root:not(.work8-missions-reward-ink-ab-baseline)
   .w8-approved-missions .w8-approved-quest-rewards strong {
     color:#fff9e7;
+    /* Restore readable reward numerals despite the inherited dark .55 quest filter. */
+    filter:brightness(1.65);
   }
 }
