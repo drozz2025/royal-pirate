@@ -117,6 +117,38 @@ test('07 Missions: native meter-spectrum source A/B, seven chests, mobile touch'
     // The exact starting state must render the same at the end: no game clock
     // or slider animation is permitted to contaminate the A/B experiment.
     const again=await sample('baseline-repeat','none');
+    // Independent 07-only SCENE sweep: all four surrounding UI regions
+    // are protected. Restore the genuine integrated background between samples.
+    // No synthetic overlays or fake game progress are used.
+    const seaSelector='.w8-approved-missions .w8-approved-scene .w8-seascape';
+    const originalSeaCss=await ev('(()=>{const e=document.querySelector('+JSON.stringify(seaSelector)+');return e?getComputedStyle(e).filter:null})()');
+    assert.ok(originalSeaCss,'live 07 maritime scenery required');
+    const seaBrightness=[.70,.73,.76,.78,.79,.795,.80,.805,.81,.815,.82,.83,.85,.87,.90,.94];
+    const seaSamples:any[]=[];
+    const seaMetricsExpression=(shot:string)=>'(async()=>{const urls='+JSON.stringify([originalUrl,'data:image/png;base64,'+shot])+',imgs=await Promise.all(urls.map(src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src})));if(imgs.some(i=>i.width!==384||i.height!==512))throw Error("native source dimensions");const pix=imgs.map(i=>{const c=document.createElement("canvas");c.width=384;c.height=512;const p=c.getContext("2d");p.drawImage(i,0,0);return p.getImageData(0,0,384,512).data});const areas={full:[0,0,384,512],coast:[0,66,384,166],quests:[12,155,372,321],daily:[13,325,373,436],chests:[20,356,370,427],dock:[0,451,384,512]};const mae=r=>{let n=0,s=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(384*y+x)*4;for(let q=0;q<3;q++){s+=Math.abs(pix[0][k+q]-pix[1][k+q]);n++}}return s/n};return Object.fromEntries(Object.entries(areas).map(([n,r])=>[n,mae(r)]))})()';
+    const seaBaselinePng=await cap();
+    const seaBaselineScore=await ev(seaMetricsExpression(seaBaselinePng));
+    seaSamples.push({name:'HEAD-integrated',css:originalSeaCss,score:seaBaselineScore,screenshot:seaBaselinePng});
+    for(const b of seaBrightness){
+      const filter='saturate(1.02) contrast(1.08) brightness('+b+') drop-shadow(0 3px 2px rgba(2,25,45,.32))';
+      await ev('document.querySelector('+JSON.stringify(seaSelector)+').style.filter='+JSON.stringify(filter)+';true');
+      await delay(75);
+      const shot=await cap();
+      seaSamples.push({name:'coast-'+b,css:filter,score:await ev(seaMetricsExpression(shot)),screenshot:shot});
+    }
+    await ev('document.querySelector('+JSON.stringify(seaSelector)+').style.removeProperty("filter");true');
+    await delay(100);
+    const restoredSea=await ev('getComputedStyle(document.querySelector('+JSON.stringify(seaSelector)+')).filter');
+    assert.equal(restoredSea,originalSeaCss,'no scene CSS remains overridden after A/B');
+    const bestSea=[...seaSamples].filter(x=>x.score.full<seaBaselineScore.full-.001).sort((a,b)=>a.score.coast-b.score.coast)[0]??seaSamples[0];
+    const seaDelta=Object.fromEntries(Object.keys(seaBaselineScore).map(k=>[k,bestSea.score[k]-seaBaselineScore[k]]));
+    save('work8-07-coast-ORIGINAL-384x512.webp',original);
+    save('work8-07-coast-BEFORE-384x512.png',seaBaselinePng);
+    save('work8-07-coast-RENDER-384x512.png',bestSea.screenshot);
+    const seaMontage='(async()=>{const urls='+JSON.stringify([originalUrl,'data:image/png;base64,'+seaBaselinePng,'data:image/png;base64,'+bestSea.screenshot])+',imgs=await Promise.all(urls.map(src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src})));const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");imgs.forEach((im,n)=>x.drawImage(im,n*384,0));x.drawImage(imgs[0],1152,0);x.globalAlpha=.5;x.drawImage(imgs[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()';
+    save('work8-07-coast-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png',await ev(seaMontage));
+    console.log('WORK8_COAST_07_SWEEP '+JSON.stringify({baseline:seaBaselineScore,winner:{name:bestSea.name,css:bestSea.css,score:bestSea.score,delta:seaDelta},samples:seaSamples.map(({name,score})=>({name,score}))}));
+
     const base=samples[0];
     const stable=Math.abs(again.score.full-base.score.full);
     assert.ok(stable<.15,'fixed animated frame must be stable: '+stable);
@@ -133,6 +165,7 @@ test('07 Missions: native meter-spectrum source A/B, seven chests, mobile touch'
       requiredReferences:refs,viewport:'native Chromium 384×512, DPR1',
       frozenAnimations:true,scope:'real 3 quest meter fills; no fake state',geometry,
       samples:samples.map(({name,filter,score})=>({name,filter,score})),
+      sea:{baseline:seaBaselineScore,winning:{name:bestSea.name,css:bestSea.css,score:bestSea.score,delta:seaDelta},samples:seaSamples.map(({name,score})=>({name,score}))},
       winning:{name:winning.name,filter:winning.filter,score:winning.score,delta:improvements},
       baselineRepeat:again.score,approved:false,approvedScreens:0};
     const m='work8-07-meter-spectrum-384x512';
