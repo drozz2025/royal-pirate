@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { createPreviewCabinGallery } from '../src/ship-cabin.ts';
-import { applyShipModules, highestUnlockedPreviewModules, validateOwnedFleetForPlayer } from '../src/ship-modules.ts';
+import { applyShipModules, highestUnlockedPreviewModules, resolveLoadout, validateOwnedFleetForPlayer } from '../src/ship-modules.ts';
 
 const classes=['scout','fighter','warship'] as const;
 const cabins=['cabin-wood','cabin-raised','cabin-palace'] as const;
@@ -75,12 +75,9 @@ test('visual palace unlock does not grant cabin or ship ownership',()=>{
  const loadout={shipClass:'warship' as const,level:20,modules:{cabin:'cabin-palace'}};
  const resolved=highestUnlockedPreviewModules(20);
  assert.equal(resolved.cabin,'cabin-palace');
- const all=new Set(Object.values(resolved));
+ const all=new Set(Object.values(resolveLoadout(loadout).modules));
  assert.throws(()=>validateOwnedFleetForPlayer(loadout,all,20,new Set(['scout' as const])),/missing verified fleet ownership/);
  assert.throws(()=>validateOwnedFleetForPlayer(loadout,new Set(['cabin-palace']),20,new Set(['warship' as const])),/missing verified ownership/);
  assert.throws(()=>validateOwnedFleetForPlayer(loadout,all,1,new Set(['warship' as const])),/does not match verified player level/);
- assert.equal(validateOwnedFleetForPlayer(loadout,new Set(Object.values({
-  ...resolved,
-  ...{hull:'hull-oak',sails:'sails-cream',cannons:'cannons-bronze',armor:'armor-none',figurehead:'figurehead-anchor',flag:'flag-navy',masts:'masts-standard',ornaments:'ornaments-simple'}
- })),20,new Set(['warship' as const])).modules.cabin,'cabin-palace');
+ assert.equal(validateOwnedFleetForPlayer(loadout,all,20,new Set(['warship' as const])).modules.cabin,'cabin-palace');
 });
