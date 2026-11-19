@@ -108,7 +108,7 @@ test('WORK5 UTC rollover, DST boundary and streak cap do not duplicate daily cre
     assert.equal(p.coins,total,'wrong daily amount on UTC day '+day);
     assert.equal(p.dailyStreak,Math.min(7,day+1));
     assert.equal(claimDaily(p,when),p,'repeated reward on same instant');
-    assert.equal(claimDaily(p,when+1),p,'repeated reward one millisecond later');
+    assert.equal(claimDaily(p,when-1),p,'repeated reward one millisecond earlier');
     if(day>0)assert.notEqual(p.lastDailyDay,before.lastDailyDay);
   }
   const gap=first+13*86400000;
@@ -174,7 +174,7 @@ test('WORK5 save/restore retains lifetime counters beyond truncated 12-row battl
   const recovered=importProfileBackup(raw);
   assert.equal(recovered.coins,490);
   assert.equal(recovered.playerName,'Capitã do Norte');
-  assert.equal(recovered.wins+p.losses,28);
+  assert.equal(recovered.wins+recovered.losses,28);
   assert.equal(recovered.hits,112);
   assert.equal(recovered.shots,140);
   assert.deepEqual(recovered.battleLog,p.battleLog);
