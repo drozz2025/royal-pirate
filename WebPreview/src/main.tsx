@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Battle } from './battle';
+import { PirateIcon } from './app-icons';
 import { OceanScene, type Metrics } from './scene';
 import { Harbour } from './harbour';
 import { AppScreens, type AppScreenId } from './app-screens';
@@ -96,7 +97,32 @@ function App(){
    {progress&&<Progress close={()=>setProgress(false)}/>}
  </main>;
 }
-function Health({name,label,value,enemy=false}:{name:string;label:string;value:number;enemy?:boolean}){return <div className={'health-card '+(enemy?'enemy':'')}><div className="health-crest"><Icon name={enemy?'flag':'anchor'} size={24}/></div><div className="health-detail"><div className="ship-label">{label}<strong>{value}<span>/100</span></strong></div><h2>{name}</h2><div className="health-track" role="progressbar" aria-label={`${name} health`} aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}><span style={{width:`${value}%`}}/></div></div></div>}
+/** Battle-only original portraits: the reference uses framed captains at the
+ * two outside ends of the health rail. This is live vector art, never a crop of
+ * the reference screenshot or a fake user avatar. */
+function BattleEnemyPortrait(){
+ return <svg className="battle-enemy-face" viewBox="0 0 48 48" width="42" height="42" fill="none" aria-hidden="true" focusable="false">
+  <circle cx="24" cy="24" r="23" fill="#3b2632"/>
+  <path d="M6 46c3-11 9-14 18-14s15 3 18 14" fill="#962f36" stroke="#f1bc6b" strokeWidth="1.4"/>
+  <path d="M15 32c1 9 4 13 9 13s9-4 10-13" fill="#27222b"/>
+  <ellipse cx="24" cy="24" rx="10.4" ry="12.2" fill="#cd875a" stroke="#643c30" strokeWidth="1.2"/>
+  <path d="M14 27c0 9 5 15 10 15s10-6 10-15l-3 5-7 6-7-6z" fill="#292129"/>
+  <path d="M15 23c2-2 5-2 7-.5m4 0c3-1.5 5-1.5 7 .5" stroke="#292129" strokeWidth="2.1" strokeLinecap="round"/>
+  <circle cx="19.5" cy="25.2" r="1" fill="#151924"/><circle cx="28.5" cy="25.2" r="1" fill="#151924"/>
+  <path d="M23 26l-1 4h3m-6 3q5 3 10 0" stroke="#8f4e38" strokeWidth="1.25" strokeLinecap="round"/>
+  <path d="M30 27l3 4" stroke="#f0c8a4" strokeWidth="1.1"/>
+  <path d="M8 20 14 6 22 10 24 4 29 10 36 6 41 20c-10-4-23-4-33 0Z" fill="#221b2a" stroke="#e5a44d" strokeWidth="1.8"/>
+  <path d="M7 20c10-4 24-4 34 0" stroke="#d4554e" strokeWidth="3" strokeLinecap="round"/>
+  <path d="m24 11 2 2-2 2-2-2Z" fill="#f6d18a"/>
+  <path d="M10 44h28" stroke="#f0bf73" strokeWidth="1.2"/>
+ </svg>;
+}
+function Health({name,label,value,enemy=false}:{name:string;label:string;value:number;enemy?:boolean}){
+ return <div className={'health-card '+(enemy?'enemy':'')}>
+  <div className="health-crest battle-captain-medallion">{enemy?<BattleEnemyPortrait/>:<PirateIcon name="profile" size={42}/>}</div>
+  <div className="health-detail"><div className="ship-label">{label}<strong>{value}<span>/100</span></strong></div><h2>{name}</h2><div className="health-track" role="progressbar" aria-label={`${name} health`} aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}><span style={{width:`${value}%`}}/></div></div>
+ </div>;
+}
 const modules=[
  ['Modelação 3D','Demonstração web','Dois navios procedurais: casco curvo, tábuas, mastros, velas, cabos, canhões e tripulação. Arte provisória. GLB original auditado, não apresentado como arte final.','ASSET_MANIFEST.md'],
  ['Construção naval','Implementado, não validado','Estaleiro e progressão existem no Work 4 e na integração Work 0. Sem execução nativa Unity. Construção não incluída nesta batalha web.','Documentation/Work4/README.md'],
