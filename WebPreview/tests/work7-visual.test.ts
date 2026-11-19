@@ -64,8 +64,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.59)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.71)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.71)!important}
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/', '--outDir', privateBuildDir],
@@ -377,53 +375,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
 
 
 
-        // WORK7 native material search (QA-only): vary one genuine frame
-        // against exact HEAD while all other frames are at their merged
-        // baseline. The entire session uses the same frozen React scene,
-        // viewport, original artwork, Chromium instance and animation frame.
-        // Results are exploratory evidence, never published runtime styles.
-        if (kind==='cards' && width===384 && height===512) {
-          const samples:any[]=[];
-          const previous:Record<number,number>={5:.59,6:.71,8:.71};
-          for(const slot of [5,6,8]){
-            const levels=slot===5?[.42,.48,.53,.59,.65,.71,.78,.86,1]:
-              [.52,.58,.64,.71,.78,.86,.95,1.07,1.20];
-            for(const level of levels){
-              const values={...previous,[slot]:level};
-              const css='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
-                Object.entries(values).map(([n,v])=>
-                  '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+n+
-                  '){filter:brightness('+v+')!important}').join('')+'}';
-              await evaluate("(()=>{const s=document.createElement('style');s.id='work7-depth-sweep';s.textContent="+
-                JSON.stringify(css)+";document.head.appendChild(s);return true})()");
-              await sleep(75);
-              const shot=await command('Page.captureScreenshot',{
-                format:'png',fromSurface:true,captureBeyondViewport:false
-              });
-              const numbers=await evaluate("(async()=>{"+
-                "const load=src=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=src});"+
-                "const ref=await load("+JSON.stringify(refUrl)+"),render=await load("+
-                  JSON.stringify('data:image/png;base64,'+shot.data)+");"+
-                "const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d');"+
-                "g.drawImage(ref,0,0);const a=g.getImageData(0,0,384,512).data;"+
-                "g.clearRect(0,0,384,512);g.drawImage(render,0,0);const b=g.getImageData(0,0,384,512).data;"+
-                "let full=0,roi=0,n=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){"+
-                "const p=(y*384+x)*4;const inside=(x>=18&&x<365&&y>=195&&y<428);"+
-                "for(let k=0;k<3;k++){const delta=Math.abs(a[p+k]-b[p+k]);full+=delta;if(inside){roi+=delta;n++}}}"+
-                "return {global:Math.round(full/(384*512*3)*1e4)/1e4,roi:Math.round(roi/n*1e4)/1e4}})()");
-              samples.push({slot,level,...numbers});
-              await evaluate("(()=>{document.getElementById('work7-depth-sweep')?.remove();return true})()");
-            }
-          }
-          await writeFile(join(output,'work7-depth-sweep.json'),JSON.stringify(samples,null,2)+'\\n');
-          console.log('WORK7 NATIVE ENAMEL SWEEP '+JSON.stringify(
-            [5,6,8].map(slot=>({
-              slot, best:samples.filter(p=>p.slot===slot).sort((a,b)=>a.global-b.global)[0],
-              reference:samples.find(p=>p.slot===slot&&p.level===previous[slot])
-            }))
-          ));
-        }
-
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
@@ -501,7 +452,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
   assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
-    'Native 05 lower-frame enamel 5/6/8 must improve strict full-frame+eight-card ROI vs actual starting HEAD: '+
+    'Native 05 fifth true frame enamel must improve strict full-frame+eight-card ROI vs actual starting HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
   assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
     '06 Shop global image must be pixel-identical to merged HEAD');
