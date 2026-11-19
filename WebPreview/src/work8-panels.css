@@ -5390,3 +5390,8 @@
     filter:brightness(.55) saturate(1.055)!important;
   }
 }
+
+/* WORK8/#104 07 Missões: native same-frame daily-board enamel sweep.
+   Experimental reference comparison only until measured ROI selects a safe
+   paint value. NO 08 Ranking, dock, Porto, gameplay, economy or layout edits.
+   Human approval: false / 0 of 8. */
