@@ -220,6 +220,12 @@ test('scout, frigate and flagship gain genuinely different original silhouette d
  };
  const scout=make('scout'),fighter=make('fighter'),warship=make('warship');
  assert.equal(scout.children.filter(part=>part.name==='scout-bowsprit').length,1);
+ const jib=scout.children.find(part=>part.name==='scout-fore-and-aft-jib');
+ assert.ok(jib instanceof T.Mesh,'scout must carry an original three-dimensional lateen-style jib');
+ assert.equal(jib.geometry.getAttribute('position').count,4);
+ assert.equal((jib.material as T.MeshStandardMaterial).side,T.DoubleSide);
+ assert.equal(fighter.children.some(part=>part.name==='scout-fore-and-aft-jib'),false);
+ assert.equal(warship.children.some(part=>part.name==='scout-fore-and-aft-jib'),false);
  assert.equal(fighter.children.filter(part=>part.name==='fighter-gunport-frame').length,6);
  assert.equal(warship.children.filter(part=>part.name==='warship-stern-window').length,3);
  assert.equal(scout.children.some(part=>part.name==='warship-stern-window'),false);
