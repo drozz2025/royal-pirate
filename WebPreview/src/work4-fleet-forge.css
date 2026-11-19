@@ -3094,3 +3094,16 @@
     border-color:#725a46;
   }
 }
+
+/* WORK4/#104 — native Frota photographic seam, actual source under real stats.
+   The previous opaque left strip created a sharp 384px photo/panel boundary.
+   Fade ONLY the live status card's left backdrop into the approved artwork;
+   source ship, genuine sea, status text, touch and WORK0 dock are unchanged.
+   A/B gate in work4-fleet-photo-contour-native.test.ts compares same frame. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    background:linear-gradient(90deg,
+      #07568400 0%,#07568400 3.8%,#075684ec 4.5%,
+      #0a4b74ed 12%,#0b3655f6 28%,#06263ff9 44%,#031b30fa 70%,#031729fb 100%)!important;
+  }
+}
