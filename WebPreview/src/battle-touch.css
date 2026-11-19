@@ -1,0 +1,12 @@
+/* Battle-only hit regions. Preserve all visual artwork, Porto and five-button dock.
+ * The visible power range is unchanged; its invisible interactive box is 44px tall.
+ * `touch-action:none` prevents Safari from treating these drags as page scroll.
+ */
+.in-battle .ocean { touch-action:none; }
+.in-battle #power {
+  height:44px;
+  min-height:44px;
+  margin-block:-12px;
+  touch-action:none;
+  cursor:ew-resize;
+}
