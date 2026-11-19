@@ -62,7 +62,7 @@ export function battleCameraPose(aspect: number): CameraPose {
       target: [ultraTall ? 7.2 : 4.2, 4.1, -3],
       showBattery: true,
       batteryOffsetZ: -18,
-      batteryOffsetX: ultraTall ? 5 : 2,
+      batteryOffsetX: ultraTall ? 3.6 : 2,
       batteryScale: 1,
       // Legacy optional edge rig is now HIDDEN for portrait battle.
       sailX: -11,
