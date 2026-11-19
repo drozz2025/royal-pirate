@@ -384,6 +384,32 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
 
 
 
+        // WORK7 native 05 exploratory filter matrix. Every candidate is
+        // painted on this exact frozen Chromium scene; CSS is removed before
+        // continuing. Log only; the strict final metric gate still decides.
+        if (kind==='cards' && width===384 && height===512) {
+          for (const first of [.44,.46,.48,.50,.52,.54]) {
+            for (const fifth of [.45,.48,.51,.53,.56,.59]) {
+              const css='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+                '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness('+first+') saturate(1.70) contrast(.87)!important}'+
+                '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness('+fifth+')!important}}';
+              await evaluate("(()=>{const e=document.createElement('style');e.id='w7-05-grid';e.textContent="+JSON.stringify(css)+";document.head.appendChild(e);return true})()");
+              await sleep(50);
+              const pic=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+              const metric=await evaluate("(async()=>{"+
+                "const load=u=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=bad;i.src=u});"+
+                "const a=await load("+JSON.stringify(refUrl)+"),b=await load("+JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(pic.data)+");"+
+                "const c=document.createElement('canvas');c.width=384;c.height=512;"+
+                "const ctx=c.getContext('2d');ctx.drawImage(a,0,0);const x=ctx.getImageData(0,0,384,512).data;"+
+                "ctx.clearRect(0,0,384,512);ctx.drawImage(b,0,0);const y=ctx.getImageData(0,0,384,512).data;"+
+                "let total=0,roi=0,rc=0;for(let j=0;j<512;j++)for(let i=0;i<384;i++){const n=(j*384+i)*4;for(let k=0;k<3;k++){const d=Math.abs(x[n+k]-y[n+k]);total+=d;if(i>=18&&i<365&&j>=195&&j<428){roi+=d;rc++}}}"+
+                "return {global:+(total/(384*512*3)).toFixed(4),roi:+(roi/rc).toFixed(4)};})()");
+              console.log('WORK7 05 SOURCE SWEEP '+first+' '+fifth+' '+JSON.stringify(metric));
+              await evaluate("(()=>{document.getElementById('w7-05-grid')?.remove();return true})()");
+            }
+          }
+        }
+
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
