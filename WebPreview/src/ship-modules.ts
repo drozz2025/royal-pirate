@@ -275,6 +275,22 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  }
  const sailColor=config.modules.sails==='sails-night'?'#1a2635':config.modules.sails==='sails-crimson'?'#b13f40':'#eadab7';
  const flagColor=config.modules.flag==='flag-black'?'#141b24':config.modules.flag==='flag-red'?'#a63336':'#245774';
+ // Scout-only original fore-and-aft jib. Its curved center is a third
+ // vertex ridge, producing a recognisable light raider silhouette instead
+ // of just recolouring or rescaling the frigate sails. Visual sandbox only.
+ if(config.shipClass==='scout'){
+  const jibGeometry=new T.BufferGeometry();
+  jibGeometry.setAttribute('position',new T.Float32BufferAttribute([
+   0,6.6,3.75, -.30,4.8,5.15, 0,4.1,6.25, 0,4.05,3.8
+  ],3));
+  jibGeometry.setIndex([0,1,3,1,2,3]);
+  jibGeometry.computeVertexNormals();
+  const jibCloth=paint(sailColor,0);
+  jibCloth.roughness=.9;
+  jibCloth.side=T.DoubleSide;
+  const jib=part(jibGeometry,jibCloth,0,0,0);
+  jib.name='scout-fore-and-aft-jib';
+ }
  // Previewing 20 levels can change sail colours many times. All sails share
  // one temporary material, as do all flags: fewer GPU material allocations.
  // Retired CanvasTextures from makeShip are released on first conversion, and
