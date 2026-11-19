@@ -88,7 +88,7 @@ test('07 Missions: genuine first three daily-chest emblem brightness / Chromium 
     const afterLayout=await geometry();
     const afterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:first-child .w8-art")).filter');
     assert.notEqual(afterInk,beforeInk,'scoped live first-day chest emblem filter must differ under A/B');
-    assert.match(afterInk,/brightness\(1\.35\)/,'first-day chest brightness must match CSS');
+    assert.match(afterInk,/brightness\(1\.55\)/,'first-day chest brightness must match CSS');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
     assert.deepEqual(afterLayout.labels,beforeLayout.labels,'real mission objective labels unchanged');
@@ -118,7 +118,7 @@ test('07 Missions: genuine first three daily-chest emblem brightness / Chromium 
       .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+after));
 
 
-    // Earlier native 33-variant sweep rejected all regressions; 96px/space-around had the best full+reward ROI without shifting the seven daily chests.
+    // Compare the live existing emblems only; do not substitute claimed-state overlays or shift the seven daily chests.
     const compared=await evalJs(injected);
     const save=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
     save('missions-early-chest-light-original-384x512.webp',original);
