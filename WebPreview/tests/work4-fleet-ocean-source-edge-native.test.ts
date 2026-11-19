@@ -24,7 +24,10 @@ test('WORK4 Fleet native 12-way ocean-water edge same-frame A/B, 320/390/430 che
   skip:process.env.CI==='true'&&chrome?false:'CI Chromium screenshot evidence only',
   timeout:240_000
 },async t=>{
-  const build=spawnSync('npm',['run','build','--','--base=/royal-pirate/'],{
+  // Independent Vite output avoids races with other Chromium QA suites.
+  const buildDir=mkdtempSync(join(tmpdir(),'rp-work4-ocean-build-'));
+  t.after(()=>rmSync(buildDir,{recursive:true,force:true,maxRetries:10,retryDelay:250}));
+  const build=spawnSync('npm',['run','build','--','--base=/royal-pirate/','--outDir',buildDir],{
     cwd:process.cwd(),encoding:'utf8',timeout:120_000,maxBuffer:12000000
   });
   assert.equal(build.status,0,'build must pass before native comparison: '+(build.stderr||build.stdout).slice(-1200));
@@ -36,7 +39,7 @@ test('WORK4 Fleet native 12-way ocean-water edge same-frame A/B, 320/390/430 che
     });
   });
   const preview=spawn(join(process.cwd(),'node_modules','.bin','vite'),[
-    'preview','--host','127.0.0.1','--port',String(port),'--strictPort','--base=/royal-pirate/'
+    'preview','--outDir',buildDir,'--host','127.0.0.1','--port',String(port),'--strictPort','--base=/royal-pirate/'
   ],{stdio:'ignore'});
   const profile=mkdtempSync(join(tmpdir(),'rp-work4-ocean-edge-'));
   let browser:ReturnType<typeof spawn>|undefined;
