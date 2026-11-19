@@ -31,18 +31,24 @@ export type CameraPose = {
  * The 02 reference has clear sky, a starboard opponent and open sea between guns.
  * Desktop remains unchanged; Porto's 1x model is restored by showHarbour(). */
 export function battleEnemyScale(aspect:number):number {
-  if(aspect<.50)return 1.38; // tall phones: ship no longer occupies the middle of the sky
-  if(aspect<.80)return 1.42; // reference-native 384x512 and compact portrait
-  return 1.82; // do not change non-portrait framing
+  // WORK0 #104 / 19 Nov: broaden the genuine 3D red opponent in the short
+  // approved 384×512 composition. Ultra-tall and 320px phones get a smaller
+  // increase because their horizontal field of view clips the outer sails.
+  // Presentation only: physical hull, damage hitbox and Porto stay unchanged.
+  if(aspect<.62)return 1.48; // 320×568, 390×844 and 430×932: protect the stern
+  if(aspect<.80)return 1.62; // 384×512: source-native, clearly readable broadside
+  return 1.82; // preserve desktop
 }
 /** Batalha 02: turn the existing live red ship into a readable starboard broadside.
  * This only changes its rendered yaw, never its position, hitbox, projectile
  * origin or the Porto camera. Mobile needs more visible hull than the narrow
  * near-bow silhouette in the current 384x512 screenshot. */
 export function battleEnemyBroadsideYaw(aspect:number):number {
-  if (aspect < .50) return -1.19; // tall phones: avoid hiding the hull behind HUD
-  if (aspect < .80) return -1.30; // approved native illustration: visible long gun deck
-  return -.95; // unchanged desktop composition
+  // The opponent's longitudinal Z axis must read side-on, not bow-on.
+  // Apply only to the battle render root, never to the simulated hull.
+  if (aspect < .62) return -1.37; // narrow phones: retain stern safe area
+  if (aspect < .80) return -1.50; // native short source: expose full port gun deck
+  return -.95; // preserve desktop
 }
 
 export function battleCameraPose(aspect: number): CameraPose {
