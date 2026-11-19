@@ -12,9 +12,19 @@
 - The 3D Shipyard remains an explicit **VISUAL SANDBOX** with `RESET PREVIEW`; module cards distinguish genuine granted ownership from level-only previews **if** a verified `ownedModuleIds` set is injected.
 - `onEquip` is **optional and hidden by default**. When the client integrates a verified entitlement set and callback, the button is disabled until the complete candidate is eligible. The callback receives a validated fully resolved loadout. No ownership, funds, transactions, persistence, upgrades or inventory are invented here. In the current web app the callback and entitlements are absent, so there is no real EQUIP action.
 
+## Verified player-level equip gate — follow-up 19 Nov 2026
+
+The **editor slider remains a visual demo**, never authoritative player progression. A discovered integration hazard was that the original optional equip callback used the slider `level` as its gate: a player could preview level 20 even if the real player level were 1.
+
+- New function `validateOwnedLoadoutForPlayer(loadout, ownedIds, verifiedPlayerLevel)` rejects **any mismatch** between the draft preview level and the independently provided real player level. It also retains all nine ownership checks.
+- Work 4 integration must pass **both** `ownedModuleIds` and `verifiedPlayerLevel` from the trusted player state, as well as `onEquip`. If the level is absent, outside 1–20, not an integer or mismatched with the preview slider, the equip UI remains disabled. No permissive fallback.
+- Real ownership/level **must be checked again on the backend** at the moment of equipping, even if the UI callback was guarded; never trust client-side sets or levels for payment/ownership decisions. The preview does not change the player's real level.
+- The new unit tests verify that a preview at level 20 cannot be equipped by a real level-1 player even when all nine default parts are owned, and that a matching level with only partial ownership also fails.
+- Work 6 does not need to change Porto or battle code. This is confined to `ship-modules.ts`, `shipyard.tsx`, tests, and the isolated WORK 2 CI workflow.
+
 ## WORK 4 contract
 - Source authenticated player level and owned-module IDs from its authoritative ledger. Never infer ownership from progression, preview selection or the default module catalog.
-- Pass `ownedModuleIds: ReadonlySet<string>` with a real `onEquip(loadout:ResolvedShipLoadout)` only after real inventory/persistence is implemented; validate again against current entitlements on the trusted transaction endpoint.
+- Pass `ownedModuleIds: ReadonlySet<string>` **and independently verified** `verifiedPlayerLevel: number`, with a real `onEquip(loadout:ResolvedShipLoadout)` only after real inventory/persistence is implemented; validate again against current entitlements and player level on the trusted transaction endpoint.
 - Save and restore equipped loadout **only** after server validation, persist via Work 4 data model, and avoid changing the playable battle ship without explicit gameplay approval.
 
 ## WORK 6 contract

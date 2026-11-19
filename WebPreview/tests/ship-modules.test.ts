@@ -1,8 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { SHIP_MODULES, SLOTS, availableModules, resolveLoadout, progressionTier, applyShipModules, mayEquip, equipAccess, validateOwnedLoadout, SHIP_CLASSES } from '../src/ship-modules.ts';
+import { SHIP_MODULES, SLOTS, availableModules, resolveLoadout, progressionTier, applyShipModules, mayEquip, equipAccess, validateOwnedLoadout, validateOwnedLoadoutForPlayer, SHIP_CLASSES } from '../src/ship-modules.ts';
 import { makeShip } from '../src/ships.ts';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { Shipyard } from '../src/shipyard.tsx';
 
 test('all ship levels 1–20 and all three ship classes are supported',()=>{
  for(let level=1;level<=20;level++){
@@ -135,4 +138,45 @@ test('mobile shipyard preview stays within a bounded mesh budget across all 20 l
    assert.ok(Number.isFinite(root.scale.x)&&Number.isFinite(root.scale.z));
   }
  }
+});
+
+test('player-verified level is independent from freely adjustable sandbox level',()=>{
+ const defaultOwned=new Set(Object.values(resolveLoadout({shipClass:'fighter',level:1,modules:{}}).modules));
+ const level20Preview={shipClass:'fighter' as const,level:20,modules:{}};
+ assert.throws(()=>validateOwnedLoadoutForPlayer(level20Preview,defaultOwned,1),/does not match verified player level/);
+ assert.throws(()=>validateOwnedLoadoutForPlayer({shipClass:'fighter',level:1,modules:{}},defaultOwned,20),/does not match verified player level/);
+ assert.throws(()=>validateOwnedLoadoutForPlayer(level20Preview,defaultOwned,21),RangeError);
+ assert.equal(validateOwnedLoadoutForPlayer({shipClass:'fighter',level:1,modules:{}},defaultOwned,1).level,1);
+ assert.equal(validateOwnedLoadoutForPlayer(level20Preview,defaultOwned,20).level,20);
+ assert.throws(()=>validateOwnedLoadoutForPlayer(level20Preview,new Set(['hull-oak']),20),/missing verified ownership/);
+});
+test('real equip button stays locked when only demo progression matches owned parts',()=>{
+ const owned=new Set(Object.values(resolveLoadout({shipClass:'fighter',level:1,modules:{}}).modules));
+ const render=(verifiedPlayerLevel?:number)=>renderToStaticMarkup(createElement(Shipyard,{
+  onClose:()=>{},onPreview:()=>{},onEquip:()=>{},ownedModuleIds:owned,verifiedPlayerLevel
+ }));
+ const equipTag=(html:string)=>html.match(/<button[^>]*class="shipyard-equip"[^>]*>/)?.[0]??'';
+ assert.match(equipTag(render()),/disabled/,'no verified level must prevent equipping');
+ assert.match(equipTag(render(20)),/disabled/,'player level 20 cannot be substituted for demo level 1');
+ assert.match(equipTag(render(0)),/disabled/,'invalid verified level must prevent equipping');
+ assert.doesNotMatch(equipTag(render(1)),/disabled/,'a verified matching level and all real entitlements allow UI action');
+ const missing=new Set(['hull-oak']);
+ const unownedHtml=renderToStaticMarkup(createElement(Shipyard,{
+  onClose:()=>{},onPreview:()=>{},onEquip:()=>{},ownedModuleIds:missing,verifiedPlayerLevel:1
+ }));
+ assert.match(equipTag(unownedHtml),/disabled/,'any unowned default part must prevent equipping');
+});
+
+test('lion and royal crown are distinct original procedural figurehead sculptures',()=>{
+ const root=new T.Group(),rig=new T.Group();root.add(rig);
+ const lion=applyShipModules(root,rig,{shipClass:'fighter',level:10,modules:{figurehead:'figurehead-lion'}});
+ const lionVertices=lion.children.filter(obj=>obj instanceof T.Mesh && obj.geometry.type==='IcosahedronGeometry').length;
+ assert.ok(lionVertices>=1,'lion mane must be a dedicated faceted sculpture');
+ const lionCount=lion.children.length;
+ const crown=applyShipModules(root,rig,{shipClass:'fighter',level:20,modules:{figurehead:'figurehead-crown'}});
+ assert.notEqual(lion,crown);
+ assert.equal(root.children.filter(obj=>obj.name==='modular-ship-accessories').length,1);
+ assert.notEqual(lionCount,crown.children.length,'crest variations must not share identical shapes');
+ assert.ok(crown.children.some(obj=>obj instanceof T.Mesh && obj.geometry.type==='ConeGeometry'),'crown points must have real 3D geometry');
+ assert.ok(crown.children.length<125,'mobile draw-call accessory budget');
 });

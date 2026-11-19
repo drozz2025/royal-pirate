@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - work2/shipyard-ownership-class-polish-20261119
+      - work2/verified-player-level-gate-20261119
   pull_request:
     branches:
       - work2/modular-ships-levels-1-20
+      - work2/shipyard-ownership-class-polish-20261119
     paths:
       - 'WebPreview/**'
       - '.github/workflows/work2-shipyard-verify.yml'
