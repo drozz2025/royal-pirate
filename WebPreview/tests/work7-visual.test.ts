@@ -26,12 +26,16 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
 }, async t => {
   const output = join(process.cwd(), 'porto-qa', 'work7');
   const temp = await mkdtemp(join(tmpdir(), 'royal-work7-chrome-'));
+  // Every browser QA suite runs concurrently in Node's test runner. The
+  // production build MUST have a private output directory: otherwise one
+  // suite can empty another suite's dist/assets while Chromium loads it.
+  const privateBuildDir = join(temp, 'production');
   await mkdir(output, { recursive: true });
   // Vite dev does not serve approved WEBP references outside its source root.
   // Build exactly as production before capturing; otherwise illustrations
   // falsely appear as empty dark cards/chests in QA screenshots.
   const productionBuild = spawnSync('npm',
-    ['run', 'build', '--', '--base=/royal-pirate/'],
+    ['run', 'build', '--', '--base=/royal-pirate/', '--outDir', privateBuildDir],
     { cwd:process.cwd(),encoding:'utf8',timeout:120_000,maxBuffer:10_000_000 });
   assert.equal(productionBuild.status,0,
     'Production assets required for real Chromium QA: ' +
@@ -66,7 +70,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
-    ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/'],
+    ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/', '--outDir', privateBuildDir],
     { cwd: process.cwd(), stdio: 'ignore' });
   let browser: ReturnType<typeof spawn> | undefined;
   let ws: WebSocket | undefined;
@@ -155,11 +159,15 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     return response.result?.value;
   };
   const waitFor = async (expression:string):Promise<void> => {
-    for (let n=0;n<75;n++) {
+    // Real mobile Chromium can take longer than 9 s to mount React while
+    // multiple GPU-based QA suites execute. Keep a bounded wait and report
+    // the document state instead of silently accepting a blank page.
+    for (let n=0;n<180;n++) {
       if (await evaluate(expression)) return;
       await sleep(120);
     }
-    throw new Error('Timed out waiting for React screen: '+expression);
+    const diagnostic = await evaluate("({url:location.href,readyState:document.readyState,title:document.title,rootText:document.getElementById('root')?.textContent?.slice(0,140),scripts:[...document.scripts].map(s=>s.src)})");
+    throw new Error('Timed out waiting for React screen: '+expression+' '+JSON.stringify(diagnostic));
   };
   await command('Page.enable');
   await command('Runtime.enable');
