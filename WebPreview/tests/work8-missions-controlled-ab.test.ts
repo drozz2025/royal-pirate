@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1651,6 +1651,96 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'the production green enamel must improve both the real tiles ROI and the full approved 07 frame');
     assert.ok(Math.abs(earlyDelta.quests)<.05 && Math.abs(earlyDelta.dockDelta)<.05,
       'no regressions in the three missions or WORK0 dock');
+
+
+    /* WORK8 #104 — Native 384x512 genuine green progress-fill source gate.
+       A/B toggles ONLY the new 07 filter in the SAME Chromium paused frame
+       after clearing historic flags. Three real live objectives, seven actual
+       daily rewards and the WORK0 five-button dock remain in the real DOM. */
+    const glowFlag='work8-missions-quest-board-luma-ab-baseline';
+    await evalJs('(()=>{const r=document.documentElement;[...r.classList].filter(x=>x.startsWith("work8-missions-")&&x.endsWith("-ab-baseline")&&x!=='+JSON.stringify(glowFlag)+').forEach(x=>r.classList.remove(x));r.classList.add('+JSON.stringify(glowFlag)+');document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
+    await delay(180);
+    const glowRects=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-list")].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
+    assert.equal(glowRects.length,1,'one genuine board containing three live objectives');
+    const glowBeforeLayout=await headingLayout();
+    const glowBeforeCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-list")).filter');
+    const glowBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(glowFlag)+');true');
+    await delay(130);
+    const glowRenderLayout=await headingLayout();
+    const glowRenderCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-list")).filter');
+    const glowRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+
+    const glowScoreSource=meterStudySource
+      .replace('__RECTS__',JSON.stringify(glowRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        'data:image/png;base64,'+glowBefore,
+        'data:image/png;base64,'+glowRender]));
+    const glowScores=await evalJs(glowScoreSource);
+    const glowDelta=Object.fromEntries(Object.keys(glowScores[0])
+      .map(k=>[k,glowScores[1][k]-glowScores[0][k]]));
+    const glowOverlaySource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+glowBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+glowRender));
+    assert.notEqual(glowOverlaySource,source,'new gate must use its own native screenshots');
+    const glowOverlays=await evalJs(glowOverlaySource);
+    saveTone('missions-quest-board-ink-original-384x512.webp',orig);
+    saveTone('missions-quest-board-ink-before-384x512.png',glowBefore);
+    saveTone('missions-quest-board-ink-render-384x512.png',glowRender);
+    saveTone('missions-quest-board-ink-original-before-overlay-384x512.png',glowOverlays.overlays[0]);
+    saveTone('missions-quest-board-ink-original-render-overlay-384x512.png',glowOverlays.overlays[1]);
+
+    /* Source-calibration sweep: each filter is displayed on the same real
+       paused scene. These shots are research only; the shipped candidate is
+       compared independently in glowBefore/glowRender above. */
+    const glowStudy=[['original',null],['deep-49',.49],['deep-52',.52],['shipped-55',.55],
+      ['balanced-57',.57],['integrated-59',.59],['lighter-61',.61],['lighter-65',.65]] as const;
+    const glowVariants:string[]=[];
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(glowFlag)+');true');
+    for(const [name,brightness] of glowStudy) {
+      const paint=brightness===null?'':'.w8-approved-missions .w8-approved-quest-list{filter:brightness('+brightness+') saturate(1.055)!important}';
+      await evalJs('(()=>{let s=document.getElementById("work8-meter-native-sweep");if(!s){s=document.createElement("style");s.id="work8-meter-native-sweep";document.head.appendChild(s)}s.textContent='+JSON.stringify(paint)+';return true})()');
+      await delay(75);
+      glowVariants.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    }
+    await evalJs('document.getElementById("work8-meter-native-sweep")?.remove();document.documentElement.classList.remove('+JSON.stringify(glowFlag)+');true');
+    const glowVariantScores=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(glowRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        ...glowVariants.map(s=>'data:image/png;base64,'+s)])));
+    const glowSweep=glowStudy.map(([name],i)=>({
+      name,...glowVariantScores[i],
+      regionDelta:glowVariantScores[i].meters-glowVariantScores[0].meters,
+      fullDelta:glowVariantScores[i].full-glowVariantScores[0].full
+    }));
+
+    const glowReport={
+      issue:104,scope:'07 Missões, three genuine objectives board pigment only',
+      baseHead:'cc44ce2ce2ba8c348f71755675dac2c3f126b328',
+      source:'assets/design-approved/07-missoes.webp',
+      requiredReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(s=>'assets/design-approved/'+s),
+      viewport:'Chromium native 384x512 DPR1',sameScenePausedFrame:true,
+      fillRects:glowRects,cssBefore:glowBeforeCss,cssRender:glowRenderCss,
+      before:glowScores[0],render:glowScores[1],delta:glowDelta,
+      overlays:glowOverlays.metrics,geometry:{before:glowBeforeLayout,render:glowRenderLayout},
+      sourceSweep:glowSweep,approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-quest-board-ink-controlled-ab.json'),JSON.stringify(glowReport,null,2));
+    console.log('WORK8 #104 ACTUAL quest-board-ink RGB MAE '+JSON.stringify(glowReport));
+    assert.notEqual(glowBeforeCss,glowRenderCss,'production must alter only fill pigment');
+    assert.deepEqual(glowBeforeLayout,glowRenderLayout,'no movement of real missions, seven chests, tabs or five-button dock');
+    assert.equal(glowRenderLayout.questCount,3);
+    assert.equal(glowRenderLayout.dayCount,7);
+    assert.equal(glowRenderLayout.dockCount,5);
+    assert.ok(glowRenderLayout.chests.every((c:any)=>c.bottom<=glowRenderLayout.nav.top+2),
+      'all seven real chest artworks must remain above the unchanged dock');
+    assert.ok(glowDelta.meters < -0.02 && glowDelta.full < -0.001 && glowDelta.quests < -0.02,
+      'actual quest board pigment must improve original-source ROI, three quests and full frame');
+    assert.ok(Math.abs(glowDelta.daily)<.06 && Math.abs(glowDelta.chests)<.06 &&
+      Math.abs(glowDelta.dockDelta)<.06,'no daily chest or WORK0 dock regression');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
