@@ -85,34 +85,15 @@ jobs:
           done
           CHROME_BIN="$(command -v google-chrome || command -v chromium)" node scripts/capture-porto.mjs
           python3 scripts/assert-forge-visibility.py porto-qa/forge-mobile-390x844.png
-      # Read-only probe. This is NOT a Sites deploy and cannot synchronize code.
-      # An unavailable/private Site never blocks GitHub Pages publication.
-      - name: Probe pre-existing ChatGPT Sites endpoint and release marker (read-only)
+      # No credentials, no mutation, no false equivalence from an HTTP 200.
+      # Compares visible release markers and same-origin JS/CSS SHA-256.
+      # Failure/absence of Sites must not prevent a valid Pages publication.
+      - name: Audit public GitHub Pages and ChatGPT Sites parity (read only)
         if: always()
         continue-on-error: true
         env:
-          RELEASE_VERSION: ${{ steps.release.outputs.version }}
-        run: |
-          set -uo pipefail
-          SITE_URL="https://royal-pirate.ricardomalheiro.chatgpt.site/"
-          code=$(curl --max-time 15 --location --silent --show-error \
-            --output /tmp/royal-pirate-chatgpt-sites.html --write-out '%{http_code}' "$SITE_URL") || code="000"
-          echo "CHATGPT SITES READ-ONLY HTTP: $code at $SITE_URL"
-          echo "ChatGPT Sites HTTP: $code at $SITE_URL" >> "$GITHUB_STEP_SUMMARY"
-          # On a failed PR the release step can be skipped, leaving an empty
-          # version; never grep for bare "v" and report a false parity match.
-          if [[ ! "${RELEASE_VERSION:-}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "ChatGPT Sites: version comparison SKIPPED (no validated release version)." >> "$GITHUB_STEP_SUMMARY"
-            echo "No validated release version; HTTP status alone does NOT establish parity."
-          elif [[ "$code" == "200" ]] && grep -Fq "v${RELEASE_VERSION}" /tmp/royal-pirate-chatgpt-sites.html; then
-            echo "ChatGPT Sites: release marker v${RELEASE_VERSION} present in HTML (marker only; code equality NOT proven)." >> "$GITHUB_STEP_SUMMARY"
-            echo "Marker found; NOT proof of source-code equality or automatic sync."
-          else
-            echo "ChatGPT Sites: release marker v${RELEASE_VERSION} NOT VERIFIED in HTML." >> "$GITHUB_STEP_SUMMARY"
-            echo "No version parity proof and no authenticated GitHub Pages -> Sites deployment configured."
-          fi
-          echo "IMPORTANT: this workflow never updates ChatGPT Sites. HTTP 200 is not a sync confirmation." >> "$GITHUB_STEP_SUMMARY"
-          test "$code" = "200"
+          EXPECTED_RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: node scripts/audit-sites-parity.mjs
 
       - name: Upload short-lived browser snapshot and mobile QA data
         if: always()
