@@ -18,7 +18,50 @@ const sphere = cached('sphere', () => new T.SphereGeometry(1, 10, 8));
 function sealTexture(red: boolean, flag = false) {
   const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 512;
   const c = canvas.getContext('2d')!;
-  c.fillStyle = flag ? '#151923' : red ? '#a7342f' : '#101923'; c.fillRect(0, 0, 512, 512);
+  // WORK0 / #104: battle enemy canvas has a true layered, wind-worn burgundy
+  // cloth dye. This is painted onto the EXISTING curved 3D sails, not a flat
+  // screenshot, overlay or added draw call. Royal player/Porto art is unchanged.
+  if (red && !flag) {
+    const dye = c.createLinearGradient(0, 0, 512, 512);
+    dye.addColorStop(0, '#482239');
+    dye.addColorStop(.22, '#913e4a');
+    dye.addColorStop(.48, '#aa4c48');
+    dye.addColorStop(.72, '#732d3c');
+    dye.addColorStop(1, '#3e1c30');
+    c.fillStyle = dye; c.fillRect(0, 0, 512, 512);
+    // Broad billowing folds, directional glaze and subtle aged canvas grain.
+    // Deterministic drawing keeps every screenshot stable across Chromium runs.
+    for (let fold = 0; fold < 8; fold++) {
+      const x = 14 + fold * 68;
+      c.beginPath(); c.moveTo(x - 22, 0);
+      c.quadraticCurveTo(x + 16, 128, x - 8, 254);
+      c.quadraticCurveTo(x - 35, 399, x - 18, 512);
+      c.lineTo(x + 19, 512);
+      c.quadraticCurveTo(x + 40, 377, x + 21, 252);
+      c.quadraticCurveTo(x + 34, 110, x + 12, 0);
+      c.closePath();
+      c.fillStyle = fold % 2 ? 'rgba(27,10,32,.18)' : 'rgba(255,199,141,.13)';
+      c.fill();
+    }
+    for (let y = 24; y < 512; y += 11) {
+      const offset = 4 * Math.sin(y * .085);
+      c.strokeStyle = y % 3 ? 'rgba(254,201,155,.045)' : 'rgba(20,10,24,.07)';
+      c.lineWidth = 1;
+      c.beginPath(); c.moveTo(16, y + offset);
+      c.quadraticCurveTo(256, y + offset + 13, 496, y + offset - 5);
+      c.stroke();
+    }
+    // Rope-coloured reinforced seams frame the insignia without obscuring it.
+    c.strokeStyle = '#d6a36f'; c.lineWidth = 5;
+    for (const x of [21,491]) {
+      c.beginPath(); c.moveTo(x, 12);
+      c.quadraticCurveTo(x + (x === 21 ? -9 : 9), 256, x, 501);
+      c.stroke();
+    }
+  } else {
+    c.fillStyle = flag ? '#151923' : '#101923';
+    c.fillRect(0, 0, 512, 512);
+  }
   c.strokeStyle = red ? '#d6634d' : '#303741'; c.lineWidth = 2;
   for (let x = 16; x < 512; x += 48) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, 512); c.stroke(); }
   c.strokeStyle = '#d5bf8c'; c.lineWidth = 4; c.strokeRect(12, 12, 488, 488);
@@ -357,11 +400,11 @@ export function makeShip(red = false): ShipArt {
     }
   }
   const sails:T.Mesh[]=[],flags:T.Mesh[]=[];
-  const sailMat=new T.MeshStandardMaterial({map:sealTexture(red),side:T.DoubleSide,roughness:.9});
+  const sailMat=new T.MeshStandardMaterial({map:sealTexture(red),side:T.DoubleSide,roughness:red?.82:.9});
   const flagMat=new T.MeshStandardMaterial({map:sealTexture(red,true),side:T.DoubleSide,roughness:1});
   // The smaller topsails are dark woven cloth. Keep the crowned skull emblem
   // on the two full main sails and on the flags, not repeated four times.
-  const topsailMat=new T.MeshStandardMaterial({color:red?'#713331':'#19232d',side:T.DoubleSide,roughness:.88});
+  const topsailMat=new T.MeshStandardMaterial({color:red?'#512738':'#19232d',side:T.DoubleSide,roughness:.88});
   for(const [z,h,w] of [[.9,8.3,4.5],[-2.1,7.1,3.5]]){
     // Rig is a separate group for damage. Static ropes stay attached to the hull.
     const mast=new T.Mesh(new T.CylinderGeometry(.07,.16,h-.6,10),honey);
