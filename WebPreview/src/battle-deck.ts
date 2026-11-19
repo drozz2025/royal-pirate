@@ -98,25 +98,29 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
   recoil.position.z=68;
   group.add(recoil);
   const breech=new T.Vector3(0,1.80,0);
-  const mouth=new T.Vector3(0,4.80,-18);
+  // Gunner-level Batalha composition: preserve ONE large aligned cannon, but
+  // bring the bore closer to the fore-deck and narrow its silhouette. The
+  // previous 18-unit barrel covered too much enemy/water on tall phones;
+  // muzzle, shot, smoke, flash and recoil still share the same live transform.
+  const mouth=new T.Vector3(0,4.05,-13.5);
   const direction=mouth.clone().sub(breech).normalize();
   const rotation=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),direction);
   const mouthFace=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,0,1),direction);
-  const tube=new T.Mesh(new T.CylinderGeometry(1.12,1.53,breech.distanceTo(mouth),28,1),iron);
+  const tube=new T.Mesh(new T.CylinderGeometry(.94,1.31,breech.distanceTo(mouth),28,1),iron);
   tube.name='first-person-central-cannon';
   tube.position.copy(breech).add(mouth).multiplyScalar(.5);tube.quaternion.copy(rotation);recoil.add(tube);
-  const breechCap=new T.Mesh(new T.SphereGeometry(1.45,18,12),iron);
+  const breechCap=new T.Mesh(new T.SphereGeometry(1.25,18,12),iron);
   breechCap.position.copy(breech);recoil.add(breechCap);
   for(const t of [.22,.60,.86,1]){
-    const radius=1.53-(1.53-1.12)*t;
-    const ring=new T.Mesh(new T.TorusGeometry(radius,.11,10,30),gold);
+    const radius=1.31-(1.31-.94)*t;
+    const ring=new T.Mesh(new T.TorusGeometry(radius,.09,10,30),gold);
     ring.position.copy(breech).lerp(mouth,t);ring.quaternion.copy(mouthFace);recoil.add(ring);
   }
-  const darkMouth=new T.Mesh(new T.CircleGeometry(1.02,32),bore);
+  const darkMouth=new T.Mesh(new T.CircleGeometry(.85,32),bore);
   darkMouth.name='first-person-central-muzzle';
   darkMouth.position.copy(mouth).addScaledVector(direction,.065);
   darkMouth.quaternion.copy(mouthFace);recoil.add(darkMouth);
-  const flash=new T.Mesh(new T.SphereGeometry(1.36,14,10),flame);
+  const flash=new T.Mesh(new T.SphereGeometry(1.14,14,10),flame);
   flash.name='first-person-central-flash';
   flash.position.copy(mouth).addScaledVector(direction,.22);
   flash.visible=false;recoil.add(flash);
@@ -124,7 +128,7 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
   // VFX sprite, screen-space fake or overlay on the firing controls. Its live
   // parent is the recoil/yaw group, so the shot, ring and flash move together.
   const blast=new T.Mesh(
-    new T.RingGeometry(1.06,1.68,28),
+    new T.RingGeometry(.90,1.41,28),
     new T.MeshBasicMaterial({color:'#ffd276',side:T.DoubleSide,
       transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending})
   );
@@ -136,7 +140,7 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
   // phones. It shares the recoil group's transform and points down the bore;
   // no billboard, DOM overlay, second cannon, physics or Porto dependency.
   const jet=new T.Mesh(
-    new T.ConeGeometry(.94,3.1,12,1),
+    new T.ConeGeometry(.78,3.1,12,1),
     new T.MeshBasicMaterial({color:'#ffb73d',side:T.DoubleSide,
       transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending})
   );
