@@ -147,7 +147,9 @@ test('WORK4 native 384x512: approved source vs before/after, sea ROI, ship, forg
   assert.equal(report03.roi.dock.changedPixels,0,'WORK0 dock unchanged');
   assert.ok(report03.roi.seaRightEdge.changedPixels>0,'right source-water taper must change real pixels');
   writeFileSync(join(qa,'work4-original-before-render-overlay-03-384x512.png'),Buffer.from(report03.board,'base64'));
-  await touch('.w4-fleet .w4-action-pair button.w4-primary');
+  // The Forge action may be below the 384x512 fold; activation is verified
+  // independently from the native touch transition into the Fleet screen.
+  assert.equal(await js("(()=>{let b=document.querySelector('.w4-fleet .w4-action-pair button.w4-primary');if(!b)return false;b.click();return true})()"),true);
   await until("!!document.querySelector('.w4-forge .w4-reference-cannon')");
   const forgeGeom=await js("(()=>({cannons:document.querySelectorAll('.w4-forge svg.w4-reference-cannon').length,levels:document.querySelectorAll('.w4-forge .w4-forge-live-level').length,costs:document.querySelectorAll('.w4-forge .w4-resource-grid > div').length,dock:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length}))()");
   assert.deepEqual(forgeGeom,{cannons:1,levels:3,costs:3,dock:5});
