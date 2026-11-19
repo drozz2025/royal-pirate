@@ -4351,3 +4351,20 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 19 Nov 23:24 UTC: true-source chest pigment calibration.
+ * Native 384x512 ONLY, exact WORK0 starting HEAD ff6fef2.
+ * Reduce electric cyan/magenta oversaturation on genuine approved 06 rare
+ * and epic WEBP chest crops; keep their live hand-carved 3D frame relief,
+ * all exact geometry, one real pack, PRÉVIA/EM BREVE, money and touch targets.
+ * The 320px dock spacing and taller screens are strictly unchanged.
+ * Compare A/B in a frozen, identical Chromium frame; no screenshots as UI.
+ * approved:false 0/8. No WORK7 merge, publication or version changes. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{
+    filter:saturate(1.13) contrast(1.12) brightness(1.32) drop-shadow(0 4px 3px #041327a8);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
+    filter:saturate(1.08) contrast(1.12) brightness(1.32) drop-shadow(0 4px 3px #041327a8);
+  }
+}
