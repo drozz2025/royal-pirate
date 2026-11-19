@@ -28,7 +28,7 @@ test('enemy crimson galleon is physically rendered and Porto retains its origina
       return all;
     }
     const redColors=colors(enemy),royalColors=colors(royal);
-    assert.ok(redColors.includes('83352f'),'enemy's red hull has genuine render material');
+    assert.ok(redColors.includes('83352f'),'enemy red hull has genuine render material');
     assert.ok(redColors.includes('38272c'),'enemy's dark plank shading is present');
     assert.ok(redColors.includes('b44d44'),'enemy topsails are separate illuminated geometry');
     assert.ok(!royalColors.includes('83352f'),'approved Porto hull unchanged');
