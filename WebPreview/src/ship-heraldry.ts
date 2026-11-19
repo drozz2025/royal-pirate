@@ -90,11 +90,11 @@ export function createPreviewSternHeraldry(
     color: '#eac473', metalness: .65, roughness: .33, side: T.DoubleSide
   });
   const mesh = new T.Mesh(combined, material);
-  const placement = {
+  const placement: Record<ShipClass, readonly [number,number,number]> = {
     scout: [0, 3.23, -4.68],
     fighter: [0, 3.17, -4.78],
     warship: [0, 4.11, -5.16]
-  } as const;
+  };
   mesh.position.set(...placement[shipClass]);
   mesh.name = 'shipyard-' + shipClass + '-stern-heraldry';
   mesh.castShadow = true;
