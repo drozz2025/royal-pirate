@@ -58,7 +58,11 @@ try {
     if(!noXOverflow)throw new Error(`Batalha horizontal overflow at ${width}x${height}`);
     await page.screenshot({path:resolve(root,`battle-${width}x${height}.png`),animations:'disabled'});
     await page.locator('.fire-button').click();
-    await page.locator('.fire-button:disabled').waitFor({state:'visible',timeout:2500});
+    // On SwiftShader the short disabled/flight phase can finish before a DOM
+    // polling interval. The proof is the LIVE WebGL firing framebuffer, not
+    // an incidental disabled CSS state. Fail if the real gun never fires.
+    await page.waitForFunction(()=>(window.__royalShotFrames??[])
+      .some(frame=>frame.ageSec<.31),null,{timeout:7000});
     // A screenshot of a random animation frame is NOT evidence of an actual
     // muzzle flash. Capture the same real WebGL viewport through the entire
     // blast/recoil/smoke window, and record observed (not invented) elapsed
