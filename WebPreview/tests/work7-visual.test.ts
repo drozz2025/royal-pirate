@@ -50,7 +50,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Native 05 WORK7 candidate must exist');
-  assert.ok(cssText.includes('actual 8/8 carved enamel inlays'), 'WORK7 authentic eight-card engraved metal frames must be present');
+  assert.ok(cssText.includes('lighter engraved inlays on 8 genuine cards'), 'WORK7 authentic eight-card engraved metal frames must be present');
   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
     'Only genuine native 06 legendary physical rim is changed in this candidate');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
