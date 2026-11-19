@@ -5486,7 +5486,7 @@
   }
 }
 
-/* WORK8 / issue #104 — 07 MISSÕES ONLY. Source-calibrated ivory ink on the
+/* WORK8 / issue #104 — 07 MISSÕES ONLY. Source-calibrated restrained caption ink on the
    seven REAL daily-day captions, without touching local claims or rewards.
    Short reference viewport only; original geometry and interactions remain.
    Root opt-out provides native Chromium same-scene paused-frame A/B.
@@ -5495,6 +5495,6 @@
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
   :root:not(.work8-missions-day-caption-ink-ab-baseline)
   .w8-approved-missions .w8-approved-days li > small {
-    filter:brightness(1.4);
+    filter:brightness(.60);
   }
 }
