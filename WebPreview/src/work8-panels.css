@@ -5428,7 +5428,7 @@
     width:27px;
     height:27px;
     top:-4px;
-    left:50%;
+    left:calc(50% - 4px);
     transform:translateX(-50%);
     box-sizing:border-box;
     border:0;
