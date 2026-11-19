@@ -1693,17 +1693,19 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     // Supplemental live-Chromium sweep diagnoses stronger/weaker source matches;
     // only the static committed CSS is subject to the strict pass/fail A/B.
     const inkSweep=[];
-    for(const pigment of [.80,.86,.90,.93,.96,1.03,1.10]) {
+    for(const [pigment,saturation] of [[.90,.80],[.90,.90],[.90,1],[.96,.80],[.96,.88],[.96,.95],[.96,1],[1,.80],[1,.90],[1,1],[1.05,.80],[1.05,.90],[1.05,1],[1.12,.80],[1.12,.90]]) {
       await evalJs('document.documentElement.style.setProperty("--w8-quest-rewards-ink",'+JSON.stringify(String(pigment))+');true');
+      await evalJs('document.documentElement.style.setProperty("--w8-quest-rewards-saturation",'+JSON.stringify(String(saturation))+');true');
       await delay(95);
       const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-      inkSweep.push({pigment,shot});
+      inkSweep.push({pigment,saturation,shot});
     }
     await evalJs('document.documentElement.style.removeProperty("--w8-quest-rewards-ink");true');
+    await evalJs('document.documentElement.style.removeProperty("--w8-quest-rewards-saturation");true');
     const inkSweepMetrics=await evalJs(meterStudySource
       .replace('__RECTS__',JSON.stringify(inkRects))
       .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+inkBefore,...inkSweep.map(x=>'data:image/png;base64,'+x.shot)])));
-    const inkStudy=inkSweep.map((x,i)=>({pigment:x.pigment,...inkSweepMetrics[i+1],
+    const inkStudy=inkSweep.map((x,i)=>({pigment:x.pigment,saturation:x.saturation,...inkSweepMetrics[i+1],
       rewardROIDelta:inkSweepMetrics[i+1].meters-inkSweepMetrics[0].meters,
       fullDelta:inkSweepMetrics[i+1].full-inkSweepMetrics[0].full}));
     const inkReferenceSet=['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
