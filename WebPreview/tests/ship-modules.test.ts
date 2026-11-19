@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { SHIP_MODULES, SLOTS, availableModules, resolveLoadout, progressionTier, applyShipModules, mayEquip, equipAccess, validateOwnedLoadout, validateOwnedLoadoutForPlayer, validateOwnedFleetForPlayer, SHIP_CLASSES } from '../src/ship-modules.ts';
+import { SHIP_MODULES, SLOTS, availableModules, resolveLoadout, progressionTier, applyShipModules, mayEquip, equipAccess, validateOwnedLoadout, validateOwnedLoadoutForPlayer, validateOwnedFleetForPlayer, SHIP_CLASSES, highestUnlockedPreviewModules } from '../src/ship-modules.ts';
 import { makeShip } from '../src/ships.ts';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -285,7 +285,8 @@ test('mobile modular previews pool repeating box, cylinder and gunport buffers w
  const cylinders=meshes.filter(o=>o.geometry.type==='CylinderGeometry' &&
   (o.geometry as T.CylinderGeometry).parameters.radiusTop===1 &&
   (o.geometry as T.CylinderGeometry).parameters.height===1);
- const rings=meshes.filter(o=>o.geometry.type==='TorusGeometry');
+ const rings=meshes.filter(o=>o.geometry.type==='TorusGeometry' && o.name!=='warship-royal-helm');
+ assert.ok(meshes.some(o=>o.name==='warship-royal-helm'),'royal helm is a distinct wheel, not a cannon rim');
  assert.ok(boxes.length>25,'complex royal hull contains many independently scaled beams and plates');
  assert.equal(new Set(boxes.map(o=>o.geometry)).size,1,'box meshes share one GPU buffer');
  assert.ok(cylinders.length>=12,'mast and armour rivets require multiple cylinders');
@@ -352,4 +353,55 @@ test('changing flag or hull retires only the previous class pennant GPU assets',
  assert.equal(next.children.some(obj=>obj.name==='warship-royal-pennant'),false);
  const newBanner=next.children.find(obj=>obj.name==='scout-swallow-pennant') as T.Mesh;
  assert.equal((newBanner.material as T.MeshStandardMaterial).color.getHexString(),'a63336');
+});
+
+
+test('visual max-level presets resolve at every level but never confer ownership',()=>{
+ for(let level=1;level<=20;level++){
+  const preset=highestUnlockedPreviewModules(level);
+  assert.equal(Object.keys(preset).length,9);
+  for(const slot of SLOTS){
+   const unlocked=availableModules(level,slot);
+   assert.equal(preset[slot],unlocked[unlocked.length-1].id);
+  }
+  for(const shipClass of ['scout','fighter','warship'] as const){
+   const resolved=resolveLoadout({shipClass,level,modules:preset});
+   assert.equal(resolved.modules.flag,preset.flag);
+   assert.throws(()=>validateOwnedFleetForPlayer(
+    {shipClass,level,modules:preset},new Set(),level,new Set([shipClass])),/missing verified ownership/);
+  }
+ }
+ assert.throws(()=>highestUnlockedPreviewModules(0),RangeError);
+ assert.throws(()=>highestUnlockedPreviewModules(21),RangeError);
+});
+
+test('each ship class has distinct original 3D helm geometry with safe replacement',()=>{
+ const root=new T.Group(),rig=new T.Group();root.add(rig);
+ const scout=applyShipModules(root,rig,{shipClass:'scout',level:1,modules:{}});
+ assert.ok(scout.getObjectByName('scout-steering-tiller'));
+ assert.equal(scout.getObjectByName('fighter-broadside-helm'),undefined);
+ const fighter=applyShipModules(root,rig,{shipClass:'fighter',level:1,modules:{}});
+ const wheel=fighter.getObjectByName('fighter-broadside-helm') as T.Mesh;
+ assert.ok(wheel instanceof T.Mesh);
+ assert.ok(wheel.geometry instanceof T.TorusGeometry);
+ assert.equal(fighter.getObjectByName('scout-steering-tiller'),undefined);
+ let wheelDispose=0;
+ wheel.geometry.addEventListener('dispose',()=>wheelDispose++);
+ const warship=applyShipModules(root,rig,{shipClass:'warship',level:1,modules:{}});
+ const royalWheel=warship.getObjectByName('warship-royal-helm') as T.Mesh;
+ assert.ok(royalWheel instanceof T.Mesh);
+ assert.ok(royalWheel.geometry instanceof T.TorusGeometry);
+ assert.ok(royalWheel.geometry.parameters.radius>wheel.geometry.parameters.radius);
+ assert.equal(wheelDispose,1);
+ assert.equal(root.children.filter(x=>x.name==='modular-ship-accessories').length,1);
+ assert.ok(warship.children.length<125,'3D accessory meshes stay within the existing mobile budget');
+});
+
+test('mobile shipyard exposes a visual-only max-unlocked preset without fake ownership',()=>{
+ const html=renderToStaticMarkup(createElement(Shipyard,{onClose:()=>{},onPreview:()=>{}}));
+ assert.match(html,/MAX LEVEL PREVIEW/);
+ assert.match(html,/Preview highest unlocked modules at this demo level, without granting ownership/);
+ assert.match(html,/RESET CLASS/);
+ assert.match(html,/Each hull keeps its own preview parts/);
+ assert.doesNotMatch(html,/EQUIP VERIFIED FLEET/);
 });
