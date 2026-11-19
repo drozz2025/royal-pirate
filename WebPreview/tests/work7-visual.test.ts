@@ -44,16 +44,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   assert.ok(cssText.includes('Native card 4+7 inlay/exposure candidate'),
-    'Only cards 4 and 7 physical artwork filters are recalibrated in this branch');
+    'Existing integrated fourth and seventh card material values remain intact');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
-    'New WORK7 eight-card short-viewport art treatment exists without screenshot backgrounds');
+    'Existing eight-card short-viewport art treatment remains intact');
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Native 05 WORK7 candidate must exist');
+  assert.ok(cssText.includes('native 06 three-chest artwork light field'), 'Three genuine chest local light fields must be present');
   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
-    'Only genuine native 06 legendary physical rim is changed in this candidate');
+    'Original genuine native 06 legendary physical rim is preserved');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
-    'The final WORK7 candidate changes only genuine 05 frame inlays');
+    'Existing genuine 05 frame inlays are preserved');
     // The only admissible before-image is the actual merged #392 v0.1.88 field.
   // Art and frames are restored with temporary CSS, never with older #384 values.
   // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
@@ -65,13 +66,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // It is inert for Shop and for 320/tall viewports.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+      .w7-screen[data-work7-screen="shop"] .w7-chest-art{
+        background:
+          radial-gradient(ellipse 66% 55% at 50% 55%,var(--w7-glow),transparent 100%)!important;
+        background:
+          radial-gradient(ellipse 66% 55% at 50% 55%,var(--w7-glow),transparent 100%),
+          radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda557,transparent 100%)!important;
       }
-    }`;
+    }`
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/', '--outDir', privateBuildDir],
     { cwd: process.cwd(), stdio: 'ignore' });
@@ -463,6 +465,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(card.roiMaeAfter,card.roiMaeBefore,
     'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
   assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
+    'Native 06 chest art light field must improve strict global MAE AND pack/chests ROI vs merged HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
