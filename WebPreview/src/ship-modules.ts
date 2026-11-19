@@ -136,6 +136,12 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
    for(const z of [-2.6,-.2,2.2])cube(brass,side*1.72,2.0,z,.07,.32,.46);
   }
   cube(warm,0,3.75,-3.25,2.6,.72,2.05);cube(brass,0,4.15,-3.25,2.75,.15,2.2);
+  // Flagship-only gunport rims accent the extra-long broadside silhouette.
+  // Keep the decoration inside the preview accessory group (never collision).
+  for(const side of [-1,1])for(const z of [-2.7,-1.1,.5,2.2]){
+   const rim=part(new T.TorusGeometry(.16,.042,4,9),brass,side*1.8,2.08,z);
+   rim.rotation.y=Math.PI/2;
+  }
  }
  const hull=config.modules.hull,armor=config.modules.armor;
  if(hull!=='hull-oak')for(const side of [-1,1])for(const z of [-2.6,-1,1,2.6])
