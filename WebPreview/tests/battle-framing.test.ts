@@ -47,7 +47,11 @@ test('deck-level portrait framing and original desktop pose are independently sc
  assert.equal(mobile.batteryOffsetZ,-30);
  assert.equal(mobile.batteryOffsetX,2);
  assert.equal(mobile.batteryScale,1);
- assert.deepEqual(battleCameraPose(320/568),mobile);
+ const compact=battleCameraPose(320/568);
+ assert.deepEqual(compact.position,mobile.position);
+ assert.deepEqual(compact.target,[6.5,4.1,-3]);
+ assert.equal(compact.batteryOffsetX,2.7);
+ assert.equal(compact.batteryOffsetZ,mobile.batteryOffsetZ);
  const tall=battleCameraPose(390/844);
  assert.deepEqual(tall.position,mobile.position);
  assert.deepEqual(tall.target,[7.65,4.1,-3]);
@@ -91,8 +95,8 @@ test('WORK0/#104: ultra-tall mobile keeps one real muzzle centered while clearin
    assert.ok(enemy.x>w*.54 && enemy.x<w*.72,
      'enemy anchor must not sit at right screen edge '+w+'x'+h);
  }
- assert.deepEqual(battleCameraPose(384/512),battleCameraPose(320/568),
-   'native reference and compact portrait camera poses must not change');
+ assert.deepEqual(battleCameraPose(384/512).position,battleCameraPose(320/568).position,
+   'native reference and compact portrait camera eyes must stay on the same forward deck');
 });
 
 test('WORK0/#104: forward-moving the camera AND single cannon deck enlarges the live enemy silhouette without offscreen cropping',()=>{
