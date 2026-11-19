@@ -26,8 +26,8 @@ test('WORK6 #104: rolling 3D battle sea stays gated away from approved Porto',()
     'broken wave ridges must govern sparse sea foam');
   assert.match(fragment,/deep\*=1\.-\.09\*\(1\.-ridge\)/,
     'the new wave ridge must shade blue troughs');
-  assert.match(fragment,/foam=clamp\(foam,0\.,\.49\)/,
-    'limit whitewater density for first-person mobile visibility');
+  assert.match(fragment,/foam=clamp\(foam,0\.,\.64\)/,
+    'the richer battle-only foam remains bounded at 0.64');
 });
 
 test('WORK6 #104: visual enemy surf follows the enlarged render hull, never physics',()=>{
