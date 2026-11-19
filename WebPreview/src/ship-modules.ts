@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { createPreviewStandingRigging, type PreviewMastModule } from './ship-rigging';
 import { createPreviewSternHeraldry, type PreviewOrnamentModule } from './ship-heraldry';
+import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
 
 /** Original modular ship system. All 20 levels are supported by progression gates,
  * not 20 duplicated meshes. Neither currency nor ownership is fabricated here. */
@@ -284,6 +285,10 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // A single merged 3D stern crest per class; selected trim tier changes its
  // sculpture without altering equipment rights or ship combat statistics.
  additions.add(createPreviewSternHeraldry(config.shipClass,config.modules.ornaments as PreviewOrnamentModule));
+ // Three hull-specific low-poly armour profiles attach only to the temporary
+ // editor preview. They have no hitboxes, stat changes or ownership semantics.
+ const shieldPlates=createPreviewArmour(config.shipClass,config.modules.armor as PreviewArmorModule);
+ if(shieldPlates)additions.add(shieldPlates);
  const hull=config.modules.hull,armor=config.modules.armor;
  if(hull!=='hull-oak')for(const side of [-1,1])for(const z of [-2.6,-1,1,2.6])
   cube(hull==='hull-royal'?brass:warm,side*1.55,1.04,z,.2,1.25,.18);
