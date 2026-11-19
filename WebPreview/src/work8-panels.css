@@ -5412,3 +5412,16 @@
       linear-gradient(170deg,#172f4b,#0d2541 62%,#081729)!important;
   }
 }
+
+/* WORK8 / #104 — 07 MISSÕES EXCLUSIVELY: true selected Daily tab blue enamel.
+   Only changes painted selected tab background. The real tab, three missions,
+   seven existing rewards, scroll/touch, unchanged five-item WORK0 dock, Porto,
+   Ranking 08 and all other WORK surfaces remain in the production DOM.
+   :root class isolates native Chromium same-frame BEFORE vs shipped RENDER.
+   Source: assets/design-approved/07-missoes.webp, approved:false / 0 of 8. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-active-tab-source-ab-baseline)
+  .w8-approved-missions .w8-approved-tabs button[aria-pressed=true] {
+    background:linear-gradient(180deg,#1e75a6,#136597 52%,#124a72)!important;
+  }
+}
