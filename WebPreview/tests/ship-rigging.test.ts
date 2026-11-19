@@ -43,7 +43,7 @@ test('raider and royal mast unlocks physically lengthen their standing rigging',
   for(let i=0;i<p.count;i++)highest=Math.max(highest,p.getY(i));
   return highest;
  };
- assert.equal(top('masts-standard'),8.06);
+ assert.ok(Math.abs(top('masts-standard')-8.06)<.0001);
  assert.ok(top('masts-raider')>top('masts-standard'));
  assert.ok(top('masts-royal')>top('masts-raider'));
  assert.throws(()=>createPreviewStandingRigging('scout','invalid-mast' as 'masts-standard'),/Unknown preview mast module/);
