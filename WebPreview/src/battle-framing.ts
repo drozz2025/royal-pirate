@@ -33,7 +33,8 @@ export type CameraPose = {
  * Desktop remains unchanged; Porto's 1x model is restored by showHarbour(). */
 export function battleEnemyScale(aspect:number):number {
   if(aspect<.50)return 1.47; // tall phones: modestly enlarge the live profile without cutting the stern
-  if(aspect<.80)return 1.64; // reference-native battle: enemy occupies the horizon, not a postage stamp
+  if(aspect<.65)return 1.53; // 320×568: preserve the right edge of the broadside at narrow FOV
+  if(aspect<.80)return 1.64; // reference-native 384×512: more prominent broadside
   return 1.82; // do not change non-portrait framing
 }
 /** Batalha 02: turn the existing live red ship into a readable starboard broadside.
@@ -54,19 +55,20 @@ export function battleCameraPose(aspect: number): CameraPose {
     // Full perspective makes the enemy grow when zooming toward its hull.
     // Ultra-tall phones have a narrower horizontal field of view. In real
     // 390x844 Chromium evidence the enemy stern touches the right edge.
-    // Short phones move the optical axis slightly left of its old 4.2 target
+    // Native 384×512 phones move the optical axis left of the old 4.2 target
     // while bringing the enemy's LIVE mesh forward in scale. This enlarges
     // the broadside and shifts it toward starboard without moving hitboxes.
     // Pan the battle-only gunner deck coherently with the camera so the
     // actual central muzzle stays aligned and fire originates from its bore.
     // Never move the simulated ships, physics, Porto or five-item dock.
     const ultraTall = aspect < .50;
+    const compact = aspect >= .50 && aspect < .65;
     return {
       position: [0, 7.4, 67],
-      target: [ultraTall ? 7.2 : 2.3, 4.1, -3],
+      target: [ultraTall ? 7.2 : compact ? 4.2 : 2.3, 4.1, -3],
       showBattery: true,
       batteryOffsetZ: -18,
-      batteryOffsetX: ultraTall ? 3.6 : 1.25,
+      batteryOffsetX: ultraTall ? 3.6 : compact ? 2 : 1.25,
       batteryScale: 1,
       // Legacy optional edge rig is now HIDDEN for portrait battle.
       sailX: -11,
