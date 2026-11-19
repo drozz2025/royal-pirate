@@ -116,6 +116,48 @@ test('07 Missions: approved three real progress-track enamel Chromium 384x512 sa
     // Compare the source-green track against the actual original navy track in the SAME live paused
     // Chromium scene, with no test fixtures or invented rewards.
     const compared=await evalJs(injected);
+
+    /* Native Chromium calibration: evaluate alternate real track pigments in
+       this SAME paused browser scene. This diagnostic never changes app data,
+       the baseline capture or production CSS defaults. Print actual ROI/full
+       measurements before selecting a hardcoded source-faithful winner. */
+    const paletteTrials:[string,string,string,string][]=[
+      ['#236537','#17462b','#082d24','#94be66'],
+      ['#1b4934','#102e29','#081f25','#cfbb83'],
+      ['#182e32','#0d2633','#071a2b','#e3c28a'],
+      ['#286b2d','#165623','#072d20','#c7b35b'],
+      ['#10362a','#09282a','#071a22','#cdb581'],
+      ['#44743d','#24532d','#132c22','#e8ce81'],
+      ['#091f2a','#051824','#03161b','#e0c180'],
+      ['#17452d','#0c3525','#072019','#b9cd78'],
+      ['#225d2b','#14472a','#09251e','#eacb7a'],
+      ['#173a29','#102b21','#092017','#b9b181'],
+      ['#164a45','#0f3537','#082731','#cba873'],
+      ['#2f5931','#1c3e2b','#0e2924','#ddc889'],
+      ['#11392f','#0c2d31','#071e2a','#e5c28d']
+    ];
+    const calibration=[];
+    for (const [top,mid,bottom,border] of paletteTrials) {
+      await evalJs('(()=>{const d=document.documentElement.style;'+
+        'd.setProperty("--w8-real-meter-top",'+JSON.stringify(top)+');'+
+        'd.setProperty("--w8-real-meter-mid",'+JSON.stringify(mid)+');'+
+        'd.setProperty("--w8-real-meter-bottom",'+JSON.stringify(bottom)+');'+
+        'd.setProperty("--w8-real-meter-border",'+JSON.stringify(border)+');return true})()');
+      await delay(65);
+      const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      const snippet='(async()=>{'+
+        'const get=s=>new Promise((res,rej)=>{const img=new Image();img.onload=()=>res(img);img.onerror=rej;img.src=s});'+
+        'const imgs=await Promise.all(['+
+        JSON.stringify('data:image/webp;base64,'+original)+','+
+        JSON.stringify('data:image/png;base64,'+shot)+'].map(get));'+
+        'const w=384,h=512,arr=imgs.map(img=>{const c=document.createElement("canvas");c.width=w;c.height=h;const t=c.getContext("2d");t.drawImage(img,0,0);return t.getImageData(0,0,w,h).data});'+
+        'const m=r=>{let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*w+x)*4;for(let z=0;z<3;z++){total+=Math.abs(arr[0][k+z]-arr[1][k+z]);n++}}return total/n};'+
+        'return {full:m([0,0,384,512]),progressROI:m([65,221,200,346]),quests:m([12,155,372,321])}})()';
+      const scores=await evalJs(snippet);
+      calibration.push({palette:[top,mid,bottom,border],...scores,deltaFull:scores.full-compared.metrics.full.baseline,deltaProgress:scores.progressROI-compared.metrics.progressROI.baseline});
+    }
+    await evalJs('(()=>{const d=document.documentElement.style;["--w8-real-meter-top","--w8-real-meter-mid","--w8-real-meter-bottom","--w8-real-meter-border"].forEach(k=>d.removeProperty(k));return true})()');
+    console.log('WORK8 real progress native pigment calibration '+JSON.stringify(calibration));
     const save=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
     save('missions-real-progress-tracks-original-384x512.webp',original);
     save('missions-real-progress-tracks-before-384x512.png',before);
