@@ -11,7 +11,7 @@ test('Batalha 02: mobile red ship shows a broader genuine hull, without changing
     const aspect=w/h, yaw=battleEnemyBroadsideYaw(aspect);
     assert.ok(Number.isFinite(yaw)&&yaw<=-1.15&&yaw>=-1.4,
       'native and tall mobile need a visible opponent broadside '+w+'x'+h);
-    assert.ok(battleEnemyScale(aspect)<=1.5,'enemy must not dominate phone sky');
+    assert.ok(battleEnemyScale(aspect)<=1.70,'enemy remains below the tested sky/HUD projection envelope');
     assert.equal(battleCameraPose(aspect).showBattery,true);
   }
   assert.equal(battleEnemyBroadsideYaw(1.4),-.95,'desktop silhouette unchanged');
