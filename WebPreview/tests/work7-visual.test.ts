@@ -66,6 +66,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)!important}
       .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
         box-shadow:inset 0 0 0 3px #071321cd,
                    inset 0 2px 11px 3px #020817c5,
@@ -380,6 +381,39 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         }
 
 
+        // Independent WORK7 05 source-pigment sweep. Experimental CSS exists
+        // only in this frozen Chromium frame; it never ships in production.
+        // Values compare the SAME original 05 image, viewport and real DOM.
+        if (kind==='cards' && width===384 && height===512) {
+          for (const value of [1.15,1.22,1.28,1.32,1.36,1.38,1.40,1.42,1.44,1.46,1.50,1.55,1.62]) {
+            const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop'+
+              '{filter:saturate(1.25) contrast(1.13) brightness('+value+')!important}}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-card2-sweep';s.textContent="+
+              JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
+            await sleep(80);
+            const shot=await command('Page.captureScreenshot',{
+              format:'png',fromSurface:true,captureBeyondViewport:false
+            });
+            const metrics=await evaluate("(async()=>{"+
+              "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "const ref=await load("+JSON.stringify(refUrl)+"),img=await load("+
+                JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+");"+
+              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+              "const ctx=cv.getContext('2d');ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
+              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
+              "let sum=0,count=0,roi=0,roiCount=0;"+
+              "for(let y=0;y<512;y++)for(let x=0;x<384;x++){const p=(y*384+x)*4;"+
+              "for(let k=0;k<3;k++){const v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
+              "if(x>=18&&x<365&&y>=195&&y<428){roi+=v;roiCount++}}}"+
+              "return {global:Math.round(sum/count*10000)/10000,roi:Math.round(roi/roiCount*10000)/10000}})()");
+            console.log('WORK7 05 VENTO FAVORAVEL SWEEP brightness='+value+' '+JSON.stringify(metrics));
+            await evaluate("(()=>{document.getElementById('w7-card2-sweep')?.remove();return true})()");
+            await sleep(50);
+          }
+        }
+
+
 
 
         report.screens.push({kind,width,height,approved:false,
@@ -458,10 +492,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const card=native.find(screen=>screen.kind==='cards');
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
-  assert.equal(card.maeRgbAfter,card.maeRgbBefore,
-    '05 Cartas must stay exactly pixel-identical to the true starting HEAD');
-  assert.equal(card.roiMaeAfter,card.roiMaeBefore,
-    'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
+  assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
+    'Second real 05 portrait must improve global MAE AND eight-card ROI vs current merged HEAD: '+
+    JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
   assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
     'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
