@@ -24,8 +24,8 @@ const sphere = cached('sphere', () => new T.SphereGeometry(1, 10, 8));
 function sealTexture(red: boolean, flag = false) {
   const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 512;
   const c = canvas.getContext('2d')!;
-  c.fillStyle = flag ? '#151923' : red ? '#a7342f' : '#101923'; c.fillRect(0, 0, 512, 512);
-  c.strokeStyle = red ? '#d6634d' : '#303741'; c.lineWidth = 2;
+  c.fillStyle = flag ? '#151923' : red ? '#8f1f39' : '#101923'; c.fillRect(0, 0, 512, 512);
+  c.strokeStyle = red ? '#e56b77' : '#303741'; c.lineWidth = 2;
   for (let x = 16; x < 512; x += 48) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, 512); c.stroke(); }
   c.strokeStyle = '#d5bf8c'; c.lineWidth = 4; c.strokeRect(12, 12, 488, 488);
   if(!red && !flag){
@@ -56,7 +56,7 @@ function sealTexture(red: boolean, flag = false) {
     for(const x of [-43,0,43]){c.beginPath();c.arc(x,-121,5,0,Math.PI*2);c.fillStyle='#fff3ab';c.fill();}
   }
   c.restore();
-  const tex = new T.CanvasTexture(canvas); tex.colorSpace = T.SRGBColorSpace; tex.anisotropy = 4; tex.userData.backgroundColor=red?'#a7342f':'#203952';return tex;
+  const tex = new T.CanvasTexture(canvas); tex.colorSpace = T.SRGBColorSpace; tex.anisotropy = 4; tex.userData.backgroundColor=red?'#8f1f39':'#203952';return tex;
 }
 
 /** Sculpted lion figurehead: real meshes attached to the player hull. */
@@ -137,7 +137,7 @@ function addLionFigurehead(root:T.Group){
 export type ShipArt = { root: T.Group; rig: T.Group; sails: T.Mesh[]; flags: T.Mesh[]; guns: T.Group[]; scars: T.Mesh[]; trim: T.MeshStandardMaterial; health: number };
 export function makeShip(red = false): ShipArt {
   const root = new T.Group(), rig = new T.Group(); root.add(rig);
-  const trim = mat(red ? '#8f3530' : '#5b321f', .05, .47);
+  const trim = mat(red ? '#b43048' : '#5b321f', .05, .47);
   const bins = new Map<T.Material, T.BufferGeometry[]>();
   function put(geometry: T.BufferGeometry, material: T.Material, x: number, y: number, z: number, sx=1, sy=1, sz=1, rotation?: T.Euler) {
     const m = new T.Matrix4().compose(new T.Vector3(x,y,z), new T.Quaternion().setFromEuler(rotation ?? new T.Euler()), new T.Vector3(sx,sy,sz));
@@ -367,7 +367,7 @@ export function makeShip(red = false): ShipArt {
   const flagMat=new T.MeshStandardMaterial({map:sealTexture(red,true),side:T.DoubleSide,roughness:1});
   // The smaller topsails are dark woven cloth. Keep the crowned skull emblem
   // on the two full main sails and on the flags, not repeated four times.
-  const topsailMat=new T.MeshStandardMaterial({color:red?'#713331':'#19232d',side:T.DoubleSide,roughness:.88});
+  const topsailMat=new T.MeshStandardMaterial({color:red?'#8c2440':'#19232d',side:T.DoubleSide,roughness:.88});
   for(const [z,h,w] of [[.9,8.3,4.5],[-2.1,7.1,3.5]]){
     // Rig is a separate group for damage. Static ropes stay attached to the hull.
     const mast=new T.Mesh(new T.CylinderGeometry(.07,.16,h-.6,10),honey);
