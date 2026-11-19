@@ -4351,3 +4351,21 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 19 Nov 21:28 UTC. Genuine 05 sail/mine pigment relief,
+ * restricted to native 384×512. Recover illustration highlights on the
+ * second (Vento Favorável) and eighth (Mina Explosiva) TRUE approved WEBP
+ * concept crops. Keep physical frame geometry/texture, 4×2 cards, real
+ * PRÉVIA labels, one honest pack and three unavailable chests intact.
+ * No screenshots as backgrounds, no changes at 320×568 or taller sizes.
+ * Verify same-frame Chromium ORIGINAL|HEAD|RENDER|OVERLAY and MAE+ROI.
+ * approved:false, 0/8; WORK0 alone merges, versions and publishes. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.50);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.73);
+  }
+}
