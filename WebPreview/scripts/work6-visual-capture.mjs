@@ -163,7 +163,7 @@ try {
     const y=bar.y+bar.height/2;
     await gesture({x:bar.x+bar.width*.1,y},{x:bar.x+bar.width*.8,y});
     const power=Number(await page.locator('#power').inputValue());
-    if(power<76||power>90)throw Error('Direct power touch/drag not reflected '+power);
+    if(power<70||power>100||power<=beforePower+10)throw Error('Direct power touch/drag not reflected '+JSON.stringify({power,beforePower}));
     if(Number(await page.locator('#bearing').inputValue())!==yaw)
       throw Error('Power drag must NOT affect bearing');
 
