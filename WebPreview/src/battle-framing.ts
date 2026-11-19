@@ -51,12 +51,18 @@ export function battleCameraPose(aspect: number): CameraPose {
     // down ONE central gun barrel. The opponent remains ahead at starboard,
     // showing its long hull in profile. This changes only battle presentation.
     // Full perspective makes the enemy grow when zooming toward its hull.
+    // Ultra-tall phones have a narrower horizontal field of view. In real
+    // 390x844 Chromium evidence the enemy stern touches the right edge.
+    // Pan the first-person camera AND battle-only gunner deck together:
+    // the single muzzle remains centred while the broadside stays visible.
+    // Never move the simulated ships, physics, Porto or five-item dock.
+    const ultraTall = aspect < .50;
     return {
       position: [0, 7.4, 67],
-      target: [4.2, 4.1, -3],
+      target: [ultraTall ? 7.2 : 4.2, 4.1, -3],
       showBattery: true,
       batteryOffsetZ: -18,
-      batteryOffsetX: 2,
+      batteryOffsetX: ultraTall ? 5 : 2,
       batteryScale: 1,
       // Legacy optional edge rig is now HIDDEN for portrait battle.
       sailX: -11,
