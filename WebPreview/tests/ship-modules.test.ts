@@ -190,11 +190,11 @@ test('real equip button stays locked when only demo progression matches owned pa
  assert.match(equipTag(render(20)),/disabled/,'player level 20 cannot be substituted for demo level 1');
  assert.match(equipTag(render(0)),/disabled/,'invalid verified level must prevent equipping');
  assert.match(equipTag(render(1)),/disabled/,'parts alone do not grant any ship class');
- assert.match(equipTag(render(1,new Set(['scout']))),/disabled/,'owning a different hull cannot equip this fighter');
- assert.doesNotMatch(equipTag(render(1,new Set(['fighter']))),/disabled/,'verified level, class and all nine owned parts permit UI action');
+ assert.match(equipTag(render(1,new Set(['scout' as const]))),/disabled/,'owning a different hull cannot equip this fighter');
+ assert.doesNotMatch(equipTag(render(1,new Set(['fighter' as const]))),/disabled/,'verified level, class and all nine owned parts permit UI action');
  const missing=new Set(['hull-oak']);
  const unownedHtml=renderToStaticMarkup(createElement(Shipyard,{
-  onClose:()=>{},onPreview:()=>{},onEquip:()=>{},ownedModuleIds:missing,ownedShipClasses:new Set(['fighter']),verifiedPlayerLevel:1
+  onClose:()=>{},onPreview:()=>{},onEquip:()=>{},ownedModuleIds:missing,ownedShipClasses:new Set(['fighter' as const]),verifiedPlayerLevel:1
  }));
  assert.match(equipTag(unownedHtml),/disabled/,'any unowned default part must prevent equipping');
 });
