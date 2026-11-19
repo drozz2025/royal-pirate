@@ -12,7 +12,7 @@ const scene=read('../src/scene.ts');
 const css=read('../src/harbour.css');
 
 test('premium black sails and sculpted lion are Three.js geometry, not a static reference image',()=>{
-  assert.match(ships,/flag \? '#151923' : red \? '#a7342f' : '#101923'/);
+  assert.match(ships,/flag \? '#151923' : red \? '#8f1f39' : '#101923'/);
   assert.match(ships,/function addLionFigurehead\(root:T\.Group\)/);
   assert.match(ships,/if\(!red\)addLionFigurehead\(root\)/);
   assert.match(ships,/new T\.ConeGeometry\(1,1,7\)/);
