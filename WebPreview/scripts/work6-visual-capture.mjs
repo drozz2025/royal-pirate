@@ -18,7 +18,11 @@ try {
     await page.screenshot({path:resolve(root,`porto-${width}x${height}.png`),animations:'disabled'});
 
     await page.locator('.harbour-battle-button').click();
-    await page.locator('.battle-approved-banner').waitFor({state:'visible',timeout:15000});
+    // The approved mobile gunner stage deliberately hides the old redundant
+    // BATALHA heading. Wait for the LIVE HP HUD, not an obsolete banner.
+    await page.locator('.battle-hud').waitFor({state:'visible',timeout:15000});
+    if(await page.locator('.battle-approved-banner').isVisible())
+      throw new Error(`Redundant BATALHA heading visible at ${width}x${height}`);
     await page.waitForTimeout(2000);
     const hud=await page.locator('.battle-hud').boundingBox();
     const fire=await page.locator('.fire-button').boundingBox();
