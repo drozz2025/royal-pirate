@@ -117,6 +117,37 @@ test('07 Missions: three genuine mission chest-icon enamel Chromium 384x512 same
     // Chromium scene, with no test fixtures or invented rewards.
     const compared=await evalJs(injected);
 
+    // Source-calibrated native Chromium pigment sweep. Every variant is captured
+    // in the SAME real paused frame without touching saved reward state.
+    const pigmentFilters=[
+      'none','brightness(.5)','brightness(.65)','brightness(.8)','brightness(.9)',
+      'brightness(1.05)','brightness(1.18)','contrast(1.25)','contrast(1.5)',
+      'saturate(.5)','saturate(.75)','saturate(1.35)','grayscale(.65)',
+      'hue-rotate(-15deg)','hue-rotate(15deg)','hue-rotate(35deg)','hue-rotate(-35deg)',
+      'hue-rotate(-80deg)','sepia(.4)','brightness(.7) saturate(.75)',
+      'brightness(.85) saturate(.6)','brightness(1.15) saturate(.8)',
+      'grayscale(.55) brightness(.9)','hue-rotate(20deg) brightness(.8)',
+      'hue-rotate(-15deg) brightness(.75)'
+    ];
+    const sweepResults:any[]=[];
+    const makeSweepScore=String.raw`(async()=>{
+      const load=u=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=u});
+      const [a,b]=await Promise.all([load(__ORIGINAL__),load(__CANDIDATE__)]);
+      const w=384,h=512,px=[a,b].map(i=>{const c=document.createElement('canvas');c.width=w;c.height=h;const t=c.getContext('2d');t.drawImage(i,0,0);return t.getImageData(0,0,w,h).data});
+      function mae(r){let v=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*w+x)*4;for(let j=0;j<3;j++){v+=Math.abs(px[0][k+j]-px[1][k+j]);n++}}return v/n}
+      return {full:mae([0,0,384,512]),firstThreeROI:mae([20,353,179,426]),daily:mae([12,326,373,436]),chests:mae([20,356,370,427])};
+    })()`;
+    for(const filter of pigmentFilters){
+      await evalJs('(()=>{document.querySelectorAll(".w8-approved-missions .w8-approved-days li:nth-child(-n+3) .w8-approved-chest > .w8-art").forEach(e=>e.style.setProperty("filter",'+JSON.stringify(filter)+',"important"));return true})()');
+      await delay(80);
+      const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      const score=await evalJs(makeSweepScore.replace('__ORIGINAL__',JSON.stringify('data:image/webp;base64,'+original)).replace('__CANDIDATE__',JSON.stringify('data:image/png;base64,'+shot)));
+      sweepResults.push({filter,...score});
+    }
+    await evalJs('(()=>{document.querySelectorAll(".w8-approved-missions .w8-approved-days li:nth-child(-n+3) .w8-approved-chest > .w8-art").forEach(e=>e.style.removeProperty("filter"));return true})()');
+    console.log('WORK8 07 SOURCE PIGMENT SWEEP '+JSON.stringify(sweepResults));
+
+
     const save=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
     save('missions-day123-real-chests-original-384x512.webp',original);
     save('missions-day123-real-chests-before-384x512.png',before);
