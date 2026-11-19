@@ -50,6 +50,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Native 05 WORK7 candidate must exist');
+  assert.ok(cssText.includes('Native single-pack gemstone bloom.'),
+    'WORK7 pack material variant must exist with an honest single local-data pack');
   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
     'Only genuine native 06 legendary physical rim is changed in this candidate');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
@@ -70,6 +72,13 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         box-shadow:inset 0 0 0 3px #071321cd,
                    inset 0 2px 11px 3px #020817c5,
                    inset 0 -2px 1px #e7b77529!important;
+      }
+      /* Reconstruct EXACT integrated HEAD Captain panel, including both
+       * former light fields and genuine live HTML, before rendering variant.
+       * A/B is captured in the same Chromium tab, state and animation frame. */
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+        background:radial-gradient(ellipse 66% 95% at 29% 42%,#a51c6655,transparent 88%),
+          linear-gradient(112deg,#360957 0%,#31065a 49%,#110839 100%)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
