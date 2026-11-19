@@ -37,3 +37,16 @@ The **editor slider remains a visual demo**, never authoritative player progress
 Unity prefabs, purchased items, a playable owned fleet, 20 unique handmade meshes, performance measurements, final premium art approval, online economies, multiplayer, published version. The visual controls are a 3D preview until the independent systems are connected.
 
 **Safe integration order:** finish WORK 6 Porto → validate conflict-free WORK 2 module files only → WORK 5 tests/visual/mobile → WORK 4 ownership service → real equipping behind entitlement validation.
+
+
+## Visual/lifecycle iteration — 19 Nov 2026 (stack after #530)
+
+**Ship art only; no effect on weapons, damage, combat stats, player state or Porto.**
+- Scout: original tapered, angled bowsprit and two side braces; recognisable fast profile, not just hull scaling.
+- Fighter: six separate low-poly framed gunport elements alongside its frigate gunwale and raised quarterdeck.
+- Warship: extra raised stern gallery with three softly emissive windows and brass rails. Mesh counts remain bounded by the mobile preview accessory test (<125), not a claim about measured mobile FPS.
+- The 3D sail/flag preview now shares exactly **two** material instances per refresh, instead of creating one for every individual fabric mesh. Replaced preview materials are disposed once. First conversion also releases old canvas textures that are otherwise abandoned after replacing the starter sails. The current scene ownership contract still requires Work 6 to dispose the scene when unmounted.
+- New tests check explicit class-specific geometry, geometry replacement, one-time texture disposal, material sharing and 20 repeated level previews.
+
+**Workflow:** source branch `work2/fabric-lifecycle-class-silhouette-20261119` is stacked on #530, which is stacked on #522 → #29. Isolated CI workflow runs npm ci, unit tests and TypeScript/Vite build with **no deploy**. Follow Work 5 mobile visual QA before integration. No ownership is granted by cosmetic changes.
+

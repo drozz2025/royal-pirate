@@ -138,6 +138,14 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
    cube(brass,side*.95,2.65,-3.25,.14,.8,1.3);
    cube(iron,side*.68,2.1,3.5,.075,.28,2.0);
   }
+  // The scout gets a long, tapered forward spar instead of flagship bulk.
+  // This is original silhouette geometry; no hitbox or combat logic changes.
+  const spar=part(new T.CylinderGeometry(.045,.12,2.45,7),warm,0,3.8,5.9);
+  spar.rotation.x=1.22;spar.name='scout-bowsprit';
+  for(const side of [-1,1]){
+   const brace=part(new T.CylinderGeometry(.025,.035,2.05,6),brass,side*.39,3.25,5.16);
+   brace.rotation.x=.68;brace.rotation.z=side*.34;
+  }
  }else if(config.shipClass==='fighter'){
   // Frigate silhouette: raised gunwale shoulders and a broad aft fighting platform.
   // Small separate details keep editing independent from the battle hitboxes.
@@ -148,6 +156,11 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
   }
   cube(warm,0,3.53,-3.45,2.45,.30,1.85);
   cube(brass,0,3.76,-3.45,2.65,.12,2.05);
+  // A frigate's paired framed gunports distinguish it from a scaled scout.
+  for(const side of [-1,1])for(const z of [-1.7,.15,1.95]){
+   const port=part(new T.TorusGeometry(.23,.048,5,9),brass,side*1.73,1.62,z);
+   port.rotation.y=Math.PI/2;port.name='fighter-gunport-frame';
+  }
  }else if(config.shipClass==='warship'){
   for(const side of [-1,1]){
    cube(warm,side*1.5,2.1,-1,.32,.9,5.5);
@@ -159,6 +172,16 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
   for(const side of [-1,1])for(const z of [-2.7,-1.1,.5,2.2]){
    const rim=part(new T.TorusGeometry(.16,.042,4,9),brass,side*1.8,2.08,z);
    rim.rotation.y=Math.PI/2;
+  }
+  // A separate stern gallery with lit windows is unique to the flagship.
+  // Low-poly box elements keep its outline readable on narrow phone screens.
+  const glass=paint('#89c2ce',.08);glass.emissive.set('#346978');glass.emissiveIntensity=.38;
+  cube(warm,0,3.0,-4.82,2.7,.74,.28);
+  cube(brass,0,3.46,-4.83,2.93,.11,.37);
+  for(const x of [-.83,0,.83]){
+   const window=cube(glass,x,3.08,-4.99,.50,.39,.08);
+   window.name='warship-stern-window';
+   cube(brass,x,3.32,-5.00,.57,.055,.11);
   }
  }
  const hull=config.modules.hull,armor=config.modules.armor;
@@ -221,14 +244,36 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  }
  const sailColor=config.modules.sails==='sails-night'?'#1a2635':config.modules.sails==='sails-crimson'?'#b13f40':'#eadab7';
  const flagColor=config.modules.flag==='flag-black'?'#141b24':config.modules.flag==='flag-red'?'#a63336':'#245774';
+ // Previewing 20 levels can change sail colours many times. All sails share
+ // one temporary material, as do all flags: fewer GPU material allocations.
+ // Retired CanvasTextures from makeShip are released on first conversion, and
+ // old temporary materials are disposed once (not once per linked sail).
+ const retired=new Set<T.Material>();
+ let previewSail:T.MeshStandardMaterial|undefined;
+ let previewFlag:T.MeshStandardMaterial|undefined;
  rig.traverse(child=>{
   if(!(child instanceof T.Mesh) || !(child.geometry instanceof T.PlaneGeometry))return;
   const isSail=child.geometry.parameters.width>2;
-  const owned=child.userData.shipyardPreviewMaterial as T.Material|undefined;
-  if(owned)owned.dispose();
-  const material=paint(isSail?sailColor:flagColor);material.side=T.DoubleSide;
-  child.material=material;child.userData.shipyardPreviewMaterial=material;
+  let material=isSail?previewSail:previewFlag;
+  if(!material){
+   material=paint(isSail?sailColor:flagColor);
+   material.side=T.DoubleSide;
+   if(isSail)previewSail=material;else previewFlag=material;
+  }
+  const old=child.material;
+  if(old!==material){
+   for(const previousMaterial of Array.isArray(old)?old:[old])retired.add(previousMaterial);
+  }
+  child.material=material;
+  child.userData.shipyardPreviewMaterial=material;
  });
+ for(const old of retired){
+  // Original rig textures are unique to its sails/flags, not shared with the
+  // game scene. Other hull, cannon and ocean materials are untouched.
+  const map=(old as T.MeshStandardMaterial).map;
+  if(map)map.dispose();
+  old.dispose();
+ }
  additions.userData={shipClass:config.shipClass,level:config.level,tier:progressionTier(config.level),modules:config.modules,previewOnly:true};
  return additions;
 }
