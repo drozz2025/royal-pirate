@@ -53,7 +53,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
     'Only genuine native 06 legendary physical rim is changed in this candidate');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
-    'The final WORK7 candidate changes only genuine 05 frame inlays');
+    'Previously integrated WORK7 05 frame inlays remain unchanged');
+  assert.ok(cssText.includes('19 Nov 08:28 UTC: native 06 Captain pack carved interior'),
+    'The current candidate adds only a native shop pack material inset');
     // The only admissible before-image is the actual merged #392 v0.1.88 field.
   // Art and frames are restored with temporary CSS, never with older #384 values.
   // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
@@ -65,11 +67,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // It is inert for Shop and for 320/tall viewports.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+        box-shadow:inset 0 2px #fff2b7aa,
+                   inset 0 0 0 2px #f1c77663,
+                   0 4px 0 #624021,
+                   0 9px 15px #06132b9c!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -341,23 +343,34 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
-        // WORK7 experimental tuning grid, never applied to the production UI:
-        // same 384x512 screenshot frame and same approved artwork for every
-        // real-chest brightness candidate; log absolute native MAE/ROI and
-        // only commit a verified winner in a separate revision.
+        // Compare real native pack metal/material depth in exactly the SAME
+        // Chromium scene/animation frame, without modifying production UI.
+        // A new CSS candidate may be retained only if true global + ROI
+        // metrics improve against the exact integrated HEAD.
         if (kind==='shop' && width===384 && height===512) {
-          const candidates:[string,number][]=[
-            ['crop',.98],['crop',1.02],['crop',1.05],['crop',1.07],
-            ['crop',1.09],['crop',1.11],['crop',1.14],['crop',1.18],
-            ['crop',1.22],['crop',1.28]
+          const base='inset 0 2px #fff2b7aa,inset 0 0 0 2px #f1c77663,';
+          const end=',0 4px 0 #624021,0 9px 15px #06132b9c';
+          const candidates:[string,string][]=[
+            ['original',base.slice(0,-1)+end],
+            ['plum-inset',base+'inset 0 -3px 2px #14062294'+end],
+            ['plum-light',base+'inset 0 -3px 2px #14062254'+end],
+            ['plum-deep',base+'inset 0 -3px 2px #140622c0'+end],
+            ['plum-wide',base+'inset 0 -5px 4px #14062294'+end],
+            ['plum-narrow',base+'inset 0 -2px 1px #14062294'+end],
+            ['gold-amber',base+'inset 0 -3px 2px #dda45358'+end],
+            ['gold-soft',base+'inset 0 -2px 2px #e5b06440'+end],
+            ['gold-narrow',base+'inset 0 -1px 1px #eec87a8c'+end],
+            ['steel',base+'inset 0 -3px 2px #263b5e75'+end],
+            ['crimson',base+'inset 0 -3px 2px #9a3e5b55'+end]
           ];
-          for (const [chest,value] of candidates) {
+          const sweepResults:any[]=[];
+          for (const [variant,boxShadow] of candidates) {
             const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
-              '.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop'+
-              '{filter:saturate(1.2) contrast(1.06) brightness('+value+') drop-shadow(0 6px 5px #14062ca3)!important}}';
+              '.w7-screen[data-work7-screen="shop"] .w7-captain-pack'+
+              '{box-shadow:'+boxShadow+'!important}}';
             await evaluate("(()=>{const s=document.createElement('style');s.id='w7-sweep';s.textContent="+
               JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
-            await sleep(90);
+            await sleep(70);
             const shot=await command('Page.captureScreenshot',{
               format:'png',fromSurface:true,captureBeyondViewport:false
             });
@@ -372,15 +385,15 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
               "for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
               "if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=v;roiCount++}}}"+
-              "return {global:Math.round(sum/count*1000)/1000,roi:Math.round(roi/roiCount*1000)/1000}})()");
-            console.log('WORK7 CROP SWEEP '+chest+'='+value+' '+JSON.stringify(metrics));
+              "return {global:Math.round(sum/count*10000)/10000,roi:Math.round(roi/roiCount*10000)/10000}})()");
+            sweepResults.push({variant,...metrics});
+            console.log('WORK7 PACK RIM SWEEP '+variant+' '+JSON.stringify(metrics));
             await evaluate("(()=>{document.getElementById('w7-sweep')?.remove();return true})()");
-            await sleep(55);
+            await sleep(40);
           }
+          await writeFile(join(output,'pack-rim-sweep-384x512.json'),
+            JSON.stringify({approved:false,source:'06-loja.webp',head:'exact merged branch parent',sweepResults},null,2)+'\n');
         }
-
-
-
 
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
@@ -463,6 +476,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(card.roiMaeAfter,card.roiMaeBefore,
     'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
   assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
+    'Native 06 Captain pack carved rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
