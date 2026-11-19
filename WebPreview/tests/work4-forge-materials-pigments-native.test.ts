@@ -29,7 +29,7 @@ const chrome=[process.env.CHROME_BIN,'chromium','google-chrome'].filter(Boolean)
   .find(bin=>spawnSync('which',[bin!],{encoding:'utf8'}).status===0);
 const delay=(ms:number)=>new Promise<void>(done=>setTimeout(done,ms));
 
-test('WORK4 Forge native material ledger: same-frame cost/cannon/furnace ROIs',{
+test('WORK4 Forge live cost-cell finish: same-frame cost/cannon/furnace ROIs',{
   skip:process.env.CI==='true'&&chrome?false:'CI Chromium screenshot evidence only',
   timeout:240_000
 },async t=>{
@@ -120,25 +120,25 @@ test('WORK4 Forge native material ledger: same-frame cost/cannon/furnace ROIs',{
   assert.equal(geometry.costs,3,'three real resource cells');
   assert.equal(geometry.dock,5,'five shared WORK0 dock buttons');
   await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const href=document.querySelector('svg.w4-reference-cannon image')?.getAttribute('href');if(!href||!(await fetch(href)).ok)throw Error('source forge image not loaded');return true;})()");
-  // Compare the source-approved Forge's EXISTING live-cost ledger paint.
-  // No new fake resource symbols, action state, cannon, furnace or global UI.
+  // Compare the source-approved Forge's three EXISTING real resource-cell paints.
+  // No fake resources, new symbols, change to action state or global UI.
   const variants=[
-    {top:'#1a1f23',mid:'#131c24',bottom:'#0b161e'},
-    {top:'#202d39',mid:'#132738',bottom:'#0b182a'},
-    {top:'#243039',mid:'#172635',bottom:'#0c1724'},
-    {top:'#1f3038',mid:'#0e2536',bottom:'#091b2c'},
-    {top:'#262b30',mid:'#18212c',bottom:'#0e1924'},
-    {top:'#262f30',mid:'#182c30',bottom:'#0c1b29'},
-    {top:'#161c25',mid:'#111921',bottom:'#071421'},
-    {top:'#242c31',mid:'#172329',bottom:'#0a1720'},
-    {top:'#27323b',mid:'#1d2c32',bottom:'#0c1925'},
-    {top:'#303234',mid:'#20262b',bottom:'#0d1824'},
-    {top:'#1a2b36',mid:'#112332',bottom:'#061624'},
-    {top:'#1f2932',mid:'#18252d',bottom:'#0e1a24'}
+    {top:'#352f2b22',bottom:'#0b14192c'},
+    {top:'#55432930',bottom:'#0b1e2936'},
+    {top:'#273f4b2c',bottom:'#10293c38'},
+    {top:'#554c3928',bottom:'#0a1c2d38'},
+    {top:'#6a432c2c',bottom:'#1f293428'},
+    {top:'#323b4b2f',bottom:'#13202b3a'},
+    {top:'#3c3a302a',bottom:'#1521253f'},
+    {top:'#443c2d35',bottom:'#0b202c38'},
+    {top:'#50412d35',bottom:'#0e1e2a32'},
+    {top:'#60472829',bottom:'#10272b31'},
+    {top:'#374c5136',bottom:'#0d233737'},
+    {top:'#544e3e30',bottom:'#111f2e32'}
   ];
   const shots=[];
   for(const shift of variants){
-    const rule='.w4-forge #w4-forge-panel > .w4-materials:where(*){background:radial-gradient(ellipse 76% 94% at 32% 0%,#a86e3738 0%,transparent 77%),repeating-linear-gradient(2deg,transparent 0 10px,#c89b5410 10px 11px,transparent 12px 21px),linear-gradient(173deg,'+shift.top+' 0%,'+shift.mid+' 52%,'+shift.bottom+' 100%)!important;}';
+    const rule='.w4-forge #w4-forge-panel .w4-resource-grid > div{background:radial-gradient(ellipse 91% 85% at 46% 0%,#d6a26216 0%,transparent 85%),linear-gradient(180deg,'+shift.top+','+shift.bottom+')!important;}';
     const exp="(()=>{let style=document.getElementById('work4-forge-plaque-candidate');if(!style){style=document.createElement('style');style.id='work4-forge-plaque-candidate';document.head.append(style)}style.textContent="+JSON.stringify(rule)+";return true})()";
     await evaluate(exp);
     await delay(120);
@@ -171,7 +171,7 @@ test('WORK4 Forge native material ledger: same-frame cost/cannon/furnace ROIs',{
       region+' must be pixel-identical to baseline');
   }
   const report={approved:false,screensApproved:0,viewport:'384x512',reference:'04-melhorias-forja.webp',
-    frame:'same Chromium 384x512 scene, paused animations; only real materials ledger background pigment changes',geometry,
+    frame:'same Chromium 384x512 scene, paused animations; only local resource-cell surface pigments change',geometry,
     candidates:variants.map((paint,i)=>({...result.records[i],paint})),
     globalWinner:variants[result.globalWinnerIndex],safeWinner:variants[result.bestIndex],
     decision:result.bestIndex===0?'Keep current real-cost board: no candidate improved full and ledger ROIs safely':'Candidate improves gated ROIs; human artistic approval still required'};
