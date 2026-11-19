@@ -51,7 +51,7 @@ test('deck-level portrait framing and original desktop pose are independently sc
  const tall=battleCameraPose(390/844);
  assert.deepEqual(tall.position,mobile.position);
  assert.deepEqual(tall.target,[7.2,4.1,-3]);
- assert.equal(tall.batteryOffsetX,5);
+ assert.equal(tall.batteryOffsetX,3.6);
  assert.deepEqual(battleCameraPose(430/932),tall);
  assert.equal(battleCameraPose(1.4).showBattery,false);
 });
