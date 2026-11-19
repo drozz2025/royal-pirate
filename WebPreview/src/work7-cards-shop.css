@@ -4319,3 +4319,19 @@
     filter:brightness(.40) saturate(1.75) contrast(.79);
   }
 }
+
+
+/* WORK7/#104 — 19 Nov 00:50 UTC. Native 05: original slot 6 carved-enamel depth.
+ * Current WORK0 v0.1.99 HEAD, independent of pending WORK7 card-5 #455
+ * and 06 treasure #452. Calibrate the sixth genuine reference-art frame
+ * against the approved 384x512 original (no page screenshot background).
+ * Keep eight exact 4x2 original WebP crops, live PREVIA, authentic game data,
+ * one pack, three chests, global dock and touch geometry unchanged.
+ * Inactive at 320x568 and taller devices; no changes to #263 fixes.
+ * A/B test restores the single .65 baseline on the SAME frozen page.
+ * Work0 alone may merge; approved:false 0/8 until human review. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+    filter:brightness(.56) saturate(1.30) contrast(.92);
+  }
+}
