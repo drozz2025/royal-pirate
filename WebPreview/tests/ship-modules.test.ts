@@ -180,3 +180,57 @@ test('lion and royal crown are distinct original procedural figurehead sculpture
  assert.ok(crown.children.some(obj=>obj instanceof T.Mesh && obj.geometry.type==='ConeGeometry'),'crown points must have real 3D geometry');
  assert.ok(crown.children.length<125,'mobile draw-call accessory budget');
 });
+
+test('scout, frigate and flagship gain genuinely different original silhouette details',()=>{
+ const make=(shipClass:'scout'|'fighter'|'warship')=>{
+  const root=new T.Group(),rig=new T.Group();root.add(rig);
+  return applyShipModules(root,rig,{shipClass,level:20,modules:{}});
+ };
+ const scout=make('scout'),fighter=make('fighter'),warship=make('warship');
+ assert.equal(scout.children.filter(part=>part.name==='scout-bowsprit').length,1);
+ assert.equal(fighter.children.filter(part=>part.name==='fighter-gunport-frame').length,6);
+ assert.equal(warship.children.filter(part=>part.name==='warship-stern-window').length,3);
+ assert.equal(scout.children.some(part=>part.name==='warship-stern-window'),false);
+ for(const group of [scout,fighter,warship])assert.ok(group.children.length<125,'mobile accessories remain bounded');
+});
+
+test('repeated recolouring shares two fabric materials and disposes replaced textures only once',()=>{
+ const root=new T.Group(),rig=new T.Group();root.add(rig);
+ const sailMap=new T.Texture(),flagMap=new T.Texture();
+ const sailOriginal=new T.MeshStandardMaterial({map:sailMap});
+ const flagOriginal=new T.MeshStandardMaterial({map:flagMap});
+ for(const width of [4.5,3.5,1.4,1.4]){
+  const isSail=width>2;
+  rig.add(new T.Mesh(new T.PlaneGeometry(width,2),isSail?sailOriginal:flagOriginal));
+ }
+ let sailTextureDisposals=0,flagTextureDisposals=0,sailMaterialDisposals=0,flagMaterialDisposals=0;
+ sailMap.addEventListener('dispose',()=>sailTextureDisposals++);
+ flagMap.addEventListener('dispose',()=>flagTextureDisposals++);
+ sailOriginal.addEventListener('dispose',()=>sailMaterialDisposals++);
+ flagOriginal.addEventListener('dispose',()=>flagMaterialDisposals++);
+ applyShipModules(root,rig,{shipClass:'scout',level:1,modules:{}});
+ assert.equal(sailTextureDisposals,1);
+ assert.equal(flagTextureDisposals,1);
+ assert.equal(sailMaterialDisposals,1);
+ assert.equal(flagMaterialDisposals,1);
+ const mesh=rig.children as T.Mesh[];
+ const oldSail=mesh[0].material as T.Material;
+ const oldFlag=mesh[2].material as T.Material;
+ assert.equal(mesh[0].material,mesh[1].material,'both sails use one temporary GPU material');
+ assert.equal(mesh[2].material,mesh[3].material,'both flags use one temporary GPU material');
+ assert.notEqual(oldSail,oldFlag);
+ let sailDisposals=0,flagDisposals=0;
+ oldSail.addEventListener('dispose',()=>sailDisposals++);
+ oldFlag.addEventListener('dispose',()=>flagDisposals++);
+ applyShipModules(root,rig,{shipClass:'fighter',level:12,modules:{sails:'sails-night',flag:'flag-red'}});
+ assert.equal(sailDisposals,1,'shared sail material must be disposed only once');
+ assert.equal(flagDisposals,1,'shared flag material must be disposed only once');
+ for(let level=1;level<=20;level++){
+  applyShipModules(root,rig,{shipClass:'warship',level,modules:{}});
+  assert.equal(root.children.filter(child=>child.name==='modular-ship-accessories').length,1);
+  assert.equal(mesh[0].material,mesh[1].material);
+  assert.equal(mesh[2].material,mesh[3].material);
+ }
+ assert.equal(sailTextureDisposals,1);
+ assert.equal(flagTextureDisposals,1);
+});
