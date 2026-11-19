@@ -41,6 +41,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
+  assert.ok(cssText.includes('Native epic chest enamel depth'), 'New 06 genuine epic inner rim material exists');
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   assert.ok(cssText.includes('Native card 4+7 inlay/exposure candidate'),
@@ -63,10 +64,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // frame filter. Previous #411/#422 and live artwork stay untouched.
   // The override is installed on the SAME page and animation frame.
   // It is inert for Shop and for 320/tall viewports.
+  // Actual unmodified merged v0.1.103 HEAD metal frame. This override
+  // isolates ONLY the new Epic inlay on an identical frozen browser frame.
+  // Card 05 and the integrated legendary rim are not touched or reset.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
+      .w7-screen[data-work7-screen="shop"] .w7-chest-epic::before {
         box-shadow:inset 0 0 0 3px #071321cd,
                    inset 0 2px 11px 3px #020817c5,
                    inset 0 -2px 1px #e7b77529!important;
@@ -341,46 +344,49 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
-        // WORK7 experimental tuning grid, never applied to the production UI:
-        // same 384x512 screenshot frame and same approved artwork for every
-        // real-chest brightness candidate; log absolute native MAE/ROI and
-        // only commit a verified winner in a separate revision.
+        // Epico native frame material sweep, evidence-only. No production
+        // CSS is changed by these browser-only trials. Every candidate uses
+        // the SAME real 384x512 React DOM, original WebP, fixed screenshot
+        // frame and live customer data; we can choose a strict MAE/ROI winner.
         if (kind==='shop' && width===384 && height===512) {
-          const candidates:[string,number][]=[
-            ['crop',.98],['crop',1.02],['crop',1.05],['crop',1.07],
-            ['crop',1.09],['crop',1.11],['crop',1.14],['crop',1.18],
-            ['crop',1.22],['crop',1.28]
-          ];
-          for (const [chest,value] of candidates) {
-            const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
-              '.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop'+
-              '{filter:saturate(1.2) contrast(1.06) brightness('+value+') drop-shadow(0 6px 5px #14062ca3)!important}}';
-            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-sweep';s.textContent="+
-              JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
-            await sleep(90);
-            const shot=await command('Page.captureScreenshot',{
+          const shadowCandidates = [
+            ['head','#071321cd','#020817c5','#e7b77529',11,1],
+            ['pink-soft','#11102bd4','#09051aab','#f4acff59',8,2],
+            ['violet-muted','#11102bd4','#09051aac','#f4acff3b',8,2],
+            ['deep-amber','#071321cd','#020817b6','#f4acff3b',9,2],
+            ['deep-recess','#071321cd','#020817da','#e7b77529',13,1],
+            ['purple-thin','#071321cd','#100723b0','#dca2ff30',9,2],
+            ['purple-bright','#17102bcd','#100723a0','#f4acff80',7,2],
+            ['soft-gold','#071321cd','#020817a9','#e7b77545',8,2],
+            ['lavender-light','#17102bcd','#100723a0','#f4acff43',7,2],
+            ['midnight','#071321dd','#020817c5','#faadf533',8,1],
+          ] as const;
+          const sweepRef = 'data:image/webp;base64,'+references.shop.toString('base64');
+          for (const [name,edge,dark,highlight,depth,bevel] of shadowCandidates) {
+            const newShadow = 'inset 0 0 0 3px '+edge+',inset 0 2px '+depth+
+              'px 3px '+dark+',inset 0 -2px '+bevel+'px '+highlight;
+            const cssTrial='@media(min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="shop"] .w7-chest-epic::before {box-shadow:'+newShadow+'!important}}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-epic-trial';s.textContent="+
+              JSON.stringify(cssTrial)+";document.head.appendChild(s);return true})()");
+            await sleep(65);
+            const trial = await command('Page.captureScreenshot', {
               format:'png',fromSurface:true,captureBeyondViewport:false
             });
             const metrics=await evaluate("(async()=>{"+
-              "const load=src=>new Promise((ok,fail)=>{let i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
-              "const ref=await load("+JSON.stringify(refUrl)+"),img=await load("+
-                JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+");"+
-              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
-              "const ctx=cv.getContext('2d');ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
-              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
-              "let sum=0,count=0,roi=0,roiCount=0;"+
-              "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
-              "for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
-              "if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=v;roiCount++}}}"+
-              "return {global:Math.round(sum/count*1000)/1000,roi:Math.round(roi/roiCount*1000)/1000}})()");
-            console.log('WORK7 CROP SWEEP '+chest+'='+value+' '+JSON.stringify(metrics));
-            await evaluate("(()=>{document.getElementById('w7-sweep')?.remove();return true})()");
-            await sleep(55);
+              "const load=src=>new Promise((ok,fail)=>{let img=new Image();img.onload=()=>ok(img);img.onerror=fail;img.src=src});"+
+              "const [ref,shot]=await Promise.all([load("+JSON.stringify(sweepRef)+"),load("+JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(trial.data)+")]);"+
+              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;const ctx=cv.getContext('2d');"+
+              "ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;ctx.clearRect(0,0,384,512);"+
+              "ctx.drawImage(shot,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
+              "let g=0,r=0,n=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
+              "for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);g+=v;if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){r+=v;n++}}}"+
+              "return{global:Math.round(g/(384*512*3)*1e4)/1e4,roi:Math.round(r/n*1e4)/1e4}})()");
+            console.log('WORK7 EPIC FRAME SWEEP '+name+' '+JSON.stringify(metrics));
+            await evaluate("(()=>{document.getElementById('w7-epic-trial')?.remove();return true})()");
+            await sleep(45);
           }
         }
-
-
-
 
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
@@ -463,6 +469,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(card.roiMaeAfter,card.roiMaeBefore,
     'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
   assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
+    'Native 06 epic metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
