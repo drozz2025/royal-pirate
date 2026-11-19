@@ -5377,14 +5377,15 @@
 }
 
 
-/* WORK8 / #104 — 07 MISSÕES ONLY. Source-gated pigment of the three genuine
-   objective reward slots (their real local gold and unavailable gem symbols).
-   Artwork/filter only, no economy, rewards, hit geometry, 08 Ranking, Porto,
-   shell or five-button dock. A distinct baseline class lets native Chromium
-   compare SAME frame and intact real player data against approved 07 source. */
+/* WORK8/#104 — 07 MISSÕES only. Source-calibrated quest-board ink with
+   the three real objectives, not their data, targets or actions. This tests a
+   separate .54 navy depth candidate from the current .59 integrated 07 panel.
+   A stable opt-out root class isolates all previous native visual regressions.
+   Zero impact on Ranking 08/#264, Porto, shell, dock, seven genuine rewards,
+   economy, Unity, multiplayer and other WORKs. */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
-  :root:not(.w8-quest-rewards-ink-baseline)
-  .w8-approved-missions .w8-approved-quest-rewards {
-    filter:brightness(var(--w8-quest-rewards-ink,.96)) saturate(var(--w8-quest-rewards-saturation,.88));
+  :root:not(.w8-quest-board-ink-baseline)
+  .w8-approved-missions .w8-approved-quest-list {
+    filter:brightness(var(--w8-quest-board-ink,.54)) saturate(1.055)!important;
   }
 }
