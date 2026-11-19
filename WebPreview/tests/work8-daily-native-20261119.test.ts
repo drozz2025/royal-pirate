@@ -79,7 +79,8 @@ test('07 native 384x512 seven-reward paint gate and 320 touch/scroll', {timeout:
     assert.ok(await ev('(()=>{const b=[...document.querySelectorAll(".harbour-screen button")].find(x=>x.textContent?.includes("MISSÕES"));if(!b)return false;b.click();return true;})()'));
     await wait('.w8-approved-missions .w8-approved-daily');
     const art=await ev('(async()=>{const urls=[...new Set([...document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting image")].map(x=>x.getAttribute("href")).filter(Boolean))];await Promise.all(urls.map(async src=>{const i=new Image();i.src=src;await i.decode()}));await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());return urls.length;})()');
-    assert.ok(art>=7,'source artwork must be decoded');
+    assert.ok(art>=1,'shared source painting must be decoded');
+    assert.equal(await ev('document.querySelectorAll(".w8-approved-days .w8-approved-chest").length'),7,'seven true reward artworks must be rendered');
     await delay(110);
     const flag='work8-missions-daily-shadow-20261119-ab-baseline';
     await ev('document.documentElement.classList.add('+JSON.stringify(flag)+');true');
