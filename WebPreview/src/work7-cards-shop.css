@@ -4351,3 +4351,19 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 19 Nov 11:35 UTC: genuine eighth illustrated card (Mina Explosiva).
+ * On the exact WORK0 base f4da87c1, restore the original warm
+ * engraved panel's depth at native 384x512 only; preserve 8 independent
+ * original 05 WebP portraits in their 4x2 frames, all live PREVIA labels,
+ * unique real 06 pack/three chests, real data and true touch surfaces.
+ * Does not alter 320px or tall phones, approved source images, Porto,
+ * shell, five-item dock, economy or any other WORK's stylesheet.
+ * A/B strict same-scene pixel metrics against this HEAD are mandatory;
+ * approval remains HUMAN ONLY: approved:false, 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
+    filter:brightness(.58) saturate(1.90) contrast(.88);
+  }
+}
