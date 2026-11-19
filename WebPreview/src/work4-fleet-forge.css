@@ -3094,3 +3094,18 @@
     border-color:#725a46;
   }
 }
+
+
+/* WORK4/#104 — approved Forja 04 native 384×512 workshop underlay.
+   Controlled Chromium same-frame 22-pigment A/B against the ORIGINAL
+   04-melhorias-forja.webp: oiled charcoal #272324 is the closest tested
+   pigment that improves full/workshop/seam RGB MAE simultaneously without
+   changing the cannon, furnace, live costs or five-item WORK0 dock pixels.
+   Existing 320/390/430 responsive treatment and all geometry are unchanged.
+   Reproducible study: work4-forge-workshop-underlay-ab.test.ts.
+   approved:false; human artistic approval remains required. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene {
+    background-color:#272324!important;
+  }
+}
