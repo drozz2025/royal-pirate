@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Battle } from './battle';
+import { bearingFromDrag, powerFromClientX } from './battle-touch';
 import { PirateIcon } from './app-icons';
 import { OceanScene, type Metrics } from './scene';
 import { Harbour } from './harbour';
@@ -11,6 +12,7 @@ import './style.css';
 import './app-screens.css';
 import './battle-approved.css';
 import './battle-layout-reset.css';
+import './battle-touch.css';
 const Icon=({name,size=22}:{name:string;size?:number})=><svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{name==='anchor'?<><circle cx="12" cy="5" r="2.5"/><path d="M12 8v13M6 11h12M4 15c0 8 16 8 16 0M2 17l2-3 3 2m10 0 3-2 2 3"/></>:name==='restart'?<><path d="M3 10a9 9 0 1 1 1 8M3 4v6h6"/></>:name==='aim'?<><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 1v4m0 14v4M1 12h4m14 0h4"/></>:name==='music'?<><path d="M10 18V5l11-2v12"/><circle cx="7" cy="18" r="3"/><circle cx="18" cy="15" r="3"/></>:name==='sound'?<><path d="M4 9h4l5-4v14l-5-4H4zM17 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></>:name==='mute'?<><path d="M4 9h4l5-4v14l-5-4H4zM17 9l5 6m0-6-5 6"/></>:name==='chart'?<><path d="M4 4v16h16M8 15v-4m5 4V6m5 9v-7"/></>:name==='camera'?<><path d="M4 7h4l2-3h4l2 3h4v13H4z"/><circle cx="12" cy="13" r="4"/></>:name==='close'?<path d="m6 6 12 12M6 18 18 6"/>:name==='flag'?<><path d="M5 22V3m0 1c6-4 8 4 15 0v11c-7 4-9-4-15 0"/></>:name==='fire'?<><path d="M13 2c2 7-5 7-3 12 2 0 3-2 3-4 7 5 5 12-1 12S1 15 6 9c-1 4 1 5 2 4-1-5 4-6 5-11Z"/></>:name==='wind'?<><path d="M3 8h12c5 0 4-6 1-5M3 12h16c5 0 4 7 0 5M5 16h6c4 0 4 6 0 5"/></>:<><path d="m8 5 8 7-8 7"/></>}</svg>;
 function battleMessagePt(message:string):string {
  if(message==='Aim your broadside')return 'Aponta os canhões';
@@ -29,6 +31,7 @@ function App(){
  const [backupMessage,setBackupMessage]=useState('');
  const [profile,setProfile]=useState(()=>{try{return parseProfile(window.localStorage.getItem(STORAGE_KEY));}catch{return parseProfile(null);}});
  const recordedResult=useRef(false);
+ const aimPointer=useRef<{id:number;startX:number;startYaw:number}|null>(null);
  const [utilityMenuOpen,setUtilityMenuOpen]=useState(false);
  const [harbour,setHarbour]=useState(true),[shipSelected,setShipSelected]=useState(false),[yaw,setYaw]=useState(0),[power,setPower]=useState(65),[progress,setProgress]=useState(false),[music,setMusic]=useState(false),[sound,setSound]=useState(false),[deck,setDeck]=useState(false),[error,setError]=useState(''),[loaded,setLoaded]=useState(false),[metrics,setMetrics]=useState<Metrics|null>(null),[diagnostics,setDiagnostics]=useState(false),[compatibility,setCompatibility]=useState(false);
  useEffect(()=>{let last='';try{const scene=new OceanScene(host.current!,engine.current,()=>{const b=engine.current;const key=[b.phase,b.health.player,b.health.enemy,b.round,b.lastMessage,b.shotsFired].join(':');if(key!==last){last=key;setState({phase:b.phase,player:b.health.player,enemy:b.health.enemy,round:b.round,message:b.lastMessage,shots:b.shotsFired,hits:b.hits});}},setMetrics,setError,setShipSelected);view.current=scene;setCompatibility(scene.compatibility);scene.showHarbour();setLoaded(true);return()=>scene.dispose();}catch(e){setError(`This browser could not start WebGL. ${e instanceof Error?e.message:'Please reload or try Safari/Chrome.'}`);}},[]);
@@ -37,7 +40,37 @@ function App(){
  useEffect(()=>{if(view.current)view.current.paused=progress||Boolean(appScreen);},[progress,appScreen]);
  useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==='Escape'){setProgress(false);setAppScreen(null);}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[]);
  const aim=(y:number,p:number)=>{engine.current.aim(y,p);setYaw(engine.current.yaw);setPower(engine.current.power);};
- const reset=()=>{recordedResult.current=false;view.current?.reset();setYaw(0);setPower(65);setDeck(false);setUtilityMenuOpen(false);};
+ const onSceneAimDown=(event:React.PointerEvent<HTMLDivElement>)=>{
+   if(harbour||appScreen||!loaded||error||engine.current.phase!=='ready')return;
+   if(!(event.target instanceof HTMLCanvasElement))return;
+   if(event.pointerType==='mouse'&&event.button!==0)return;
+   if(!event.isPrimary){aimPointer.current=null;return;}
+   if(aimPointer.current)return;
+   aimPointer.current={id:event.pointerId,startX:event.clientX,startYaw:engine.current.yaw};
+   event.currentTarget.setPointerCapture(event.pointerId);
+   event.preventDefault();event.stopPropagation();
+ };
+ const onSceneAimMove=(event:React.PointerEvent<HTMLDivElement>)=>{
+   const start=aimPointer.current;
+   if(!start||start.id!==event.pointerId)return;
+   event.preventDefault();event.stopPropagation();
+   if(engine.current.phase==='ready'){
+     aim(bearingFromDrag(start.startYaw,start.startX,event.clientX,event.currentTarget.clientWidth),engine.current.power);
+   }
+ };
+ const onSceneAimEnd=(event:React.PointerEvent<HTMLDivElement>)=>{
+   if(aimPointer.current?.id!==event.pointerId)return;
+   aimPointer.current=null;
+   if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);
+   event.preventDefault();event.stopPropagation();
+ };
+ const onPowerPointer=(event:React.PointerEvent<HTMLInputElement>)=>{
+   if(engine.current.phase!=='ready')return;
+   const rect=event.currentTarget.getBoundingClientRect();
+   aim(engine.current.yaw,powerFromClientX(event.clientX,rect.left,rect.width));
+   event.preventDefault();
+ };
+ const reset=()=>{aimPointer.current=null;recordedResult.current=false;view.current?.reset();setYaw(0);setPower(65);setDeck(false);setUtilityMenuOpen(false);};
  const enterBattle=()=>{reset();view.current?.showBattle();setShipSelected(false);setHarbour(false);setAppScreen(null);};
  const returnHarbour=()=>{reset();view.current?.showHarbour();setShipSelected(false);setHarbour(true);setAppScreen(null);};
  const navigateTo=(next:AppScreenId)=>{setShipSelected(false);setAppScreen(next);};
@@ -66,7 +99,7 @@ function App(){
  };
  const result=state.phase==='victory'||state.phase==='defeat',ready=state.phase==='ready'&&loaded&&!error;
  return <main className={'app '+(harbour?'in-harbour':'in-battle')}>
-   <div ref={host} className="ocean"/><div className="vignette"/>
+   <div ref={host} className="ocean" onPointerDownCapture={onSceneAimDown} onPointerMoveCapture={onSceneAimMove} onPointerUpCapture={onSceneAimEnd} onPointerCancelCapture={onSceneAimEnd}/><div className="vignette"/>
    {harbour&&<Harbour onBattle={enterBattle} onNavigate={navigateTo} profile={profile} selected={shipSelected} hidden={Boolean(appScreen)}/>}
    <input ref={backupFile} type="file" hidden accept=".json,application/json" aria-label="Choose a local Royal Pirate save backup" onChange={restoreBackup}/>
    {harbour&&appScreen&&<AppScreens screen={appScreen} profile={profile} onNavigate={navigateTo} onClose={()=>setAppScreen(null)} onBattle={enterBattle}
@@ -90,7 +123,7 @@ function App(){
    {!loaded&&!error&&<div className="loading"><Icon name="anchor" size={38}/><p>Setting sail…</p></div>}
    {error&&<div className="error-panel" role="alert"><h2>The ocean needs a reload</h2><p>{error}</p><button onClick={()=>location.reload()}>Reload preview</button></div>}
    {!result&&<section className="command-deck" aria-label="Battle controls"><div className="turn-line"><span className={'turn-dot '+(ready?'':'enemy-dot')}/><strong>{error?'3D UNAVAILABLE':!loaded?'SETTING SAIL':ready?'TUA VEZ':state.phase==='enemy-aim'?'INIMIGO A APONTAR':state.phase==='enemy-flight'?'DEFENDE-TE':'DISPARO EM VOO'}</strong><span className="message" aria-live="polite">{battleMessagePt(state.message)}</span><span className="wind"><Icon name="wind" size={16}/> CALM SEAS</span></div>
-   <div className="controls-body"><div className="sliders"><label htmlFor="bearing"><span><Icon name="aim" size={16}/> ÂNGULO <b>{yaw>0?'+':''}{yaw}°</b></span><input id="bearing" aria-label="Bearing" type="range" min="-25" max="25" step="1" value={yaw} disabled={!ready} onChange={e=>aim(+e.target.value,power)}/><div className="scale"><span>BOMBORDO</span><span>ESTIBORDO</span></div></label><label htmlFor="power"><span><Icon name="fire" size={16}/> POTÊNCIA <b>{power}%</b></span><input id="power" aria-label="Power" type="range" min="20" max="100" step="1" value={power} disabled={!ready} onChange={e=>aim(yaw,+e.target.value)}/><div className="scale"><span>CURTO</span><span>LONGO</span></div></label></div><button className="fire-button" disabled={!ready} onClick={()=>engine.current.fire()}><Icon name="fire" size={29}/><span>{ready?'DISPARAR!':'AGUARDA'}</span><small>CANHÃO NAVAL</small></button></div><div className="deck-footer"><span>Ajusta a mira e a potência antes de disparar.</span><span className="ammo">● ● ● <b>ILIMITADA</b></span></div></section>}
+   <div className="controls-body"><div className="sliders"><label htmlFor="bearing"><span><Icon name="aim" size={16}/> ÂNGULO <b>{yaw>0?'+':''}{yaw}°</b></span><input id="bearing" aria-label="Bearing" type="range" min="-25" max="25" step="1" value={yaw} disabled={!ready} onChange={e=>aim(+e.target.value,power)}/><div className="scale"><span>BOMBORDO</span><span>ESTIBORDO</span></div></label><label htmlFor="power"><span><Icon name="fire" size={16}/> POTÊNCIA <b>{power}%</b></span><input id="power" aria-label="Power" type="range" min="20" max="100" step="1" value={power} disabled={!ready} onChange={e=>aim(yaw,+e.target.value)} onPointerDown={e=>{if(!ready)return;e.currentTarget.focus();e.currentTarget.setPointerCapture(e.pointerId);onPowerPointer(e);}} onPointerMove={e=>{if(e.currentTarget.hasPointerCapture(e.pointerId))onPowerPointer(e);}} onPointerUp={e=>{if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);}} onPointerCancel={e=>{if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);}}/><div className="scale"><span>CURTO</span><span>LONGO</span></div></label></div><button className="fire-button" disabled={!ready} onClick={()=>engine.current.fire()}><Icon name="fire" size={29}/><span>{ready?'DISPARAR!':'AGUARDA'}</span><small>CANHÃO NAVAL</small></button></div><div className="deck-footer"><span>Ajusta a mira e a potência antes de disparar.</span><span className="ammo">● ● ● <b>ILIMITADA</b></span></div></section>}
    {result&&<section className="result" role="dialog" aria-modal="true" aria-label="Battle result"><div className="result-badge"><Icon name={state.phase==='victory'?'flag':'anchor'} size={40}/></div><span className="eyebrow">THE FIRST BROADSIDE</span><h2>{state.phase==='victory'?'Seas of glory.':'A captain rises again.'}</h2><p>{state.phase==='victory'?'The Crimson Tide has fallen. These waters are yours.':'Your ship has fallen. A new broadside awaits.'}</p><div className="result-stats"><span><strong>{state.round}</strong>ROUNDS</span><span><strong>{state.hits}/{state.shots}</strong>SHOTS LANDED</span></div><p className="result-loot">{state.phase==='victory'?'+35 LOCAL COINS · +50 XP':'+10 XP · NO COINS'} · saved on this device</p><button onClick={reset}><Icon name="restart" size={20}/> SAIL AGAIN</button><button className="return-port-button" onClick={returnHarbour}>⚓ RETURN TO PORT</button></section>}
    <footer className="bottom-note"><span>{compatibility?'CANVAS 3D · WEBGL UNAVAILABLE':'WEB DEMONSTRATION'} <span>·</span> ART IN DEVELOPMENT</span><button onClick={()=>setDiagnostics(!diagnostics)}>{metrics?.fps??'—'} FPS <span>⌁</span></button></footer>
    {diagnostics&&<aside className="diagnostics"><strong>Browser diagnostics · {compatibility?'Canvas 3D (CPU)':'WebGL2'}</strong><p>{metrics?.renderMs} ms render · {metrics?.calls} draw calls · {metrics?.triangles.toLocaleString()} triangles</p><p>{metrics?.geometries} geometries · {metrics?.textures} textures · {metrics?.effects} active effects</p><p>{metrics?.heapMB?`${metrics.heapMB} MB JS heap (Chromium estimate)`:'JS heap measurement unavailable'}</p><small>Live browser measurements. Not an iPhone or Unity benchmark.</small></aside>}
