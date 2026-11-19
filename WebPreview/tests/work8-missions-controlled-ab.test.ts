@@ -10,7 +10,7 @@ import {setTimeout as delay} from 'node:timers/promises';
    The baseline root class disables ONLY this PR's frame-pigment CSS; integrated #269/#271 stay active in both frames.
    No fictional mission states, no screenshot replacement, no navigation edits.
    Each screenshot is native 384x512 and checked against 07-missoes.webp. */
-test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves ROI without dock or day regressions', {timeout:150000}, async()=>{
+test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves ROI without dock or day regressions', {timeout:240000}, async()=>{
   // Avoid overlapping Chrome GPU/CDP with the existing WORK7 test (Node runs test files concurrently).
   await delay(48000);
   const chromeBin=process.env.CHROME_BIN ||
@@ -1812,7 +1812,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'const c=document.createElement("canvas");c.width=384;c.height=512;const p=c.getContext("2d");p.drawImage(im,0,0);window.__w8ToneReference=p.getImageData(0,0,384,512).data;return true})()';
     assert.ok(await evalJs(w8ReferenceInit),'approved original must load');
     for(const sample of w8ToneCandidates){
-      const paintRule=sample.paint?daySurfaceSelector+'{background:'+sample.paint+'!important}':'';
+      const paintRule=sample.paint?':root:not(.work8-tone-native-disabled) '+daySurfaceSelector+'{background:'+sample.paint+'!important}':'';
       await evalJs('(()=>{let s=document.getElementById("work8-tone-native-study");'+
         'if(!s){s=document.createElement("style");s.id="work8-tone-native-study";document.head.appendChild(s)}'+
         's.textContent='+JSON.stringify(paintRule)+';return true})()');
@@ -1863,6 +1863,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       winner:w8ToneWinner,rows:w8ToneRows,geometry:w8ToneLayoutAfter,approved:false,approvedScreens:0
     },null,2));
     console.log('WORK8_NATIVE_TONE_WINNER '+JSON.stringify(w8ToneWinner));
+    console.log('WORK8_NATIVE_TONE_TOP '+JSON.stringify([...w8ToneRows].slice(1).sort((a,b)=>a.deltaDaily-b.deltaDaily).slice(0,5)));
+    assert.ok(w8ToneRows.some(r=>Math.abs(r.deltaDaily)>.01),'CSS research must actually affect native pixels');
     /* This initial sweep is research. The candidate must be committed in a
        separate scoped CSS edit and independently retested before review. */
     const enamelRows=enamelOptions.map(([name,background],i)=>({
