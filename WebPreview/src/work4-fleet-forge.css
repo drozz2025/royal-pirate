@@ -3094,3 +3094,24 @@
     border-color:#725a46;
   }
 }
+
+
+/* WORK4/#104 — isolated native 384x512 cannon source-edge A/B candidate.
+   Preserve the approved 04 painting, one cannon, actual lit furnace, three
+   real costs and all shared WORK0 controls. Changes ONLY the last 0.5%
+   vertical feather of the existing approved source crop. Same-frame pixel
+   comparison and region-of-interest metrics are run by WORK4's own test.
+   No responsive 320/390/430, Porto, dock, functional or economic changes.
+   approved:false; only WORK0 may integrate/publish. */
+@media (width:384px) and (height:512px) {
+  .w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon {
+    -webkit-mask-image:
+      radial-gradient(ellipse 140% 122% at 37% 49%,#000 0%,#000 84%,transparent 99%),
+      linear-gradient(to bottom,#000 0%,#000 99.5%,transparent 100%);
+    mask-image:
+      radial-gradient(ellipse 140% 122% at 37% 49%,#000 0%,#000 84%,transparent 99%),
+      linear-gradient(to bottom,#000 0%,#000 99.5%,transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-composite:intersect;
+  }
+}
