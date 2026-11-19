@@ -85,8 +85,8 @@ test('07 Missions: genuine seven-day caption ivory calibration / Chromium native
     await delay(180);
     const afterLayout=await geometry();
     const afterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li small")).filter');
-    assert.notEqual(afterInk,beforeInk,'real source-painted coin must be present in production only');
-    assert.match(afterInk,/brightness\\(1\\.4\\)/,'real seven-day captions must use proposed brightness in candidate');
+    assert.notEqual(afterInk,beforeInk,'proposed caption tint must differ from baseline');
+    assert.equal(afterInk,'brightness(1.4)','native 07 caption ink must be applied');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
     assert.deepEqual(afterLayout.labels,beforeLayout.labels,'real mission objective labels unchanged');
