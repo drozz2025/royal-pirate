@@ -33,6 +33,12 @@ test('WORK4 Forge native background pigment sweep: same Chromium frame, source M
   skip:process.env.CI==='true'&&chrome?false:'CI Chromium screenshot evidence only',
   timeout:240_000
 },async t=>{
+  const buildDir=mkdtempSync(join(tmpdir(),'rp-work4-forge-build-'));
+  t.after(()=>rmSync(buildDir,{recursive:true,force:true,maxRetries:10,retryDelay:200}));
+  const build=spawnSync('npm',['run','build','--','--base=/royal-pirate/','--outDir',buildDir],{
+    cwd:process.cwd(),encoding:'utf8',timeout:120_000,maxBuffer:12000000
+  });
+  assert.equal(build.status,0,'isolated Forge build: '+(build.stderr||build.stdout).slice(-1200));
   const qa=resolve('porto-qa/work4');mkdirSync(qa,{recursive:true});
   const port=await new Promise<number>((yes,no)=>{
     const s=createServer();s.once('error',no);s.listen(0,'127.0.0.1',()=>{
@@ -41,7 +47,7 @@ test('WORK4 Forge native background pigment sweep: same Chromium frame, source M
     });
   });
   const preview=spawn(join(process.cwd(),'node_modules','.bin','vite'),[
-    '--host','127.0.0.1','--port',String(port),'--strictPort','--base=/royal-pirate/'
+    'preview','--outDir',buildDir,'--host','127.0.0.1','--port',String(port),'--strictPort','--base=/royal-pirate/'
   ],{stdio:'ignore'});
   const profile=mkdtempSync(join(tmpdir(),'rp-work4-forge-sweep-'));
   let browser:ReturnType<typeof spawn>|undefined;
