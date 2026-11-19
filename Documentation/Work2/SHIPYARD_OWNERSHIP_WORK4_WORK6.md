@@ -64,3 +64,5 @@ New Work 2 implementation (stack after the fabric lifecycle feature):
 - Isolated workflow `.github/workflows/work2-shipyard-verify.yml` includes the new feature branch for tests, TypeScript and Vite build, with **no deployment**.
 
 Review visually on 360/390px mobile before merging. Do not confuse unit-test success with measured FPS or iPhone-native validation.
+
+- New original Scout-only triangular fore-and-aft jib geometry now matches the selected sail preview colour. It is an explicit low-poly Three.js cloth triangle mesh (not a static PNG), stays inside the modular accessory group, and is removed/disposed on class swaps. Tests assert it is present only on Scout, with two-sided cloth and a bounded mesh count. This is not part of battle hitboxes or combat mechanics.
