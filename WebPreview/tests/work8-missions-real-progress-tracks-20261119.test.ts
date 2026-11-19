@@ -10,7 +10,7 @@ import {setTimeout as delay} from 'node:timers/promises';
  * The root switch changes ONLY the decoration of the three existing real mission progress-meter tracks.
  * Real progress fill, numerical reward values, claim state, artwork and the
  * five-item shared dock MUST remain unchanged. No mock data or approval. */
-test('07 Missions: approved three real progress-track enamel Chromium 384x512 same-frame A/B', {timeout:220000}, async()=>{
+test('07 Missions: three genuine mission progress-track enamel Chromium 384x512 same-frame A/B', {timeout:220000}, async()=>{
   await delay(28000); // isolate real Chromium runner sessions
   const chromeBin=process.env.CHROME_BIN || spawnSync('sh',['-c','command -v chromium || command -v google-chrome'],{encoding:'utf8'}).stdout.trim();
   assert.ok(chromeBin,'native Chromium is mandatory; never silently skip MAE QA');
@@ -101,7 +101,7 @@ test('07 Missions: approved three real progress-track enamel Chromium 384x512 sa
       const images=await Promise.all([__ORIGINAL__,__BEFORE__,__AFTER__].map(make));
       const w=384,h=512;if(images.some(x=>x.width!==w||x.height!==h))throw Error('native images required');
       const px=images.map(i=>{const c=document.createElement('canvas');c.width=w;c.height=h;const t=c.getContext('2d');t.drawImage(i,0,0);return t.getImageData(0,0,w,h).data});
-      const roi={full:[0,0,384,512],progressROI:[65,221,200,346],questRows:[12,155,372,321],missions:[12,155,372,321],daily:[12,326,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,451,384,512]};
+      const roi={full:[0,0,384,512],progressROI:[65,180,200,312],questRows:[12,155,372,321],missions:[12,155,372,321],daily:[12,326,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,451,384,512]};
       function mae(a,b,r){let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=(y*w+x)*4;for(let z=0;z<3;z++){total+=Math.abs(a[p+z]-b[p+z]);n++}}return total/n}
       const metrics={};for(const [k,r] of Object.entries(roi)){const baseline=mae(px[0],px[1],r),candidate=mae(px[0],px[2],r);metrics[k]={baseline,candidate,delta:candidate-baseline}}
       const unchanged={header:mae(px[1],px[2],roi.header),dock:mae(px[1],px[2],roi.dock)};
@@ -117,47 +117,6 @@ test('07 Missions: approved three real progress-track enamel Chromium 384x512 sa
     // Chromium scene, with no test fixtures or invented rewards.
     const compared=await evalJs(injected);
 
-    /* Native Chromium calibration: evaluate alternate real track pigments in
-       this SAME paused browser scene. This diagnostic never changes app data,
-       the baseline capture or production CSS defaults. Print actual ROI/full
-       measurements before selecting a hardcoded source-faithful winner. */
-    const paletteTrials:[string,string,string,string][]=[
-      ['#236537','#17462b','#082d24','#94be66'],
-      ['#1b4934','#102e29','#081f25','#cfbb83'],
-      ['#182e32','#0d2633','#071a2b','#e3c28a'],
-      ['#286b2d','#165623','#072d20','#c7b35b'],
-      ['#10362a','#09282a','#071a22','#cdb581'],
-      ['#44743d','#24532d','#132c22','#e8ce81'],
-      ['#091f2a','#051824','#03161b','#e0c180'],
-      ['#17452d','#0c3525','#072019','#b9cd78'],
-      ['#225d2b','#14472a','#09251e','#eacb7a'],
-      ['#173a29','#102b21','#092017','#b9b181'],
-      ['#164a45','#0f3537','#082731','#cba873'],
-      ['#2f5931','#1c3e2b','#0e2924','#ddc889'],
-      ['#11392f','#0c2d31','#071e2a','#e5c28d']
-    ];
-    const calibration=[];
-    for (const [top,mid,bottom,border] of paletteTrials) {
-      await evalJs('(()=>{const d=document.documentElement.style;'+
-        'd.setProperty("--w8-real-meter-top",'+JSON.stringify(top)+');'+
-        'd.setProperty("--w8-real-meter-mid",'+JSON.stringify(mid)+');'+
-        'd.setProperty("--w8-real-meter-bottom",'+JSON.stringify(bottom)+');'+
-        'd.setProperty("--w8-real-meter-border",'+JSON.stringify(border)+');return true})()');
-      await delay(65);
-      const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-      const snippet='(async()=>{'+
-        'const get=s=>new Promise((res,rej)=>{const img=new Image();img.onload=()=>res(img);img.onerror=rej;img.src=s});'+
-        'const imgs=await Promise.all(['+
-        JSON.stringify('data:image/webp;base64,'+original)+','+
-        JSON.stringify('data:image/png;base64,'+shot)+'].map(get));'+
-        'const w=384,h=512,arr=imgs.map(img=>{const c=document.createElement("canvas");c.width=w;c.height=h;const t=c.getContext("2d");t.drawImage(img,0,0);return t.getImageData(0,0,w,h).data});'+
-        'const m=r=>{let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*w+x)*4;for(let z=0;z<3;z++){total+=Math.abs(arr[0][k+z]-arr[1][k+z]);n++}}return total/n};'+
-        'return {full:m([0,0,384,512]),progressROI:m([65,221,200,346]),quests:m([12,155,372,321])}})()';
-      const scores=await evalJs(snippet);
-      calibration.push({palette:[top,mid,bottom,border],...scores,deltaFull:scores.full-compared.metrics.full.baseline,deltaProgress:scores.progressROI-compared.metrics.progressROI.baseline});
-    }
-    await evalJs('(()=>{const d=document.documentElement.style;["--w8-real-meter-top","--w8-real-meter-mid","--w8-real-meter-bottom","--w8-real-meter-border"].forEach(k=>d.removeProperty(k));return true})()');
-    console.log('WORK8 real progress native pigment calibration '+JSON.stringify(calibration));
     const save=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
     save('missions-real-progress-tracks-original-384x512.webp',original);
     save('missions-real-progress-tracks-before-384x512.png',before);
@@ -175,7 +134,7 @@ test('07 Missions: approved three real progress-track enamel Chromium 384x512 sa
     writeFileSync(join(evidence,'work8-missions-real-progress-tracks-native-ab.json'),JSON.stringify(report,null,2));
     console.log('WORK8 07 live mission progress tracks Chromium A/B '+JSON.stringify(compared.metrics));
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
-    assert.ok(compared.metrics.progressROI.delta<-.03,'real daily board progress track ROI must measurably improve');
+    assert.ok(compared.metrics.progressROI.delta<-.30,'all three real objective progress tracks must improve source ROI');
     assert.ok(compared.metrics.full.delta<-.001,'native full frame must improve');
     assert.ok(compared.metrics.daily.delta<.10&&compared.metrics.chests.delta<.10,'objective meter enamel must improve and seven chests remain unobstructed');
     // Real CDP touch (rather than merely DOM click), preserving active daily tab.
