@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-icon-relief-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1651,6 +1651,112 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'the production green enamel must improve both the real tiles ROI and the full approved 07 frame');
     assert.ok(Math.abs(earlyDelta.quests)<.05 && Math.abs(earlyDelta.dockDelta)<.05,
       'no regressions in the three missions or WORK0 dock');
+
+
+    /* WORK8 #104 / 07 ONLY — test the ACTUAL icon-medallion relief against the
+       approved 07 source using ONE live Chromium 384x512 DPR1 paused frame.
+       No synthetic player values: the 3 live missions and 7 actual rewards
+       are untouched. Earlier historical comparison flags are now cleared so
+       the before frame represents integrated HEAD, not a stale CSS state. */
+    const reliefFlag='work8-missions-icon-relief-ab-baseline';
+    await evalJs('(()=>{const d=document.documentElement;[...d.classList].filter(s=>s.startsWith("work8-missions-")&&s.endsWith("-ab-baseline")&&s!=='+JSON.stringify(reliefFlag)+').forEach(s=>d.classList.remove(s));return true})()');
+    await delay(160);
+    const reliefRects=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-art")].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
+    assert.equal(reliefRects.length,3,'exactly three AUTHENTIC quest paintings in the same scene');
+    const reliefBeforeGeometry=await headingLayout();
+    const reliefBeforeCss=await evalJs('(()=>{const e=document.querySelector(".w8-approved-missions .w8-approved-quest-art");return [getComputedStyle(e,"::before").opacity,getComputedStyle(e,"::after").opacity]})()');
+    const reliefBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+
+    const reliefVariants=[
+      ['original',null,null],
+      ['no-medallion',0,0],
+      ['low-relief',.35,.15],
+      ['source-relief',.60,.25],
+      ['mid-relief',.80,.50],
+      ['nearly-original',.95,.8],
+    ] as const;
+    const reliefShots:string[]=[];
+    const reliefStudyStyleId='work8-relief-native-sweep';
+    for(const [label,fore,back] of reliefVariants){
+      const override=fore===null?'':'.w8-approved-missions .w8-approved-quest-art::before{opacity:'+fore+'!important}.w8-approved-missions .w8-approved-quest-art::after{opacity:'+back+'!important}';
+      await evalJs('(()=>{let s=document.getElementById('+JSON.stringify(reliefStudyStyleId)+');if(!s){s=document.createElement("style");s.id='+JSON.stringify(reliefStudyStyleId)+';document.head.append(s)}s.textContent='+JSON.stringify(override)+';return true})()');
+      await delay(75);
+      reliefShots.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    }
+    await evalJs('document.getElementById('+JSON.stringify(reliefStudyStyleId)+')?.remove();true');
+    const reliefStudy=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(reliefRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        ...reliefShots.map(s=>'data:image/png;base64,'+s)])));
+    const reliefSweep=reliefVariants.map(([name],i)=>({
+      name,...reliefStudy[i],
+      artDelta:reliefStudy[i].meters-reliefStudy[0].meters,
+      fullDelta:reliefStudy[i].full-reliefStudy[0].full
+    }));
+    console.log('WORK8 #104 native icon relief real source sweep '+JSON.stringify(reliefSweep));
+
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(reliefFlag)+');true');
+    await delay(160);
+    const reliefRenderGeometry=await headingLayout();
+    const reliefRenderCss=await evalJs('(()=>{const e=document.querySelector(".w8-approved-missions .w8-approved-quest-art");return [getComputedStyle(e,"::before").opacity,getComputedStyle(e,"::after").opacity]})()');
+    const reliefRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const reliefScores=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(reliefRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,
+        'data:image/png;base64,'+reliefBefore,'data:image/png;base64,'+reliefRender])));
+    const reliefDelta=Object.fromEntries(Object.keys(reliefScores[0])
+      .map(k=>[k,reliefScores[1][k]-reliefScores[0][k]]));
+    const reliefOverlaysSrc=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+reliefBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+reliefRender));
+    assert.notEqual(reliefOverlaysSrc,source);
+    const reliefOverlays=await evalJs(reliefOverlaysSrc);
+    saveTone('missions-relief-original-384x512.webp',orig);
+    saveTone('missions-relief-before-384x512.png',reliefBefore);
+    saveTone('missions-relief-render-384x512.png',reliefRender);
+    saveTone('missions-relief-original-before-overlay-384x512.png',reliefOverlays.overlays[0]);
+    saveTone('missions-relief-original-render-overlay-384x512.png',reliefOverlays.overlays[1]);
+    const reliefReport={
+      issue:104,baseHead:'c9d2546a0d5daa49d2d376397a02fa8e77ec6d8e',
+      scope:'07 missions: three real quest pictorial medallion overlays only',
+      references:earlyReferenceSet,viewport:'Chromium 384x512 DPR1',
+      sameSceneSamePausedFrame:true,roi:{threeOriginalQuestArt:reliefRects},
+      before:{computedCss:reliefBeforeCss,mae:reliefScores[0]},
+      render:{computedCss:reliefRenderCss,mae:reliefScores[1]},
+      delta:reliefDelta,sweep:reliefSweep,
+      geometry:{before:reliefBeforeGeometry,render:reliefRenderGeometry},
+      overlay:reliefOverlays.metrics,approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-relief-native-ab.json'),JSON.stringify(reliefReport,null,2));
+    console.log('WORK8 #104 REAL medallion relief MAE '+JSON.stringify(reliefReport));
+    assert.notDeepEqual(reliefBeforeCss,reliefRenderCss,'the production pseudo-element opacity genuinely changed');
+    assert.deepEqual(reliefBeforeGeometry,reliefRenderGeometry,
+      'all mission, chest, tab, hit area and five-item dock rectangles must remain fixed');
+    assert.equal(reliefRenderGeometry.questCount,3);
+    assert.equal(reliefRenderGeometry.dayCount,7);
+    assert.equal(reliefRenderGeometry.dockCount,5);
+    assert.ok(reliefRenderGeometry.chests.every((c:any)=>c.bottom<=reliefRenderGeometry.nav.top+2),
+      'all seven genuine reward chest illustrations remain ABOVE the dock at 384');
+    assert.ok(reliefDelta.meters<-.001&&reliefDelta.full<-.0002&&reliefDelta.quests<-.0002,
+      'shipping medallion relief must improve approved source art ROI, 3 real quests and full frame');
+    assert.ok(Math.abs(reliefDelta.daily)<.05&&Math.abs(reliefDelta.dockDelta)<.05,
+      'daily reward area and WORK0 dock unchanged');
+
+    // Native Chromium TOUCH, not synthetic state: weekly then daily tabs,
+    // while all five menu buttons remain untouched and present.
+    const touchTab=async(n:number)=>{
+      const xy=await evalJs('(()=>{const r=document.querySelectorAll(".w8-approved-tabs button")['+n+'].getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()');
+      await cmd('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[xy]});
+      await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+      await delay(125);
+    };
+    await touchTab(1);
+    assert.equal(await evalJs('document.querySelectorAll(".w8-approved-tabs button")[1].getAttribute("aria-pressed")'),'true',
+      'native touch switches to weekly without invented missions');
+    await touchTab(0);
+    assert.equal(await evalJs('document.querySelectorAll(".w8-approved-tabs button")[0].getAttribute("aria-pressed")'),'true',
+      'native touch returns to the 3 authentic missions');
+    assert.equal(await evalJs('document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length'),5);
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
