@@ -997,6 +997,10 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* WORK8/#104 — Current HEAD 07 Missions, exact same loaded Chromium frame.
        Toggle ONLY active (not claimable or claimed) CTA enamel. Preserve actual
        mission state, scroll, day claims and all five Porto-owned nav items. */
+    // Isolate the legacy, previously approved CTA brightness A/B from the
+    // independent WORK8 #104 two-button blue CTA sweep in a separate PR.
+    // Both before and after here must exclude the new proposed paint rule.
+    await evalJs('document.documentElement.classList.add("work8-missions-cta-blue-ab-baseline");true');
     const actionFlag='work8-missions-action-enamel-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(actionFlag)+');true');
     await delay(140);
@@ -1006,6 +1010,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(140);
     const actionAfterLayout=await headingLayout();
     const actionAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove("work8-missions-cta-blue-ab-baseline");true');
     const actionSource=source
       .replace(JSON.stringify('data:image/png;base64,'+before),'"__WORK8_ACTION_BEFORE__"')
       .replace(JSON.stringify('data:image/png;base64,'+after),'"__WORK8_ACTION_AFTER__"')
