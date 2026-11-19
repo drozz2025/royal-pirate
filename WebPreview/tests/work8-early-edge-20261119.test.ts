@@ -116,6 +116,29 @@ test('07 Missions: measured early three-day edge fidelity native 384x512 A/B', {
 
     // Earlier native 33-variant sweep rejected all regressions; 96px/space-around had the best full+reward ROI without shifting the seven daily chests.
     const compared=await evalJs(injected);
+    /* A genuine native Chrome visual sweep, held in the SAME DOM and paused frame,
+       selects source-match pigments without guessing by eye. Production paint
+       must be updated to match the best measured candidate before approval. */
+    const sweepColors=['#46a843','#a3ff75','#7ecf65','#5fd54a','#195f3f',
+      '#86bf72','#638e5a','#3f8c66','#5abb44','#afd46a','#2f754e',
+      '#6dbb68','#cbe7a5','#a6d949','#4cb979','#419a52','#6eaf4b',
+      '#8bd15b','#95f477','#8aca8b','#a9dca3','#cbdeb2','#7abb42',
+      '#b0e08b','#f5d887','#51af78','#3c7f67','#5d9d83','#8da9ac'];
+    const sweepRows=[];
+    for (const color of sweepColors) {
+      await evalJs('(()=>{let n=document.querySelector("#w8-early-edge-sweep");if(!n){n=document.createElement("style");n.id="w8-early-edge-sweep";document.head.append(n)}n.textContent=".w8-approved-missions .w8-approved-days li:nth-child(-n+3){border-color:'+color+'!important}";return true})()');
+      await delay(45);
+      const painted=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      const sample=await evalJs(script.replace('__ORIGINAL__',JSON.stringify('data:image/webp;base64,'+original))
+        .replace('__BEFORE__',JSON.stringify('data:image/png;base64,'+before))
+        .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+painted)));
+      sweepRows.push({color,full:sample.metrics.full.delta,earlyTiles:sample.metrics.earlyTiles.delta,
+        daily:sample.metrics.daily.delta,chests:sample.metrics.chests.delta});
+    }
+    await evalJs('document.querySelector("#w8-early-edge-sweep")?.remove();true');
+    const sweepBest=[...sweepRows].sort((a,b)=>a.earlyTiles-b.earlyTiles)[0];
+    console.log('WORK8_EARLY_EDGE_SWEEP '+JSON.stringify({best:sweepBest,all:sweepRows}));
+    writeFileSync(join(evidence,'work8-missions-early-edge-pigment-sweep.json'),JSON.stringify({best:sweepBest,all:sweepRows},null,2));
     const save=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
     save('missions-early-edge-original-384x512.webp',original);
     save('missions-early-edge-before-384x512.png',before);
