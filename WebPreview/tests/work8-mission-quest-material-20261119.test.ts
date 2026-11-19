@@ -7,10 +7,10 @@ import {join} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 
 /** WORK8/#104: unscaled 07-missoes source, SAME real Chromium DOM/frame.
- * The root switch changes ONLY the Missions SVG coastal brightness.
+ * The root switch changes ONLY the native three objective-card materials.
  * Real progress, numerical reward values, claim state, artwork and the
  * five-item shared dock MUST remain unchanged. No mock data or approval. */
-test('07 Missions: measured authentic existing day 4–7 source-metal edge native 384x512 A/B', {timeout:220000}, async()=>{
+test('07 Missions: source-selected three quest-row enamel native same-frame 384x512 A/B', {timeout:220000}, async()=>{
   await delay(50000); // do not overload shared GitHub runner Chromium sessions
   const chromeBin=process.env.CHROME_BIN || spawnSync('sh',['-c','command -v chromium || command -v google-chrome'],{encoding:'utf8'}).stdout.trim();
   assert.ok(chromeBin,'native Chromium is mandatory; never silently skip MAE QA');
@@ -113,7 +113,7 @@ test('07 Missions: measured authentic existing day 4–7 source-metal edge nativ
       .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+after));
 
 
-    // Compare seven candidate real-material palettes on the SAME live paused
+    // Compare eight candidate real-material palettes on the SAME live paused
     // Chromium scene, with no test fixtures or invented rewards.
     const compared=await evalJs(injected);
     const palettes=[
@@ -160,8 +160,8 @@ test('07 Missions: measured authentic existing day 4–7 source-metal edge nativ
     writeFileSync(join(evidence,'work8-missions-quest-ground-native-ab.json'),JSON.stringify(report,null,2));
     console.log('WORK8 07 quest-row enamel controlled Chromium A/B '+JSON.stringify(compared.metrics));
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
-    assert.ok(compared.metrics.questRows.delta<-.01,'authentic three quest rows must improve original-art MAE ROI');
-    assert.ok(compared.metrics.full.delta<-.001,'genuine day 4–7 original metal must improve full frame');
+    assert.ok(compared.metrics.questRows.delta<-.1,'authentic three quest rows must improve original-art MAE ROI');
+    assert.ok(compared.metrics.full.delta<-.05,'native chosen quest-row enamel must improve full frame');
     assert.ok(compared.metrics.daily.delta<.05&&compared.metrics.chests.delta<.05,'daily artwork must not regress and seven chests remain unobstructed');
     // Real CDP touch (rather than merely DOM click), preserving active daily tab.
     const tap=await evalJs('(()=>{const e=document.querySelector(".w8-approved-missions .w8-approved-tabs button");const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()');
