@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { createPreviewStandingRigging } from './ship-rigging';
 
 /** Original modular ship system. All 20 levels are supported by progression gates,
  * not 20 duplicated meshes. Neither currency nor ownership is fabricated here. */
@@ -154,7 +155,7 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
   const geometries=new Set<T.BufferGeometry>();
   const materials=new Set<T.Material>();
   previous.traverse(o=>{
-   if(!(o instanceof T.Mesh))return;
+   if(!(o instanceof T.Mesh) && !(o instanceof T.LineSegments))return;
    geometries.add(o.geometry);
    for(const material of Array.isArray(o.material)?o.material:[o.material])materials.add(material);
   });
@@ -276,6 +277,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
   const stand=cube(iron,0,2.02+height/2,helmZ,.13,height,.22);
   stand.name=config.shipClass+'-helm-stand';
  }
+ // One low-cost line-buffer creates authentic 3D shrouds, ratlines and stays.
+ // Shipyard-only geometry does not change rig damage, battle or entitlements.
+ additions.add(createPreviewStandingRigging(config.shipClass,config.modules.masts));
  const hull=config.modules.hull,armor=config.modules.armor;
  if(hull!=='hull-oak')for(const side of [-1,1])for(const z of [-2.6,-1,1,2.6])
   cube(hull==='hull-royal'?brass:warm,side*1.55,1.04,z,.2,1.25,.18);
