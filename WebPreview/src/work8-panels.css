@@ -5485,3 +5485,22 @@
     visibility:hidden;
   }
 }
+
+
+/* WORK8 / issue #104 — ONLY 07 Missões. Native 384×512 source uses
+   deep-green readable tracks behind each actual mission progress fraction.
+   Retune the three TRACK surfaces only, never fabricate completed progress:
+   the bar fill, 0/target numbers, claim eligibility, reward data and touch
+   targets remain driven by the unchanged React application.
+   Historical WORK8 and WORK0 rules stay active in BOTH frames. The root
+   flag is a true same-DOM A/B switch for Chromium original/overlay/MAE.
+   Ranking 08, Porto, dock, economy, shell, Unity and all other WORKs untouched.
+   Artistic approval remains false (0/8). */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-real-progress-tracks-ab-baseline)
+  .w8-approved-missions .w8-approved-quest .w8-approved-meter {
+    background:linear-gradient(180deg,#236537 0%,#17462b 52%,#082d24 100%)!important;
+    border-color:#94be66!important;
+    box-shadow:inset 0 1px rgba(236,252,155,.64),inset 0 -2px #071e1d,0 0 3px rgba(82,185,79,.38)!important;
+  }
+}
