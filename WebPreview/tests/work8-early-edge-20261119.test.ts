@@ -7,10 +7,9 @@ import {join} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 
 /** WORK8/#104: unscaled 07-missoes source, SAME real Chromium DOM/frame.
- * The root switch only hides/reveals decorative reward-coin and reward-gem
- * WebP crops. Real progress, numerical values, gem availability and five-item
- * shared dock MUST be identical. No mocked app state, image backdrop or
- * APPROVED flag. */
+ * The root switch changes ONLY three existing early-day tile border pigments.
+ * Real progress, numerical reward values, claim state, artwork and the
+ * five-item shared dock MUST remain unchanged. No mock data or approval. */
 test('07 Missions: measured early three-day edge fidelity native 384x512 A/B', {timeout:220000}, async()=>{
   await delay(50000); // do not overload shared GitHub runner Chromium sessions
   const chromeBin=process.env.CHROME_BIN || spawnSync('sh',['-c','command -v chromium || command -v google-chrome'],{encoding:'utf8'}).stdout.trim();
@@ -114,7 +113,7 @@ test('07 Missions: measured early three-day edge fidelity native 384x512 A/B', {
       .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+after));
 
 
-    // Earlier native 33-variant sweep rejected all regressions; 96px/space-around had the best full+reward ROI without shifting the seven daily chests.
+    // Native 29-color source-pigment sweep; production #195f3f must genuinely improve all targeted ROI pixels without changing seven daily chests.
     const compared=await evalJs(injected);
     /* A genuine native Chrome visual sweep, held in the SAME DOM and paused frame,
        selects source-match pigments without guessing by eye. Production paint
@@ -154,11 +153,11 @@ test('07 Missions: measured early three-day edge fidelity native 384x512 A/B', {
       geometry:{before:beforeLayout,after:afterLayout},approved:false,approvedScreens:0
     };
     writeFileSync(join(evidence,'work8-missions-early-edge-native-ab.json'),JSON.stringify(report,null,2));
-    console.log('WORK8 07 reward grid controlled Chromium A/B '+JSON.stringify(compared.metrics));
+    console.log('WORK8 07 original forest-green controlled Chromium A/B '+JSON.stringify(compared.metrics));
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
-    assert.ok(compared.metrics.earlyTiles.delta<-.025,'genuine early three-day edge fidelity must improve target ROI');
-    assert.ok(compared.metrics.full.delta<-.003,'genuine three-row reward alignment must improve full frame');
-    assert.ok(compared.metrics.daily.delta<-.01&&compared.metrics.chests.delta<-.01,'daily reward strip cannot regress');
+    assert.ok(compared.metrics.earlyTiles.delta<-.025,'early three-day source forest-green border must improve actual ROI');
+    assert.ok(compared.metrics.full.delta<-.003,'genuine early-day border pigment must improve full frame');
+    assert.ok(compared.metrics.daily.delta<-.01&&compared.metrics.chests.delta<-.01,'daily reward artwork/strip must improve and remain above dock');
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const days=document.querySelector(".w8-approved-days"),nav=document.querySelector(".app-sheet > .harbour-nav"),sheet=document.querySelector(".app-sheet-content");if(sheet)sheet.scrollTop=sheet.scrollHeight;if(days)days.scrollLeft=days.scrollWidth;const a=days.getBoundingClientRect(),b=days.lastElementChild.getBoundingClientRect();return {sevenVisible:b.left>=a.left-2&&b.right<=a.right+2,dock:nav.querySelectorAll(".harbour-nav-item").length,quest:document.querySelectorAll(".w8-approved-quest").length,days:days.children.length,width:document.documentElement.scrollWidth}})()');
