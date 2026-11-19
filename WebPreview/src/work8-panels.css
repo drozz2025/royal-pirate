@@ -5385,6 +5385,6 @@
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
   :root:not(.w8-quest-rewards-ink-baseline)
   .w8-approved-missions .w8-approved-quest-rewards {
-    filter:brightness(var(--w8-quest-rewards-ink,.93)) saturate(1.035);
+    filter:brightness(var(--w8-quest-rewards-ink,.96)) saturate(var(--w8-quest-rewards-saturation,.88));
   }
 }
