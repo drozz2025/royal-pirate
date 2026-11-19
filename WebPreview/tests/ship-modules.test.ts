@@ -329,6 +329,9 @@ test('three classes have original lightweight folded pennants, tinted by the sel
   assert.equal(material.color.getHexString(),c.color,'module selection controls fabric colour');
   assert.equal(material.side,T.DoubleSide,'both sides visible during orbit');
   assert.equal(banner.userData.moduleId,c.flag);
+  const seam=preview.children.find(obj=>obj.name===c.shipClass+'-pennant-clasp');
+  assert.ok(seam instanceof T.Mesh,'gold-seamed cloth silhouette is a real 3D mesh');
+  assert.equal(seam.geometry.type,'BoxGeometry','gilded seam reuses the pooled box buffer');
   assert.equal(rig.children.some(obj=>obj===banner),false,'accessories stay isolated from battle rig');
   assert.ok(preview.children.length<125,'mobile accessory mesh budget remains bounded');
  }
