@@ -5485,3 +5485,19 @@
     visibility:hidden;
   }
 }
+
+/* WORK8 #104 — 07 Missões only. Native 384x512 source-calibrated green
+   metallic edges of the three ACTUAL early daily reward tiles. The approved 07.webp reference favors a deep original forest-green rim.
+   Native same-DOM Chromium compared 29 pigments and found #195f3f best:
+   early three-tile ROI -1.367, full-screen -0.0789 MAE RGB vs baseline.
+   Adjust only that surface pigment,
+   not reward status, inventory, chests, labels or geometry. Root opt-out
+   enables SAME DOM / SAME FRAME Chromium source A/B. Never color a
+   claimed-status check: only the existing state-driven check may appear.
+   Ranking 08, Porto, shared dock and all other WORKs remain untouched. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-early-edge-ab-baseline)
+  .w8-approved-missions .w8-approved-days li:nth-child(-n+3) {
+    border-color:#195f3f;
+  }
+}
