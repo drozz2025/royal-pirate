@@ -98,6 +98,8 @@ test('07 native 384x512 seven-reward paint gate and 320 touch/scroll', {timeout:
     save('work8-20261119-07-BEFORE-384x512.png',before);
     save('work8-20261119-07-RENDER-384x512.png',render);
     save('work8-20261119-07-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png',measured.montage);
+    console.log('WORK8_07_DAILY_MEASURED_MAE '+JSON.stringify(measured.roi));
+    writeFileSync(join(evidence,'work8-20261119-07-precheck-roi.json'),JSON.stringify({roi:measured.roi,approved:false,approvedScreens:0},null,2));
     assert.notEqual(beforeGeometry.dailyFilter,renderGeometry.dailyFilter,'candidate CSS must be active');
     const {dailyFilter:one,...baseLayout}=beforeGeometry;
     const {dailyFilter:two,...finalLayout}=renderGeometry;
