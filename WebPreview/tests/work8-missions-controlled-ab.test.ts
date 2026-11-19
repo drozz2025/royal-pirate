@@ -1827,8 +1827,67 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     console.log('WORK8_DAILY_SURFACE_SWEEP '+JSON.stringify(enamelRows));
     console.log('WORK8_DAILY_SURFACE_BEST '+JSON.stringify(optimal));
     assert.ok(enamelShots.length===enamelOptions.length && enamelScores.length===enamelOptions.length);
-    /* This first research pass does not claim improvement or ship an unproven
-       pigment; a separate candidate gate must be measured before integration. */
+
+    /* Shipping gate: do not confuse the winning synthetic CSS sweep with the
+       ACTUAL repository candidate. Toggle only the production :root guard
+       within this SAME loaded/paused Chromium frame and read real computed CSS.
+       The MAE thresholds operate on the real production screenshots. */
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(daySurfaceClass)+');true');
+    await delay(140);
+    const realDayBeforeGeometry=await headingLayout();
+    const realDayBeforeCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(daySurfaceSelector)+')).backgroundImage');
+    const realDayBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(daySurfaceClass)+');true');
+    await delay(140);
+    const realDayRenderGeometry=await headingLayout();
+    const realDayRenderCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(daySurfaceSelector)+')).backgroundImage');
+    const realDayRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const dailyActualScoreSource='(async()=>{'+
+      'const urls='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+realDayBefore,'data:image/png;base64,'+realDayRender])+';'+
+      'const pics=await Promise.all(urls.map(s=>new Promise((ok,err)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=err;i.src=s})));'+
+      'if(pics.some(i=>i.width!==384||i.height!==512))throw Error("384x512 native source required");'+
+      'const data=pics.map(im=>{const c=document.createElement("canvas");c.width=384;c.height=512;const x=c.getContext("2d");x.drawImage(im,0,0);return x.getImageData(0,0,384,512).data});'+
+      'const areas={full:[0,0,384,512],daily:[13,325,373,436],chests:[20,356,370,427],quest:[12,155,372,321],dock:[0,451,384,512]};'+
+      'function score(a,b,r){let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const j=4*(384*y+x);for(let k=0;k<3;k++){total+=Math.abs(a[j+k]-b[j+k]);n++}}return total/n}'+
+      'return [data[1],data[2]].map(p=>Object.fromEntries(Object.entries(areas).map(([k,r])=>[k,score(data[0],p,r)])))'+
+      '})()';
+    const [realDayBeforeScore,realDayRenderScore]=await evalJs(dailyActualScoreSource);
+    const realDayDelta=Object.fromEntries(Object.keys(realDayBeforeScore).map(k=>[
+      k,realDayRenderScore[k]-realDayBeforeScore[k]]));
+    const dailyActualMontage='(async()=>{const urls='+JSON.stringify([
+      'data:image/webp;base64,'+orig,
+      'data:image/png;base64,'+realDayBefore,
+      'data:image/png;base64,'+realDayRender
+    ])+';const imgs=await Promise.all(urls.map(s=>new Promise((ok,err)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=err;i.src=s})));const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");imgs.forEach((im,n)=>x.drawImage(im,384*n,0));x.drawImage(imgs[0],1152,0);x.globalAlpha=.5;x.drawImage(imgs[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()';
+    saveTone('missions-daily-surface-PRODUCTION-original-before-render-overlay-384x512.png',await evalJs(dailyActualMontage));
+    saveTone('missions-daily-surface-PRODUCTION-before-384x512.png',realDayBefore);
+    saveTone('missions-daily-surface-PRODUCTION-render-384x512.png',realDayRender);
+    const dayProductionReport={
+      issue:104,scope:'07 Missões genuine seven-reward daily board background only',
+      baseHead:'ce76942e8cb17a1819daafb0ff34cd7a159fdc08',
+      reference:'assets/design-approved/07-missoes.webp',
+      requiredReferences:dailyEnamelReport.approvedReferences,
+      viewport:{width:384,height:512,devicePixelRatio:1},sameScenePausedFrame:true,
+      cssBefore:realDayBeforeCss,cssRender:realDayRenderCss,
+      before:realDayBeforeScore,render:realDayRenderScore,delta:realDayDelta,
+      geometry:{before:realDayBeforeGeometry,render:realDayRenderGeometry},
+      chosenFrom13LiveSamples:optimal?.name,approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-daily-surface-PRODUCTION-ab.json'),JSON.stringify(dayProductionReport,null,2));
+    console.log('WORK8_DAILY_SURFACE_PRODUCTION '+JSON.stringify(dayProductionReport));
+    assert.ok(optimal?.name==='night-steel','only the validated pigment can ship');
+    assert.notEqual(realDayBeforeCss,realDayRenderCss,'production CSS must actually change native screenshot paint');
+    assert.deepEqual(realDayBeforeGeometry,realDayRenderGeometry,'keep exact three missions, 7 chests and 5 navigation slots');
+    assert.equal(realDayRenderGeometry.questCount,3);
+    assert.equal(realDayRenderGeometry.dayCount,7);
+    assert.equal(realDayRenderGeometry.dockCount,5);
+    assert.ok(realDayRenderGeometry.chests.every((c:any)=>c.bottom<=realDayRenderGeometry.nav.top+2),
+      'all seven actual chest artworks stay fully above WORK0 dock');
+    assert.ok(realDayDelta.full<-0.01 && realDayDelta.daily<-.05,
+      'SHIPPED native frame AND daily ROI must measurably improve');
+    assert.ok(realDayDelta.chests<.02 && Math.abs(realDayDelta.quest)<.02 &&
+      Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
+
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
