@@ -4363,6 +4363,6 @@
  * No screenshots as backgrounds; no shared shell, dock or Porto changes. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="shop"] .w7-chest-epic{
-    --w7-chest-field:#741f66;
+    --w7-chest-field:#7a1b75;
   }
 }
