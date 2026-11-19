@@ -71,6 +71,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{
         filter:saturate(1.25) contrast(1.13) brightness(2.14)!important;
       }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
+        filter:brightness(.43) saturate(1.20) contrast(.74)!important;
+      }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/', '--outDir', privateBuildDir],
@@ -371,6 +374,39 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
             console.log('WORK7 CARD-1 SOURCE SWEEP brightness='+value+' '+JSON.stringify(metrics));
             await evaluate("(()=>{document.getElementById('w7-sweep')?.remove();return true})()");
             await sleep(60);
+          }
+        }
+
+        // WORK7 independent frame-material sweep: genuine Reparação slot #3.
+        // No screenshot stand-ins and no permanent CSS during the measurements.
+        if (kind==='cards' && width===384 && height===512) {
+          const frameBrightness=[.34,.38,.43,.48,.52,.55,.59,.63,.68,.74,.82,.94];
+          for (const value of frameBrightness) {
+            const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3)'+
+              '{filter:brightness('+value+') saturate(1.20) contrast(.74)!important}}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-sweep-third';s.textContent="+
+              JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
+            await sleep(95);
+            const shot=await command('Page.captureScreenshot',{
+              format:'png',fromSurface:true,captureBeyondViewport:false
+            });
+            const metrics=await evaluate("(async()=>{"+
+              "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "const ref=await load("+JSON.stringify(refUrl)+"),img=await load("+
+                JSON.stringify('data:image/png;base64,'+shot.data)+");"+
+              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+              "const ctx=cv.getContext('2d');ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
+              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
+              "let sum=0,count=0,roi=0,roiCount=0,local=0,localCount=0;"+
+              "for(let y=0;y<512;y++)for(let x=0;x<384;x++){const p=(y*384+x)*4;"+
+              "for(let k=0;k<3;k++){const v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
+              "if(x>=18&&x<365&&y>=195&&y<428){roi+=v;roiCount++}"+
+              "if(x>=190&&x<280&&y>=195&&y<310){local+=v;localCount++}}}"+
+              "return {global:Math.round(sum/count*10000)/10000,roi:Math.round(roi/roiCount*10000)/10000,local:Math.round(local/localCount*10000)/10000}})()");
+            console.log('WORK7 CARD-3 SOURCE SWEEP brightness='+value+' '+JSON.stringify(metrics));
+            await evaluate("(()=>{document.getElementById('w7-sweep-third')?.remove();return true})()");
+            await sleep(50);
           }
         }
 
