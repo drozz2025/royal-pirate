@@ -5485,3 +5485,18 @@
     visibility:hidden;
   }
 }
+
+/* WORK8 / issue #104 — 07 MISSÕES ONLY: original quest-symbol visibility.
+   Preserve the THREE actual quests, their saved progress/rewards, SEVEN real
+   daily rewards, touch/scroll and all five WORK0 dock buttons.
+   The original approved reference has clearly engraved sword, ship, target.
+   Tint ONLY the existing source-backed SVG painting in the 384x512 viewport;
+   root opt-out enables exact same-DOM/frame native Chromium A/B.
+   approved:false; 0/8 until the user's artistic approval. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-quest-icons-luma-ab-baseline)
+  .w8-approved-missions .w8-approved-quest-art > svg.w8-approved-painting {
+    filter:contrast(1.07) saturate(1.07) brightness(1.18)
+      drop-shadow(0 1px 1px #011625);
+  }
+}
