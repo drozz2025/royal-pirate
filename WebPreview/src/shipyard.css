@@ -38,7 +38,7 @@
 .shipyard-slot-strip button.active{background:linear-gradient(#f9dc8a,#b57936);color:#102d4c;text-shadow:none;border-color:#ffe8a0}
 .shipyard-parts-header{display:flex;align-items:center;justify-content:space-between;max-width:720px;margin:0 auto}
 .shipyard-parts-header strong{font:900 13px 'Barlow Condensed',sans-serif;letter-spacing:1px;color:#f4d78a}
-.shipyard-parts-tools{display:flex;gap:12px;align-items:center}
+.shipyard-parts-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .shipyard-parts-tools button{color:#e4e6e3;background:none;border:0;text-decoration:underline;font-size:11px;min-height:38px}
 .shipyard-equip{display:block;width:min(96%,420px);margin:8px auto;border:2px solid #f4d78a;border-radius:12px;
  padding:12px 10px;background:linear-gradient(#ebbe60,#a76c2b);color:#132a46;font:900 14px 'Barlow Condensed',sans-serif;text-shadow:none}
@@ -58,3 +58,10 @@
 @media(max-height:720px){.shipyard-header{padding-top:6px;min-height:54px}.shipyard-class-panel{padding:5px}
  .shipyard-panel{max-height:51dvh;padding-top:6px}.shipyard-orbit-hint{margin-bottom:4px}.shipyard-slot-strip{padding:6px 0}}
 @media(prefers-reduced-motion:reduce){.shipyard-screen *{scroll-behavior:auto}}
+
+/* Additional visual preset controls must stay tappable on narrow phones. */
+@media(max-width:390px){
+ .shipyard-parts-header{flex-wrap:wrap;gap:2px 8px}
+ .shipyard-parts-tools{width:100%;justify-content:space-between;gap:4px}
+ .shipyard-parts-tools button{font-size:10px;min-height:36px;padding:4px 2px}
+}
