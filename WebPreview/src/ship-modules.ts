@@ -6,6 +6,8 @@ export type ModuleSlot = 'hull'|'sails'|'cannons'|'armor'|'figurehead'|'flag'|'m
 export type ShipClass = 'scout'|'fighter'|'warship';
 export type ShipModule = { id:string; slot:ModuleSlot; minLevel:number; name:string; description:string };
 export type ShipLoadout = { shipClass:ShipClass; level:number; modules:Partial<Record<ModuleSlot,string>> };
+/** Once resolved, every one of the nine slots has a concrete module ID. */
+export type ResolvedShipLoadout = Omit<ShipLoadout,'modules'> & { modules:Record<ModuleSlot,string> };
 export const SHIP_MODULES:readonly ShipModule[] = [
   {id:'hull-oak',slot:'hull',minLevel:1,name:'Oak hull',description:'Light planked hull'},
   {id:'hull-ironwood',slot:'hull',minLevel:6,name:'Ironwood hull',description:'Reinforced timbers'},
@@ -49,7 +51,7 @@ export function availableModules(level:number,slot?:ModuleSlot):ShipModule[]{
  progressionTier(level);
  return SHIP_MODULES.filter(m=>m.minLevel<=level&&(!slot||m.slot===slot));
 }
-export function resolveLoadout(input:ShipLoadout):Required<ShipLoadout>{
+export function resolveLoadout(input:ShipLoadout):ResolvedShipLoadout{
  progressionTier(input.level);
  if(!['scout','fighter','warship'].includes(input.shipClass))throw new Error('Unknown ship class');
  const modules={...DEFAULT_MODULES};
@@ -79,7 +81,7 @@ export function mayEquip(id:string,level:number,ownedIds:ReadonlySet<string>):bo
 /** Only accepts a complete, level-eligible loadout with every part truly owned.
  * This is an in-app guard, not a substitute for server-side transaction checks.
  * WORK 4 supplies authenticated ownedIds when real persistence exists. */
-export function validateOwnedLoadout(input:ShipLoadout,ownedIds:ReadonlySet<string>):Required<ShipLoadout>{
+export function validateOwnedLoadout(input:ShipLoadout,ownedIds:ReadonlySet<string>):ResolvedShipLoadout{
  const resolved=resolveLoadout(input);
  for(const slot of SLOTS){
   const id=resolved.modules[slot];
