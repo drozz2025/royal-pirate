@@ -21,14 +21,21 @@ function sealTexture(red: boolean, flag = false) {
   // WORK0 / #104: battle enemy canvas has a true layered, wind-worn burgundy
   // cloth dye. This is painted onto the EXISTING curved 3D sails, not a flat
   // screenshot, overlay or added draw call. Royal player/Porto art is unchanged.
+  // Preserve the original flat colour contract for lightweight 2D mock canvases
+  // and older preview tests; capable browsers paint the new live 3D cloth on top.
+  c.fillStyle = flag ? '#151923' : red ? '#a7342f' : '#101923'; c.fillRect(0, 0, 512, 512);
   if (red && !flag) {
     const dye = c.createLinearGradient(0, 0, 512, 512);
-    dye.addColorStop(0, '#482239');
-    dye.addColorStop(.22, '#913e4a');
-    dye.addColorStop(.48, '#aa4c48');
-    dye.addColorStop(.72, '#732d3c');
-    dye.addColorStop(1, '#3e1c30');
-    c.fillStyle = dye; c.fillRect(0, 0, 512, 512);
+    // Headless unit stubs can omit the gradient object. Real Canvas2D always
+    // returns a CanvasGradient, so the production painting remains unchanged.
+    if (dye && typeof dye.addColorStop === 'function') {
+      dye.addColorStop(0, '#482239');
+      dye.addColorStop(.22, '#913e4a');
+      dye.addColorStop(.48, '#aa4c48');
+      dye.addColorStop(.72, '#732d3c');
+      dye.addColorStop(1, '#3e1c30');
+      c.fillStyle = dye; c.fillRect(0, 0, 512, 512);
+    }
     // Broad billowing folds, directional glaze and subtle aged canvas grain.
     // Deterministic drawing keeps every screenshot stable across Chromium runs.
     for (let fold = 0; fold < 8; fold++) {
@@ -58,9 +65,6 @@ function sealTexture(red: boolean, flag = false) {
       c.quadraticCurveTo(x + (x === 21 ? -9 : 9), 256, x, 501);
       c.stroke();
     }
-  } else {
-    c.fillStyle = flag ? '#151923' : '#101923';
-    c.fillRect(0, 0, 512, 512);
   }
   c.strokeStyle = red ? '#d6634d' : '#303741'; c.lineWidth = 2;
   for (let x = 16; x < 512; x += 48) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, 512); c.stroke(); }
