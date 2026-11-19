@@ -33,6 +33,7 @@ test('WORK4 approved source inputs and protected visual selectors exist',()=>{
   assert.match(css,/svg\.w4-reference-sea/);
   assert.match(css,/contain:paint/);
   assert.match(css,/transform:translateZ\(0\)/);
+  assert.ok(css.includes('linear-gradient(to bottom,transparent 0%,#000 1%,#000 98%,transparent 100%)'),'native corrected source feather');
 });
 
 test('WORK4 single Royal Crown / single cannon: same-frame native photo-contour ROI comparison',{
@@ -136,7 +137,7 @@ test('WORK4 single Royal Crown / single cannon: same-frame native photo-contour 
     [1,1,4,5,3],'one real Royal Crown, one approved sea, 4 slots, 5 dock items, 3 levels');
   await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const e=document.querySelector('.w4-fleet .w4-reference-ship image');if(!e||!(await fetch(e.getAttribute('href'))).ok)throw Error('source not loaded');return true;})()");
   const masks=[
-    {name:'HEAD',radial:null,opaque:0,bottom:0},
+    {name:'v0.1.110-before',radial:'radial-gradient(ellipse 110% 123% at 30% 50%,#000 0%,#000 84%,transparent 99%)',opaque:2,bottom:97},
     ...[
       [106,120,83,2,97],[108,123,84,2,97],[112,123,84,2,97],
       [115,126,84,2,97],[118,130,84,2,97],[120,130,86,2,97],
@@ -176,6 +177,15 @@ test('WORK4 single Royal Crown / single cannon: same-frame native photo-contour 
   assert.equal(fleet.samples.length,masks.length,'all controlled variants must be measured');
   assert.ok(Number.isFinite(fleet.samples[0].roi.ship.mae));
   assert.equal(fleet.samples[0].roi.dock.changedPixels,0);
+  const shippedIndex=masks.findIndex(m=>m.name==='radial-110x123-o84-top1-bottom98');
+  assert.ok(shippedIndex>0,'new production mask is part of measured A/B');
+  const released=fleet.samples[0].roi,shipped=fleet.samples[shippedIndex].roi;
+  assert.ok(shipped.full.mae<released.full.mae,'shipped source contour reduces full MAE');
+  assert.ok(shipped.water.mae<released.water.mae,'real source-water ROI improves');
+  assert.ok(shipped.coast.mae<=released.coast.mae,'source coast ROI does not regress');
+  for(const area of ['ship','roster','dock']){
+    assert.equal(shipped[area].changedPixels,0,area+' must remain pixel-identical to release');
+  }
   writeFileSync(join(qa,'work4-source-contour-original-before-render-overlay-384x512.png'),Buffer.from(fleet.comparison,'base64'));
   await evaluate("document.getElementById('work4-contour-variant')?.remove();true");
   const linked=await evaluate("(()=>{const e=document.querySelector('.w4-fleet .w4-action-pair button.w4-primary');if(!e)return false;e.click();return true})()");
