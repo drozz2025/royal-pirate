@@ -3094,3 +3094,26 @@
     border-color:#725a46;
   }
 }
+
+
+/* WORK4/#104 — controlled source-edge correction, 19 Nov 18h.
+   One native Chromium 384x512 frame, with animations paused, compared 12
+   real cropped-image masks against the approved 03-frota.webp. The winning
+   1%/98% vertical feather restores genuine approved coastline/water pixels:
+   RGB MAE full 48.122357 -> 48.000617, coast 2.636212 -> 2.635880,
+   water 2.209449 -> 2.191167. Exactly 1,274 changed source-edge pixels;
+   central Royal Crown, 4 roster slots and 5 dock items: ZERO changed pixels.
+   No procedural sea, duplicate vessel or responsive 320/390/430 change.
+   WORK0 owns merge/version/publish; approved:false until human sign-off. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {
+    -webkit-mask-image:
+      radial-gradient(ellipse 110% 123% at 30% 50%,#000 0%,#000 84%,transparent 99%),
+      linear-gradient(to bottom,transparent 0%,#000 1%,#000 98%,transparent 100%);
+    mask-image:
+      radial-gradient(ellipse 110% 123% at 30% 50%,#000 0%,#000 84%,transparent 99%),
+      linear-gradient(to bottom,transparent 0%,#000 1%,#000 98%,transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-composite:intersect;
+  }
+}
