@@ -283,3 +283,75 @@
   .in-battle .command-deck {height:117px}
   .in-battle .command-deck .turn-line {top:max(92px,calc(env(safe-area-inset-top) + 88px))}
 }
+
+/* WORK0 / issue #104 · Batalha 02 visual hierarchy.
+   The original reference has two captain portraits OUTSIDE the live HP bars.
+   Use actual vector portraits, not screenshot/UI crops. This makes the two
+   teams instantly recognizable while keeping one-row health and open 3D stage.
+   Battle-only: no Porto, dock, title or economy changes. */
+@media (max-width:600px) {
+  .in-battle .battle-hud {
+    gap:4px;
+    top:max(47px,calc(env(safe-area-inset-top) + 43px));
+  }
+  .in-battle .health-card {
+    position:relative;min-height:49px;
+    padding:6px 7px 5px 49px;
+    align-items:center;overflow:visible;
+    background:linear-gradient(180deg,rgba(12,51,84,.90),rgba(6,29,57,.88));
+    border-color:#c5a572;
+  }
+  .in-battle .health-card.enemy {padding:6px 49px 5px 7px}
+  .in-battle .health-card .battle-captain-medallion {
+    position:absolute;top:50%;left:-4px;
+    transform:translateY(-50%);
+    display:grid;place-items:center;
+    flex:none;width:47px;height:47px;
+    padding:1px;border:3px solid #e8bd68;
+    border-radius:50%;
+    background:radial-gradient(circle at 40% 25%,#f8d891,#875227 76%,#4e2e22);
+    box-shadow:inset 0 0 0 1px #fff4b4,0 2px 5px #041a2db0;
+    overflow:hidden;z-index:2;
+  }
+  .in-battle .health-card.enemy .battle-captain-medallion {
+    left:auto;right:-4px;
+    border-color:#cf9f60;
+  }
+  .in-battle .battle-captain-medallion svg {
+    width:41px;height:41px;display:block;flex:none;
+    filter:none;
+  }
+  .in-battle .health-card .health-detail {
+    flex:1 1 auto;min-width:0;width:100%;
+  }
+  .in-battle .health-card .ship-label {
+    display:flex;align-items:center;justify-content:space-between;
+    gap:2px;white-space:nowrap;font-size:8px;letter-spacing:0;
+  }
+  .in-battle .health-card .ship-label strong {font-size:9px}
+  .in-battle .health-card .health-detail h2 {
+    font-size:clamp(10px,2.8vw,13px);
+    margin:3px 0 4px;
+  }
+  .in-battle .health-card .health-track {height:7px}
+  .in-battle .round {flex-basis:26px;min-width:26px}
+  .in-battle .round .battle-versus {font-size:17px}
+  .in-battle .command-deck .turn-line {
+    top:max(106px,calc(env(safe-area-inset-top) + 102px));
+  }
+}
+@media (max-width:350px) {
+  .in-battle .health-card {min-height:44px;padding-left:39px}
+  .in-battle .health-card.enemy {padding-right:39px;padding-left:5px}
+  .in-battle .health-card .battle-captain-medallion {
+    width:39px;height:39px;border-width:2px;left:-2px
+  }
+  .in-battle .health-card.enemy .battle-captain-medallion {
+    right:-2px;left:auto
+  }
+  .in-battle .battle-captain-medallion svg {width:35px;height:35px}
+  .in-battle .health-card .ship-label {font-size:7px}
+  .in-battle .health-card .ship-label strong {font-size:8px}
+  .in-battle .health-card .health-detail h2 {font-size:10px}
+  .in-battle .command-deck .turn-line {top:max(101px,calc(env(safe-area-inset-top) + 97px))}
+}
