@@ -3094,3 +3094,15 @@
     border-color:#725a46;
   }
 }
+
+/* WORK4 / #104 — native 384x512: remove the fake raised-rectangle shadow
+   from the photographic source crop. The original ship has its own shaded
+   hull; drop-shadow() applies to the masked *photograph*, not the hull, and
+   exaggerates the rectangular seam beside source sea. Keep one actual
+   Royal Crown, its pixels, the existing organic mask and water bridge.
+   Desktop/tall mobile remain on the previous rules. No WORK0-owned UI. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {
+    filter:none!important;
+  }
+}
