@@ -4351,3 +4351,19 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 19 Nov native 05 carved enamel artwork correction.
+ * Fine-adjust only the painted 1st and 5th original 05 frames at 384x512:
+ * recover amber highlights without altering the 8 original concept images,
+ * genuine live crew, preview statuses, frame geometry, global dock or Porto.
+ * Native same-scene MAE + ROI and real touch gate in work7-visual.test.ts.
+ * 320x568 and tall phones unaffected. No screenshot backgrounds.
+ * Human approval remains FALSE (0/8); WORK0 alone controls integration. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){
+    filter:brightness(.53) saturate(1.70) contrast(.87);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.57);
+  }
+}
