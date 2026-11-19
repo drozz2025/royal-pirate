@@ -44,7 +44,7 @@ test('07 Missions: measured reward column registration native 384x512 A/B', {tim
         '--user-data-dir='+attemptProfile,'about:blank'],{stdio:'ignore'});
       for(let n=0;n<160;n++){
         try{
-          const port=Number(readFileSync(join(attemptProfile,'DevToolsActivePort'),'utf8').split('\\n')[0].trim());
+          const port=Number(readFileSync(join(attemptProfile,'DevToolsActivePort'),'utf8').split('\n')[0].trim());
           if(port>0){
             const r=await fetch('http://127.0.0.1:'+port+'/json/list');
             if(r.ok){
