@@ -97,7 +97,7 @@ export function Shipyard({onClose,onPreview,ownedModuleIds,ownedShipClasses,veri
      </button>;
     })}
    </div>
-   {onEquip&&<button type="button" className="shipyard-equip" disabled={!equipEnabled} onClick={equipVerified} aria-label="Equip only fully owned and level-unlocked modules">
+   {onEquip&&<button type="button" className="shipyard-equip" disabled={!equipEnabled} onClick={equipVerified} aria-label="Equip only a verified owned ship class with fully owned and level-unlocked modules">
     {equipEnabled?'EQUIP VERIFIED FLEET':!verifiedLevelMatches?'EQUIP UNAVAILABLE — VERIFIED LEVEL REQUIRED':!ownedShipClasses?.has(shipClass)?'EQUIP UNAVAILABLE — SHIP CLASS NOT OWNED':'EQUIP UNAVAILABLE — MODULE OWNERSHIP REQUIRED'}
    </button>}
    <p className="shipyard-legal">VISUAL SANDBOX ONLY · Level unlocks are not purchases or ownership. Preview changes are not saved and do not affect battle. {ownedModuleIds?'Ownership data supplied by the connected game service.':'Module ownership verification is not connected.'} {ownedShipClasses?.has(shipClass)?'Ship class ownership verified.':'Ship class ownership not verified.'} {verifiedLevelMatches?'Preview matches the verified player level.':'The preview slider cannot replace a verified player level.'}</p>
