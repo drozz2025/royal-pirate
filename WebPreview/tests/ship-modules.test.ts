@@ -285,7 +285,8 @@ test('mobile modular previews pool repeating box, cylinder and gunport buffers w
  const cylinders=meshes.filter(o=>o.geometry.type==='CylinderGeometry' &&
   (o.geometry as T.CylinderGeometry).parameters.radiusTop===1 &&
   (o.geometry as T.CylinderGeometry).parameters.height===1);
- const rings=meshes.filter(o=>o.geometry.type==='TorusGeometry');
+ const rings=meshes.filter(o=>o.geometry.type==='TorusGeometry' && o.name!=='warship-royal-helm');
+ assert.ok(meshes.some(o=>o.name==='warship-royal-helm'),'royal helm is a distinct wheel, not a cannon rim');
  assert.ok(boxes.length>25,'complex royal hull contains many independently scaled beams and plates');
  assert.equal(new Set(boxes.map(o=>o.geometry)).size,1,'box meshes share one GPU buffer');
  assert.ok(cylinders.length>=12,'mast and armour rivets require multiple cylinders');
