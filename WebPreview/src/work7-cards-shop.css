@@ -4351,3 +4351,20 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7 / #104 — 19 Nov 10:27 UTC: native 06 three-chest artwork light field.
+ * Calibrate the independent underpainting behind the approved genuine WEBP
+ * crops (rare/epic/legend), not their images, actual unavailable labels or
+ * frame geometry. First test only: controlled same-frame native Chromium
+ * versus exact merged 36f57ee HEAD, with global MAE + pack/chests ROI gate.
+ * All eight authentic 05 cards 4x2, one pack, 320x568, tall sizes, touch,
+ * five-dock, Porto, shared shell, economy and Unity unchanged.
+ * 00 original, 00 eight-screen mosaic and 01–08 WEBPs are mandatory.
+ * No screenshot backgrounds; approved:false (0/8). WORK0 merges only. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{
+    background:
+      radial-gradient(ellipse 68% 58% at 50% 51%,var(--w7-glow),transparent 93%),
+      radial-gradient(ellipse 66% 28% at 50% 88%,#ffdda53b,transparent 100%);
+  }
+}
