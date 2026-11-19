@@ -4351,3 +4351,23 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 19 Nov 05:21 UTC. Authentic 06 rare chest inner alloy relief.
+ * Source contract: approved 00 original + eight-screen mosaic + individual
+ * 01–08 WEBPs. Restore the turquoise-metal lower bevel and softer radial
+ * inner recess on the actual first chest; retain its source WEBP, live
+ * EM BREVE plaque, 1 pack + 3 chests, genuine 05 4x2 cards and currency.
+ * Native 384x512 visual treatment only. Nothing at 320/tall viewports;
+ * no screenshot backgrounds and no changes to Porto, dock, global shell,
+ * gameplay, payments or another WORK. Human approved:false (0/8).
+ * Compare with exact current merged WORK0 v0.1.102 HEAD using same-frame
+ * Chromium original/render/overlay and reject regressions in both MAE/ROI. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px) {
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare::before {
+    box-shadow:
+      inset 0 0 0 3px #071321cd,
+      inset 0 2px 13px 3px #020817b5,
+      inset 0 -2px 2px #b8f1ff45;
+  }
+}
