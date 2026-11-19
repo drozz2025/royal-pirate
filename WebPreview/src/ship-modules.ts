@@ -109,6 +109,22 @@ export function validateOwnedLoadoutForPlayer(
  return validateOwnedLoadout(input,ownedIds);
 }
 
+/** Work 4: fleet hull ownership is a separate entitlement from owning individual
+ * modules. No class is granted by a demo slider, a level unlock or default parts.
+ * Verify the hull and the nine modules again in a trusted service before save. */
+export function validateOwnedFleetForPlayer(
+ input:ShipLoadout,
+ ownedIds:ReadonlySet<string>,
+ verifiedPlayerLevel:number,
+ ownedShipClasses:ReadonlySet<ShipClass>
+):ResolvedShipLoadout{
+ const resolved=validateOwnedLoadoutForPlayer(input,ownedIds,verifiedPlayerLevel);
+ if(!ownedShipClasses.has(resolved.shipClass)){
+  throw new Error('Cannot equip ship class: missing verified fleet ownership');
+ }
+ return resolved;
+}
+
 export const SHIP_CLASSES={
  scout:{name:'Swift Scout',description:'Lean corsair silhouette',width:.82,length:.92,height:.95},
  fighter:{name:'Sea Fighter',description:'Balanced broadside frigate',width:1,length:1,height:1},
@@ -120,7 +136,22 @@ export const SHIP_CLASSES={
 export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T.Group{
  const config=resolveLoadout(loadout);
  const previous=root.getObjectByName('modular-ship-accessories');
- if(previous){previous.traverse(o=>{if(o instanceof T.Mesh){o.geometry.dispose();const mats=Array.isArray(o.material)?o.material:[o.material];for(const m of mats)m.dispose();}});root.remove(previous);}
+ if(previous){
+  // Multiple ship parts share brass/wood/iron materials. Dispose every GPU
+  // resource exactly once when changing class or level, never once per mesh.
+  // These assets belong exclusively to the modular accessory group; the base
+  // ship and the sails/flags remain owned by the scene.
+  const geometries=new Set<T.BufferGeometry>();
+  const materials=new Set<T.Material>();
+  previous.traverse(o=>{
+   if(!(o instanceof T.Mesh))return;
+   geometries.add(o.geometry);
+   for(const material of Array.isArray(o.material)?o.material:[o.material])materials.add(material);
+  });
+  root.remove(previous);
+  for(const geometry of geometries)geometry.dispose();
+  for(const material of materials)material.dispose();
+ }
  const cls=SHIP_CLASSES[config.shipClass];
  root.scale.set(cls.width,cls.height,cls.length);
  const additions=new T.Group();additions.name='modular-ship-accessories';root.add(additions);
@@ -244,6 +275,22 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  }
  const sailColor=config.modules.sails==='sails-night'?'#1a2635':config.modules.sails==='sails-crimson'?'#b13f40':'#eadab7';
  const flagColor=config.modules.flag==='flag-black'?'#141b24':config.modules.flag==='flag-red'?'#a63336':'#245774';
+ // Scout-only original fore-and-aft jib. Its curved center is a third
+ // vertex ridge, producing a recognisable light raider silhouette instead
+ // of just recolouring or rescaling the frigate sails. Visual sandbox only.
+ if(config.shipClass==='scout'){
+  const jibGeometry=new T.BufferGeometry();
+  jibGeometry.setAttribute('position',new T.Float32BufferAttribute([
+   0,6.6,3.75, -.30,4.8,5.15, 0,4.1,6.25, 0,4.05,3.8
+  ],3));
+  jibGeometry.setIndex([0,1,3,1,2,3]);
+  jibGeometry.computeVertexNormals();
+  const jibCloth=paint(sailColor,0);
+  jibCloth.roughness=.9;
+  jibCloth.side=T.DoubleSide;
+  const jib=part(jibGeometry,jibCloth,0,0,0);
+  jib.name='scout-fore-and-aft-jib';
+ }
  // Previewing 20 levels can change sail colours many times. All sails share
  // one temporary material, as do all flags: fewer GPU material allocations.
  // Retired CanvasTextures from makeShip are released on first conversion, and

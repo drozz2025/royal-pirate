@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   DEFAULT_MODULES, SHIP_CLASSES, SHIP_MODULES, SLOTS, progressionTier, equipAccess,
-  mayEquip, validateOwnedLoadoutForPlayer, type ModuleSlot, type ShipClass, type ShipLoadout, type ResolvedShipLoadout
+  mayEquip, validateOwnedFleetForPlayer, type ModuleSlot, type ShipClass, type ShipLoadout, type ResolvedShipLoadout
 } from './ship-modules';
 
 /** Optional Work 4 interface: never infer entitlements from demo preview progress. */
@@ -9,6 +9,8 @@ type ShipyardProps={
  onClose:()=>void;
  onPreview:(loadout:ShipLoadout)=>void;
  ownedModuleIds?:ReadonlySet<string>;
+ /** Independently verified ownership of the ship class/hull, not individual modules. */
+ ownedShipClasses?:ReadonlySet<ShipClass>;
  /** Player's real, independently verified level; NEVER the preview slider. */
  verifiedPlayerLevel?:number;
  onEquip?:(loadout:ResolvedShipLoadout)=>void;
@@ -20,7 +22,7 @@ const SLOT_NAMES:Record<ModuleSlot,string>={
 
 /** Interactive ship construction sandbox. Nothing here is purchased, owned,
  * persisted, awarded or injected into combat; only original 3D parts are previewed. */
-export function Shipyard({onClose,onPreview,ownedModuleIds,verifiedPlayerLevel,onEquip}:ShipyardProps){
+export function Shipyard({onClose,onPreview,ownedModuleIds,ownedShipClasses,verifiedPlayerLevel,onEquip}:ShipyardProps){
  const [shipClass,setShipClass]=useState<ShipClass>('fighter');
  const [level,setLevel]=useState(1);
  const [slot,setSlot]=useState<ModuleSlot>('hull');
@@ -41,11 +43,11 @@ export function Shipyard({onClose,onPreview,ownedModuleIds,verifiedPlayerLevel,o
  const verifiedLevelMatches=typeof verifiedPlayerLevel==='number'
   &&Number.isInteger(verifiedPlayerLevel)&&verifiedPlayerLevel>=1
   &&verifiedPlayerLevel<=20&&verifiedPlayerLevel===level;
- const equipEnabled=!!onEquip&&!!ownedModuleIds&&verifiedLevelMatches
+ const equipEnabled=!!onEquip&&!!ownedModuleIds&&!!ownedShipClasses&&ownedShipClasses.has(shipClass)&&verifiedLevelMatches
   &&SLOTS.every(s=>mayEquip(selected[s]??DEFAULT_MODULES[s],verifiedPlayerLevel,ownedModuleIds));
  const equipVerified=()=>{
-  if(onEquip&&ownedModuleIds&&equipEnabled&&verifiedPlayerLevel!==undefined){
-   onEquip(validateOwnedLoadoutForPlayer(draftLoadout,ownedModuleIds,verifiedPlayerLevel));
+  if(onEquip&&ownedModuleIds&&ownedShipClasses&&equipEnabled&&verifiedPlayerLevel!==undefined){
+   onEquip(validateOwnedFleetForPlayer(draftLoadout,ownedModuleIds,verifiedPlayerLevel,ownedShipClasses));
   }
  };
  return <section className="shipyard-screen" aria-label="Ship customisation 3D sandbox">
@@ -62,7 +64,7 @@ export function Shipyard({onClose,onPreview,ownedModuleIds,verifiedPlayerLevel,o
       aria-pressed={type===shipClass} onClick={()=>setShipClass(type)}>{SHIP_CLASSES[type].name}</button>
     )}
    </div>
-   <small>{SHIP_CLASSES[shipClass].description} · {progressionTier(level).toUpperCase()} TIER</small>
+   <small>{SHIP_CLASSES[shipClass].description} · {progressionTier(level).toUpperCase()} TIER · {ownedShipClasses?.has(shipClass)?'VERIFIED FLEET HULL':'HULL PREVIEW ONLY'}</small>
   </div>
   <div className="shipyard-orbit-hint" aria-hidden="true">↔ DRAG TO ROTATE · PINCH TO ZOOM</div>
   <div className="shipyard-panel">
@@ -95,10 +97,10 @@ export function Shipyard({onClose,onPreview,ownedModuleIds,verifiedPlayerLevel,o
      </button>;
     })}
    </div>
-   {onEquip&&<button type="button" className="shipyard-equip" disabled={!equipEnabled} onClick={equipVerified} aria-label="Equip only fully owned and level-unlocked modules">
-    {equipEnabled?'EQUIP VERIFIED FLEET':!verifiedLevelMatches?'EQUIP UNAVAILABLE — VERIFIED LEVEL REQUIRED':'EQUIP UNAVAILABLE — OWNERSHIP REQUIRED'}
+   {onEquip&&<button type="button" className="shipyard-equip" disabled={!equipEnabled} onClick={equipVerified} aria-label="Equip only a verified owned ship class with fully owned and level-unlocked modules">
+    {equipEnabled?'EQUIP VERIFIED FLEET':!verifiedLevelMatches?'EQUIP UNAVAILABLE — VERIFIED LEVEL REQUIRED':!ownedShipClasses?.has(shipClass)?'EQUIP UNAVAILABLE — SHIP CLASS NOT OWNED':'EQUIP UNAVAILABLE — MODULE OWNERSHIP REQUIRED'}
    </button>}
-   <p className="shipyard-legal">VISUAL SANDBOX ONLY · Level unlocks are not purchases or ownership. Preview changes are not saved and do not affect battle. {ownedModuleIds?'Ownership data supplied by the connected game service.':'Ownership verification is not connected.'} {verifiedLevelMatches?'Preview matches the verified player level.':'The preview slider cannot replace a verified player level.'}</p>
+   <p className="shipyard-legal">VISUAL SANDBOX ONLY · Level unlocks are not purchases or ownership. Preview changes are not saved and do not affect battle. {ownedModuleIds?'Ownership data supplied by the connected game service.':'Module ownership verification is not connected.'} {ownedShipClasses?.has(shipClass)?'Ship class ownership verified.':'Ship class ownership not verified.'} {verifiedLevelMatches?'Preview matches the verified player level.':'The preview slider cannot replace a verified player level.'}</p>
   </div>
  </section>;
 }

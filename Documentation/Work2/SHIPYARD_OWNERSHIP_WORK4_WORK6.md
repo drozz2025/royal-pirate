@@ -50,3 +50,19 @@ Unity prefabs, purchased items, a playable owned fleet, 20 unique handmade meshe
 
 **Workflow:** source branch `work2/fabric-lifecycle-class-silhouette-20261119` is stacked on #530, which is stacked on #522 → #29. Isolated CI workflow runs npm ci, unit tests and TypeScript/Vite build with **no deploy**. Follow Work 5 mobile visual QA before integration. No ownership is granted by cosmetic changes.
 
+
+
+## Independent ship-class entitlement and one-time GPU cleanup — 19 Nov 2026
+
+New Work 2 implementation (stack after the fabric lifecycle feature):
+- A player may own all nine modular parts **without owning the specific Scout, Fighter or Warship hull**. This previously would have been enough for the optional equipment control if verifiedPlayerLevel matched. `validateOwnedFleetForPlayer(loadout, ownedModuleIds, verifiedPlayerLevel, ownedShipClasses)` now requires all three distinct verifications: verified level, each of nine modules, **and the selected ship class**. Missing or different-class entitlements reject the action. The demo slider grants nothing.
+- The `Shipyard` accepts an additional **optional** `ownedShipClasses: ReadonlySet<ShipClass>`. Without it the sandbox still previews all three silhouettes, but real EQUIP is disabled even if modules are owned. With it, the selected hull must also be present in the verified class set. Equip UI says why it is blocked, and the selected preview explicitly reads HULL PREVIEW ONLY / VERIFIED FLEET HULL.
+- WORK 4 must source class ownership from its authoritative inventory together with the real player level and module IDs. The class can be **previewed at any level**; its acquisition must not be inferred from level 1–20 or catalog defaults. Backend must revalidate the same combination when persisting.
+- WORK 6 need not edit Porto or combat. Work 2 touches only the standalone shipyard, the module builder, isolated tests, and CI.
+- The module preview now disposes each *shared* accessory GPU material and geometry exactly once when class, tier or equipped preview changes, instead of disposing the same shared material repeatedly for each mesh; base ship, sail/flag and battle resources stay untouched. New tests assert one disposal event for shared accessories and one for geometry.
+- This adds no fictional owned fleet, currencies, IAP, server inventory or purchased hulls. The 3D editor remains a visual sandbox until Work 4 passes verified ownership services.
+- Isolated workflow `.github/workflows/work2-shipyard-verify.yml` includes the new feature branch for tests, TypeScript and Vite build, with **no deployment**.
+
+Review visually on 360/390px mobile before merging. Do not confuse unit-test success with measured FPS or iPhone-native validation.
+
+- New original Scout-only triangular fore-and-aft jib geometry now matches the selected sail preview colour. It is an explicit low-poly Three.js cloth triangle mesh (not a static PNG), stays inside the modular accessory group, and is removed/disposed on class swaps. Tests assert it is present only on Scout, with two-sided cloth and a bounded mesh count. This is not part of battle hitboxes or combat mechanics.

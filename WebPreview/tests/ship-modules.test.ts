@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { SHIP_MODULES, SLOTS, availableModules, resolveLoadout, progressionTier, applyShipModules, mayEquip, equipAccess, validateOwnedLoadout, validateOwnedLoadoutForPlayer, SHIP_CLASSES } from '../src/ship-modules.ts';
+import { SHIP_MODULES, SLOTS, availableModules, resolveLoadout, progressionTier, applyShipModules, mayEquip, equipAccess, validateOwnedLoadout, validateOwnedLoadoutForPlayer, validateOwnedFleetForPlayer, SHIP_CLASSES } from '../src/ship-modules.ts';
 import { makeShip } from '../src/ships.ts';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -150,19 +150,51 @@ test('player-verified level is independent from freely adjustable sandbox level'
  assert.equal(validateOwnedLoadoutForPlayer(level20Preview,defaultOwned,20).level,20);
  assert.throws(()=>validateOwnedLoadoutForPlayer(level20Preview,new Set(['hull-oak']),20),/missing verified ownership/);
 });
+test('a real fleet hull is a separate entitlement from owned modules and demo level',()=>{
+ const ownedParts=new Set(Object.values(resolveLoadout({shipClass:'fighter',level:1,modules:{}}).modules));
+ const fighter={shipClass:'fighter' as const,level:1,modules:{}};
+ const warship={shipClass:'warship' as const,level:1,modules:{}};
+ const hulls=new Set(['fighter' as const]);
+ assert.equal(validateOwnedFleetForPlayer(fighter,ownedParts,1,hulls).shipClass,'fighter');
+ assert.throws(()=>validateOwnedFleetForPlayer(warship,ownedParts,1,hulls),/missing verified fleet ownership/);
+ assert.throws(()=>validateOwnedFleetForPlayer(fighter,ownedParts,1,new Set()),/missing verified fleet ownership/);
+ assert.throws(()=>validateOwnedFleetForPlayer(fighter,ownedParts,2,hulls),/does not match verified player level/);
+ assert.throws(()=>validateOwnedFleetForPlayer(fighter,new Set(['hull-oak']),1,hulls),/missing verified ownership/);
+});
+
+test('disposing repeated ship modules releases shared materials once per preview',()=>{
+ const root=new T.Group(),rig=new T.Group();root.add(rig);
+ const first=applyShipModules(root,rig,{shipClass:'warship',level:20,modules:{armor:'armor-royal',ornaments:'ornaments-legendary'}});
+ const meshes=first.children.filter((obj):obj is T.Mesh=>obj instanceof T.Mesh);
+ const references=new Map<T.Material,number>();
+ for(const mesh of meshes)for(const material of Array.isArray(mesh.material)?mesh.material:[mesh.material])
+  references.set(material,(references.get(material)??0)+1);
+ const shared=[...references].find(([,refs])=>refs>=3)?.[0];
+ assert.ok(shared,'several accessories should intentionally share a material');
+ let disposals=0;shared.addEventListener('dispose',()=>disposals++);
+ const oldGeo=meshes[0].geometry;
+ let geoDisposals=0;oldGeo.addEventListener('dispose',()=>geoDisposals++);
+ applyShipModules(root,rig,{shipClass:'scout',level:1,modules:{}});
+ assert.equal(disposals,1,'shared material should be disposed once instead of once per mesh');
+ assert.equal(geoDisposals,1);
+ assert.equal(root.children.filter(obj=>obj.name==='modular-ship-accessories').length,1);
+});
+
 test('real equip button stays locked when only demo progression matches owned parts',()=>{
  const owned=new Set(Object.values(resolveLoadout({shipClass:'fighter',level:1,modules:{}}).modules));
- const render=(verifiedPlayerLevel?:number)=>renderToStaticMarkup(createElement(Shipyard,{
-  onClose:()=>{},onPreview:()=>{},onEquip:()=>{},ownedModuleIds:owned,verifiedPlayerLevel
+ const render=(verifiedPlayerLevel?:number,ownedShipClasses?:ReadonlySet<'scout'|'fighter'|'warship'>)=>renderToStaticMarkup(createElement(Shipyard,{
+  onClose:()=>{},onPreview:()=>{},onEquip:()=>{},ownedModuleIds:owned,ownedShipClasses,verifiedPlayerLevel
  }));
  const equipTag=(html:string)=>html.match(/<button[^>]*class="shipyard-equip"[^>]*>/)?.[0]??'';
  assert.match(equipTag(render()),/disabled/,'no verified level must prevent equipping');
  assert.match(equipTag(render(20)),/disabled/,'player level 20 cannot be substituted for demo level 1');
  assert.match(equipTag(render(0)),/disabled/,'invalid verified level must prevent equipping');
- assert.doesNotMatch(equipTag(render(1)),/disabled/,'a verified matching level and all real entitlements allow UI action');
+ assert.match(equipTag(render(1)),/disabled/,'parts alone do not grant any ship class');
+ assert.match(equipTag(render(1,new Set(['scout' as const]))),/disabled/,'owning a different hull cannot equip this fighter');
+ assert.doesNotMatch(equipTag(render(1,new Set(['fighter' as const]))),/disabled/,'verified level, class and all nine owned parts permit UI action');
  const missing=new Set(['hull-oak']);
  const unownedHtml=renderToStaticMarkup(createElement(Shipyard,{
-  onClose:()=>{},onPreview:()=>{},onEquip:()=>{},ownedModuleIds:missing,verifiedPlayerLevel:1
+  onClose:()=>{},onPreview:()=>{},onEquip:()=>{},ownedModuleIds:missing,ownedShipClasses:new Set(['fighter' as const]),verifiedPlayerLevel:1
  }));
  assert.match(equipTag(unownedHtml),/disabled/,'any unowned default part must prevent equipping');
 });
@@ -188,6 +220,12 @@ test('scout, frigate and flagship gain genuinely different original silhouette d
  };
  const scout=make('scout'),fighter=make('fighter'),warship=make('warship');
  assert.equal(scout.children.filter(part=>part.name==='scout-bowsprit').length,1);
+ const jib=scout.children.find(part=>part.name==='scout-fore-and-aft-jib');
+ assert.ok(jib instanceof T.Mesh,'scout must carry an original three-dimensional lateen-style jib');
+ assert.equal(jib.geometry.getAttribute('position').count,4);
+ assert.equal((jib.material as T.MeshStandardMaterial).side,T.DoubleSide);
+ assert.equal(fighter.children.some(part=>part.name==='scout-fore-and-aft-jib'),false);
+ assert.equal(warship.children.some(part=>part.name==='scout-fore-and-aft-jib'),false);
  assert.equal(fighter.children.filter(part=>part.name==='fighter-gunport-frame').length,6);
  assert.equal(warship.children.filter(part=>part.name==='warship-stern-window').length,3);
  assert.equal(scout.children.some(part=>part.name==='warship-stern-window'),false);
