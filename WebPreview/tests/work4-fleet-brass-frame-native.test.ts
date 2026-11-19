@@ -1,0 +1,205 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync} from 'node:fs';
+import {spawn,spawnSync} from 'node:child_process';
+import {createServer} from 'node:net';
+import {join,resolve} from 'node:path';
+import {tmpdir} from 'node:os';
+
+const css=readFileSync(new URL('../src/work4-fleet-forge.css',import.meta.url),'utf8');
+const marker='WORK4/#104 — native source-frame metallurgy (19 Nov 06h).';
+const paint=css.split(marker)[1]?.split('/*')[0]||'';
+const selector='.w4-fleet #w4-fleet-panel > .w4-harbour-stage';
+const oldBorder='#2e485a';
+const approved=readFileSync(new URL('../../assets/design-approved/03-frota.webp',import.meta.url)).toString('base64');
+
+test('WORK4 Fleet native brass-frame pigment is source-scoped and leaves the real ship/sea/shell alone',()=>{
+  assert.ok(paint,'native source inset must exist');
+  assert.match(paint,/@media \(width:384px\) and \(height:512px\)/);
+  assert.match(paint,/border-color:#273640/);
+  assert.doesNotMatch(paint,/!important/);
+  assert.equal((paint.match(/\.w4-harbour-stage/g)||[]).length,1);
+  assert.doesNotMatch(paint,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-reference-sea|\.w4-reference-ship|\.w4-cannon-art|contain:paint|transform:|position:|pointer-events:)/);
+  assert.ok(css.includes('radial-gradient(ellipse 110% 123% at 30% 50%'),'approved Royal Crown source contour must survive');
+  assert.ok(css.includes('svg.w4-reference-sea'),'source water must survive');
+});
+
+test('WORK4: approved original, eight-screen board and all 01–08 WebP anchors stay immutable',()=>{
+  const names=['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+    '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+    '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'];
+  for(const name of names){
+    const bytes=readFileSync(new URL('../../assets/design-approved/'+name,import.meta.url));
+    assert.equal(bytes.toString('ascii',0,4),'RIFF',name+' missing RIFF header');
+    assert.equal(bytes.toString('ascii',8,12),'WEBP',name+' missing WebP header');
+    assert.ok(bytes.length>1000,name+' should contain original approved image');
+  }
+});
+
+const chrome=[process.env.CHROME_BIN,'chromium','google-chrome'].filter(Boolean)
+  .find(bin=>spawnSync('which',[bin!],{encoding:'utf8'}).status===0);
+const delay=(ms:number)=>new Promise<void>(done=>setTimeout(done,ms));
+
+test('WORK4 Fleet native bronze-frame A/B: same Chromium frame, ship/sea + five dock controls',{
+  skip:process.env.CI==='true'&&chrome?false:'CI Chromium screenshot evidence only',
+  timeout:240_000
+},async t=>{
+  const buildDir=mkdtempSync(join(tmpdir(),'rp-work4-brass-build-'));
+  t.after(()=>rmSync(buildDir,{recursive:true,force:true,maxRetries:10,retryDelay:200}));
+  const build=spawnSync('npm',['run','build','--','--base=/royal-pirate/','--outDir',buildDir],{
+    cwd:process.cwd(),encoding:'utf8',timeout:120_000,maxBuffer:12000000
+  });
+  assert.equal(build.status,0,'build must pass before native comparison: '+(build.stderr||build.stdout).slice(-1200));
+  const qa=resolve('porto-qa/work4');mkdirSync(qa,{recursive:true});
+  const port=await new Promise<number>((yes,no)=>{
+    const s=createServer();s.once('error',no);s.listen(0,'127.0.0.1',()=>{
+      const addr=s.address();if(!addr||typeof addr==='string'){s.close();return no(Error('port'));}
+      s.close(()=>yes(addr.port));
+    });
+  });
+  const preview=spawn(join(process.cwd(),'node_modules','.bin','vite'),[
+    'preview','--outDir',buildDir,'--host','127.0.0.1','--port',String(port),'--strictPort','--base=/royal-pirate/'
+  ],{stdio:'ignore'});
+  const profile=mkdtempSync(join(tmpdir(),'rp-work4-ship-frame-'));
+  let browser:ReturnType<typeof spawn>|undefined;
+  let ws:WebSocket|undefined;
+  t.after(async()=>{ws?.close();browser?.kill('SIGTERM');preview.kill('SIGTERM');
+    await delay(450);rmSync(profile,{recursive:true,force:true,maxRetries:12,retryDelay:250});
+  });
+  const origin='http://127.0.0.1:'+port+'/royal-pirate/';
+  let live=false;
+  for(let i=0;i<120;i++){try{live=(await fetch(origin,{signal:AbortSignal.timeout(750)})).ok;if(live)break;}catch{}await delay(120);}
+  assert.ok(live,'production preview must be live');
+  browser=spawn(chrome!,[
+    '--headless=new','--no-sandbox','--disable-dev-shm-usage',
+    '--remote-allow-origins=*','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'
+  ],{stdio:'ignore'});
+  let target:any=null;
+  for(let i=0;i<270;i++){
+    if(browser.exitCode!==null)throw Error('Chromium exited early');
+    try{const p=Number(readFileSync(join(profile,'DevToolsActivePort'),'utf8').split('\n')[0]);
+      if(p>0){const res=await fetch('http://127.0.0.1:'+p+'/json/list',{signal:AbortSignal.timeout(750)});
+        if(res.ok)target=(await res.json() as any[]).find(item=>item.type==='page');}
+    }catch{}
+    if(target)break;await delay(100);
+  }
+  assert.ok(target?.webSocketDebuggerUrl,'Chromium debugger target');
+  ws=new WebSocket(target.webSocketDebuggerUrl);
+  await new Promise<void>((yes,no)=>{
+    ws!.addEventListener('open',()=>yes(),{once:true});
+    ws!.addEventListener('error',()=>no(Error('DevTools WS')), {once:true});
+  });
+  let next=0;const pending=new Map<number,{resolve:(v:any)=>void;reject:(e:Error)=>void}>();
+  ws.addEventListener('message',e=>{
+    const m=JSON.parse(String(e.data)),p=pending.get(m.id);if(!p)return;
+    pending.delete(m.id);m.error?p.reject(Error(m.error.message)):p.resolve(m.result);
+  });
+  const cmd=(method:string,params:Record<string,unknown>={})=>new Promise<any>((yes,no)=>{
+    const id=++next;
+    const timer=setTimeout(()=>{pending.delete(id);no(Error('CDP timeout: '+method));},30000);
+    pending.set(id,{resolve:v=>{clearTimeout(timer);yes(v);},
+      reject:e=>{clearTimeout(timer);no(e);}});
+    ws!.send(JSON.stringify({id,method,params}));
+  });
+  const evaluate=async(expression:string)=>{
+    const r=await cmd('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});
+    if(r.exceptionDetails)throw Error('Runtime.evaluate '+r.exceptionDetails.text);
+    return r.result?.value;
+  };
+  const until=async(expr:string)=>{
+    for(let i=0;i<170;i++){if(await evaluate(expr))return;await delay(130);}
+    throw Error('Missing browser UI '+expr);
+  };
+  await cmd('Page.enable');await cmd('Runtime.enable');
+  await cmd('Emulation.setDeviceMetricsOverride',{
+    width:384,height:512,deviceScaleFactor:1,mobile:true,screenWidth:384,screenHeight:512
+  });
+  await cmd('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:2});
+  await cmd('Page.navigate',{url:origin+'?work4=source-brass-frame-ab'});
+  await until("!!document.querySelector('.harbour-screen .harbour-nav-item:nth-child(2)')");
+  const nav=await evaluate("(()=>{const e=document.querySelector('.harbour-screen .harbour-nav-item:nth-child(2)');const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()");
+  await cmd('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:nav.x,y:nav.y,id:3}]});
+  await delay(60);
+  await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  await until("!!document.querySelector('.w4-fleet .w4-reference-ship')");
+  const geometry=await evaluate("(()=>{const stage=document.querySelector('.w4-harbour-stage');const label=document.querySelector('.w4-stage-label');const r=stage.getBoundingClientRect(),p=label.getBoundingClientRect();return {stage:{x:r.x,y:r.y,width:r.width,height:r.height},label:{x:p.x,y:p.y,width:p.width,height:p.height},ship:document.querySelectorAll('.w4-fleet svg.w4-reference-ship').length,sea:document.querySelectorAll('.w4-fleet svg.w4-reference-sea').length,dock:document.querySelectorAll('.app-sheet .harbour-nav.app-dock-porto .harbour-nav-item').length,realLevels:document.querySelectorAll('.w4-fleet .w4-stage-stats > span').length}})()");
+  assert.equal(geometry.ship,1,'exactly one Royal Crown source painting');
+  assert.equal(geometry.sea,1,'exactly one approved source sea');
+  assert.equal(geometry.dock,5,'five dock buttons still present and touchable');
+  assert.equal(geometry.realLevels,3,'existing real levels preserved');
+  await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const href=document.querySelector('svg.w4-reference-ship image')?.getAttribute('href');if(!href||!(await fetch(href)).ok)throw Error('approved ship source not loaded');const style=document.createElement('style');style.id='work4-native-ab-baseline';style.textContent="+JSON.stringify(selector+"{border-color:"+oldBorder+"!important;}")+";document.head.append(style);return true;})()");
+  await delay(180);
+  const before=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
+
+  // Native source-honest pigment sweep: the first entry is the released WORK0
+  // blue-gray rim. All variants are rendered without navigation or frame changes.
+  const tones=['#2e485a','#142b3d','#193044','#1e3444','#233b4d',
+    '#1f2f38','#273640','#303b43','#39454d','#2a414f',
+    '#123750','#173f54','#2f3a3e','#3c3835','#443930',
+    '#58422c','#6d4c34','#84613f','#98754d','#b79c67'];
+  const shots:string[]=[];
+  for(const color of tones){
+    await evaluate("(()=>{const style=document.getElementById('work4-native-ab-baseline');style.textContent="+
+      JSON.stringify(selector+"{border-color:"+color+"!important;}")+";return true})()");
+    await delay(80);
+    shots.push((await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string);
+  }
+  await evaluate("document.getElementById('work4-native-ab-baseline')?.remove();true");
+  const actualBorder=await evaluate("getComputedStyle(document.querySelector('.w4-fleet #w4-fleet-panel > .w4-harbour-stage')).borderTopColor");
+  assert.equal(actualBorder,'rgb(39, 54, 64)','production CSS must exactly use empirically selected native pigment');
+
+  const expression="(async()=>{const open=async(source)=>{const im=new Image();im.src=source;await im.decode();return im;};"+
+    "const original=await open('data:image/webp;base64,"+approved+"');"+
+    "const before=await open('data:image/png;base64,"+before+"');"+
+    "const screenshots=await Promise.all("+JSON.stringify(shots)+".map(s=>open('data:image/png;base64,'+s)));"+
+    "if([original,before,...screenshots].some(im=>im.width!==384||im.height!==512))throw Error('native 384x512 frames required');"+
+    "const bitmap=im=>{const can=document.createElement('canvas');can.width=384;can.height=512;const ctx=can.getContext('2d',{willReadFrequently:true});ctx.drawImage(im,0,0);return ctx.getImageData(0,0,384,512).data;};"+
+    "const a=bitmap(original),b=bitmap(before),shots=screenshots.map(bitmap);"+
+    "const boxes={full:[0,0,384,512],frame:[14,133,372,341],leftRim:[14,152,20,336],rightRim:[365,152,372,336],royalCrown:[65,205,175,307],sea:[188,306,236,333],dock:[0,433,384,512]};"+
+    "const mae=(x,y,box)=>{let total=0,n=0;for(let yy=box[1];yy<box[3];yy++)for(let xx=box[0];xx<box[2];xx++){let k=(yy*384+xx)*4;for(let j=0;j<3;j++){total+=Math.abs(x[k+j]-y[k+j]);n++;}}return total/n;};"+
+    "const changed=(x,y,box)=>{let count=0;for(let yy=box[1];yy<box[3];yy++)for(let xx=box[0];xx<box[2];xx++){let k=(yy*384+xx)*4;if(x[k]!==y[k]||x[k+1]!==y[k+1]||x[k+2]!==y[k+2])count++;}return count;};"+
+    "const records=shots.map((pixels,i)=>{const roi={};for(const [name,box] of Object.entries(boxes))roi[name]={mae:mae(a,pixels,box),changedPixels:changed(b,pixels,box)};return {index:i,roi};});"+
+    "const baseline=records[0];"+
+    "const valid=records.filter(r=>['royalCrown','sea','dock'].every(n=>r.roi[n].changedPixels===0)&&"+
+    "['full','frame','leftRim','rightRim'].every(n=>r.roi[n].mae<=baseline.roi[n].mae+0.000001));"+
+    "valid.sort((x,y)=>x.roi.full.mae-y.roi.full.mae||x.roi.frame.mae-y.roi.frame.mae);"+
+    "const winner=valid[0]||baseline;const after= screenshots[winner.index];"+
+    "const metrics={};for(const [name,box] of Object.entries(boxes))metrics[name]={before:mae(a,b,box),after:mae(a,shots[winner.index],box),changedPixels:changed(b,shots[winner.index],box)};"+
+    "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;const ctx=canvas.getContext('2d');"+
+    "ctx.drawImage(original,0,0);ctx.drawImage(before,384,0);ctx.drawImage(after,768,0);ctx.drawImage(original,1152,0);ctx.globalAlpha=.5;ctx.drawImage(after,1152,0);ctx.globalAlpha=1;"+
+    "return {winnerIndex:winner.index,records,metrics,comparison:canvas.toDataURL('image/png').split(',')[1]};})()";
+  const result=await evaluate(expression);
+  assert.ok(result?.metrics?.frame,'native stage ROI measured');
+  assert.equal(result.metrics.royalCrown.changedPixels,0,'Royal Crown remains pixel-identical');
+  assert.equal(result.metrics.sea.changedPixels,0,'approved water stays identical');
+  assert.equal(result.metrics.dock.changedPixels,0,'five WORK0 dock entries remain unchanged');
+  assert.ok(result.records.length===tones.length,'measure every candidate in the SAME paused frame');
+  assert.ok(result.records[result.winnerIndex].roi.full.mae<=result.records[0].roi.full.mae+.00001,
+    'only nonregressing candidate may be selected');
+  writeFileSync(join(qa,'original-before-render-overlay-fleet-brass-frame-384x512.png'),Buffer.from(result.comparison,'base64'));
+  const report={approved:false,screensApproved:0,viewport:'384x512',source:'03-frota.webp',
+    frame:'one native Chromium scene, same persisted state, all animations paused',
+    geometry,winnerTone:tones[result.winnerIndex],winnerIndex:result.winnerIndex,roi:result.metrics,
+    candidates:result.records.map((r:any)=>({color:tones[r.index],...r})),
+    note:'This is a source-border pigment selection study. It is not itself human artistic approval or publication.'};
+  writeFileSync(join(qa,'work4-native-fleet-brass-frame-ab.json'),JSON.stringify(report,null,2)+'\n');
+  console.log('WORK4_BRASS_FRAME_NATIVE_AB '+JSON.stringify(report));
+  // Real responsive browser evidence: preserve the merged WORK0 320/390/430
+  // layouts, without extending the 384-only paint rule to other screen sizes.
+  for (const [width,height] of [[320,568],[390,844],[430,932]] as const) {
+    await cmd('Emulation.setDeviceMetricsOverride',{
+      width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height
+    });
+    await delay(200);
+    const proof=await evaluate("(()=>{const items=[...document.querySelectorAll('.app-sheet .harbour-nav.app-dock-porto .harbour-nav-item')];const stage=document.querySelector('.w4-fleet .w4-harbour-stage');const ship=document.querySelectorAll('.w4-fleet .w4-reference-ship').length;const sea=document.querySelectorAll('.w4-fleet .w4-reference-sea').length;const visible=items.filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&r.height>0&&r.left>=-1&&r.right<=innerWidth+1;}).length;return {width:innerWidth,stage:!!stage,dock:items.length,visible,ship,sea};})()");
+    assert.equal(proof.width,width,'native responsive viewport width '+width);
+    assert.ok(proof.stage,'live fleet remains rendered at '+width);
+    assert.equal(proof.ship,1,'one Royal Crown at '+width);
+    assert.equal(proof.sea,1,'one approved sea at '+width);
+    assert.equal(proof.dock,5,'five dock hit targets at '+width);
+    assert.equal(proof.visible,5,'all five dock items within screen at '+width);
+    const shot=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
+    writeFileSync(join(qa,'work4-fleet-responsive-'+width+'x'+height+'.png'),Buffer.from(shot,'base64'));
+  }
+
+});
