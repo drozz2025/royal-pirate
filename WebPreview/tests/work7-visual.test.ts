@@ -47,22 +47,24 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
     'The final WORK7 candidate changes only genuine 05 frame inlays');
+  assert.ok(cssText.includes('19 Nov 00:23 UTC. Native carved-frame material: originals 05 slots 5 & 6.'),
+    'The native 05 enamel pass targets only the fifth and sixth genuine 4×2 frames');
     // The only admissible before-image is the actual merged #392 v0.1.88 field.
   // Art and frames are restored with temporary CSS, never with older #384 values.
   // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
   // All eight image sublayers also restore their actual pre-PR values.
   // These !important overrides exist ONLY for controlled same-frame A/B screenshots.
-  // Exact merged WORK0 v0.1.96 HEAD: undo ONLY THIS PR's fourth
-  // frame filter. Previous #411/#422 and live artwork stay untouched.
-  // The override is installed on the SAME page and animation frame.
-  // It is inert for Shop and for 320/tall viewports.
+  // WORK7 19 Nov: strict A/B against the VERIFIED v0.1.98 base HEAD.
+  // Cancel ONLY this branch's genuine card 5 + 6 inlay exposure. Keep
+  // merged #442 frame 4/7, approved crops and all other work unchanged.
+  // The override is injected/removed in one frozen Chromium scene/frame.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
-        filter:brightness(.52) saturate(2.00) contrast(.79)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+        filter:brightness(.45) saturate(2.00) contrast(.85)!important;
       }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
-        filter:brightness(.42) saturate(1.75) contrast(.79)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+        filter:brightness(.65) saturate(1.30) contrast(.92)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -447,7 +449,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
   assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
-    'Only native genuine 05 slots 4 and 7 may improve strict full-frame+eight-card ROI vs current merged v0.1.96 HEAD: '+
+    'Only new genuine 05 card 5+6 inlay exposure may improve strict full-frame+eight-card ROI vs current v0.1.98 HEAD: '+
     JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
   assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
     '06 Shop global image must be pixel-identical to merged HEAD');
