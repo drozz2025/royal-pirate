@@ -21,8 +21,19 @@ test('WORK0 #104: first-person mobile has one richly sculpted deck, never extra 
       'first-person-rubbing-strake-','first-person-breeching-rope-']){
       const mesh=premium.getObjectByName(item+side);
       assert.ok(mesh instanceof T.Mesh,'missing 3D '+item+side);
-      assert.ok(Math.abs(mesh.position.x)>3.8 || item.startsWith('first-person-gunwale'),
-        'decorative rope cannot occlude the live centre-line bore');
+      // TubeGeometry stores its CatmullRom coordinates in vertex positions:
+      // mesh.position.x is zero even when the ENTIRE rail is far outboard.
+      if(item.startsWith('first-person-breeching-rope-')){
+        assert.ok(Math.abs(mesh.position.x)>3.8,
+          'rope cannot occlude the live centre-line bore');
+      }else{
+        assert.ok(mesh.geometry instanceof T.TubeGeometry,'real shaped rail required');
+        const vertices=mesh.geometry.getAttribute('position');
+        let nearest=Infinity;
+        for(let vertex=0;vertex<vertices.count;vertex++)
+          nearest=Math.min(nearest,Math.abs(vertices.getX(vertex)+mesh.position.x));
+        assert.ok(nearest>3.8,'entire 3D curved rail must remain outboard');
+      }
     }
   }
   const studs=premium.getObjectByName('first-person-deck-nails');
