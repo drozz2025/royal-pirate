@@ -21,10 +21,12 @@ test('WORK4 native source-light: mandatory originals, one scoped media rule, no 
    assert.equal(b.toString('ascii',8,12),'WEBP',n);
  }
  assert.match(own,/@media \(width:384px\) and \(height:512px\)/);
- assert.match(own,/stop-opacity:\.06/);
- assert.match(own,/stop-opacity:\.02/);
- assert.match(own,/stop-opacity:\.04/);
- assert.doesNotMatch(own,/\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-improve-button|contain:paint|translateZ|height:|width:|position:/);
+ assert.match(own,/svg\.w4-reference-cannon > ellipse:first-of-type/);
+ assert.match(own,/svg\.w4-reference-cannon > ellipse:last-of-type/);
+ assert.match(own,/opacity:\.20/);
+ assert.match(own,/opacity:\.25/);
+ const declarations=own.replace(/@media[^{}]*\{/g,'');
+ assert.doesNotMatch(declarations,/\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-improve-button|contain:paint|translateZ|(?:^|[;{\s])(?:height|width|position):/);
 });
 
 const chrome=[process.env.CHROME_BIN,'chromium','google-chrome'].filter(Boolean)
@@ -120,22 +122,20 @@ test('WORK4 Forge: authentic source hearth light A/B, fixed native frame and pro
   assert.equal(go,true,'functional Frota to Forja navigation');
   await until("!!document.querySelector('.w4-forge .w4-reference-cannon')");
   const selectors=[
-    '#w4-approved-hearth-20261117 stop:first-child',
-    '#w4-approved-hearth-20261117 stop:nth-child(2)',
-    '#w4-approved-iron-20261117 stop:first-child'
+    '.w4-forge svg.w4-reference-cannon > ellipse:first-of-type',
+    '.w4-forge svg.w4-reference-cannon > ellipse:last-of-type'
   ];
-  const oldValues=[.33,.13,.19],newValues=[.06,.02,.04];
+  const oldValues=[1,1],newValues=[.20,.25];
   const geometry=await evaluate("(()=>{const box=s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]};return {cannon:document.querySelectorAll('.w4-forge svg.w4-reference-cannon').length,levels:document.querySelectorAll('.w4-forge .w4-forge-live-level').length,costs:document.querySelectorAll('.w4-forge .w4-resource-grid > div').length,dock:document.querySelectorAll('.app-sheet .harbour-nav.app-dock-porto .harbour-nav-item').length,art:box('.w4-forge svg.w4-reference-cannon'),plaque:box('.w4-forge .w4-forge-description'),materials:box('.w4-forge .w4-materials'),action:box('.w4-forge .w4-improve-button'),dockBox:box('.app-sheet .harbour-nav.app-dock-porto')}})()");
   assert.equal(geometry.cannon,1,'no duplicate source cannon');
   assert.equal(geometry.levels,3,'three genuine saved upgrade levels');
   assert.equal(geometry.costs,3,'three genuine real cost cells');
   assert.equal(geometry.dock,5,'five shared navigation targets');
   await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const href=document.querySelector('svg.w4-reference-cannon image')?.getAttribute('href');if(!href||!(await fetch(href)).ok)throw Error('approved source image not loaded');return true;})()");
-  const legacy=".w4-forge .w4-reference-cannon #w4-approved-hearth-20261117 stop:first-child{stop-opacity:.33!important}"+
-    ".w4-forge .w4-reference-cannon #w4-approved-hearth-20261117 stop:nth-child(2){stop-opacity:.13!important}"+
-    ".w4-forge .w4-reference-cannon #w4-approved-iron-20261117 stop:first-child{stop-opacity:.19!important}";
+  const legacy=".w4-forge svg.w4-reference-cannon > ellipse:first-of-type{opacity:1!important}"+
+    ".w4-forge svg.w4-reference-cannon > ellipse:last-of-type{opacity:1!important}";
   await evaluate("(()=>{let s=document.createElement('style');s.id='work4-legacy-light-ab';s.textContent="+JSON.stringify(legacy)+";document.head.append(s);return true})()");
-  const values=async()=>await evaluate("(()=>["+selectors.map(s=>"getComputedStyle(document.querySelector("+JSON.stringify(s)+")).stopOpacity").join(",")+"])()");
+  const values=async()=>await evaluate("(()=>["+selectors.map(s=>"getComputedStyle(document.querySelector("+JSON.stringify(s)+")).opacity").join(",")+"])()");
   const baselineValues=await values();
   baselineValues.forEach((v:string,i:number)=>assert.ok(Math.abs(Number(v)-oldValues[i])<.001,'legacy SVG glow value '+i));
   await delay(140);
@@ -166,6 +166,7 @@ test('WORK4 Forge: authentic source hearth light A/B, fixed native frame and pro
     "return {roi,comparison:cn.toDataURL('image/png').split(',')[1]};})()";
   const measured=await evaluate(script);
   assert.ok(measured?.roi?.cannonArt,'art ROI must exist');
+  console.log('WORK4_FORGE_SOURCE_LIGHT_PRECHECK '+JSON.stringify({roi:measured.roi,geometry,oldValues,newValues}));
   assert.ok(measured.roi.cannonArt.changedPixels>0,'source light must produce real visible pixels');
   for(const name of ['materials','action','dock','plaque']) {
     assert.equal(measured.roi[name].changedPixels,0,name+' must be pixel-identical');
