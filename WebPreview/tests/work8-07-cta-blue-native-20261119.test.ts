@@ -130,7 +130,7 @@ test('WORK8 07 authentic cta-blue ink — source-ledger and mobile touch', {time
     assert.equal(afterGeometry.quests,3);
     assert.equal(afterGeometry.days,7);
     assert.equal(afterGeometry.navCount,5);
-    assert.equal(afterGeometry.activeCount,1);
+    assert.equal(afterGeometry.activeCount,2,'only the two intended real active CTAs are measured');
     assert.ok(afterGeometry.chests.every((c:any)=>c.bottom<=afterGeometry.nav.y+2),'seven genuine chests not hidden by dock');
     console.log('WORK8_07_CTA_SWEEP_WINNER '+JSON.stringify({brightness:win.shift,roi:win.score.buttons}));
     assert.ok(measured.roi.full.delta<-.001 && measured.roi.buttons.delta<-.025,'source MAE must improve for real mission buttons');
