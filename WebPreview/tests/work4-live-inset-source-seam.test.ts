@@ -32,7 +32,11 @@ test('WORK4 Fleet native live-inset controlled A/B: same Chromium frame, per-ROI
   skip:process.env.CI==='true'&&chrome?false:'CI Chromium screenshot evidence only',
   timeout:240_000
 },async t=>{
-  const build=spawnSync('npm',['run','build','--','--base=/royal-pirate/'],{
+  // Each native test owns its immutable preview output: concurrent WORK tests
+  // must never erase Vite assets in a shared dist/ while Chromium is loading.
+  const buildDir=mkdtempSync(join(tmpdir(),'rp-work4-fleet-inset-build-'));
+  t.after(()=>rmSync(buildDir,{recursive:true,force:true,maxRetries:10,retryDelay:250}));
+  const build=spawnSync('npm',['run','build','--','--base=/royal-pirate/','--outDir',buildDir],{
     cwd:process.cwd(),encoding:'utf8',timeout:120_000,maxBuffer:12000000
   });
   assert.equal(build.status,0,'build must pass before native comparison: '+(build.stderr||build.stdout).slice(-1200));
@@ -44,7 +48,7 @@ test('WORK4 Fleet native live-inset controlled A/B: same Chromium frame, per-ROI
     });
   });
   const preview=spawn(join(process.cwd(),'node_modules','.bin','vite'),[
-    'preview','--host','127.0.0.1','--port',String(port),'--strictPort','--base=/royal-pirate/'
+    'preview','--outDir',buildDir,'--host','127.0.0.1','--port',String(port),'--strictPort','--base=/royal-pirate/'
   ],{stdio:'ignore'});
   const profile=mkdtempSync(join(tmpdir(),'rp-work4-live-seam-'));
   let browser:ReturnType<typeof spawn>|undefined;
@@ -113,7 +117,7 @@ test('WORK4 Fleet native live-inset controlled A/B: same Chromium frame, per-ROI
   assert.equal(geometry.sea,1,'exactly one approved source sea');
   assert.equal(geometry.dock,5,'five dock buttons still present and touchable');
   assert.equal(geometry.realLevels,3,'existing real levels preserved');
-  await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const href=document.querySelector('svg.w4-reference-ship image')?.getAttribute('href');if(!href||!(await fetch(href)).ok)throw Error('approved ship source not loaded');const style=document.createElement('style');style.id='work4-native-ab-baseline';style.textContent="+JSON.stringify(selector+"{background:"+oldGradient+"!important;}")+";document.head.append(style);return true;})()");
+  await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const href=document.querySelector('svg.w4-reference-ship image')?.getAttribute('href');if(!href)throw Error('approved ship source missing');let loaded=false;for(let i=0;i<15;i++){try{loaded=(await fetch(href,{cache:'no-store'})).ok;}catch{}if(loaded)break;await new Promise(done=>setTimeout(done,120));}if(!loaded)throw Error('approved ship source not loaded from immutable preview: '+href);const style=document.createElement('style');style.id='work4-native-ab-baseline';style.textContent="+JSON.stringify(selector+"{background:"+oldGradient+"!important;}")+";document.head.append(style);return true;})()");
   await delay(180);
   const before=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
   await evaluate("document.getElementById('work4-native-ab-baseline')?.remove();true");
