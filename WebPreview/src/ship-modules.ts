@@ -1,5 +1,6 @@
 import * as T from 'three';
 import { createPreviewStandingRigging, type PreviewMastModule } from './ship-rigging';
+import { createPreviewSternHeraldry, type PreviewOrnamentModule } from './ship-heraldry';
 
 /** Original modular ship system. All 20 levels are supported by progression gates,
  * not 20 duplicated meshes. Neither currency nor ownership is fabricated here. */
@@ -280,6 +281,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // One low-cost line-buffer creates authentic 3D shrouds, ratlines and stays.
  // Shipyard-only geometry does not change rig damage, battle or entitlements.
  additions.add(createPreviewStandingRigging(config.shipClass,config.modules.masts as PreviewMastModule));
+ // A single merged 3D stern crest per class; selected trim tier changes its
+ // sculpture without altering equipment rights or ship combat statistics.
+ additions.add(createPreviewSternHeraldry(config.shipClass,config.modules.ornaments as PreviewOrnamentModule));
  const hull=config.modules.hull,armor=config.modules.armor;
  if(hull!=='hull-oak')for(const side of [-1,1])for(const z of [-2.6,-1,1,2.6])
   cube(hull==='hull-royal'?brass:warm,side*1.55,1.04,z,.2,1.25,.18);
