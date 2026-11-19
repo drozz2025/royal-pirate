@@ -4351,3 +4351,18 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 19 Nov 22:22 UTC. Genuine 06 legendary chest painted-metal highlight.
+ * Calibrated exclusively for native 384×512; no screen-sized image backgrounds.
+ * Preserve real 05 eight-card 4×2 portraits, single real 06 Captain pack,
+ * three unavailable chests, PRÉVIA/EM BREVE, live values, approved dock and HUD.
+ * Prior integrated legendary art brightness was 1.59. This standalone art
+ * pigment trial increases illumination inside that original illustration;
+ * CSS/QA must prove strict same-scene MAE+ROI gains or WORK0 must reject it.
+ * 320×568 and taller viewports are untouched. approved:false (0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(1.72) drop-shadow(0 4px 3px #041327a8);
+  }
+}
