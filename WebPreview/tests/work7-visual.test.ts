@@ -332,6 +332,42 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
+        // WORK7/#104 native 384x512 same-frame experimental enamel sweep.
+        // No production values are modified by this in-memory diagnostic.
+        // Test baseline is the exact merged v0.1.98 05 slot 5/6 material.
+        if (kind==='cards' && width===384 && height===512) {
+          const candidates:[number,number][]=[
+            ...[.38,.40,.42,.43,.44,.45,.46,.47,.48,.50,.52,.54]
+              .map(value=>[value,.65] as [number,number]),
+            ...[.54,.57,.60,.61,.62,.63,.65,.67,.69,.71,.74,.78]
+              .map(value=>[.45,value] as [number,number])
+          ];
+          for(const [fifth,sixth] of candidates){
+            const paint='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5)'+
+              '{filter:brightness('+fifth+') saturate(2.00) contrast(.85)!important}'+
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6)'+
+              '{filter:brightness('+sixth+') saturate(1.30) contrast(.92)!important}}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-enamel-sweep';s.textContent="+JSON.stringify(paint)+";document.head.appendChild(s);return true})()");
+            await sleep(60);
+            const snap=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+            const score=await evaluate("(async()=>{"+
+              "const load=u=>new Promise((ok,fail)=>{let i=new Image;i.onload=()=>ok(i);i.onerror=fail;i.src=u});"+
+              "const [ref,img]=await Promise.all([load("+JSON.stringify(refUrl)+"),load("+
+              JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(snap.data)+")]);"+
+              "const c=document.createElement('canvas');c.width=384;c.height=512;const ctx=c.getContext('2d');"+
+              "ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
+              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
+              "let sum=0,roi=0,rn=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){"+
+              "const p=(y*384+x)*4;for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;"+
+              "if(x>=18&&x<365&&y>=195&&y<428){roi+=v;rn++}}}"+
+              "return {mae:+(sum/(384*512*3)).toFixed(5),roi:+(roi/rn).toFixed(5)}})()");
+            console.log('WORK7 ENAMEL SWEEP card5='+fifth+' card6='+sixth+' '+JSON.stringify(score));
+            await evaluate("(()=>{document.getElementById('w7-enamel-sweep')?.remove();return true})()");
+            await sleep(40);
+          }
+        }
+
         // WORK7 experimental tuning grid, never applied to the production UI:
         // same 384x512 screenshot frame and same approved artwork for every
         // real-chest brightness candidate; log absolute native MAE/ROI and
