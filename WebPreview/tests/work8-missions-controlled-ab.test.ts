@@ -94,6 +94,9 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
     await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline");true');
+    // Keep this run's *new* colour candidate isolated from the historical,
+    // separately source-validated A/B gates on the exact same real DOM.
+    await evalJs('document.documentElement.classList.add("w8-quest-rewards-ink-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1651,6 +1654,84 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'the production green enamel must improve both the real tiles ROI and the full approved 07 frame');
     assert.ok(Math.abs(earlyDelta.quests)<.05 && Math.abs(earlyDelta.dockDelta)<.05,
       'no regressions in the three missions or WORK0 dock');
+
+
+    /* WORK8 #104 — only the three real 07 objective reward slots.
+       Baseline and candidate share ONE decoded, paused native Chromium scene.
+       Full-frame, three slots, three quests, seven chests and dock ROIs are
+       measured against the exact 07 source image, never synthetic user data.
+       This flag is independent of historical WORK8 snapshot baselines. */
+    const inkFlag='w8-quest-rewards-ink-baseline';
+    const inkRects=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
+    assert.equal(inkRects.length,3,'exactly three genuine mission reward slots');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(inkFlag)+');true');
+    await delay(160);
+    const inkBeforeLayout=await headingLayout();
+    const inkCssBefore=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-rewards")).filter');
+    const inkBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(inkFlag)+');true');
+    await delay(160);
+    const inkAfterLayout=await headingLayout();
+    const inkCssAfter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-rewards")).filter');
+    const inkAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const inkMetrics=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(inkRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+inkBefore,'data:image/png;base64,'+inkAfter])));
+    const inkDelta=Object.fromEntries(Object.keys(inkMetrics[0]).map(k=>[k,inkMetrics[1][k]-inkMetrics[0][k]]));
+    const inkOverlaySource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+inkBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+inkAfter));
+    assert.notEqual(inkOverlaySource,source,'must compare actual candidate captured frame');
+    const inkOverlays=await evalJs(inkOverlaySource);
+    saveTone('missions-reward-ink-original-384x512.webp',orig);
+    saveTone('missions-reward-ink-before-384x512.png',inkBefore);
+    saveTone('missions-reward-ink-render-384x512.png',inkAfter);
+    saveTone('missions-reward-ink-original-before-overlay-384x512.png',inkOverlays.overlays[0]);
+    saveTone('missions-reward-ink-original-render-overlay-384x512.png',inkOverlays.overlays[1]);
+    // Transparency is forbidden: this is the real style shipped in production.
+    // Supplemental live-Chromium sweep diagnoses stronger/weaker source matches;
+    // only the static committed CSS is subject to the strict pass/fail A/B.
+    const inkSweep=[];
+    for(const pigment of [.80,.86,.90,.93,.96,1.03,1.10]) {
+      await evalJs('document.documentElement.style.setProperty("--w8-quest-rewards-ink",'+JSON.stringify(String(pigment))+');true');
+      await delay(95);
+      const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      inkSweep.push({pigment,shot});
+    }
+    await evalJs('document.documentElement.style.removeProperty("--w8-quest-rewards-ink");true');
+    const inkSweepMetrics=await evalJs(meterStudySource
+      .replace('__RECTS__',JSON.stringify(inkRects))
+      .replace('__IMAGES__',JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+inkBefore,...inkSweep.map(x=>'data:image/png;base64,'+x.shot)])));
+    const inkStudy=inkSweep.map((x,i)=>({pigment:x.pigment,...inkSweepMetrics[i+1],
+      rewardROIDelta:inkSweepMetrics[i+1].meters-inkSweepMetrics[0].meters,
+      fullDelta:inkSweepMetrics[i+1].full-inkSweepMetrics[0].full}));
+    const inkReferenceSet=['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+      '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+      '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+      .map(name=>'assets/design-approved/'+name);
+    for(const ref of inkReferenceSet)
+      assert.ok(readFileSync(new URL('../../'+ref,import.meta.url)).length>1000,'approved source not available: '+ref);
+    const inkReport={issue:104,baseHead:'cc44ce2ce2ba8c348f71755675dac2c3f126b328',
+      scope:'only 07 live objective reward enamel; no Ranking 08, Porto, dock or game data',
+      reference:'assets/design-approved/07-missoes.webp',referenceSet:inkReferenceSet,
+      browser:'native Chromium 384x512 DPR 1',scene:'same DOM/frame, paused animations, decoded artwork',
+      cssBefore:inkCssBefore,cssRender:inkCssAfter,roiRects:inkRects,
+      before:inkMetrics[0],render:inkMetrics[1],delta:inkDelta,
+      pigmentSweep:inkStudy,geometry:{before:inkBeforeLayout,render:inkAfterLayout},
+      overlay:inkOverlays.metrics,approved:false,approvedScreens:0};
+    writeFileSync(join(evidence,'work8-missions-reward-ink-native-ab.json'),JSON.stringify(inkReport,null,2));
+    console.log('WORK8 #104 genuine objective reward ink native A/B '+JSON.stringify(inkReport));
+    assert.notEqual(inkCssBefore,inkCssAfter,'the committed production pigment must actually render');
+    assert.deepEqual(inkBeforeLayout,inkAfterLayout,'never shift three missions or seven chest/dock coordinates');
+    assert.equal(inkAfterLayout.questCount,3);
+    assert.equal(inkAfterLayout.dayCount,7);
+    assert.equal(inkAfterLayout.dockCount,5);
+    assert.ok(inkAfterLayout.chests.every((r:any)=>r.bottom<=inkAfterLayout.nav.top+2),
+      'all seven source-painted reward chests stay above the five-button dock');
+    assert.ok(inkDelta.meters < -0.004 && inkDelta.full < -0.0002,
+      'real objective reward ink must improve authentic native MAE at both ROI and complete frame');
+    assert.ok(Math.abs(inkDelta.daily)<.05 && Math.abs(inkDelta.dockDelta)<.05,
+      'do not regress seven daily rewards or WORK0 dock');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
