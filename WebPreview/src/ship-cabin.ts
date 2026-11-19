@@ -91,7 +91,7 @@ export function createPreviewCabinGallery(
   // Level 9: actual raised gallery trim, not just a colour change.
   box(0,p.eaveY-.29,p.aftZ+.15,p.width*.80,.13,.28);
   for(const side of [-1,1])
-   box(side*p.width*.35,p.eaveY-.06+lift,p.aftZ+.p.depth*.84,.09,.35,.10);
+   box(side*p.width*.35,p.eaveY-.06+lift,p.aftZ+p.depth*.84,.09,.35,.10);
  }
  if(palace){
   // Level 18: a second, distinctly smaller royal roof, with pointed
