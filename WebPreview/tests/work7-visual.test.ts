@@ -348,18 +348,19 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         // committed to the production UI and is removed between candidates.
         // Log exact 384×512 global and entire 4×2 eight-card ROI values.
         if (kind==='cards' && width===384 && height===512) {
-          const materials:[string,string][]=[
-            ['fine', 'inset 0 0 0 2px #061629b0,inset 0 3px 7px 1px #02091a8a,inset 0 -2px 1px #e5b97438'],
-            ['medium', 'inset 0 0 0 3px #061629d8,inset 0 3px 8px 2px #02091ab0,inset 0 -2px 2px #d9af7655'],
-            ['deep', 'inset 0 0 0 4px #061629d8,inset 0 4px 9px 3px #02091ab0,inset 0 -2px 2px #d9af7655'],
-            ['bronze', 'inset 0 0 0 3px #3b281ac4,inset 0 3px 8px 2px #0b0b1ca9,inset 0 -2px 2px #ffe3a54d'],
-            ['blue', 'inset 0 0 0 3px #113651bd,inset 0 3px 8px 2px #02091a9a,inset 0 -2px 2px #c6ebff47'],
-            ['dark', 'inset 0 0 0 2px #061629df,inset 0 4px 8px 2px #00030fe1,inset 0 -2px 1px #d6ad692b'],
-            ['subtle', 'inset 0 0 0 2px #07182ab6,inset 0 2px 7px 1px #02091a8e,inset 0 -2px 1px #d9af7645']
+          const baselineShadow='inset 0 0 0 1px #472714ae,inset 0 3px 6px #080c237a,inset 0 -2px 1px #ffdb7b2b';
+          const finishes:[string,string][]=[
+            ['fine','inset 0 0 0 2px #061629b0,inset 0 3px 7px 1px #02091a8a,inset 0 -2px 1px #e5b97438'],
+            ['gentle','inset 0 0 0 1px #472714ae,inset 0 2px 6px #080c2380,inset 0 -2px 1px #ffdb7b4a'],
+            ['light','inset 0 0 0 1px #47271480,inset 0 2px 4px #080c235d,inset 0 -2px 1px #ffdb7b43'],
+            ['warm','inset 0 0 0 1px #472714ae,inset 0 3px 6px #080c237a,inset 0 -2px 1px #ffdb7b55']
           ];
-          for (const [name,shadows] of materials) {
+          const materials:[string,number,string][]=[];
+          for(let n=1;n<=8;n++) for (const [finish,shadow] of finishes) materials.push([finish,n,shadow]);
+          for (const [name,slot,shadows] of materials) {
             const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
-              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot::before{box-shadow:'+shadows+'!important}}';
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot::before{box-shadow:'+baselineShadow+'!important}'+
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+slot+')::before{box-shadow:'+shadows+'!important}}';
             await evaluate("(()=>{const s=document.createElement('style');s.id='w7-sweep';s.textContent="+
               JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
             await sleep(100);
@@ -376,7 +377,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               "for(let k=0;k<3;k++){const d=Math.abs(a[p+k]-b[p+k]);sum+=d;n++;"+
               "if(x>=18&&x<365&&y>=195&&y<428){roi+=d;nroi++}}}"+
               "return {mae:Math.round(sum/n*10000)/10000,roi:Math.round(roi/nroi*10000)/10000}})()");
-            console.log('WORK7 REAL EIGHT-FRAME SWEEP '+name+' '+JSON.stringify(candidate));
+            console.log('WORK7 FRAME-ISOLATED SWEEP '+name+' slot='+slot+' '+JSON.stringify(candidate));
             await evaluate("(()=>{document.getElementById('w7-sweep')?.remove();return true})()");
             await sleep(65);
           }
