@@ -349,9 +349,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         // This is diagnostic only; no sweep material is committed to CSS.
         if (kind === 'shop' && width === 384 && height === 512) {
           const variants = [
-            [6, '9e', '29'], [7, 'a9', '35'], [8, 'a9', '45'],
-            [8, 'b8', '35'], [8, 'bb', '45'], [9, 'a9', '35'],
-            [9, 'b8', '45'], [10, 'b5', '45']
+            [10, 'b5', '45'], [11, 'b5', '45'], [12, 'b5', '45'],
+            [13, 'b5', '45'], [14, 'b5', '45'], [15, 'b5', '45'],
+            [17, 'b5', '45'], [20, 'b5', '45']
           ] as const;
           for (const [blur, shade, lower] of variants) {
             const styleText =

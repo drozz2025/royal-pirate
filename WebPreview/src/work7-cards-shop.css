@@ -4367,7 +4367,7 @@
   .w7-screen[data-work7-screen="shop"] .w7-chest-rare::before {
     box-shadow:
       inset 0 0 0 3px #071321cd,
-      inset 0 2px 8px 3px #020817a9,
+      inset 0 2px 13px 3px #020817b5,
       inset 0 -2px 2px #b8f1ff45;
   }
 }
