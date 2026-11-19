@@ -4364,3 +4364,12 @@
     filter:saturate(1.25) contrast(1.13) brightness(2.20);
   }
 }
+
+/* WORK7/#104 — controlled 05 green Reparação frame pigment depth, 384x512 only.
+ * Not additional content or an approved background. Keep all genuine labels.
+ * Candidate until native MAE/ROI and real touchscreen gates pass. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
+    filter:brightness(.55) saturate(1.20) contrast(.74);
+  }
+}
