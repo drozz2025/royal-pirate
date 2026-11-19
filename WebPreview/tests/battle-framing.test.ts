@@ -43,9 +43,9 @@ test('WORK6 18 Nov: one camera-aligned FIRST PERSON barrel and right-side enemy 
 test('deck-level portrait framing and original desktop pose are independently scoped',()=>{
  const mobile=battleCameraPose(384/512);
  assert.deepEqual(mobile.position,[0,7.4,67]);
- assert.deepEqual(mobile.target,[4.2,4.1,-3]);
+ assert.deepEqual(mobile.target,[2.3,4.1,-3]);
  assert.equal(mobile.batteryOffsetZ,-18);
- assert.equal(mobile.batteryOffsetX,2);
+ assert.equal(mobile.batteryOffsetX,1.25);
  assert.equal(mobile.batteryScale,1);
  assert.deepEqual(battleCameraPose(320/568),mobile);
  const tall=battleCameraPose(390/844);
