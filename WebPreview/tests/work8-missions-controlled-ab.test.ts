@@ -1656,6 +1656,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'no regressions in the three missions or WORK0 dock');
 
 
+    {
     /* WORK8 #104 — only the three real 07 objective reward slots.
        Baseline and candidate share ONE decoded, paused native Chromium scene.
        Full-frame, three slots, three quests, seven chests and dock ROIs are
@@ -1732,6 +1733,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'real objective reward ink must improve authentic native MAE at both ROI and complete frame');
     assert.ok(Math.abs(inkDelta.daily)<.05 && Math.abs(inkDelta.dockDelta)<.05,
       'do not regress seven daily rewards or WORK0 dock');
+    }
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
