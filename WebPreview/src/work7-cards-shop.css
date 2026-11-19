@@ -4361,9 +4361,9 @@
  * Human approval remains FALSE (0/8); WORK0 alone controls integration. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){
-    filter:brightness(.53) saturate(1.70) contrast(.87);
+    filter:brightness(.48) saturate(1.70) contrast(.87);
   }
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
-    filter:brightness(.57);
+    filter:brightness(.56);
   }
 }
