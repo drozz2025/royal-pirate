@@ -336,6 +336,37 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
+        // WORK7 sixth physical frame only: controlled exposure sweep.
+        // Each sample uses the identical frozen 384x512 React scene and
+        // original WEBP, with a temporary !important override; all samples
+        // are removed before continuing regression and metric assertions.
+        if (kind==='cards' && width===384 && height===512) {
+          for (const value of [.62,.65,.68,.70,.72,.74,.76,.78,.82,.86]) {
+            const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6)'+
+              '{filter:brightness('+value+') saturate(1.30) contrast(.92)!important}}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-card6-sweep';s.textContent="+JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
+            await sleep(100);
+            const frame=await command('Page.captureScreenshot',{
+              format:'png',fromSurface:true,captureBeyondViewport:false
+            });
+            const scores=await evaluate("(async()=>{"+
+              "const load=src=>new Promise((ok,fail)=>{let i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "const ref=await load("+JSON.stringify(refUrl)+"),pic=await load("+
+                JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(frame.data)+");"+
+              "const c=document.createElement('canvas');c.width=384;c.height=512;"+
+              "const ctx=c.getContext('2d');ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
+              "ctx.clearRect(0,0,384,512);ctx.drawImage(pic,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
+              "let total=0,roi=0,count=0;"+
+              "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
+              "for(let k=0;k<3;k++){const d=Math.abs(a[p+k]-b[p+k]);total+=d;if(x>=18&&x<365&&y>=195&&y<428){roi+=d;count++}}}"+
+              "return {global:Math.round(total/(384*512*3)*10000)/10000,roi:Math.round(roi/count*10000)/10000}})()");
+            console.log('WORK7 CARD6 NATIVE SWEEP brightness='+value+' '+JSON.stringify(scores));
+            await evaluate("(()=>{document.getElementById('w7-card6-sweep')?.remove();return true})()");
+            await sleep(55);
+          }
+        }
+
         // WORK7 experimental tuning grid, never applied to the production UI:
         // same 384x512 screenshot frame and same approved artwork for every
         // real-chest brightness candidate; log absolute native MAE/ROI and
