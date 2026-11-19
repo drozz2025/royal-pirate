@@ -39,7 +39,13 @@ test('WORK0 #104: first-person mobile has one richly sculpted deck, never extra 
   const studs=premium.getObjectByName('first-person-deck-nails');
   assert.ok(studs instanceof T.InstancedMesh,'repeated fasteners must be one draw call');
   assert.equal(studs.count,18);
-  assert.ok(premium.children.length>=40,'real sculpted rails/rope/fasteners, not CSS-only detail');
+  // Exact same 36 original fittings, now three instanced draws instead of 36.
+  const batches=['first-person-deck-oak-batch','first-person-deck-iron-batch',
+    'first-person-deck-brass-batch'].map(name=>premium.getObjectByName(name));
+  for(const batch of batches)assert.ok(batch instanceof T.InstancedMesh,'real batched deck fitting');
+  assert.deepEqual(batches.map(b=>(b as T.InstancedMesh).count),[12,10,14]);
+  assert.equal(batches.reduce((sum,b)=>sum+(b as T.InstancedMesh).count,0),36);
+  assert.ok(premium.children.length<=16,'mobile deck must fit bounded render draw-call budget');
 });
 
 test('WORK0 #104: muzzle-to-projectile 3D alignment and porto isolation hold on four phones',()=>{
