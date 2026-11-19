@@ -4351,3 +4351,18 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 19 Nov 17:29 UTC. Epic chest source-faithful purple enamel.
+ * Candidate narrow color correction ONLY on the genuine 06 Baú Épico frame
+ * substrate. The approved original 06 WebP chest illustration and all live
+ * counters / prices / availability labels remain untouched. Eight genuine
+ * 05 concepts 4×2, one pack and three chests retain their box geometry.
+ * Scoped exclusively to 384×512 class; inactive at 320 and tall screens.
+ * Chromium A/B must strictly improve global + original pack/chests ROI
+ * before WORK0 considers integration. approved:false / 0-8.
+ * No screenshots as backgrounds; no shared shell, dock or Porto changes. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{
+    --w7-chest-field:#741f66;
+  }
+}
