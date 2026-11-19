@@ -132,6 +132,19 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
   blast.position.copy(mouth).addScaledVector(direction,.36);
   blast.quaternion.copy(mouthFace);
   blast.visible=false;recoil.add(blast);
+  // A directional, 3D muzzle jet makes the actual ignition legible on small
+  // phones. It shares the recoil group's transform and points down the bore;
+  // no billboard, DOM overlay, second cannon, physics or Porto dependency.
+  const jet=new T.Mesh(
+    new T.ConeGeometry(.94,3.1,12,1),
+    new T.MeshBasicMaterial({color:'#ffb73d',side:T.DoubleSide,
+      transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending})
+  );
+  jet.name='first-person-central-fire-jet';
+  jet.position.copy(mouth).addScaledVector(direction,1.42);
+  jet.quaternion.copy(rotation);
+  jet.visible=false;
+  recoil.add(jet);
   // Six lightweight powder wisps in ONE instanced draw call. The smoke is
   // attached to the REAL recoil/yaw group, in the barrel's local muzzle axis;
   // it is not a screen overlay or a second simulated projectile.
