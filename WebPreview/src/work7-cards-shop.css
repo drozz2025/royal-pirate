@@ -4370,6 +4370,6 @@
  * Candidate until native MAE/ROI and real touchscreen gates pass. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
-    filter:brightness(.55) saturate(1.20) contrast(.74);
+    filter:brightness(.38) saturate(1.20) contrast(.74);
   }
 }
