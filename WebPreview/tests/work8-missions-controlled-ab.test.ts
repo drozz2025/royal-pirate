@@ -1660,15 +1660,15 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     const glowFlag='work8-missions-progress-glow-ab-baseline';
     await evalJs('(()=>{const r=document.documentElement;[...r.classList].filter(x=>x.startsWith("work8-missions-")&&x.endsWith("-ab-baseline")&&x!=='+JSON.stringify(glowFlag)+').forEach(x=>r.classList.remove(x));r.classList.add('+JSON.stringify(glowFlag)+');document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
     await delay(180);
-    const glowRects=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest .w8-approved-meter>span")].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
-    assert.equal(glowRects.length,3,'three AUTHENTIC live progress fills');
+    const glowRects=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest .w8-approved-meter")].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
+    assert.equal(glowRects.length,3,'three AUTHENTIC live progress meters');
     const glowBeforeLayout=await headingLayout();
-    const glowBeforeCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest .w8-approved-meter>span")).filter');
+    const glowBeforeCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest .w8-approved-meter")).filter');
     const glowBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove('+JSON.stringify(glowFlag)+');true');
     await delay(130);
     const glowRenderLayout=await headingLayout();
-    const glowRenderCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest .w8-approved-meter>span")).filter');
+    const glowRenderCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest .w8-approved-meter")).filter');
     const glowRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
 
     const glowScoreSource=meterStudySource
@@ -1698,7 +1698,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     const glowVariants:string[]=[];
     await evalJs('document.documentElement.classList.add('+JSON.stringify(glowFlag)+');true');
     for(const [name,brightness] of glowStudy) {
-      const paint=brightness===null?'':'.w8-approved-missions .w8-approved-quest .w8-approved-meter>span{filter:brightness('+brightness+') saturate(1.08)!important}';
+      const paint=brightness===null?'':'.w8-approved-missions .w8-approved-quest .w8-approved-meter{filter:brightness('+brightness+') saturate(1.08)!important}';
       await evalJs('(()=>{let s=document.getElementById("work8-meter-native-sweep");if(!s){s=document.createElement("style");s.id="work8-meter-native-sweep";document.head.appendChild(s)}s.textContent='+JSON.stringify(paint)+';return true})()');
       await delay(75);
       glowVariants.push((await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
@@ -1715,7 +1715,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     }));
 
     const glowReport={
-      issue:104,scope:'07 Missões, three genuine green progress fills only',
+      issue:104,scope:'07 Missões, three genuine progress-meter enclosures only',
       baseHead:'cc44ce2ce2ba8c348f71755675dac2c3f126b328',
       source:'assets/design-approved/07-missoes.webp',
       requiredReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
