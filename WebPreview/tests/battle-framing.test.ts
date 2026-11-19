@@ -106,7 +106,7 @@ test('WORK0/#104: forward-moving the camera AND single cannon deck enlarges the 
   oldCamera.updateMatrixWorld();
   const oldMast=new T.Vector3(10,15,-3).project(oldCamera);
   const oldHull=new T.Vector3(10,0,-3).project(oldCamera);
-  const oldSpan=(oldHull.y-oldMast.y)*h/2;
+  const oldSpan=(oldMast.y-oldHull.y)*h/2;
 
   const newMast=screen(w,h,new T.Vector3(10,15,-3));
   const newHull=screen(w,h,new T.Vector3(10,0,-3));
