@@ -4323,14 +4323,12 @@
 
 /* WORK7/#104 — 19 Nov: native carved enamel shadow registration (unapproved)
  * The authentic 05 portraits remain eight independent real WEBP crops in
- * their approved 4x2 positions. Local relief values on the three lower
- * painted-metal frames only: retain all exact sizes, live PRÉVIA plaques,
+ * their approved 4x2 positions. Local relief value on the fifth lower-row
+ * painted-metal frame only: retain all exact sizes, live PRÉVIA plaques,
  * real crew inventory, navigation and locked/unavailable states.
  * No screenshot background, currency, global shell or 320px change.
  * Test against exact parent cc44ce2ce in frozen native Chromium.
  * approved:false 0/8; WORK0 exclusively controls merge and publication. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.64)}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.64)}
 }
