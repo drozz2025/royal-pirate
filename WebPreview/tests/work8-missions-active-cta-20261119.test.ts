@@ -78,6 +78,9 @@ test('07 Missions: active real mission control enamel, same-frame native Chromiu
     await wait('.w8-approved-missions .w8-approved-quest-list');
     await evalJs('(async()=>{const u=[...new Set([...document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting image")].map(x=>x.getAttribute("href")).filter(Boolean))];await Promise.all(u.map(async src=>{const img=new Image();img.src=src;await img.decode()}));await document.fonts.ready;document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return u.length})()');
     await delay(250);
+    // Disable transition interpolation ONLY in this native A/B fixture. Otherwise
+    // the AFTER screenshot reads an arbitrary animated intermediate filter.
+    await evalJs('(()=>{const s=document.createElement("style");s.textContent="*,*::before,*::after{transition:none!important;animation:none!important}";document.head.appendChild(s);return true})()');
     const geometry=()=>evalJs('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const nav=document.querySelector(".app-sheet > .harbour-nav");const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")],days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],buttons=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button, .w8-approved-missions .w8-approved-quest > button")],dockButtons=[...nav.querySelectorAll(".harbour-nav-item")];return {questCount:quests.length,days:days.length,dockCount:dockButtons.length,tabAndActionCount:buttons.length,questBoxes:quests.map(rect),dayBoxes:days.map(rect),rewardBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(rect),nav:rect(nav),captions:days.map(d=>rect(d.querySelector("small"))),documentWidth:document.documentElement.scrollWidth,labels:quests.map(q=>q.querySelector(".w8-approved-quest-core strong")?.textContent),rewards:quests.map(q=>[...q.querySelectorAll(".w8-approved-quest-rewards strong")].map(s=>s.textContent)),glyphs:document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem").length}})()');
     const beforeLayout=await geometry();
     const beforeInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest[data-state=active] > button")).filter');
@@ -86,7 +89,7 @@ test('07 Missions: active real mission control enamel, same-frame native Chromiu
     await delay(180);
     const afterLayout=await geometry();
     const afterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest[data-state=active] > button")).filter');
-    assert.notEqual(afterInk,beforeInk,'real source-painted gem must be present in production only');
+    assert.notEqual(afterInk,beforeInk,'real active control enamel must change in production only');
     assert.match(afterInk,/brightness\(1\.48\)/,'active control must use the candidate enamel');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
