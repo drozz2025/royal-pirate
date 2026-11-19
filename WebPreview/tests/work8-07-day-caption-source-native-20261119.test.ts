@@ -84,7 +84,7 @@ test('WORK8 07 seven real day captions — source-ledger and mobile touch', {tim
       const images=await Promise.all(urls.map(src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src})));
       const w=384,h=512;if(images.some(i=>i.width!==w||i.height!==h))throw Error('NOT native 384x512');
       const pixels=images.map(i=>{let c=document.createElement('canvas');c.width=w;c.height=h;let p=c.getContext('2d');p.drawImage(i,0,0);return p.getImageData(0,0,w,h).data});
-      const roi={full:[0,0,384,512],captions:[20,331,370,356],missions:[12,155,372,321],daily:[13,325,373,436],chests:[20,356,370,427],dock:[0,451,384,512],header:[0,0,384,70]};
+      const roi={full:[0,0,384,512],captions:[20,397,370,428],missions:[12,155,372,321],daily:[13,325,373,436],chests:[20,356,370,427],dock:[0,451,384,512],header:[0,0,384,70]};
       const mae=(a,b,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){let j=4*(y*w+x);for(let k=0;k<3;k++){sum+=Math.abs(a[j+k]-b[j+k]);n++}}return sum/n};
       const out={};for(const [k,r] of Object.entries(roi))out[k]={before:mae(pixels[0],pixels[1],r),after:mae(pixels[0],pixels[2],r),delta:mae(pixels[0],pixels[2],r)-mae(pixels[0],pixels[1],r),changed:mae(pixels[1],pixels[2],r)};
       const c=document.createElement('canvas');c.width=w*4;c.height=h;let p=c.getContext('2d');images.forEach((i,k)=>p.drawImage(i,w*k,0));p.drawImage(images[0],w*3,0);p.globalAlpha=.5;p.drawImage(images[2],w*3,0);
@@ -133,9 +133,9 @@ test('WORK8 07 seven real day captions — source-ledger and mobile touch', {tim
     assert.equal(afterGeometry.activeCount,7,'all seven real day captions are present');
     assert.ok(afterGeometry.chests.every((c:any)=>c.bottom<=afterGeometry.nav.y+2),'seven genuine chests not hidden by dock');
     console.log('WORK8_07_CAPTION_INK_SWEEP_WINNER '+JSON.stringify({brightness:win.shift,roi:win.score.captions}));
-    assert.ok(measured.roi.full.delta<-.003 && measured.roi.captions.delta<-.04,'source MAE must improve for real daily captions');
-    assert.ok(measured.roi.daily.delta<-.01,'real seven-day panel must improve relative to source');
-    for(const region of ['missions','chests','dock','header'])assert.ok(measured.roi[region].changed<.03,'no regression outside mission actions: '+region);
+    assert.ok(measured.roi.full.delta<-.05 && measured.roi.captions.delta<-.03,'native global and actual caption-bottom ROI must improve');
+    assert.ok(measured.roi.daily.delta<-.3 && measured.roi.chests.delta<-.4,'real seven-day tray and chest-caption region must improve');
+    for(const region of ['missions','dock','header'])assert.ok(measured.roi[region].changed<.03,'no regression outside actual daily captions: '+region);
     for(const [w,h] of [[320,568],[390,844],[430,932]]){
       await setSize(w,h);await delay(170);
       const r=await evaluate('(()=>{const d=document.querySelector(".w8-approved-days"),area=document.querySelector(".app-sheet-content");if(area)area.scrollTop=0;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),nav=document.querySelector(".app-sheet > .harbour-nav"),selected=document.querySelector(".w8-approved-missions .w8-approved-tabs button[aria-pressed=true]");return {width:document.documentElement.scrollWidth,quests:document.querySelectorAll(".w8-approved-quest").length,days:d?.children.length,navCount:nav?.querySelectorAll(".harbour-nav-item").length,day7Visible:!!(last&&container&&last.left>=container.left-2&&last.right<=container.right+2),pointer:getComputedStyle(selected).pointerEvents,selectedRect:selected?.getBoundingClientRect().toJSON()}})()');
