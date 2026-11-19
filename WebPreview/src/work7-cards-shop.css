@@ -4332,6 +4332,6 @@
  * Work0 alone may merge; approved:false 0/8 until human review. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
-    filter:brightness(.56) saturate(1.30) contrast(.92);
+    filter:brightness(.74) saturate(1.30) contrast(.92);
   }
 }
