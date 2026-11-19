@@ -10,7 +10,7 @@ import {setTimeout as delay} from 'node:timers/promises';
    The baseline root class disables ONLY this PR's frame-pigment CSS; integrated #269/#271 stay active in both frames.
    No fictional mission states, no screenshot replacement, no navigation edits.
    Each screenshot is native 384x512 and checked against 07-missoes.webp. */
-test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves ROI without dock or day regressions', {timeout:150000}, async()=>{
+test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves ROI without dock or day regressions', {timeout:240000}, async()=>{
   // Avoid overlapping Chrome GPU/CDP with the existing WORK7 test (Node runs test files concurrently).
   await delay(48000);
   const chromeBin=process.env.CHROME_BIN ||
@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline","work8-missions-native-tone-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1747,6 +1747,12 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        No mock UI or state changes: study only real 07 background paint.
        Every sample is in the same 384x512 Chromium tab and frozen scene.
        Keep other WORKs, Ranking, dock, three missions and 7 actual chests fixed. */
+    /* Independently isolate the proposed 07 pigment during the PRE-EXISTING
+       #468 night-steel calibration. Without this, the newer :root override
+       masks every historical candidate: all screenshots become identical,
+       making the original 'night-steel' CI gate fail for the wrong reason.
+       We re-enable only the new tone for its dedicated native production A/B. */
+    await evalJs('document.documentElement.classList.add("work8-missions-native-tone-ab-baseline");true');
     const daySurfaceClass='work8-missions-daily-surface-ab-baseline';
     const daySurfaceSelector='.w8-approved-missions .w8-approved-daily';
     await evalJs('(()=>{document.documentElement.classList.add('+JSON.stringify(daySurfaceClass)+');document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
@@ -1791,6 +1797,144 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'return data.slice(1).map((b,i)=>Object.fromEntries(Object.entries(rois).map(([name,r])=>[name,mae(data[0],b,r)])));'+
       '})()';
     const enamelScores=await evalJs(enamelSource);
+
+    // Earlier historic ROI tests clear all work8 A/B flags. Restore the real
+    // integrated baseline before sweeping new candidate paints.
+    await evalJs('document.documentElement.classList.add("work8-missions-native-tone-ab-baseline");true');
+    /* WORK8 #104: further genuine source-constrained native enamel research.
+       No artificial mission data, no reference-as-background, no CSS production
+       selection before comparing the SAME frozen frame in Chromium.
+       Only the 07 Missions reward board is painted in the temporary style. */
+    const w8TonePaint=(shift:number,glow:number)=>{
+      const hex=(v:number[])=>'#'+v.map(n=>Math.max(0,Math.min(255,n+shift)).toString(16).padStart(2,'0')).join('');
+      return 'radial-gradient(ellipse at 50% -8%,rgba(116,169,179,'+glow+'),transparent 68%),'+
+        'linear-gradient(170deg,'+hex([23,47,75])+','+hex([13,37,65])+' 62%,'+hex([8,23,41])+')';
+    };
+    const w8ToneCandidates:{name:string,paint:string|null}[]=[{name:'integrated',paint:null}];
+    for(const shift of [-18,-12,-6,0,6,12,18])
+      for(const glow of [.12,.20,.26,.34,.42])
+        w8ToneCandidates.push({name:'shift'+shift+'-glow'+glow,paint:w8TonePaint(shift,glow)});
+    const w8ToneScreens:string[]=[];
+    const w8ToneScores:{full:number,daily:number,chests:number,quests:number,dock:number}[]=[];
+    const w8ReferenceInit='(async()=>{const im=new Image();im.src='+JSON.stringify('data:image/webp;base64,'+orig)+
+      ';await im.decode();if(im.width!==384||im.height!==512)throw Error("native original must be 384x512");'+
+      'const c=document.createElement("canvas");c.width=384;c.height=512;const p=c.getContext("2d");p.drawImage(im,0,0);window.__w8ToneReference=p.getImageData(0,0,384,512).data;return true})()';
+    assert.ok(await evalJs(w8ReferenceInit),'approved original must load');
+    for(const sample of w8ToneCandidates){
+      const paintRule=sample.paint?':root:not(.work8-tone-native-disabled) '+daySurfaceSelector+'{background:'+sample.paint+'!important}':'';
+      await evalJs('(()=>{let s=document.getElementById("work8-tone-native-study");'+
+        'if(!s){s=document.createElement("style");s.id="work8-tone-native-study";document.head.appendChild(s)}'+
+        's.textContent='+JSON.stringify(paintRule)+';return true})()');
+      await delay(95);
+      const png=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      w8ToneScreens.push(png);
+      const measure='(async()=>{const i=new Image();i.src='+JSON.stringify('data:image/png;base64,'+png)+
+        ';await i.decode();if(i.width!==384||i.height!==512)throw Error("native rendered size");'+
+        'const c=document.createElement("canvas");c.width=384;c.height=512;const x=c.getContext("2d");x.drawImage(i,0,0);'+
+        'const a=window.__w8ToneReference,b=x.getImageData(0,0,384,512).data;'+
+        'const roi={full:[0,0,384,512],daily:[13,325,373,436],chests:[20,356,370,427],quests:[12,155,372,321],dock:[0,451,384,512]};'+
+        'const mae=r=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=4*(384*y+x);for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++}}return sum/n};'+
+        'return Object.fromEntries(Object.entries(roi).map(([key,r])=>[key,mae(r)]))})()';
+      w8ToneScores.push(await evalJs(measure));
+    }
+    await evalJs('document.getElementById("work8-tone-native-study")?.remove();delete window.__w8ToneReference;true');
+    const w8ToneLayoutAfter=await headingLayout();
+    assert.deepEqual(w8ToneLayoutAfter,dailySampleGeometry,'native tone study must not move any 07 hitbox or dock');
+    const w8ToneRows=w8ToneCandidates.map((s,i)=>({
+      ...s,...w8ToneScores[i],
+      deltaFull:w8ToneScores[i].full-w8ToneScores[0].full,
+      deltaDaily:w8ToneScores[i].daily-w8ToneScores[0].daily,
+      deltaChests:w8ToneScores[i].chests-w8ToneScores[0].chests,
+      deltaQuests:w8ToneScores[i].quests-w8ToneScores[0].quests,
+      deltaDock:w8ToneScores[i].dock-w8ToneScores[0].dock
+    }));
+    const w8ToneWinner=w8ToneRows.filter(r=>r.deltaFull<-.003&&r.deltaDaily<-.012&&
+      Math.abs(r.deltaQuests)<.008&&Math.abs(r.deltaDock)<.008&&r.deltaChests<.20)
+      .sort((a,b)=>a.deltaDaily-b.deltaDaily)[0]||null;
+    const w8BestIdx=w8ToneWinner?w8ToneRows.indexOf(w8ToneWinner):0;
+    const w8ToneVisualScript='(async()=>{const data='+JSON.stringify([
+      'data:image/webp;base64,'+orig,
+      'data:image/png;base64,'+w8ToneScreens[0],
+      'data:image/png;base64,'+w8ToneScreens[w8BestIdx]
+    ])+';const a=await Promise.all(data.map(src=>new Promise((ok,no)=>{let im=new Image();im.onload=()=>ok(im);im.onerror=no;im.src=src})));'+
+      'const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");a.forEach((im,i)=>x.drawImage(im,384*i,0));'+
+      'x.drawImage(a[0],1152,0);x.globalAlpha=.5;x.drawImage(a[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()';
+    saveTone('missions-native-tone-original-before-best-overlay.png',await evalJs(w8ToneVisualScript));
+    saveTone('missions-native-tone-before.png',w8ToneScreens[0]);
+    saveTone('missions-native-tone-best.png',w8ToneScreens[w8BestIdx]);
+    writeFileSync(join(evidence,'work8-missions-native-tone-study.json'),JSON.stringify({
+      issue:104,scope:'07 Missões daily enamel only',base:'b0b3a13529eca5b5453b3342fd711e2f47b0bdf5',
+      references:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      controlled:true,viewport:'native Chromium 384x512 DPR1, identical frozen real scene',
+      roi:{full:[0,0,384,512],daily:[13,325,373,436],chests:[20,356,370,427],quests:[12,155,372,321],dock:[0,451,384,512]},
+      winner:w8ToneWinner,rows:w8ToneRows,geometry:w8ToneLayoutAfter,approved:false,approvedScreens:0
+    },null,2));
+    console.log('WORK8_NATIVE_TONE_WINNER '+JSON.stringify(w8ToneWinner));
+    console.log('WORK8_NATIVE_TONE_TOP '+JSON.stringify([...w8ToneRows].slice(1).sort((a,b)=>a.deltaDaily-b.deltaDaily).slice(0,5)));
+    assert.ok(w8ToneRows.some(r=>Math.abs(r.deltaDaily)>.01),'CSS research must actually affect native pixels');
+    /* This initial sweep is research. The candidate must be committed in a
+       separate scoped CSS edit and independently retested before review. */
+
+    /* Independent PRODUCTION A/B: the stylesheet value (not an experimental
+       override) must improve ORIGINAL vs real native Chromium output. */
+    assert.ok(w8ToneWinner,'no measured daily-enamel winner; do not ship a regression');
+    const prodBaselineClass='work8-missions-native-tone-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(prodBaselineClass)+');true');
+    await delay(110);
+    const prodBeforeGeometry=await headingLayout();
+    const prodBeforeCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-daily")).backgroundImage');
+    const prodBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(prodBaselineClass)+');true');
+    await delay(110);
+    const prodAfterGeometry=await headingLayout();
+    const prodAfterCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-daily")).backgroundImage');
+    const prodAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(prodBaselineClass)+');true');
+    assert.notEqual(prodBeforeCss,prodAfterCss,'production CSS must ACTUALLY paint a changed daily board');
+    assert.deepEqual(prodBeforeGeometry,prodAfterGeometry,'new 07 paint cannot move genuine mission/reward/dock hit targets');
+    assert.equal(prodAfterGeometry.questCount,3);
+    assert.equal(prodAfterGeometry.dayCount,7);
+    assert.equal(prodAfterGeometry.dockCount,5);
+    assert.ok(prodAfterGeometry.chests.every((r:any)=>r.bottom<=prodAfterGeometry.nav.top-5),
+      'all seven actual chest illustrations must remain above shared dock');
+    const nativeProductionA='(async()=>{const u='+JSON.stringify([
+      'data:image/webp;base64,'+orig,
+      'data:image/png;base64,'+prodBefore,
+      'data:image/png;base64,'+prodAfter
+    ])+';const loaded=await Promise.all(u.map(src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src})));'+
+      'const w=384,h=512;if(loaded.some(i=>i.width!==w||i.height!==h))throw Error("native dimensions");'+
+      'const pixels=loaded.map(im=>{const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.drawImage(im,0,0);return x.getImageData(0,0,w,h).data});'+
+      'const regions={full:[0,0,384,512],daily:[13,325,373,436],chests:[20,356,370,427],quests:[12,155,372,321],dock:[0,451,384,512],header:[0,0,384,70]};'+
+      'function mae(a,b,r){let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){let p=4*(y*w+x);for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++}}return sum/n}'+
+      'const metrics={};for(const [k,r] of Object.entries(regions)){let before=mae(pixels[0],pixels[1],r),after=mae(pixels[0],pixels[2],r);metrics[k]={before,after,delta:after-before}}'+
+      'const unchanged={quests:mae(pixels[1],pixels[2],regions.quests),dock:mae(pixels[1],pixels[2],regions.dock),header:mae(pixels[1],pixels[2],regions.header)};'+
+      'const out=document.createElement("canvas");out.width=4*w;out.height=h;const x=out.getContext("2d");loaded.forEach((i,n)=>x.drawImage(i,n*w,0));x.drawImage(loaded[0],3*w,0);x.globalAlpha=.5;x.drawImage(loaded[2],3*w,0);'+
+      'return {metrics,unchanged,mosaic:out.toDataURL("image/png").split(",")[1]}})()';
+    const prodActual=await evalJs(nativeProductionA);
+    saveTone('missions-production-original-before-render-overlay-384x512.png',prodActual.mosaic);
+    saveTone('missions-production-before-384x512.png',prodBefore);
+    saveTone('missions-production-render-384x512.png',prodAfter);
+    const prodReport={
+      issue:104,scope:'07 Missões genuine daily reward paint ONLY',approved:false,approvedScreens:0,
+      baseHead:'b0b3a13529eca5b5453b3342fd711e2f47b0bdf5',
+      source:'assets/design-approved/07-missoes.webp',
+      sourceSet:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      method:'CHROMIUM DPR1 384x512; original-vs-native; same real DOM/frame; paused animations',
+      roi:prodActual.metrics,unchanged:prodActual.unchanged,
+      beforeStyle:prodBeforeCss,renderStyle:prodAfterCss,
+      geometry:{before:prodBeforeGeometry,render:prodAfterGeometry}
+    };
+    writeFileSync(join(evidence,'work8-missions-native-production-ab.json'),JSON.stringify(prodReport,null,2));
+    console.log('WORK8_NATIVE_PRODUCTION_AB '+JSON.stringify(prodReport.roi));
+    assert.ok(prodActual.metrics.full.delta<-.005,'07 enamel must reduce actual FULL-frame MAE');
+    assert.ok(prodActual.metrics.daily.delta<-.04,'07 enamel must reduce actual daily-board MAE');
+    assert.ok(prodActual.metrics.chests.delta<.01,'seven actual chest ROI cannot regress');
+    assert.ok(prodActual.unchanged.quests<.001 && prodActual.unchanged.dock<.001 &&
+      prodActual.unchanged.header<.001,'objectives, header and WORK0 dock must remain pixel-identical');
     const enamelRows=enamelOptions.map(([name,background],i)=>({
       name,background,...enamelScores[i],
       deltaFull:enamelScores[i].full-enamelScores[0].full,
