@@ -253,6 +253,8 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
   tiller.name='scout-steering-tiller';
   const grip=cube(brass,0,3.01,-1.67,.24,.15,.19);
   grip.name='scout-tiller-grip';
+  const stand=cube(iron,0,2.48,-2.50,.16,.92,.20);
+  stand.name='scout-tiller-stand';
  }else{
   const flagship=config.shipClass==='warship';
   const helmY=flagship?3.39:3.18,helmZ=flagship?-2.60:-2.45;
@@ -270,7 +272,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
     helmZ,.034,radius);
    spoke.rotation.z=-angle;
   }
-  cube(iron,0,helmY-.52,helmZ,.13,.50,.22);
+  const height=helmY-2.02;
+  const stand=cube(iron,0,2.02+height/2,helmZ,.13,height,.22);
+  stand.name=config.shipClass+'-helm-stand';
  }
  const hull=config.modules.hull,armor=config.modules.armor;
  if(hull!=='hull-oak')for(const side of [-1,1])for(const z of [-2.6,-1,1,2.6])
