@@ -223,7 +223,9 @@ export class OceanScene {
     const rig=this.ships.enemy.rig;
     const cloth=new T.BufferGeometry();
     const positions:number[]=[],colors:number[]=[],indices:number[]=[];
-    const bright=new T.Color('#c85648'),shadow=new T.Color('#692632');
+    // Same wind-filled live geometry, richer burgundy shadow/light for
+    // a readable premium enemy broadside in the approved 02 palette.
+    const bright=new T.Color('#b8685b'),shadow=new T.Color('#492033');
     const goldLine:number[]=[];
     // local coordinates: mast Z, cloth foot Y, height, original yard end X,
     // flank and wind extension. Each panel joins its ORIGINAL mast, never
