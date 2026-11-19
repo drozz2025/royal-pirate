@@ -68,7 +68,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // Exact pre-candidate v0.1.112 parent image pigments; do not revert any
   // previous WORK0-integrated #263 geometry or native treasure corrections.
   // Insertion below occurs only on the SAME frozen Chromium page and frame.
-  const cssBaseline = \`
+  const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{
         filter:saturate(1.25) contrast(1.13) brightness(1.36)!important;
@@ -76,7 +76,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{
         filter:saturate(1.25) contrast(1.13) brightness(1.60)!important;
       }
-    }\`;
+    }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/', '--outDir', privateBuildDir],
     { cwd: process.cwd(), stdio: 'ignore' });
