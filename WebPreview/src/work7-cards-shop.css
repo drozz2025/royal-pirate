@@ -4351,3 +4351,15 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 19 Nov 15:20 UTC · second genuine 05 portrait optical depth.
+ * Native 384x512 only: adjust the REAL approved Vento Favorável art pigment
+ * without changing its 4x2 physical geometry, inlay, labels or live DOM.
+ * Keep one 06 Captain pack, three genuine unavailable chests, all prices honest.
+ * Work0 alone decides merge/version/publish. approved:false (0/8).
+ * Same-frame Chromium sweep/ROI gate required before adoption. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.40);
+  }
+}
