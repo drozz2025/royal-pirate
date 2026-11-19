@@ -101,7 +101,7 @@ test('07 Missions: approved selected category enamel Chromium 384x512 same-frame
       const images=await Promise.all([__ORIGINAL__,__BEFORE__,__AFTER__].map(make));
       const w=384,h=512;if(images.some(x=>x.width!==w||x.height!==h))throw Error('native images required');
       const px=images.map(i=>{const c=document.createElement('canvas');c.width=w;c.height=h;const t=c.getContext('2d');t.drawImage(i,0,0);return t.getImageData(0,0,w,h).data});
-      const roi={full:[0,0,384,512],activeTabROI:[12,149,143,183],questRows:[12,155,372,321],missions:[12,155,372,321],daily:[12,326,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,451,384,512]};
+      const roi={full:[0,0,384,512],activeTabROI:[14,119,130,149],questRows:[12,155,372,321],missions:[12,155,372,321],daily:[12,326,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,451,384,512]};
       function mae(a,b,r){let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=(y*w+x)*4;for(let z=0;z<3;z++){total+=Math.abs(a[p+z]-b[p+z]);n++}}return total/n}
       const metrics={};for(const [k,r] of Object.entries(roi)){const baseline=mae(px[0],px[1],r),candidate=mae(px[0],px[2],r);metrics[k]={baseline,candidate,delta:candidate-baseline}}
       const unchanged={header:mae(px[1],px[2],roi.header),dock:mae(px[1],px[2],roi.dock)};
