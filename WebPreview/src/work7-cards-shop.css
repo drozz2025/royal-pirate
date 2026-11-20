@@ -4351,3 +4351,22 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 20 Nov, genuine 05 framed-art local tonal registration.
+ * Three lower-row portraits retain the exact approved WebP source, 4x2
+ * geometry and separate live PRÉVIA plaques. Correct only the enamel-lit
+ * pigment within their real native frames at 384x512; no screenshot backing,
+ * fake levels/economy, dock, shell, 320px or tall phone alterations.
+ * Same-scene paused Chromium compares only these three crop filters to
+ * the exact starting WORK0 HEAD. approved:false (0/8), WORK0-only merge. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px) {
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop {
+    filter:saturate(1.25) contrast(1.13) brightness(2.12);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop {
+    filter:saturate(1.25) contrast(1.13) brightness(1.76);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop {
+    filter:saturate(1.25) contrast(1.13) brightness(1.83);
+  }
+}
