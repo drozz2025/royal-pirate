@@ -242,7 +242,16 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         {id:'waterfall',paint:'linear-gradient(90deg,#0b4963dc 0%,#092a44f4 35%,#071e34fb 65%,#031529fc 100%)'},
         {id:'coast-soft-azure',paint:'linear-gradient(90deg,#075b70d0 0%,#07394de9 18%,#071f34f7 56%,#031529fc 100%)'},
         {id:'coast-deep-indigo',paint:'linear-gradient(90deg,#06314be5 0%,#08263fed 18%,#061c31f8 56%,#031529fc 100%)'},
-        {id:'coast-timber-edge',paint:'linear-gradient(90deg,#154451d9 0%,#102e42ef 20%,#081d32f8 56%,#031529fc 100%)'}
+        {id:'coast-timber-edge',paint:'linear-gradient(90deg,#154451d9 0%,#102e42ef 20%,#081d32f8 56%,#031529fc 100%)'},
+        // WORK4 #104: Test actual structural SKYLIGHT, not another tiny pigment.
+        // The current native 384 screenshot has an added upper-right synthetic
+        // sky block. Suppress/feather ONLY that local underlay in one frozen
+        // frame and measure original 03 source pixels before any production edit.
+        {id:'native-sky-off',paint:null,stage:'display:none!important;'},
+        {id:'native-sky-half',paint:null,stage:'opacity:.5!important;'},
+        {id:'native-sky-quarter',paint:null,stage:'opacity:.25!important;'},
+        {id:'native-sky-small',paint:null,stage:'height:12%!important;width:28%!important;'},
+        {id:'native-sky-source',paint:null,stage:'background:linear-gradient(180deg,#041a30e9 0%,#062941ad 32%,transparent 100%)!important;'}
       ]
       :[
         {id:'HEAD',paint:null},
@@ -270,8 +279,10 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
       const previousStroke=('shadow' in candidate && candidate.shadow) ? 'box-shadow:'+candidate.shadow+'!important;' : '';
       const oldLip=('seam' in candidate && candidate.seam)
         ?paintSelector+'::after{'+candidate.seam+'}' : '';
+      const nativeSky=('stage' in candidate && candidate.stage)
+        ?'.w4-fleet #w4-fleet-panel > .w4-harbour-stage::after{'+candidate.stage+'}' : '';
       const rule=paintSelector+'{'+(candidate.paint ? 'background:'+candidate.paint+'!important;' : '')+
-        previousStroke+'}'+oldLip;
+        previousStroke+'}'+oldLip+nativeSky;
       await evaluate("(()=>{const s=document.createElement('style');s.id='work4-pigment-ab';s.textContent="+
         JSON.stringify(rule)+";document.head.appendChild(s);return true})()");
       const applied=await evaluate("(()=>getComputedStyle(document.querySelector("+
@@ -296,7 +307,7 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
       }
     }
     const paintRois=screen==='fleet'
-      ?{full:[0,0,384,512],inset:[242,163,368,340],seam:[232,162,257,340],
+      ?{full:[0,0,384,512],sky:[236,133,375,211],inset:[242,163,368,340],seam:[232,162,257,340],
         ship:[65,205,175,307],sea:[18,307,218,358],
         cards:[18,350,374,429],dock:[0,433,384,512]}
       :{full:[0,0,384,512],materials:[16,340,375,404],
@@ -362,6 +373,13 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         dockChanged:lip.dockChanged}));
       console.log('WORK4_COAST_WIDTH_SWEEP '+JSON.stringify(pigments.records.filter((r:any)=>
         r.id==='HEAD'||r.id.includes('coast-lip'))));
+      console.log('WORK4_SKY_SOURCE_STRUCTURAL_AB '+JSON.stringify({
+        baseline:{full:after.full,sky:after.sky,seam:after.seam},
+        alternatives:pigments.records.filter((r:any)=>r.id.startsWith('native-sky-'))
+          .map((r:any)=>({id:r.id,full:r.full,sky:r.sky,seam:r.seam,
+            shipChanged:r.shipOrCannonChanged,dockChanged:r.dockChanged})),
+        approved:false,approvedScreens:0
+      }));
       console.log('WORK4_SILVER_EDGE_A_B '+JSON.stringify({newSeam:after.seam,oldSeam:oldLine.seam,
         newFull:after.full,oldFull:oldLine.full,shipDeltaPx:oldLine.shipOrCannonChanged,
         dockDeltaPx:oldLine.dockChanged}));
