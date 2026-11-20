@@ -16,9 +16,9 @@ test('WORK0 #104: irregular battle ocean breakers remain isolated from Porto', (
   assert.match(combat, /float curling=sin\(/);
   assert.match(combat, /float edgeBreak=smoothstep\(/);
   assert.match(combat, /foam=max\(foam,edgeBreak\*irregular\*\.59\)/);
-  assert.match(combat, /vec3 deep=mix\(vec3\(\.010,\.14,\.30\),vec3\(\.024,\.45,\.62\)/);
-  assert.match(combat, /deep=mix\(deep,vec3\(\.10,\.64,\.79\),clamp\(edgeBreak\*\.34\+ridge\*\.12,0\.,\.48\)\)/,
-    'bright turquoise must be constrained to actual broken crests');
+  assert.match(combat, /vec3 deep=mix\(vec3\(\.005,\.105,\.235\),vec3\(\.019,\.34,\.51\)/);
+  assert.match(combat, /deep=mix\(deep,vec3\(\.055,\.50,\.64\),clamp\(edgeBreak\*\.26\+ridge\*\.09,0\.,\.38\)\)/,
+    'cyan remains bound to broken crests (<= .38), with deep-blue troughs');
   assert.match(combat, /foam=clamp\(foam,0\.,\.64\)/,
     'new crest foam stays below 0.64 and out of Porto');
   assert.match(source, /new T\.PlaneGeometry\(210,210,190,190\)/, 'same animated ocean mesh, no new draw call');
