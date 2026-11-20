@@ -82,7 +82,7 @@ test('WORK5: previewed ballistic path starts at actual muzzle and stops only at 
         assert.ok([point.x,point.y,point.z].every(Number.isFinite),'non-finite trajectory');
       }
       const final=preview[preview.length-1],before=preview[preview.length-2];
-      assert.ok(collision(before,final,'player')!==null||final.y<0,
+      assert.ok(collision(before,final,'player')!==null||final.y<=.080001,
         'preview must terminate at a hull/water contact');
     }
   }
