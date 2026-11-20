@@ -337,7 +337,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "const b0=tctx.getImageData(0,0,w,h).data;let diff0=0;"+
           "for(let p=0;p<a.length;p+=4){diff0+=Math.abs(a[p]-b0[p])+Math.abs(a[p+1]-b0[p+1])+Math.abs(a[p+2]-b0[p+2])}"+
           "maeBefore=Math.round(diff0/(w*h*3)*10000)/10000;"+
-"const patches="+JSON.stringify(kind==='shop'?[[18,175,173,309],[18,329,365,427]]:[[18,195,365,428]])+";"+
+// 06 ROI includes the ENTIRE genuine Captain pack, not only the left icon crop.
+"const patches="+JSON.stringify(kind==='shop'?[[18,175,365,309],[18,329,365,427]]:[[18,195,365,428]])+";"+
 "let sumA=0,sumB=0,pixels=0;for(const [x0,y0,x1,y1] of patches){for(let y=y0;y<y1;y++){for(let x=x0;x<x1;x++){const p=(y*w+x)*4;for(let k=0;k<3;k++){sumA+=Math.abs(a[p+k]-b0[p+k]);sumB+=Math.abs(a[p+k]-b[p+k]);pixels++}}}}"+
 "roiBefore=Math.round(sumA/pixels*10000)/10000;roiAfter=Math.round(sumB/pixels*10000)/10000;}}"+
           "return {png:c.toDataURL('image/png').slice(22),mae,maeBefore,roiBefore,roiAfter,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
@@ -374,7 +375,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               "let sum=0,count=0,roi=0,roiCount=0;"+
               "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
               "for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
-              "if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=v;roiCount++}}}"+
+              "if((x>=18&&x<365&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=v;roiCount++}}}"+
               "return {global:Math.round(sum/count*1000)/1000,roi:Math.round(roi/roiCount*1000)/1000}})()");
             console.log('WORK7 CROP SWEEP '+chest+'='+value+' '+JSON.stringify(metrics));
             await evaluate("(()=>{document.getElementById('w7-sweep')?.remove();return true})()");
