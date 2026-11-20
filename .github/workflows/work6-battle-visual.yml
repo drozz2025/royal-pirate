@@ -43,11 +43,18 @@ jobs:
       - name: Typecheck and production build
         working-directory: WebPreview
         run: npm run build
-      - name: Install temporary Chromium runner (no dependency or lockfile changes)
+      - name: Use runner's verified system Chromium (avoid apt mirror stalls)
         working-directory: WebPreview
         run: |
+          set -euo pipefail
+          # The Pages verify workflow already captures WebGL with this preinstalled
+          # Chrome binary. Playwright's --with-deps previously stalled apt for 16m
+          # and cancelled the actual visual screenshots, even though tests passed.
           npm install --no-save --no-package-lock playwright@1.56.1
-          npx playwright install --with-deps chromium
+          chrome="$(command -v google-chrome || command -v chromium)"
+          test -x "$chrome"
+          "$chrome" --version
+          echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
       - name: Capture actual 320/384/390/430 Porto and Batalha
         working-directory: WebPreview
         run: |

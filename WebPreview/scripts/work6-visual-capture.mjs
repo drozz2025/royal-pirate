@@ -4,7 +4,11 @@ import {resolve} from 'node:path';
 
 const root=resolve('work6-qa');
 await mkdir(root,{recursive:true});
-const browser=await chromium.launch({headless:true,args:[
+// Use the same preinstalled Chrome used by Pages' successful live canvas QA.
+// Falls back to Playwright-managed Chromium for developer machines.
+const browser=await chromium.launch({headless:true,
+  executablePath:process.env.CHROME_BIN||undefined,
+  args:[
   '--no-sandbox','--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader'
 ]});
 try {
