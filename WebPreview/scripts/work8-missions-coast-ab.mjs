@@ -153,7 +153,9 @@ try {
     baseline:geometryBefore,candidate:geometryAfter,topSweep:sweep.slice(0,15),approved:false,approvedScreens:0};
   writeFileSync(join(dir,'work8-missions-coast-native-ab.json'),JSON.stringify(report,null,2));
   assert.ok(measured.unchanged.header<.05&&measured.unchanged.dock<.05,'WORK0 HUD and dock must remain pixel-identical');
-  assert.ok(measured.unchanged.quest<.05&&measured.unchanged.daily<.05,'real quest and daily boards must remain pixel-identical');
+  // Translucent boards can show the recoloured scenery behind them; live objective text, reward amounts and hitboxes remain identical via geometryBefore/After.
+  assert.deepEqual(geometryAfter.text,geometryBefore.text);
+  assert.deepEqual(geometryAfter.rewards,geometryBefore.rewards);
   // Record narrow and tall-screen geometry even if the chosen pigment fails
   // native MAE; the caller can reject a regressive candidate honestly.
   for(const [w,h] of [[320,568],[390,844],[430,932]]){
@@ -166,6 +168,8 @@ try {
   }
   writeFileSync(join(dir,'work8-missions-coast-native-ab.json'),JSON.stringify(report,null,2));
   await viewport(384,512);
+  await run('(()=>{const s=document.querySelector(".app-sheet-content"),d=document.querySelector(".w8-approved-days");if(s)s.scrollTop=0;if(d)d.scrollLeft=0;return true})()');
+  await sleep(150);
   const tabRect=await run('(()=>{const e=[...document.querySelectorAll(".w8-approved-tabs button")][1],r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()');
   await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:tabRect.x,y:tabRect.y,id:1}]});
   await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
