@@ -1942,7 +1942,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.equal(headingAfterGeom.dockCount,5);
     assert.ok(headingAfterGeom.chests.every((c:any)=>c.bottom<=headingAfterGeom.nav.top+2),'all 7 chest images above WORK0 dock');
     assert.ok(headingDelta.heading<-.02&&headingDelta.full<-.001,'actual source heading and full-frame MAE must improve');
-    assert.ok(Math.abs(headingDelta.quests)<.02&&Math.abs(headingDelta.chests)<.02&&
+    assert.ok(Math.abs(headingDelta.quests)<.02&&headingDelta.chests<.02&&
       Math.abs(headingDelta.dock)<.02&&Math.abs(headingDelta.header)<.02,
       'other missions, chests, header and WORK0 dock must remain unchanged');
 
