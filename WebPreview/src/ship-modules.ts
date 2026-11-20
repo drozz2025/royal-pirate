@@ -5,6 +5,7 @@ import { createPreviewSternHeraldry, type PreviewOrnamentModule } from './ship-h
 import { createPreviewDeckCapstans } from './ship-deck-capstans';
 import { createPreviewBowAnchors } from './ship-bow-anchors';
 import { createPreviewDeckRopeCoils } from './ship-deck-rope-coils';
+import { createPreviewDeckLongboats } from './ship-deck-longboats';
 import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
 import { createPreviewCabinGallery, type PreviewCabinModule } from './ship-cabin';
 import { createPreviewCannonRefit, type PreviewCannonModule } from './ship-cannons';
@@ -306,6 +307,8 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // Coiled working lines and belaying cleats are original GPU-batched preview props.
  // The mast level changes their appearance but never equips or grants any asset.
  additions.add(createPreviewDeckRopeCoils(config.shipClass,config.modules.masts as PreviewMastModule));
+ // Solid 3D lifeboat tenders are preview hull fittings, never fleet ownership.
+ additions.add(createPreviewDeckLongboats(config.shipClass,config.modules.hull as PreviewHullModule));
  // Raised-quarterdeck and admiral cabin silhouettes are preview-only meshes.
  // They never alter the persistent fleet, resources or battle ship geometry.
  additions.add(createPreviewCabinGallery(config.shipClass,config.modules.cabin as PreviewCabinModule));
