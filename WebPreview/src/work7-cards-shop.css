@@ -4351,3 +4351,26 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 20 Nov 22:23 UTC. Four additional source-frame pigment trials.
+ * After checking current WORK0 10830c86 and open candidate #698, refine only
+ * the genuine approved 05 physical frame pigments in slots 3/4/6/7.
+ * Native 384x512 only. Source WEBPs, eight true crops, 4x2 geometry, live
+ * PRÉVIA, unique Captain pack and all EM BREVE chests are unchanged.
+ * No 320/tall-phone changes, no screenshot backgrounds or shared shell.
+ * Strict native same-frame global MAE+eight-card ROI; approved:false, 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
+    filter:brightness(.43) saturate(1.20) contrast(.74) hue-rotate(18deg) brightness(.95) saturate(1.10);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
+    filter:brightness(.49) saturate(2.00) contrast(.79) hue-rotate(-8deg) brightness(.92) saturate(1.08);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+    filter:brightness(.65) saturate(1.30) contrast(.92) hue-rotate(4deg) brightness(.96);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+    filter:brightness(.40) saturate(1.75) contrast(.79) hue-rotate(-8deg) brightness(.93) saturate(1.10);
+  }
+}
