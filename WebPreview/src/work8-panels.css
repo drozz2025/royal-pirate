@@ -5487,9 +5487,9 @@
 }
 
 
-/* WORK8 / #104 — 07 MISSÕES ONLY: restore the ivory legibility of the
+/* WORK8 / #104 — 07 MISSÕES ONLY: calibrate the approved navy engraving behind the
    seven ACTUAL day captions against the approved 384×512 original.
-   The existing darkened daily tray attenuates its labels; retune the
+   A native Chromium A/B rejected the brightening trial (+3.176 caption ROI, +0.120 global MAE). Retune the
    captions alone, not day state, prizes, box dimensions or scroll.
    This is a purely decorative root-opt-out native Chromium A/B surface.
    Ranking 08, Porto, global dock/shell, player economy, other WORKs,
@@ -5497,6 +5497,6 @@
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
   :root:not(.work8-missions-daily-captions-ab-baseline)
   .w8-approved-missions .w8-approved-days li > small {
-    filter:brightness(1.42) saturate(1.04);
+    filter:brightness(.84) saturate(1.00);
   }
 }
