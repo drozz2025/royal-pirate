@@ -93,6 +93,11 @@ test('07 Missions: three live mission emblems plus active controls improve appro
       throw Error('missing real DOM: '+selector);
     };
     await cmd('Page.enable');await cmd('Runtime.enable');
+    // Disable CSS filter transitions through the browser's native media setting.
+    // Both baseline and candidate must be captured in the same final paint;
+    // a mid-transition computed brightness() is neither baseline nor candidate.
+    // This does not change the production UI, hit targets or art assets.
+    await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
     await cmd('Emulation.setDeviceMetricsOverride',{width:384,height:512,mobile:true,deviceScaleFactor:1,screenWidth:384,screenHeight:512});
     await cmd('Page.navigate',{url:'http://127.0.0.1:4295/'});
     await wait('.harbour-screen .harbour-nav-item');
