@@ -199,17 +199,19 @@ test('real equip button stays locked when only demo progression matches owned pa
  assert.match(equipTag(unownedHtml),/disabled/,'any unowned default part must prevent equipping');
 });
 
-test('lion and royal crown are distinct original procedural figurehead sculptures',()=>{
+test('figurehead refits are independently carved and GPU merged',()=>{
  const root=new T.Group(),rig=new T.Group();root.add(rig);
  const lion=applyShipModules(root,rig,{shipClass:'fighter',level:10,modules:{figurehead:'figurehead-lion'}});
- const lionVertices=lion.children.filter(obj=>obj instanceof T.Mesh && obj.geometry.type==='IcosahedronGeometry').length;
- assert.ok(lionVertices>=1,'lion mane must be a dedicated faceted sculpture');
- const lionCount=lion.children.length;
+ const lionSculpture=lion.getObjectByName('shipyard-fighter-figurehead-lion-sculpture') as T.Group;
+ assert.ok(lionSculpture,'lion should be a physical bow sculpture');
+ assert.equal(lionSculpture.children.length,2,'two fused PBR draws, not many separate primitives');
+ const lionVertices=(lionSculpture.children[0] as T.Mesh).geometry.getAttribute('position').count;
  const crown=applyShipModules(root,rig,{shipClass:'fighter',level:20,modules:{figurehead:'figurehead-crown'}});
- assert.notEqual(lion,crown);
+ const crownSculpture=crown.getObjectByName('shipyard-fighter-figurehead-crown-sculpture') as T.Group;
+ assert.ok(crownSculpture);
+ const crownVertices=(crownSculpture.children[0] as T.Mesh).geometry.getAttribute('position').count;
+ assert.notEqual(lionVertices,crownVertices,'crown must use different physical geometry');
  assert.equal(root.children.filter(obj=>obj.name==='modular-ship-accessories').length,1);
- assert.notEqual(lionCount,crown.children.length,'crest variations must not share identical shapes');
- assert.ok(crown.children.some(obj=>obj instanceof T.Mesh && obj.geometry.type==='ConeGeometry'),'crown points must have real 3D geometry');
  assert.ok(crown.children.length<125,'mobile draw-call accessory budget');
 });
 
