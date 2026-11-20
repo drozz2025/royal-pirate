@@ -4357,13 +4357,13 @@
  * The approved 06 rare/epic/legendary original WEBP crops and their frames
  * remain unchanged in size/position, and all three real EM BREVE labels remain
  * live DOM. Previous native screenshots show overly luminous frame fields.
- * Reduce whole physical panel exposure (not a screenshot overlay) for the
+ * Calibrate three native enamel pigments (not a screenshot overlay) for the
  * exact approved 384x512 short viewport only; untouched Porto, dock, shell,
  * economy and all 320/tall geometries. Head A/B in work7-visual.test.ts
  * restores the EXACT parent values .73/.74/.60 in the same frozen DOM/frame.
  * Human approval is mandatory: approved:false, 0/8. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.65)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.66)}
-  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.49)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.713) saturate(1.04) hue-rotate(-2deg)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.755) saturate(.88) hue-rotate(-5deg)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.60) saturate(1.45) hue-rotate(-4deg)}
 }
