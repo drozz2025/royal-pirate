@@ -1948,7 +1948,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'genuine daily reward plate and entire 07 frame MUST improve MAE');
     assert.ok(edgeM.edgeTop.delta+edgeM.edgeLeft.delta+edgeM.edgeRight.delta<-.08,
       'genuine frame border ink must approach approved source');
-    assert.ok(Math.abs(edgeM.quests.delta)<.03&&Math.abs(edgeM.chests.delta)<.1,
+    assert.ok(Math.abs(edgeM.quests.delta)<.03&&edgeM.chests.delta<.02,
       'no quest or chest ROI regression');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
