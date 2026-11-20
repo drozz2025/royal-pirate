@@ -232,7 +232,7 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
 
   assert.equal(result.records.length,variants.length,'all controlled source paint variants measured');
   assert.match(css,/background-color:#2d2929!important/,'baseline retained in scoped CSS');
-  assert.match(css,/linear-gradient\(165deg,#181d26/,'native graded workshop material candidate');
+  assert.match(css,/linear-gradient\(165deg,#26252a/,'native graded workshop material candidate');
   const baseline=result.records[0],proposal=result.records[1];
   for(const region of ['full','workshop','cannon','furnace','costs','dock']){
     assert.ok(Number.isFinite(baseline.roi[region].mae),'valid source RGB MAE '+region);
