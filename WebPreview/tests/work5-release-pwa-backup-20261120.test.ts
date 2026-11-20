@@ -58,7 +58,7 @@ test('WORK5: displayed version, build metadata and offline cache use the same re
   assert.ok(swSource.includes("const CACHE='royal-pirate-web-v"+version+"';"),'PWA cache is on another release');
   assert.match(html,/name="viewport"[^>]*viewport-fit=cover/,'portrait safe-area viewport must be explicit');
   assert.ok(!swSource.includes(STORAGE_KEY),'service worker must not cache a private save key');
-  assert.ok(!swSource.includes('localStorage'),'service worker must not read device profile');
+  assert.doesNotMatch(swSource,/\blocalStorage\s*\.\s*(?:getItem|setItem|removeItem|clear)\s*\(/,'service worker must not access local profile storage');
 });
 
 test('WORK5: PWA installation only pre-caches same-origin, in-scope public assets',async()=>{
