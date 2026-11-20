@@ -4351,3 +4351,20 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 20 Nov 20:27 UTC. Match genuine third concept preview enamel
+ * to its original lime-green approved 05 card. The preceding third-card teal
+ * status was visibly unlike the source green collectible bar. Preserve live
+ * PRÉVIA text (NOT fake levels or progress), true 4×2 painted art, existing
+ * carved frame and original crop geometry; no screenshots as backgrounds.
+ * Native 384×512 ONLY: 320×568 and tall viewports untouched.
+ * Comparison against exact WORK0 HEAD using paused SAME-FRAME Chromium.
+ * approved:false — 0/8; WORK0 alone owns merges, release and HTTP. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) small {
+    background:
+      linear-gradient(180deg,#fff9d4c9 0%,transparent 35%),
+      linear-gradient(180deg,#a8f75a 14%,#42be46 72%,#155c32 100%);
+  }
+}
