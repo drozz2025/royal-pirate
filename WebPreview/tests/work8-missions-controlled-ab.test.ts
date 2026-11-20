@@ -1889,6 +1889,64 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
 
+
+
+    /* WORK8/#104 — independent native reward-amount pigment gate.
+       Same decoded, paused Chromium DOM and frame; toggling a CSS class
+       changes only the three already-real gold amount labels, never
+       their data or unavailable gem dashes. Source is approved 07. */
+    const valuesFlag='work8-missions-quest-values-ink-ab-baseline';
+    const valuesSelector='.w8-approved-missions .w8-approved-quest-rewards > .w8-approved-coin > strong';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(valuesFlag)+');true');
+    await delay(145);
+    const valuesBeforeLayout=await headingLayout();
+    const valuesBeforeCss=await evalJs('[...document.querySelectorAll('+JSON.stringify(valuesSelector)+')].map(x=>getComputedStyle(x).filter)');
+    const valuesBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(valuesFlag)+');true');
+    await delay(145);
+    const valuesAfterLayout=await headingLayout();
+    const valuesAfterCss=await evalJs('[...document.querySelectorAll('+JSON.stringify(valuesSelector)+')].map(x=>getComputedStyle(x).filter)');
+    const valuesRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const valuesSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+valuesBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+valuesRender))
+      .replace('chests:[20,356,370,427],dock:','chests:[20,356,370,427],coinValues:[201,155,249,320],dock:');
+    assert.notEqual(valuesSource,source,'reward ROI must be independent same-frame native capture');
+    const valuesResult=await evalJs(valuesSource);
+    const valuesReport={
+      issue:104,scope:'WORK8: 07 Missões three real gold reward labels only',
+      reference:'assets/design-approved/07-missoes.webp',
+      mandatoryReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      base:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
+      viewport:{width:384,height:512,deviceScaleFactor:1},
+      sameDecodedPausedScene:true,beforeFilter:valuesBeforeCss,renderFilter:valuesAfterCss,
+      metrics:valuesResult.metrics,unchanged:valuesResult.unchanged,
+      beforeLayout:valuesBeforeLayout,renderLayout:valuesAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-quest-values-native-ab.json'),JSON.stringify(valuesReport,null,2));
+    writeFileSync(join(evidence,'missions-quest-values-ORIGINAL-BEFORE-OVERLAY-384x512.png'),Buffer.from(valuesResult.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-quest-values-ORIGINAL-RENDER-OVERLAY-384x512.png'),Buffer.from(valuesResult.overlays[1],'base64'));
+    writeFileSync(join(evidence,'missions-quest-values-before-384x512.png'),Buffer.from(valuesBefore,'base64'));
+    writeFileSync(join(evidence,'missions-quest-values-render-384x512.png'),Buffer.from(valuesRender,'base64'));
+    console.log('WORK8_QUEST_VALUES_NATIVE '+JSON.stringify(valuesReport));
+    assert.equal(valuesBeforeCss.length,3,'only three actual reward labels targeted');
+    assert.notDeepEqual(valuesBeforeCss,valuesAfterCss,'new production paint must be observed by native Chrome');
+    assert.deepEqual(valuesBeforeLayout,valuesAfterLayout,'all quest, reward and WORK0 nav hitboxes stable');
+    assert.equal(valuesAfterLayout.questCount,3);
+    assert.equal(valuesAfterLayout.dayCount,7);
+    assert.equal(valuesAfterLayout.dockCount,5);
+    assert.ok(valuesAfterLayout.chests.every((c:any)=>c.bottom<=valuesAfterLayout.nav.top+2),
+      'seven real chest artworks fully above unchanged dock');
+    assert.ok(valuesResult.unchanged.dock<.03&&valuesResult.unchanged.header<.03,
+      'shared WORK0 header and dock cannot repaint');
+    assert.ok(valuesResult.metrics.coinValues.delta<-.01&&valuesResult.metrics.full.delta<-.001,
+      'only source-proven improvements can ship: reward label ROI and complete frame');
+    assert.ok(Math.abs(valuesResult.metrics.daily.delta)<.02&&Math.abs(valuesResult.metrics.chests.delta)<.02,
+      'daily rewards or chest regions must not regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
