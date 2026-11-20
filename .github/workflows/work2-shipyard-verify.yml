@@ -30,6 +30,7 @@ on:
       - work2/original-3d-deck-hatches-20261120
       - work2/release-shipyard-gpu-on-exit-20261120
       - work2/original-3d-stern-rudders-20261120
+      - work2/original-3d-gunport-shutters-20261120
   pull_request:
     branches:
       - work2/original-stern-heraldry-20261119
