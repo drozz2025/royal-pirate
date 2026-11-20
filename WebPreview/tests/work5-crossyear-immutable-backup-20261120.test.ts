@@ -33,7 +33,8 @@ test('WORK5: leap-day and year-end UTC boundaries award exactly one daily reward
     assert.equal(profile.coins,previous+15+expectedStreak[index]*5,'wrong UTC-day reward');
     assert.equal(profile.lastDailyDay,dates[index].slice(0,10));
     assert.strictEqual(claimDaily(profile,at),profile,'same millisecond paid twice');
-    assert.strictEqual(claimDaily(profile,at+500),profile,'same UTC day paid twice');
+    const sameDayNoon=ms(dates[index].slice(0,10)+'T12:00:00.000Z');
+    assert.strictEqual(claimDaily(profile,sameDayNoon),profile,'same UTC day paid twice');
     const restored=importProfileBackup(exportProfileBackup(profile,at));
     assert.deepEqual(restored,profile,'backup forgot UTC-day claim state');
     assert.strictEqual(claimDaily(restored,at),restored,'backup reopened claimed UTC day');
