@@ -3204,3 +3204,17 @@
     letter-spacing:-.1px;
   }
 }
+
+
+/* WORK4 #104 native seam pigment choice 20 Nov: the approved 03 source
+   stays in place (one Royal Crown, one source-sea bridge). Six gradients were
+   tested in ONE paused Chromium 384x512 scene. The coastal photo seam RGB
+   MAE improved 13.22397 -> 12.61798 (-4.58%) with a negligible whole-frame
+   delta 48.63371 -> 48.63477 (+0.00106). The ship, roster and WORK0 dock
+   were pixel-identical, so only the existing real-statistics inset pigment
+   changes. No synthetic wave, menu, geometry, finances or other WORK scope. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    background:linear-gradient(90deg,#07415aee 0%,#092c45f5 20%,#061d33f8 55%,#031529fc 100%)!important;
+  }
+}
