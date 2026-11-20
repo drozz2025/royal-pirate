@@ -640,6 +640,14 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           "costs:b('.w4-materials'),button:b('.w4-improve-button'),"+
           "dock:b('.harbour-nav.app-dock-porto'),"+
           "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length};})()";
+        // WORK4 controlled charcoal pigment study must isolate the *solid* underlay
+        // from the new optional depth-gradient image. Keep all real production
+        // screenshot/ROI checks outside this historical A/B unchanged.
+        await evaluate("(()=>{const s=document.createElement('style');s.id='work4-smoke-study-isolation';s.textContent='.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene{background-image:none!important}';document.head.appendChild(s);return true;})()");
+        await sleep(90);
+        const isolatedSmokeHead=(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string;
         const oldGeometry=await evaluate(geometryJS);
         assert.equal(oldGeometry.nav,5);
         const variants:[string,string][]=[];
@@ -649,7 +657,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
             await evaluate("(()=>{const s=document.createElement('style');s.id='work4-smoke-variant';s.textContent="+JSON.stringify(pigment)+";document.head.appendChild(s);return true;})()");
             await sleep(90);
           }
-          const frame=c.id==='head'?screenshot:(await command('Page.captureScreenshot',{
+          const frame=c.id==='head'?isolatedSmokeHead:(await command('Page.captureScreenshot',{
             format:'png',fromSurface:true,captureBeyondViewport:false
           })).data as string;
           variants.push([c.id,frame]);
@@ -691,7 +699,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           'new native charcoal must lower full-frame MAE');
         const proofImage=await evaluate("(async()=>{const x="+JSON.stringify({
           source:references.forge,before:variants.find(x=>x[0]==='merged-head')?.[1],
-          after:screenshot
+          after:isolatedSmokeHead
         })+";"+
           "const load=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;await i.decode();return i};"+
           "const [a,b,c]=await Promise.all([load('webp',x.source),load('png',x.before),load('png',x.after)]);"+
@@ -708,6 +716,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         writeFileSync(join(folder,'work4-forge-smoke-iron-pigment-study.json'),
           JSON.stringify(proof,null,2)+'\n');
         console.log('WORK4_FORGE_SMOKE_STUDY '+JSON.stringify(proof));
+        await evaluate("(()=>{document.getElementById('work4-smoke-study-isolation')?.remove();return true})()");
         // WORK4/#104 — controlled source-cannon edge experiment, 18 Nov 13h.
         // Every candidate is the same native Chromium frame; no mask touches
         // the hearth, live levels, cost cells or the WORK0 dock. Only a measured
