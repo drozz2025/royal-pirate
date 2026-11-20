@@ -1893,20 +1893,20 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        SAME Chrome viewport, paused DOM scene and unchanged seven daily
        rewards. Base class disables ONLY the new source-gold correction.
        Never alter day claims, mission progress, WORK0 dock or Ranking 08. */
-    const royalFlag='work8-missions-royal-enamel-v2-ab-baseline';
-    const royalSelector='.w8-approved-missions .w8-approved-days li:nth-child(7) .w8-approved-chest > svg.w8-approved-painting-chest-royal';
-    await evalJs('document.documentElement.classList.add('+JSON.stringify(royalFlag)+');true');
+    const royalV2Flag='work8-missions-royal-enamel-v2-ab-baseline';
+    const royalV2Selector='.w8-approved-missions .w8-approved-days li:nth-child(7) .w8-approved-chest > svg.w8-approved-painting-chest-royal';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(royalV2Flag)+');true');
     await delay(140);
-    const royalBeforeGeometry=await headingLayout();
-    const royalBeforeFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(royalSelector)+')).filter');
-    const royalBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    await evalJs('document.documentElement.classList.remove('+JSON.stringify(royalFlag)+');true');
+    const royalV2BeforeGeometry=await headingLayout();
+    const royalV2BeforeFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(royalV2Selector)+')).filter');
+    const royalV2Before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(royalV2Flag)+');true');
     await delay(140);
-    const royalAfterGeometry=await headingLayout();
-    const royalAfterFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(royalSelector)+')).filter');
-    const royalAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    const royalScoreJs='(async()=>{'+
-      'const srcs='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+royalBefore,'data:image/png;base64,'+royalAfter])+';'+
+    const royalV2AfterGeometry=await headingLayout();
+    const royalV2AfterFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(royalV2Selector)+')).filter');
+    const royalV2After=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const royalV2ScoreJs='(async()=>{'+
+      'const srcs='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+royalV2Before,'data:image/png;base64,'+royalV2After])+';'+
       'const images=await Promise.all(srcs.map(src=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=src})));'+
       'if(images.some(im=>im.width!==384||im.height!==512))throw Error("Native 384x512 source and captures required");'+
       'const px=images.map(im=>{const c=document.createElement("canvas");c.width=384;c.height=512;const g=c.getContext("2d");g.drawImage(im,0,0);return g.getImageData(0,0,384,512).data});'+
@@ -1914,33 +1914,33 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'const mae=(a,b,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=4*(y*384+x);for(let j=0;j<3;j++){sum+=Math.abs(a[p+j]-b[p+j]);n++}}return sum/n};'+
       'return Object.fromEntries(Object.entries(regions).map(([name,roi])=>{const before=mae(px[0],px[1],roi),render=mae(px[0],px[2],roi),changed=mae(px[1],px[2],roi);return [name,{before,render,delta:render-before,changed}]}))'+
       '})()';
-    const royalMetrics=await evalJs(royalScoreJs);
-    const royalMontageJs='(async()=>{'+
-      'const srcs='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+royalBefore,'data:image/png;base64,'+royalAfter])+';'+
+    const royalV2Metrics=await evalJs(royalV2ScoreJs);
+    const royalV2MontageJs='(async()=>{'+
+      'const srcs='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+royalV2Before,'data:image/png;base64,'+royalV2After])+';'+
       'const images=await Promise.all(srcs.map(s=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=bad;i.src=s})));'+
       'const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");images.forEach((im,n)=>x.drawImage(im,384*n,0));x.drawImage(images[0],1152,0);x.globalAlpha=.5;x.drawImage(images[2],1152,0);return c.toDataURL("image/png").split(",")[1]'+
       '})()';
-    saveTone('missions-royal-day7-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png',await evalJs(royalMontageJs));
-    saveTone('missions-royal-day7-before-384x512.png',royalBefore);
-    saveTone('missions-royal-day7-render-384x512.png',royalAfter);
-    const royalReport={issue:104,scope:'WORK8 only 07 Missions actual day-seven royal chest artwork',
+    saveTone('missions-royal-day7-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png',await evalJs(royalV2MontageJs));
+    saveTone('missions-royal-day7-before-384x512.png',royalV2Before);
+    saveTone('missions-royal-day7-render-384x512.png',royalV2After);
+    const royalV2Report={issue:104,scope:'WORK8 only 07 Missions actual day-seven royal chest artwork',
       reference:'assets/design-approved/07-missoes.webp',
       viewport:'Chromium native 384x512 DPR1',pausedSameFrame:true,
-      beforeFilter:royalBeforeFilter,afterFilter:royalAfterFilter,
-      mae:royalMetrics,geometry:{before:royalBeforeGeometry,render:royalAfterGeometry},
+      beforeFilter:royalV2BeforeFilter,afterFilter:royalV2AfterFilter,
+      mae:royalV2Metrics,geometry:{before:royalV2BeforeGeometry,render:royalV2AfterGeometry},
       approved:false,approvedScreens:0};
-    writeFileSync(join(evidence,'work8-missions-royal-day7-controlled-ab.json'),JSON.stringify(royalReport,null,2));
-    console.log('WORK8_ROYAL_DAY7_AB '+JSON.stringify(royalReport));
-    assert.notEqual(royalBeforeFilter,royalAfterFilter,'isolated original chest artwork actually repainted');
-    assert.deepEqual(royalBeforeGeometry,royalAfterGeometry,'never move three missions, seven chests or five-item dock');
-    assert.equal(royalAfterGeometry.questCount,3);
-    assert.equal(royalAfterGeometry.dayCount,7);
-    assert.equal(royalAfterGeometry.dockCount,5);
-    assert.ok(royalAfterGeometry.chests.every((c:any)=>c.bottom<=royalAfterGeometry.nav.top+2),
+    writeFileSync(join(evidence,'work8-missions-royal-day7-controlled-ab.json'),JSON.stringify(royalV2Report,null,2));
+    console.log('WORK8_ROYAL_DAY7_AB '+JSON.stringify(royalV2Report));
+    assert.notEqual(royalV2BeforeFilter,royalV2AfterFilter,'isolated original chest artwork actually repainted');
+    assert.deepEqual(royalV2BeforeGeometry,royalV2AfterGeometry,'never move three missions, seven chests or five-item dock');
+    assert.equal(royalV2AfterGeometry.questCount,3);
+    assert.equal(royalV2AfterGeometry.dayCount,7);
+    assert.equal(royalV2AfterGeometry.dockCount,5);
+    assert.ok(royalV2AfterGeometry.chests.every((c:any)=>c.bottom<=royalV2AfterGeometry.nav.top+2),
       'all seven chest artworks above WORK0 dock in native 384');
-    assert.ok(royalMetrics.full.delta < -0.002 && royalMetrics.royal.delta < -0.10,
+    assert.ok(royalV2Metrics.full.delta < -0.002 && royalV2Metrics.royal.delta < -0.10,
       'source gold must measurably improve full MAE and 07 royal chest ROI');
-    assert.ok(Math.abs(royalMetrics.quests.delta)<.01 && Math.abs(royalMetrics.dock.delta)<.01,
+    assert.ok(Math.abs(royalV2Metrics.quests.delta)<.01 && Math.abs(royalV2Metrics.dock.delta)<.01,
       'quests and WORK0 dock must be pixel-identical');
 
 
