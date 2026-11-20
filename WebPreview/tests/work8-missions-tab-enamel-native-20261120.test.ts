@@ -89,10 +89,10 @@ test('WORK8 07 approved navy on inactive tabs: real Chromium same-frame A/B and 
     await evaluate('(()=>{document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
     const flag='work8-missions-tabs-luma-ab-baseline';
     await evaluate('document.documentElement.classList.add('+JSON.stringify(flag)+');true');
-    await delay(150);
+    await delay(700); // let the real native CSS filter transition settle fully
     const beforeLayout=await layout(),before=await screenshot();
     await evaluate('document.documentElement.classList.remove('+JSON.stringify(flag)+');true');
-    await delay(150);
+    await delay(700); // identical settled frame; no mid-transition MAE samples
     const afterLayout=await layout(),after=await screenshot();
     const original=readFileSync(new URL('../../assets/design-approved/07-missoes.webp',import.meta.url)).toString('base64');
     const compareExpression='(async()=>{'+
