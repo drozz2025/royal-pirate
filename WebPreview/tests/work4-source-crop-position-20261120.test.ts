@@ -269,7 +269,7 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
       if('seam' in candidate && candidate.seam){
         const coast=await evaluate("(()=>{const s=getComputedStyle(document.querySelector("+
           JSON.stringify(paintSelector)+"),'::after');return {width:s.width,background:s.backgroundImage}})()");
-        const width=candidate.seam.match(/width:(\\d+)px/)?.[1];
+        const width=candidate.seam.match(/width:(\d+)px/)?.[1];
         assert.equal(coast.width,width+'px','coast bridge variant must really apply: '+candidate.id);
         assert.ok(coast.background.includes('gradient('),'coast paint visibly rendered');
       }
