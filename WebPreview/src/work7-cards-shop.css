@@ -4351,3 +4351,15 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 20 Nov 13:30 UTC. Epic chest native painted enamel depth.
+ * Only original 06 second genuine chest at native 384×512; original WebP
+ * and absolute sizes intact. 320px #263 and all shared screens untouched.
+ * No change to navigation, costs, locked states or real economy.
+ * approved:false 0/8; WORK0 exclusively merges/releases. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{
+    --w7-chest-field:#5a2270;
+  }
+}
