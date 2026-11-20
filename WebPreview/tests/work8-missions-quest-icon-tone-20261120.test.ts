@@ -7,11 +7,11 @@ import {join} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 
 /** WORK8/#104: unscaled 07-missoes source, SAME real Chromium DOM/frame.
- * The root switch only changes the decorative swords and target art exposure.
+ * The root switch only changes the decorative first swords art exposure.
  * Real progress, numerical values, gem availability and five-item
  * shared dock MUST be identical. No mocked app state, image backdrop or
  * APPROVED flag. */
-test('07 Missions: painted swords + target tone calibration, controlled native Chromium', {timeout:220000}, async()=>{
+test('07 Missions: first real swords icon brightness (target unchanged), controlled native Chromium', {timeout:220000}, async()=>{
   await delay(2000); // Parallel test suites have separate ports and profiles
   for(const file of ['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']) {
     assert.ok(existsSync(new URL('../../assets/design-approved/'+file,import.meta.url)),'required reference '+file);
@@ -81,12 +81,12 @@ test('07 Missions: painted swords + target tone calibration, controlled native C
     await delay(250);
     const geometry=()=>evalJs('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const nav=document.querySelector(".app-sheet > .harbour-nav");const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")],days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],buttons=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button, .w8-approved-missions .w8-approved-quest > button")],dockButtons=[...nav.querySelectorAll(".harbour-nav-item")];return {questCount:quests.length,days:days.length,dockCount:dockButtons.length,tabAndActionCount:buttons.length,questBoxes:quests.map(rect),dayBoxes:days.map(rect),rewardBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(rect),nav:rect(nav),captions:days.map(d=>rect(d.querySelector("small"))),documentWidth:document.documentElement.scrollWidth,labels:quests.map(q=>q.querySelector(".w8-approved-quest-core strong")?.textContent),rewards:quests.map(q=>[...q.querySelectorAll(".w8-approved-quest-rewards strong")].map(s=>s.textContent)),glyphs:document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem").length}})()');
     const beforeLayout=await geometry();
-    const beforeInk=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-art")].filter((_,i)=>i===0||i===2).map(e=>getComputedStyle(e).filter).join(" | "))()');
+    const beforeInk=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-art")].filter((_,i)=>i===0).map(e=>getComputedStyle(e).filter).join(" | "))()');
     const before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove("work8-missions-quest-icon-tone-ab-baseline");true');
     await delay(180);
     const afterLayout=await geometry();
-    const afterInk=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-art")].filter((_,i)=>i===0||i===2).map(e=>getComputedStyle(e).filter).join(" | "))()');
+    const afterInk=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-art")].filter((_,i)=>i===0).map(e=>getComputedStyle(e).filter).join(" | "))()');
     assert.notEqual(afterInk,beforeInk,'icon filters must change only after enabling proposal');
     assert.match(afterInk,/brightness/,'native pictogram filters must be active');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
@@ -106,7 +106,7 @@ test('07 Missions: painted swords + target tone calibration, controlled native C
       const images=await Promise.all([__ORIGINAL__,__BEFORE__,__AFTER__].map(make));
       const w=384,h=512;if(images.some(x=>x.width!==w||x.height!==h))throw Error('native images required');
       const px=images.map(i=>{const c=document.createElement('canvas');c.width=w;c.height=h;const t=c.getContext('2d');t.drawImage(i,0,0);return t.getImageData(0,0,w,h).data});
-      const roi={full:[0,0,384,512],iconPaint:[14,197,67,357],rewardLayout:[185,155,292,321],missions:[12,155,372,321],daily:[12,326,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,451,384,512]};
+      const roi={full:[0,0,384,512],iconPaint:[16,160,67,211],rewardLayout:[185,155,292,321],missions:[12,155,372,321],daily:[12,326,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,451,384,512]};
       function mae(a,b,r){let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=(y*w+x)*4;for(let z=0;z<3;z++){total+=Math.abs(a[p+z]-b[p+z]);n++}}return total/n}
       const metrics={};for(const [k,r] of Object.entries(roi)){const baseline=mae(px[0],px[1],r),candidate=mae(px[0],px[2],r);metrics[k]={baseline,candidate,delta:candidate-baseline}}
       const unchanged={header:mae(px[1],px[2],roi.header),dock:mae(px[1],px[2],roi.dock)};
@@ -127,7 +127,7 @@ test('07 Missions: painted swords + target tone calibration, controlled native C
     save('missions-quest-icon-tones-original-before-overlay.png',compared.overlays[0]);
     save('missions-quest-icon-tones-original-render-overlay.png',compared.overlays[1]);
     const report={
-      issue:104,scope:'WORK8 exclusively 07 Missões only, existing real quest swords and target artwork exposure',
+      issue:104,scope:'WORK8 exclusively 07 Missões only, existing real first quest swords artwork exposure',
       reference:'assets/design-approved/07-missoes.webp',
       mandatoryRefs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']].map(n=>'assets/design-approved/'+n),
       viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-quest-icon-tone-ab-baseline',
