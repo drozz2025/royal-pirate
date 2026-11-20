@@ -5485,3 +5485,23 @@
     visibility:hidden;
   }
 }
+
+/* WORK8 / issue #104 — 07 MISSÕES EXCLUSIVAMENTE · botões JOGAR/RECOLHER reais.
+   Em 384×512, a referência aprovada reserva uma coluna de ação mais larga
+   que os 59px atuais. Redistribuir 6px apenas entre os emblemas decorativos
+   das duas recompensas e os botões de ação, mantendo exatamente o espaço do
+   texto e os 3 objetivos/progressos reais. Um deslocamento de 3px regista
+   visualmente as CTAs com as placas azuis originais; o hitbox acompanha o
+   botão, não é uma sobreposição capturada. Em 320/390 alto/430 alto, layout
+   e scroll históricos permanecem inalterados. Desativação :root permite
+   ORIGINAL|BEFORE|RENDER|OVERLAY no MESMO DOM/frame nativo.
+   Sem alterações ao Ranking, Porto, dock, shell, economia, funcionalidades,
+   Unity, multiplayer ou ficheiros de outros WORKs. approved:false, 0/8. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-cta-registration-ab-baseline) .w8-approved-missions .w8-approved-quest {
+    grid-template-columns:38px minmax(0,1fr) 90px 65px !important;
+  }
+  :root:not(.work8-missions-cta-registration-ab-baseline) .w8-approved-missions .w8-approved-quest > button {
+    transform:translateX(3px);
+  }
+}
