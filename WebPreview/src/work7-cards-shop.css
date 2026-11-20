@@ -4351,3 +4351,21 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — native 384x512 physical chest art registration (20 Nov 08:24 UTC).
+ * Real approved 06 art, independent 3 chest crops. Align the height of the
+ * genuine paintings in their already-approved frames, without resizing frames,
+ * overlaying screenshots or touching real availability, prices or the dock.
+ * Same-frame exact-HEAD A/B in the WORK7-only Chromium visual gate;
+ * 320px and tall mobile viewports remain pixel-identical. approved:false 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{
+    transform:translate(-2px,-5px) scale(.88);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
+    transform:translate(4px,-5px) scale(.9);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+    transform:translate(4px,-5px) scale(1.02);
+  }
+}
