@@ -7,6 +7,7 @@ import { makeShip, type ShipArt } from './ships';
 import { applyShipModules, type ShipLoadout, type ModuleSlot } from './ship-modules';
 import { shipyardCameraOffset, shipyardPartTarget, shipyardPartCameraOffset, type ShipyardView } from './shipyard-camera';
 import { releaseShipyardResources } from './shipyard-resources';
+import { preferredShipyardPixelRatio, adjustedShipyardPixelRatio } from './shipyard-render-budget';
 import { hullImpactPlacement } from './impact-visuals';
 import { rippleState } from './water-vfx';
 export type Metrics = { fps: number; renderMs: number; calls: number; triangles: number; geometries: number; textures: number; effects: number; heapMB?: number };
@@ -18,13 +19,16 @@ export class OceanScene {
   private ball: T.Mesh; private particleGeometry=new T.IcosahedronGeometry(1,0); private particleMaterial=new T.MeshBasicMaterial({color:'#fff'});
   private particles: { mesh:T.Mesh;velocity:T.Vector3;age:number;life:number;size:number;smoke:boolean }[]=[];
   private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'|'inspect'|'shipyard'='battle'; private shipyardView:ShipyardView='quarter'; private shipyardFocusSlot:ModuleSlot|null=null; private shipyardArt:ShipArt|null=null; private harbourDock=new T.Group(); private shake=0;
-  private renderMs=0;private lastRender=0;private frameSamples:number[]=[];private metricsAt=0; private pirateAudio=new PirateAudio(); paused=false; disposed=false;
+  private renderMs=0;private lastRender=0;private frameSamples:number[]=[];private metricsAt=0;
+  private normalPixelRatio=1;private shipyardPixelRatio=1;private shipyardAdjustmentAt=0;private shipyardRenderSamples:number[]=[];
+  private pirateAudio=new PirateAudio(); paused=false; disposed=false;
   private onContextLost=(event:Event)=>{event.preventDefault();this.paused=true;this.onError('The 3D view was interrupted. Reload to restore the ocean.');};
   private onVisibility=()=>{this.previous=0;this.pirateAudio.setHidden(document.hidden);};
   constructor(private host:HTMLElement, public battle:Battle, private onFrame:()=>void,private onMetrics:(m:Metrics)=>void,private onError:(message:string)=>void){
     const probe=document.createElement('canvas');const context=probe.getContext('webgl2',{antialias:true,alpha:false,powerPreference:'high-performance'});
     this.compatibility=!context;this.renderer=context?new T.WebGLRenderer({canvas:probe,context,antialias:true,alpha:false}):new SoftwareRenderer();
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));this.renderer.outputColorSpace=T.SRGBColorSpace;this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.2;
+    this.normalPixelRatio=Math.min(window.devicePixelRatio||1,1.5);
+    this.renderer.setPixelRatio(this.normalPixelRatio);this.renderer.outputColorSpace=T.SRGBColorSpace;this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.2;
     this.canvas=this.renderer.domElement;host.append(this.canvas);this.canvas.setAttribute('aria-label','3D naval battlefield. Drag to orbit, pinch to zoom.');
     this.canvas.addEventListener('webglcontextlost',this.onContextLost);
     this.scene.background=new T.Color('#93d8ed');this.scene.fog=new T.FogExp2('#9ad8df',.008);
@@ -104,7 +108,13 @@ export class OceanScene {
     }
     this.harbourDock.visible=false;
   }
-  private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();else if(this.cameraMode==='inspect')this.inspectShip();else if(this.cameraMode==='shipyard')this.setShipyardCamera();}
+  private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;
+    // Orientation changes may lower the preview cap, never the battle resolution.
+    if(this.shipyardArt&&this.cameraMode==='shipyard'){
+      const cap=preferredShipyardPixelRatio(w,window.devicePixelRatio||1);
+      if(this.shipyardPixelRatio>cap){this.shipyardPixelRatio=cap;this.renderer.setPixelRatio(cap);}
+    }
+    this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();else if(this.cameraMode==='inspect')this.inspectShip();else if(this.cameraMode==='shipyard')this.setShipyardCamera();}
   home(){this.cameraMode='battle';const aspect=this.host.clientWidth/this.host.clientHeight;const distance=aspect<.75?55:aspect<1.2?43:34;if(aspect<.75){this.camera.position.set(-distance*.74,distance*.62,distance*.58);this.controls.target.set(0,1.6,0);}else{this.camera.position.set(distance*.20,distance*.56,distance*.88);this.controls.target.set(0,2,0);}this.controls.update();}
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
   /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
@@ -137,10 +147,20 @@ export class OceanScene {
     releaseShipyardResources(this.scene,this.shipyardArt.root);
     this.shipyardArt=null;
     this.shipyardFocusSlot=null;
+    this.shipyardRenderSamples.length=0;
+    // Battle and harbour always retain their original renderer resolution.
+    this.shipyardPixelRatio=this.normalPixelRatio;
+    this.renderer.setPixelRatio(this.normalPixelRatio);
   }
   /** Harbour-only sandbox: the battle ship, damage and ownership are untouched. */
   showShipyard(loadout:ShipLoadout){
     if(!this.shipyardArt){
+      // Isolated editor quality budget: no effects on battle, purchases or fleet.
+      this.shipyardPixelRatio=preferredShipyardPixelRatio(this.host.clientWidth,window.devicePixelRatio||1);
+      this.renderer.setPixelRatio(this.shipyardPixelRatio);
+      this.shipyardAdjustmentAt=performance.now();
+      this.shipyardRenderSamples.length=0;
+      this.frameSamples.length=0;
       this.shipyardArt=makeShip(false);
       this.shipyardArt.root.position.set(SHIPS.player.x,0,SHIPS.player.z);
       this.scene.add(this.shipyardArt.root);
@@ -237,7 +257,20 @@ export class OceanScene {
     if(this.battle.shot){const s=this.battle.shot;this.ball.visible=true;this.ball.position.set(s.position.x,s.position.y,s.position.z);this.trail.visible=true;const p=this.ball.position.clone(),v=new T.Vector3(s.velocity.x,s.velocity.y-12*s.age,s.velocity.z).normalize();this.trail.geometry.setFromPoints([p,p.clone().addScaledVector(v,-1.2)]);}else{this.ball.visible=false;this.trail.visible=false;}
     for(let i=this.particles.length-1;i>=0;i--){const p=this.particles[i];p.age+=dt;if(p.age>=p.life){p.mesh.visible=false;this.pool.push(p.mesh);this.particles.splice(i,1);continue;}p.mesh.position.addScaledVector(p.velocity,dt);if(!p.smoke)p.velocity.y-=8*dt;const alpha=1-p.age/p.life;(p.mesh.material as T.MeshBasicMaterial).opacity=alpha;p.mesh.scale.setScalar(p.size*(p.smoke?1+p.age*2:Math.max(.2,alpha)));}
     this.controls.update();if(this.shake>0){this.camera.position.y+=Math.sin(timestamp*.1)*this.shake;this.shake*=.86;}
-    const renderStart=performance.now();this.renderer.render(this.scene,this.camera);this.renderMs=performance.now()-renderStart;this.onFrame();if(timestamp-this.metricsAt>1000){this.metricsAt=timestamp;this.onMetrics(this.getMetrics());}
+    const renderStart=performance.now();this.renderer.render(this.scene,this.camera);this.renderMs=performance.now()-renderStart;
+    if(this.cameraMode==='shipyard'&&this.shipyardArt?.root.visible){
+      this.shipyardRenderSamples.push(this.renderMs);
+      if(this.shipyardRenderSamples.length>90)this.shipyardRenderSamples.shift();
+      // Average visible frames and CPU render times; never adjust every frame.
+      if(timestamp-this.shipyardAdjustmentAt>=8000&&this.frameSamples.length>=60&&this.shipyardRenderSamples.length>=60){
+        const average=(samples:number[])=>samples.reduce((sum,value)=>sum+value,0)/samples.length;
+        const ceiling=preferredShipyardPixelRatio(this.host.clientWidth,window.devicePixelRatio||1);
+        const next=adjustedShipyardPixelRatio(this.shipyardPixelRatio,ceiling,average(this.frameSamples),average(this.shipyardRenderSamples));
+        if(next!==this.shipyardPixelRatio){this.shipyardPixelRatio=next;this.renderer.setPixelRatio(next);}
+        this.shipyardAdjustmentAt=timestamp;
+      }
+    }
+    this.onFrame();if(timestamp-this.metricsAt>1000){this.metricsAt=timestamp;this.onMetrics(this.getMetrics());}
   };
   dispose(){this.disposed=true;cancelAnimationFrame(this.raf);this.resizeObserver.disconnect();document.removeEventListener('visibilitychange',this.onVisibility);this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.controls.dispose();const geometries=new Set<T.BufferGeometry>(),materials=new Set<T.Material>(),textures=new Set<T.Texture>();this.scene.traverse(o=>{if(o instanceof T.Mesh||o instanceof T.Line){geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:[o.material]){materials.add(m);for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);}}});geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());this.renderer.dispose();this.canvas.remove();this.pirateAudio.dispose();}
 }
