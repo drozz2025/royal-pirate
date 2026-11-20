@@ -27,3 +27,11 @@ test('WORK0 #104: bearing/power remain genuine native slider + real deck gesture
   // The controls never mistake vertical finger motion for extra power/elevation.
   assert.match(app,/bearingFromDrag\(start\.startYaw,start\.startX,event\.clientX,event\.currentTarget\.clientWidth\)/);
 });
+
+test('WORK0 #104: developer FPS/version overlays never obscure 320–430px combat sliders',()=>{
+  assert.match(css,/@media\s*\(max-width:600px\)\s*\{[\s\S]*?\.in-battle\s+\.bottom-note\s*\{\s*display:none;\s*\}/);
+  assert.match(css,/body:has\(\.in-battle\)\s*>\s*\.rp-version\s*\{\s*display:none!important;/);
+  assert.match(app,/<footer className="bottom-note">/);
+  assert.match(app,/onClick=\{\(\)=>setDiagnostics\(!diagnostics\)\}/,
+    'developer FPS is retained in Porto, not deleted from the application');
+});
