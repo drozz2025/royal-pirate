@@ -36,6 +36,14 @@ test('battle-only cloudfront is painted to a real 1024 square sky texture, witho
     assert.equal(created[0].width, 1024);
     assert.equal(created[0].height, 1024);
     assert.ok(draws > 100, 'painted volumes, sun shafts and mist must render');
+    // Source 02's large open-sky area is bright COBALT, not the previous
+    // desaturated grey-cyan; check real canvas gradient stops, not comments.
+    assert.ok(stops.includes('#064a9a'), 'deep cobalt at zenith');
+    assert.ok(stops.includes('#076fce'), 'royal-blue upper sky');
+    assert.ok(stops.includes('#21a0ea'), 'bright sea-blue central sky');
+    assert.ok(stops.includes('#7fc7f4'), 'cool, bright near-horizon blue');
+    assert.ok(stops.includes('#d2ecf1'), 'clear distant haze');
+    assert.ok(!stops.includes('#59b7e5'), 'do not restore the washed-out old middle sky');
     assert.ok(stops.includes('rgba(35,80,116,.40)'), 'deep blue storm shadows are painted');
     assert.ok(stops.includes('rgba(255,255,242,.39)'), 'lit cloud edges are painted');
     texture.dispose();
