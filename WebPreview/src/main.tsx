@@ -98,7 +98,7 @@ function App(){
    }catch(err){setBackupMessage(err instanceof Error?err.message:'Restore failed.');}
  };
  const result=state.phase==='victory'||state.phase==='defeat',ready=state.phase==='ready'&&loaded&&!error;
- return <main className={'app '+(harbour?'in-harbour':'in-battle')}>
+ return <main className={'app '+(harbour?'in-harbour':'in-battle')+(harbour&&appScreen?' with-app-sheet':'')}>
    <div ref={host} className="ocean" onPointerDownCapture={onSceneAimDown} onPointerMoveCapture={onSceneAimMove} onPointerUpCapture={onSceneAimEnd} onPointerCancelCapture={onSceneAimEnd}/><div className="vignette"/>
    {harbour&&<Harbour onBattle={enterBattle} onNavigate={navigateTo} profile={profile} selected={shipSelected} hidden={Boolean(appScreen)}/>}
    <input ref={backupFile} type="file" hidden accept=".json,application/json" aria-label="Choose a local Royal Pirate save backup" onChange={restoreBackup}/>

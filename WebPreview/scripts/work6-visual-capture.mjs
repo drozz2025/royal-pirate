@@ -21,6 +21,53 @@ try {
     await page.waitForTimeout(2200);
     await page.screenshot({path:resolve(root,`porto-${width}x${height}.png`),animations:'disabled'});
 
+    // WORK0 #104: capture all eight source-approved screens on the same
+    // REAL browser viewport, and reject the legacy 570px floor clipping
+    // the shared five-button dock on 384×512 / 320×568. No mock screens.
+    const verifySheet=async(name)=>{
+      await page.locator('.app-sheet').waitFor({state:'visible',timeout:10000});
+      const geometry=await page.evaluate(()=>{
+        const app=document.querySelector('.app.with-app-sheet');
+        const sheet=document.querySelector('.app-sheet');
+        const dock=document.querySelector('.app-sheet > .harbour-nav');
+        if(!app||!sheet||!dock)return null;
+        const a=app.getBoundingClientRect(),s=sheet.getBoundingClientRect(),d=dock.getBoundingClientRect();
+        const buttons=Array.from(dock.querySelectorAll('button'));
+        return {appBottom:a.bottom,sheetBottom:s.bottom,dockTop:d.top,dockBottom:d.bottom,
+          scrollHeight:document.documentElement.scrollHeight,innerHeight,
+          fiveButtons:buttons.length,
+          hittable:buttons.every(b=>{
+            const r=b.getBoundingClientRect();
+            const point=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
+            return point===b||b.contains(point);
+          })};
+      });
+      if(!geometry||geometry.fiveButtons!==5||!geometry.hittable||
+         Math.abs(geometry.appBottom-height)>1||
+         Math.abs(geometry.sheetBottom-height)>1||
+         geometry.dockTop<0||geometry.dockBottom>height+1||
+         geometry.scrollHeight>height+1)
+        throw new Error(`App sheet / 5-tab dock clipped on ${name} ${width}x${height}: ${JSON.stringify(geometry)}`);
+      await page.screenshot({path:resolve(root,`${name}-${width}x${height}.png`),animations:'disabled'});
+    };
+    await page.locator('.harbour-nav:not(.app-dock-porto) button').filter({hasText:'FROTA'}).click();
+    await verifySheet('frota');
+    await page.locator('.w4-action-pair button').filter({hasText:'ABRIR MELHORIAS'}).click();
+    await verifySheet('forja');
+    await page.locator('.app-dock-porto button').filter({hasText:'CARTAS'}).click();
+    await verifySheet('cartas');
+    await page.locator('.app-dock-porto button').filter({hasText:'LOJA'}).click();
+    await verifySheet('loja');
+    // On 320/384px the header shortcuts are deliberately hidden. Exercise
+    // the VISIBLE real Porto flank route instead of a hidden button.
+    await page.locator('.app-dock-porto button').filter({hasText:'PORTO'}).click();
+    await page.locator('.harbour-flank-right button').filter({hasText:'MISSÕES'}).click();
+    await verifySheet('missoes');
+    await page.locator('.app-dock-porto button').filter({hasText:'RANKING'}).click();
+    await verifySheet('ranking');
+    await page.locator('.app-dock-porto button').filter({hasText:'PORTO'}).click();
+    await page.locator('.harbour-battle-button').waitFor({state:'visible',timeout:10000});
+
     await page.locator('.harbour-battle-button').click();
     // The approved mobile gunner stage deliberately hides the old redundant
     // BATALHA heading. Wait for the LIVE HP HUD, not an obsolete banner.

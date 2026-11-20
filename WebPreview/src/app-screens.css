@@ -789,3 +789,14 @@
     min-width:62px;min-height:24px;padding:2px 3px;
   }
 }
+
+/* WORK0 / issue #104 · Screen-size parity with the full-bleed Porto.
+   The legacy 570px mobile min-height belongs to the unobstructed harbour only.
+   At 320×568 / 384×512 it silently made every overlay sheet taller than the
+   REAL viewport, clipping the five-item bottom dock below Safari's screen.
+   Scope to the mounted sheet so the already-approved Porto is untouched.
+   The content pane itself stays scrollable where real content needs more room. */
+@media (max-width:600px) {
+  .app.with-app-sheet {height:100dvh;min-height:0;max-height:100dvh}
+  .app.with-app-sheet .app-sheet {height:100%;min-height:0;max-height:100%;overflow:hidden}
+}
