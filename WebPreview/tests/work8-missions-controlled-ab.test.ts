@@ -1889,6 +1889,63 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
 
+
+    /* WORK8/#104 — independent production A/B for authentic quest artwork.
+       Both frames use the same decoded image, profile, 384x512 native
+       viewport, Chromium tab, frozen animation and saved mission state. */
+    const questArtFlag='work8-missions-quest-art-luma-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(questArtFlag)+');true');
+    await delay(160);
+    const questArtBeforeGeometry=await headingLayout();
+    const questArtBeforeCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-quest-art > svg.w8-approved-painting")).filter');
+    const questArtBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(questArtFlag)+');true');
+    await delay(160);
+    const questArtRenderGeometry=await headingLayout();
+    const questArtRenderCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-quest-art > svg.w8-approved-painting")).filter');
+    const questArtRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const questArtMetricExpression='(async()=>{'+
+      'const srcs='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+questArtBefore,'data:image/png;base64,'+questArtRender])+';'+
+      'const imgs=await Promise.all(srcs.map(s=>new Promise((ok,err)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=err;i.src=s})));'+
+      'if(imgs.some(i=>i.width!==384||i.height!==512))throw Error("native 384x512 source needed");'+
+      'const p=imgs.map(i=>{const c=document.createElement("canvas");c.width=384;c.height=512;const ctx=c.getContext("2d");ctx.drawImage(i,0,0);return ctx.getImageData(0,0,384,512).data});'+
+      'const roi={full:[0,0,384,512],illustrations:[12,156,76,322],quests:[12,155,372,321],daily:[13,325,373,436],chests:[20,356,370,427],dock:[0,451,384,512]};'+
+      'const score=(a,b,r)=>{let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;for(let i=0;i<3;i++){total+=Math.abs(a[k+i]-b[k+i]);n++}}return total/n};'+
+      'const before=Object.fromEntries(Object.entries(roi).map(([n,r])=>[n,score(p[0],p[1],r)]));'+
+      'const render=Object.fromEntries(Object.entries(roi).map(([n,r])=>[n,score(p[0],p[2],r)]));'+
+      'const difference=Object.fromEntries(Object.entries(roi).map(([n,r])=>[n,score(p[1],p[2],r)]));'+
+      'const canvas=document.createElement("canvas");canvas.width=1536;canvas.height=512;const c=canvas.getContext("2d");imgs.forEach((im,i)=>c.drawImage(im,384*i,0));c.drawImage(imgs[0],1152,0);c.globalAlpha=.5;c.drawImage(imgs[2],1152,0);'+
+      'return {before,render,difference,overlay:canvas.toDataURL("image/png").split(",")[1]}})()';
+    const questArtMetrics=await evalJs(questArtMetricExpression);
+    const questArtDelta=Object.fromEntries(Object.keys(questArtMetrics.before).map(k=>[
+      k,questArtMetrics.render[k]-questArtMetrics.before[k]]));
+    const questArtReport={
+      issue:104,work:'WORK8',screen:'07-missoes',baseSha:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
+      approved:false,approvedScreens:0,reference:'assets/design-approved/07-missoes.webp',
+      additionalReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','08-ranking-perfil.webp'],
+      viewport:'Chromium 384x512 DPR1, identical paused live scene/frame',
+      beforeFilter:questArtBeforeCss,renderFilter:questArtRenderCss,
+      mae:questArtMetrics,delta:questArtDelta,
+      geometry:{before:questArtBeforeGeometry,render:questArtRenderGeometry}
+    };
+    saveCoast('missions-quest-art-original-before-render-overlay-384x512.png',questArtMetrics.overlay);
+    saveCoast('missions-quest-art-before-384x512.png',questArtBefore);
+    saveCoast('missions-quest-art-render-384x512.png',questArtRender);
+    writeFileSync(join(evidence,'missions-quest-art-mae-roi.json'),JSON.stringify({...questArtReport,mae:{...questArtMetrics,overlay:undefined}},null,2));
+    console.log('WORK8_QUEST_ART_NATIVE_A_B '+JSON.stringify({before:questArtMetrics.before,render:questArtMetrics.render,delta:questArtDelta}));
+    assert.notEqual(questArtBeforeCss,questArtRenderCss,'art CSS has truly changed in the production Chromium');
+    assert.deepEqual(questArtBeforeGeometry,questArtRenderGeometry,'no changed quest, reward, chest or dock geometry');
+    assert.ok(questArtRenderGeometry.questCount===3&&questArtRenderGeometry.dayCount===7&&questArtRenderGeometry.dockCount===5,
+      'three real quests, seven genuine rewards, 5 dock items');
+    assert.ok(questArtRenderGeometry.chests.every(c=>c.bottom<=questArtRenderGeometry.nav.top+2),
+      'seven original chests remain above protected dock');
+    assert.ok(questArtDelta.full<-.008&&questArtDelta.illustrations<-.1&&questArtDelta.quests<-.02,
+      'full, source illustration ROI and three quest rows must improve, not just be different');
+    assert.ok(Math.abs(questArtDelta.daily)<.015&&Math.abs(questArtDelta.chests)<.015&&Math.abs(questArtDelta.dock)<.015,
+      'daily seven rewards and WORK0 dock must not regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
