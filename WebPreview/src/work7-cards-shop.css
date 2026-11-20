@@ -4351,3 +4351,14 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 20 Nov 12:28 UTC: genuine rare chest cool-metal relief.
+ * Trial against actual HEAD 8536f682. Only the blue enamel pigment behind
+ * the one genuine 06 rare chest changes; its genuine illustration, three
+ * statuses, pack, 4x2 cards, geometry, Porto, dock and currency stay untouched.
+ * 384x512 native only; reject unless same-frame RGB MAE/ROI improves.
+ * This is not a design approval: approved:false; 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+ .w7-screen[data-work7-screen="shop"] .w7-chest-rare{--w7-chest-field:#124a75}
+}
