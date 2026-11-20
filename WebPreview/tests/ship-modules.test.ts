@@ -289,10 +289,14 @@ test('mobile modular previews pool repeating box, cylinder and gunport buffers w
   (o.geometry as T.CylinderGeometry).parameters.height===1);
  const rings=meshes.filter(o=>o.geometry.type==='TorusGeometry' && o.name!=='warship-royal-helm');
  assert.ok(meshes.some(o=>o.name==='warship-royal-helm'),'royal helm is a distinct wheel, not a cannon rim');
- assert.ok(boxes.length>25,'complex royal hull contains many independently scaled beams and plates');
- assert.equal(new Set(boxes.map(o=>o.geometry)).size,1,'box meshes share one GPU buffer');
- assert.ok(cylinders.length>=12,'mast and armour rivets require multiple cylinders');
- assert.equal(new Set(cylinders.map(o=>o.geometry)).size,1,'cylinders share one GPU buffer');
+ const drawInstances=(items:T.Mesh[])=>items.reduce(
+  (total,mesh)=>total+(mesh instanceof T.InstancedMesh?mesh.count:1),0);
+ assert.ok(drawInstances(boxes)>25,'complex royal hull retains all independently scaled beams and plates');
+ assert.ok(boxes.length<drawInstances(boxes),'decorative boxes now use fewer draw objects than beams');
+ assert.equal(new Set(boxes.map(o=>o.geometry)).size,1,'box instances share one GPU buffer');
+ assert.ok(drawInstances(cylinders)>=12,'mast and armour rivets remain after instancing');
+ assert.ok(cylinders.length<drawInstances(cylinders),'repeated rivets should draw as instances');
+ assert.equal(new Set(cylinders.map(o=>o.geometry)).size,1,'cylinder instances share one GPU buffer');
  assert.equal(rings.length,14,'eight flagship port rims plus six modular cannon rings');
  assert.equal(new Set(rings.map(o=>o.geometry)).size,2,'each ring size has one shared buffer');
  assert.ok(new Set(meshes.map(o=>o.geometry)).size<20,'accessory geometries stay bounded for mobile');
