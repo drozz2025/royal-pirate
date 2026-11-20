@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline","work8-missions-action-clarity-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1888,6 +1888,70 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(realDayDelta.chests<.02 && Math.abs(realDayDelta.quest)<.02 &&
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
+
+
+    /* WORK8 07 / #104: the three REAL CTA states and their original
+       disabled/active labels are preserved. Test only the new blue enamel,
+       using the SAME already-decoded, paused Chromium 384x512 scene/frame.
+       The prior 1.18 active-button correction must be active on BOTH sides
+       of this A/B — unlike earlier immutable regression gates above. */
+    await evalJs('document.documentElement.classList.remove("work8-missions-action-enamel-ab-baseline");true');
+    const actionClass='work8-missions-action-clarity-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(actionClass)+');true');
+    await delay(140);
+    const actionBeforeLayout=await headingLayout();
+    const actionBeforeFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-quest[data-state=active] > button")).filter');
+    const actionBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(actionClass)+');true');
+    await delay(140);
+    const actionRenderLayout=await headingLayout();
+    const actionRenderFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-quest[data-state=active] > button")).filter');
+    const actionRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const actionMetricsExpression=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+actionBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+actionRender))
+      .replace('quests:[12,155,372,321],daily:',
+        'quests:[12,155,372,321],actionButtons:[294,169,367,322],actionButtonsLower:[294,212,367,322],daily:');
+    assert.notEqual(actionMetricsExpression,source,'native CTA A/B must use newly captured real screenshots');
+    const actionCompare=await evalJs(actionMetricsExpression);
+    const actionMontageExpression='(async()=>{const urls='+JSON.stringify([
+      'data:image/webp;base64,'+orig,
+      'data:image/png;base64,'+actionBefore,
+      'data:image/png;base64,'+actionRender
+    ])+';const ims=await Promise.all(urls.map(u=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=u})));const cv=document.createElement("canvas");cv.width=1536;cv.height=512;const x=cv.getContext("2d");ims.forEach((im,n)=>x.drawImage(im,n*384,0));x.drawImage(ims[0],1152,0);x.globalAlpha=.5;x.drawImage(ims[2],1152,0);return cv.toDataURL("image/png").split(",")[1]})()';
+    const actionMontage=await evalJs(actionMontageExpression);
+    writeFileSync(join(evidence,'missions-action-clarity-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png'),Buffer.from(actionMontage,'base64'));
+    writeFileSync(join(evidence,'missions-action-clarity-before-384x512.png'),Buffer.from(actionBefore,'base64'));
+    writeFileSync(join(evidence,'missions-action-clarity-render-384x512.png'),Buffer.from(actionRender,'base64'));
+    const actionReport={
+      issue:104,scope:'07 Missões: existing active blue buttons only',
+      source:'assets/design-approved/07-missoes.webp',
+      referenceSet:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      sameScenePausedFrame:true,viewport:{width:384,height:512,devicePixelRatio:1},
+      beforeFilter:actionBeforeFilter,renderFilter:actionRenderFilter,
+      roi:actionCompare.metrics,unchanged:actionCompare.unchanged,
+      geometry:{before:actionBeforeLayout,render:actionRenderLayout},
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-action-clarity-native-ab.json'),JSON.stringify(actionReport,null,2));
+    console.log('WORK8_ACTION_CLARITY_AB '+JSON.stringify(actionReport));
+    assert.notEqual(actionBeforeFilter,actionRenderFilter,
+      'real active buttons must receive the new CSS filter');
+    assert.deepEqual(actionBeforeLayout,actionRenderLayout,
+      'active buttons, quest rows, seven chest artwork and WORK0 dock geometry must not move');
+    assert.equal(actionRenderLayout.questCount,3);
+    assert.equal(actionRenderLayout.dayCount,7);
+    assert.equal(actionRenderLayout.dockCount,5);
+    assert.ok(actionRenderLayout.chests.every((r:any)=>r.bottom<=actionRenderLayout.nav.top+2),
+      'seven genuine daily rewards must remain above the unchanged dock');
+    assert.ok(actionCompare.unchanged.dock<.1 && actionCompare.unchanged.header<.1,
+      'new button enamel must not repaint the global header or dock');
+    assert.ok(actionCompare.metrics.full.delta<0 &&
+      actionCompare.metrics.actionButtons.delta<-.02 &&
+      actionCompare.metrics.actionButtonsLower.delta<-.03,
+      'new active-button paint MUST improve the true source MAE on entire screen and CTA ROIs');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
