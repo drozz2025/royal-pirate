@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline","work8-missions-inactive-tab-contrast-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1888,6 +1888,69 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(realDayDelta.chests<.02 && Math.abs(realDayDelta.quest)<.02 &&
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
+
+
+    /* WORK8 07-only: compare the real two inactive mission tab buttons to
+       the source 07 WebP in a SINGLE decoded and frozen Chromium frame.
+       Preserve unchanged viewport, all hit targets, three missions, seven
+       chests and WORK0's dock. Historical A/B tests above deliberately keep
+       this new visual layer disabled until this independent measurement. */
+    const tabContrastFlag='work8-missions-inactive-tab-contrast-ab-baseline';
+    const inactiveSelector='.w8-approved-missions > .w8-approved-tabs button:not([aria-pressed=true])';
+    const tabGeometry=()=>evalJs('(()=>{const rect=e=>{const b=e?.getBoundingClientRect();return b?{x:b.x,y:b.y,width:b.width,height:b.height,bottom:b.bottom}:null};return {inactive:[...document.querySelectorAll('+JSON.stringify(inactiveSelector)+')].map(rect),tabs:[...document.querySelectorAll(".w8-approved-missions > .w8-approved-tabs button")].map(rect),quests:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")].map(rect),chests:[...document.querySelectorAll(".w8-approved-missions .w8-approved-chest")].map(rect),dock:rect(document.querySelector(".app-sheet > .harbour-nav")),scrollWidth:document.documentElement.scrollWidth,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length}})()');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(tabContrastFlag)+');true');
+    await delay(130);
+    const tabBeforeGeometry=await tabGeometry();
+    const tabBeforeFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(inactiveSelector)+')).filter');
+    const tabBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(tabContrastFlag)+');true');
+    await delay(130);
+    const tabRenderGeometry=await tabGeometry();
+    const tabRenderFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(inactiveSelector)+')).filter');
+    const tabRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const tabCompare='(async()=>{'+
+      'const urls='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+tabBefore,'data:image/png;base64,'+tabRender])+';'+
+      'const images=await Promise.all(urls.map(s=>new Promise((yes,no)=>{const im=new Image();im.onload=()=>yes(im);im.onerror=no;im.src=s})));'+
+      'if(images.some(im=>im.width!==384||im.height!==512))throw Error("unscaled native 384x512 required");'+
+      'const px=images.map(im=>{const c=document.createElement("canvas");c.width=384;c.height=512;const ctx=c.getContext("2d");ctx.drawImage(im,0,0);return ctx.getImageData(0,0,384,512).data});'+
+      'const regions={full:[0,0,384,512],tabs:[20,118,371,153],inactive:[144,118,371,153],quests:[12,155,372,321],daily:[13,325,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,430,384,512]};'+
+      'const mae=(a,b,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const j=4*(y*384+x);for(let c=0;c<3;c++){sum+=Math.abs(a[j+c]-b[j+c]);n++}}return sum/n};'+
+      'const before=Object.fromEntries(Object.entries(regions).map(([k,v])=>[k,mae(px[0],px[1],v)]));'+
+      'const render=Object.fromEntries(Object.entries(regions).map(([k,v])=>[k,mae(px[0],px[2],v)]));'+
+      'const changed=Object.fromEntries(Object.entries(regions).map(([k,v])=>[k,mae(px[1],px[2],v)]));'+
+      'const montage=document.createElement("canvas");montage.width=1536;montage.height=512;const ctx=montage.getContext("2d");images.forEach((im,i)=>ctx.drawImage(im,i*384,0));ctx.drawImage(images[0],1152,0);ctx.globalAlpha=.5;ctx.drawImage(images[2],1152,0);'+
+      'return {before,render,changed,overlay:montage.toDataURL("image/png").split(",")[1]}})()';
+    const tabCompared=await evalJs(tabCompare);
+    const tabDelta=Object.fromEntries(Object.keys(tabCompared.before).map(k=>[k,tabCompared.render[k]-tabCompared.before[k]]));
+    const tabReport={issue:104,screen:'07 Missões',baseSha:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
+      reference:'assets/design-approved/07-missoes.webp',
+      mandatoryAssets:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      method:'384x512 native Chromium DPR1, same loaded source/scene/frame, paused animations',
+      beforeFilter:tabBeforeFilter,renderFilter:tabRenderFilter,
+      mae:{before:tabCompared.before,render:tabCompared.render,changed:tabCompared.changed},
+      delta:tabDelta,geometry:{before:tabBeforeGeometry,render:tabRenderGeometry},
+      approved:false,approvedScreens:0};
+    writeFileSync(join(evidence,'work8-missions-inactive-tab-mae-roi.json'),JSON.stringify(tabReport,null,2));
+    writeFileSync(join(evidence,'work8-missions-inactive-tab-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png'),Buffer.from(tabCompared.overlay,'base64'));
+    writeFileSync(join(evidence,'work8-missions-inactive-tab-before-384x512.png'),Buffer.from(tabBefore,'base64'));
+    writeFileSync(join(evidence,'work8-missions-inactive-tab-render-384x512.png'),Buffer.from(tabRender,'base64'));
+    console.log('WORK8_MISSIONS_INACTIVE_TAB_NATIVE '+JSON.stringify(tabReport));
+    assert.notEqual(tabBeforeFilter,tabRenderFilter,'production inactive tab tint MUST apply');
+    assert.deepEqual(tabBeforeGeometry,tabRenderGeometry,'never move actual missions, chests, touch targets or WORK0 dock');
+    assert.equal(tabRenderGeometry.inactive.length,2);
+    assert.equal(tabRenderGeometry.quests.length,3);
+    assert.equal(tabRenderGeometry.chests.length,7);
+    assert.equal(tabRenderGeometry.navCount,5);
+    assert.ok(tabRenderGeometry.scrollWidth<=386);
+    assert.ok(tabRenderGeometry.chests.every(c=>c.bottom<=tabRenderGeometry.dock.y+1),'all seven real reward chests visible above dock');
+    assert.ok(tabDelta.full<-.005 && tabDelta.inactive<-.05,
+      'candidate must genuinely improve whole approved frame AND inactive tab source ROI');
+    for(const name of ['quests','daily','chests','header','dock']){
+      assert.ok(Math.abs(tabDelta[name])<.025 && tabCompared.changed[name]<.025,
+        'protected region '+name+' cannot change due to 07 tabs');
+    }
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
