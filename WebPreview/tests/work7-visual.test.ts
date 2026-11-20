@@ -65,7 +65,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // frame filter. Previous #411/#422 and live artwork stay untouched.
   // The override is installed on the SAME page and animation frame.
   // It is inert for Shop and for 320/tall viewports.
-  // Exact merged HEAD 10830c86: restore ONLY the novel Captain-pack
+  // Exact merged HEAD 10830c86: restore ONLY the novel Captain-pack and rare-chest
   // native pigment. Do not revert an older LEGEND or CARDS correction, as
   // that would compare against a stale pre-HEAD frame.
   const cssBaseline = `
@@ -74,6 +74,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         background:
           radial-gradient(ellipse 66% 95% at 29% 42%,#a51c6655,transparent 88%),
           linear-gradient(112deg,#360957 0%,#31065a 49%,#110839 100%) !important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-rare{
+        --w7-chest-field:#125984 !important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -467,6 +470,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(card.roiMaeAfter,card.roiMaeBefore,
     'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
   assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 Captain pack native pigment must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
+    'Native 06 Captain pack and rare-chest native pigments must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
