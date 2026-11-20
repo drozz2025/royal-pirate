@@ -5485,3 +5485,18 @@
     visibility:hidden;
   }
 }
+
+
+/* WORK8/#104 — 07 MISSÕES ONLY: native source-painted contrast of the
+   THREE EXISTING real gold reward amounts, not their numbers or eligibility.
+   The 384×512 approved frame is brighter than the subdued reward captions;
+   isolate the paint correction by one root opt-out for exact SAME-SCENE
+   Chromium BEFORE/RENDER. No fake gems, objectives, claims, Ranking 08,
+   Porto, WORK0 dock/shell, other WORKs, economy, multiplayer or Unity.
+   Human artistic approval is still false / 0 of 8. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-quest-values-ink-ab-baseline)
+  .w8-approved-missions .w8-approved-quest-rewards > .w8-approved-coin > strong {
+    filter:brightness(1.38) contrast(1.03);
+  }
+}
