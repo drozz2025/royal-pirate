@@ -1889,6 +1889,69 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
 
+
+    /* WORK8/#104 — new 07-only native painted-title registration A/B.
+       The SAME real Chromium document, profile, source images and PAUSED
+       animations are used. The opt-out flag restores the precise WORK0
+       HEAD title placement; there are NO image mocks, DOM patches, gameplay
+       edits or adjacent WORK modifications. */
+    const plaqueBaselineClass='work8-missions-plaque-registration-ab-baseline';
+    const plaqueArtworkSelector='.w8-approved-missions .w8-approved-title > svg.w8-approved-painting-title-missions';
+    const readPlaque=()=>evalJs('(()=>{const e=document.querySelector('+JSON.stringify(plaqueArtworkSelector)+');const p=e?.getBoundingClientRect();const nav=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {art:p?{x:p.x,y:p.y,right:p.right,bottom:p.bottom}:null,style:e?{top:getComputedStyle(e).top,left:getComputedStyle(e).left}:null,nav:nav?{y:nav.y,bottom:nav.bottom}:null,questCount:document.querySelectorAll(".w8-approved-quest").length,dayCount:document.querySelectorAll(".w8-approved-days li").length,dockCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,documentWidth:document.documentElement.scrollWidth};})()');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(plaqueBaselineClass)+');true');
+    await delay(150);
+    const plaqueBeforeGeometry=await readPlaque();
+    const plaqueBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(plaqueBaselineClass)+');true');
+    await delay(150);
+    const plaqueAfterGeometry=await readPlaque();
+    const plaqueAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const plaqueSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+plaqueBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+plaqueAfter))
+      .replace('chests:[20,356,370,427],dock:', 'chests:[20,356,370,427],plaque:[96,74,288,121],dock:');
+    assert.notEqual(plaqueSource,source,'production visual A/B must use two different real screenshots');
+    const plaqueMetrics=await evalJs(plaqueSource);
+    const titleReport={
+      scope:'WORK8 issue #104; 07 Missões painted title only',
+      base:'work6/web-3d-preview',source:'assets/design-approved/07-missoes.webp',
+      approvedReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      frame:'real same scene/frame Chromium 384x512 DPR1; all document animations paused',
+      baseline:plaqueBeforeGeometry,candidate:plaqueAfterGeometry,
+      roi:plaqueMetrics.metrics,unchanged:plaqueMetrics.unchanged,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-plaque-registration-ab.json'),JSON.stringify(titleReport,null,2));
+    writeFileSync(join(evidence,'work8-missions-plaque-before-384x512.png'),Buffer.from(plaqueBefore,'base64'));
+    writeFileSync(join(evidence,'work8-missions-plaque-render-384x512.png'),Buffer.from(plaqueAfter,'base64'));
+    writeFileSync(join(evidence,'work8-missions-plaque-original-before-overlay-384x512.png'),Buffer.from(plaqueMetrics.overlays[0],'base64'));
+    writeFileSync(join(evidence,'work8-missions-plaque-original-render-overlay-384x512.png'),Buffer.from(plaqueMetrics.overlays[1],'base64'));
+    const plaqueMontage=await evalJs('(async()=>{const paths='+JSON.stringify([
+      'data:image/webp;base64,'+orig,
+      'data:image/png;base64,'+plaqueBefore,
+      'data:image/png;base64,'+plaqueAfter
+    ])+';const imgs=await Promise.all(paths.map(s=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=s})));if(imgs.some(i=>i.width!==384||i.height!==512))throw Error("non-native image");const c=document.createElement("canvas");c.width=1536;c.height=512;const t=c.getContext("2d");imgs.forEach((im,n)=>t.drawImage(im,384*n,0));t.drawImage(imgs[0],1152,0);t.globalAlpha=.5;t.drawImage(imgs[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()');
+    writeFileSync(join(evidence,'work8-missions-plaque-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png'),Buffer.from(plaqueMontage,'base64'));
+    console.log('WORK8_07_PLAQUE_SOURCE_AB '+JSON.stringify(titleReport));
+    assert.equal(plaqueAfterGeometry.questCount,3);
+    assert.equal(plaqueAfterGeometry.dayCount,7);
+    assert.equal(plaqueAfterGeometry.dockCount,5);
+    assert.ok(plaqueAfterGeometry.documentWidth<=386);
+    assert.deepEqual(plaqueBeforeGeometry.nav,plaqueAfterGeometry.nav,'no WORK0 dock movement');
+    assert.ok(plaqueBeforeGeometry.art&&plaqueAfterGeometry.art,'true approved title source painting required');
+    assert.ok(Math.abs(plaqueAfterGeometry.art.y-plaqueBeforeGeometry.art.y+3)<.15,'only the original title art moves 3px up');
+    assert.ok(Math.abs(plaqueAfterGeometry.art.x-plaqueBeforeGeometry.art.x-1)<.15,'only the original title art moves 1px right');
+    assert.ok(plaqueMetrics.metrics.plaque.delta < -1,
+      'native 07 source title ROI MUST improve, not merely move the DOM');
+    assert.ok(plaqueMetrics.metrics.full.delta < -0.03,
+      'native 07 full-frame source MAE MUST improve');
+    for(const region of ['quests','daily','chests','header','dock']){
+      assert.ok(Math.abs(plaqueMetrics.metrics[region].delta)<.1,
+        'protected screen region '+region+' must remain visually unchanged');
+    }
+    assert.ok(plaqueMetrics.unchanged.dock<.1&&plaqueMetrics.unchanged.header<.1,
+      'real shared dock/HUD geometry and pixels remain identical');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
