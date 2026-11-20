@@ -4,7 +4,8 @@ import { Battle, predict, SHIPS, type BattleEvent } from './battle';
 import { SoftwareRenderer } from './software-renderer';
 import { PirateAudio } from './audio';
 import { makeShip, type ShipArt } from './ships';
-import { applyShipModules, type ShipLoadout, type ModuleSlot } from './ship-modules';
+import { type ShipLoadout, type ModuleSlot } from './ship-modules';
+import { syncShipyardPreview } from './shipyard-preview-sync';
 import { shipyardCameraOffset, shipyardPartTarget, shipyardPartCameraOffset, type ShipyardView } from './shipyard-camera';
 import { releaseShipyardResources } from './shipyard-resources';
 import { preferredShipyardPixelRatio, adjustedShipyardPixelRatio } from './shipyard-render-budget';
@@ -165,7 +166,8 @@ export class OceanScene {
       this.shipyardArt.root.position.set(SHIPS.player.x,0,SHIPS.player.z);
       this.scene.add(this.shipyardArt.root);
     }
-    applyShipModules(this.shipyardArt.root,this.shipyardArt.rig,loadout);
+    // Slider-only demo level changes update metadata instead of rebuilding GPU meshes.
+    syncShipyardPreview(this.shipyardArt.root,this.shipyardArt.rig,loadout);
     this.ships.player.root.visible=false;this.shipyardArt.root.visible=true;
     this.ships.enemy.root.visible=false;this.foam[1].visible=false;
     this.harbourDock.visible=true;this.path.visible=false;this.marker.visible=false;
