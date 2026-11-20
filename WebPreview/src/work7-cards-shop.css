@@ -4364,4 +4364,9 @@
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
     filter:brightness(.84);
   }
+  /* Keep authentic treasure pigment while darkening the enveloping velvet:
+     0.84×1.22 ~= the merged HEAD's 0.88×1.16. */
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    filter:saturate(1.05) contrast(1.06) brightness(1.22) drop-shadow(0 6px 5px #14062ca3);
+  }
 }
