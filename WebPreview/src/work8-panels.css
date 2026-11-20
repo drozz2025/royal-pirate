@@ -5485,3 +5485,16 @@
     visibility:hidden;
   }
 }
+
+/* WORK8/#104 — 07 MISSÕES only: relief of the three real early-day chest
+   illustrations. The source-approved strip has luminous emerald metal,
+   while the live W8Art silhouettes were dimmed by the existing enamel.
+   This changes pixels only: no claimed checkmark, reward, day position,
+   Ranking, Porto, shared dock or hitbox. Native same-scene comparison
+   toggles this root guard; artistic approval remains false. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-early-chest-light-ab-baseline)
+  .w8-approved-missions .w8-approved-days li:nth-child(-n+3) .w8-approved-chest > svg.w8-art {
+    filter:brightness(1.38) saturate(1.13) drop-shadow(0 2px 2px #04201a);
+  }
+}
