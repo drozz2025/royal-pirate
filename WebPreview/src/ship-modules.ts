@@ -7,6 +7,7 @@ import { createPreviewBowAnchors } from './ship-bow-anchors';
 import { createPreviewDeckRopeCoils } from './ship-deck-rope-coils';
 import { createPreviewDeckLongboats } from './ship-deck-longboats';
 import { createPreviewDeckHatches } from './ship-deck-hatches';
+import { createPreviewShipBell } from './ship-deck-bell';
 import { createPreviewSternRudder } from './ship-stern-rudders';
 import { createPreviewGunportShutters } from './ship-gunport-shutters';
 import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
@@ -317,6 +318,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // Raised deck hatches are two GPU-batched preview meshes keyed by cabin tier.
  // Their geometry never belongs to the battle ship or persistent fleet.
  additions.add(createPreviewDeckHatches(config.shipClass,config.modules.cabin as PreviewCabinModule));
+ // Original bronze bell on a class-specific timber yoke. Only ornamental preview
+ // geometry: no combat audio, stats, ownership, currency or persistence.
+ additions.add(createPreviewShipBell(config.shipClass,config.modules.ornaments as PreviewOrnamentModule));
  // An original tapered wooden rudder with class-specific forged hinges and
  // hull-tier refits: decorative 3D shipyard art, NOT a steering or combat change.
  additions.add(createPreviewSternRudder(config.shipClass,config.modules.hull as PreviewHullModule));
