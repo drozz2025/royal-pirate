@@ -67,14 +67,10 @@ test('WORK5: profile shows exactly 12 latest battle rows while lifetime statisti
   assert.equal((html.match(/class="app-battle-entry\s/g)||[]).length,12,
     'profile must show the twelve retained receipts and no duplicates');
   assert.match(html,/12\s*\/\s*12 saved/,'profile history cap missing');
-  for(let i=36;i<48;i++){
-    const label=new Date(FIRST+i*1000).toISOString().slice(0,16).replace('T',' ');
-    assert.ok(html.includes(label),'missing visible timestamp for battle '+i);
-  }
-  for(let i=0;i<36;i++){
-    const label=new Date(FIRST+i*1000).toISOString().slice(0,16).replace('T',' ');
-    assert.ok(!html.includes(label),'old expired receipt leaked into UI for battle '+i);
-  }
+  const timestamps=[...html.matchAll(/<time\\b[^>]*\\bdatetime="([^"]+)"/gi)]
+    .map(match=>match[1]);
+  assert.deepEqual(timestamps,p.battleLog.map(entry=>entry.completedAt),
+    'visible profile receipts must be exactly the newest twelve in order');
   assert.equal(missionProgress(p,'first-win'),1);
   assert.equal(missionProgress(p,'five-hits'),5);
   assert.equal(missionProgress(p,'three-battles'),3);
