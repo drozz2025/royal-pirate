@@ -43,6 +43,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
+  assert.ok(cssText.includes('Match genuine third concept preview enamel'),
+    'Only native third-card preview-enamel change may enter this branch');
   assert.ok(cssText.includes('Native card 4+7 inlay/exposure candidate'),
     'Only cards 4 and 7 physical artwork filters are recalibrated in this branch');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
@@ -64,12 +66,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // The override is installed on the SAME page and animation frame.
   // It is inert for Shop and for 320/tall viewports.
   const cssBaseline = `
+    /* Exactly undo WORK7 native third preview plaque; all other HEAD paint
+     * and artwork are shared with RENDER in this frozen Chromium frame. */
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) small{
+        background:linear-gradient(180deg,#fff8dcb8 0%,transparent 37%),
+                   linear-gradient(180deg,var(--w7-enamel) 14%,var(--w7-shadow) 100%)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -458,11 +460,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const card=native.find(screen=>screen.kind==='cards');
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
-  assert.equal(card.maeRgbAfter,card.maeRgbBefore,
-    '05 Cartas must stay exactly pixel-identical to the true starting HEAD');
-  assert.equal(card.roiMaeAfter,card.roiMaeBefore,
-    'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
-  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
-    JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
+  assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
+    'Native 05 genuine third preview lime enamel must improve both global MAE AND eight-card ROI: '+
+    JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
+  assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
+    '06 Loja must remain pixel-identical to exact merged WORK0 HEAD');
+  assert.equal(shop.roiMaeAfter,shop.roiMaeBefore,
+    'The single pack and all three chest previews must remain pixel-identical');
 });
