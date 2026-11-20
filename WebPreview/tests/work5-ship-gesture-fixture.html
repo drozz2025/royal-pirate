@@ -15,6 +15,7 @@ try {
     pointerCount:()=>scene.shipPointers.size,
     zoomEnabled:()=>scene.controls.enableZoom,
     canvasRect:()=>{const r=scene.renderer.domElement.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height}},
+    viewport:()=>{const r=scene.renderer.domElement.getBoundingClientRect();return{width:r.width,height:r.height,aspect:scene.camera.aspect,pixelWidth:scene.renderer.domElement.width,pixelHeight:scene.renderer.domElement.height}},
     findHit:()=>{
       const r=scene.renderer.domElement.getBoundingClientRect();
       scene.ships.player.root.updateWorldMatrix(true,true);
