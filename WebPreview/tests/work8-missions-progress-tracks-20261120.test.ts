@@ -7,8 +7,8 @@ import {join} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 
 /** WORK8/#104: 07-missoes source, SAME genuine Chromium DOM/frame.
- * The root switch adjusts only the seven real daily caption labels. Real objectives, reward amounts, claimability and five-item
- * shared dock MUST be identical. No mocked app state, image backdrop or
+ * The root switch changes ONLY the pigment of three existing objective progress troughs. Real progress,
+ * objective counts, rewards, claimability, touch targets and WORK0 five-item dock MUST be identical. No mocked app state, image backdrop or
  * APPROVED flag. */
 test('07 Missions: three real objective progress troughs improve approved 384x512 Chromium MAE', {timeout:220000}, async()=>{
   await delay(50000); // do not overload shared GitHub runner Chromium sessions
@@ -102,7 +102,7 @@ test('07 Missions: three real objective progress troughs improve approved 384x51
     await wait('.w8-approved-missions .w8-approved-quest-list');
     await evalJs('(async()=>{const u=[...new Set([...document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting image")].map(x=>x.getAttribute("href")).filter(Boolean))];await Promise.all(u.map(async src=>{const img=new Image();img.src=src;await img.decode()}));await document.fonts.ready;document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return u.length})()');
     await delay(250);
-    const geometry=()=>evalJs('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const nav=document.querySelector(".app-sheet > .harbour-nav");const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")],days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],buttons=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button, .w8-approved-missions .w8-approved-quest > button")],dockButtons=[...nav.querySelectorAll(".harbour-nav-item")];return {questCount:quests.length,days:days.length,dockCount:dockButtons.length,tabAndActionCount:buttons.length,tabBoxes:[...document.querySelectorAll(\".w8-approved-missions .w8-approved-tabs button\")].map(rect),questBoxes:quests.map(rect),dayBoxes:days.map(rect),rewardBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(rect),nav:rect(nav),meters:quests.map(q=>rect(q.querySelector(".w8-approved-meter"))),documentWidth:document.documentElement.scrollWidth,labels:quests.map(q=>q.querySelector(".w8-approved-quest-core strong")?.textContent),rewards:quests.map(q=>[...q.querySelectorAll(".w8-approved-quest-rewards strong")].map(s=>s.textContent)),glyphs:document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem").length}})()');
+    const geometry=()=>evalJs('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const nav=document.querySelector(".app-sheet > .harbour-nav");const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")],days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],buttons=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button, .w8-approved-missions .w8-approved-quest > button")],dockButtons=[...nav.querySelectorAll(".harbour-nav-item")];return {questCount:quests.length,days:days.length,dockCount:dockButtons.length,tabAndActionCount:buttons.length,tabBoxes:[...document.querySelectorAll(\".w8-approved-missions .w8-approved-tabs button\")].map(rect),questBoxes:quests.map(rect),dayBoxes:days.map(rect),rewardBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(rect),nav:rect(nav),meters:quests.map(q=>rect(q.querySelector(".w8-approved-meter"))),captions:days.map(d=>rect(d.querySelector("small"))),documentWidth:document.documentElement.scrollWidth,labels:quests.map(q=>q.querySelector(".w8-approved-quest-core strong")?.textContent),rewards:quests.map(q=>[...q.querySelectorAll(".w8-approved-quest-rewards strong")].map(s=>s.textContent)),glyphs:document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem").length}})()');
     const beforeLayout=await geometry();
     const selectedBefore=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest .w8-approved-meter")).backgroundImage');
     const before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
@@ -116,6 +116,7 @@ test('07 Missions: three real objective progress troughs improve approved 384x51
     assert.deepEqual(afterLayout.tabBoxes,beforeLayout.tabBoxes,'tab tap targets and layout must not shift');
     assert.deepEqual(afterLayout.dayBoxes,beforeLayout.dayBoxes,'seven reward boxes and scroll geometry must not shift');
     assert.deepEqual(afterLayout.meters,beforeLayout.meters,'progress trough boxes must not move');
+    assert.deepEqual(afterLayout.captions,beforeLayout.captions,'seven real reward captions may not shift');
     assert.deepEqual(afterLayout.labels,beforeLayout.labels,'real mission objective labels unchanged');
     assert.deepEqual(afterLayout.rewards,beforeLayout.rewards,'real mission rewards unchanged');
     assert.equal(afterLayout.questCount,3);
@@ -125,6 +126,7 @@ test('07 Missions: three real objective progress troughs improve approved 384x51
     assert.equal(afterLayout.glyphs,0,'do not use source screenshot icon overlays or fake currency');
     assert.ok(afterLayout.dayBoxes.every((d:number[])=>d[0]>=-1&&d[0]+d[2]<=385));
     assert.ok(afterLayout.meters.every((d:number[])=>d[1]+d[3]<=afterLayout.nav[1]+3),'three progress track readouts must remain above dock');
+    assert.ok(afterLayout.captions.every((d:number[])=>d[1]+d[3]<=afterLayout.nav[1]+3),'all seven day labels must remain above the WORK0 dock at 384x512');
     const original=readFileSync(new URL('../../assets/design-approved/07-missoes.webp',import.meta.url)).toString('base64');
     const script=String.raw`(async()=>{
       const make=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src});
@@ -168,6 +170,14 @@ test('07 Missions: three real objective progress troughs improve approved 384x51
     save('missions-progress-tracks-render-384x512.png',after);
     save('missions-progress-tracks-original-before-overlay.png',compared.overlays[0]);
     save('missions-progress-tracks-original-render-overlay.png',compared.overlays[1]);
+    // A four-panel artifact uses the SAME decoded, paused Chromium frame.
+    // No synthetic state and no scaling of the native approved 384x512 artwork.
+    const fourPanelSource='(async()=>{const src='+JSON.stringify([
+      'data:image/webp;base64,'+original,
+      'data:image/png;base64,'+before,
+      'data:image/png;base64,'+after
+    ])+';const pics=await Promise.all(src.map(v=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=v})));const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");pics.forEach((im,n)=>x.drawImage(im,384*n,0));x.drawImage(pics[0],1152,0);x.globalAlpha=.5;x.drawImage(pics[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()';
+    save('missions-progress-tracks-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png',await evalJs(fourPanelSource));
     const report={
       issue:104,scope:'WORK8 exclusively 07 Missões: actual progress meter troughs',
       reference:'assets/design-approved/07-missoes.webp',
@@ -193,8 +203,8 @@ test('07 Missions: three real objective progress troughs improve approved 384x51
       await delay(140);
       assert.equal(await evalJs('document.querySelector(".w8-approved-missions .w8-approved-tabs button:nth-child('+index+')").getAttribute("aria-pressed")'),'true','native Missions tab touch must remain functional');
     }
-    const narrow=await evalJs('(()=>{const days=document.querySelector(".w8-approved-days"),nav=document.querySelector(".app-sheet > .harbour-nav"),sheet=document.querySelector(".app-sheet-content");if(sheet)sheet.scrollTop=sheet.scrollHeight;if(days)days.scrollLeft=days.scrollWidth;const a=days.getBoundingClientRect(),b=days.lastElementChild.getBoundingClientRect();return {sevenVisible:b.left>=a.left-2&&b.right<=a.right+2,dock:nav.querySelectorAll(".harbour-nav-item").length,quest:document.querySelectorAll(".w8-approved-quest").length,days:days.children.length,width:document.documentElement.scrollWidth}})()');
-    assert.ok(narrow.sevenVisible&&narrow.width<=322&&narrow.dock===5&&narrow.quest===3&&narrow.days===7);
+    const narrow=await evalJs('(()=>{const days=document.querySelector(".w8-approved-days"),nav=document.querySelector(".app-sheet > .harbour-nav"),sheet=document.querySelector(".app-sheet-content");if(sheet)sheet.scrollTop=sheet.scrollHeight;if(days)days.scrollLeft=days.scrollWidth;const a=days.getBoundingClientRect(),b=days.lastElementChild.getBoundingClientRect();return {sevenVisible:b.left>=a.left-2&&b.right<=a.right+2,sevenAboveDock:b.bottom<=nav.getBoundingClientRect().top+2,dock:nav.querySelectorAll(".harbour-nav-item").length,quest:document.querySelectorAll(".w8-approved-quest").length,days:days.children.length,width:document.documentElement.scrollWidth}})()');
+    assert.ok(narrow.sevenVisible&&narrow.sevenAboveDock&&narrow.width<=322&&narrow.dock===5&&narrow.quest===3&&narrow.days===7);
     save('missions-progress-tracks-320x568.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     for(const viewport of [{width:390,height:844},{width:430,height:932}]){
       await cmd('Emulation.setDeviceMetricsOverride',{...viewport,mobile:true,deviceScaleFactor:1,screenWidth:viewport.width,screenHeight:viewport.height});
