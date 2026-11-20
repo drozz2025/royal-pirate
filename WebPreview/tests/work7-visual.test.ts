@@ -66,6 +66,17 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
+      /* Restore exactly the physical painting positions of merged HEAD, not
+         stale geometry from a previously unmerged WORK7 draft. */
+      .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{
+        transform:translate(-2px,0) scale(.88)!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
+        transform:translate(4px,0) scale(.9)!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+        transform:translate(4px,4px) scale(1.02)!important;
+      }
       .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
         box-shadow:inset 0 0 0 3px #071321cd,
                    inset 0 2px 11px 3px #020817c5,
@@ -463,6 +474,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(card.roiMaeAfter,card.roiMaeBefore,
     'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
   assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
+    'Native 06 three real paintings must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
