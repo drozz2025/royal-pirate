@@ -5491,14 +5491,23 @@
    readable and visually source-registered, without shifting a single reward
    tile, chest artwork, claim action or WORK0's fixed five-button dock.
    Native approved 07-missoes.webp shows Dia 1–7 lettering at y≈417–426;
-   the current Chromium labels are at y≈405–413. The paint-only translate
-   corrects the inscription alignment while preserving live text and layout.
+   the current Chromium labels are drawn above their intended baseline.
+   Shortening ONLY each static glyph's line box repositions its ink while
+   preserving the label bottom and the seven chest / dock boundaries.
    A root opt-out supplies real SAME FRAME BEFORE/RENDER test captures.
    At 320x568 and taller viewport layouts this style is entirely inactive.
    Artistic approval remains false (0/8). */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
   :root:not(.work8-missions-seven-caption-source-ab-baseline)
   .w8-approved-missions .w8-approved-days li > small {
-    transform:translateY(13px);
+    /* The old 24px line box wasted 12px above the painted glyphs.
+       Correct the glyph baseline INSIDE the original tile bounds, instead
+       of translating its 24px box underneath the WORK0 dock. */
+    box-sizing:border-box;
+    height:12px;
+    min-height:12px;
+    line-height:12px;
+    padding:0;
+    margin:0;
   }
 }
