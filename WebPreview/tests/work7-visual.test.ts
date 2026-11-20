@@ -433,9 +433,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           assert.ok(geometry.slots[0].x>=12 && geometry.slots[0].x<=18,
             'The scaled original 05 left border starts around x=16 at 320px');
         }
-        if(width===320 && kind==='shop') {
+        if(width===320) {
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y-8),
-            'All three real chest availability labels need at least 8px clear above the 320px dock');
+            'All live WORK7 PRÉVIA / EM BREVE labels need >=8px clearance above the genuine five-item dock at 320x568');
+        }
+        if(width===320 && kind==='shop') {
           assert.ok(baselineGeometry && baselineGeometry.labels.length===3,
             'Measure the genuine prior HEAD chest labels at the same 320x568 viewport');
           assert.ok(Math.max(...geometry.labels.map((label:any)=>label.bottom))
