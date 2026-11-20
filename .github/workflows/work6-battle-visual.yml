@@ -55,7 +55,7 @@ jobs:
           test -x "$chrome"
           "$chrome" --version
           echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
-      - name: Capture actual 320/384/390/430 Porto and Batalha
+      - name: Capture real 320/384/390/430 eight-screen dock and Batalha
         working-directory: WebPreview
         run: |
           npm run dev -- --host 127.0.0.1 > /tmp/royal-work6-vite.log 2>&1 &
@@ -73,7 +73,13 @@ jobs:
           from pathlib import Path
           root=Path('work6-qa')
           refs={'porto':Path('../assets/design-approved/01-porto.webp'),
-                'battle':Path('../assets/design-approved/02-batalha.webp')}
+                'battle':Path('../assets/design-approved/02-batalha.webp'),
+                'frota':Path('../assets/design-approved/03-frota.webp'),
+                'forja':Path('../assets/design-approved/04-melhorias-forja.webp'),
+                'cartas':Path('../assets/design-approved/05-cartas.webp'),
+                'loja':Path('../assets/design-approved/06-loja.webp'),
+                'missoes':Path('../assets/design-approved/07-missoes.webp'),
+                'ranking':Path('../assets/design-approved/08-ranking-perfil.webp')}
           for screen, refpath in refs.items():
               source=Image.open(refpath).convert('RGB')
               for w,h in [(320,568),(384,512),(390,844),(430,932)]:
