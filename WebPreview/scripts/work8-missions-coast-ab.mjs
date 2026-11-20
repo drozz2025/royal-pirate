@@ -129,10 +129,10 @@ try {
   // production app states. The same DOM, profile, viewport and frozen frame
   // are used for every sample and are compared to the source artwork.
   const sweep=[];
-  const svg='.w8-approved-missions .w8-approved-scene .w8-seascape';
+  const svg='.w8-approved-missions .w8-approved-scene .w8-seascape > g:first-of-type';
   for(const hue of [-24,-16,-8,0,8,10,12,16,24,32]){
     for(const bright of [.74,.80,.86]){
-      const filter='saturate(1.02) contrast(1.08) brightness('+bright+') hue-rotate('+hue+'deg) drop-shadow(0 3px 2px rgba(2,25,45,.32))';
+      const filter='brightness('+bright+') saturate(1.02) hue-rotate('+hue+'deg)';
       await run('document.querySelector('+JSON.stringify(svg)+').style.filter='+JSON.stringify(filter)+';true');
       await sleep(35);
       const shot=await grab(null);
