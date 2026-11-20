@@ -272,6 +272,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           // viewport and font rendering identical before/after.
           const enabled = await evaluate("(()=>{const s=document.createElement('style');s.id='work7-css-baseline';s.textContent="+JSON.stringify(cssBaseline)+";document.head.appendChild(s);return true})()");
           assert.ok(enabled,'Isolated work7 CSS-only baseline installed');
+          if (kind==='shop' && width===384 && height===512) {
+            const previousMaterial=await evaluate("getComputedStyle(document.querySelector('[data-work7-screen=\\\"shop\\\"] .w7-chest-rare')).getPropertyValue('--w7-chest-field').trim()");
+            assert.equal(previousMaterial,'#125984','Before image must have the genuine BASE SHA rare chest pigment, not an unrelated style');
+          }
           await sleep(200);
           // Actual HEAD geometry before this PR, measured in the same browser
           // and viewport. Position/area validation matters beyond global MAE.
@@ -286,6 +290,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           await writeFile(join(output,'before-'+kind+'-'+width+'x'+height+'.png'),
             Buffer.from(baseline.data,'base64'));
           await evaluate("(()=>{document.getElementById('work7-css-baseline')?.remove();return true})()");
+          if(kind==='shop' && width===384 && height===512){
+            const newMaterial=await evaluate("getComputedStyle(document.querySelector('[data-work7-screen=\\\"shop\\\"] .w7-chest-rare')).getPropertyValue('--w7-chest-field').trim()");
+            assert.equal(newMaterial,'#124a75','After image must use the actual PR rare chest pigment, not an injected-only CSS baseline');
+          }
           await sleep(200);
           if (width===384 && height===512) {
             // Actual current HEAD, not the older pre-#268 baseline: the only
