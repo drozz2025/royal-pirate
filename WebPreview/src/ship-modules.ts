@@ -5,6 +5,7 @@ import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
 import { createPreviewCabinGallery, type PreviewCabinModule } from './ship-cabin';
 import { createPreviewCannonRefit, type PreviewCannonModule } from './ship-cannons';
 import { createPreviewFigurehead, type PreviewFigureheadModule } from './ship-figureheads';
+import { createPreviewHullRelief, type PreviewHullModule } from './ship-hull-relief';
 
 /** Original modular ship system. All 20 levels are supported by progression gates,
  * not 20 duplicated meshes. Neither currency nor ownership is fabricated here. */
@@ -295,6 +296,10 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // editor preview. They have no hitboxes, stat changes or ownership semantics.
  const shieldPlates=createPreviewArmour(config.shipClass,config.modules.armor as PreviewArmorModule);
  if(shieldPlates)additions.add(shieldPlates);
+ // Physical sheer planks and forged fittings follow the curved base hull.
+ // Class silhouettes and oak/ironwood/royal finishes are distinct, yet each
+ // refit consumes only two preview draw objects and never affects battle.
+ additions.add(createPreviewHullRelief(config.shipClass,config.modules.hull as PreviewHullModule));
  const hull=config.modules.hull,armor=config.modules.armor;
  if(hull!=='hull-oak')for(const side of [-1,1])for(const z of [-2.6,-1,1,2.6])
   cube(hull==='hull-royal'?brass:warm,side*1.55,1.04,z,.2,1.25,.18);
