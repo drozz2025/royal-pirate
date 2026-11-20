@@ -12,6 +12,7 @@ import { makeBattleDeck } from './battle-deck';
 import { projectileFromMuzzle, firstPersonArc, firstPersonShotPosition } from './battle-shot-presentation';
 import { makeBattleForegroundSail } from './battle-foreground-sail';
 import { createBattleSkyTexture } from './battle-atmosphere';
+import { makeBattleEnemyOrnaments } from './battle-enemy-ornaments';
 export type Metrics = { fps: number; renderMs: number; calls: number; triangles: number; geometries: number; textures: number; effects: number; heapMB?: number };
 export class OceanScene {
   renderer: T.WebGLRenderer | SoftwareRenderer; compatibility=false; scene=new T.Scene(); camera=new T.PerspectiveCamera(42,1,.1,220); controls: OrbitControls;
@@ -294,6 +295,9 @@ export class OceanScene {
     );
     seams.name='battle-only-red-hem-stitching';
     rig.add(seams);
+    // The only enemy art group gains a sculpted broadside, stern galleries and
+    // cloth-following pirate heraldry; its gameplay rig remains unchanged.
+    rig.add(makeBattleEnemyOrnaments());
   }
 
   private dressBattleDeck(){
