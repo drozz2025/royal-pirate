@@ -272,4 +272,78 @@ test('WORK4 Forge native genuine-plaque metal rim sweep: same frame, full/plaque
       cannon:x.roi.cannon.changedPixels,furnace:x.roi.furnace.changedPixels}))
   }));
 
+  // WORK4/#104: reference 04 has the cannon improvement heading beside its
+  // actual illustrated medal. Compare local plate composition within ONE
+  // paused Chromium 384x512 scene; do not substitute dummy money/levels.
+  // These are diagnostic CSS injections; runtime styling is not touched here.
+  const headerSel='.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description';
+  const gridVariant=(badge:number,titleSize:number)=>[
+    headerSel+'{display:grid!important;grid-template-columns:'+ (badge+6) +'px minmax(0,1fr)!important;grid-template-rows:14px 23px 19px auto!important;column-gap:4px!important;row-gap:0!important;align-content:start!important;padding:6px 6px 7px!important;}',
+    headerSel+' > .w4-forge-medallion{grid-column:1!important;grid-row:1/4!important;width:'+badge+'px!important;height:'+badge+'px!important;align-self:start!important;margin:0!important;}',
+    headerSel+' > span{grid-column:2!important;grid-row:1!important;align-self:end!important;white-space:nowrap!important;font-size:7px!important;line-height:1!important;}',
+    headerSel+' > h3{grid-column:2!important;grid-row:2!important;margin:0!important;align-self:center!important;font-size:'+titleSize+'px!important;line-height:1!important;}',
+    headerSel+' > strong{grid-column:2!important;grid-row:3!important;align-self:center!important;font-size:15px!important;line-height:1!important;}',
+    headerSel+' > .w4-forge-live-levels{grid-column:1/-1!important;grid-row:4!important;margin-top:5px!important;}'
+  ].join('');
+  const headerCandidates=[
+    {id:'release',rules:''},
+    {id:'grid-40-19',rules:gridVariant(40,19)},
+    {id:'grid-44-19',rules:gridVariant(44,19)},
+    {id:'grid-44-21',rules:gridVariant(44,21)},
+    {id:'grid-48-19',rules:gridVariant(48,19)},
+    {id:'grid-48-21',rules:gridVariant(48,21)},
+    {id:'grid-52-19',rules:gridVariant(52,19)},
+    {id:'warm-iron',rules:headerSel+'{background:linear-gradient(165deg,#433322f0,#17242bf5 55%,#081821f9)!important;}'},
+    {id:'source-dark',rules:headerSel+'{background:linear-gradient(170deg,#232524f2,#0a1c29f6 70%,#061221fc)!important;}'},
+  ];
+  const headerShots:string[]=[];
+  for(const candidate of headerCandidates){
+    const rule=candidate.rules;
+    await evaluate("(()=>{let e=document.getElementById('work4-forge-header-study');"+
+      "if(!e){e=document.createElement('style');e.id='work4-forge-header-study';document.head.append(e);}"+
+      "e.textContent="+JSON.stringify(rule)+";return true;})()");
+    await delay(120);
+    headerShots.push((await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string);
+  }
+  await evaluate("(()=>{document.getElementById('work4-forge-header-study')?.remove();return true})()");
+  const headerPixelScript="(async()=>{const shots="+JSON.stringify(headerShots)+
+    ";const original='data:image/webp;base64,"+reference+"';"+
+    "const load=async(src)=>{const i=new Image();i.src=src;await i.decode();return i};"+
+    "const [ref,...images]=await Promise.all([load(original),...shots.map(s=>load('data:image/png;base64,'+s))]);"+
+    "if([ref,...images].some(i=>i.width!==384||i.height!==512))throw Error('native 384x512 only');"+
+    "const pix=img=>{const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+    "const g=cv.getContext('2d',{willReadFrequently:true});g.drawImage(img,0,0);return g.getImageData(0,0,384,512).data;};"+
+    "const base=pix(ref),frames=images.map(pix),boxes={full:[0,0,384,512],"+
+    "plaque:[179,165,373,333],heading:[183,180,363,267],"+
+    "cannon:[18,153,175,305],furnace:[129,168,171,294],"+
+    "costs:[16,342,375,430],dock:[0,453,384,512]};"+
+    "const calc=(a,b,box)=>{let err=0,n=0,changed=0;for(let y=box[1];y<box[3];y++)"+
+    "for(let x=box[0];x<box[2];x++){const p=(y*384+x)*4;let different=false;"+
+    "for(let k=0;k<3;k++){err+=Math.abs(a[p+k]-b[p+k]);n++;if(a[p+k]!==b[p+k])different=true;}"+
+    "if(different)changed++;}return {mae:err/n,changedPixels:changed}};"+
+    "const rows=frames.map((f,i)=>({index:i,metrics:Object.fromEntries(Object.entries(boxes).map(([name,box])=>[name,"+
+    "{mae:calc(base,f,box).mae,changedPixels:calc(frames[0],f,box).changedPixels}]))}));"+
+    "const b=rows[0],valid=rows.filter(r=>['cannon','furnace','costs','dock'].every(k=>r.metrics[k].changedPixels===0)&&"+
+    "r.metrics.full.mae<=b.metrics.full.mae&&r.metrics.plaque.mae<b.metrics.plaque.mae);"+
+    "valid.sort((a,b)=>a.metrics.heading.mae-b.metrics.heading.mae||a.metrics.full.mae-b.metrics.full.mae);"+
+    "const best=valid[0]||rows[0];"+
+    "const cv=document.createElement('canvas');cv.width=1536;cv.height=512;const g=cv.getContext('2d');"+
+    "g.drawImage(ref,0,0);g.drawImage(images[0],384,0);g.drawImage(images[best.index],768,0);"+
+    "g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(images[best.index],1152,0);"+
+    "return {rows,winner:best.index,boxes,montage:cv.toDataURL('image/png').split(',')[1]};})()";
+  const headerResult=await evaluate(headerPixelScript);
+  assert.equal(headerResult.rows.length,headerCandidates.length);
+  for(const row of headerResult.rows)for(const key of ['cannon','furnace','costs','dock'])
+    assert.equal(row.metrics[key].changedPixels,0,key+' must not be changed by plate layout');
+  const headerReport={approved:false,screensApproved:0,viewport:'384x512',samePausedFrame:true,
+    reference:'04-melhorias-forja.webp',safeWinner:headerCandidates[headerResult.winner].id,
+    variants:headerCandidates.map((item,i)=>({id:item.id,...headerResult.rows[i]})),boxes:headerResult.boxes};
+  writeFileSync(join(qa,'work4-forge-header-study-384x512.json'),JSON.stringify(headerReport,null,2)+'\n');
+  writeFileSync(join(qa,'original-before-render-overlay-forge-header-384x512.png'),
+    Buffer.from(headerResult.montage,'base64'));
+  console.log('WORK4_FORGE_HEADER_STUDY '+JSON.stringify({safeWinner:headerReport.safeWinner,
+    candidates:headerReport.variants.map(x=>({id:x.id,full:x.metrics.full.mae,
+      plaque:x.metrics.plaque.mae,heading:x.metrics.heading.mae,
+      cannonChanges:x.metrics.cannon.changedPixels,costsChanges:x.metrics.costs.changedPixels}))}));
+
 });
