@@ -3,6 +3,7 @@ import { createPreviewStandingRigging, type PreviewMastModule } from './ship-rig
 import { createPreviewSternHeraldry, type PreviewOrnamentModule } from './ship-heraldry';
 import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
 import { createPreviewCabinGallery, type PreviewCabinModule } from './ship-cabin';
+import { createPreviewCannonRefit, type PreviewCannonModule } from './ship-cannons';
 
 /** Original modular ship system. All 20 levels are supported by progression gates,
  * not 20 duplicated meshes. Neither currency nor ownership is fabricated here. */
@@ -300,6 +301,10 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
   cube(armor==='armor-royal'?brass:iron,side*1.58,y,0,.13,.14,7.1);
   for(const z of [-2.6,-1.2,.4,1.9])tube(brass,side*1.68,y,z,.065,.12);
  }
+ // Six original low-poly refit sleeves + barrel hoops merge to just two draw
+ // calls across the complete broadside. These overlay the base cannon models;
+ // none of the battle gun groups or combat stats are ever replaced.
+ additions.add(createPreviewCannonRefit(config.shipClass,config.modules.cannons as PreviewCannonModule));
  if(config.modules.cannons!=='cannons-bronze')for(const side of [-1,1])for(const z of [-1.8,0,1.8]){
   ring(config.modules.cannons==='cannons-gold'?brass:iron,side*2.6,1.56,z,.24,.07,6,12);
  }
