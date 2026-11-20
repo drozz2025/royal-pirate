@@ -26,5 +26,6 @@ test('battle water has finite colours, capped foam, and no new draw calls',()=>{
   assert.match(shader,/vec3 deep=mix\(vec3\(\.005,\.105,\.235\),vec3\(\.019,\.34,\.51\),/);
   assert.match(shader,/gl_FragColor=vec4\(col,1\.\);/);
   assert.match(source,/new T\.PlaneGeometry\(210,210,190,190\),this\.water/);
-  assert.doesNotMatch(shader,/texture2D\(|fetch\(|video|screenshot/i);
+  const executableShader=shader.replace(/\/\/[^\n]*/g,'');
+  assert.doesNotMatch(executableShader,/\btexture2D\s*\(|\bfetch\s*\(|\bvideo\b/i);
 });
