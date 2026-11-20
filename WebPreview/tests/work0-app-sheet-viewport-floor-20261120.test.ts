@@ -7,7 +7,7 @@ import {readFileSync} from 'node:fs';
  * Visual and interaction validation still belongs to Chromium mobile QA. */
 test('overlay screens get their own viewport class only while mounted',()=>{
  const main=readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
- assert.match(main,/harbour&&appScreen\?' with-app-sheet':' '/);
+ assert.match(main,/harbour&&appScreen\?' with-app-sheet':''/);
  assert.match(main,/className=\{'app '/);
 });
 test('mobile sheets cannot exceed their real phone viewport; Porto unchanged',()=>{
