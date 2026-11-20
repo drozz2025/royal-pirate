@@ -4352,25 +4352,13 @@
   }
 }
 
-/* WORK7/#104 — 20 Nov 01:45 UTC. Native 384x512 hand-painted metal relief.
- * Real approved 05 artwork remains eight separate 4x2 live image crops;
- * preserve honest PRÉVIA, one Captain pack, all three unavailable chests.
- * Match deeper recessed pigments in the four physical 05 frames (slots 4,
- * 6, 7 and 8) without affecting illustration size, text, hit targets,
- * Porto, dock, shared shell, 320x568 or tall portrait viewports.
- * Same-frame exact HEAD A/B in Chromium tests strict global/atlas ROI.
- * No screenshots as page backgrounds. approved:false (0/8); WORK0 only. */
+/* WORK7/#104 — 20 Nov 01:48 UTC. Source-painted Captain chest art only.
+ * Native 384x512 crop pigment calibration: real Chromium sweep from
+ * v0.1.113 found brightness 1.14 better than 1.16 in full MAE and ROI.
+ * Preserves original WebP, live text, real state and all other 05/06 content.
+ * No other WORK or 320x568/tall layout changes; approved:false, 0/8. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
-    filter:brightness(.44) saturate(2.00) contrast(.79);
-  }
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
-    filter:brightness(.59) saturate(1.30) contrast(.92);
-  }
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
-    filter:brightness(.36) saturate(1.75) contrast(.79);
-  }
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
-    filter:brightness(.58) saturate(1.90) contrast(.88);
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    filter:saturate(1.05) contrast(1.06) brightness(1.14) drop-shadow(0 6px 5px #14062ca3);
   }
 }
