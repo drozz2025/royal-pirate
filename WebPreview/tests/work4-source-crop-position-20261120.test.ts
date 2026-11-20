@@ -139,8 +139,8 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
     if(screen==='fleet'){assert.equal(initial.cards,4);assert.ok(initial.ship);}
     else {assert.ok(initial.cannon);assert.ok(initial.costs);}
     const selector=screen==='fleet'
-      ?'.w4-fleet .w4-harbour-stage > svg.w4-reference-ship'
-      :'.w4-forge .w4-forge-scene > svg.w4-reference-cannon';
+      ?'.w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship'
+      :'.w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon';
     const variants=screen==='fleet'
       ?[{id:'HEAD',x:null,y:null},{id:'left-2',x:'-2px',y:'9px'},
         {id:'right-2',x:'2px',y:'9px'},{id:'up-2',x:'0px',y:'7px'},
@@ -155,6 +155,9 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
       if(candidate.id!=='HEAD'){
         const css=selector+'{left:'+candidate.x+'!important;top:'+candidate.y+'!important;}';
         await evaluate("(()=>{const style=document.createElement('style');style.id='work4-crop-offset-ab';style.textContent="+JSON.stringify(css)+";document.head.appendChild(style);return true;})()");
+        const applied=await evaluate("(()=>{const s=getComputedStyle(document.querySelector("+JSON.stringify(selector)+"));return {x:s.left,y:s.top}})()");
+        assert.equal(applied.x,candidate.x,'candidate must actually override existing important ship/cannon CSS');
+        assert.equal(applied.y,candidate.y,'candidate must change the actual rendered crop top');
       }
       await sleep(120);
       images.push([candidate.id,await shot()]);
