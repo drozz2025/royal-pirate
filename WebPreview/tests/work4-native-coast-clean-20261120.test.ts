@@ -192,6 +192,6 @@ test('WORK4 Fleet native live-inset controlled A/B: same Chromium frame, per-ROI
   }
   writeFileSync(join(qa,'work4-clean-coast-responsive-qa.json'),
     JSON.stringify({approved:false,approvedScreens:0,viewport:'native384+3mobile',
-      comparisons:report.roi,mobileQA},null,2)+'\\n');
+      comparisons:report.roi,mobileQA},null,2)+String.fromCharCode(10));
 
 });
