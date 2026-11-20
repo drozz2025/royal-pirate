@@ -146,12 +146,23 @@ test('WORK4 Forja 04: A/B cost-board relief vs approved source, cannon and dock 
     {id:'dark-brass',css:'linear-gradient(173deg,#302d25 0%,#191f23 48%,#0c1720 100%)'},
     {id:'source-black',css:'linear-gradient(173deg,#222727 0%,#161b22 55%,#09151b 100%)'},
     {id:'wood-interior',css:'linear-gradient(173deg,#37302a 0%,#202020 52%,#121a20 100%)'},
-    {id:'ash-and-iron',css:'linear-gradient(173deg,#2e302f 0%,#1b242a 48%,#101a24 100%)'}
+    {id:'ash-and-iron',css:'linear-gradient(173deg,#2e302f 0%,#1b242a 48%,#101a24 100%)'},
+    // Isolate the suspected remaining Forja regression against the merged HEAD:
+    // original live 9px costs versus PR's 11px, on the EXACT same frame.
+    {id:'caption-9-release',css:'',caption:{size:9,top:0}},
+    {id:'caption-9-clear',css:'',caption:{size:9,top:-3}},
+    {id:'caption-10-clear',css:'',caption:{size:10,top:-3}},
+    {id:'caption-12-clear',css:'',caption:{size:12,top:-3}}
   ];
   const captures:string[]=[];
   const selector='.w4-forge #w4-forge-panel > .w4-materials:where(*)';
   for(const p of paints){
-    const injected=p.css?selector+'{background:'+p.css+'!important;}':'';
+    const injected=(p.css?selector+'{background:'+p.css+'!important;}':'')+
+      ('caption' in p&&p.caption?
+        '@media (width:384px) and (height:512px){'+
+        '.w4-forge #w4-forge-panel [aria-label="Custo e materiais disponíveis"] small'+
+        '{font-size:'+p.caption.size+'px!important;line-height:1.05!important;letter-spacing:-.1px!important;}'+
+        '.w4-forge #w4-forge-panel > .w4-improve-button{top:'+p.caption.top+'px!important;}}':'');
     const applied=await evaluate("(()=>{let s=document.getElementById('w4-cost-paint-study');if(!s){s=document.createElement('style');s.id='w4-cost-paint-study';document.head.append(s)}s.textContent="+JSON.stringify(injected)+";return getComputedStyle(document.querySelector('.w4-forge #w4-forge-panel > .w4-materials')).backgroundImage})()");
     assert.ok(typeof applied==='string'&&applied.length>8,'CSS candidate actually computed');
     captures.push(await shot());
@@ -164,11 +175,11 @@ test('WORK4 Forja 04: A/B cost-board relief vs approved source, cannon and dock 
     "const pix=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data};"+
     "const src=pix(ref),samples=ims.map(pix),m="+JSON.stringify(geometry.materials)+";"+
     "const box=a=>[Math.max(0,Math.floor(a[0])),Math.max(0,Math.floor(a[1])),Math.min(384,Math.ceil(a[2])),Math.min(512,Math.ceil(a[3]))];"+
-    "const regions={global:[0,0,384,512],materials:box(m),cannon:[18,153,175,305],furnace:[129,168,171,294],dock:[0,433,384,512]};"+
+    "const regions={global:[0,0,384,512],materials:box(m),costsAndAction:[16,318,375,430],cannon:[18,153,175,305],furnace:[129,168,171,294],dock:[0,433,384,512]};"+
     "const measure=(a,b,r)=>{let s=0,n=0,c=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=4*(y*384+x);let changed=false;for(let i=0;i<3;i++){s+=Math.abs(a[k+i]-b[k+i]);n++;if(a[k+i]!==b[k+i])changed=true}if(changed)c++}return {mae:s/n,changedPixels:c}};"+
     "const records=samples.map((p,i)=>({index:i,roi:Object.fromEntries(Object.entries(regions).map(([name,b])=>[name,{mae:measure(src,p,b).mae,changedPixels:measure(samples[0],p,b).changedPixels}]))}));"+
-    "const before=records[0];const admitted=records.filter(r=>r.roi.cannon.changedPixels===0&&r.roi.furnace.changedPixels===0&&r.roi.dock.changedPixels===0&&r.roi.global.mae<=before.roi.global.mae&&r.roi.materials.mae<=before.roi.materials.mae);"+
-    "admitted.sort((a,b)=>(a.roi.materials.mae-b.roi.materials.mae)||(a.roi.global.mae-b.roi.global.mae));"+
+    "const before=records[0];const admitted=records.filter(r=>r.roi.cannon.changedPixels===0&&r.roi.furnace.changedPixels===0&&r.roi.dock.changedPixels===0&&r.roi.global.mae<=before.roi.global.mae&&r.roi.costsAndAction.mae<=before.roi.costsAndAction.mae);"+
+    "admitted.sort((a,b)=>(a.roi.costsAndAction.mae-b.roi.costsAndAction.mae)||(a.roi.global.mae-b.roi.global.mae));"+
     "const best=admitted[0]||before;const grid=document.createElement('canvas');grid.width=1536;grid.height=512;const g=grid.getContext('2d');g.drawImage(ref,0,0);g.drawImage(ims[0],384,0);g.drawImage(ims[best.index],768,0);g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(ims[best.index],1152,0);"+
     "return {records,bestIndex:best.index,regions,grid:grid.toDataURL('image/png').split(',')[1]}})()";
   const pixels=await evaluate(calculate);
