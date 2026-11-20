@@ -376,7 +376,8 @@ test('WORK4 Forge native genuine-plaque metal rim sweep: same frame, full/plaque
   const costNumbersAfter=await evaluate("Array.from(document.querySelectorAll('.w4-forge .w4-resource-grid strong'),e=>e.textContent?.trim())");
   assert.deepEqual(costNumbersAfter,costNumbersBefore,'typography never changes material amounts');
   const captionGeometry=await evaluate("(()=>{const b=document.querySelector('.w4-improve-button').getBoundingClientRect();return {buttonHeight:b.height,buttonBottom:b.bottom,navCount:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length,scrollWidth:document.documentElement.scrollWidth,width:innerWidth}})()");
-  assert.ok(captionGeometry.buttonHeight>=40 && captionGeometry.scrollWidth<=384+2);
+  assert.ok(captionGeometry.buttonHeight>=44 && captionGeometry.scrollWidth<=384+2);
+  assert.ok(captionGeometry.buttonBottom<=429,'real WORK4 upgrade button must clear WORK0 dock at y=430 with 1px margin');
   assert.equal(captionGeometry.navCount,5,'WORK0 five-item dock preserved');
   const captionPixelEval="(async()=>{"+
     "const png="+JSON.stringify(captionShots)+";"+
