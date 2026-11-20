@@ -3260,3 +3260,19 @@
     box-shadow:none;
   }
 }
+
+/* WORK4/#104 — chromatic coast/ink transition, native 384×512 only.
+   The preceding paint ends at #07415aee on the live inset's coastline side,
+   but its old 10px ::after bridge ended at #082c48de: a second visible
+   vertical discontinuity. Match the destination pigment and feather over
+   14px instead. This pseudo-paint is noninteractive, under the same SINGLE
+   approved Royal Crown. It neither redraws sea nor moves the stats, roster,
+   cannon, actual costs, dock or WORK0 shell. Chromium source-ROI A/B gate
+   compares this against the previous real ten-pixel bridge; approved:false. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after {
+    left:-14px;
+    width:14px;
+    background:linear-gradient(90deg,transparent 0%,#07415aee 100%);
+  }
+}
