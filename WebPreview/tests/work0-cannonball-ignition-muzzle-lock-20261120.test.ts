@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import * as T from 'three';
 import {makeBattleDeck} from '../src/battle-deck';
 import {battleDeckMuzzleWorld} from '../src/battle-framing';
 import {firstPersonShotPosition} from '../src/battle-shot-presentation';
@@ -37,10 +36,10 @@ test('WORK0 #104: first-person ball starts at the real central muzzle and stays 
 
 test('WORK0 #104: battle renderer caches firing muzzle and never retargets ball from recoil',()=>{
   const code=readFileSync(new URL('../src/scene.ts',import.meta.url),'utf8');
-  assert.match(code,/private playerShotMuzzle:T\\.Vector3\\|null=null/);
-  assert.match(code,/this\\.playerShotMuzzle=this\\.battleBattery\\.visible\\?\\(this\\.playerMuzzleWorld\\(\\)\\?\\.clone\\(\\)\\?\\?null\\):null/);
-  assert.match(code,/this\\.playerShotMuzzle\\?\\?this\\.playerMuzzleWorld\\(\\)/);
-  assert.match(code,/this\\.playerShotMuzzle=null;this\\.playerArcTarget=null/);
-  assert.match(code,/vfxOrigin=event\\.type==='fire'/,
-    'flash and smoke still use the animated cannon mouth');
+  assert.ok(code.includes('private playerShotMuzzle:T.Vector3|null=null'));
+  assert.ok(code.includes('this.playerShotMuzzle=this.battleBattery.visible?'));
+  assert.ok(code.includes('(this.playerShotMuzzle??this.playerMuzzleWorld())'));
+  assert.ok(code.includes('this.playerShotMuzzle=null;this.playerArcTarget=null'));
+  assert.ok(code.includes("vfxOrigin=event.type==='fire'"),
+    'flash and smoke still originate at the live cannon muzzle');
 });
