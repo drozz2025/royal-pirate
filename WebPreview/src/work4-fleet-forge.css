@@ -3094,3 +3094,66 @@
     border-color:#725a46;
   }
 }
+
+
+/* WORK4/#104 — 20 Nov 03h: full-height Fleet 03 live stats inset
+   The verified 384x512 reference places one uninterrupted dark information
+   recess against the right-hand coast, from top to bottom of the stage.
+   Our older floating rectangle left bright synthetic sea visible above/below
+   the source Royal Crown crop, advertising the vertical photo cut at x≈241.
+   Bring the EXISTING real levels into that same full-height recess, feather
+   the narrow join into the approved source, and leave the pictured ship and
+   water at their exact source registration. No duplicated ship, fake water
+   strokes or copied reference numbers. #255/#260 390/430 and WORK0 dock
+   remain untouched. WORK0 must review the A/B before integrating. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    top:0;
+    bottom:0;
+    right:0;
+    box-sizing:border-box;
+    width:34%;
+    height:100%;
+    min-height:0;
+    padding:7px 5px 7px 8px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    gap:2px;
+    border:0;
+    border-radius:0;
+    background:linear-gradient(90deg,#082c48de 0%,#09253ff1 20%,#061d33f8 55%,#031529fc 100%)!important;
+    box-shadow:inset 1px 0 #bad4cf27;
+  }
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after {
+    content:"";
+    position:absolute;
+    left:-10px;
+    top:0;
+    bottom:0;
+    width:10px;
+    background:linear-gradient(90deg,transparent 0%,#082c48de 100%);
+    pointer-events:none;
+  }
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label > strong {
+    font-size:clamp(18px,4.8vw,23px);
+    line-height:.94;
+  }
+}
+
+/* WORK4/#104 — native Forge workshop source depth, 20 Nov.
+   Controlled 384x512 A/B reuses the distinct, previously validated #588
+   graded underpainting and measures it against the actual current HEAD
+   in the SAME paused Chromium Forja scene. The one approved cannon and
+   real flame remain in foreground; no new assets or second cannon.
+   Underlay only: protect real prices, 44px action and 5-item dock.
+   320/390/430 CSS and WORK0 integrations are unchanged.
+   approved:false: compare ORIGINAL|BEFORE|RENDER|OVERLAY before integration. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene {
+    background-image:
+      radial-gradient(ellipse 48% 82% at 12% 84%,#493326 0%,#302724 39%,transparent 90%),
+      linear-gradient(165deg,#181d26 0%,#252327 56%,#272324 100%)!important;
+  }
+}

@@ -180,4 +180,96 @@ test('WORK4 Forge native genuine-plaque metal rim sweep: same frame, full/plaque
   writeFileSync(join(qa,'original-before-best-overlay-forge-plaque-384x512.png'),Buffer.from(result.grid,'base64'));
   console.log('WORK4_FORGE_PLAQUE_RIM_SWEEP '+JSON.stringify({globalWinner:report.globalWinner,safeWinner:report.safeWinner,decision:report.decision,baseline:report.candidates[0],winner:report.candidates[result.bestIndex],geometry,
     roiSummary:report.candidates.map(x=>({paint:x.paint,full:x.roi.full.mae,plaque:x.roi.plaque.mae,plaqueBorder:x.roi.plaqueBorder.mae,cannon:x.roi.cannon.mae,furnace:x.roi.furnace.mae}))}));
+
+  // WORK4 / #104 20 Nov: controlled prospect for an ORIGINAL-source forge
+  // plaque transition. No runtime paint is changed by this diagnostic.
+  // All candidates are captured from the SAME paused DOM and browser frame,
+  // after restoring the actual release border (not the prior border sweep).
+  await evaluate("(()=>{document.getElementById('work4-forge-plaque-candidate')?.remove();return true})()");
+  await delay(180);
+  const tonalCandidates=[
+    {id:'HEAD',paint:null},
+    {id:'source-left-08',paint:'linear-gradient(90deg,#172b3600 0%,#172b36e2 8%,#061827f4 70%,#04101ff9 100%)'},
+    {id:'source-left-14',paint:'linear-gradient(90deg,#172b3600 0%,#172b36e3 14%,#061827f2 70%,#04101ff9 100%)'},
+    {id:'source-left-22',paint:'linear-gradient(90deg,#172b3600 0%,#172b36df 22%,#061827f2 70%,#04101ff9 100%)'},
+    {id:'source-left-32',paint:'linear-gradient(90deg,#172b3600 0%,#172b36e5 32%,#061827f4 70%,#04101ff9 100%)'},
+    {id:'soft-all',paint:'linear-gradient(170deg,#172b36bd,#061827dc 70%,#04101fe9)'},
+    {id:'soft-top',paint:'linear-gradient(170deg,#172b36a9,#061827ed 70%,#04101ff6)'},
+    {id:'warm-smoke',paint:'linear-gradient(170deg,#3d3229dc,#15222def 65%,#071723f7)'},
+    {id:'warm-metal',paint:'linear-gradient(170deg,#554332dd,#1b2733ef 65%,#071421f8)'},
+    {id:'muted-steel',paint:'linear-gradient(165deg,#243c48dc,#091f31f1 65%,#04101ffa)'},
+    {id:'bronze-side',paint:'linear-gradient(90deg,#7c594633 0%,#1c303dda 20%,#081a2cf4 65%,#04101ff9)'},
+  ];
+  const tonals:string[]=[];
+  for(const item of tonalCandidates){
+    await evaluate("(()=>{let el=document.getElementById('w4-forge-tonal-candidate');"+
+      "if(!el){el=document.createElement('style');el.id='w4-forge-tonal-candidate';document.head.append(el);}"+
+      "el.textContent="+JSON.stringify(item.paint?
+        '.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description { background:'+item.paint+'!important; }':
+        '')+";return true})()");
+    await delay(125);
+    tonals.push((await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string);
+  }
+  await evaluate("(()=>{document.getElementById('w4-forge-tonal-candidate')?.remove();return true})()");
+  const tonalScript="(async()=>{"+
+    "const input="+JSON.stringify({ref:reference,shots:tonals})+";"+
+    "const im=async(data,type)=>{const i=new Image();i.src='data:image/'+type+';base64,'+data;await i.decode();return i;};"+
+    "const source=await im(input.ref,'webp'),imgs=await Promise.all(input.shots.map(b=>im(b,'png')));"+
+    "if([source,...imgs].some(i=>i.width!==384||i.height!==512))throw Error('native 384x512 only');"+
+    "const pix=i=>{const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+    "const g=cv.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data;};"+
+    "const ref=pix(source),frames=imgs.map(pix),rects={full:[0,0,384,512],"+
+    "plaque:[179,145,373,316],plaqueJoin:[176,150,206,310],"+
+    "cannon:[18,153,175,305],furnace:[129,168,171,294],"+
+    "costs:[16,329,375,430],dock:[0,433,384,512]};"+
+    "const score=(a,b,box)=>{let abs=0,n=0,diff=0;for(let y=box[1];y<box[3];y++)"+
+    "for(let x=box[0];x<box[2];x++){const p=(y*384+x)*4;"+
+    "let changed=false;for(let c=0;c<3;c++){abs+=Math.abs(a[p+c]-b[p+c]);n++;"+
+    "if(a[p+c]!==b[p+c])changed=true;}if(changed)diff++;}return {mae:abs/n,changedPixels:diff};};"+
+    "const rows=frames.map((f,i)=>{const roi={};"+
+    "for(const [name,rect] of Object.entries(rects)){roi[name]={"+
+    "mae:score(ref,f,rect).mae,changedPixels:score(frames[0],f,rect).changedPixels};}"+
+    "return {index:i,roi};});"+
+    "const base=rows[0],valid=rows.filter(r=>"+
+    "['cannon','furnace','costs','dock'].every(k=>r.roi[k].changedPixels===0)&&"+
+    "r.roi.full.mae<=base.roi.full.mae+.1&&"+
+    "r.roi.plaque.mae<=base.roi.plaque.mae+.1);"+
+    "valid.sort((a,b)=>(a.roi.plaque.mae*.6+a.roi.plaqueJoin.mae*.3+a.roi.full.mae*.1)-"+
+    "(b.roi.plaque.mae*.6+b.roi.plaqueJoin.mae*.3+b.roi.full.mae*.1));"+
+    "const winner=valid[0]||base;"+
+    "const grid=document.createElement('canvas');grid.width=1536;grid.height=512;"+
+    "const g=grid.getContext('2d');g.drawImage(source,0,0);"+
+    "g.drawImage(imgs[0],384,0);g.drawImage(imgs[winner.index],768,0);"+
+    "g.drawImage(source,1152,0);g.globalAlpha=.5;g.drawImage(imgs[winner.index],1152,0);"+
+    "return {rows,winner:winner.index,rects,montage:grid.toDataURL('image/png').split(',')[1]};})()";
+  const tonalResult=await evaluate(tonalScript);
+  assert.equal(tonalResult.rows.length,tonalCandidates.length,'all original-frame pigment variants compared');
+  for(const row of tonalResult.rows){
+    for(const key of ['cannon','furnace','costs','dock'])
+      assert.equal(row.roi[key].changedPixels,0,key+' protected original pixels across all variants');
+  }
+  const tonalWinner=tonalResult.rows[tonalResult.winner];
+  const tonalReport={
+    approved:false,screensApproved:0,source:'assets/design-approved/04-melhorias-forja.webp',
+    viewport:'384x512',samePausedFrame:true,productionCSSUnchanged:true,
+    note:'Research-only. Ship the best original-source painter ONLY after measuring ROI improvement and checking readability.',
+    geometry,rects:tonalResult.rects,
+    rows:tonalCandidates.map((v,i)=>({...v,...tonalResult.rows[i]})),
+    candidate:tonalCandidates[tonalResult.winner],
+    improvement:{
+      full:tonalResult.rows[0].roi.full.mae-tonalWinner.roi.full.mae,
+      plaque:tonalResult.rows[0].roi.plaque.mae-tonalWinner.roi.plaque.mae,
+      join:tonalResult.rows[0].roi.plaqueJoin.mae-tonalWinner.roi.plaqueJoin.mae
+    }
+  };
+  writeFileSync(join(qa,'work4-forge-tonal-ab-384x512.json'),JSON.stringify(tonalReport,null,2)+'\n');
+  writeFileSync(join(qa,'original-before-render-overlay-forge-tonal-384x512.png'),
+    Buffer.from(tonalResult.montage,'base64'));
+  console.log('WORK4_FORGE_TONAL_AB '+JSON.stringify({
+    candidate:tonalReport.candidate,improvement:tonalReport.improvement,
+    summary:tonalReport.rows.map(x=>({id:x.id,full:x.roi.full.mae,
+      plaque:x.roi.plaque.mae,join:x.roi.plaqueJoin.mae,
+      cannon:x.roi.cannon.changedPixels,furnace:x.roi.furnace.changedPixels}))
+  }));
+
 });
