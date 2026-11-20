@@ -222,8 +222,11 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     "const valid=records.filter(r=>r.roi.costs.changedPixels===0&&r.roi.dock.changedPixels===0&&['full','workshop','cannon','furnace'].every(name=>r.roi[name].mae<=baseline.roi[name].mae));"+
     "valid.sort((x,y)=>(x.roi.full.mae-y.roi.full.mae)||(x.roi.workshop.mae-y.roi.workshop.mae)||(x.roi.furnace.mae-y.roi.furnace.mae));"+
     "const best=valid[0];if(!best)throw Error('baseline must remain an admissible candidate');"+
-    "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;const g=canvas.getContext('2d');g.drawImage(original,0,0);g.drawImage(screens[0],384,0);g.drawImage(screens[best.index],768,0);g.drawImage(original,1152,0);g.globalAlpha=.5;g.drawImage(screens[best.index],1152,0);"+
-    "return {records,bestIndex:best.index,globalWinnerIndex:globalWinner.index,baseline,geometry:"+JSON.stringify(geometry)+",grid:canvas.toDataURL('image/png').split(',')[1]};})()";
+    "const release=records[1];const changesFromRelease=shots.map(shot=>Object.fromEntries(Object.entries(boxes).map(([name,box])=>[name,count(shots[1],shot,box)])));"+
+    "const safeNew=records.filter(r=>r.index>=records.length-7&&[\'costs\',\'dock\'].every(k=>changesFromRelease[r.index][k]===0)&&[\'full\',\'workshop\',\'cannon\',\'furnace\'].every(k=>r.roi[k].mae<=release.roi[k].mae));"+
+    "safeNew.sort((a,b)=>(a.roi.full.mae-b.roi.full.mae)||(a.roi.workshop.mae-b.roi.workshop.mae));const bestRelease=safeNew[0]||release;"+
+    "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;const g=canvas.getContext('2d');g.drawImage(original,0,0);g.drawImage(screens[1],384,0);g.drawImage(screens[bestRelease.index],768,0);g.drawImage(original,1152,0);g.globalAlpha=.5;g.drawImage(screens[bestRelease.index],1152,0);"+
+    "return {records,bestIndex:best.index,bestReleaseIndex:bestRelease.index,changesFromRelease,globalWinnerIndex:globalWinner.index,baseline,geometry:"+JSON.stringify(geometry)+",grid:canvas.toDataURL('image/png').split(',')[1]};})()";
   const result=await evaluate(script);
 
   assert.equal(result.records.length,variants.length,'all controlled source paint variants measured');
@@ -237,6 +240,13 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
   assert.ok(proposal.roi.workshop.changedPixels>0,'workshop pigment must change visible original pixels');
   assert.equal(proposal.roi.costs.changedPixels,0,'three real material prices must not change');
   assert.equal(proposal.roi.dock.changedPixels,0,'WORK0 global five-item dock must not change');
+  const tested=variants.slice(-7).map((variant,j)=>({variant,index:variants.length-7+j}));
+  assert.ok(tested.some(x=>result.changesFromRelease[x.index].cannon>0),
+    'at least one iron candidate must actually change source cannon pixels');
+  for(const x of tested){
+    assert.equal(result.changesFromRelease[x.index].costs,0,'real prices cannot change: '+x.variant.id);
+    assert.equal(result.changesFromRelease[x.index].dock,0,'WORK0 dock cannot change: '+x.variant.id);
+  }
   // The stage source painting, live progression and functional cannon are
   // not restyled. ROI changes are recorded, not misreported as artistic approval.
   // Remove the injected native study override: mobile captures must reflect
@@ -265,6 +275,17 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     reference:'04-melhorias-forja.webp',
     comparison:'same real Chromium Forge frame with animations paused; previous no-image underlay vs graduated workshop pigments',
     geometries:geometry,roi:rois,mobile,
+    releaseComparison:{
+      reference:'same genuine 04 WEBP; HEAD release current underlay as baseline',
+      release:variants[1].id,
+      measured:tested.map(x=>({id:x.variant.id,
+        roi:Object.fromEntries(['full','workshop','cannon','furnace','costs','dock'].map(k=>
+          [k,{release:result.records[1].roi[k].mae,candidate:result.records[x.index].roi[k].mae,
+            delta:result.records[x.index].roi[k].mae-result.records[1].roi[k].mae,
+            changedPixels:result.changesFromRelease[x.index][k]}]))})),
+      bestNonRegressing:variants[result.bestReleaseIndex].id,
+      qualifiesForArtReview:result.bestReleaseIndex!==1
+    },
     study:variants.map((v,i)=>({id:v.id,roi:result.records[i].roi})),
     bestByFull:variants[result.globalWinnerIndex].id,
     bestProtected:variants[result.bestIndex].id,
@@ -275,4 +296,5 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
   writeFileSync(join(qa,'work4-forge-depth-gradient-ab-384x512.json'),JSON.stringify(report,null,2)+'\n');
   writeFileSync(join(qa,'work4-original-before-render-overlay-forge-gradient-384x512.png'),Buffer.from(result.grid,'base64'));
   console.log('WORK4_FORGE_GRADIENT_NATIVE_AB '+JSON.stringify(report));
+  console.log('WORK4_FORGE_IRON_LIGHT_RELEASE_AB '+JSON.stringify(report.releaseComparison));
 });
