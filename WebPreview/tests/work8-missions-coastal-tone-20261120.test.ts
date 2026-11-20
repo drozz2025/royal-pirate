@@ -173,7 +173,7 @@ test('07 Missions: approved Missions coastal scenery improve approved 384x512 Ch
       viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-coastal-tone-ab-baseline',
       metrics:compared.metrics,unchanged:compared.unchanged,
       geometry:{before:beforeLayout,after:afterLayout},approved:false,approvedScreens:0,
-      candidate:'Missions-only seascape saturate(1.06) contrast(1.07) brightness(1.08)'
+      candidate:'Missions-only seascape saturate(1.02) contrast(1.08) brightness(.77) with original drop-shadow'
     };
     writeFileSync(join(evidence,'work8-missions-coastal-tone-native-ab.json'),JSON.stringify(report,null,2));
     console.log('WORK8 07 coastal scenery native Chromium A/B '+JSON.stringify(compared.metrics));
