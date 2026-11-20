@@ -1,5 +1,6 @@
 import * as T from 'three';
 import { createPreviewStandingRigging, type PreviewMastModule } from './ship-rigging';
+import { createPreviewMastLookouts } from './ship-mast-lookouts';
 import { createPreviewSternHeraldry, type PreviewOrnamentModule } from './ship-heraldry';
 import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
 import { createPreviewCabinGallery, type PreviewCabinModule } from './ship-cabin';
@@ -288,6 +289,8 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // One low-cost line-buffer creates authentic 3D shrouds, ratlines and stays.
  // Shipyard-only geometry does not change rig damage, battle or entitlements.
  additions.add(createPreviewStandingRigging(config.shipClass,config.modules.masts as PreviewMastModule));
+ // Original mast lookout platforms: two batched meshes, in editor only.
+ additions.add(createPreviewMastLookouts(config.shipClass,config.modules.masts as PreviewMastModule));
  // A single merged 3D stern crest per class; selected trim tier changes its
  // sculpture without altering equipment rights or ship combat statistics.
  additions.add(createPreviewSternHeraldry(config.shipClass,config.modules.ornaments as PreviewOrnamentModule));
