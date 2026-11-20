@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {enemyGalleonPlankHeight,makeShip} from '../src/ships';
+import {enemyGalleonPlankHeight} from '../src/ships';
 import {Battle} from '../src/battle';
 
 // This is a real 3D silhouette change, NOT a one-viewport CSS tint.
@@ -23,9 +23,10 @@ test('WORK0: red galleon geometry only; player Porto, cannon flight and HUD unto
   const source=readFileSync(new URL('../src/ships.ts',import.meta.url),'utf8');
   assert.match(source,/red\?enemyGalleonPlankHeight\(z,y0\):y0/);
   assert.match(source,/red\?enemyGalleonPlankHeight\(z,y1\):y1/);
-  const red=makeShip(true),player=makeShip(false);
-  assert.ok(red.root.children.length>0&&player.root.children.length>0);
-  assert.equal(red.health,player.health);
+  // makeShip() constructs texture canvases and intentionally requires the DOM.
+  // Node's headless source/geometry test must NOT pretend to run a browser.
+  assert.match(source,/red\?enemyGalleonPlankHeight\(stations\[i\],2\.82\):2\.82/);
+  assert.match(source,/red\?enemyGalleonPlankHeight\(stations\[i\+1\],2\.82\):2\.82/);
   const battle=new Battle(1729);
   battle.aim(12,65);
   assert.equal(battle.fire(),true);
