@@ -1914,16 +1914,16 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(150);
     const tabBeforeGeometry=await selectedTabGeometry();
     const tabBeforeCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(selectedTabSelector)+')).filter');
-    const tabBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const selectedNavBeforePng=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove('+JSON.stringify(selectedTabFlag)+');true');
     await delay(150);
     const tabAfterGeometry=await selectedTabGeometry();
     const tabAfterCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(selectedTabSelector)+')).filter');
-    const tabAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    const tabComparison=await selectedTabMetrics(tabBefore,tabAfter);
+    const selectedNavAfterPng=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const tabComparison=await selectedTabMetrics(selectedNavBeforePng,selectedNavAfterPng);
     writeFileSync(join(evidence,'missions-selected-tab-original-before-render-overlay-384x512.png'),Buffer.from(tabComparison.montage,'base64'));
-    writeFileSync(join(evidence,'missions-selected-tab-before-384x512.png'),Buffer.from(tabBefore,'base64'));
-    writeFileSync(join(evidence,'missions-selected-tab-render-384x512.png'),Buffer.from(tabAfter,'base64'));
+    writeFileSync(join(evidence,'missions-selected-tab-before-384x512.png'),Buffer.from(selectedNavBeforePng,'base64'));
+    writeFileSync(join(evidence,'missions-selected-tab-render-384x512.png'),Buffer.from(selectedNavAfterPng,'base64'));
     const tabReport={
       issue:104,baseHead:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
       references:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
