@@ -9,7 +9,7 @@ import {setTimeout as delay} from 'node:timers/promises';
 /* WORK8 / #104 — exact source/native Chromium controlled tab A/B.
    The real three missions and seven rewards remain untouched; the only
    candidate is a root-opt-out-isolated paint filter of the two INACTIVE category tabs. */
-test('WORK8 07 source-light inactive navy: real Chromium same-frame A/B and touch', {timeout:240000}, async()=>{
+test('WORK8 07 source-depth inactive navy: real Chromium same-frame A/B and touch', {timeout:240000}, async()=>{
   await delay(55000); // avoid simultaneous expensive Chromium sessions
   const chrome=process.env.CHROME_BIN ||
     spawnSync('sh',['-c','command -v google-chrome || command -v chromium'],{encoding:'utf8'}).stdout.trim();
@@ -127,7 +127,7 @@ test('WORK8 07 source-light inactive navy: real Chromium same-frame A/B and touc
     assert.deepEqual(beforeLayout.dock,afterLayout.dock,'WORK0 dock unchanged');
     assert.ok(afterLayout.chests.every((d:any)=>d.bottom<=afterLayout.dock.y+2),'no chest under dock');
     assert.ok(afterLayout.captions.every((d:any)=>d.bottom<=afterLayout.dock.y+2),'no daily label under dock');
-    assert.notEqual(beforeLayout.inactiveFilter,afterLayout.inactiveFilter,'production CSS filter really changed');
+    assert.ok(result.scores.inactiveTabs.pixelDiff > 3,'native inactive-tab pixels must really change, not just a computed CSS string');
     assert.ok(result.scores.inactiveTabs.delta < -0.05,'source error MUST fall in true inactive-tabs ROI');
     assert.ok(result.scores.full.delta < -0.002,'full-frame native MAE MUST improve');
     for(const roi of ['quests','chests','header','dock']){
