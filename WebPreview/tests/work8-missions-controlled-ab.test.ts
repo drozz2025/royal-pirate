@@ -1902,14 +1902,14 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(130);
     const tabBeforeGeometry=await tabGeometry();
     const tabBeforeFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(inactiveSelector)+')).filter');
-    const tabBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const inactiveContrastBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove('+JSON.stringify(tabContrastFlag)+');true');
     await delay(130);
     const tabRenderGeometry=await tabGeometry();
     const tabRenderFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(inactiveSelector)+')).filter');
     const tabRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    const tabCompare='(async()=>{'+
-      'const urls='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+tabBefore,'data:image/png;base64,'+tabRender])+';'+
+    const inactiveContrastCompare='(async()=>{'+
+      'const urls='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+inactiveContrastBefore,'data:image/png;base64,'+tabRender])+';'+
       'const images=await Promise.all(urls.map(s=>new Promise((yes,no)=>{const im=new Image();im.onload=()=>yes(im);im.onerror=no;im.src=s})));'+
       'if(images.some(im=>im.width!==384||im.height!==512))throw Error("unscaled native 384x512 required");'+
       'const px=images.map(im=>{const c=document.createElement("canvas");c.width=384;c.height=512;const ctx=c.getContext("2d");ctx.drawImage(im,0,0);return ctx.getImageData(0,0,384,512).data});'+
@@ -1920,7 +1920,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'const changed=Object.fromEntries(Object.entries(regions).map(([k,v])=>[k,mae(px[1],px[2],v)]));'+
       'const montage=document.createElement("canvas");montage.width=1536;montage.height=512;const ctx=montage.getContext("2d");images.forEach((im,i)=>ctx.drawImage(im,i*384,0));ctx.drawImage(images[0],1152,0);ctx.globalAlpha=.5;ctx.drawImage(images[2],1152,0);'+
       'return {before,render,changed,overlay:montage.toDataURL("image/png").split(",")[1]}})()';
-    const tabCompared=await evalJs(tabCompare);
+    const tabCompared=await evalJs(inactiveContrastCompare);
     const tabDelta=Object.fromEntries(Object.keys(tabCompared.before).map(k=>[k,tabCompared.render[k]-tabCompared.before[k]]));
     const tabReport={issue:104,screen:'07 Missões',baseSha:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
       reference:'assets/design-approved/07-missoes.webp',
@@ -1934,7 +1934,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       approved:false,approvedScreens:0};
     writeFileSync(join(evidence,'work8-missions-inactive-tab-mae-roi.json'),JSON.stringify(tabReport,null,2));
     writeFileSync(join(evidence,'work8-missions-inactive-tab-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png'),Buffer.from(tabCompared.overlay,'base64'));
-    writeFileSync(join(evidence,'work8-missions-inactive-tab-before-384x512.png'),Buffer.from(tabBefore,'base64'));
+    writeFileSync(join(evidence,'work8-missions-inactive-tab-before-384x512.png'),Buffer.from(inactiveContrastBefore,'base64'));
     writeFileSync(join(evidence,'work8-missions-inactive-tab-render-384x512.png'),Buffer.from(tabRender,'base64'));
     console.log('WORK8_MISSIONS_INACTIVE_TAB_NATIVE '+JSON.stringify(tabReport));
     assert.notEqual(tabBeforeFilter,tabRenderFilter,'production inactive tab tint MUST apply');
