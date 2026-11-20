@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline","work8-missions-daily-heading-pigment-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1888,6 +1888,63 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(realDayDelta.chests<.02 && Math.abs(realDayDelta.quest)<.02 &&
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
+
+
+    /* WORK8/#104: actual production SVG, identical paused Chromium 384x512
+       scene and original approved WebP. Root flag switches only this paint. */
+    const headingFlag='work8-missions-daily-heading-pigment-ab-baseline';
+    const headingSelector='.w8-approved-missions .w8-approved-daily h3 > svg.w8-approved-painting-daily-heading';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(headingFlag)+');true');
+    await delay(140);
+    const headingBeforeGeom=await headingLayout();
+    const headingFilterBefore=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(headingSelector)+')).filter');
+    const headingBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(headingFlag)+');true');
+    await delay(140);
+    const headingAfterGeom=await headingLayout();
+    const headingFilterAfter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(headingSelector)+')).filter');
+    const headingAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const headingCalc='(async()=>{'+
+      'const urls='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+headingBefore,'data:image/png;base64,'+headingAfter])+';'+
+      'const images=await Promise.all(urls.map(s=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=s})));'+
+      'if(images.some(i=>i.width!==384||i.height!==512))throw Error("Native 384x512 DPR1 required");'+
+      'const pix=images.map(i=>{const c=document.createElement("canvas");c.width=384;c.height=512;const p=c.getContext("2d");p.drawImage(i,0,0);return p.getImageData(0,0,384,512).data});'+
+      'const rois={full:[0,0,384,512],heading:[106,326,280,356],daily:[13,325,373,436],chests:[20,356,370,427],quests:[12,155,372,321],dock:[0,451,384,512],header:[0,0,384,70]};'+
+      'const mae=(a,b,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=(y*384+x)*4;for(let j=0;j<3;j++){sum+=Math.abs(a[p+j]-b[p+j]);n++}}return sum/n};'+
+      'const before=Object.fromEntries(Object.entries(rois).map(([k,r])=>[k,mae(pix[0],pix[1],r)]));'+
+      'const render=Object.fromEntries(Object.entries(rois).map(([k,r])=>[k,mae(pix[0],pix[2],r)]));'+
+      'const changed=Object.fromEntries(Object.entries(rois).map(([k,r])=>[k,mae(pix[1],pix[2],r)]));'+
+      'const canvas=document.createElement("canvas");canvas.width=1536;canvas.height=512;const ctx=canvas.getContext("2d");images.forEach((im,i)=>ctx.drawImage(im,384*i,0));ctx.drawImage(images[0],1152,0);ctx.globalAlpha=.5;ctx.drawImage(images[2],1152,0);'+
+      'return {before,render,changed,overlay:canvas.toDataURL("image/png").split(",")[1]}})()';
+    const headingScored=await evalJs(headingCalc);
+    const headingDelta=Object.fromEntries(Object.keys(headingScored.before).map(k=>[k,headingScored.render[k]-headingScored.before[k]]));
+    saveCoast('missions-daily-heading-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png',headingScored.overlay);
+    saveCoast('missions-daily-heading-before-384x512.png',headingBefore);
+    saveCoast('missions-daily-heading-render-384x512.png',headingAfter);
+    const headingReport={
+      issue:104,work:'WORK8',screen:'07 Missões',
+      baseSha:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
+      approved:false,approvedScreens:0,original:'assets/design-approved/07-missoes.webp',
+      references:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      viewport:{width:384,height:512,deviceScaleFactor:1},samePausedFrame:true,
+      beforeFilter:headingFilterBefore,renderFilter:headingFilterAfter,
+      mae:{before:headingScored.before,render:headingScored.render,changed:headingScored.changed},
+      delta:headingDelta,geometry:{before:headingBeforeGeom,render:headingAfterGeom}
+    };
+    writeFileSync(join(evidence,'missions-daily-heading-mae-roi.json'),JSON.stringify(headingReport,null,2));
+    console.log('WORK8_DAILY_HEADING_MAE '+JSON.stringify({before:headingScored.before,render:headingScored.render,delta:headingDelta}));
+    assert.notEqual(headingFilterBefore,headingFilterAfter,'genuine heading SVG paint must change');
+    assert.deepEqual(headingBeforeGeom,headingAfterGeom,'same geometry for objectives, rewards, five-item dock');
+    assert.equal(headingAfterGeom.questCount,3);
+    assert.equal(headingAfterGeom.dayCount,7);
+    assert.equal(headingAfterGeom.dockCount,5);
+    assert.ok(headingAfterGeom.chests.every((c:any)=>c.bottom<=headingAfterGeom.nav.top+2),'all 7 chest images above WORK0 dock');
+    assert.ok(headingDelta.heading<-.02&&headingDelta.full<-.001,'actual source heading and full-frame MAE must improve');
+    assert.ok(Math.abs(headingDelta.quests)<.02&&Math.abs(headingDelta.chests)<.02&&
+      Math.abs(headingDelta.dock)<.02&&Math.abs(headingDelta.header)<.02,
+      'other missions, chests, header and WORK0 dock must remain unchanged');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
