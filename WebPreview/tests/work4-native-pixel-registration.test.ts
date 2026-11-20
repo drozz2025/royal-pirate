@@ -240,6 +240,90 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
       const screenshot=(await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data as string;
       writeFileSync(join(folder,screen+'-'+width+'x'+height+'.png'),Buffer.from(screenshot,'base64'));
 
+
+      // WORK4 / #104: explore genuine 04 material-board finishes on the SAME
+      // paused native Chromium frame, not substituted mockups or fake resources.
+      // This is a measurement-only trial: a winner is NOT merged as art unless
+      // MAE + protected ROI evidence supports it and WORK0 accepts the Draft.
+      if(screen==='forge'&&width===384&&height===512){
+        const finishes=[
+          {id:'HEAD-real',background:null},
+          {id:'reference-blue',background:'radial-gradient(ellipse 75% 65% at 50% 0%,#6a7b8330,transparent 72%),linear-gradient(175deg,#182d40 0%,#102438 55%,#07182a 100%)'},
+          {id:'smoked-steel',background:'radial-gradient(ellipse 85% 84% at 42% 0%,#c69c6328,transparent 78%),linear-gradient(173deg,#303438 0%,#1d2d36 55%,#0c1c2b 100%)'},
+          {id:'royal-navy',background:'radial-gradient(ellipse 80% 77% at 45% 0%,#d4aa6a1e,transparent 79%),linear-gradient(170deg,#1c354d 0%,#132638 57%,#07182c 100%)'},
+          {id:'charcoal-copper',background:'radial-gradient(ellipse 75% 87% at 36% 0%,#a06c442b,transparent 76%),linear-gradient(175deg,#302e2b 0%,#202628 53%,#0c1c27 100%)'},
+          {id:'ink-blue',background:'radial-gradient(ellipse 82% 81% at 48% 0%,#c1b7a91c,transparent 77%),linear-gradient(175deg,#203340 0%,#132330 55%,#091929 100%)'},
+          {id:'wrought-iron',background:'radial-gradient(ellipse 72% 91% at 33% 0%,#de995523,transparent 76%),linear-gradient(177deg,#37332d 0%,#272a2a 53%,#0f1d27 100%)'},
+          {id:'furnace-amber',background:'radial-gradient(ellipse 68% 76% at 27% 0%,#bd67283a,transparent 79%),linear-gradient(170deg,#342c29 0%,#23282b 50%,#0b1c29 100%)'}
+        ];
+        const getRects="(()=>{const rect=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?[r.x,r.y,r.width,r.height]:null};return {"+
+          "cannon:rect('.w4-reference-cannon'),furnace:rect('.w4-forge-scene'),"+
+          "materials:rect('.w4-materials'),costs:rect('.w4-resource-grid'),"+
+          "action:rect('.w4-improve-button'),dock:rect('.harbour-nav.app-dock-porto'),"+
+          "priceCells:document.querySelectorAll('.w4-resource-grid > div').length,"+
+          "nav:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length}})()";
+        const staticGeometry=await evaluate(getRects);
+        assert.equal(staticGeometry.nav,5,'protected five-item dock');
+        assert.equal(staticGeometry.priceCells,3,'real costs are three honest local-currency amounts');
+        assert.ok(staticGeometry.cannon&&staticGeometry.materials,'real cannon & ledger still rendered');
+        const samples:[string,string][]=[['HEAD-real',screenshot]];
+        for(const variant of finishes.slice(1)){
+          const paint='.w4-forge #w4-forge-panel > .w4-materials:where(*){background:'+
+            variant.background+'!important;}';
+          await evaluate("(()=>{const style=document.createElement('style');"+
+            "style.id='work4-material-test';style.textContent="+JSON.stringify(paint)+";"+
+            "document.head.appendChild(style);return true})()");
+          await sleep(110);
+          samples.push([variant.id,(await command('Page.captureScreenshot',{
+            format:'png',fromSurface:true,captureBeyondViewport:false
+          })).data as string]);
+          await evaluate("(()=>{document.getElementById('work4-material-test')?.remove();return true;})()");
+          assert.deepEqual(await evaluate(getRects),staticGeometry,
+            'material pigment cannot move the cannon, flame, cost values, action or dock');
+        }
+        const analysis="(async()=>{const payload="+JSON.stringify({
+          source:references.forge,samples
+        })+";"+
+          "const img=async(type,bytes)=>{const i=new Image();i.src='data:image/'+type+';base64,'+bytes;"+
+          "await i.decode();if(i.width!==384||i.height!==512)throw Error('non-native frame');return i};"+
+          "const rgba=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
+          "const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);"+
+          "return g.getImageData(0,0,384,512).data};"+
+          "const source=rgba(await img('webp',payload.source));"+
+          "const rois={full:[0,0,384,512],materials:[16,318,370,382],"+
+          "ledger:[23,340,365,377],cannon:[30,220,176,313],"+
+          "furnace:[115,217,180,307],dock:[0,430,384,512]};"+
+          "const score=(p,r)=>{let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){"+
+          "const k=(y*384+x)*4;for(let channel=0;channel<3;channel++){total+=Math.abs(source[k+channel]-p[k+channel]);n++}}return total/n};"+
+          "const results=[];for(const [name,shot] of payload.samples){const p=rgba(await img('png',shot));"+
+          "const row={name};for(const [key,r] of Object.entries(rois))row[key]=score(p,r);results.push(row)}"+
+          "const head=results[0];const ranked=[...results].sort((a,b)=>a.materials-b.materials);"+
+          "const eligible=ranked.filter(x=>x.full<=head.full+.03&&"+
+          "Math.abs(x.cannon-head.cannon)<.015&&Math.abs(x.furnace-head.furnace)<.015&&"+
+          "Math.abs(x.dock-head.dock)<.015);"+
+          "const recommended=eligible.find(x=>x.name!=='HEAD-real'&&x.materials<head.materials-.04)||null;"+
+          "const winnerFrame=payload.samples.find(x=>x[0]===(recommended?.name||'HEAD-real'))[1];"+
+          "const loadWinner=await img('png',winnerFrame);const base=await img('png',payload.samples[0][1]);"+
+          "const reference=await img('webp',payload.source);"+
+          "const cv=document.createElement('canvas');cv.width=1536;cv.height=512;"+
+          "const g=cv.getContext('2d');g.drawImage(reference,0,0);g.drawImage(base,384,0);"+
+          "g.drawImage(loadWinner,768,0);g.drawImage(reference,1152,0);g.globalAlpha=.5;"+
+          "g.drawImage(loadWinner,1152,0);return {head,rois,results,ranked,eligible,"+
+          "recommended:recommended?.name||null,montage:cv.toDataURL('image/png').split(',')[1]};})()";
+        const study=await evaluate(analysis);
+        assert.equal(study.results.length,finishes.length);
+        const {montage,...metrics}=study;
+        writeFileSync(join(folder,'work4-04-materials-original-base-render-overlay-384x512.png'),
+          Buffer.from(montage,'base64'));
+        writeFileSync(join(folder,'work4-04-materials-real-head-ab.json'),
+          JSON.stringify({...metrics,geometry:staticGeometry,
+            baseline:'verified HEAD real style; CSS candidate injected only',
+            source:'assets/design-approved/04-melhorias-forja.webp',
+            samePausedFrame:true,viewport:'384x512',approved:false,approvedScreens:0,
+            otherViewports:viewports.map(p=>p.join('x'))},null,2)+'\n');
+        console.log('WORK4_REAL_FORGE_MATERIAL_AB '+JSON.stringify(metrics));
+      }
+
       // WORK4/#104: exploratory native sky/photographic-edge A/B. Same paused
       // React scene, exact approved 03 WebP, no changes to ship/water/dock.
       // Only the measured winner is shipped; the prior HEAD is recomputed as
