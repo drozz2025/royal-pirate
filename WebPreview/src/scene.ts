@@ -6,6 +6,7 @@ import { PirateAudio } from './audio';
 import { makeShip, type ShipArt } from './ships';
 import { applyShipModules, type ShipLoadout, type ModuleSlot } from './ship-modules';
 import { shipyardCameraOffset, shipyardPartTarget, shipyardPartCameraOffset, type ShipyardView } from './shipyard-camera';
+import { releaseShipyardResources } from './shipyard-resources';
 import { hullImpactPlacement } from './impact-visuals';
 import { rippleState } from './water-vfx';
 export type Metrics = { fps: number; renderMs: number; calls: number; triangles: number; geometries: number; textures: number; effects: number; heapMB?: number };
@@ -108,7 +109,7 @@ export class OceanScene {
   deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
   /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
   showHarbour(){
-    this.cameraMode='harbour';this.ships.player.root.visible=true;if(this.shipyardArt)this.shipyardArt.root.visible=false;this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
+    this.cameraMode='harbour';this.ships.player.root.visible=true;this.releaseShipyardPreview();this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
     this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
     this.controls.enableRotate=false;this.controls.enableZoom=false;
     const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
@@ -118,7 +119,7 @@ export class OceanScene {
   }
   /** Active 3D inspection: orbit and pinch-zoom the real ship without starting a fight. */
   inspectShip(){
-    this.cameraMode='inspect';this.ships.player.root.visible=true;if(this.shipyardArt)this.shipyardArt.root.visible=false;
+    this.cameraMode='inspect';this.ships.player.root.visible=true;this.releaseShipyardPreview();
     this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
     this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.trail.visible=false;
     this.controls.enableRotate=true;this.controls.enableZoom=true;
@@ -129,7 +130,14 @@ export class OceanScene {
     this.controls.update();
   }
   /** Returns to the existing working battle camera, with both ships visible. */
-  showBattle(){this.ships.player.root.visible=true;if(this.shipyardArt)this.shipyardArt.root.visible=false;this.ships.enemy.root.visible=true;this.foam[1].visible=true;this.harbourDock.visible=false;this.controls.enableRotate=true;this.controls.enableZoom=true;this.controls.minDistance=18;this.controls.maxDistance=110;this.home();}
+  showBattle(){this.ships.player.root.visible=true;this.releaseShipyardPreview();this.ships.enemy.root.visible=true;this.foam[1].visible=true;this.harbourDock.visible=false;this.controls.enableRotate=true;this.controls.enableZoom=true;this.controls.minDistance=18;this.controls.maxDistance=110;this.home();}
+  /** Release isolated preview assets on exit; shared battle geometry survives. */
+  private releaseShipyardPreview(){
+    if(!this.shipyardArt)return;
+    releaseShipyardResources(this.scene,this.shipyardArt.root);
+    this.shipyardArt=null;
+    this.shipyardFocusSlot=null;
+  }
   /** Harbour-only sandbox: the battle ship, damage and ownership are untouched. */
   showShipyard(loadout:ShipLoadout){
     if(!this.shipyardArt){
