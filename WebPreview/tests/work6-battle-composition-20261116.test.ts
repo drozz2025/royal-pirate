@@ -23,8 +23,8 @@ test('WORK6: enemy scale and left sail crop are strictly battle-only, Porto rest
   const porto=scene.split('  showHarbour(){')[1]?.split('  /** Harbour only:')[0]??'';
   assert.match(home,/battleEnemyScale\(battleAspect\)/);
   // WORK0/#104 visually verified 384×512 now preserves full ship at starboard.
-  assert.equal(battleEnemyScale(384/512),1.42);
-  assert.equal(battleEnemyScale(390/844),1.48);
+  assert.equal(battleEnemyScale(384/512),1.35);
+  assert.equal(battleEnemyScale(390/844),1.30);
   assert.equal(battleEnemyScale(1.4),1.82);
   assert.match(home,/battleForegroundSail\.position\.x=pose\.sailX/);
   assert.match(home,/this\.ships\.player\.root\.visible=false/);
