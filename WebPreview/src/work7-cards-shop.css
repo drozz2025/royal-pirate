@@ -4351,3 +4351,19 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 20 Nov, true-source 05 card inlay unmasking, 384x512 only.
+ * Keep eight real 4x2 illustrated cards, border, engraved corner ornaments,
+ * external stacked gold rim and original art crops. Remove ONLY the inner
+ * over-darkening pseudo-element shadow; the native carved relief underneath
+ * remains. Matched-frame Chromium sweep #44767236020 measured the no-shadow
+ * pigment at RGB MAE 60.2736 / card ROI 54.6418 vs current merged HEAD
+ * 60.4417 / 55.0507. Strict A/B gate repeats these metrics in this branch.
+ * No layout, hitboxes, menu, 320px, tall screens or gameplay change.
+ * approved:false; 0/8. WORK0 handles review/merge/release/HTTP. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot::before{
+    box-shadow:none;
+  }
+}
