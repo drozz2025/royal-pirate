@@ -90,6 +90,30 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
   const dressing=new T.Group();
   dressing.name='first-person-premium-gundeck';
   group.add(dressing);
+  // WORK0/#104: the original teak stops at local Z=76, while the gunner
+  // camera stands at world Z=55 (local Z≈101 on portrait phones). That left
+  // a conspicuous wedge of OCEAN between the cannon carriage and the lower
+  // controls. Continue the SAME real 3D boards aft to Z=106.2, just behind
+  // the camera, without a screenshot plane, extra ship or physics changes.
+  // Two instanced draws cover nine boards instead of nine new mesh draws.
+  for(const [name,material,indices] of [
+    ['first-person-deck-aft-oak',deck,[-4,-2,0,2,4]],
+    ['first-person-deck-aft-warm',alternate,[-3,-1,1,3]]
+  ] as const){
+    const batch=new T.InstancedMesh(box,material,indices.length);
+    batch.name=name;
+    const tr=new T.Object3D();
+    indices.forEach((i,j)=>{
+      tr.position.set(i*1.33,.22,91);
+      tr.scale.set(1.28,.37,30.4);
+      tr.updateMatrix();
+      batch.setMatrixAt(j,tr.matrix);
+    });
+    batch.instanceMatrix.needsUpdate=true;
+    batch.computeBoundingSphere();
+    batch.receiveShadow=true;
+    dressing.add(batch);
+  }
   const oak=new T.MeshStandardMaterial({color:'#81502e',roughness:.78});
   const oakEdge=new T.MeshStandardMaterial({color:'#bf8750',roughness:.70});
   const brass=new T.MeshStandardMaterial({color:'#e5b46d',roughness:.37,metalness:.65});
