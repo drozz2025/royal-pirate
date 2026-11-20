@@ -26,6 +26,9 @@ export function createPreviewFigurehead(
    new T.Vector3(x,y,z),new T.Quaternion().setFromEuler(new T.Euler(0,0,angle)),
    new T.Vector3(sx,sy,sz)
   ));
+  // IcosahedronGeometry is unindexed while boxes/cones are indexed.
+  // BufferGeometryUtils.mergeGeometries requires one consistent topology.
+  if(g.index){const flat=g.toNonIndexed();g.dispose();g=flat;}
   (dark?inlay:metal).push(g);
  }
  function block(w:number,h:number,d:number,x:number,y:number,z:number,angle=0,dark=false){
