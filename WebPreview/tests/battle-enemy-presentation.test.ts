@@ -57,7 +57,7 @@ test('enemy battle-only presentation leaves the tested camera and Porto intact',
     camera.lookAt(...pose.target);
     camera.updateMatrixWorld();
     const battleScale=battleEnemyScale(w/h);
-    assert.ok(battleScale>=1.45&&battleScale<=1.65,'portrait enemy retains visible broadside on mobile');
+    assert.ok(battleScale>=1.25&&battleScale<=1.4,'portrait enemy retains a readable, less dominant broadside');
     const points=[
       new T.Vector3(10,0,-3),
       new T.Vector3(10,battleScale*8.4,-3),
