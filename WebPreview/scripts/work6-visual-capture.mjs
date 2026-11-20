@@ -16,7 +16,7 @@ try {
     const ctx=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,reducedMotion:'reduce'});
     const page=await ctx.newPage();
     page.on('pageerror',error=>{throw error;});
-    await page.goto('http://127.0.0.1:5173/?work6shots=1',{waitUntil:'domcontentloaded'});
+    await page.goto('http://127.0.0.1:5173/royal-pirate/?work6shots=1',{waitUntil:'domcontentloaded'});
     await page.locator('.harbour-battle-button').waitFor({state:'visible',timeout:20000});
     await page.waitForTimeout(2200);
     await page.screenshot({path:resolve(root,`porto-${width}x${height}.png`),animations:'disabled'});
@@ -206,7 +206,7 @@ try {
       reducedMotion:'reduce'
     });
     const page=await ctx.newPage();
-    await page.goto('http://127.0.0.1:5173/?work6shots=1',{waitUntil:'domcontentloaded'});
+    await page.goto('http://127.0.0.1:5173/royal-pirate/?work6shots=1',{waitUntil:'domcontentloaded'});
     await page.locator('.harbour-battle-button').waitFor({state:'visible',timeout:20000});
     await page.locator('.harbour-battle-button').click();
     await page.locator('.fire-button').waitFor({state:'visible',timeout:15000});
