@@ -46,12 +46,14 @@ export type CameraPose = {
  * The 02 reference has clear sky, a starboard opponent and open sea between guns.
  * Desktop remains unchanged; Porto's 1x model is restored by showHarbour(). */
 export function battleEnemyScale(aspect:number):number {
-  // WORK0 #104 / 19 Nov: broaden the genuine 3D red opponent in the short
-  // approved 384×512 composition. Ultra-tall and 320px phones get a smaller
-  // increase because their horizontal field of view clips the outer sails.
+  // WORK0 #104 / 20 Nov: structurally reframe the approved short 384×512
+  // Batalha. Scale down the broadside just enough that the entire aftcastle
+  // fits on the right after moving it toward the approved starboard third.
+  // Tall/320px framing is deliberately unchanged: its opponent already
+  // approaches the right screen edge.
   // Presentation only: physical hull, damage hitbox and Porto stay unchanged.
   if(aspect<.62)return 1.48; // 320×568, 390×844 and 430×932: protect the stern
-  if(aspect<.80)return 1.62; // 384×512: source-native, clearly readable broadside
+  if(aspect<.80)return 1.42; // 384×512: preserve full broadside and starboard margin
   return 1.82; // preserve desktop
 }
 /** Batalha 02: turn the existing live red ship into a readable starboard broadside.
@@ -80,15 +82,17 @@ export function battleCameraPose(aspect: number): CameraPose {
     const ultraTall = aspect < .50;
     const compact = aspect >= .50 && aspect < .62; // 320x568: guard the galleon's stern
     return {
-      // Move the EYE and physical first-person gun deck forward as one unit.
-      // This enlarges the live enemy's apparent broadside by perspective,
-      // not by scaling its collision-inaccurate visual root. A matching pan
-      // preserves the stern margin on 320 / 384 / 390 / 430 portrait viewports.
+      // Keep the gunner eye at deck height. At the native 384x512 reference
+      // crop, aim the camera further toward the PORT side so the enemy reads
+      // in the RIGHT third instead of blocking the cannon centreline.
+      // Move the existing live gun deck laterally with that pan to preserve
+      // the real muzzle near x=50%, rather than reprojecting a fake shot.
+      // Narrow/tall crops preserve their already edge-safe framing.
       position: [0, 7.4, 55],
-      target: [ultraTall ? 7.65 : compact ? 6.5 : 5.15, 4.1, -3],
+      target: [ultraTall ? 7.65 : compact ? 6.5 : 2.65, 4.1, -3],
       showBattery: true,
       batteryOffsetZ: -30,
-      batteryOffsetX: ultraTall ? 3.6 : compact ? 2.7 : 2,
+      batteryOffsetX: ultraTall ? 3.6 : compact ? 2.7 : 1.3,
       batteryScale: 1,
       // Legacy optional edge rig is now HIDDEN for portrait battle.
       sailX: -11,
