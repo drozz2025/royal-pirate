@@ -12,7 +12,7 @@ import {setTimeout as delay} from 'node:timers/promises';
  * shared dock change. Four phone viewports and native CDP touch checked. No mocked app state, image backdrop or
  * APPROVED flag. */
 test('07 Missions: real action buttons native-width registration and reward-column geometry / Chromium A/B', {timeout:220000}, async()=>{
-  await delay(2000); // Parallel test suites have separate ports and profiles
+  await delay(40000); // Leave existing native Chromium coin/gem tests their browser startup window; independent port/profile
   for(const file of ['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']) {
     assert.ok(existsSync(new URL('../../assets/design-approved/'+file,import.meta.url)),'required reference '+file);
   }
@@ -73,7 +73,7 @@ test('07 Missions: real action buttons native-width registration and reward-colu
     await cmd('Emulation.setDeviceMetricsOverride',{width:384,height:512,mobile:true,deviceScaleFactor:1,screenWidth:384,screenHeight:512});
     await cmd('Page.navigate',{url:'http://127.0.0.1:4215/'});
     await wait('.harbour-screen .harbour-nav-item');
-    await evalJs('document.documentElement.classList.add("work8-missions-cta-register-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-cta-registration-ab-baseline");true');
     const clicked=await evalJs('(()=>{const b=[...document.querySelectorAll(".harbour-screen button")].find(x=>x.textContent?.includes("MISSÕES"));b?.click();return !!b})()');
     assert.ok(clicked,'real Porto->Missões navigation required');
     await wait('.w8-approved-missions .w8-approved-quest-list');
@@ -83,7 +83,7 @@ test('07 Missions: real action buttons native-width registration and reward-colu
     const beforeLayout=await geometry();
     const beforeInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest")).gridTemplateColumns');
     const before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    await evalJs('document.documentElement.classList.remove("work8-missions-cta-register-ab-baseline");true');
+    await evalJs('document.documentElement.classList.remove("work8-missions-cta-registration-ab-baseline");true');
     await delay(180);
     const afterLayout=await geometry();
     const afterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest")).gridTemplateColumns');
@@ -133,7 +133,7 @@ test('07 Missions: real action buttons native-width registration and reward-colu
       issue:104,scope:'WORK8 exclusively 07 Missões: genuine three mission action-buttons with real 3 objectives, 7 daily rewards, no mocked state',
       reference:'assets/design-approved/07-missoes.webp',
       mandatoryRefs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']].map(n=>'assets/design-approved/'+n),
-      viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-cta-register-ab-baseline',
+      viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-cta-registration-ab-baseline',
       metrics:compared.metrics,unchanged:compared.unchanged,
       geometry:{before:beforeLayout,after:afterLayout},actionGrid:{before:beforeInk,after:afterInk},approved:false,approvedScreens:0
     };
