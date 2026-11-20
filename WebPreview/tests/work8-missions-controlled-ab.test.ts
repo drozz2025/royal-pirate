@@ -1889,6 +1889,68 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
 
+
+    /* WORK8 #104 — native 384x512 daily-plate pewter edge A/B.
+       Same actual decoded live scene, no reset of quest data, seven rewards
+       or bottom dock. New opt-out only changes one board's border pigment. */
+    const edgeFlag='work8-missions-daily-edge-native-ab-baseline';
+    const edgeSelector='.w8-approved-missions .w8-approved-daily';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(edgeFlag)+');true');
+    await delay(150);
+    const edgeBeforeLayout=await headingLayout();
+    const edgeBeforeCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(edgeSelector)+')).borderTopColor');
+    const edgeBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(edgeFlag)+');true');
+    await delay(150);
+    const edgeAfterLayout=await headingLayout();
+    const edgeAfterCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(edgeSelector)+')).borderTopColor');
+    const edgeAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const edgeSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+edgeBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+edgeAfter))
+      .replace('chests:[20,356,370,427],dock:',
+        'chests:[20,356,370,427],edgeTop:[13,324,373,332],edgeLeft:[13,325,21,435],edgeRight:[365,325,373,435],dock:');
+    assert.notEqual(edgeSource,source,'WORK8 edge gate must use independent same-frame screenshots');
+    const edgeResult=await evalJs(edgeSource);
+    const edgeM=edgeResult.metrics;
+    const edgeReport={
+      issue:104,scope:'07 Missões; 7-reward daily plate border pigment only',
+      branch: 'work8/issue104-daily-edge-native-20261120-2254',
+      base:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
+      reference:'assets/design-approved/07-missoes.webp',
+      requiredReferences:[
+        '00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'
+      ],
+      viewport:{width:384,height:512,devicePixelRatio:1},
+      sameDecodedPausedScene:true,cssBefore:edgeBeforeCss,cssRender:edgeAfterCss,
+      metrics:edgeM,unchanged:edgeResult.unchanged,
+      beforeLayout:edgeBeforeLayout,renderLayout:edgeAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-daily-edge-native-ab.json'),JSON.stringify(edgeReport,null,2));
+    writeFileSync(join(evidence,'missions-daily-edge-original-before-overlay-384x512.png'),Buffer.from(edgeResult.overlays[0],'base64'));
+    writeFileSync(join(evidence,'missions-daily-edge-original-render-overlay-384x512.png'),Buffer.from(edgeResult.overlays[1],'base64'));
+    writeFileSync(join(evidence,'missions-daily-edge-before-384x512.png'),Buffer.from(edgeBefore,'base64'));
+    writeFileSync(join(evidence,'missions-daily-edge-render-384x512.png'),Buffer.from(edgeAfter,'base64'));
+    console.log('WORK8_DAILY_EDGE_NATIVE '+JSON.stringify(edgeReport));
+    assert.notEqual(edgeBeforeCss,edgeAfterCss,'production border pigment must change');
+    assert.deepEqual(edgeBeforeLayout,edgeAfterLayout,'all original hitboxes and 7 rewards remain');
+    assert.equal(edgeAfterLayout.questCount,3);
+    assert.equal(edgeAfterLayout.dayCount,7);
+    assert.equal(edgeAfterLayout.dockCount,5);
+    assert.ok(edgeAfterLayout.chests.every((c:any)=>c.bottom<=edgeAfterLayout.nav.top+2),
+      'all seven real reward artworks must remain above WORK0 dock');
+    assert.ok(edgeResult.unchanged.dock<.03&&edgeResult.unchanged.header<.03,
+      'WORK0 header/dock cannot repaint');
+    assert.ok(edgeM.daily.delta<-.005&&edgeM.full.delta<-.001,
+      'genuine daily reward plate and entire 07 frame MUST improve MAE');
+    assert.ok(edgeM.edgeTop.delta+edgeM.edgeLeft.delta+edgeM.edgeRight.delta<-.08,
+      'genuine frame border ink must approach approved source');
+    assert.ok(Math.abs(edgeM.quests.delta)<.03&&Math.abs(edgeM.chests.delta)<.1,
+      'no quest or chest ROI regression');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
