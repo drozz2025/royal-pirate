@@ -44,8 +44,8 @@ try {
             return r.width>0 && r.height>0;
           });
           await Promise.all(images.map(async img=>{
-            if(!img.complete||!img.naturalWidth)throw Error('Source image not loaded: '+img.src);
             await img.decode();
+            if(!img.naturalWidth)throw Error('Source image not decoded: '+img.src);
           }));
           await new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done)));
         });
