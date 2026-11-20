@@ -23,11 +23,11 @@ test('WORK4 organic sky candidate cannot change approved 03/04 art, real data, d
     assert.equal(img.toString('ascii',8,12),'WEBP',name);
   }
   assert.ok(paint,'native scoped candidate is present');
-  assert.match(paint,/@media \\(width:384px\\) and \\(height:512px\\)/);
-  assert.match(paint,/background:radial-gradient\\(ellipse 140% 160%/);
-  assert.match(paint,/mask-image:radial-gradient\\(ellipse 142% 120%/);
-  assert.equal((paint.match(/\\.w4-harbour-stage::after/g)||[]).length,1);
-  assert.doesNotMatch(paint,/(?:\\.app-|\\.porto-|\\.harbour-nav|\\.w4-reference-sea|\\.w4-reference-ship|\\.w4-cannon-art|\\.w4-forge|contain:paint|transform:|position:|pointer-events:|height:|width:)/);
+  assert.match(paint,/@media \(width:384px\) and \(height:512px\)/);
+  assert.match(paint,/background:radial-gradient\(ellipse 140% 160%/);
+  assert.match(paint,/mask-image:radial-gradient\(ellipse 142% 120%/);
+  assert.equal((paint.match(/\.w4-harbour-stage::after/g)||[]).length,1);
+  assert.doesNotMatch(paint,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-reference-sea|\.w4-reference-ship|\.w4-cannon-art|\.w4-forge|contain:paint|transform:|position:|pointer-events:|height:|width:)/);
   assert.ok(css.includes('radial-gradient(ellipse 110% 123% at 30% 50%'),'merged approved source coast survives');
   assert.ok(css.includes('svg.w4-reference-sea'),'single original water crop survives');
   assert.ok(css.includes('radial-gradient(ellipse 140% 122% at 37% 49%'),'protected Forge cannon survives');
