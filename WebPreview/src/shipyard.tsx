@@ -32,6 +32,9 @@ const SLOT_NAMES:Record<ModuleSlot,string>={
 /** Interactive ship construction sandbox. Nothing here is purchased, owned,
  * persisted, awarded or injected into combat; only original 3D parts are previewed. */
 export function Shipyard({onClose,onPreview,onViewChange,onFocusSlot,ownedModuleIds,ownedShipClasses,verifiedPlayerLevel,onEquip}:ShipyardProps){
+ const [slot,setSlot]=useState<ModuleSlot>('hull');
+ const [cameraView,setCameraView]=useState<ShipyardView>('quarter');
+ const [focusedSlot,setFocusedSlot]=useState<ModuleSlot|null>(null);
  const [history,setHistory]=useState(createPreviewHistory);
  const draft=currentPreview(history);
  const {shipClass,level,selectedByClass}=draft;
