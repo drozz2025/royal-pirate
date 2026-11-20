@@ -4362,8 +4362,8 @@
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
     background:
-      radial-gradient(ellipse 66% 95% at 28% 40%,#d34da877,transparent 85%),
-      radial-gradient(ellipse 57% 81% at 77% 13%,#8a4dd547,transparent 87%),
-      linear-gradient(112deg,#4c0f67 0%,#390b65 49%,#110839 100%);
+      radial-gradient(ellipse 66% 95% at 29% 42%,#b7308063,transparent 88%),
+      radial-gradient(ellipse 57% 81% at 77% 13%,#8a4dd519,transparent 87%),
+      linear-gradient(112deg,#3f0b5d 0%,#340864 49%,#110839 100%);
   }
 }
