@@ -211,7 +211,7 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
     const state=await geometry();
     assert.equal(state.dockItems,5,'responsive real WORK0 nav at '+width);
     assert.equal(state.overflow,false,'responsive viewport no overflow at '+width);
-    assert.ok(state.cannon?.width>100,'responsive original cannon at '+width);
+    assert.ok(state.cannon?.[2]>100,'responsive original cannon at '+width);
     assert.ok(state.costs,'three actual costs remain accessible at '+width);
     writeFileSync(join(folder,'work4-forge-crop-qa-'+width+'x'+height+'.png'),
       Buffer.from(await shot(),'base64'));
