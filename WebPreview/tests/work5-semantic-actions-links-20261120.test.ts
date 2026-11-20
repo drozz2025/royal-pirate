@@ -29,13 +29,13 @@ function attr(attributes:string,name:string):string {
   return match?.[1]??'';
 }
 function readable(inner:string):string {
-  return inner.replace(/<svg\\b[^>]*>[\\s\\S]*?<\\/svg>/gi,'')
-    .replace(/<[^>]*>/g,' ').replace(/&(?:nbsp|amp|lt|gt|quot|#\\d+);/g,' ')
-    .replace(/\\s+/g,' ').trim();
+  return inner.replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi,'')
+    .replace(/<[^>]*>/g,' ').replace(/&(?:nbsp|amp|lt|gt|quot|#\d+);/g,' ')
+    .replace(/\s+/g,' ').trim();
 }
-const buttons=(html:string)=>[...html.matchAll(/<button\\b([^>]*)>([\\s\\S]*?)<\\/button>/g)]
+const buttons=(html:string)=>[...html.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)]
   .map(m=>({attributes:m[1],body:m[2],name:attr(m[1],'aria-label')||readable(m[2])}));
-const anchors=(html:string)=>[...html.matchAll(/<a\\b([^>]*)>([\\s\\S]*?)<\\/a>/g)]
+const anchors=(html:string)=>[...html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)]
   .map(m=>({attributes:m[1],body:m[2],href:attr(m[1],'href')}));
 
 test('WORK5: all 12 modal destinations and Porto expose non-empty names for rendered buttons',()=>{
@@ -51,11 +51,11 @@ test('WORK5: all 12 modal destinations and Porto expose non-empty names for rend
     for(const [index,button] of items.entries()){
       assert.ok(button.name.trim(),
         'Unlabelled button '+index+' in '+route+': '+button.attributes.slice(0,120));
-      assert.doesNotMatch(button.attributes,/\\btabIndex="-1"(?=[^>]*disabled)/,
+      assert.doesNotMatch(button.attributes,/\btabIndex="-1"(?=[^>]*disabled)/,
         'Disabled keyboard focus mismatch in '+route);
     }
     if(route!=='Porto'){
-      assert.match(html,/<section\\b[^>]*role="dialog"[^>]*aria-modal="true"/,
+      assert.match(html,/<section\b[^>]*role="dialog"[^>]*aria-modal="true"/,
         'Modal semantics missing in '+route);
       assert.match(html,/aria-labelledby="app-screen-title"/,
         'Dialog is missing its visible heading reference in '+route);
@@ -69,12 +69,12 @@ test('WORK5: no empty, placeholder or javascript links in any modal; external li
   for(const route of routes){
     for(const [index,link] of anchors(htmlFor(route)).entries()){
       assert.ok(link.href,'Missing href on '+route+' link '+index);
-      assert.ok(!/^\\s*(?:#|javascript:|data:|about:blank)\\s*$/i.test(link.href),
+      assert.ok(!/^\s*(?:#|javascript:|data:|about:blank)\s*$/i.test(link.href),
         'Dead/dangerous href in '+route+': '+link.href);
       const target=attr(link.attributes,'target');
       if(target==='_blank'){
         const rel=attr(link.attributes,'rel');
-        assert.match(rel,/\\b(?:noopener|noreferrer)\\b/,
+        assert.match(rel,/\b(?:noopener|noreferrer)\b/,
           'External blank-target link missing safe relation in '+route+': '+link.href);
       }
       assert.ok(attr(link.attributes,'aria-label')||readable(link.body),
@@ -86,7 +86,7 @@ test('WORK5: no empty, placeholder or javascript links in any modal; external li
 test('WORK5: all five bottom-route controls remain labelled, local profile save/restore is not a dead placeholder',()=>{
   for(const route of routes){
     const html=htmlFor(route);
-    const nav=html.match(/<nav\\b[^>]*aria-label="Main game screens"[^>]*>([\\s\\S]*?)<\\/nav>/);
+    const nav=html.match(/<nav\b[^>]*aria-label="Main game screens"[^>]*>([\s\S]*?)<\/nav>/);
     assert.ok(nav,'Missing labelled dock on '+route);
     const tabs=buttons(nav![1]);
     assert.equal(tabs.length,5,'Wrong number of dock controls on '+route);
