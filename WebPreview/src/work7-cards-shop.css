@@ -4351,3 +4351,19 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 20 Nov 17:22 selective engraved inlay at source-native 384×512.
+ * Eight independent original 05 artwork crops remain 4×2 with true PRÉVIA.
+ * Same-frame 384×512 comparisons of parent 10830c86 against earlier full
+ * mask-removal candidate #679 showed a small regression on the first concept
+ * but improvements on the other seven. Preserve its first physical inner
+ * shadow; on seven remaining true cards remove only the over-heavy inset
+ * shadow while RETAINING the corner rivets, gold border and other relief.
+ * No 320×568 or tall-screen effect. No Shop, prices, shell, dock, gameplay,
+ * Unity, screenshot backgrounds or false unlocks. approved:false (0/8).
+ * CI must confirm strict MAE + eight-card ROI improvement before WORK0 review. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px) {
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(n+2)::before {
+    box-shadow:none;
+  }
+}
