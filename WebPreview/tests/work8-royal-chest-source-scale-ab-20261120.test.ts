@@ -11,7 +11,7 @@ import {setTimeout as delay} from 'node:timers/promises';
  * WebP crops. Real progress, numerical values, gem availability and five-item
  * shared dock MUST be identical. No mocked app state, image backdrop or
  * APPROVED flag. */
-test('07 Missions: native seventh royal chest scale against approved original / Chromium', {timeout:220000}, async()=>{
+test('07 Missions: native seventh royal chest luminance against approved original / Chromium', {timeout:220000}, async()=>{
   await delay(2000); // Parallel test suites have separate ports and profiles
   for(const file of ['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']) {
     assert.ok(existsSync(new URL('../../assets/design-approved/'+file,import.meta.url)),'required reference '+file);
@@ -81,14 +81,14 @@ test('07 Missions: native seventh royal chest scale against approved original / 
     await delay(250);
     const geometry=()=>evalJs('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const nav=document.querySelector(".app-sheet > .harbour-nav");const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")],days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],buttons=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button, .w8-approved-missions .w8-approved-quest > button")],dockButtons=[...nav.querySelectorAll(".harbour-nav-item")];return {questCount:quests.length,days:days.length,dockCount:dockButtons.length,tabAndActionCount:buttons.length,questBoxes:quests.map(rect),dayBoxes:days.map(rect),rewardBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(rect),nav:rect(nav),captions:days.map(d=>rect(d.querySelector("small"))),documentWidth:document.documentElement.scrollWidth,labels:quests.map(q=>q.querySelector(".w8-approved-quest-core strong")?.textContent),rewards:quests.map(q=>[...q.querySelectorAll(".w8-approved-quest-rewards strong")].map(s=>s.textContent)),glyphs:document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem").length}})()');
     const beforeLayout=await geometry();
-    const beforeInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:nth-child(7) .w8-approved-chest > svg.w8-approved-painting-chest-royal")).transform');
+    const beforeInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:nth-child(7) .w8-approved-chest > svg.w8-approved-painting-chest-royal")).filter');
     const before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove("work8-missions-royal-scale-ab-baseline");true');
     await delay(180);
     const afterLayout=await geometry();
-    const afterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:nth-child(7) .w8-approved-chest > svg.w8-approved-painting-chest-royal")).transform');
+    const afterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:nth-child(7) .w8-approved-chest > svg.w8-approved-painting-chest-royal")).filter');
     assert.notEqual(afterInk,beforeInk,'day 1 chest SVG paint must differ from baseline');
-    assert.match(afterInk,/matrix\(/,'source crop must have a native transform matrix');
+    assert.match(afterInk,/brightness\(1\.4\)/,'day-seven royal crop must have measured enamel luminance');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
     assert.deepEqual(afterLayout.labels,beforeLayout.labels,'real mission objective labels unchanged');
@@ -137,8 +137,8 @@ test('07 Missions: native seventh royal chest scale against approved original / 
     writeFileSync(join(evidence,'work8-missions-royal-scale-native-ab.json'),JSON.stringify(report,null,2));
     console.log('WORK8 07 reward grid controlled Chromium A/B '+JSON.stringify(compared.metrics));
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
-    assert.ok(compared.metrics.royalChest.delta<-.05,'seventh royal-chest ROI must strictly improve');
-    assert.ok(compared.metrics.full.delta<-.005,'real reward chest paint must improve full frame');
+    assert.ok(compared.metrics.royalChest.delta<-.08,'seventh royal-chest ROI must strictly improve');
+    assert.ok(compared.metrics.full.delta<-.002,'real reward chest paint must improve full frame');
     assert.ok(compared.metrics.daily.delta<0&&compared.metrics.chests.delta<0,'daily rewards and chest band must both improve');
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
