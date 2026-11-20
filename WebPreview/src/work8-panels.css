@@ -5485,3 +5485,21 @@
     visibility:hidden;
   }
 }
+
+
+/* WORK8/#104 — 07 MISSÕES ONLY: register the authentic approved fixed
+   MISSÕES title engraving against its unscaled 384x512 source.
+   The source vs native Chromium registration at the existing three-quest
+   scene shows the painted plaque 3px too low and ~1px too far left.
+   Shift ONLY the decorative, pointer-events:none source-art SVG. The
+   semantic h2, tabs, objectives, day rewards, hitboxes, ranking and the
+   WORK0 five-item dock retain their original layout and functionality.
+   A root opt-out class provides a controlled SAME SCENE/FRAME before
+   screenshot. Keep approved:false until direct human approval. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-plaque-registration-ab-baseline)
+  .w8-approved-missions .w8-approved-title > svg.w8-approved-painting-title-missions {
+    top:calc(50% - 32px);
+    left:calc(50% + 1px);
+  }
+}
