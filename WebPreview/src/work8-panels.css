@@ -5485,3 +5485,18 @@
     visibility:hidden;
   }
 }
+
+
+/* WORK8/#104 — 07 MISSÕES ONLY. On the genuine unfinished missions,
+   restore part of the original blue-button enamel muted by the quest
+   board's integrated darkness. This touches PAINT ONLY: no label,
+   collected state, objective progress, gem availability, seven actual
+   day rewards, hitbox, Ranking 08 or WORK0 navigation changes.
+   The root opt-out isolates precisely this correction in same-frame
+   original/before/render/overlay native Chromium verification. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-action-clarity-ab-baseline)
+  .w8-approved-missions .w8-approved-quest[data-state="active"] > button {
+    filter:brightness(1.30) saturate(1.06);
+  }
+}
