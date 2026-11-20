@@ -44,6 +44,12 @@ export function releaseShipyardResources(
  scene: T.Scene, shipyardRoot: T.Object3D
 ): ShipyardResourceRelease {
  shipyardRoot.removeFromParent();
+ // InstancedMesh owns an instanceMatrix GPU buffer, which geometry.dispose()
+ // alone does not release. Each editor batch is disposable and scene-local.
+ // Release those buffers even if a shape/material also exists in battle.
+ shipyardRoot.traverse(node=>{
+  if(node instanceof T.InstancedMesh)node.dispose();
+ });
  const retained = resourcesUnder(scene);
  const removed = resourcesUnder(shipyardRoot);
  let geometries = 0, materials = 0, textures = 0;

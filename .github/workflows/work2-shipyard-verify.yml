@@ -32,6 +32,7 @@ on:
       - work2/original-3d-stern-rudders-20261120
       - work2/original-3d-gunport-shutters-20261120
       - work2/shipyard-undo-redo-20261120
+      - work2/shipyard-instanced-gpu-batching-20261120
   pull_request:
     branches:
       - work2/original-3d-gunport-shutters-20261120
