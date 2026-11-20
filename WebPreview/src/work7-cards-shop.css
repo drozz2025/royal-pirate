@@ -4351,3 +4351,23 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 20 Nov 21:22 UTC. Native original-pigment chroma calibration.
+ * Independently retune only first, fifth and eighth of the EIGHT TRUE 05
+ * approved WEBP illustration frames at 384x512, preserving the already merged
+ * base exposure/depth chain. The painted amber/violet reference has warmer
+ * red enamel than the merged cyan/green cast. No art replacement/screenshot,
+ * no changes to 06, to hitboxes/labels, to 320x568 or tall phone layouts.
+ * Strict same-frame Chromium RGB MAE + all-eight-card ROI gate required.
+ * Human approval: false, 0/8. WORK0 alone merges/releases/publishes. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){
+    filter:brightness(.50) saturate(1.70) contrast(.87) hue-rotate(-16deg) brightness(1.085) saturate(.96);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
+    filter:brightness(.64) saturate(1.90) contrast(.88) hue-rotate(-13deg) brightness(.99) saturate(1.11);
+  }
+}
