@@ -102,7 +102,10 @@ test('WORK5: real ship selection and measured two-finger zoom in mobile Chromium
     await call('Runtime.enable');
     await metrics(390,844);
     await call('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:3});
-    await call('Page.navigate',{url:'http://127.0.0.1:'+address.port+'/tests/work5-ship-gesture-fixture.html'});
+    // Freeze only decorative harbour bob/sails in this LOCAL QA fixture. This keeps
+    // the raycast and actual CDP touch on the same ship geometry across frames;
+    // gameplay and pointer handlers remain fully live.
+    await call('Page.navigate',{url:'http://127.0.0.1:'+address.port+'/tests/work5-ship-gesture-fixture.html?work6ab=1'});
     await waitFor('Boolean(window.__work5||window.__work5Error)','fixture initialization',20000);
     assert.equal(await evaluate('window.__work5Error'),undefined,'production 3D OceanScene fixture errored');
 
