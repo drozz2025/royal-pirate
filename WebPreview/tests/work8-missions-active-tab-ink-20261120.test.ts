@@ -130,19 +130,26 @@ test('07 Missions: selected active tab paint improves approved 384x512 Chromium 
       const images=await Promise.all([__ORIGINAL__,__BEFORE__,__AFTER__].map(make));
       const w=384,h=512;if(images.some(x=>x.width!==w||x.height!==h))throw Error('native images required');
       const px=images.map(i=>{const c=document.createElement('canvas');c.width=w;c.height=h;const t=c.getContext('2d');t.drawImage(i,0,0);return t.getImageData(0,0,w,h).data});
-      const roi={full:[0,0,384,512],activeTab:[18,154,145,194],tabStrip:[16,151,374,195],missions:[12,155,372,321],daily:[12,326,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,451,384,512]};
+      const roi={full:[0,0,384,512],activeTab:__ACTIVE_TAB_ROI__,tabStrip:__TAB_STRIP_ROI__,missions:[12,155,372,321],daily:[12,326,373,436],chests:[20,356,370,427],header:[0,0,384,70],dock:[0,451,384,512]};
       function mae(a,b,r){let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=(y*w+x)*4;for(let z=0;z<3;z++){total+=Math.abs(a[p+z]-b[p+z]);n++}}return total/n}
       const metrics={};for(const [k,r] of Object.entries(roi)){const baseline=mae(px[0],px[1],r),candidate=mae(px[0],px[2],r);metrics[k]={baseline,candidate,delta:candidate-baseline}}
       const unchanged={header:mae(px[1],px[2],roi.header),dock:mae(px[1],px[2],roi.dock)};
       const overlays=[1,2].map(i=>{const c=document.createElement('canvas');c.width=w*3;c.height=h;const t=c.getContext('2d');t.drawImage(images[0],0,0);t.drawImage(images[i],w,0);t.drawImage(images[0],2*w,0);t.globalAlpha=.5;t.drawImage(images[i],2*w,0);return c.toDataURL('image/png').split(',')[1]});
       return {metrics,unchanged,overlays,sizes:images.map(i=>[i.width,i.height])};
     })()`;
+    const rectRoi=(rect:number[])=>[Math.max(0,Math.floor(rect[0])),Math.max(0,Math.floor(rect[1])),Math.min(384,Math.ceil(rect[0]+rect[2])),Math.min(512,Math.ceil(rect[1]+rect[3]))];
+    const activeRoi=rectRoi(beforeLayout.tabBoxes[0]);
+    const stripRoi=rectRoi([beforeLayout.tabBoxes[0][0],beforeLayout.tabBoxes[0][1],beforeLayout.tabBoxes[2][0]+beforeLayout.tabBoxes[2][2]-beforeLayout.tabBoxes[0][0],Math.max(...beforeLayout.tabBoxes.map((a:number[])=>a[3]))]);
+    assert.ok(activeRoi[2]>activeRoi[0]&&activeRoi[3]>activeRoi[1],'selected tab must be visible at native reference viewport');
+    console.log('WORK8 active tab/strip ROI',JSON.stringify({activeRoi,stripRoi}));
     const injected=script.replace('__ORIGINAL__',JSON.stringify('data:image/webp;base64,'+original))
       .replace('__BEFORE__',JSON.stringify('data:image/png;base64,'+before))
-      .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+after));
+      .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+after))
+      .replace('__ACTIVE_TAB_ROI__',JSON.stringify(activeRoi))
+      .replace('__TAB_STRIP_ROI__',JSON.stringify(stripRoi));
 
 
-    // Earlier native 33-variant sweep rejected all regressions; 96px/space-around had the best full+reward ROI without shifting the seven daily chests.
+    // Direct same-DOM/frame comparison of the actual current selected tab against the approved original.
     const compared=await evalJs(injected);
     const save=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
     save('missions-active-tab-ink-original-384x512.webp',original);
@@ -157,7 +164,7 @@ test('07 Missions: selected active tab paint improves approved 384x512 Chromium 
       viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-active-tab-ink-ab-baseline',
       metrics:compared.metrics,unchanged:compared.unchanged,
       geometry:{before:beforeLayout,after:afterLayout},approved:false,approvedScreens:0,
-      candidate:'activeTab brightness(1.13) saturate(1.04)'
+      candidate:'activeTab brightness(.86) saturate(1.04)'
     };
     writeFileSync(join(evidence,'work8-missions-active-tab-ink-native-ab.json'),JSON.stringify(report,null,2));
     console.log('WORK8 07 active tab native Chromium A/B '+JSON.stringify(compared.metrics));
