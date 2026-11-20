@@ -134,6 +134,22 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
       "for(const e of document.querySelectorAll('.w4-screen svg image')){const url=e.getAttribute('href');if(url&&!(await fetch(url)).ok)throw Error('approved crop not loaded')}return true;})()");
     await sleep(130);
     const initial=await geometry();
+
+    // WORK4_NATIVE_LABEL_A11Y: measure readable native labels without any
+    // interference with the real five-item dock or click-target geometry.
+    const readability=await evaluate("(()=>{const rect=s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return {top:r.top,bottom:r.bottom,width:r.width,height:r.height}};const px=s=>{const e=document.querySelector(s);return e?parseFloat(getComputedStyle(e).fontSize):null};return {namePx:px('.w4-fleet .w4-ship-slot strong'),statusPx:px('.w4-fleet .w4-ship-slot small'),costPx:px('.w4-forge .w4-resource-grid small'),slot:rect('.w4-fleet .w4-ship-slot.is-active'),dock:rect('.harbour-nav.app-dock-porto'),button:rect('.w4-forge .w4-improve-button')}})()");
+    if(screen==='fleet'){
+      assert.ok(readability.namePx>=11,'native ship names must remain legible');
+      assert.ok(readability.statusPx>=8,'native ship availability must remain legible');
+      assert.ok(readability.slot?.height>=44,'Royal Crown remains a viable touch target');
+      assert.ok(readability.slot.bottom<=readability.dock.top+1,
+        'ship selection must not be hidden beneath the WORK0 dock');
+    }else{
+      assert.ok(readability.costPx>=9,'real material/cost captions must remain legible');
+      assert.ok(readability.button?.height>=44,'real upgrade button remains touch sized');
+    }
+    console.log('WORK4_NATIVE_LABEL_A11Y '+JSON.stringify({screen,...readability}));
+
     assert.equal(initial.dockItems,5,'WORK0 menu has exactly five live options');
     assert.equal(initial.overflow,false,'native scene has no horizontal overflow');
     if(screen==='fleet'){assert.equal(initial.cards,4);assert.ok(initial.ship);}
