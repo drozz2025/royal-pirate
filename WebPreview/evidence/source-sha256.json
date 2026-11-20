@@ -1,0 +1,14 @@
+{
+  "index.html": "64ca3854e09a54fcb5e2cda34c519623d6323b967fe39d2fdaacce7e0d2e2884",
+  "package-lock.json": "82ed5d984752351970683ae9d34910488c1acc9b3cc6771826ab16d36a5bb909",
+  "package.json": "60ee6a50b20d8568ce22c1a296674972410c8584e47de77a84adc00ac57dea55",
+  "src/battle.ts": "39afc843974901afa9cd8b520b72fda15f35a67792a1bb9f2534e3979535943a",
+  "src/main.tsx": "3b30d3892fa35b80a194a29119c2936f7d586f4d912c0861b7e59aa5a29c41cc",
+  "src/scene.ts": "256da57f4827d028bc983135ff3c0ead960917f36bf9428c66ff40ff41bdd3ab",
+  "src/ships.ts": "fa3b8211cfe149fb69929eb3ea206a37523475d60c4d3f9acfe40bea0b729f99",
+  "src/software-renderer.ts": "ea342fdd45602c6f773101fbdbc7042598ca5c8303bde98070b0661fe1bcbf18",
+  "src/style.css": "f9bfba7370d6d1646676400ced3ca093cd23f9983b16a653ecea21cdbcad9f89",
+  "tests/battle.test.ts": "d2b8a6716f2c2e918f71b90bb800b01d7d23c91f6356d0c2e503c63fa2b62136",
+  "tests/mobile.html": "c5f7594ca29481fef605a8be8812faa4b9092dc12a21e14d644ed08c30937ba2",
+  "tsconfig.json": "6a95e1be4330779c8c80b9b2b8187862a7715f72e4ceab8fc23bc069e4301491"
+}

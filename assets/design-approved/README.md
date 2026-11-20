@@ -1,0 +1,38 @@
+# ROYAL PIRATE — referências visuais aprovadas
+
+## Direção visual vinculativa
+O ecrã Porto aprovado pelo utilizador é a referência de qualidade para todas as páginas. Preservar: navio pirata 3D central e detalhado, cenário tropical de porto vivo, água convincente, iluminação premium, interface azul-marinho e dourado, botões grandes e legíveis no iPhone, identidade visual consistente. Não usar uma imagem estática como substituto do jogo 3D.
+
+## Ecrãs (8)
+1. **Porto** — navio principal, arena, recursos, baús e BATALHA.
+2. **Batalha** — navios, mira, potência, DISPARAR, habilidades e danos.
+3. **Frota** — selecionar, obter e personalizar navios.
+4. **Melhorias / Forja** — casco, canhões, velas, materiais e evolução.
+5. **Cartas** — coleção, raridades, habilidades e baralhos.
+6. **Loja** — moedas, gemas, baús e ofertas.
+7. **Missões** — objetivos diários, eventos, progresso e recompensas.
+8. **Ranking / Perfil** — ligas, classificação, estatísticas e progresso.
+
+## Contrato para WORK 6
+- Usar as imagens aprovadas como referência de composição e qualidade, não como fundos estáticos.
+- Integrar assets 3D reais ou com o apoio do WORK 2, preservando gameplay, navegação e responsividade mobile.
+- Implementar gradualmente, Porto e Batalha primeiro; executar testes e validar no iPhone antes de publicar.
+- Evitar valores económicos fictícios ou textos meramente decorativos nas interfaces funcionais.
+- Coordenar com WORK 0 e WORK 4 para uniformidade de design e UX.
+
+## Ficheiros visuais — CARREGADOS E VERIFICADOS
+
+Os seguintes ficheiros `.webp` estão disponíveis nesta pasta, na branch `work6/web-3d-preview`:
+
+- `00-referencia-original-aprovada.webp` — referência prioritária, aprovada pelo utilizador
+- `00-painel-oito-ecras.webp` — vista geral de todos os ecrãs
+- `01-porto.webp`
+- `02-batalha.webp`
+- `03-frota.webp`
+- `04-melhorias-forja.webp`
+- `05-cartas.webp`
+- `06-loja.webp`
+- `07-missoes.webp`
+- `08-ranking-perfil.webp`
+
+Estas imagens são referências de design e não substituem modelos 3D nem código jogável. As propostas visuais devem seguir sobretudo a imagem original aprovada.

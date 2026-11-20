@@ -1,0 +1,802 @@
+@import './work4-fleet-forge.css';
+@import './work7-cards-shop.css';
+@import './work8-panels.css';
+@import './app-port-side.css';
+/* ROYAL PIRATE app-first mobile shell. Original responsive navy/gold UI over live ocean. */
+.app-sheet{--gold:#ffe0a0;position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;
+  color:#fff3dd;background:radial-gradient(ellipse 90% 35% at 50% 12%,#3b83b28a,transparent 95%),
+  linear-gradient(165deg,rgba(4,22,51,.96),rgba(10,47,81,.965) 45%,rgba(4,21,45,.98));
+  isolation:isolate;text-shadow:0 2px 3px #020e1b88}
+.app-sheet button{transition:filter .15s,transform .1s}
+.app-sheet button:active:not(:disabled){transform:translateY(2px)}
+.app-sheet button:focus-visible{outline:3px solid #fff4b8;outline-offset:2px}
+.app-sheet button:disabled{opacity:.5;cursor:not-allowed}
+.app-sheet-header{display:flex;align-items:center;gap:10px;padding:max(16px,env(safe-area-inset-top)) 14px 11px;
+  border-bottom:2px solid #c6a16088;background:linear-gradient(#071b35a8,#102e4a60);min-height:86px}
+.app-back{display:grid;place-items:center;flex:none;width:46px;height:46px;border:2px solid #e7bd72;border-radius:14px;
+  background:linear-gradient(#2b6389,#103052);font:bold 35px 'Barlow Condensed',sans-serif;color:#fff5df;box-shadow:0 3px #4c2b1d}
+.app-sheet-brand{min-width:0;flex:1}
+.app-sheet-brand small{display:block;font:800 9px 'Barlow',sans-serif;letter-spacing:1.2px;color:#c6d6e9}
+.app-sheet-brand h1{margin:2px 0 0;font:900 clamp(25px,6.5vw,38px) 'Barlow Condensed',sans-serif;text-transform:uppercase;line-height:1;letter-spacing:.5px}
+.app-sheet-brand h1 span{color:var(--gold);font-size:.85em}
+.app-wallet{border:2px solid #ca9a50;border-radius:12px;padding:7px 10px;background:linear-gradient(#305074,#112c53);
+  display:flex;align-items:center;gap:4px;flex:none;box-shadow:inset 0 1px #ffe7a044}
+.app-wallet span{color:#ffd45a}.app-wallet strong{font:900 21px 'Barlow Condensed',sans-serif}.app-wallet small{font:700 8px 'Barlow',sans-serif;color:#d9c18e}
+.app-shortcuts{display:flex;justify-content:center;gap:7px;padding:11px 14px 3px;flex-shrink:0}
+.app-shortcuts button{flex:1;max-width:165px;min-height:43px;border:1px solid #9cbdd067;border-radius:9px;
+  background:#1a4973;color:#f4e5c2;font:800 13px 'Barlow Condensed',sans-serif;letter-spacing:.3px}
+.app-shortcuts button[aria-current=page]{background:linear-gradient(#f4d07f,#bf8538);color:#28283f;border-color:#fff0b2}
+.app-sheet-content{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  padding:18px max(15px,calc((100% - 620px)/2)) 28px}
+.app-sheet-content h2{margin:0 0 15px;font:900 clamp(28px,7.2vw,44px) 'Barlow Condensed',sans-serif;color:#fff2d0}
+.app-sheet-content h3{font:800 22px 'Barlow Condensed',sans-serif;margin:22px 0 10px}
+.app-sheet-content p{line-height:1.5}
+.app-stack{display:flex;flex-direction:column;gap:13px}
+.app-kicker{color:#f4c978;font:800 10px 'Barlow',sans-serif;letter-spacing:1.4px;text-transform:uppercase}
+.app-fine{font:600 12px 'Barlow',sans-serif;color:#b6d0de;line-height:1.55;margin:2px 0 14px}
+.app-item{border:2px solid #c39d5bb5;border-radius:15px;padding:14px 11px;display:flex;align-items:center;gap:11px;
+  background:linear-gradient(120deg,#1a476ccf,#102d4de9);box-shadow:inset 0 1px #ffeaba2a,0 4px 12px #07142666}
+.app-item-symbol{display:grid;place-items:center;flex:0 0 61px;height:64px;border:2px solid #e3b96c;border-radius:13px;
+  background:linear-gradient(135deg,#875c3f,#332536);color:#ffe3a5;font-size:34px}
+.app-item-text{flex:1;min-width:0}.app-item-text strong{display:block;font:800 20px 'Barlow Condensed',sans-serif}
+.app-item-text small{display:block;color:#e8c88d;font:700 10px 'Barlow',sans-serif;letter-spacing:.4px}
+.app-item-text p{font:500 11px 'Barlow',sans-serif;line-height:1.4;color:#bdd2e0;margin:6px 0 0}
+.app-item>button,.app-daily>button,.app-offer button,.app-row-muted button{flex:0 0 auto;min-width:65px;
+  min-height:44px;border:2px solid #f6d08a;border-radius:10px;padding:7px 10px;background:linear-gradient(#f5d98c,#c48f4a);
+  color:#272c37;font:900 13px 'Barlow Condensed',sans-serif;letter-spacing:.5px;text-shadow:none}
+.app-equipped{border-color:#f7e59c;box-shadow:0 0 0 2px #f4cd7233,inset 0 1px #fff8}
+.app-ship-card{display:flex;align-items:center;gap:16px;padding:21px 14px;border-radius:20px;border:2px solid #d8ad6c;
+  background:linear-gradient(115deg,#1c5377bb,#3a3549b3);min-height:172px;box-shadow:0 7px 19px #08172699}
+.app-ship-card>span{font-size:77px;line-height:1;color:#eed39c;text-shadow:0 4px #77502d}
+.app-ship-card strong{display:block;font:900 26px 'Barlow Condensed',sans-serif}
+.app-ship-card small{display:block;font:600 11px 'Barlow',sans-serif;color:#f1cf95}
+.app-ship-card p{font-size:13px;color:#d6ddeb}
+.app-cta{width:100%;padding:17px;border:3px solid #ffe7a1;border-radius:15px;background:linear-gradient(#ffea91,#f4b845 56%,#d77d2a);
+  color:#3b2718;font:900 23px 'Barlow Condensed',sans-serif;letter-spacing:.8px;text-shadow:0 1px #fff2d0;
+  box-shadow:inset 0 2px #fff8bb,0 5px #87501d}
+.app-row-muted{padding:15px;display:flex;gap:8px;align-items:center;justify-content:space-between;border:1px solid #728ba680;
+  border-radius:12px;background:#112c4e;color:#b5cfdd;font:600 12px 'Barlow',sans-serif}
+.app-row-muted>span:last-child{font:900 10px 'Barlow',sans-serif;color:#efc685}
+.app-offer{display:flex;align-items:center;gap:12px;padding:15px;border:1px solid #9bb9c777;border-radius:14px;background:#193d61cb}
+.app-offer>span{font-size:38px;color:#ffd98d}.app-offer>div{flex:1;min-width:0}
+.app-offer strong{font:800 17px 'Barlow Condensed',sans-serif}
+.app-offer>strong{font-size:10px;color:#ebcc8d;white-space:nowrap}
+.app-offer p{font:500 12px 'Barlow',sans-serif;color:#bcd4e1;margin:5px 0 0}
+.app-intro{text-align:center}.app-crest{font-size:66px;color:#ffdc81;display:block;margin:12px auto 8px;text-shadow:0 7px #47362a}
+.app-intro p{max-width:440px;margin:12px auto 18px;color:#bed3e4;font-size:13px}
+.app-versus{display:flex;align-items:center;justify-content:space-around;gap:8px;margin:22px 0;padding:20px 12px;border-radius:18px;
+  background:linear-gradient(130deg,#13466c,#5c3037);border:2px solid #b18e56}
+.app-versus>div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}.app-versus>div>strong{font-size:53px;color:#ffde8c}
+.app-versus b{font:900 19px 'Barlow Condensed',sans-serif}.app-versus small{font:700 9px 'Barlow',sans-serif;color:#bcd2d9}
+.app-versus>span{font:900 28px 'Barlow Condensed',sans-serif;color:#ffe9b1}
+.app-daily{display:flex;align-items:center;gap:12px;border:2px solid #ecc478;padding:15px;border-radius:16px;
+  background:linear-gradient(135deg,#614c3b,#1c4564);box-shadow:inset 0 1px #fff6a866}
+.app-daily>span{font-size:42px}.app-daily>div{flex:1}.app-daily strong{font:800 18px 'Barlow Condensed',sans-serif}
+.app-daily p{font-size:11px;margin:4px 0}.app-daily small{font-size:10px;color:#f2d3a0}
+.app-mission .app-item-text{padding:3px}.app-track{height:7px;border-radius:8px;background:#071d31;margin-top:9px;overflow:hidden}
+.app-track>span{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#7fd4c3,#ffe2a0)}
+.app-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.app-stat-grid>div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  padding:16px 5px;border-radius:13px;border:1px solid #c99e5a;background:linear-gradient(#2a4e74,#132e50)}
+.app-stat-grid small{font:800 10px 'Barlow',sans-serif;color:#e9cd8d}.app-stat-grid strong{font:900 30px 'Barlow Condensed',sans-serif}
+.app-dock{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));flex-shrink:0;min-height:74px;
+  padding:5px 7px max(7px,env(safe-area-inset-bottom));gap:4px;background:linear-gradient(#153b69,#061f46);
+  border-top:3px solid #d3ae64;box-shadow:0 -4px 15px #030e1bc0}
+.app-dock button{min-width:0;padding:3px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1px;border-radius:11px;background:transparent;color:#d7e7f6}
+.app-dock button span{font-size:24px;line-height:1.1;color:#f5cc75}.app-dock button strong{font:800 12px 'Barlow Condensed',sans-serif;letter-spacing:.2px}
+.app-dock button[aria-current=page]{border:2px solid #f6dc90;background:linear-gradient(#edce89,#b9813c);color:#272d40;box-shadow:0 2px #5b3c28}
+.app-dock button[aria-current=page] span{color:#4b3427}
+/* Keep all app pages in the same viewport as the approved full-bleed Porto. */
+@media(min-width:660px){.app-sheet{width:100%;max-width:none;margin:0;border-left:0;border-right:0;box-shadow:none}}
+@media(max-width:370px){.app-sheet-header{padding-left:8px;padding-right:8px;gap:6px}.app-wallet small{display:none}.app-back{width:40px;height:40px}
+  .app-item{gap:6px;padding:10px 7px}.app-item-symbol{flex-basis:49px;height:57px;font-size:28px}
+  .app-item-text strong{font-size:17px}.app-item>button{min-width:57px;padding:5px}.app-dock button strong{font-size:10px}}
+@media(max-height:650px){.app-sheet-header{min-height:67px;padding-top:max(7px,env(safe-area-inset-top));padding-bottom:6px}
+  .app-shortcuts{padding:5px 10px 2px}.app-shortcuts button{min-height:38px}.app-sheet-content{padding-top:8px}
+  .app-dock{min-height:65px}.app-crest{font-size:42px;margin:2px auto}}
+@media(prefers-reduced-motion:reduce){.app-sheet button{transition:none}}
+
+/* Local save controls: truthful offline-only data portability. */
+.app-save-backup{margin-top:12px;padding:17px;border:1px solid #ccac69;border-radius:16px;
+  background:linear-gradient(130deg,#163f63,#102943);box-shadow:inset 0 1px #ffebb533}
+.app-save-backup h3{margin:7px 0 6px;font-size:24px}
+.app-save-backup p{font:500 13px/1.55 'Barlow',sans-serif;color:#e4eef7;margin:0 0 14px}
+.app-backup-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px}
+.app-backup-actions button{min-height:49px;padding:9px 6px;border:2px solid #f3ce83;border-radius:11px;
+  font:900 14px 'Barlow Condensed',sans-serif;color:#172d46;background:linear-gradient(#ffe8a1,#c9934f)}
+.app-save-backup .app-backup-status{padding:9px 11px;border-left:3px solid #f3ce83;border-radius:4px;
+  background:#09223f;color:#ffeac3;font-size:12px}
+.app-save-backup small{display:block;color:#aecada;font:500 11px/1.55 'Barlow',sans-serif}
+@media(max-width:370px){.app-backup-actions button{font-size:12px}}
+
+
+/* Seven-day supply route: fully original shapes, no artwork or monetized chests. */
+.app-sheet-announcement{padding:10px 16px;background:#103a4f;border-bottom:2px solid #edcb82;
+  color:#fff2c9;font:700 13px/1.35 'Barlow',sans-serif}
+.app-sheet-announcement:empty{display:none}
+.app-sheet-brand h1:focus{outline:none}
+.app-week-rewards{border:1px solid #cfa968;border-radius:16px;padding:14px 12px 12px;
+  background:linear-gradient(145deg,rgba(7,30,57,.92),rgba(23,60,91,.94));
+  box-shadow:inset 0 1px #ffe9b633,0 6px 20px #06142580}
+.app-week-heading{display:flex;flex-wrap:wrap;gap:3px 14px;justify-content:space-between;align-items:baseline}
+.app-week-heading h3{margin:0 0 11px;color:#ffe3a4;font:900 23px 'Barlow Condensed',sans-serif}
+.app-week-heading small{font:600 11px 'Barlow',sans-serif;color:#bfd8e5}
+.app-week-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;
+  padding:0;margin:0 0 10px;list-style:none}
+.app-week-day{min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:10px 4px;border:1px solid #8fabc6a0;border-radius:11px;
+  background:linear-gradient(160deg,#1d4468,#122d4e);text-align:center}
+.app-week-day-label{font:800 11px 'Barlow Condensed',sans-serif;color:#e8d4a9;letter-spacing:.5px}
+.app-week-day-icon{font:900 26px/1.25 'Barlow Condensed',sans-serif;color:#f4d48c}
+.app-week-day strong{font:900 17px 'Barlow Condensed',sans-serif;color:#fff4db;white-space:nowrap}
+.app-week-day strong span{color:#fbd376;font-size:12px}
+.app-week-day small{font:600 10px/1.2 'Barlow',sans-serif;color:#c7deef;min-height:24px}
+.app-week-day.is-claimed{background:linear-gradient(145deg,#164f56,#0f3b53);border-color:#80d5ae}
+.app-week-day.is-claimed .app-week-day-icon{color:#a9f5c9}
+.app-week-day.is-next{background:linear-gradient(145deg,#664927,#243d54);border:2px solid #ffdf9b;
+  box-shadow:0 0 0 1px #e8bc6730,inset 0 1px #fff6cb4a}
+.app-week-day:last-child{background-image:linear-gradient(145deg,#544065,#143350)}
+.app-week-day:last-child.is-claimed{background-image:linear-gradient(145deg,#164f56,#0f3b53)}
+.app-week-rewards>.app-fine{margin:3px 0 0;max-width:none}
+@media(max-width:370px){
+  .app-week-grid{gap:5px}
+  .app-week-day{padding:8px 2px}
+  .app-week-day strong{font-size:15px}
+  .app-week-day small{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){.app-sheet button{transition:none}}
+
+
+/* v0.1.10: legible collectible roster and shipyard milestones. */
+.app-summary-strip,.app-crew-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:12px 14px;border:1px solid #dfbd79;border-radius:13px;background:linear-gradient(130deg,#244b6d,#0b2847)}
+.app-summary-strip>span,.app-crew-tools>div:first-child{display:flex;flex-direction:column;gap:3px}
+.app-summary-strip strong,.app-crew-tools strong{font:900 27px 'Barlow Condensed',sans-serif;color:#ffe6a9}
+.app-summary-strip small,.app-crew-tools small{font:700 10px 'Barlow',sans-serif;color:#c6dbeb;letter-spacing:.6px}
+.app-upgrade-item{align-items:flex-start}
+.app-upgrade-item>button{align-self:center}
+.app-upgrade-steps{display:flex;gap:5px;margin:12px 0 5px;max-width:270px}
+.app-upgrade-steps span{height:12px;flex:1;border-radius:4px;border:1px solid #9ab6bf;box-shadow:inset 0 2px 3px #00182e88;background:#061b35}
+.app-upgrade-steps .is-complete{border-color:#f8df99;background:linear-gradient(#ffe5a0,#c98f48);box-shadow:0 0 5px #e8b45366}
+.app-item-text .app-cost-note{color:#c5d9e6;font:700 10px/1.4 'Barlow',sans-serif}
+.app-crew-filters{display:flex;gap:5px;padding:3px;background:#071e36;border:1px solid #819aaa;border-radius:11px}
+.app-crew-filters button{min-height:42px;min-width:65px;border:0;border-radius:8px;padding:6px;background:transparent;color:#d6e7f2;font:900 12px 'Barlow Condensed',sans-serif}
+.app-crew-filters button[aria-pressed="true"]{color:#26364a;background:linear-gradient(#ffe9aa,#d3a258);box-shadow:0 2px #7e522b}
+.app-crew-item{min-height:109px}
+.app-crew-portrait{position:relative;font-size:36px;border-radius:15px;background:radial-gradient(circle at 48% 22%,#b17f57,#5d3841 55%,#1c2940)}
+.app-crew-portrait.is-locked{filter:saturate(.45);opacity:.76;border-color:#8aa4af}
+.app-crew-item.app-equipped{background:linear-gradient(120deg,#285a6e,#132c50 88%)}
+@media(max-width:370px){.app-summary-strip,.app-crew-tools{padding:9px}.app-crew-filters button{min-width:50px}}
+@media(prefers-reduced-motion:reduce){.app-upgrade-steps span{transition:none}}
+
+
+/* v0.1.11: custom vector icons, legible on mobile Retina displays and at browser zoom. */
+.app-page-glyph,.app-tab-glyph{display:inline-flex;align-items:center;justify-content:center}
+.app-page-glyph svg{vertical-align:middle;filter:drop-shadow(0 2px 2px #091527)}
+.app-shortcuts button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.app-shortcuts button .pirate-icon{flex:0 0 auto;color:#ffe4a7}
+.app-shortcuts button[aria-current=page] .pirate-icon{color:#372914}
+.app-dock button .app-tab-glyph{min-height:29px}
+.app-dock button .app-tab-glyph svg{width:27px;height:27px}
+.app-dock button[aria-current=page] .app-tab-glyph svg{color:#4b3427}
+@media(max-width:350px){.app-shortcuts button{gap:3px;font-size:11px}}
+
+
+/* v0.1.12 — real battle history, clear win/loss results and touch-sized scan targets. */
+.app-battle-log{border:1px solid #cba660;border-radius:15px;background:linear-gradient(145deg,#0a2846,#153b5c);padding:13px 12px}
+.app-battle-log-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}
+.app-battle-log-heading h3{font:900 23px 'Barlow Condensed',sans-serif;margin:3px 0;color:#ffe5af}
+.app-battle-log-heading>small{font:700 11px 'Barlow',sans-serif;color:#c3d9e5;white-space:nowrap}
+.app-battle-empty{margin:0;padding:16px 12px;border:1px dashed #879cae;border-radius:10px;background:#0b233c;color:#d1e5f0;font:600 13px/1.5 'Barlow',sans-serif}
+.app-battle-entries{list-style:none;display:grid;gap:7px;margin:0;padding:0}
+.app-battle-entry{display:flex;align-items:center;gap:10px;padding:11px 10px;min-height:69px;border-radius:11px;background:#153755;border:1px solid #799bb0}
+.app-battle-entry.is-win{border-left:4px solid #e9c87e}
+.app-battle-entry.is-loss{border-left:4px solid #8cb1ce}
+.app-battle-medallion{display:grid;place-items:center;flex:0 0 39px;width:39px;height:39px;border-radius:50%;border:1px solid #e0ba73;color:#f9dfa6;background:#253a50;font-size:21px}
+.app-battle-details{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.app-battle-details strong{font:900 16px 'Barlow Condensed',sans-serif;letter-spacing:.4px;color:#fff0cb}
+.app-battle-details time,.app-battle-details small{font:600 11px 'Barlow',sans-serif;color:#cfdee7}
+.app-battle-loot{display:flex;align-items:flex-end;flex-direction:column;gap:4px;flex:0 0 auto}
+.app-battle-loot strong{font:900 16px 'Barlow Condensed',sans-serif;color:#ffdc99}
+.app-battle-loot small{font:800 10px 'Barlow',sans-serif;color:#c6e5d8}
+.app-battle-log>.app-fine{font-size:11px;line-height:1.5;margin:12px 0 0}
+@media(max-width:370px){.app-battle-entry{gap:6px;padding:9px 6px}.app-battle-medallion{width:33px;height:33px;flex-basis:33px;font-size:18px}.app-battle-details time,.app-battle-details small{font-size:10px}}
+
+
+/* v0.1.13 — real local port-market merchandise and personal victory route.
+ * Original navy/champagne illustrations: no borrowed art or fabricated leaderboard.
+ */
+.app-market-hero{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:11px;
+  padding:19px 12px;border:2px solid #e4b970;border-radius:20px;
+  background:radial-gradient(circle at 80% 10%,#5b82a266,transparent 55%),linear-gradient(145deg,#264765,#102743 80%);
+  box-shadow:inset 0 2px #fff4cc2b,0 8px 20px #02112385}
+.app-market-icon{display:grid;place-items:center;flex:0 0 auto;width:64px;height:70px;border:2px solid #f6db9c;border-radius:16px;
+  background:linear-gradient(145deg,#bb8650,#65402d 57%,#332b3e);color:#fff1bf;box-shadow:0 3px #372a32}
+.app-market-copy{min-width:0}.app-market-copy h2{margin:2px 0 5px;font:900 clamp(25px,6.5vw,37px)/1 'Barlow Condensed',sans-serif;color:#ffe9bc}
+.app-market-copy p{font:600 12px/1.5 'Barlow',sans-serif;color:#d4e7f1;margin:0}
+.app-market-purse{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:65px;padding:9px 6px;
+  border:1px solid #f3d48a;border-radius:13px;background:linear-gradient(#213f60,#0b2845);box-shadow:inset 0 2px #ffe8a22b}
+.app-market-purse strong{font:900 25px 'Barlow Condensed',sans-serif;color:#ffe0a1}
+.app-market-purse small{font:800 9px 'Barlow',sans-serif;white-space:nowrap;color:#eed29c}
+.app-market-roster{padding:12px 11px;border:1px solid #bd9f70;border-radius:17px;
+  background:linear-gradient(155deg,#123759e8,#0a2644ef);box-shadow:0 6px 18px #05152b85}
+.app-market-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:9px;margin-bottom:12px}
+.app-market-heading h3{font:900 26px 'Barlow Condensed',sans-serif;margin:3px 0 0;color:#ffebb9}
+.app-market-heading>small{font:800 10px 'Barlow',sans-serif;color:#e5cd9b;text-align:right;white-space:nowrap}
+.app-market-list{display:grid;gap:9px}
+.app-market-card{display:flex;align-items:center;gap:10px;padding:12px 9px;
+  border:1px solid #8aa3b9;border-radius:14px;background:linear-gradient(120deg,#265176,#102e4d);
+  box-shadow:inset 0 1px #e8f7ff23}
+.app-market-card.is-owned{border-color:#dcb677;background:linear-gradient(120deg,#285663,#12314d)}
+.app-market-portrait{display:grid;place-items:center;flex:0 0 62px;height:68px;border-radius:12px;
+  border:2px solid #d3ac72;background:radial-gradient(circle at 40% 15%,#c49164,#583b3b 68%,#24263f);
+  color:#ffe3ab;font:900 36px 'Barlow Condensed',sans-serif;text-shadow:0 2px #251927}
+.app-market-card-info{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.app-market-card-info>strong{font:900 20px 'Barlow Condensed',sans-serif;color:#fff0cc;line-height:1.05}
+.app-market-card-info>small{font:800 9px 'Barlow',sans-serif;letter-spacing:.5px;color:#f0d395}
+.app-market-card-info p{margin:1px 0 0;font:600 11px/1.3 'Barlow',sans-serif;color:#d7e4ed}
+.app-market-price{font:800 10px 'Barlow Condensed',sans-serif;color:#ffe0a1;letter-spacing:.4px}
+.app-market-card>button{flex:0 0 auto;min-width:75px;min-height:46px;padding:8px 7px;border:2px solid #fbe0a0;
+  border-radius:10px;background:linear-gradient(#ffe5a0,#ce9147);color:#30281f;text-shadow:none;font:900 13px 'Barlow Condensed',sans-serif}
+.app-market-card>button:disabled{opacity:.69;background:#334a60;color:#e3ebf0;border-color:#9caebc}
+.app-market-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.app-market-actions button{min-height:49px;padding:8px;border:2px solid #edce8b;border-radius:12px;
+  background:linear-gradient(#eecb81,#ad7840);color:#2d2b32;font:900 13px 'Barlow Condensed',sans-serif}
+.app-market-actions button:last-child{background:linear-gradient(#315d7e,#143651);color:#ffe3ad}
+.app-market-pending{border-color:#8ca7ae}
+.app-captain-route{padding:16px 13px 12px;border:2px solid #ccac70;border-radius:16px;
+  background:radial-gradient(ellipse at top right,#2f628254,transparent 65%),linear-gradient(#153d61,#0b2844);
+  box-shadow:inset 0 1px #ffe4a344,0 7px 19px #07172f77}
+.app-captain-route-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.app-captain-route-top h3{font:900 26px 'Barlow Condensed',sans-serif;margin:4px 0 12px;color:#ffe1a0}
+.app-captain-route-top>strong{display:flex;flex-direction:column;align-items:center;font:900 28px 'Barlow Condensed',sans-serif;color:#ffdfa0}
+.app-captain-route-top>strong small{font:800 9px 'Barlow',sans-serif;color:#dce6e9}
+.app-captain-route-track{height:13px;border:2px solid #8fa4aa;border-radius:8px;background:#071f35;overflow:hidden}
+.app-captain-route-track>span{display:block;height:100%;border-radius:7px;background:linear-gradient(90deg,#a7d6d1,#f2cd7c)}
+.app-captain-route-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;list-style:none;padding:0;margin:9px 0 12px}
+.app-captain-route-steps li{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;
+  min-height:56px;padding:4px 2px;border-radius:9px;border:1px solid #7c99ae;background:#0c2844;
+  color:#b9cdda;text-align:center}
+.app-captain-route-steps li.is-earned{border-color:#f7d38b;background:#294b55;color:#ffe7b5}
+.app-captain-route-steps li>span{font-size:21px;line-height:1}
+.app-captain-route-steps li strong{font:900 11px 'Barlow Condensed',sans-serif}
+.app-captain-route>.app-fine{margin:0;color:#d1e4ed}
+@media(max-width:390px){.app-market-hero{grid-template-columns:auto minmax(0,1fr);padding:12px 9px;gap:8px}
+  .app-market-icon{width:46px;height:55px}.app-market-icon svg{width:32px;height:32px}
+  .app-market-purse{grid-column:1 / -1;flex-direction:row;gap:7px;padding:6px;min-height:36px}
+  .app-market-purse strong{font-size:22px}.app-market-purse small{font-size:10px}
+  .app-market-card{padding:9px 6px;gap:6px}.app-market-portrait{flex-basis:45px;height:56px;font-size:26px}
+  .app-market-card-info>strong{font-size:17px}.app-market-card>button{min-width:62px;padding:6px 4px;font-size:11px}
+  .app-market-actions button{font-size:11px}.app-captain-route-steps li strong{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.app-market-card button,.app-market-actions button{transition:none}}
+
+/* v0.1.14 — original fleet blueprint. Decorative only; actual 3D inspection is unchanged. */
+.app-fleet-showcase{padding:14px 12px;border:2px solid #d8b777;border-radius:17px;
+  background:radial-gradient(ellipse at 50% 6%,#35678688,transparent 66%),linear-gradient(160deg,#153b5a,#071f3c 95%);
+  box-shadow:inset 0 1px #ffedc04a,0 7px 17px #021428aa}
+.app-fleet-status-heading{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.app-fleet-status-heading h3{font:900 28px/1.1 'Barlow Condensed',sans-serif;color:#ffebba;margin:4px 0 8px}
+.app-fleet-levels{display:flex;flex-direction:column;align-items:center;flex-shrink:0;
+  border:1px solid #e9c886;border-radius:10px;background:#0c2844;padding:6px 10px}
+.app-fleet-levels strong{font:900 24px 'Barlow Condensed',sans-serif;color:#ffe4aa}
+.app-fleet-levels small{font:800 9px 'Barlow',sans-serif;color:#cbdce4;letter-spacing:.3px}
+.app-fleet-blueprint{position:relative;overflow:hidden;border:1px solid #b89d71;border-radius:13px;
+  background:radial-gradient(ellipse at 48% 100%,#32678d6b,transparent 80%),linear-gradient(#0e3556,#071c32);
+  padding:7px 10px 12px;text-align:center}
+.app-fleet-blueprint svg{display:block;width:100%;max-height:178px;margin:0 auto}
+.app-fleet-hull-shape{fill:#956e4c;stroke:#ffdfa1;stroke-width:2.2}
+.app-fleet-deck,.app-fleet-mast{fill:none;stroke:#f7db98;stroke-width:3;stroke-linejoin:round}
+.app-fleet-sail{fill:#e7d9b8;stroke:#e4c68c;stroke-width:2}
+.app-fleet-flag{fill:#d8a04b;stroke:#ffe2a5;stroke-width:1}
+.app-fleet-wave{fill:none;stroke:#66a9bb;stroke-width:3;opacity:.7}
+.app-fleet-porthole{fill:#143750;stroke:#ffd995;stroke-width:2}
+.app-fleet-blueprint>span{font:800 9px/1.4 'Barlow',sans-serif;color:#c6dce8;letter-spacing:.55px}
+.app-fleet-modules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.app-fleet-module{min-width:0;padding:11px 9px;border:1px solid #9ab2bf;border-radius:11px;background:linear-gradient(#204963,#0a2745)}
+.app-fleet-module-top{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.app-fleet-module-top>span{font-size:20px;color:#f8dd9d}
+.app-fleet-module-top strong{font:900 17px 'Barlow Condensed',sans-serif;color:#ffe7b1}
+.app-fleet-module-top small{flex-basis:100%;font:800 10px 'Barlow',sans-serif;color:#cadfea}
+.app-fleet-progress{height:11px;border-radius:10px;border:1px solid #98adbb;overflow:hidden;margin:10px 0 7px;background:#081e32}
+.app-fleet-progress>span{display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,#dab46e,#ffe4a6)}
+.app-fleet-module>small{display:block;font:700 10px/1.4 'Barlow',sans-serif;color:#d1e2ee}
+.app-fleet-captain{margin:0 0 10px;font:700 13px 'Barlow',sans-serif;color:#d1e4ed}
+.app-fleet-captain strong{color:#ffe6a8}
+.app-fleet-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.app-fleet-actions button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:48px;
+  border:2px solid #eed090;border-radius:11px;background:linear-gradient(#f9dea0,#c88a40);
+  color:#30231a;text-shadow:none;font:900 14px 'Barlow Condensed',sans-serif}
+.app-fleet-actions button:last-child{background:linear-gradient(#325f7d,#173851);color:#ffe3a6}
+.app-fleet-actions button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.app-fleet-showcase>.app-fine{font-size:11px;line-height:1.5;margin:12px 0 0}
+@media(max-width:390px){
+ .app-fleet-showcase{padding:10px 8px}
+ .app-fleet-status-heading h3{font-size:24px}
+ .app-fleet-modules{gap:5px}.app-fleet-module{padding:9px 5px}
+ .app-fleet-module-top strong{font-size:14px}.app-fleet-module-top>span{font-size:17px}
+ .app-fleet-module>small{font-size:9px}
+ .app-fleet-actions button{font-size:12px;gap:4px;padding:6px 4px}
+}
+@media(max-width:335px){.app-fleet-modules{grid-template-columns:1fr}
+ .app-fleet-module-top small{flex-basis:auto;margin-left:auto}}
+@media(prefers-reduced-motion:reduce){.app-fleet-actions button{transition:none}}
+
+/* v0.1.15 — original interactive crew deck; actual local ownership and active captain. */
+.app-deck{display:flex;flex-direction:column;gap:11px;padding:13px;border:2px solid #d8b777;border-radius:18px;
+ background:radial-gradient(ellipse at 20% 5%,#326d8699,transparent 60%),linear-gradient(160deg,#153b5c,#081e38);
+ box-shadow:inset 0 1px #ffe7bb66,0 9px 23px #011427bb}
+.app-deck-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.app-deck-top h3{font:900 27px/1 'Barlow Condensed',sans-serif;color:#ffebbb;margin:5px 0}
+.app-deck-count{flex:none;color:#ffe4a8;font:900 11px 'Barlow',sans-serif;border:1px solid #b8a175;
+ background:#092945;padding:7px;border-radius:9px}
+.app-deck-feature{display:grid;grid-template-columns:minmax(100px,42%) minmax(0,1fr);gap:12px;
+ border:1px solid #b8a47b;border-radius:14px;padding:11px;background:linear-gradient(110deg,#284b66,#0b2846)}
+.app-deck-illustration{position:relative;align-self:center;min-width:0;border-radius:14px;
+ background:radial-gradient(circle,#42688277,#061d3699 75%)}
+.app-deck-illustration svg{display:block;width:100%;height:auto;max-height:198px}
+.app-deck-emblem{position:absolute;right:2px;bottom:0;width:39px;height:39px;display:grid;place-items:center;
+ border:2px solid #ffe0a4;border-radius:50%;background:linear-gradient(#675338,#302a33);font:900 26px 'Barlow Condensed',sans-serif;color:#ffdf97}
+.app-deck-info{min-width:0;display:flex;align-items:flex-start;flex-direction:column;justify-content:center;gap:6px}
+.app-deck-info>small{color:#f6d593;font:900 10px 'Barlow',sans-serif;letter-spacing:.4px}
+.app-deck-info h4{margin:0;font:900 clamp(22px,5.6vw,32px)/.95 'Barlow Condensed',sans-serif;color:#fff4d7}
+.app-deck-info p{margin:0;color:#c3dce9;font:600 11px/1.35 'Barlow',sans-serif}
+.app-deck-info>strong{color:#ffe0a5;font:900 13px 'Barlow Condensed',sans-serif}
+.app-deck-afford{color:#c8dae7;font:700 11px/1.35 'Barlow',sans-serif}
+.app-deck-info button{width:100%;min-height:46px;padding:8px;border:2px solid #ffe0a2;border-radius:10px;
+ background:linear-gradient(#ffe9af,#cc9651);color:#2b2c33;text-shadow:none;font:900 13px 'Barlow Condensed',sans-serif}
+.app-deck-info button:disabled{background:#294d65;color:#f3dcae;border-color:#b5a17e;opacity:1}
+.app-deck-roster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.app-deck-slot{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;min-width:0;
+ padding:9px 4px;min-height:96px;border:1px solid #88a8b8;border-radius:11px;background:linear-gradient(#1c4667,#0a253d);
+ color:#e7eff2;text-shadow:none}
+.app-deck-slot.is-preview{border:2px solid #ffe0a0;background:linear-gradient(#71543b,#243952)}
+.app-deck-slot-icon{display:grid;place-items:center;width:39px;height:39px;border:1px solid #e8c989;
+ border-radius:50%;font:900 25px 'Barlow Condensed',sans-serif;color:#ffdc93;background:#152b45}
+.app-deck-slot strong{max-width:100%;font:900 13px 'Barlow Condensed',sans-serif;overflow-wrap:anywhere;line-height:1.15}
+.app-deck-slot small{font:800 10px 'Barlow',sans-serif;color:#ffdfa0}
+.app-deck-footer{display:flex;gap:9px;align-items:center;justify-content:space-between}
+.app-deck-footer>span{flex:1;color:#cddfea;font:600 11px/1.35 'Barlow',sans-serif}
+.app-deck-footer button{min-height:46px;padding:7px 11px;flex:none;border:2px solid #e8c786;border-radius:10px;
+ font:900 12px 'Barlow Condensed',sans-serif;color:#ffdfa5;background:#123b60}
+.app-deck button:focus-visible,.app-forge-board button:focus-visible{outline:3px solid #fff4bc;outline-offset:3px}
+
+/* The Forge board shows recorded upgrade levels without fictional combat effects. */
+.app-forge-board{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:center;padding:12px;
+ border:2px solid #d3b273;border-radius:17px;background:linear-gradient(120deg,#224f66,#0a2745);
+ box-shadow:inset 0 1px #ffebc244,0 7px 17px #00172e88}
+.app-forge-seal{min-height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+ border:1px solid #bd9b67;border-radius:12px;background:radial-gradient(circle,#3c6374,#142f4e 70%);
+ color:#ffe0a1}
+.app-forge-seal span{font:900 11px 'Barlow Condensed',sans-serif;letter-spacing:.8px}
+.app-forge-status h3{font:900 25px 'Barlow Condensed',sans-serif;color:#ffe6ae;margin:4px 0 10px}
+.app-forge-mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.app-forge-mini-grid>div{min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 3px;
+ border:1px solid #8aaabb;border-radius:9px;background:#0b2c4b}
+.app-forge-mini-grid span{font-size:24px;color:#ffdfa0;line-height:1}
+.app-forge-mini-grid strong{font:900 12px 'Barlow Condensed',sans-serif}
+.app-forge-mini-grid small{font:800 11px 'Barlow',sans-serif;color:#ffda8c}
+.app-forge-status p{color:#c5dbe6;font:600 10px/1.45 'Barlow',sans-serif;margin:9px 0 0}
+@media(max-width:390px){
+ .app-deck{padding:9px;gap:8px}.app-deck-feature{padding:8px;gap:7px;grid-template-columns:minmax(92px,40%) minmax(0,1fr)}
+ .app-deck-info h4{font-size:23px}.app-deck-info>small{font-size:9px}.app-deck-info button{font-size:11px;padding:5px}
+ .app-deck-slot{min-height:90px}.app-deck-slot strong{font-size:12px}
+ .app-deck-footer button{font-size:11px;padding:5px}
+ .app-forge-board{grid-template-columns:75px minmax(0,1fr);gap:7px;padding:8px}
+ .app-forge-seal{min-height:135px}.app-forge-seal svg{width:44px}.app-forge-seal span{font-size:9px}
+ .app-forge-mini-grid span{font-size:19px}.app-forge-mini-grid strong{font-size:10px}
+ .app-forge-status h3{font-size:22px}
+}
+@media(max-width:330px){.app-deck-feature{grid-template-columns:1fr}
+ .app-deck-illustration{max-width:145px;margin:auto}.app-deck-info h4{font-size:25px}
+ .app-forge-board{grid-template-columns:1fr}.app-forge-seal{min-height:70px;flex-direction:row}
+}
+@media(prefers-reduced-motion:reduce){.app-deck button{transition:none}}
+
+
+/* WORK 6 — Porto is the approved dimension/shape reference, 15 Nov 2026.
+ * Other app sheets use its exact harbour-nav markup, illustrations and CSS.
+ * Do not restyle harbour-screen or the approved Porto menu.
+ */
+.app-sheet {
+  --porto-nav-height:clamp(82px,11dvh,112px);
+}
+.app-sheet > .harbour-nav {
+  position:relative;
+  inset:auto;
+  width:100%;
+  flex:0 0 var(--porto-nav-height);
+  z-index:5;
+}
+.app-sheet > .harbour-nav .harbour-nav-item:disabled {
+  opacity:1;
+  cursor:default;
+}
+/* Extra shortcuts duplicated the same destinations above the page content.
+ * Their routes remain available from Porto and the page's real CTA controls.
+ */
+.app-sheet > .app-shortcuts {
+  display:none;
+}
+
+/* WORK 6 — player identity and scale consistent with the approved Porto HUD.
+   This styles only internal screens, never harbour-screen or harbour-nav. */
+.app-sheet-brand small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f4dca5;letter-spacing:.5px;font-size:clamp(10px,2.7vw,12px)}
+.app-sheet-brand h1{font-size:clamp(23px,6vw,34px)}
+.app-player-name-edit{display:flex;flex-direction:column;gap:8px;padding:13px 14px;border:2px solid #bd995c;border-radius:14px;background:linear-gradient(130deg,#1c5274e8,#0b264be8);box-shadow:inset 0 1px #ffecba77,0 5px 14px #04152c80}
+.app-player-name-edit label{font:900 13px 'Barlow Condensed',sans-serif;letter-spacing:.7px;color:#ffe5a4}
+.app-player-name-edit>div{display:flex;gap:9px;align-items:center}
+.app-player-name-edit input{min-width:0;flex:1;height:43px;border:2px solid #8bafc7;border-radius:9px;background:#071d3d;color:#fff9e8;padding:8px 11px;font:800 17px 'Barlow Condensed',sans-serif}
+.app-player-name-edit button{min-height:43px;border:2px solid #ffe1a1;border-radius:9px;background:linear-gradient(#f7df9b,#c69048);color:#2c251d;padding:8px 12px;font:900 13px 'Barlow Condensed',sans-serif;text-shadow:none}
+.app-player-name-edit button:disabled{opacity:.55;cursor:not-allowed}
+.app-player-name-edit small{color:#c8dce9;font:600 11px/1.35 'Barlow',sans-serif}
+
+
+/* WORK 6 · Internal HUD rhythm (16 Nov 2026).
+   Apply only inside the app sheets: the approved Porto screen and its
+   harbour-nav (including the five shared tabs) are deliberately untouched.
+   Stable one-line titles and a compact coin badge stop the header jumping
+   between Frota, Forja, Cartas, Loja, Missões, Ranking and Perfil. */
+.app-sheet > .app-sheet-header{
+  position:relative;
+  flex:0 0 auto;
+  min-height:76px;
+  padding:max(11px,env(safe-area-inset-top)) 12px 10px;
+  gap:9px;
+  border-bottom:2px solid #d5af6c;
+  background:linear-gradient(180deg,#194364f5 0%,#092746f9 100%);
+  box-shadow:0 4px 14px #000d2366;
+}
+.app-sheet > .app-sheet-header::after{
+  content:"";
+  position:absolute;
+  left:12px;
+  right:12px;
+  bottom:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#fff3c47d,transparent);
+  pointer-events:none;
+}
+.app-sheet-header .app-back{
+  flex:0 0 40px;
+  width:40px;
+  height:40px;
+  border-width:1px;
+  border-radius:10px;
+  font-size:29px;
+  line-height:1;
+  box-shadow:inset 0 1px #ffdfa477,0 2px 4px #00132699;
+}
+.app-sheet-header .app-sheet-brand{
+  flex:1 1 auto;
+  min-width:0;
+  overflow:hidden;
+}
+.app-sheet-header .app-sheet-brand small{
+  display:block;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  font-size:clamp(9px,2.5vw,11px);
+  line-height:1.3;
+}
+.app-sheet-header .app-sheet-brand h1{
+  margin-top:4px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:clamp(22px,5.8vw,31px);
+  line-height:1.1;
+  letter-spacing:.25px;
+}
+.app-sheet-header .app-page-glyph{
+  display:inline-grid;
+  place-items:center;
+  width:22px;
+  height:22px;
+  margin-right:3px;
+  vertical-align:middle;
+}
+.app-sheet-header .app-page-glyph svg{
+  width:19px;
+  height:19px;
+}
+.app-sheet-header .app-wallet{
+  min-width:0;
+  max-width:35%;
+  gap:5px;
+  padding:6px 8px;
+  border-width:1px;
+  border-radius:10px;
+  background:linear-gradient(180deg,#315e7e,#123150);
+  box-shadow:inset 0 1px #ffedaa66,0 2px 6px #00172d6b;
+}
+.app-sheet-header .app-wallet > span{
+  display:grid;
+  place-items:center;
+  flex:0 0 19px;
+  width:19px;
+  height:19px;
+  border:1px solid #fff0b6;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff2ac,#f1c357 55%,#ac762b);
+  box-shadow:0 1px 3px #00152e8c;
+  font-size:0;
+  line-height:1;
+}
+.app-sheet-header .app-wallet > span::after{
+  content:"✦";
+  color:#895b24;
+  font-size:11px;
+  text-shadow:none;
+}
+.app-sheet-header .app-wallet strong{
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  font-size:clamp(17px,4.5vw,21px);
+  line-height:1;
+}
+.app-sheet-header .app-wallet small{
+  white-space:nowrap;
+  font-size:8px;
+}
+@media(max-width:360px){
+  .app-sheet > .app-sheet-header{gap:6px;padding-left:8px;padding-right:8px}
+  .app-sheet-header .app-back{flex-basis:36px;width:36px;height:36px}
+  .app-sheet-header .app-wallet{max-width:32%;padding:5px 6px;gap:4px}
+  .app-sheet-header .app-wallet small{display:none}
+}
+
+
+/* WORK 6 — approved two-resource HUD on inner screens only. Porto and
+ * its bottom navigation are untouched. The diamond is unavailable until
+ * a real gem ledger and purchase validation exist; never mint a balance. */
+.app-sheet-header .app-resource-counters{
+  flex:0 0 auto;display:flex;align-items:center;gap:5px;
+  min-width:0;max-width:47%;
+}
+.app-sheet-header .app-resource-counters .app-wallet{
+  min-width:0;max-width:none;gap:4px;padding:6px 7px;
+  border-radius:10px;white-space:nowrap;
+}
+.app-sheet-header .app-resource-counters .app-wallet strong{
+  font-size:clamp(16px,4vw,20px);line-height:1;
+  min-width:0;overflow:hidden;text-overflow:ellipsis;
+}
+.app-sheet-header .app-resource-counters .app-wallet small{
+  font-size:8px;letter-spacing:.2px;
+}
+.app-sheet-header .app-wallet-gems{
+  opacity:.78;border-color:#75a3bf;background:linear-gradient(180deg,#244861,#112e48);
+}
+.app-sheet-header .app-wallet-gems svg{width:19px;height:19px;flex:0 0 19px;filter:drop-shadow(0 1px 3px #021324)}
+.app-sheet-header .app-wallet-gems strong{color:#c4deed}
+@media(max-width:420px){
+  .app-sheet-header .app-resource-counters{max-width:46%;gap:3px}
+  .app-sheet-header .app-resource-counters .app-wallet{padding:5px 5px;gap:3px}
+  .app-sheet-header .app-resource-counters .app-wallet small{display:none}
+  .app-sheet-header .app-resource-counters .app-wallet strong{max-width:67px}
+}
+@media(max-width:350px){
+  .app-sheet-header .app-resource-counters{max-width:43%}
+  .app-sheet-header .app-resource-counters .app-wallet{padding:4px 3px}
+  .app-sheet-header .app-resource-counters .app-wallet strong{font-size:14px;max-width:42px}
+  .app-sheet-header .app-wallet-gems svg{width:15px;height:15px;flex-basis:15px}
+}
+
+
+/* WORK 0 / #104 — inner-screen header follows the 8-screen approved mosaic.
+   Single ROYAL PIRATE wordmark, captain portrait, coins and (unavailable) gems.
+   Page title is announced to screen readers; the screen-specific banner is the
+   sole visible page title. This block does NOT style the approved Porto or dock. */
+.app-sheet > .app-approved-hud{
+  display:grid;
+  grid-template-columns:48px minmax(0,1fr) auto;
+  align-items:center;
+  gap:5px;
+  min-height:67px;
+  padding:max(7px,env(safe-area-inset-top)) 8px 7px;
+  border-bottom:0;
+  background:linear-gradient(180deg,#2283b3 0%,#13608e 55%,#0b365c 100%);
+  box-shadow:inset 0 -2px #f2c776,0 3px 9px #00102766;
+}
+.app-sheet > .app-approved-hud::after{display:none}
+.app-approved-hud .app-captain-return{
+  position:relative;
+  flex:none;
+  width:46px;
+  height:46px;
+  padding:5px;
+  color:#ffe6a2;
+  border:3px solid #f7d484;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 26%,#2479ac,#0a294b 76%);
+  box-shadow:0 2px 0 #77451f,0 3px 9px #03152ca6,inset 0 1px #fff5baaa;
+}
+.app-approved-hud .app-captain-return svg{width:32px;height:32px}
+.app-approved-hud .app-captain-badge{
+  display:grid;
+  place-items:center;
+  position:absolute;
+  bottom:-3px;
+  left:-3px;
+  min-width:17px;
+  height:17px;
+  border:1px solid #f7d787;
+  border-radius:50%;
+  background:#082b50;
+  font:900 10px/1 'Barlow Condensed',sans-serif;
+  color:#ffdfa0;
+  text-shadow:0 1px #000;
+}
+.app-approved-hud .app-sheet-brand{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-width:0;
+  overflow:visible;
+  text-align:center;
+}
+.app-approved-hud .app-royal-wordmark{
+  display:block;
+  max-width:100%;
+  font:900 clamp(16px,5.2vw,27px)/.98 Georgia,serif;
+  font-variant:small-caps;
+  letter-spacing:-.8px;
+  white-space:nowrap;
+  color:#ffe6a3;
+  -webkit-text-stroke:.5px #68351a;
+  text-shadow:0 -1px #fff9d3,1px 2px #4d2714,-1px 2px #4d2714,0 4px 4px #001a31;
+  transform:rotate(-2deg);
+}
+.app-approved-hud .app-screen-title-accessible{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+.app-sheet-header.app-approved-hud .app-resource-counters{
+  display:flex;
+  align-items:center;
+  flex:0 0 auto;
+  gap:4px;
+  width:auto;
+  max-width:none;
+  min-width:0;
+}
+.app-sheet-header.app-approved-hud .app-resource-counters .app-wallet{
+  display:flex;
+  align-items:center;
+  gap:3px;
+  min-height:28px;
+  padding:3px 5px;
+  border:2px solid #d5a451;
+  border-radius:9px;
+  background:linear-gradient(#174c76,#08294d);
+  box-shadow:inset 0 1px #fff7b07a,0 2px 3px #0012227c;
+}
+.app-sheet-header.app-approved-hud .app-resource-counters .app-wallet strong{
+  max-width:none;
+  font-size:clamp(13px,3.8vw,20px);
+  color:#fff5d9;
+}
+.app-sheet-header.app-approved-hud .app-wallet-gems{border-color:#ab88c0;opacity:1}
+.app-sheet-header.app-approved-hud .app-wallet-gems strong{color:#d4d9ee}
+.app-sheet > .app-sheet-content{padding-top:8px}
+@media(max-width:360px){
+  .app-sheet > .app-approved-hud{grid-template-columns:40px minmax(0,1fr) auto;gap:3px;padding-left:5px;padding-right:5px}
+  .app-approved-hud .app-captain-return{width:40px;height:40px;padding:4px}
+  .app-approved-hud .app-captain-return svg{width:27px;height:27px}
+  .app-approved-hud .app-royal-wordmark{font-size:clamp(14px,4.65vw,18px);letter-spacing:-.9px}
+  .app-sheet-header.app-approved-hud .app-resource-counters{max-width:none}
+  .app-sheet-header.app-approved-hud .app-resource-counters .app-wallet{padding:3px}
+  .app-sheet-header.app-approved-hud .app-resource-counters .app-wallet strong{max-width:none;font-size:13px}
+  .app-sheet-header.app-approved-hud .app-wallet-gems svg{width:15px;height:15px;flex-basis:15px}
+}
+
+/* Keep semantic resource names for screen readers without adding a second HUD row. */
+.app-sheet-header.app-approved-hud .app-wallet-sr{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+
+/* WORK0 / #104 — source-composed inner HUD for the eight approved screens.
+   On the actual 384x512 original the wordmark occupies its own TOP band,
+   the real captain portrait sits at lower left, and real wallet counters
+   occupy the band BELOW the wordmark. The earlier one-row grid forced the
+   brand to ~105px and made the phone look like a desktop admin toolbar.
+   Scope: inner app-sheet ONLY. Does not style the approved Porto, Batalha,
+   bottom five-item dock, balances, inputs or any screen artwork. */
+@media (max-width:600px) {
+  .app-sheet > .app-approved-hud {
+    position:relative;
+    display:block;
+    box-sizing:border-box;
+    width:100%;
+    height:67px;
+    min-height:67px;
+    padding:0;
+    isolation:isolate;
+    background:
+      radial-gradient(ellipse 34% 47% at 50% 5%,#9be0ed3b,transparent 100%),
+      linear-gradient(180deg,#278fc3 0%,#166a9a 52%,#0c365e 100%);
+  }
+  .app-approved-hud .app-sheet-brand {
+    position:absolute;
+    top:5px;
+    left:50%;
+    width:max-content;
+    max-width:calc(100% - 110px);
+    justify-content:center;
+    transform:translateX(-50%);
+    z-index:1;
+    pointer-events:none;
+  }
+  .app-approved-hud .app-royal-wordmark {
+    font-size:clamp(22px,6.25vw,30px);
+    letter-spacing:-.9px;
+    line-height:1.05;
+    text-shadow:0 -1px #fff5c7,1px 2px #51270c,-1px 2px #51270c,0 4px 4px #001a31;
+    transform:rotate(-2deg);
+  }
+  .app-approved-hud .app-captain-return {
+    position:absolute;
+    left:7px;
+    top:19px;
+    width:44px;
+    height:44px;
+    z-index:2;
+  }
+  .app-sheet-header.app-approved-hud .app-resource-counters {
+    position:absolute;
+    top:35px;
+    bottom:auto;
+    left:clamp(136px,40vw,178px);
+    right:6px;
+    width:auto;
+    min-width:0;
+    max-width:none;
+    display:flex;
+    justify-content:space-between;
+    gap:6px;
+    z-index:2;
+  }
+  .app-sheet-header.app-approved-hud .app-resource-counters .app-wallet {
+    flex:0 1 auto;
+    justify-content:center;
+    min-width:68px;
+    min-height:26px;
+    padding:2px 5px;
+    border-radius:14px;
+  }
+}
+@media (max-width:350px) {
+  .app-sheet > .app-approved-hud {height:67px;min-height:67px}
+  .app-approved-hud .app-sheet-brand {top:4px;max-width:calc(100% - 78px)}
+  .app-approved-hud .app-royal-wordmark {font-size:21px}
+  .app-approved-hud .app-captain-return {top:20px;left:4px;width:40px;height:40px}
+  .app-sheet-header.app-approved-hud .app-resource-counters {
+    top:36px;left:clamp(111px,37vw,130px);right:4px;gap:4px;
+  }
+  .app-sheet-header.app-approved-hud .app-resource-counters .app-wallet {
+    min-width:62px;min-height:24px;padding:2px 3px;
+  }
+}
+
+/* WORK0 / issue #104 · Screen-size parity with the full-bleed Porto.
+   The legacy 570px mobile min-height belongs to the unobstructed harbour only.
+   At 320×568 / 384×512 it silently made every overlay sheet taller than the
+   REAL viewport, clipping the five-item bottom dock below Safari's screen.
+   Scope to the mounted sheet so the already-approved Porto is untouched.
+   The content pane itself stays scrollable where real content needs more room. */
+@media (max-width:600px) {
+  .app.with-app-sheet {height:100dvh;min-height:0;max-height:100dvh}
+  .app.with-app-sheet .app-sheet {height:100%;min-height:0;max-height:100%;overflow:hidden}
+}

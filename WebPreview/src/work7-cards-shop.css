@@ -1,0 +1,4353 @@
+/* WORK 7 — screens 05/06. Isolated selectors; no Porto/Frota/Forge overrides. */
+.w7-screen{
+ --w7-gold:#f9d48d;--w7-edge:#b88243;--w7-navy:#071c3a;
+ display:grid;gap:12px;min-width:0;padding-bottom:14px;
+ color:#fff0d1;font-family:'Barlow',sans-serif;
+}
+.w7-screen *{box-sizing:border-box}
+.w7-hero{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:105px;
+ padding:14px 16px;border:2px solid #d5a65b;border-radius:17px;
+ background:radial-gradient(circle at 7% 20%,#28759999,transparent 55%),linear-gradient(140deg,#21456b,#0c2348 73%);
+ box-shadow:0 5px 0 #061225, inset 0 2px #f8d99b70;position:relative;overflow:hidden}
+.w7-hero:after{content:'✦';position:absolute;color:#efcc7c38;font-size:115px;right:75px;top:-44px;pointer-events:none}
+.w7-eyebrow{display:block;font:800 10px 'Barlow',sans-serif;letter-spacing:1.4px;color:#edc476}
+.w7-screen .w7-hero h2{margin:1px 0!important;color:#ffe9af;font:900 clamp(37px,11vw,60px) 'Barlow Condensed',sans-serif!important;line-height:.96;text-shadow:0 3px #482b20}
+.w7-hero p{margin:3px 0 0;font:700 12px 'Barlow',sans-serif;color:#d1e1f0}
+.w7-medal{flex:none;display:grid;align-content:center;justify-items:center;width:78px;height:76px;border:3px solid #eac57c;border-radius:20px;
+ background:radial-gradient(circle at 50% 8%,#437795,#112c52 72%);box-shadow:inset 0 1px #fff1bd,0 3px 0 #68401e;z-index:1}
+.w7-medal strong{font:900 28px 'Barlow Condensed',sans-serif;color:#ffdf94;line-height:1}
+.w7-medal small{font:900 10px 'Barlow',sans-serif;color:#d9e4eb;margin-top:6px}
+.w7-wallet{width:100px}
+.w7-wallet strong{font-size:25px}
+.w7-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px;
+ background:#081b35;border:2px solid #9a764d;border-radius:13px;box-shadow:0 3px 0 #020c19}
+.w7-tabs-four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.w7-tabs button{min-width:0;min-height:49px;border-radius:8px;border:1px solid #4d7596;background:linear-gradient(#26577d,#153554);
+ color:#e8edf2;font:900 clamp(10px,2.8vw,13px) 'Barlow Condensed',sans-serif;letter-spacing:.2px;
+ line-height:1.05;white-space:normal;padding:5px 2px;text-shadow:0 1px #06172b}
+.w7-tabs button[aria-selected=true]{background:linear-gradient(180deg,#ffe9b5,#e5b96c 48%,#b87c38);
+ border-color:#fff3cd;color:#39281c;text-shadow:0 1px #ffeab0;box-shadow:inset 0 2px #fff8d0,0 2px 3px #0009}
+.w7-content{display:grid;gap:12px;min-width:0}
+.w7-line{display:flex;align-items:center;justify-content:space-between;gap:7px;min-height:34px;color:#e8c480;font:900 12px 'Barlow Condensed',sans-serif;letter-spacing:.7px}
+.w7-line>span{color:#abc8db;font:800 11px 'Barlow',sans-serif}
+.w7-filter{display:flex;gap:4px;border:1px solid #557d90;background:#09243d;padding:3px;border-radius:8px}
+.w7-filter button{min-height:33px;padding:5px 10px;border:0;border-radius:6px;color:#c9deea;background:transparent;font:900 11px 'Barlow',sans-serif}
+.w7-filter button[aria-pressed=true]{background:#e8bd79;color:#142b46}
+.w7-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;align-items:stretch}
+.w7-card{display:flex;flex-direction:column;align-items:stretch;gap:4px;text-align:center;min-width:0;min-height:221px;
+ padding:7px 7px 10px;border:3px solid #c2a168;border-radius:13px 13px 18px 18px;position:relative;overflow:hidden;
+ background:radial-gradient(circle at 50% 35%,#285c86,#0a2344 65%);
+ color:#fff1d0;box-shadow:0 5px 0 #08162c, inset 0 2px #ffe9ba50}
+.w7-card:before{content:'';position:absolute;inset:4px;border:1px solid #d9b67844;border-radius:8px 8px 13px 13px;pointer-events:none}
+.w7-card.is-selected{border-color:#ffedb3;box-shadow:0 0 0 2px #bd8537,0 6px 0 #06152a,0 0 22px #f3c36845}
+.w7-card.is-locked .w7-card-art{filter:saturate(.55) brightness(.85)}
+.w7-card-top{display:flex;justify-content:space-between;text-align:left;color:#ffe2ac;font:900 9px 'Barlow Condensed',sans-serif;letter-spacing:.7px;z-index:1}
+.w7-card-top span:last-child{font-size:17px;line-height:1}
+.w7-card-art{display:block;min-width:0;min-height:115px;height:clamp(110px,30vw,150px);z-index:1}
+.w7-art-svg{width:100%;height:100%;filter:drop-shadow(0 7px 5px #07132870)}
+.w7-card>strong{font:900 clamp(20px,5vw,27px) 'Barlow Condensed',sans-serif;line-height:1.05;color:#fff1ca;z-index:1}
+.w7-card>small{font:900 10px 'Barlow',sans-serif;color:#f0cc83;z-index:1}
+.w7-gunner{background:radial-gradient(circle at 50% 34%,#8f4a3a,#271f3c 73%)}
+.w7-navigator{background:radial-gradient(circle at 50% 34%,#317b89,#09263f 75%)}
+.w7-detail{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px;
+ border:2px solid #b58e55;border-radius:12px;background:linear-gradient(105deg,#193d65,#0b2444)}
+.w7-screen .w7-detail h3{font:900 26px 'Barlow Condensed',sans-serif;color:#ffe4a3;margin:1px 0 2px}
+.w7-detail p{font:600 11px 'Barlow',sans-serif;color:#c8dbe5;margin:0}
+.w7-detail button,.w7-feature>button,.w7-shop-actions button{flex:none;min-height:45px;max-width:130px;padding:7px 9px;border:2px solid #ffe7ad;border-radius:10px;
+ color:#31261d;background:linear-gradient(#ffeba7,#d29a4d);font:900 13px 'Barlow Condensed',sans-serif;box-shadow:0 3px #644320}
+.w7-screen button:disabled{opacity:.7;cursor:not-allowed;box-shadow:none}
+.w7-disclaimer{font:600 11px/1.55 'Barlow',sans-serif;color:#b9d2de;margin:0}
+.w7-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;
+ border-top:1px solid #a68f6670;padding:13px 3px 3px;color:#b8cede;font:800 10px 'Barlow',sans-serif}
+.w7-foot button{border:0;color:#ffdb93;background:transparent;font:900 13px 'Barlow Condensed',sans-serif;text-decoration:underline;text-underline-offset:3px}
+.w7-feature{justify-items:center;text-align:center;padding:27px 15px;background:linear-gradient(165deg,#225478,#0b264b);
+ border:2px solid #bb965f;border-radius:16px;box-shadow:inset 0 1px #fff0b365}
+.w7-feature-mark{display:grid;place-items:center;min-width:93px;min-height:93px;padding:8px;border:3px solid #f1d28d;
+ border-radius:24px;background:radial-gradient(circle at 50% 28%,#4c84a3,#0c2a4b);
+ box-shadow:0 8px 0 #07203b;color:#ffe1a1;font:900 34px 'Barlow Condensed',sans-serif;text-shadow:0 3px #6c4835}
+.w7-screen .w7-feature h3{font:900 36px 'Barlow Condensed',sans-serif;color:#ffdea4;margin:0}
+.w7-feature p{font:600 13px/1.55 'Barlow',sans-serif;max-width:390px;margin:0;color:#d5e5ed}
+.w7-feature-row{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:1px solid #76909d;
+ background:#0c2b4a;padding:13px;border-radius:12px;font:800 11px 'Barlow',sans-serif}
+.w7-feature-row>span{font-size:24px;color:#ffcf7d}
+.w7-feature-row strong{flex:1;color:#dde8ed}
+.w7-feature-row b{color:#ffd58a;font:900 12px 'Barlow Condensed',sans-serif}
+.w7-feature>button{max-width:none;padding:9px 17px}
+.w7-shop-hero{background:radial-gradient(circle at 25% 40%,#5e758a70,transparent 60%),linear-gradient(130deg,#214065,#071b38)}
+.w7-banner{display:flex;align-items:center;gap:16px;padding:16px 12px;border-radius:15px;border:2px solid #d4ad6d;
+ background:radial-gradient(circle at 11% 55%,#ac743888,transparent 42%),linear-gradient(110deg,#254961,#10243e);
+ box-shadow:inset 0 1px #ffeaba70}
+.w7-banner>span{display:grid;place-items:center;min-width:65px;height:70px;font-size:42px;color:#ffe19b;
+ text-shadow:0 4px #422919;background:radial-gradient(#836443,#2e3850 70%);border:2px solid #c59f60;border-radius:15px}
+.w7-banner>div{display:grid;gap:4px}
+.w7-banner small{color:#f5cd87;font:900 10px 'Barlow',sans-serif;letter-spacing:1px}
+.w7-banner strong{color:#fff0c6;font:900 22px/1.0 'Barlow Condensed',sans-serif}
+.w7-banner p{margin:0;font:600 11px 'Barlow',sans-serif;color:#d9e6ed}
+.w7-shop-list{display:grid;gap:9px}
+.w7-product{display:grid;grid-template-columns:92px minmax(0,1fr) 72px;gap:10px;align-items:center;
+ padding:8px;border:2px solid #bd9658;border-radius:14px;background:linear-gradient(115deg,#234f6d,#0c294b);
+ box-shadow:0 4px 0 #091b34}
+.w7-product-art{display:grid;place-items:center;height:89px;background:radial-gradient(#5a7b93,#132948 74%);
+ border:1px solid #c7a56a;border-radius:11px}
+.w7-product.w7-gunner .w7-product-art{background:radial-gradient(#8d5b43,#291f39 78%)}
+.w7-product.w7-navigator .w7-product-art{background:radial-gradient(#52929d,#153a51 78%)}
+.w7-product-info{display:grid;gap:2px;min-width:0}
+.w7-product-info small{color:#fad79a;font:900 9px 'Barlow',sans-serif;letter-spacing:.5px}
+.w7-product-info strong{color:#ffe4af;font:900 22px 'Barlow Condensed',sans-serif;line-height:1}
+.w7-product-info span{color:#cbdce5;font:600 10px/1.25 'Barlow',sans-serif}
+.w7-product-info b{color:#ffdf8a;font:900 14px 'Barlow Condensed',sans-serif;margin-top:4px}
+.w7-product button{min-height:43px;max-width:76px;padding:5px 3px;background:linear-gradient(#ffe8ad,#c9934b);
+ border:2px solid #fff0b8;color:#2e281f;border-radius:9px;font:900 11px 'Barlow Condensed',sans-serif;line-height:1.1}
+.w7-shop-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.w7-shop-actions button{max-width:none}
+.w7-pending{min-height:400px;align-content:center}
+.w7-screen button:focus-visible{outline:3px solid #fff4c4;outline-offset:3px}
+@media(max-width:390px){
+ .w7-screen{gap:10px}.w7-hero{padding:12px;min-height:97px}
+ .w7-card{min-height:207px}.w7-card-grid{gap:8px}
+ .w7-product{grid-template-columns:72px minmax(0,1fr) 65px;gap:7px;padding:7px}
+ .w7-product-art{height:73px}.w7-product-info strong{font-size:20px}
+ .w7-product button{font-size:10px}
+}
+@media(max-width:340px){
+ .w7-tabs{gap:2px;padding:3px}.w7-tabs button{font-size:9px}
+ .w7-medal{width:65px;height:65px}.w7-wallet{width:78px}.w7-wallet strong{font-size:19px}
+ .w7-product{grid-template-columns:57px minmax(0,1fr) 59px;gap:5px}
+ .w7-product-art{height:62px}.w7-product-info strong{font-size:18px}
+ .w7-detail{flex-direction:column;align-items:stretch}
+ .w7-detail button{max-width:none}
+}
+@media(prefers-reduced-motion:reduce){.w7-screen *{transition:none!important;animation:none!important}}
+
+
+/* WORK 7 · MOSAIC VISUAL PASS 2026-11-15. Isolated premium presentation.
+   No shared HUD, Porto, Fleet, Forge, battle or progression styles touched. */
+.w7-screen{
+  --w7-gold:#f6cb77;
+  --w7-gold-bright:#ffefb4;
+  --w7-deep:#061427;
+  position:relative;
+  isolation:isolate;
+  gap:13px;
+  padding:10px 9px 17px;
+  border-radius:19px;
+  border:1px solid #cca06370;
+  background:
+    radial-gradient(ellipse 90% 22% at 50% 4%,#2e618b80,transparent 85%),
+    repeating-linear-gradient(115deg,transparent 0 39px,#ffe6af04 40px 41px),
+    linear-gradient(177deg,#0c3157,#071a37 47%,#05152e);
+  box-shadow:inset 0 2px #f8dda337,inset 0 0 0 4px #04142b88,0 12px 23px #0005;
+}
+.w7-screen:before{
+  content:'';position:absolute;inset:6px;border:1px solid #e2b36a28;
+  border-radius:14px;pointer-events:none;z-index:-1;
+}
+.w7-hero{
+  min-height:116px;
+  padding:17px 16px;
+  border:3px solid #e6b965;
+  border-radius:16px;
+  background:
+    radial-gradient(ellipse at 73% 15%,#fbd68f33,transparent 46%),
+    repeating-radial-gradient(circle at 10% 100%,transparent 0 18px,#efdfad06 19px 20px),
+    linear-gradient(135deg,#2a648e 0%,#143e69 37%,#071d42 100%);
+  box-shadow:inset 0 2px #fff1bf90,inset 0 -6px #03162d88,
+    0 5px 0 #6d4927,0 9px 15px #0006;
+}
+.w7-hero:before{
+  content:'✦';position:absolute;left:50%;top:3px;transform:translateX(-50%);
+  color:#ffdd9299;font-size:12px;text-shadow:0 1px #0007;
+}
+.w7-hero:after{
+  content:'⚓';right:86px;top:10px;
+  font-size:87px;transform:rotate(-17deg);color:#f6cc7d17;
+  text-shadow:0 0 3px #ffebaf17;
+}
+.w7-hero .w7-eyebrow{color:#ffe2a0;font-size:10px;letter-spacing:1.55px}
+.w7-screen .w7-hero h2{
+  font-size:clamp(42px,12vw,64px)!important;
+  color:#fff0c2;
+  letter-spacing:.3px;
+  -webkit-text-stroke:.45px #fff5cf;
+  text-shadow:1px 1px 0 #725128,2px 3px 0 #53321a,0 6px 11px #061226;
+}
+.w7-hero p{font-size:12px;color:#ebf0ee;font-weight:700}
+.w7-medal{
+  width:83px;height:82px;border-radius:19px;
+  border:3px solid #ffdfa1;
+  outline:2px solid #a27239;outline-offset:0;
+  background:radial-gradient(circle at 50% 14%,#77a2ba 0%,#194d77 42%,#0a2648 90%);
+  box-shadow:inset 0 2px #ffffff9c,inset 0 -5px #07192f,0 5px 0 #704523,0 7px 9px #0008;
+}
+.w7-medal:before{content:'★';font-size:13px;color:#ffe7a8;line-height:1}
+.w7-medal strong{font-size:27px;text-shadow:0 2px #49351d}
+.w7-wallet{width:105px}
+.w7-wallet strong{font-size:25px}
+.w7-tabs{
+  gap:5px;padding:6px;
+  background:linear-gradient(#203d58,#071c35);
+  border:2px solid #e2b776;
+  border-radius:14px;
+  box-shadow:inset 0 2px #f6d4a966,0 5px 0 #061329,0 7px 10px #0005;
+}
+.w7-tabs button{
+  min-height:51px;
+  border:1px solid #6793ae;
+  border-bottom:3px solid #0b233d;
+  border-radius:8px;
+  background:linear-gradient(#376889 0%,#214d77 33%,#0e2a4b 100%);
+  color:#eff8fc;
+  text-shadow:0 2px #081c31;
+  font-size:clamp(10px,2.75vw,13px);
+  box-shadow:inset 0 1px #b5d0dc82;
+  padding:6px 2px;
+}
+.w7-tabs button[aria-selected=true]{
+  border:2px solid #fff0b5;border-bottom:4px solid #a45a23;
+  background:linear-gradient(#fff5cf 0%,#f9d98f 38%,#d39a46 100%);
+  color:#4b2b18;
+  box-shadow:inset 0 2px #fffbea,0 3px 6px #0007;
+}
+.w7-content{gap:13px}
+.w7-line{
+  padding:3px 3px 2px;
+  border-bottom:1px solid #e8bf7255;
+  font-size:15px;
+  color:#fbe2a1;
+  text-shadow:0 2px #0008;
+}
+.w7-line>span{font-size:10px}
+.w7-filter{
+  gap:2px;
+  border:1px solid #c3995f;
+  background:#061a33;
+  border-radius:9px;
+  box-shadow:inset 0 2px #0005;
+}
+.w7-filter button{min-height:31px;font-size:10px}
+.w7-filter button[aria-pressed=true]{
+  background:linear-gradient(#ffebac,#bd8743);
+  color:#382918;
+  box-shadow:inset 0 1px #fffbdf,0 2px #3d2c1f;
+}
+.w7-card-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.w7-card{
+  min-height:230px;
+  padding:8px 8px 11px;
+  gap:3px;
+  border:3px solid #f6cc79;
+  border-bottom:6px solid #855429;
+  border-radius:14px 14px 18px 18px;
+  background:
+    radial-gradient(ellipse at 50% 32%,#70bce67a 0%,transparent 61%),
+    radial-gradient(circle at 50% 108%,#13466a,#0a2343 64%),
+    linear-gradient(140deg,#2a587a,#061c3b);
+  box-shadow:
+    0 0 0 2px #664221,0 8px 0 #06162e,0 13px 15px #0007,
+    inset 0 0 0 2px #fff1be33,inset 0 5px #fff5c27a;
+  transition:transform .16s ease,box-shadow .16s ease;
+}
+.w7-card:before{
+  inset:5px;
+  border:1.5px solid #ffe7a48c;
+  border-radius:8px 8px 12px 12px;
+  box-shadow:inset 0 0 17px #030e2152;
+}
+.w7-card:after{
+  content:'✦';position:absolute;bottom:42px;right:13px;
+  color:#fff0b135;font-size:30px;
+  pointer-events:none;
+}
+.w7-card.is-selected{
+  border-color:#fff1b9;
+  box-shadow:0 0 0 3px #dca34b,0 8px 0 #06162e,0 0 24px #ffe39b7c,inset 0 3px #fff5d0aa;
+}
+.w7-card:not(:disabled):active{transform:translateY(3px)}
+.w7-card.is-locked .w7-card-art{
+  filter:saturate(.78) brightness(.87);
+}
+.w7-card-top{
+  align-items:center;min-height:21px;
+  padding:3px 5px;margin:0 -2px;
+  background:linear-gradient(90deg,#132f51,#345c72bd,#132f51);
+  border:1px solid #cda55e85;
+  border-radius:6px;color:#fff0be;
+  letter-spacing:.55px;font-size:9px;
+}
+.w7-card-top span:last-child{color:#fff2bf;font-size:16px}
+.w7-card-art{
+  height:clamp(101px,27vw,135px);
+  min-height:101px;
+  margin:0 -4px;
+  background:radial-gradient(ellipse at center,#ffdb9b32,transparent 68%);
+}
+.w7-art-svg{
+  width:100%;height:100%;
+  filter:drop-shadow(0 8px 2px #03172b8c);
+  transform:scale(1.05);
+}
+.w7-card-level{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  min-height:19px;
+  margin:-3px 6px 0;
+  color:#f9e6ba;
+  background:#071b36a9;
+  border:1px solid #dfb46a70;border-radius:5px;
+  font:900 9px 'Barlow Condensed',sans-serif;
+  letter-spacing:.4px;
+  position:relative;z-index:1;
+}
+.w7-card-level span{font-size:8px;color:#a8d4eb}
+.w7-card>strong{
+  font-size:clamp(17px,4.7vw,25px);
+  line-height:1.02;
+  text-shadow:0 2px #071629;
+}
+.w7-card>small{
+  color:#ffe3a5;
+  font-size:9px;
+  letter-spacing:.1px;
+  background:#071c35aa;
+  border-radius:5px;
+  padding:3px 1px;
+}
+.w7-card.w7-gunner{
+  border-color:#eaa267;
+  background:radial-gradient(ellipse at 50% 34%,#ef976a99,transparent 64%),linear-gradient(#643343,#25192f 72%,#15182f);
+}
+.w7-card.w7-navigator{
+  border-color:#82dbe6;
+  background:radial-gradient(ellipse at 50% 35%,#62dce1a3,transparent 62%),linear-gradient(#245f76,#073344 73%,#091f38);
+}
+.w7-card.w7-navigator .w7-card-top{border-color:#7de2ebaa}
+.w7-future-card{
+  min-height:230px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;position:relative;
+  padding:12px 7px;border:3px dashed #a28e6f;
+  border-radius:15px 15px 20px 20px;
+  background:radial-gradient(circle at 50% 33%,#385d728a,transparent 57%),linear-gradient(#1b3550,#0a203c);
+  box-shadow:inset 0 0 0 4px #0b1b31,0 8px 0 #06162e;
+  text-align:center;
+}
+.w7-future-seal{
+  width:94px;height:103px;display:grid;place-items:center;
+  border:3px solid #7c91a1;border-radius:48% 48% 17px 17px;
+  background:radial-gradient(circle at 45% 20%,#638296,#21354d 64%);
+  box-shadow:inset 0 3px #a5b2b6a3,0 6px 0 #09152a;
+}
+.w7-future-seal span{font:900 66px 'Barlow Condensed',sans-serif;color:#a4bacb;text-shadow:0 3px #0a1726}
+.w7-future-card>strong{font:900 23px 'Barlow Condensed',sans-serif;color:#e8d4ac}
+.w7-future-card>small{font:900 11px 'Barlow',sans-serif;color:#ffdf94;letter-spacing:1px}
+.w7-future-note{max-width:130px;color:#a4bac9;font:600 9px/1.25 'Barlow',sans-serif}
+.w7-detail{
+  border:2px solid #f4d08f;
+  border-radius:13px;
+  background:radial-gradient(circle at 96% 10%,#57779b55,transparent 43%),linear-gradient(120deg,#275477,#0c2448);
+  box-shadow:inset 0 2px #ffffe455,0 4px 0 #674621;
+  padding:14px;
+}
+.w7-screen .w7-detail h3{color:#ffecba;font-size:28px;text-shadow:0 2px #071529}
+.w7-detail button,.w7-feature>button,.w7-shop-actions button{
+  border:2px solid #fff3c7;
+  border-bottom:4px solid #8e5527;
+  border-radius:9px;
+  color:#38291a;
+  background:linear-gradient(#fff4c9 0%,#f6d084 46%,#c58b3a);
+  box-shadow:inset 0 1px #fffdf2,0 3px 0 #5a351b,0 6px 9px #0005;
+}
+.w7-detail button:disabled{filter:saturate(.4)}
+.w7-disclaimer{color:#b9d0dc;font-size:10px;line-height:1.45}
+.w7-feature{
+  min-height:350px;
+  padding:22px 14px;
+  border:3px solid #e2bc77;
+  background:radial-gradient(circle at 50% 6%,#397da27a,transparent 53%),linear-gradient(#17486e,#081e3e);
+  box-shadow:inset 0 2px #ffe9a78c,0 6px 0 #4a361f;
+}
+.w7-feature-mark{border-radius:50%;background:linear-gradient(#527fa0,#103453);box-shadow:0 7px #07162f}
+.w7-feature-row{border:2px solid #b99769;box-shadow:inset 0 1px #fff3bf44}
+.w7-banner{
+  padding:10px 13px;gap:12px;
+  border:3px solid #f4c878;
+  background:radial-gradient(circle at 10% 35%,#bd844a88,transparent 55%),linear-gradient(112deg,#254d6b,#0b2143);
+  box-shadow:inset 0 2px #ffedb278,0 4px 0 #5a3a22;
+}
+.w7-banner>span{
+  min-width:83px;height:84px;padding:3px;
+  background:radial-gradient(#6d7595,#22324d 78%);
+  border:2px solid #f1d596;box-shadow:inset 0 2px #ffedb28a,0 3px #50351d;
+}
+.w7-banner .w7-relic-svg{height:77px;width:75px}
+.w7-banner strong{font-size:24px;color:#fff0bd;text-shadow:0 2px #0007}
+.w7-banner p{font-size:11px;color:#dceaf0}
+.w7-preview-strip{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+.w7-preview-strip button{
+  min-width:0;display:grid;justify-items:center;align-content:center;gap:1px;
+  padding:6px 3px 9px;
+  border:2px solid #d3a86a;border-bottom:5px solid #85532a;
+  border-radius:13px;
+  background:radial-gradient(circle at 50% 22%,#2e688a,#102a4b 73%);
+  box-shadow:inset 0 2px #ffffff5c,0 5px 0 #07182e;
+  color:#fff0c7;
+}
+.w7-preview-strip button:nth-child(2){border-color:#74cde0;background:radial-gradient(circle at 50% 20%,#3d879a,#102b53 74%)}
+.w7-preview-strip button:nth-child(3){border-color:#e4b971;background:radial-gradient(circle at 50% 20%,#8d5e57,#142944 74%)}
+.w7-relic-svg{display:block;width:100%;height:100%;filter:drop-shadow(0 5px 3px #05142b99)}
+.w7-preview-strip .w7-relic-svg{height:65px;width:min(100%,85px)}
+.w7-preview-strip strong{font:900 15px 'Barlow Condensed',sans-serif;text-shadow:0 2px #05172c}
+.w7-preview-strip small{font:900 9px 'Barlow',sans-serif;color:#e8bc72;letter-spacing:.5px}
+.w7-shop-list{gap:12px}
+.w7-product{
+  min-height:112px;
+  grid-template-columns:92px minmax(0,1fr) 79px;
+  border:2px solid #e9b86e;border-bottom:5px solid #81532a;
+  background:radial-gradient(circle at 8% 45%,#6793af77,transparent 52%),linear-gradient(115deg,#285875,#0a2448);
+  box-shadow:inset 0 2px #ffe4a34d,0 6px 0 #08152b,0 9px 15px #0004;
+  padding:8px;
+}
+.w7-product-art{
+  height:92px;
+  border:2px solid #e4c17e;
+  background:radial-gradient(#568bae,#122b4a 70%);
+  box-shadow:inset 0 2px #fff0b390,0 3px #07192c;
+}
+.w7-product-info strong{color:#ffebbc;font-size:24px;text-shadow:0 2px #05172e}
+.w7-product-info small{color:#ffda91}
+.w7-product-info b{color:#ffe69b;font-size:16px}
+.w7-product button{
+  min-height:50px;max-width:80px;
+  border:2px solid #fff1c3;border-bottom:4px solid #925a27;
+  border-radius:9px;background:linear-gradient(#fff3c2,#dca857 62%,#b47730);
+  box-shadow:inset 0 1px #fff9e0,0 3px #5e381d;
+}
+.w7-product button:disabled{filter:saturate(.55)}
+.w7-shop-actions{margin-top:4px}
+.w7-shop-actions button{min-height:51px}
+.w7-pending{
+  min-height:405px;
+  padding:21px 14px;
+  gap:13px;
+}
+.w7-pending-relic{
+  display:grid;place-items:center;width:130px;height:120px;
+  border:3px solid #edcc84;border-radius:24px;
+  background:radial-gradient(circle at 50% 12%,#507998,#112f53 71%);
+  box-shadow:inset 0 2px #ffebb9b0,0 8px 0 #07162d,0 14px 16px #0004;
+}
+.w7-pending-relic .w7-relic-svg{width:116px;height:105px}
+.w7-pending-card{
+  display:grid;grid-template-columns:1fr auto;gap:8px 15px;
+  align-items:center;text-align:left;width:100%;
+  padding:13px 15px;
+  border:2px solid #d7b17c;border-radius:12px;
+  background:linear-gradient(130deg,#264d6f,#0c284c);
+  box-shadow:inset 0 2px #ffedb344,0 4px 0 #0a1b30;
+}
+.w7-pending-card>span{
+  grid-column:1/-1;
+  color:#d3e4e9;font:900 10px 'Barlow',sans-serif;letter-spacing:.7px;
+}
+.w7-pending-price{display:grid;gap:1px}
+.w7-pending-price small{font:700 10px 'Barlow',sans-serif;color:#b8d2e0}
+.w7-pending-price strong{font:900 23px 'Barlow Condensed',sans-serif;color:#ffe4a2}
+.w7-pending-card>b{
+  padding:9px;
+  color:#aebfcf;background:#071a35;
+  border:1px solid #68829a;border-radius:8px;
+  font:900 12px 'Barlow Condensed',sans-serif;
+}
+@media (hover:hover){
+ .w7-card:hover,.w7-preview-strip button:hover{transform:translateY(-2px)}
+ .w7-tabs button:hover:not([aria-selected=true]){filter:brightness(1.15)}
+}
+@media(max-width:390px){
+ .w7-screen{padding:8px 7px 15px;gap:11px}
+ .w7-hero{min-height:104px;padding:12px 13px}
+ .w7-hero:after{font-size:68px;right:76px}
+ .w7-card-grid{gap:9px}
+ .w7-card,.w7-future-card{min-height:213px}
+ .w7-card-art{min-height:96px;height:clamp(96px,26vw,120px)}
+ .w7-card-top{font-size:8px}
+ .w7-card-level{font-size:8px;margin:-2px 1px 0}
+ .w7-card-level span{font-size:7px}
+ .w7-product{grid-template-columns:76px minmax(0,1fr) 68px;gap:6px}
+ .w7-product-art{height:81px}
+ .w7-product-info strong{font-size:20px}
+ .w7-banner>span{min-width:69px;height:73px}
+ .w7-banner .w7-relic-svg{height:65px;width:64px}
+ .w7-banner strong{font-size:20px}
+ .w7-preview-strip .w7-relic-svg{height:53px}
+ .w7-preview-strip strong{font-size:13px}
+}
+@media(max-width:340px){
+ .w7-tabs button{font-size:9px}
+ .w7-medal{width:69px;height:69px}
+ .w7-wallet{width:83px}
+ .w7-hero:after{display:none}
+ .w7-card,.w7-future-card{min-height:197px}
+ .w7-card-art{min-height:89px;height:90px}
+ .w7-card>strong{font-size:15px}
+ .w7-card-level{font-size:7px}
+ .w7-card-level span{font-size:7px}
+ .w7-future-seal{width:75px;height:79px}
+ .w7-preview-strip{gap:4px}
+ .w7-product{grid-template-columns:57px minmax(0,1fr) 59px;gap:5px}
+ .w7-product-info strong{font-size:18px}
+ .w7-product-art{height:65px}
+}
+@media(prefers-reduced-motion:reduce){
+ .w7-card{transition:none}
+}
+
+
+/* WORK 7 · Illustrated 05/06 panorama and card-theatre pass.
+   Scoped exclusively to Cartas/Loja; navigation and local progression untouched. */
+.w7-screen {
+  --w7-cream:#fff0c5;
+  --w7-amber:#f8d47a;
+  gap:12px;
+  background:
+    radial-gradient(ellipse 95% 31% at 50% 0,#35739880,transparent 83%),
+    radial-gradient(ellipse 76% 34% at 3% 66%,#1b566a55,transparent 90%),
+    linear-gradient(170deg,#153b60 0%,#092440 36%,#07182e 100%);
+}
+.w7-hero,.w7-shop-hero {
+  min-height:145px;
+  padding:16px 17px;
+  border:3px solid #f4d290;
+  border-bottom:5px solid #8b5b30;
+  border-radius:19px;
+  background:#09223b;
+  box-shadow:inset 0 2px #fff1c6ad,0 5px 0 #422e21,0 11px 18px #0007;
+}
+.w7-masthead-art {
+  position:absolute;
+  inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  pointer-events:none;
+  z-index:0;
+  opacity:.94;
+}
+.w7-hero:before {display:none}
+.w7-hero:after {
+  content:'';
+  position:absolute;inset:0;
+  top:0;right:0;
+  border-radius:15px;
+  background:linear-gradient(90deg,#041a32ef 0%,#072747c9 35%,#081f3b29 70%,#07192e56);
+  z-index:1;
+  pointer-events:none;
+  transform:none;
+  font-size:0;
+}
+.w7-shop-hero:after {
+  background:linear-gradient(90deg,#071b37f2 0%,#0a294bb9 44%,#081b3733 82%);
+}
+.w7-hero > div {
+  position:relative;
+  z-index:2;
+}
+.w7-hero .w7-eyebrow {
+  font-size:10px;
+  letter-spacing:1.25px;
+  color:#ffe8af;
+  filter:drop-shadow(0 2px 1px #041021);
+}
+.w7-screen .w7-hero h2 {
+  font-size:clamp(42px,12.5vw,65px)!important;
+  color:#fff1bf;
+  letter-spacing:1px;
+  text-shadow:0 1px #ffe9aa,1px 3px #7c4d24,2px 5px #281d24,0 8px 14px #000e;
+}
+.w7-hero p {
+  max-width:200px;
+  color:#ebf5f9;
+  font-size:12px;
+  text-shadow:0 2px #021225;
+}
+.w7-medal {
+  width:80px;
+  height:80px;
+  background:
+    radial-gradient(circle at 37% 24%,#7ac1c2a6,transparent 44%),
+    linear-gradient(155deg,#1e5c77,#0b2349);
+  border-radius:50%;
+  border:4px double #ffe4a0;
+  outline:3px solid #70441f;
+  box-shadow:inset 0 3px #ffffffad,inset 0 -6px #081a30,0 5px 0 #4a2b19,0 8px 14px #000b;
+}
+.w7-wallet{width:91px;border-radius:18px}
+.w7-wallet strong{font-size:22px}
+.w7-tabs {
+  padding:6px;
+  background:linear-gradient(#283f50,#091c34);
+  border:2px solid #f2ce8b;
+  box-shadow:inset 0 2px #fff3ca75,0 5px 0 #483320,0 8px 14px #0007;
+}
+.w7-tabs button {
+  min-height:49px;
+  background:linear-gradient(#367ca0,#1d4a73 50%,#0b294d);
+  border:1px solid #7fb1c7;
+  border-bottom:4px solid #0b233b;
+  border-radius:8px;
+  color:#fcf6e3;
+  text-shadow:0 2px #07203d;
+  font-weight:900;
+}
+.w7-tabs button[aria-selected=true] {
+  background:linear-gradient(#fff5d3 0%,#ffdfa0 31%,#dba750 72%,#b67a31 100%);
+  color:#3d281d;
+  text-shadow:0 1px #fff3cc;
+  border-color:#fff9df;
+  border-bottom-color:#a05b26;
+}
+.w7-collection-progress{
+  height:11px;
+  margin:-8px 3px 0;
+  padding:2px;
+  overflow:hidden;
+  background:#07172b;
+  border:1px solid #e1b878;
+  border-radius:99px;
+  box-shadow:inset 0 2px 3px #000b,0 2px #29455d;
+}
+.w7-collection-progress > span{
+  display:block;height:100%;
+  border-radius:99px;
+  background:linear-gradient(90deg,#c48a3c,#ffe7a0 55%,#e0a955);
+  box-shadow:0 0 9px #ffe3a26e,inset 0 1px #fff8d2;
+}
+.w7-card-grid{gap:11px}
+.w7-card {
+  min-height:245px;
+  padding:9px 8px 12px;
+  border-radius:18px 18px 21px 21px;
+  border:4px ridge #f9ce79;
+  border-bottom:7px solid #855022;
+  background:
+    radial-gradient(ellipse at 50% 33%,#d6f8e255,transparent 43%),
+    radial-gradient(ellipse at 50% 90%,#144e65,#0d2746 57%,#08182d 100%);
+  box-shadow:0 0 0 2px #52341b,0 8px 0 #071328,0 13px 18px #0009,
+   inset 0 4px #ffebba91,inset 0 -8px #030d2099;
+}
+.w7-card:before {
+  inset:5px;border:1px solid #ffe7b8d9;
+  border-radius:11px 11px 14px 14px;
+  box-shadow:inset 0 0 0 2px #ffe4aa19,inset 0 0 24px #fff0ad12;
+}
+.w7-card:after {
+  content:'✦';
+  top:auto;right:10px;bottom:39px;
+  font-size:25px;
+  color:#ffde8e6b;
+}
+.w7-card.is-selected{
+  transform:translateY(-2px);
+  box-shadow:0 0 0 3px #edbc6b,0 11px 0 #061327,0 0 28px #fbd6888a,inset 0 4px #fffbd3;
+}
+.w7-card.w7-gunner {
+  background:
+    radial-gradient(ellipse at 50% 35%,#ffb67b8e,transparent 54%),
+    linear-gradient(155deg,#754044,#2c263c 68%,#16192f);
+}
+.w7-card.w7-navigator {
+  background:
+    radial-gradient(ellipse at 50% 34%,#96f0eca3,transparent 54%),
+    linear-gradient(155deg,#2e8794,#0e4256 66%,#091e34);
+}
+.w7-card-top {
+  z-index:2;
+  border-radius:7px 7px 4px 4px;
+  min-height:24px;
+  padding:4px 6px;
+  background:linear-gradient(90deg,#493525,#846039,#483221);
+  border:1px solid #f5dc9d;
+  color:#fff5d5;
+  box-shadow:0 2px #081427;
+}
+.w7-gunner .w7-card-top{background:linear-gradient(90deg,#65382f,#bd6648,#65382f)}
+.w7-navigator .w7-card-top{background:linear-gradient(90deg,#155565,#368998,#155565)}
+.w7-card-art{
+  min-height:118px;
+  height:clamp(118px,31vw,155px);
+  margin:0 -5px;
+  background:radial-gradient(ellipse at 50% 48%,#ffdda15c,transparent 67%);
+}
+.w7-art-svg{transform:scale(1.12);filter:drop-shadow(0 9px 3px #061121a8)}
+.w7-card-level{
+  background:linear-gradient(90deg,#10263e,#33516c,#10263e);
+  border:1px solid #efca86;
+}
+.w7-card>strong {
+  font-size:clamp(19px,5.2vw,28px);
+  text-shadow:0 2px 2px #050f20,0 0 8px #ffe8ad36;
+}
+.w7-future-card{
+  min-height:245px;
+  border:3px dashed #b9a37f;
+  background:radial-gradient(ellipse at 50% 24%,#7395a34a,transparent 55%),linear-gradient(#1a3e60,#07182d);
+}
+.w7-detail{
+  border:3px solid #eac680;
+  border-radius:16px;
+  background:linear-gradient(110deg,#2d5978,#0b2c4e);
+  box-shadow:inset 0 2px #fff1c285,0 5px 0 #624323;
+}
+.w7-detail button:not(:disabled),.w7-shop-actions button:not(:disabled) {
+  background:linear-gradient(#fff3c2,#edbc6a 50%,#c48b3f);
+  box-shadow:inset 0 2px #fffad9,0 4px #6c431f;
+}
+.w7-feature-deck{
+  width:min(100%,300px);height:132px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  margin:2px 0 8px;
+}
+.w7-feature-art,.w7-feature-empty{
+  width:88px;height:117px;
+  display:grid;place-items:center;
+  border:3px solid #ffdc95;
+  border-bottom:6px solid #82552c;
+  border-radius:13px;
+  background:radial-gradient(circle at 50% 30%,#4a9fb0,#122947);
+  box-shadow:inset 0 2px #fff2c3a0,0 5px 10px #0008;
+  overflow:hidden;
+}
+.w7-feature-art .w7-art-svg{transform:scale(1.4)}
+.w7-feature-empty{
+  border-color:#8c9cad;
+  border-style:dashed;
+  background:linear-gradient(#23455c,#132e47);
+  font:900 52px 'Barlow Condensed',sans-serif;
+  color:#a4bccd;
+}
+.w7-feature-spark{color:#ffe6a4;font:900 42px 'Barlow Condensed',sans-serif;text-shadow:0 3px #7e512c}
+.w7-banner{
+  border:3px solid #f4d38e;
+  border-bottom:6px solid #93642e;
+  background:
+    radial-gradient(ellipse at 86% 0%,#edb8694f,transparent 50%),
+    linear-gradient(115deg,#2f5975,#0c294c);
+  box-shadow:inset 0 2px #ffe9b5b5,0 7px 0 #071a32,0 12px 17px #0006;
+}
+.w7-banner>span {
+  background:radial-gradient(circle at 50% 15%,#7d86a9,#1a2c4c 73%);
+  border-radius:18px;
+  border-color:#ffdd98;
+  box-shadow:inset 0 3px #fff5c3a2,0 5px #5b3b20;
+}
+.w7-preview-strip button{
+  border:3px solid #edc27d;
+  border-bottom:6px solid #815127;
+  border-radius:16px;
+  box-shadow:inset 0 2px #ffe8b982,0 6px 0 #07162b,0 11px 14px #0007;
+}
+.w7-product{
+  border:3px solid #f4cd86;
+  border-bottom:6px solid #815029;
+  background:
+    radial-gradient(ellipse at 12% 25%,#75bbd35d,transparent 50%),
+    linear-gradient(120deg,#285d7f,#0a2442);
+}
+.w7-product-art{
+  border:3px solid #eac884;
+  border-radius:12px;
+  box-shadow:inset 0 2px #ffebbf,0 4px #0a1a2d;
+}
+.w7-product-info small{color:#ffe5a2}
+.w7-product-info strong{color:#fff0bf}
+.w7-product button{
+  background:linear-gradient(#fff2cb,#e6b36b 48%,#b77832);
+}
+.w7-pending-relic{
+  border-radius:50%;
+  background:radial-gradient(circle at 42% 20%,#71acb7,#0a2548 72%);
+}
+@media(max-width:390px){
+ .w7-hero,.w7-shop-hero{min-height:128px;padding:12px 14px}
+ .w7-wallet{width:84px;height:76px}
+ .w7-medal strong{font-size:24px}
+ .w7-tabs button{min-height:46px}
+ .w7-card,.w7-future-card{min-height:226px}
+ .w7-card-art{height:clamp(104px,28vw,126px);min-height:104px}
+ .w7-card-grid{gap:9px}
+ .w7-product{grid-template-columns:74px minmax(0,1fr) 67px;gap:7px}
+ .w7-product-art{height:78px}
+ .w7-feature-deck{height:118px}
+ .w7-feature-art,.w7-feature-empty{width:79px;height:105px}
+}
+@media(max-width:340px){
+ .w7-hero,.w7-shop-hero{min-height:119px}
+ .w7-medal{width:63px;height:68px}
+ .w7-wallet{width:75px}
+ .w7-screen .w7-hero h2{font-size:40px!important}
+ .w7-card,.w7-future-card{min-height:206px}
+ .w7-card-art{height:94px;min-height:94px}
+ .w7-card>strong{font-size:16px}
+ .w7-tabs button{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){.w7-card{transition:none!important}}
+
+
+/* WORK 7 — 15 NOV 2026. Screen 05/06 theatrical mobile composition.
+   Isolated to Cartas/Loja: no global HUD, Porto or battle overrides.
+   Art is decorative; collection and local-shop state remain canonical. */
+.w7-screen[data-work7-screen="cards"] .w7-content,
+.w7-screen[data-work7-screen="shop"] .w7-content{gap:13px}
+.w7-spotlight{
+  position:relative;isolation:isolate;overflow:hidden;
+  display:grid;grid-template-columns:minmax(95px,36%) minmax(0,1fr);
+  align-items:center;gap:12px;min-height:173px;
+  padding:12px 13px 12px 10px;
+  border:3px solid #ffe1a1;border-bottom:6px solid #86552b;border-radius:19px;
+  background:radial-gradient(ellipse at 7% 15%,#58a6b988,transparent 66%),
+    linear-gradient(118deg,#214a73 3%,#0a2848 54%,#06162e);
+  box-shadow:inset 0 2px #fff7d18c,0 7px #06142a,0 12px 18px #0007
+}
+.w7-spotlight:before{
+  content:'';position:absolute;inset:6px;border:1px solid #fce1aa6e;
+  border-radius:12px;pointer-events:none;z-index:-1;
+}
+.w7-spotlight:after{
+  content:'✦';position:absolute;right:12px;top:4px;
+  font-size:29px;color:#ffe5ac42;pointer-events:none;
+}
+.w7-spotlight-gunner{
+  background:radial-gradient(ellipse at 10% 20%,#de8c6999,transparent 70%),linear-gradient(120deg,#5b3449,#211e39 68%,#0e1a35)
+}
+.w7-spotlight-navigator{
+  background:radial-gradient(ellipse at 10% 20%,#74dfe8a3,transparent 70%),linear-gradient(120deg,#1c6578,#092b4e 68%,#0a1b34)
+}
+.w7-spotlight-portrait{
+  align-self:stretch;position:relative;min-height:151px;display:flex;align-items:center;justify-content:center;
+  border:3px solid #ffe4a2;border-bottom:5px solid #8d552d;border-radius:13px;
+  background:radial-gradient(circle at 51% 31%,#b5d8e487,transparent 62%),linear-gradient(#37758b,#0a2e51 75%);
+  box-shadow:inset 0 2px #fff7dc,0 3px #07182b,0 9px 16px #051226aa;
+}
+.w7-spotlight-portrait:before{
+  content:'★';position:absolute;top:-9px;left:calc(50% - 14px);
+  width:28px;height:23px;display:grid;place-items:center;color:#57371d;font-size:13px;
+  background:linear-gradient(#fff5cc,#e7b766);border:2px solid #fff5c7;border-radius:0 0 9px 9px;z-index:2
+}
+.w7-spotlight-portrait .w7-featured-svg{
+  width:110%;height:126px;flex:none;transform:scale(1.05);
+  filter:drop-shadow(0 8px 5px #071326a8)
+}
+.w7-spotlight-portrait>span{
+  position:absolute;bottom:5px;left:5px;right:5px;
+  border:1px solid #f8dfa2;border-radius:4px;background:#061f3ce8;
+  padding:4px 1px;color:#ffedb7;text-align:center;
+  font:900 9px 'Barlow Condensed',sans-serif;letter-spacing:.35px;z-index:2
+}
+.w7-spotlight-info{min-width:0;display:grid;align-content:center;gap:7px}
+.w7-screen .w7-spotlight-info h3{
+  margin:0;color:#fff0c5;font:900 clamp(24px,7vw,34px)/.98 'Barlow Condensed',sans-serif;
+  text-shadow:0 3px #071424
+}
+.w7-spotlight-info p{font:600 11px/1.3 'Barlow',sans-serif;color:#d5eaf3;margin:0}
+.w7-spotlight-tags{display:flex;flex-wrap:wrap;gap:5px}
+.w7-spotlight-tags span{
+  display:inline-block;padding:5px 7px;border:1px solid #cea971;border-radius:6px;
+  background:#09213bdc;color:#ffe4a8;font:800 9px/1.1 'Barlow Condensed',sans-serif;
+  letter-spacing:.2px
+}
+.w7-spotlight-info button{
+  min-height:43px;width:100%;border:2px solid #fff1be;border-bottom:5px solid #885226;
+  border-radius:9px;background:linear-gradient(#fff2bd 0%,#eebd67 55%,#b97935);
+  box-shadow:inset 0 2px #fffadd,0 3px #071426;
+  color:#3d2818;font:900 17px 'Barlow Condensed',sans-serif;letter-spacing:.5px
+}
+.w7-spotlight-info button:disabled{border-color:#c4ac84;filter:saturate(.6);color:#5c5447}
+.w7-crew-caption{min-height:23px;padding-top:2px}
+.w7-crew-caption>span{font-size:9px}
+.w7-screen[data-work7-screen="cards"] .w7-card-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;align-items:stretch;
+}
+.w7-screen[data-work7-screen="cards"] .w7-card,
+.w7-screen[data-work7-screen="cards"] .w7-future-card{
+  min-height:171px;padding:5px 4px 7px;border-width:3px;
+  border-bottom-width:6px;border-radius:12px 12px 16px 16px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-card{
+  box-shadow:0 0 0 1px #543e25,0 5px 0 #06162b,0 8px 11px #0009,inset 0 3px #fff5c273;
+}
+.w7-screen[data-work7-screen="cards"] .w7-card.is-selected{
+  transform:translateY(-2px);
+  box-shadow:0 0 0 2px #ffe2a1,0 7px 0 #06162b,0 0 18px #ffe0a98c
+}
+.w7-screen[data-work7-screen="cards"] .w7-card-top{
+  min-height:20px;padding:3px;margin:0 -1px;
+  font-size:clamp(7px,1.95vw,9px);line-height:1.1;letter-spacing:0
+}
+.w7-screen[data-work7-screen="cards"] .w7-card-top span:last-child{font-size:12px}
+.w7-screen[data-work7-screen="cards"] .w7-card-art{
+  min-height:76px;height:clamp(76px,24vw,103px);margin:0 -5px
+}
+.w7-screen[data-work7-screen="cards"] .w7-art-svg{transform:scale(1.14)}
+.w7-screen[data-work7-screen="cards"] .w7-card-level{
+  min-height:17px;padding:1px;margin:-2px 0 0;
+  gap:2px;font-size:8px;letter-spacing:0
+}
+.w7-screen[data-work7-screen="cards"] .w7-card-level span{font-size:7px}
+.w7-screen[data-work7-screen="cards"] .w7-card>strong{
+  font-size:clamp(14px,3.55vw,19px);line-height:.97;
+  overflow-wrap:anywhere
+}
+.w7-screen[data-work7-screen="cards"] .w7-card>small{
+  font-size:clamp(7px,1.9vw,9px);line-height:1.15
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card{
+  justify-content:center;gap:5px;border-style:dashed;padding:9px 4px
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-seal{
+  width:65px;height:70px;border-radius:50% 50% 12px 12px
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-seal span{font-size:49px}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>strong{font-size:16px}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>small{font-size:9px}
+.w7-screen[data-work7-screen="cards"] .w7-future-note{font-size:8px}
+
+/* Shop: illustrated treasure display and real local-coin catalogue. */
+.w7-market-feature{
+  display:grid;grid-template-columns:minmax(93px,36%) minmax(0,1fr);
+  align-items:center;gap:13px;position:relative;overflow:hidden;
+  min-height:153px;padding:12px 13px;
+  border:3px solid #ffe1a0;border-bottom:6px solid #8c552d;border-radius:18px;
+  background:radial-gradient(circle at 13% 25%,#e7af5d4d,transparent 52%),
+    linear-gradient(120deg,#3c5466,#103252 57%,#081e3d);
+  box-shadow:inset 0 2px #ffedb4b8,0 7px #06152c,0 12px 18px #0008
+}
+.w7-market-feature:before{
+  content:'';position:absolute;inset:6px;border:1px solid #ffe9a17a;border-radius:11px;pointer-events:none
+}
+.w7-market-feature-art{
+  position:relative;display:grid;place-items:center;
+  min-height:126px;border:2px solid #efca88;border-radius:16px;
+  background:radial-gradient(circle at 50% 38%,#8d8a80a8,transparent 66%),linear-gradient(#466d84,#192e4e);
+  box-shadow:inset 0 2px #fff1b8a8,0 5px #0a1b2d
+}
+.w7-market-feature-art .w7-relic-svg{
+  width:100%;height:114px;transform:scale(1.15);
+  filter:drop-shadow(0 9px 4px #091526ab)
+}
+.w7-market-glint{
+  position:absolute;top:-5px;right:1px;color:#fff3bf;
+  font-size:28px;text-shadow:0 0 12px #ffe59b
+}
+.w7-market-feature-copy{min-width:0;display:grid;gap:8px}
+.w7-screen .w7-market-feature h3{
+  margin:0;color:#ffe6ac;
+  font:900 clamp(22px,6.9vw,31px)/1 'Barlow Condensed',sans-serif;
+  text-shadow:0 3px #061426
+}
+.w7-market-feature p{margin:0;font:600 11px/1.45 'Barlow',sans-serif;color:#e3eff5}
+.w7-market-balance{
+  display:inline-block;justify-self:start;
+  padding:7px 9px;border-radius:7px;border:1px solid #efcf91;
+  background:linear-gradient(#294e64,#0b2a46);box-shadow:inset 0 1px #fff4c240;
+  font:900 11px 'Barlow Condensed',sans-serif;color:#ffe6a6
+}
+.w7-screen[data-work7-screen="shop"] .w7-shop-list{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;align-items:stretch
+}
+.w7-screen[data-work7-screen="shop"] .w7-product,
+.w7-market-soon{
+  display:flex;flex-direction:column;align-items:stretch;
+  position:relative;gap:7px;min-width:0;min-height:254px;padding:9px;
+  border:3px solid #f5cd86;border-bottom:6px solid #805127;
+  border-radius:16px;background:radial-gradient(ellipse at 50% 20%,#367b9e70,transparent 62%),linear-gradient(#284e70,#0a2343);
+  box-shadow:inset 0 2px #fff6cf8c,0 5px #07172e,0 10px 13px #0007
+}
+.w7-screen[data-work7-screen="shop"] .w7-product.w7-gunner{
+  background:radial-gradient(ellipse at 50% 20%,#d889647a,transparent 62%),linear-gradient(#65424d,#201b35)
+}
+.w7-screen[data-work7-screen="shop"] .w7-product.w7-navigator{
+  background:radial-gradient(ellipse at 50% 20%,#5fd3e183,transparent 62%),linear-gradient(#1f6375,#0a2845)
+}
+.w7-screen[data-work7-screen="shop"] .w7-product-art{
+  width:100%;height:118px;min-height:118px;display:grid;place-items:center
+}
+.w7-screen[data-work7-screen="shop"] .w7-product-art .w7-art-svg{height:106px;width:100%;transform:scale(1.06)}
+.w7-screen[data-work7-screen="shop"] .w7-product-info{flex:1;gap:4px}
+.w7-screen[data-work7-screen="shop"] .w7-product-info small{font-size:9px}
+.w7-screen[data-work7-screen="shop"] .w7-product-info strong{font-size:clamp(19px,5vw,25px)}
+.w7-screen[data-work7-screen="shop"] .w7-product-info span{font-size:10px;line-height:1.3}
+.w7-screen[data-work7-screen="shop"] .w7-product-info b{
+  justify-self:start;padding:5px 7px;border:1px solid #dec081;
+  border-radius:6px;background:#081b35c9;font-size:13px
+}
+.w7-screen[data-work7-screen="shop"] .w7-product button{
+  width:100%;min-height:43px;max-width:none;margin-top:auto;
+  font-size:13px;letter-spacing:.4px
+}
+.w7-market-soon{
+  align-items:center;justify-content:center;text-align:center;
+  gap:8px;border-style:dashed;border-color:#99a9aa;
+  background:radial-gradient(ellipse at 50% 25%,#57838d61,transparent 65%),linear-gradient(#203a52,#10243c)
+}
+.w7-market-soon-art{
+  display:grid;place-items:center;width:86px;height:103px;
+  padding:4px;border:2px solid #8eabae;border-radius:17px;
+  background:linear-gradient(#2b5b71,#14283e);
+  filter:grayscale(.5) saturate(.7)
+}
+.w7-market-soon-art .w7-relic-svg{width:78px;height:89px}
+.w7-market-soon>strong{font:900 21px/1.05 'Barlow Condensed',sans-serif;color:#f4dba9}
+.w7-market-soon>small{font:900 9px 'Barlow',sans-serif;color:#b8cfda}
+@media(min-width:520px){
+  .w7-spotlight{grid-template-columns:150px minmax(0,1fr)}
+  .w7-screen[data-work7-screen="cards"] .w7-card-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:390px){
+  .w7-spotlight{grid-template-columns:minmax(86px,35%) minmax(0,1fr);gap:9px;padding:9px}
+  .w7-spotlight-portrait{min-height:144px}
+  .w7-spotlight-portrait .w7-featured-svg{height:116px}
+  .w7-screen .w7-spotlight-info h3{font-size:clamp(22px,6.5vw,28px)}
+  .w7-spotlight-tags span{font-size:8px;padding:4px}
+  .w7-screen[data-work7-screen="cards"] .w7-card-grid{gap:7px}
+  .w7-screen[data-work7-screen="cards"] .w7-card,
+  .w7-screen[data-work7-screen="cards"] .w7-future-card{min-height:168px}
+  .w7-market-feature{grid-template-columns:minmax(82px,35%) minmax(0,1fr);gap:10px;padding:9px;min-height:145px}
+  .w7-market-feature-art{min-height:118px}
+  .w7-market-feature-art .w7-relic-svg{height:108px}
+  .w7-screen[data-work7-screen="shop"] .w7-shop-list{gap:9px}
+  .w7-screen[data-work7-screen="shop"] .w7-product,
+  .w7-market-soon{min-height:248px;padding:7px}
+}
+@media(max-width:340px){
+  .w7-spotlight{grid-template-columns:88px minmax(0,1fr)}
+  .w7-spotlight-portrait{min-height:133px}
+  .w7-spotlight-portrait .w7-art-svg{height:105px}
+  .w7-screen .w7-spotlight-info h3{font-size:22px}
+  .w7-spotlight-info button{min-height:39px;font-size:14px}
+  .w7-crew-caption>span{display:none}
+  .w7-screen[data-work7-screen="cards"] .w7-card-top{font-size:7px}
+  .w7-screen[data-work7-screen="cards"] .w7-card>strong{font-size:12px}
+  .w7-screen[data-work7-screen="cards"] .w7-card-art{height:72px;min-height:72px}
+  .w7-market-feature-art{min-height:110px}
+  .w7-screen[data-work7-screen="shop"] .w7-product-art{height:95px;min-height:95px}
+  .w7-screen[data-work7-screen="shop"] .w7-product-info strong{font-size:18px}
+}
+
+/* WORK 7 · Layout do mosaico 05/06: conteúdo interativo antes dos enfeites,
+   proporção mobile mais compacta. Apenas Cartas e Loja. */
+.w7-screen[data-work7-screen="cards"],.w7-screen[data-work7-screen="shop"]{
+  gap:9px;padding:8px 8px 15px;
+  background:radial-gradient(ellipse 80% 25% at 49% 0%,#3b82ad6e,transparent 90%),
+    linear-gradient(176deg,#143b64 0%,#082442 45%,#04142c 100%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero,
+.w7-screen[data-work7-screen="shop"] .w7-hero{
+  min-height:91px;padding:9px 14px;border-radius:14px;border-width:2px;
+  box-shadow:inset 0 2px #fff4c68c,0 4px 0 #634324,0 7px 12px #0007;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero h2,
+.w7-screen[data-work7-screen="shop"] .w7-hero h2{
+  font-size:clamp(39px,10vw,51px)!important;line-height:.92!important;
+}
+.w7-screen .w7-hero p{font-size:11px}
+.w7-screen .w7-medal{height:66px;width:66px;outline-width:2px;border-width:3px}
+.w7-screen .w7-medal strong{font-size:23px}
+.w7-screen .w7-medal small{font-size:9px;margin-top:3px}
+.w7-screen .w7-wallet{width:90px}
+.w7-screen .w7-wallet strong{font-size:21px}
+.w7-screen .w7-tabs{padding:4px;gap:4px;border-radius:11px}
+.w7-screen .w7-tabs button{min-height:43px;padding:5px 2px;font-size:clamp(10px,2.8vw,12px)}
+.w7-screen .w7-content{gap:10px}
+.w7-screen .w7-line{min-height:28px;font-size:15px;padding:1px 3px}
+.w7-screen .w7-collection-progress{height:10px;margin:-6px 3px -1px}
+.w7-screen .w7-filter button{min-height:28px}
+.w7-screen[data-work7-screen="cards"] .w7-card-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:3px 2px 8px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-card,
+.w7-screen[data-work7-screen="cards"] .w7-future-card{
+  min-height:184px;border-radius:11px 11px 16px 16px;border-width:3px;
+  border-bottom-width:5px;padding:6px 4px 8px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-card-top{
+  min-height:23px;border-radius:5px;
+  background:linear-gradient(#947045,#4e352d);
+  color:#fff3c4;font-size:clamp(8px,2vw,10px);
+}
+.w7-screen[data-work7-screen="cards"] .w7-card-art{
+  min-height:88px;height:clamp(88px,24vw,108px);
+  background:radial-gradient(ellipse at center,#b3e5dd44,transparent 70%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-card>strong{
+  font-size:clamp(15px,3.9vw,21px);text-wrap:balance;
+}
+.w7-screen[data-work7-screen="cards"] .w7-card-level{min-height:18px;font-size:9px}
+.w7-screen[data-work7-screen="cards"] .w7-card-level span{font-size:8px}
+.w7-screen[data-work7-screen="cards"] .w7-card>small{font-size:9px}
+.w7-screen[data-work7-screen="cards"] .w7-card.is-selected{
+  border-color:#fff5bd;box-shadow:0 0 0 2px #ffc96b,0 6px #08182d,0 0 23px #ffd8929a;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight{
+  min-height:136px;padding:8px 10px;
+  grid-template-columns:minmax(93px,30%) minmax(0,1fr);
+  border-width:2px;border-bottom-width:5px;
+  box-shadow:inset 0 1px #fff1ba,0 5px #051629;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-portrait{min-height:125px}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-portrait .w7-featured-svg{height:105px}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info{gap:5px}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info button{min-height:41px}
+.w7-screen[data-work7-screen="shop"] .w7-market-feature{
+  min-height:110px;grid-template-columns:minmax(80px,27%) minmax(0,1fr);
+  gap:10px;padding:8px;border-width:2px;border-bottom-width:5px;border-radius:14px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-market-feature-art{min-height:90px;border-radius:11px}
+.w7-screen[data-work7-screen="shop"] .w7-market-feature-art .w7-relic-svg{height:88px}
+.w7-screen[data-work7-screen="shop"] .w7-market-feature-copy{gap:4px}
+.w7-screen[data-work7-screen="shop"] .w7-market-feature h3{font-size:clamp(21px,6.1vw,29px)}
+.w7-screen[data-work7-screen="shop"] .w7-market-feature p{font-size:10px;line-height:1.3}
+.w7-screen[data-work7-screen="shop"] .w7-market-balance{padding:4px 7px;font-size:10px}
+.w7-screen[data-work7-screen="shop"] .w7-shop-list{gap:9px}
+.w7-screen[data-work7-screen="shop"] .w7-product,
+.w7-screen[data-work7-screen="shop"] .w7-market-soon{
+  min-height:223px;border-radius:13px;padding:8px;gap:5px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-product-art{
+  height:90px;min-height:90px;border:1px solid #f6c87f;border-radius:11px;
+  background:radial-gradient(ellipse at 50% 28%,#9acecb55,#0d294c 72%);
+}
+.w7-screen[data-work7-screen="shop"] .w7-product-art .w7-art-svg{height:86px}
+.w7-screen[data-work7-screen="shop"] .w7-product-info strong{font-size:clamp(19px,4.8vw,24px)}
+.w7-screen[data-work7-screen="shop"] .w7-product button{min-height:40px;font-size:13px}
+.w7-screen[data-work7-screen="shop"] .w7-preview-strip{
+  gap:8px;padding-top:6px;border-top:1px solid #e6c38c69;
+}
+@media(max-width:350px){
+ .w7-screen[data-work7-screen="cards"] .w7-card-grid{gap:5px}
+ .w7-screen[data-work7-screen="cards"] .w7-card,
+ .w7-screen[data-work7-screen="cards"] .w7-future-card{min-height:177px;padding:5px 3px}
+ .w7-screen[data-work7-screen="cards"] .w7-card-art{height:76px;min-height:76px}
+ .w7-screen[data-work7-screen="cards"] .w7-card>strong{font-size:13px}
+ .w7-screen[data-work7-screen="shop"] .w7-product,
+ .w7-screen[data-work7-screen="shop"] .w7-market-soon{min-height:218px;padding:6px}
+}
+
+/* Mosaico aprovado: 3 produtos visíveis por linha no iPhone, não 2.
+   Os produtos continuam a ser apenas os membros reais da tripulação local. */
+@media(min-width:355px) and (max-width:519px){
+ .w7-screen[data-work7-screen="shop"] .w7-shop-list{
+   grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product,
+ .w7-screen[data-work7-screen="shop"] .w7-market-soon{
+   min-height:221px;padding:6px 4px;gap:4px;
+   border-width:2px;border-bottom-width:5px;border-radius:11px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product-art{
+   min-height:86px;height:86px;border-width:1px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product-art .w7-art-svg{height:82px}
+ .w7-screen[data-work7-screen="shop"] .w7-product-info{gap:4px}
+ .w7-screen[data-work7-screen="shop"] .w7-product-info strong{
+   font-size:clamp(15px,3.85vw,20px);line-height:1.02;text-wrap:balance;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product-info span{display:none}
+ .w7-screen[data-work7-screen="shop"] .w7-product-info small{font-size:8px}
+ .w7-screen[data-work7-screen="shop"] .w7-product-info b{font-size:11px;padding:3px 4px}
+ .w7-screen[data-work7-screen="shop"] .w7-product button{
+   min-height:37px;font-size:11px;padding:4px 1px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-market-soon-art{
+   width:64px;height:78px;padding:2px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-market-soon-art .w7-relic-svg{
+   width:61px;height:72px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-market-soon>strong{font-size:16px}
+ .w7-screen[data-work7-screen="shop"] .w7-market-soon>small{font-size:8px}
+}
+
+/* WORK 7 — Approved 16:18 UTC mosaic, screens 05/06. One coordinated
+ * mobile hierarchy pass. These are LOCAL selectors: never touch Porto/nav.
+ * Four readable collection slots; three compact market goods on first row.
+ * No fabricated levels, offers, prices, IAPs, or additional crew. */
+.w7-screen[data-work7-screen="cards"],
+.w7-screen[data-work7-screen="shop"]{
+  gap:8px;
+  padding:7px 7px 14px;
+  background:radial-gradient(ellipse 88% 24% at 50% -3%,#226da276,transparent 90%),linear-gradient(180deg,#0c3963,#092342 46%,#04162c);
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero,
+.w7-screen[data-work7-screen="shop"] .w7-hero{
+  min-height:83px;
+  padding:8px 12px;
+  border-color:#edc377;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero h2,
+.w7-screen[data-work7-screen="shop"] .w7-hero h2{
+  font-size:clamp(34px,9.1vw,46px)!important;
+}
+.w7-screen[data-work7-screen="cards"] .w7-medal,
+.w7-screen[data-work7-screen="shop"] .w7-medal{
+  width:62px;height:60px;border-width:2px;
+  border-radius:13px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-wallet{width:79px}
+.w7-screen[data-work7-screen="cards"] .w7-medal strong,
+.w7-screen[data-work7-screen="shop"] .w7-medal strong{font-size:22px}
+.w7-screen[data-work7-screen="cards"] .w7-medal small,
+.w7-screen[data-work7-screen="shop"] .w7-medal small{font-size:9px;margin-top:1px}
+.w7-screen[data-work7-screen="cards"] .w7-tabs,
+.w7-screen[data-work7-screen="shop"] .w7-tabs{gap:3px;padding:3px}
+.w7-screen[data-work7-screen="cards"] .w7-tabs button,
+.w7-screen[data-work7-screen="shop"] .w7-tabs button{
+  min-height:40px;font-size:clamp(10px,2.65vw,12px);
+  letter-spacing:0;padding:5px 2px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-content,
+.w7-screen[data-work7-screen="shop"] .w7-content{gap:7px}
+.w7-screen[data-work7-screen="cards"] .w7-line,
+.w7-screen[data-work7-screen="shop"] .w7-line{min-height:25px;font-size:13px}
+.w7-screen[data-work7-screen="cards"] .w7-crew-caption{min-height:19px}
+.w7-screen[data-work7-screen="cards"] .w7-card-top{background:linear-gradient(#324f75,#0a2c55);border-color:#ac8759}
+.w7-screen[data-work7-screen="cards"] .w7-card-level{
+  margin:0 1px;min-height:15px;padding:0 2px;
+  font-size:8px;white-space:nowrap;
+}
+.w7-screen[data-work7-screen="cards"] .w7-card-level span{font-size:10px;color:#fce5ad}
+.w7-screen[data-work7-screen="cards"] .w7-card>small{
+  display:block;white-space:normal;overflow-wrap:anywhere;
+  color:#e8eccc;font-size:8px;letter-spacing:0;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-note{display:none}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight{
+  grid-template-columns:minmax(72px,25%) minmax(0,1fr);
+  min-height:116px;padding:6px 8px;gap:8px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-portrait{min-height:104px}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-portrait .w7-featured-svg{height:94px}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info{gap:3px}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info h3{font-size:clamp(19px,5.8vw,26px)}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info button{min-height:39px}
+.w7-screen[data-work7-screen="shop"] .w7-market-feature{
+  min-height:104px;grid-template-columns:84px minmax(0,1fr);
+  gap:8px;padding:7px;border-width:2px;border-bottom-width:4px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-market-feature-art{
+  min-height:85px;border-radius:9px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-market-feature-art .w7-relic-svg{height:77px}
+.w7-screen[data-work7-screen="shop"] .w7-market-feature h3{font-size:clamp(19px,5.4vw,25px);line-height:1.02}
+.w7-screen[data-work7-screen="shop"] .w7-market-feature p{font-size:11px;line-height:1.24}
+.w7-screen[data-work7-screen="shop"] .w7-market-balance{font-size:10px;padding:3px 6px}
+.w7-screen[data-work7-screen="shop"] .w7-product-info small{font-size:9px}
+.w7-screen[data-work7-screen="shop"] .w7-product-info b{margin:0;color:#ffe5ac}
+.w7-screen[data-work7-screen="shop"] .w7-product button{min-height:39px}
+.w7-screen[data-work7-screen="shop"] .w7-preview-strip{display:none}
+@media(min-width:355px) and (max-width:519px){
+ .w7-screen[data-work7-screen="cards"] .w7-card-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:1px 1px 6px;
+ }
+ .w7-screen[data-work7-screen="cards"] .w7-card,
+ .w7-screen[data-work7-screen="cards"] .w7-future-card{
+  min-width:0;min-height:152px;padding:4px 3px 5px;
+  border-width:2px;border-bottom-width:4px;border-radius:9px;
+  gap:2px;
+ }
+ .w7-screen[data-work7-screen="cards"] .w7-card-top{
+  min-height:18px;padding:2px 1px;margin:0;gap:1px;font-size:8px;
+ }
+ .w7-screen[data-work7-screen="cards"] .w7-card-top span:last-child{font-size:10px}
+ .w7-screen[data-work7-screen="cards"] .w7-card-art{
+  min-height:64px;height:clamp(64px,18vw,81px);margin:0 -3px;
+ }
+ .w7-screen[data-work7-screen="cards"] .w7-art-svg{transform:scale(1)}
+ .w7-screen[data-work7-screen="cards"] .w7-card>strong{
+  font-size:clamp(11px,2.9vw,15px);line-height:1.03;overflow-wrap:anywhere;
+ }
+ .w7-screen[data-work7-screen="cards"] .w7-card>small{font-size:7px;line-height:1.05}
+ .w7-screen[data-work7-screen="cards"] .w7-future-seal{transform:scale(.7)}
+ .w7-screen[data-work7-screen="cards"] .w7-future-card>strong{font-size:12px}
+ .w7-screen[data-work7-screen="cards"] .w7-future-card>small{font-size:8px}
+ .w7-screen[data-work7-screen="shop"] .w7-shop-list{
+  grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product{
+  min-width:0;min-height:163px;grid-template-columns:minmax(0,1fr);
+  gap:3px;padding:5px 4px 7px;border-width:2px;border-bottom-width:4px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product-art{
+  height:60px;min-height:60px;border-radius:8px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product-art .w7-art-svg{
+  height:59px;max-width:100%;transform:scale(.94);
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product-info{gap:2px}
+ .w7-screen[data-work7-screen="shop"] .w7-product-info strong{
+  font-size:clamp(14px,3.6vw,18px);text-wrap:balance;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product-info b{font-size:11px}
+ .w7-screen[data-work7-screen="shop"] .w7-product button{
+  min-height:34px;max-width:none;width:100%;
+  font-size:11px;line-height:1.05;padding:3px 1px;
+ }
+}
+@media(max-width:354px){
+ .w7-screen[data-work7-screen="cards"] .w7-card-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;
+ }
+ .w7-screen[data-work7-screen="cards"] .w7-card,
+ .w7-screen[data-work7-screen="cards"] .w7-future-card{min-height:168px}
+ .w7-screen[data-work7-screen="shop"] .w7-shop-list{
+  grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product{
+  display:flex;flex-direction:column;min-height:179px;
+ }
+ .w7-screen[data-work7-screen="shop"] .w7-product-art{width:100%;height:69px;min-height:69px}
+ .w7-screen[data-work7-screen="shop"] .w7-product button{max-width:none;width:100%}
+}
+
+/* WORK 7 — Mosaic 05/06 composition: an honest 8-slot album and a treasure shop.
+   Scoped entirely to Cartas/Loja; Porto/nav geometry and shared HUD remain untouched.
+   Locked slots and chests carry NO fake levels, prices, balances or purchasable items. */
+.w7-screen[data-work7-screen="cards"] .w7-future-card{
+ border-style:solid; border-color:#887a78; background:
+ radial-gradient(ellipse at 50% 35%,#5b749055,transparent 70%),linear-gradient(#233d57,#091b36);
+ box-shadow:inset 0 2px #d9d8b034,0 4px 0 #071425;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card:nth-child(4n+2){border-color:#7672a4;background:radial-gradient(ellipse at 50% 30%,#5b3c9473,transparent 75%),linear-gradient(#293957,#0a1733)}
+.w7-screen[data-work7-screen="cards"] .w7-future-card:nth-child(4n+3){border-color:#6a9f9c;background:radial-gradient(ellipse at 50% 30%,#247c7973,transparent 75%),linear-gradient(#1b465a,#0a1b32)}
+.w7-screen[data-work7-screen="cards"] .w7-future-card:nth-child(4n+4){border-color:#af8252;background:radial-gradient(ellipse at 50% 30%,#a56a3373,transparent 75%),linear-gradient(#3b3450,#101c32)}
+.w7-screen[data-work7-screen="cards"] .w7-future-seal{width:min(100%,74px);height:71px;border-radius:12px 12px 8px 8px;border-width:2px;box-shadow:inset 0 2px #dfdbbb78,0 3px #111e32}
+.w7-screen[data-work7-screen="cards"] .w7-future-seal span{font-size:45px}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>strong{font-size:clamp(12px,3vw,17px);line-height:1.05;overflow-wrap:anywhere}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>small{font-size:9px}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+ position:relative;min-width:0;min-height:145px;overflow:hidden;
+ display:grid;grid-template-columns:minmax(105px,43%) minmax(0,1fr);
+ gap:7px;align-items:center;padding:10px 13px;border:2px solid #f6c26d;
+ border-bottom:5px solid #915b31;border-radius:13px;
+ background:radial-gradient(ellipse at 30% 38%,#e1857c80,transparent 43%),radial-gradient(ellipse at 85% 5%,#ce69ed65,transparent 58%),linear-gradient(120deg,#54204d,#210f43 64%,#14244c);
+ box-shadow:inset 0 2px #fff3ac80,0 5px 0 #07172a,0 9px 16px #0006;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack:after{content:'';inset:5px;position:absolute;border:1px solid #ffd78b5e;border-radius:8px;pointer-events:none}
+.w7-screen[data-work7-screen="shop"] .w7-pack-ribbon{
+ position:absolute;right:-24px;top:12px;z-index:2;transform:rotate(28deg);
+ width:103px;text-align:center;padding:4px 0;background:linear-gradient(#e54b4a,#8f192d);
+ border:1px solid #ffab8e;box-shadow:0 2px #471328;
+ color:#ffebc1;font:900 10px 'Barlow Condensed',sans-serif;letter-spacing:.4px;
+}
+.w7-captain-pack-art{position:relative;display:grid;place-items:center;height:125px;min-width:0}
+.w7-captain-pack-art .w7-relic-svg{height:129px;width:100%;max-width:148px;filter:drop-shadow(0 5px 1px #0e0731)}
+.w7-pack-glint{position:absolute;left:6px;top:4px;font-size:27px;color:#fff1ba;text-shadow:0 0 9px #fbc765}
+.w7-captain-pack-info{min-width:0;display:grid;gap:5px;align-content:center;padding-right:4px;z-index:1}
+.w7-screen .w7-captain-pack-info h3{font:900 clamp(22px,6vw,31px)/.94 'Barlow Condensed',sans-serif;color:#fff3b9;margin:0;text-shadow:0 2px #110f32}
+.w7-captain-pack-info p{margin:0;color:#eee5fa;font:700 11px/1.24 'Barlow',sans-serif}
+.w7-pack-unavailable{
+ display:grid;place-items:center;min-height:33px;background:linear-gradient(#b8df70,#467e32);
+ border:2px solid #ddf6af;border-radius:8px;box-shadow:0 3px #25401e;
+ color:#122d19;font:900 15px 'Barlow Condensed',sans-serif;
+}
+.w7-captain-pack-info small{font:700 9px/1.2 'Barlow',sans-serif;color:#f4daea}
+.w7-chests-heading,.w7-shop-local-note{display:flex;align-items:center;justify-content:space-between;gap:5px;min-width:0}
+.w7-chests-heading>strong,.w7-shop-local-note>strong{color:#ffd991;font:900 14px 'Barlow Condensed',sans-serif}
+.w7-chests-heading>span,.w7-shop-local-note>span{font:800 9px 'Barlow Condensed',sans-serif;color:#aacbdf;text-align:right}
+.w7-chest-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.w7-chest{display:grid;justify-items:center;align-content:space-between;gap:5px;min-width:0;min-height:155px;
+ padding:8px 4px 7px;border:2px solid #75b8e0;border-bottom:5px solid #18426a;border-radius:11px;
+ background:radial-gradient(ellipse at 50% 32%,#6deaff77,transparent 62%),linear-gradient(#2078b4,#092d59);
+ box-shadow:inset 0 2px #ceefff9c,0 4px #061426;color:#fff6d9}
+.w7-chest>strong{font:900 clamp(11px,2.9vw,16px)/1.08 'Barlow Condensed',sans-serif;text-align:center;white-space:normal}
+.w7-chest-art{display:grid;place-items:center;min-height:72px;width:100%;overflow:hidden}
+.w7-chest-art .w7-relic-svg{width:100%;max-width:110px;height:80px;filter:drop-shadow(0 3px #06243f)}
+.w7-chest-status{display:grid;place-items:center;width:100%;min-height:28px;
+ background:linear-gradient(#a2cf5e,#4a8432);border:1px solid #dbffb7;border-radius:8px;
+ box-shadow:0 2px #1a411f;color:#193b19;font:900 12px 'Barlow Condensed',sans-serif}
+.w7-chest-epic{background:radial-gradient(ellipse at 50% 32%,#d5a5ff79,transparent 62%),linear-gradient(#7d3c9b,#28114e);border-color:#d18de4;border-bottom-color:#632a83}
+.w7-chest-epic .w7-relic-svg{filter:hue-rotate(57deg) saturate(1.4) drop-shadow(0 3px #241039)}
+.w7-chest-legend{background:radial-gradient(ellipse at 50% 32%,#ffe59786,transparent 62%),linear-gradient(#ba8536,#4f2719);border-color:#ffdc78;border-bottom-color:#8c4a26}
+.w7-chest-legend .w7-relic-svg{filter:saturate(1.6) brightness(1.1) drop-shadow(0 3px #57260f)}
+.w7-shop-local-note{padding:8px 2px 0;border-top:1px solid #c79c658a}
+@media(max-width:390px){
+ .w7-screen[data-work7-screen="shop"] .w7-captain-pack{grid-template-columns:minmax(90px,40%) minmax(0,1fr);min-height:139px;padding:8px 9px}
+ .w7-captain-pack-art{height:116px}
+ .w7-captain-pack-art .w7-relic-svg{height:116px}
+ .w7-chest{min-height:141px;padding:6px 3px}
+ .w7-chest-art .w7-relic-svg{height:72px}
+ .w7-chest-status{font-size:11px;min-height:26px}
+ .w7-captain-pack-info small{font-size:8px}
+ .w7-chests-heading>span,.w7-shop-local-note>span{font-size:8px}
+}
+@media(max-width:354px){
+ .w7-screen[data-work7-screen="shop"] .w7-captain-pack{grid-template-columns:35% 1fr}
+ .w7-captain-pack-info p{font-size:10px}
+ .w7-chest-grid{gap:4px}
+ .w7-chest>strong{font-size:11px}
+ .w7-chest-art .w7-relic-svg{height:65px}
+}
+
+
+/* WORK 7 · 16 Nov 2026 · Screens 05/06 illustrated cardbacks and chests.
+   The five shields are NON-ITEM decorative placeholders; three treasure
+   chests are preview-only. No global HUD, Porto, or shared nav selectors. */
+.w7-screen[data-work7-screen="cards"] .w7-future-card{
+  isolation:isolate;
+  background:radial-gradient(ellipse at 50% 30%,#5087a085,transparent 64%),
+    linear-gradient(155deg,#233f5d,#07182f 84%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card:before{
+  content:"";position:absolute;inset:5px;border:1px solid #ffe1a544;
+  border-radius:8px;pointer-events:none;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-seal{
+  position:relative;width:100%;height:auto;min-height:68px;
+  border:0;border-radius:0;background:none;box-shadow:none;
+  filter:drop-shadow(0 5px 2px #020f23c7);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-icon{
+  display:block;width:min(100%,82px);height:75px;overflow:visible;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>strong{
+  font-size:clamp(10px,2.7vw,15px);line-height:1.06;letter-spacing:.15px;
+  text-shadow:0 2px #041021;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>small{
+  display:inline-grid;place-items:center;min-height:19px;
+  width:min(100%,76px);padding:3px 2px;
+  border:1px solid #d6b57b99;border-radius:4px;
+  background:#071b34a6;color:#ffe5a9;font-size:clamp(8px,2.2vw,10px);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card.w7-upcoming-1{
+  background:radial-gradient(ellipse at 50% 30%,#8c5aae77,transparent 64%),linear-gradient(#3b2d60,#101833);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card.w7-upcoming-2{
+  background:radial-gradient(ellipse at 50% 30%,#58ac8b80,transparent 64%),linear-gradient(#204c50,#091f37);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card.w7-upcoming-3{
+  background:radial-gradient(ellipse at 50% 30%,#b8844f80,transparent 64%),linear-gradient(#594044,#18243a);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card.w7-upcoming-4{
+  background:radial-gradient(ellipse at 50% 30%,#a7607f80,transparent 64%),linear-gradient(#50334e,#162038);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest{
+  position:relative;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 28%,#6bdcf3a6,transparent 66%),linear-gradient(#307aab,#102a53);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-epic{
+  background:radial-gradient(ellipse at 50% 28%,#daa3ffc0,transparent 66%),linear-gradient(#723e9c,#251445);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-legend{
+  background:radial-gradient(ellipse at 50% 28%,#ffe09bc4,transparent 66%),linear-gradient(#b68743,#4c2e2c);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  position:relative;min-width:0;min-height:75px;overflow:visible;
+}
+.w7-screen[data-work7-screen="shop"] .w7-preview-chest{
+  display:block;width:100%;max-width:120px;height:90px;
+  filter:drop-shadow(0 6px 2px #061428a8);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-preview-chest,
+.w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-preview-chest{
+  filter:drop-shadow(0 6px 2px #061428a8);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  position:relative;z-index:1;
+  min-height:29px;border-width:2px;border-radius:6px;
+  background:linear-gradient(#e5dfa9,#a7a078);color:#282d2d;
+  border-color:#fff3c6;box-shadow:0 2px #514f3b;
+  font-size:clamp(10px,2.7vw,12px);letter-spacing:.15px;
+}
+@media(min-width:355px) and (max-width:519px){
+  .w7-screen[data-work7-screen="cards"] .w7-future-card{gap:2px;justify-content:space-evenly}
+  .w7-screen[data-work7-screen="cards"] .w7-future-icon{height:69px}
+  .w7-screen[data-work7-screen="shop"] .w7-preview-chest{height:83px}
+}
+@media(max-width:354px){
+  .w7-screen[data-work7-screen="cards"] .w7-future-icon{height:77px}
+  .w7-screen[data-work7-screen="shop"] .w7-preview-chest{height:75px}
+}
+
+
+/* WORK 7 — 16/11/2026 — visual alignment with approved screens 05 and 06.
+   Scope is strictly Cards/Shop; the Porto menu and shared HUD are untouched.
+   The approved composition starts with a compact wooden title plaque, the
+   tab strip and the visible 4×2 card album / main treasure offer. */
+@media (min-width:355px) {
+  .w7-screen[data-work7-screen="cards"] .w7-card-grid {
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+}
+.w7-screen[data-work7-screen="cards"],
+.w7-screen[data-work7-screen="shop"] {
+  padding:4px 5px 12px;
+  gap:6px;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:
+    radial-gradient(ellipse 115% 23% at 50% 0%,#337eb7 0%,#184d7a 58%,transparent 100%),
+    linear-gradient(180deg,#0e3f74 0%,#062345 35%,#06182e 100%);
+}
+.w7-screen[data-work7-screen="cards"]::before,
+.w7-screen[data-work7-screen="shop"]::before {display:none}
+.w7-screen[data-work7-screen="cards"] .w7-hero,
+.w7-screen[data-work7-screen="shop"] .w7-hero {
+  min-height:70px;
+  height:70px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:0;
+  padding:4px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  overflow:visible;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero:after,
+.w7-screen[data-work7-screen="shop"] .w7-hero:after {
+  background:linear-gradient(90deg,#041a3777,transparent 42%,#061d3877);
+  border-radius:0;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type {
+  display:grid;
+  align-content:center;
+  justify-items:center;
+  width:min(69%,270px);
+  height:49px;
+  padding:2px 14px 4px;
+  border:3px ridge #f7ce7c;
+  border-radius:37% 37% 19% 19% / 28% 28% 33% 33%;
+  background:
+    linear-gradient(90deg,#543822 0%,#2c1a16 17%,#4d301e 50%,#271716 83%,#68462c 100%);
+  box-shadow:inset 0 2px #fbe4a18c,inset 0 -4px #170f13,
+    0 3px 0 #7d5026,0 6px 9px #010f26b8;
+  z-index:3;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero .w7-eyebrow,
+.w7-screen[data-work7-screen="shop"] .w7-hero .w7-eyebrow,
+.w7-screen[data-work7-screen="cards"] .w7-hero p,
+.w7-screen[data-work7-screen="shop"] .w7-hero p {display:none}
+.w7-screen[data-work7-screen="cards"] .w7-hero h2,
+.w7-screen[data-work7-screen="shop"] .w7-hero h2 {
+  margin:0!important;
+  font-size:clamp(25px,7vw,33px)!important;
+  line-height:1!important;
+  letter-spacing:.65px;
+  color:#fff2cf;
+  text-align:center;
+  text-shadow:0 2px #120d0c,0 3px 1px #6d441d;
+  -webkit-text-stroke:0;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero .w7-medal,
+.w7-screen[data-work7-screen="shop"] .w7-hero .w7-medal {
+  display:none; /* same canonical coin count remains in shared top HUD */
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs,
+.w7-screen[data-work7-screen="shop"] .w7-tabs {
+  padding:3px;
+  gap:3px;
+  margin:0;
+  border:2px solid #cfa15f;
+  border-radius:12px;
+  background:linear-gradient(#143b5a,#05182f);
+  box-shadow:0 2px 0 #51371f;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs button,
+.w7-screen[data-work7-screen="shop"] .w7-tabs button {
+  min-height:37px;
+  padding:4px 2px;
+  border:1px solid #82abc8;
+  border-bottom:3px solid #0a2443;
+  border-radius:7px;
+  font-size:clamp(9px,2.6vw,12px);
+  line-height:1.05;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs button[aria-selected=true],
+.w7-screen[data-work7-screen="shop"] .w7-tabs button[aria-selected=true] {
+  border-color:#fff4bb;
+  border-bottom-color:#99602c;
+  background:linear-gradient(#ffecaa,#d5a04e 70%,#9b632e);
+}
+.w7-screen[data-work7-screen="cards"] .w7-content,
+.w7-screen[data-work7-screen="shop"] .w7-content {gap:5px}
+.w7-screen[data-work7-screen="cards"] .w7-line:first-child {
+  min-height:31px;
+  border:1px solid #9b895f;
+  border-radius:7px;
+  padding:2px 7px;
+  background:linear-gradient(#172b3d,#081e37);
+  color:#ffe8aa;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-caption {display:none}
+.w7-screen[data-work7-screen="cards"] .w7-collection-progress {
+  height:5px;margin:0 3px 2px;padding:0;
+}
+@media(min-width:355px) and (max-width:519px) {
+  .w7-screen[data-work7-screen="cards"] .w7-card-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:1px 1px 5px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-card,
+  .w7-screen[data-work7-screen="cards"] .w7-future-card {
+    min-height:135px;gap:2px;padding:3px 2px 5px;
+    border:2px solid #bc8f58;border-bottom-width:4px;border-radius:9px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-card-art{
+    min-height:59px;height:clamp(59px,16.8vw,70px);margin:0 -2px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-card-top {
+    min-height:16px;padding:1px 2px;font-size:7px;
+    background:linear-gradient(#5c3b39,#20243f);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-card>strong{
+    font-size:clamp(11px,3.15vw,14px);line-height:1.02;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-card>small{
+    font-size:7px;line-height:1;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-card-level{
+    min-height:15px;padding:1px;margin:0;font-size:8px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-future-seal{
+    min-height:56px;transform:none;width:100%;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-future-icon{
+    height:55px;width:min(100%,61px);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-future-card>strong{
+    font-size:11px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-future-card>small{
+    min-height:16px;font-size:8px;
+  }
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack {
+  min-height:154px;
+  grid-template-columns:minmax(95px,45%) minmax(0,1fr);
+  border-color:#e9bc69;
+  border-radius:13px;
+  padding:8px 9px;
+  background:
+    radial-gradient(ellipse at 23% 50%,#b26c72a0,transparent 54%),
+    radial-gradient(ellipse at 85% 12%,#a460e364,transparent 67%),
+    linear-gradient(110deg,#48204d,#21113c 65%,#152e52);
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+  height:123px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-relic-svg {
+  max-width:152px;height:120px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+  min-height:24px;margin-top:1px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-grid{gap:6px}
+.w7-screen[data-work7-screen="shop"] .w7-chest {
+  min-height:139px;
+  padding:5px 3px 6px;
+  border-radius:10px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  min-height:72px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-preview-chest{
+  max-width:120px;height:80px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  min-height:27px;font-size:clamp(10px,2.7vw,12px);
+}
+@media(max-width:354px){
+  .w7-screen[data-work7-screen="cards"] .w7-card-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    grid-template-columns:37% 1fr;
+    padding:7px;
+  }
+}
+
+
+/* WORK 7, 16 Nov — approved art appears only in clipped illustrations, never
+ * as an inert full-screen screenshot. All labels/actions use live UI state.
+ * Screen 05/06 artwork source: ../../assets/design-approved/. */
+.w7-approved-crop{
+  display:block;position:relative;isolation:isolate;
+  width:100%;aspect-ratio:1;overflow:hidden;
+  border-radius:8px;background:#0a2445;
+}
+.w7-approved-crop img{
+  position:absolute;display:block;height:auto;max-width:none;
+  pointer-events:none;user-select:none;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card .w7-future-seal{
+  display:grid;place-items:center;
+  min-height:64px;width:100%;height:auto;padding:0;
+  background:transparent;border:0;box-shadow:none;
+  filter:drop-shadow(0 3px 2px #010f2a);
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-seal .w7-approved-crop{
+  width:min(100%,76px);
+  border:2px solid #ffd99f;border-radius:7px;
+  box-shadow:0 2px 0 #513820,inset 0 1px #fff2c5;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>strong{
+  min-height:24px;display:grid;place-items:center;
+  font-size:clamp(10px,2.65vw,13px);
+  color:#fff1c7;
+}
+.w7-screen[data-work7-screen="cards"] .w7-future-card>small{
+  width:100%;font-size:clamp(7px,1.95vw,9px);letter-spacing:0;
+  text-align:center;white-space:normal;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+  width:min(100%,124px);height:auto;
+  border:2px solid #f4c06e;border-radius:11px;
+  box-shadow:0 4px 12px #10092bc9;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  width:min(100%,83px);
+  border:1px solid #fff5d27a;
+  box-shadow:0 3px 8px #021632bb;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  display:grid;place-items:center;
+}
+.w7-recruit-details{
+  margin-top:5px;padding:0;
+  border:1px solid #a88d6c;border-radius:9px;
+  background:linear-gradient(#174268,#0b2844);
+  color:#f4d79d;
+}
+.w7-recruit-details>summary{
+  list-style:none;cursor:pointer;min-height:35px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:6px;padding:7px 11px;
+  font:900 12px 'Barlow Condensed',sans-serif;
+}
+.w7-recruit-details>summary::-webkit-details-marker{display:none}
+.w7-recruit-details>summary::after{content:'⌄';font-size:21px;line-height:1}
+.w7-recruit-details[open]>summary::after{transform:rotate(180deg)}
+.w7-recruit-details[open]{padding:0 7px 9px}
+.w7-recruit-details[open]>summary{margin-bottom:8px;border-bottom:1px solid #b9905e}
+.w7-recruit-details .w7-shop-local-note{margin:0 0 5px}
+.w7-recruit-details .w7-shop-actions{margin-top:9px}
+.w7-recruit-details>summary:focus-visible{outline:3px solid #fff0b2;outline-offset:2px}
+@media(max-width:390px){
+  .w7-screen[data-work7-screen="cards"] .w7-future-seal .w7-approved-crop{width:min(100%,67px)}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{width:min(100%,118px)}
+}
+
+/* WORK 7 — 16 Nov 03h visual QA: honest eight-artwork atlas from approved
+ * reference 05. No drawn/borrowed replacement images, no fake inventory.
+ * All selectors remain scoped to WORK 7; shared HUD/nav are untouched. */
+.w7-screen[data-work7-screen="cards"] .w7-collection-content{
+  gap:7px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  padding:8px 10px;min-height:34px;
+  border:2px solid #cda96e;border-radius:10px;
+  background:linear-gradient(180deg,#1c3857,#071b36);
+  box-shadow:inset 0 1px #ffe8b65c;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status strong{
+  color:#ffe2a5;font:900 clamp(11px,3.1vw,14px)/1.1 'Barlow Condensed',sans-serif;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status span{
+  flex:0 0 auto;color:#bfd3e6;
+  font:800 clamp(8px,2.15vw,10px) 'Barlow',sans-serif;text-align:right;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;
+  padding:2px 1px 5px;align-items:stretch;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+  display:flex;flex-direction:column;align-items:center;min-width:0;
+  gap:3px;padding:4px 3px 5px;overflow:hidden;
+  border:2px solid #f0b75d;border-bottom:4px solid #8f4e27;
+  border-radius:9px;
+  background:radial-gradient(ellipse at 50% 20%,#f3aa5c83,transparent 65%),
+    linear-gradient(#74435b,#1d1e43 90%);
+  box-shadow:inset 0 1px #fff0c07c,0 3px 0 #06142b;
+  color:#fff7dc;text-align:center;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+2){
+  border-color:#70c7ed;border-bottom-color:#295992;
+  background:radial-gradient(ellipse at 50% 22%,#62caff75,transparent 65%),linear-gradient(#244b9c,#141d53);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+3){
+  border-color:#89e4b6;border-bottom-color:#206e55;
+  background:radial-gradient(ellipse at 50% 22%,#78ddb08c,transparent 65%),linear-gradient(#256e61,#142d43);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+4){
+  border-color:#c887f6;border-bottom-color:#71408b;
+  background:radial-gradient(ellipse at 50% 22%,#af8aff8c,transparent 65%),linear-gradient(#57307d,#211b47);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+  width:100%;height:auto;border:1px solid #ffe7b7;
+  border-radius:6px;box-shadow:0 2px 6px #0008;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+  min-height:25px;display:grid;align-content:center;max-width:100%;
+  color:#fff7d7;font:900 clamp(10px,2.65vw,13px)/1.04 'Barlow Condensed',sans-serif;
+  overflow-wrap:anywhere;text-shadow:0 2px 2px #07132d;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  display:grid;place-items:center;min-height:19px;width:100%;
+  padding:2px 1px;border:1px solid #e1b98499;border-radius:5px;
+  background:linear-gradient(#152e4f,#071932);
+  color:#f4daa8;font:900 clamp(7px,1.92vw,9px)/1.06 'Barlow Condensed',sans-serif;
+  letter-spacing:0;overflow-wrap:anywhere;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight{
+  min-height:127px;grid-template-columns:minmax(76px,27%) minmax(0,1fr);
+  gap:8px;padding:7px;border-width:2px;border-bottom-width:5px;border-radius:14px;
+  margin-top:4px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-portrait{
+  min-height:110px;border-width:2px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info{gap:4px}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info h3{
+  font-size:clamp(20px,5.7vw,29px);line-height:1;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info p{
+  font-size:11px;line-height:1.2;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info button{
+  min-height:38px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details{
+  overflow:hidden;border:1px solid #bf955f;border-radius:10px;
+  background:linear-gradient(#153d63,#0a2747);
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details > summary{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  list-style:none;min-height:37px;padding:7px 11px;
+  color:#ffe4aa;font:900 13px 'Barlow Condensed',sans-serif;
+  cursor:pointer;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details > summary::-webkit-details-marker{display:none}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details > summary:after{
+  content:'⌄';font-size:20px;line-height:1;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details[open] > summary:after{
+  transform:rotate(180deg);
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details[open]{padding-bottom:10px}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details[open] > summary{
+  border-bottom:1px solid #b89259;margin-bottom:8px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-tools{
+  margin:0 8px 8px;padding:5px;min-height:40px;
+  background:transparent;border:0;box-shadow:none;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-tools strong{
+  font:900 12px 'Barlow Condensed',sans-serif;
+}
+.w7-screen[data-work7-screen="cards"] .w7-roster-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;margin:0 8px 4px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-roster-grid .w7-card{
+  min-height:150px;max-width:none;
+}
+.w7-screen[data-work7-screen="cards"] .w7-disclaimer{
+  margin:0;color:#b9cedd;font:600 10px/1.4 'Barlow',sans-serif;
+}
+.w7-screen[data-work7-screen="cards"] .w7-fusion-access{
+  justify-self:end;min-height:33px;padding:5px 12px;
+  border:1px solid #cba66c;border-radius:8px;
+  background:#173d60;color:#efd9ad;
+  font:900 11px 'Barlow Condensed',sans-serif;
+}
+/* Approved shop 06: larger original illustrations, offer hierarchy, real
+ * commerce disabled. Prevent local crew management from taking over viewport. */
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+  grid-template-columns:minmax(120px,46%) minmax(0,1fr);
+  min-height:166px;
+  background:radial-gradient(ellipse at 26% 42%,#d25c96a0,transparent 56%),
+    linear-gradient(120deg,#55205d,#231240 67%,#211c53);
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+  min-width:0;height:139px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+  width:min(100%,152px);
+  border:0;border-radius:10px;
+  box-shadow:0 6px 10px #10082799;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{
+  gap:7px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+  margin-top:6px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest{
+  min-height:151px;gap:4px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  min-height:86px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  width:min(100%,102px);border:0;background:transparent;
+  box-shadow:none;
+}
+.w7-screen[data-work7-screen="shop"] .w7-recruit-details{
+  margin-top:12px;
+}
+@media(max-width:390px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{gap:4px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{padding:3px 2px 5px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{font-size:10px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    grid-template-columns:minmax(104px,43%) minmax(0,1fr);
+    min-height:148px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{height:119px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{width:min(100%,138px)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest{min-height:145px}
+}
+@media(max-width:350px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{font-size:9px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{font-size:7px}
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status span{font-size:8px}
+  .w7-screen[data-work7-screen="cards"] .w7-crew-tools{flex-wrap:wrap}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    grid-template-columns:40% 1fr;padding:7px;
+  }
+}
+
+
+/* WORK 7 / #104 — 16 Nov, 04h: visual composition pass for approved 05/06.
+ * Scope strictly [data-work7-screen]; no shared HUD / Porto / nav rules.
+ * Illustration atlas supplies art ONLY. Labels and disabled commerce remain real.
+ * Target: same 4×2 visual rhythm and compact density on 320/390/430 mobile. */
+.w7-screen[data-work7-screen="cards"],
+.w7-screen[data-work7-screen="shop"]{
+  gap:5px;
+  padding:2px 6px 12px;
+  background:
+    radial-gradient(ellipse 86% 15% at 50% 5%,#5ca8d2a8 0%,#25659d77 69%,transparent 100%),
+    linear-gradient(180deg,#125488 0%,#103960 24%,#081d3e 49%,#051630 100%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero,
+.w7-screen[data-work7-screen="shop"] .w7-hero{
+  height:61px;min-height:61px;padding:2px 0;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type{
+  height:45px;width:min(72%,278px);
+  border:3px ridge #f1c884;
+  box-shadow:inset 0 2px #ffe6b5,inset 0 -5px #1b100d,
+    0 2px 0 #b88648,0 5px 0 #4b2b1c,0 7px 11px #0009;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::before{
+  content:"✦";position:absolute;left:14%;top:18px;
+  font:900 20px 'Barlow Condensed',sans-serif;color:#e4bd75;
+  text-shadow:0 2px #34211b;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::after,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::after{
+  content:"✦";position:absolute;right:14%;top:18px;
+  font:900 20px 'Barlow Condensed',sans-serif;color:#e4bd75;
+  text-shadow:0 2px #34211b;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero h2,
+.w7-screen[data-work7-screen="shop"] .w7-hero h2{
+  font-size:clamp(25px,7.1vw,31px)!important;letter-spacing:.1px;
+  text-shadow:0 2px #170f0b,0 3px 0 #80532c;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs,
+.w7-screen[data-work7-screen="shop"] .w7-tabs{
+  min-height:43px;padding:3px 4px;gap:4px;
+  border:2px solid #c89452;
+  box-shadow:inset 0 1px #ffe9b55c,0 3px #061529;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs button,
+.w7-screen[data-work7-screen="shop"] .w7-tabs button{
+  min-height:33px;border-width:1px;border-bottom-width:3px;
+  font-size:clamp(10px,2.8vw,13px);
+  letter-spacing:0;text-shadow:0 1px #031021;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs button[aria-selected="true"],
+.w7-screen[data-work7-screen="shop"] .w7-tabs button[aria-selected="true"]{
+  text-shadow:0 1px #fff2d3;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-content{
+  gap:6px;padding:8px 7px 9px;
+  border:2px solid #bfa070;border-radius:12px;
+  background:linear-gradient(180deg,#142d46f9,#081c35fc);
+  box-shadow:inset 0 1px #fff0ba42,0 4px 10px #031024a3;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status{
+  min-height:31px;padding:4px 7px;
+  border:1px solid #7c92a3;border-radius:7px;
+  background:linear-gradient(#264256,#142b41);
+  box-shadow:inset 0 1px #ffe4a133;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status strong{
+  color:#fff0bf;
+  font-size:clamp(11px,3.1vw,14px);
+  line-height:1.05;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status span{
+  color:#d2dfec;white-space:nowrap;font-size:clamp(8px,2.15vw,10px);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+  gap:5px;padding:2px 0 3px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+  position:relative;gap:2px;
+  padding:3px 2px 4px;border-radius:9px;
+  border-width:2px;border-bottom-width:4px;
+  background-image:linear-gradient(165deg,#78395e,#251d51 80%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+  width:100%;height:auto;aspect-ratio:73/70;
+  border:1px solid #f7deb1;border-radius:5px;
+  box-shadow:0 2px 5px #010f2488;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:2;
+  width:calc(100% + 1px);min-height:23px;
+  margin-top:-20px;padding:4px 1px 2px;
+  background:linear-gradient(180deg,transparent,#09102fe0 50%,#08112afa);
+  color:#fff5db;font:900 clamp(9px,2.6vw,13px)/.98 'Barlow Condensed',sans-serif;
+  overflow-wrap:normal;hyphens:auto;
+  text-shadow:0 2px 2px #020614;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  min-height:16px;padding:2px 1px 1px;
+  border:1px solid #d0a668;border-radius:5px;
+  font:900 clamp(7px,1.9vw,9px)/1 'Barlow Condensed',sans-serif;
+  background:linear-gradient(#3c4562,#152a48);
+  color:#fff0b4;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight{
+  margin-top:3px;min-height:115px;padding:7px;
+  grid-template-columns:minmax(70px,26%) minmax(0,1fr);
+  border:2px solid #f2cb84;border-radius:13px;
+  background:linear-gradient(110deg,#255f82,#0d2c56 73%);
+  box-shadow:inset 0 1px #fff3c479,0 4px #664322;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-portrait{
+  min-height:102px;border-radius:10px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info h3{
+  font-size:clamp(20px,5.6vw,28px);line-height:1;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info button{
+  min-height:36px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details{
+  margin-top:2px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-content{gap:7px}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+  min-height:174px;padding:9px 9px 10px;
+  grid-template-columns:minmax(115px,46%) minmax(0,1fr);
+  background:
+    radial-gradient(ellipse at 29% 36%,#b7698e95,transparent 59%),
+    linear-gradient(115deg,#54206b,#28174f 65%,#121c40);
+  border:2px solid #ffce7f;border-bottom:5px solid #996133;
+  box-shadow:inset 0 2px #fff0b881,0 4px #06152f;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+  height:146px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+  width:min(100%,160px);
+  border:0;box-shadow:0 5px 8px #1005269e;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info h3{
+  font-size:clamp(21px,6vw,28px);line-height:.98;
+}
+.w7-screen[data-work7-screen="shop"] .w7-pack-unavailable{
+  min-height:35px;font-size:clamp(13px,4vw,17px);
+  background:linear-gradient(#c9e887,#659c43);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+  min-height:20px;margin-top:3px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-grid{gap:6px}
+.w7-screen[data-work7-screen="shop"] .w7-chest{
+  min-height:157px;padding:5px 3px 7px;
+  border-radius:10px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{min-height:89px}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  width:min(100%,108px);border:0;box-shadow:none;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  min-height:28px;
+  color:#25351f;background:linear-gradient(#d9eb94,#86a34d);
+  border-color:#f7efb4;
+}
+.w7-screen[data-work7-screen="shop"] .w7-recruit-details{
+  margin-top:8px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-disclaimer{
+  font-size:10px;line-height:1.34;color:#a9c8d8;
+}
+@media(max-width:354px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+  .w7-screen[data-work7-screen="cards"] .w7-collection-content{padding:6px 4px 7px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{padding:2px 1px 3px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{font-size:8px;min-height:22px;margin-top:-17px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{font-size:7px;min-height:17px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    grid-template-columns:40% minmax(0,1fr);min-height:156px;padding:7px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{height:130px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{width:min(100%,135px)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest{min-height:145px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{min-height:77px}
+}
+
+
+/* WORK 7 / #104 — reference 05/06 proportion pass (16 Nov, 05h).
+   Keep the eight approved images as *non-playable* concepts. This enlarges
+   artwork and gives the shop's pack/three chests the visual prominence of
+   the approved mosaic. Every selector stays inside WORK 7: Porto, global
+   header and bottom navigation are not changed. */
+.w7-screen[data-work7-screen="cards"],
+.w7-screen[data-work7-screen="shop"]{
+  background:
+    radial-gradient(ellipse 75% 23% at 50% 0%,#60b2d7a8 0%,#2576a97a 55%,transparent 100%),
+    linear-gradient(180deg,#145d8e 0%,#10446f 25%,#092744 58%,#06172f 100%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status{
+  min-height:38px;
+  padding:5px 10px;
+  border-color:#dfb77b;
+  background:linear-gradient(180deg,#224463,#0d2944);
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status strong{
+  color:#fff0c8;font-size:clamp(14px,3.7vw,17px);
+  letter-spacing:.35px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status span{
+  color:#f4d29a;font:800 clamp(8px,2.25vw,11px)/1.15 'Barlow',sans-serif;
+  white-space:normal;max-width:45%;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+  column-gap:6px;row-gap:8px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+  min-height:clamp(112px,14.5dvh,124px);
+  border-bottom-width:5px;
+  box-shadow:inset 0 2px #fff4cb66,0 4px 0 #041026,0 7px 11px #0006;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+  min-height:25px;
+  font-size:clamp(10px,2.7vw,13px);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  margin-top:auto;
+  min-height:18px;
+  font-size:clamp(8px,2.1vw,10px);
+  letter-spacing:.1px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight{
+  margin-top:7px;
+  background:linear-gradient(125deg,#2d6f95,#143f6a 47%,#0b2a50);
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-portrait{
+  background:radial-gradient(circle at 50% 35%,#5793a2,#152b4b 75%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details>summary{
+  min-height:41px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+  min-height:205px;
+  padding:12px 11px;
+  grid-template-columns:minmax(126px,48%) minmax(0,1fr);
+  border-color:#f4ce86;
+  background:radial-gradient(ellipse 76% 90% at 26% 43%,#bf649b9c,transparent 82%),
+    linear-gradient(115deg,#62206c,#29164e 65%,#111a41);
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+  height:174px;
+  display:grid;place-items:center;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+  width:min(100%,168px);
+  filter:drop-shadow(0 7px 5px #12062e9c);
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{
+  gap:8px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info h3{
+  font-size:clamp(23px,6.5vw,32px);
+  line-height:1;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+  min-height:30px;
+  margin-top:7px;
+  padding:3px 2px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading strong{
+  font-size:clamp(15px,4vw,20px);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+  gap:7px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest{
+  min-height:177px;
+  padding:8px 4px 9px;
+  border-bottom-width:5px;
+  box-shadow:inset 0 2px #fff3bd66,0 4px 0 #08132d;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  min-height:101px;
+  display:grid;place-items:center;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  width:min(100%,116px);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  font-size:clamp(10px,2.9vw,13px);
+  min-height:30px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-disclaimer{
+  max-width:100%;
+  font-size:11px;line-height:1.45;color:#c9deeb;
+}
+@media(max-width:354px),(max-height:640px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{gap:3px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{min-height:103px;padding:2px 1px 3px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{font-size:9px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{font-size:7px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    min-height:159px;grid-template-columns:41% minmax(0,1fr);padding:7px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{height:132px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest{min-height:145px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{min-height:77px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{font-size:9px}
+}
+
+
+/* WORK 7 / #104 — 16 Nov 06h: visual/reading pass after PR #133.
+   Only screens 05 and 06 are affected. The approved eight art crops are
+   decorative concept art, not unlocked cards. Leave Porto, shared HUD,
+   bottom tabs, and all game balances/economy unchanged. */
+.w7-screen[data-work7-screen="cards"],
+.w7-screen[data-work7-screen="shop"] {
+  gap:7px;
+  padding:2px 3px 15px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs button,
+.w7-screen[data-work7-screen="shop"] .w7-tabs button {
+  font-size:clamp(12px,3vw,14px);
+  font-weight:900;
+  min-height:37px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-content {
+  padding:9px 6px 12px;
+  gap:9px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status {
+  min-height:38px;
+  gap:6px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status strong {
+  font-size:clamp(14px,3.7vw,18px);
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status span {
+  font-size:clamp(10px,2.5vw,12px);
+  line-height:1.15;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-grid {
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  column-gap:5px;
+  row-gap:8px;
+  padding:3px 0 6px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot {
+  padding:3px 2px 5px;
+  gap:3px;
+  min-height:clamp(120px,15.5dvh,132px);
+  border-bottom-width:5px;
+  border-radius:10px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop {
+  width:100%;
+  max-width:none;
+  border:1px solid #ffe9bc;
+  border-radius:6px;
+  filter:saturate(1.12) contrast(1.05);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot strong {
+  z-index:2;
+  margin-top:-18px;
+  min-height:27px;
+  padding:5px 1px 2px;
+  font:900 clamp(11px,2.95vw,14px)/1.03 'Barlow Condensed',sans-serif;
+  letter-spacing:-.12px;
+  overflow-wrap:anywhere;
+  text-shadow:0 2px 3px #02071b,0 1px #000;
+  background:linear-gradient(180deg,transparent 0%,#07102acb 33%,#061029 100%);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small {
+  margin-top:auto;
+  width:100%;
+  min-height:29px;
+  padding:3px 1px;
+  font:900 clamp(10px,2.6vw,12px)/1.12 'Barlow Condensed',sans-serif;
+  white-space:normal;
+  overflow-wrap:break-word;
+  color:#fff2ca;
+  border:1px solid #e9be80;
+  background:linear-gradient(#344e70,#102642);
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info p,
+.w7-screen[data-work7-screen="cards"] .w7-disclaimer {
+  font-size:12px;
+  line-height:1.35;
+}
+.w7-screen[data-work7-screen="cards"] .w7-crew-details>summary {
+  font-size:14px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-content {gap:10px}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack {
+  min-height:210px;
+  grid-template-columns:minmax(0,48%) minmax(0,1fr);
+  gap:9px;
+  padding:11px 9px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art {
+  min-width:0;height:178px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop {
+  width:100%;
+  max-width:175px;
+  border-radius:9px;
+  filter:saturate(1.11) drop-shadow(0 6px 4px #1a0b32a0);
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info {
+  gap:6px;
+  min-width:0;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info h3 {
+  font:900 clamp(24px,6.5vw,33px)/.97 'Barlow Condensed',sans-serif;
+  overflow-wrap:anywhere;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info p {
+  font-size:clamp(12px,3vw,14px);
+  line-height:1.3;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info small {
+  font-size:11px;
+  line-height:1.2;
+}
+.w7-screen[data-work7-screen="shop"] .w7-pack-unavailable {
+  min-height:38px;
+  font-size:clamp(14px,3.6vw,17px);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading strong {
+  font-size:clamp(16px,4.1vw,20px);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading span {
+  font-size:10px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-grid {
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest {
+  min-width:0;
+  padding:7px 3px 8px;
+  min-height:177px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest>strong {
+  font:900 clamp(12px,3.15vw,15px)/1.1 'Barlow Condensed',sans-serif;
+  overflow-wrap:anywhere;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art {
+  min-height:104px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop {
+  width:100%;
+  max-width:120px;
+  filter:saturate(1.1);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status {
+  min-height:32px;
+  width:100%;
+  font-size:clamp(12px,3.05vw,14px);
+}
+.w7-screen[data-work7-screen="shop"] .w7-recruit-details>summary {
+  font-size:13px;
+  min-height:39px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-disclaimer {
+  font-size:12px;
+  line-height:1.35;
+}
+/* 320×568: preserve four-by-two cards and three side-by-side chests.
+   Vertically scroll the app body normally; never crop or cover UI controls. */
+@media(max-width:354px),(max-height:640px) {
+  .w7-screen[data-work7-screen="cards"],
+  .w7-screen[data-work7-screen="shop"] {padding-inline:1px;gap:5px}
+  .w7-screen[data-work7-screen="cards"] .w7-collection-content {padding:6px 3px 9px;gap:6px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid {grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 3px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot {min-height:116px;padding:2px 1px 4px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong {min-height:24px;font-size:10.5px;margin-top:-16px;padding:3px 0 2px}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small {min-height:29px;font-size:10px;line-height:1.1;padding:3px 1px 2px}
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status span {font-size:9px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack {min-height:163px;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:7px;padding:8px 6px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art {height:133px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop {width:100%;max-width:132px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info h3 {font-size:clamp(21px,6.5vw,26px)}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info p {font-size:11px}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info small {font-size:10px}
+  .w7-screen[data-work7-screen="shop"] .w7-pack-unavailable {font-size:12px;min-height:31px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-grid {grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest {min-height:147px;padding:5px 2px 6px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest>strong {font-size:11px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art {min-height:79px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status {font-size:10.5px;min-height:29px}
+}
+
+
+/* WORK 7 — #104, 16 Nov 11h. 05 Cartas / 06 Loja.
+ * Replace earlier 08h overrides (do not stack another CSS layer).
+ * Scope is limited to both work7 screens: never touch Porto, global HUD/nav,
+ * gameplay, saved balances, release metadata or payment contracts.
+ *
+ * Visual goals: full-bleed approved art in the 4×2 grid; names and PREVIA
+ * remain readable without masking portraits; pack + 3 chest hierarchy.
+ * Visual approval: false until human review of reference | render | overlay.
+ */
+.w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px 5px;
+  padding:3px 0 4px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  position:relative;
+  min-width:0;
+  min-height:clamp(113px,14.2dvh,129px);
+  gap:0;
+  padding:2px 2px 3px;
+  border:2px solid #f2c886;
+  border-bottom:5px solid #88502b;
+  border-radius:9px;
+  background:linear-gradient(#4b3963,#091b40);
+  box-shadow:inset 0 2px #ffeeba99,0 3px 0 #081326,0 6px 11px #0008;
+  overflow:hidden;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+2){border-color:#70c7ed;border-bottom-color:#295992}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+3){border-color:#89e4b6;border-bottom-color:#206e55}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4n+4){border-color:#dba1f8;border-bottom-color:#713b93}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+  flex:0 0 auto;
+  width:calc(100% + 4px);
+  margin-left:-2px;
+  max-width:none;
+  height:auto;
+  aspect-ratio:73/67;
+  border:0;
+  border-bottom:1px solid #fbe1a288;
+  border-radius:5px 5px 3px 3px;
+  filter:saturate(1.18) contrast(1.09);
+  box-shadow:0 2px 4px #0009;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+  position:relative;
+  z-index:2;
+  display:grid;
+  place-items:center;
+  min-height:25px;
+  width:calc(100% + 4px);
+  margin:-25px -2px 0;
+  padding:5px 1px 3px;
+  font:900 clamp(10px,2.95vw,14px)/1.04 'Barlow Condensed',sans-serif;
+  letter-spacing:-.1px;
+  overflow-wrap:anywhere;
+  color:#fff8dc;
+  background:linear-gradient(180deg,transparent 0%,#06142bd4 30%,#06112bf5 100%);
+  text-shadow:0 2px 3px #000,0 0 4px #001327;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  display:grid;
+  place-items:center;
+  width:100%;
+  min-height:20px;
+  margin-top:auto;
+  padding:2px 1px 1px;
+  border:1px solid #ffe8b5;
+  border-radius:5px;
+  background:linear-gradient(#36547b,#102744);
+  color:#ffedbe;
+  font:900 clamp(9px,2.35vw,11px)/1.05 'Barlow Condensed',sans-serif;
+  letter-spacing:.2px;
+  white-space:nowrap;
+  box-shadow:inset 0 1px #fff1c080;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status strong{
+  font:900 clamp(14px,3.7vw,18px)/1.08 'Barlow Condensed',sans-serif;
+  letter-spacing:.2px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status span{
+  max-width:54%;
+  color:#ffe1a7;
+  font:900 clamp(9px,2.6vw,12px)/1.13 'Barlow Condensed',sans-serif;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight{
+  margin-top:3px;
+  gap:8px;
+  background:linear-gradient(115deg,#2c7293,#143e67 47%,#0a2a50);
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info h3{
+  font:900 clamp(22px,5.75vw,30px)/1.04 'Barlow Condensed',sans-serif;
+}
+.w7-screen[data-work7-screen="cards"] .w7-spotlight-info p{
+  font:700 clamp(12px,3.1vw,14px)/1.3 'Barlow',sans-serif;
+  color:#ebf2f6;
+}
+
+/* The reference is image-led. Make the real pack/chests correspondingly
+ * prominent; all green labels still explicitly say unavailable / em breve. */
+.w7-screen[data-work7-screen="shop"] .w7-content{gap:8px}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+  grid-template-columns:minmax(0,51%) minmax(0,1fr);
+  min-height:199px;
+  gap:8px;
+  padding:9px 9px 10px;
+  border-color:#f8cd80;
+  background:radial-gradient(ellipse at 23% 35%,#c668ab9e,transparent 60%),
+    linear-gradient(120deg,#67236e,#29134d 65%,#101737);
+  box-shadow:inset 0 2px #fff3c07f,0 4px 0 #06162b,0 8px 14px #0006;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+  min-width:0;
+  height:169px;
+  display:grid;
+  place-items:center;
+  overflow:visible;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+  width:100%;
+  max-width:184px;
+  border:0;
+  border-radius:8px;
+  filter:saturate(1.2) contrast(1.06) drop-shadow(0 6px 5px #14062ca3);
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{gap:5px;min-width:0}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info h3{
+  font:900 clamp(23px,6.25vw,32px)/.98 'Barlow Condensed',sans-serif;
+  overflow-wrap:anywhere;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info p{
+  font:700 clamp(12px,3.05vw,14px)/1.25 'Barlow',sans-serif;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info small{
+  font:700 clamp(10px,2.7vw,12px)/1.25 'Barlow',sans-serif;
+}
+.w7-screen[data-work7-screen="shop"] .w7-pack-unavailable{
+  min-height:37px;
+  font:900 clamp(12px,3.45vw,16px)/1.04 'Barlow Condensed',sans-serif;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+  margin-top:5px;
+  min-height:28px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading strong{
+  font:900 clamp(17px,4.3vw,21px)/1 'Barlow Condensed',sans-serif;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading span{
+  font-size:clamp(10px,2.5vw,12px);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest{
+  min-width:0;
+  min-height:173px;
+  gap:3px;
+  padding:6px 3px 7px;
+  border-bottom-width:5px;
+  border-radius:11px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest>strong{
+  font:900 clamp(12px,3.3vw,16px)/1.08 'Barlow Condensed',sans-serif;
+  text-wrap:balance;
+  overflow-wrap:anywhere;
+  text-shadow:0 2px #06142c;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  min-height:107px;
+  width:100%;
+  overflow:visible;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  width:100%;
+  max-width:125px;
+  border:0;
+  filter:saturate(1.22) contrast(1.09) drop-shadow(0 4px 3px #06122b94);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  min-height:29px;
+  width:100%;
+  font:900 clamp(11px,2.95vw,14px)/1.05 'Barlow Condensed',sans-serif;
+  letter-spacing:.2px;
+}
+
+/* The longer explanation remains available on demand, while the visible
+ * unavailable labels and no-payments indicators stay in the first viewport. */
+.w7-screen[data-work7-screen="shop"] .w7-legal-details{
+  min-width:0;
+  border:1px solid #8d9fae;
+  border-radius:9px;
+  background:#0a2846;
+  color:#d8e9f2;
+}
+.w7-screen[data-work7-screen="shop"] .w7-legal-details>summary{
+  cursor:pointer;
+  min-height:36px;
+  padding:9px 11px;
+  color:#ffe2ad;
+  font:900 12px/1.2 'Barlow Condensed',sans-serif;
+  letter-spacing:.25px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-legal-details .w7-disclaimer{
+  margin:0;
+  padding:0 10px 12px;
+  color:#d8e5f0;
+  font:650 12px/1.45 'Barlow',sans-serif;
+}
+
+/* On the smallest device, keep exact 4×2 + 3 side-by-side geometry and
+ * ≥10px readable captions; content scrolls rather than clipping horizontally.
+ * Do not alter shared nav, header, safe-area or viewport styles. */
+@media(max-width:354px),(max-height:640px){
+  .w7-screen[data-work7-screen="cards"],
+  .w7-screen[data-work7-screen="shop"]{gap:5px;padding-inline:1px}
+  .w7-screen[data-work7-screen="cards"] .w7-collection-content{
+    gap:6px;padding:6px 3px 9px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:4px 3px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+    min-height:108px;
+    padding:2px 1px 4px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+    width:calc(100% + 2px);
+    margin-left:-1px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+    min-height:23px;margin-top:-23px;
+    font-size:10.5px;padding:4px 1px 2px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+    min-height:19px;
+    padding:2px 1px;
+    font-size:10px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status span{
+    font-size:10px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    grid-template-columns:minmax(0,44%) minmax(0,1fr);
+    min-height:171px;
+    gap:6px;
+    padding:7px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+    height:140px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    width:100%;max-width:144px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info h3{
+    font-size:clamp(21px,6.5vw,26px);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info p{
+    font-size:11px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info small{
+    font-size:10px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-pack-unavailable{
+    min-height:31px;font-size:12px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest{
+    min-height:148px;padding:4px 2px 5px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest>strong{font-size:11px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{min-height:87px}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    min-height:27px;font-size:10.5px;
+  }
+}
+
+/* WORK 7 / #104 — 16 Nov 12h, tropical atmosphere for approved 05/06.
+ * New visual difference vs merged #163: sky, island horizon and palm silhouettes,
+ * not more card/chest resizing. All scene vectors are original decoration, NOT an
+ * image of the approved entire page. No HTML buttons, balances or prices are drawn.
+ * The Porto HUD, title shell, navigation and gameplay remain untouched.
+ * Keep approved:false pending reference | render | overlay human review. */
+.w7-screen[data-work7-screen="cards"],
+.w7-screen[data-work7-screen="shop"]{
+  background-color:#071b37;
+  background-image:
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20430%20258%22%20preserveAspectRatio%3D%22none%22%3E%0A%3Cdefs%3E%0A%20%3ClinearGradient%20id%3D%22sky%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%233baee3%22%2F%3E%3Cstop%20offset%3D%22.29%22%20stop-color%3D%22%2383d8f0%22%2F%3E%3Cstop%20offset%3D%22.57%22%20stop-color%3D%22%234ca6c5%22%2F%3E%3Cstop%20offset%3D%22.8%22%20stop-color%3D%22%231b6386%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23071b37%22%2F%3E%3C%2FlinearGradient%3E%0A%20%3CradialGradient%20id%3D%22sun%22%3E%3Cstop%20stop-color%3D%22%23fff7cf%22%20stop-opacity%3D%22.88%22%2F%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%23f9e8b5%22%20stop-opacity%3D%22.32%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%0A%3C%2Fdefs%3E%0A%3Crect%20width%3D%22430%22%20height%3D%22258%22%20fill%3D%22url(%23sky)%22%2F%3E%0A%3Cellipse%20cx%3D%22295%22%20cy%3D%2258%22%20rx%3D%22106%22%20ry%3D%2283%22%20fill%3D%22url(%23sun)%22%2F%3E%0A%3Cg%20fill%3D%22%23e8faff%22%20opacity%3D%22.62%22%3E%0A%20%3Cpath%20d%3D%22M25%2055q19-22%2039-4%2018-20%2043-7%2020-12%2041%209-32%206-123%202%22%2F%3E%0A%20%3Cpath%20d%3D%22M236%2037q16-13%2034-3%2015-18%2034-7%2023-11%2047%209-52%208-115%201%22%2F%3E%0A%20%3Cpath%20d%3D%22M302%2095q18-15%2036-3%2023-18%2045%200%2020-8%2039%209-52%205-120-6%22%2F%3E%0A%3C%2Fg%3E%0A%3Cpath%20d%3D%22M0%20164q47-8%2079%204t78-2q38-14%2077%200t75-6q57-13%20121%200v98H0Z%22%20fill%3D%22%233a8ca3%22%20opacity%3D%22.3%22%2F%3E%0A%3Cpath%20d%3D%22M0%20194q44%204%2082-3%2052-5%2091%203%2049%209%2095-2%2069-8%20162%203v63H0Z%22%20fill%3D%22%230e4a71%22%20opacity%3D%22.54%22%2F%3E%0A%3Cpath%20d%3D%22M0%20218q50-11%20102-3%2048%204%2091-4%2062-12%20127%200%2065%2011%20110%203v44H0Z%22%20fill%3D%22%23082c51%22%20opacity%3D%22.65%22%2F%3E%0A%3Cg%20stroke%3D%22%23103f41%22%20stroke-linecap%3D%22round%22%20fill%3D%22none%22%3E%0A%20%3Cpath%20d%3D%22M-11%20224Q5%20132%2033%2066%22%20stroke-width%3D%2214%22%2F%3E%0A%20%3Cpath%20d%3D%22M-5%20221Q12%20133%2034%2067%22%20stroke%3D%22%238b7948%22%20stroke-width%3D%224%22%20opacity%3D%22.62%22%2F%3E%0A%20%3Cpath%20d%3D%22M445%20225Q416%20143%20391%2071%22%20stroke-width%3D%2215%22%2F%3E%0A%20%3Cpath%20d%3D%22M439%20224Q411%20139%20389%2070%22%20stroke%3D%22%23a2975d%22%20stroke-width%3D%224%22%20opacity%3D%22.6%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20fill%3D%22%23176b60%22%20stroke%3D%22%2312554b%22%20stroke-width%3D%221.2%22%3E%0A%20%3Cpath%20d%3D%22M32%2067Q-19%204-62%2037-30%2034%2032%2067%22%2F%3E%0A%20%3Cpath%20d%3D%22M32%2067Q-6%201%2011-26%2012%2011%2032%2067%22%2F%3E%0A%20%3Cpath%20d%3D%22M32%2067Q35%204%2082-16%2066%2017%2032%2067%22%2F%3E%0A%20%3Cpath%20d%3D%22M32%2067Q88%2013%20128%2037%2074%2035%2032%2067%22%2F%3E%0A%20%3Cpath%20d%3D%22M32%2067Q100%2043%20131%2087%2089%2064%2032%2067%22%2F%3E%0A%20%3Cpath%20d%3D%22M32%2067Q-21%2050-47%20104-12%2081%2032%2067%22%2F%3E%0A%20%3Cpath%20d%3D%22M391%2072Q351%203%20305%2014%20349%2031%20391%2072%22%2F%3E%0A%20%3Cpath%20d%3D%22M391%2072Q369%2010%20396-30%20390%2018%20391%2072%22%2F%3E%0A%20%3Cpath%20d%3D%22M391%2072Q407%202%20446-12%20421%2029%20391%2072%22%2F%3E%0A%20%3Cpath%20d%3D%22M391%2072Q440%2017%20488%2047%20441%2050%20391%2072%22%2F%3E%0A%20%3Cpath%20d%3D%22M391%2072Q458%2050%20472%20109%20432%2072%20391%2072%22%2F%3E%0A%20%3Cpath%20d%3D%22M391%2072Q345%2052%20311%20101%20353%2077%20391%2072%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20stroke%3D%22%2375c9b1%22%20stroke-width%3D%221.5%22%20opacity%3D%22.22%22%3E%3Cpath%20d%3D%22M0%20168q54%209%20107%200M290%20186q78-6%20140%204M52%20205q40%206%2081%200%22%2F%3E%3C%2Fg%3E%0A%3C%2Fsvg%3E"),
+    linear-gradient(180deg,#2285b2 0%,#0e3b65 37%,#071b37 74%,#06152c 100%);
+  background-repeat:no-repeat,no-repeat;
+  background-position:center top,center;
+  background-size:100% 258px,100% 100%;
+}
+/* Reveal the tropical illustration behind the existing semantic title
+ * plaque, while retaining the ship/market SVG as faint distant scenery. */
+.w7-screen[data-work7-screen="cards"] .w7-hero,
+.w7-screen[data-work7-screen="shop"] .w7-hero{
+  background:transparent;
+  isolation:isolate;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero .w7-masthead-art,
+.w7-screen[data-work7-screen="shop"] .w7-hero .w7-masthead-art{
+  opacity:.19;
+  filter:saturate(.8);
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero::after,
+.w7-screen[data-work7-screen="shop"] .w7-hero::after{
+  background:linear-gradient(90deg,rgba(4,37,61,.15),rgba(4,28,53,0) 50%,rgba(4,32,57,.12));
+}
+/* The approved wooden masthead remains a functional HTML title. Decorative
+ * gold scrollwork is constrained to its own plaque, never to the shared HUD. */
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type{
+  border-color:#f7db94;
+  background:linear-gradient(90deg,#5c351e,#251413 18%,#593621 50%,#281514 83%,#724522);
+  box-shadow:inset 0 2px #fff2cb,inset 0 -5px #150d0b,
+    0 2px 0 #d4a05e,0 5px 0 #70441e,0 8px 13px #052645b3;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::before{
+  content:"❦";
+  left:7%;
+  top:7px;
+  font-size:29px;
+  color:#f8d68b;
+  text-shadow:0 1px #50301d,0 0 5px #ffdea566;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::after,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::after{
+  content:"❦";
+  right:7%;
+  top:7px;
+  font-size:29px;
+  transform:scaleX(-1);
+  color:#f8d68b;
+  text-shadow:0 1px #50301d,0 0 5px #ffdea566;
+}
+/* WORK 7 / #104 — 05/06 local upper-panel contrast correction (16 Nov 15h).
+ * The tropical sky added in #167 was still hidden beneath opaque navy slabs:
+ * lift the *local* tab rail and collection deck into the blue daylight while
+ * retaining opaque navy directly behind labels and readable action controls.
+ * The 4×2 portraits, three chests, their approved crops and gameplay state are
+ * untouched. No shared shell, HUD or Porto navigation rules are addressed.
+ * Visual approval stays false until human reference/render/overlay review. */
+.w7-screen[data-work7-screen="cards"] .w7-tabs,
+.w7-screen[data-work7-screen="shop"] .w7-tabs{
+  border-color:#f2d196;
+  background:linear-gradient(180deg,rgba(61,130,160,.91),rgba(12,53,90,.96));
+  box-shadow:inset 0 1px #fff2d9a8,0 3px 0 #5b3d24;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-content{
+  position:relative;
+  border-color:#efcf92;
+  background:
+    radial-gradient(ellipse 80% 105px at 50% 0,rgba(191,243,244,.26),transparent 100%),
+    linear-gradient(180deg,rgba(39,136,169,.74) 0%,rgba(21,88,123,.88) 30%,rgba(9,43,78,.97) 63%,#071a34 100%);
+  box-shadow:inset 0 2px rgba(255,240,191,.62),0 4px 10px rgba(3,16,36,.56);
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status{
+  border-color:#e8c68e;
+  background:linear-gradient(100deg,rgba(12,56,86,.94),rgba(28,83,116,.94) 53%,rgba(12,50,80,.95));
+  box-shadow:inset 0 1px rgba(255,240,192,.53),0 2px 4px rgba(4,19,41,.32);
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+  border-radius:9px;
+  background:linear-gradient(180deg,rgba(153,223,234,.12),rgba(5,27,53,0) 76%);
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+  border-color:#ffe0a0;
+  background:
+    radial-gradient(ellipse 52% 85% at 26% 27%,rgba(255,221,172,.37),transparent 85%),
+    radial-gradient(ellipse 62% 95% at 72% 27%,rgba(208,124,225,.27),transparent 87%),
+    linear-gradient(120deg,#793875 0%,#4d245f 51%,#132b50 100%);
+  box-shadow:inset 0 2px rgba(255,240,195,.66),0 4px 0 #614124,0 8px 14px rgba(0,11,32,.52);
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack:after{
+  border-color:rgba(255,230,169,.66);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+  border-bottom:1px solid rgba(243,207,139,.62);
+  background:linear-gradient(90deg,transparent,rgba(239,198,128,.11) 50%,transparent);
+  text-shadow:0 2px 3px #052341;
+}
+@media(max-width:354px),(max-height:640px){
+  .w7-screen[data-work7-screen="cards"],
+  .w7-screen[data-work7-screen="shop"]{
+    background-size:100% 218px,100% 100%;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::before,
+  .w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::before{
+    left:5%;font-size:24px;top:10px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::after,
+  .w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::after{
+    right:5%;font-size:24px;top:10px;
+  }
+}
+
+/* WORK 7 / #104 — 16 Nov 16h: NEW local ornamental relief pass after merged
+ * #180. Do not repeat the tropical-sky/translucent-panel work: this pass
+ * enriches the already-approved concept crops and decorative wooden/gold
+ * framing. No shared shell, HUD, navigation, balances or purchases touched.
+ * Artwork remains cropped reference *illustrations*, not a page screenshot.
+ * Visual approval: false pending human reference | render | overlay review. */
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type{
+  border-color:#ffe2a0;
+  background:
+    radial-gradient(ellipse 50% 38% at 50% 0%,#a7743e80,transparent),
+    repeating-linear-gradient(0deg,#ffdf8b08 0 2px,transparent 2px 7px),
+    linear-gradient(90deg,#764323,#241511 18%,#57321e 50%,#241511 83%,#764323);
+  box-shadow:inset 0 2px #fff6cf,inset 0 -4px #170b0c,
+    inset 0 0 0 2px #a37139,0 2px 0 #c9934c,0 5px 0 #633815,0 8px 12px #051627a8;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::after,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::after{
+  color:#ffe6a5;
+  text-shadow:0 1px #643d20,0 0 5px #ffe89a8c;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero h2,
+.w7-screen[data-work7-screen="shop"] .w7-hero h2{
+  font-size:clamp(27px,7.75vw,34px)!important;
+  text-shadow:0 1px #120b0b,0 3px #75461e,0 0 8px #ffdf8170;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs button,
+.w7-screen[data-work7-screen="shop"] .w7-tabs button{
+  font-size:clamp(11.5px,3.1vw,14px);
+  letter-spacing:.1px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-content{
+  border-color:#f2d69a;
+  background:
+    radial-gradient(ellipse 92% 95px at 50% 0%,#d3fff23d,transparent),
+    linear-gradient(180deg,#339abea6 0%,#175781df 44%,#082b50f4 70%,#061a33 100%);
+  box-shadow:inset 0 2px #fff5ca99,inset 0 0 0 1px #56391888,0 5px 12px #02132494;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+  isolation:isolate;
+  box-shadow:0 0 0 1px #593b24,inset 0 0 0 1px #ffedb3,
+    inset 0 2px #fff8d0aa,0 4px 0 #06192f,0 8px 12px #0007;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot::before,
+.w7-screen[data-work7-screen="shop"] .w7-chest::before{
+  content:"";
+  position:absolute;inset:3px;
+  z-index:2;pointer-events:none;
+  border:1px solid #ffe3a6b8;border-radius:6px;
+  box-shadow:inset 0 0 0 1px #55301370;
+  background:
+    radial-gradient(circle,#ffe7ac 0 2px,#795126 2.5px,transparent 3.5px) left 1px top 1px/8px 8px no-repeat,
+    radial-gradient(circle,#ffe7ac 0 2px,#795126 2.5px,transparent 3.5px) right 1px top 1px/8px 8px no-repeat,
+    radial-gradient(circle,#ffe7ac 0 2px,#795126 2.5px,transparent 3.5px) left 1px bottom 1px/8px 8px no-repeat,
+    radial-gradient(circle,#ffe7ac 0 2px,#795126 2.5px,transparent 3.5px) right 1px bottom 1px/8px 8px no-repeat;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+  filter:saturate(1.25) contrast(1.13) brightness(1.04);
+  border-bottom:2px solid #ffe5aa;
+  box-shadow:0 3px 7px #020e2ac4;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+  min-height:29px;
+  font-size:clamp(11px,3.05vw,14.5px);
+  line-height:1.03;
+  text-shadow:0 2px 3px #000,0 0 5px #000;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  min-height:23px;
+  font-size:clamp(10px,2.65vw,12px);
+  border-color:#ffefc2;
+  background:linear-gradient(#406a87,#142c4b 65%,#0b1b37);
+  box-shadow:inset 0 1px #fff8d1ab;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+  background:
+    radial-gradient(ellipse 40% 55% at 23% 30%,#ffd9957a,transparent),
+    radial-gradient(ellipse 55% 70% at 75% 12%,#e6a5fb50,transparent),
+    linear-gradient(120deg,#7d3975,#49225f 55%,#122b51);
+  box-shadow:inset 0 2px #fff2b7aa,inset 0 0 0 2px #f1c77663,
+    0 4px 0 #624021,0 9px 15px #06132b9c;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest{
+  position:relative;
+  isolation:isolate;
+  box-shadow:inset 0 0 0 1px #fff0baa8,inset 0 2px #fff7d1b0,
+    0 0 0 1px #57331f,0 4px 0 #07172d,0 9px 11px #0008;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  border-radius:8px;
+  background:radial-gradient(ellipse at 50% 52%,#ffdf9670,transparent 69%);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  border:1px solid #ffe6a5b5;
+  border-radius:6px;
+  filter:saturate(1.28) contrast(1.15) brightness(1.04) drop-shadow(0 5px 3px #071b33a8);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest>strong{
+  font-size:clamp(12px,3.35vw,16px);
+  color:#fff2c9;text-shadow:0 2px 2px #061126;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  font-size:clamp(12px,3vw,14px);
+  box-shadow:inset 0 1px #fff8c3b8,0 2px #3b3426;
+}
+@media(max-width:354px),(max-height:640px){
+  .w7-screen[data-work7-screen="cards"] .w7-hero h2,
+  .w7-screen[data-work7-screen="shop"] .w7-hero h2{font-size:clamp(25px,8vw,29px)!important}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+    font-size:10.5px;min-height:25px;line-height:1;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+    font-size:10px;min-height:20px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    font-size:10.5px;
+  }
+}
+
+
+/* WORK7 / #104 — reference-led density correction, 16 Nov 17h.
+ * In the approved 06 artwork the captain pack is ~160/512px high and
+ * all three offers are ~120/512px high. The 390x844 render before this
+ * pass gave the pack ~199px and the offers ~177px, creating an over-tall
+ * opaque merchant deck. Shorter local picture frames recover vertical
+ * rhythm; this is NOT a redesign of the shared HUD/nav, tropical sky,
+ * gold accents, product definitions, or any payment mechanics.
+ * Keep the 8x 4x2 conceptual Cards and 3 unavailable shop chests. 
+ * approved:false until human inspects CI reference/render/overlay. */
+@media (min-width:355px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    min-height:171px;
+    grid-template-columns:minmax(0,49%) minmax(0,1fr);
+    gap:8px;
+    padding:8px 9px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+    height:148px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    max-width:165px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{
+    gap:4px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    min-height:26px;
+    margin-top:3px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest{
+    min-height:154px;
+    padding:5px 3px 6px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{
+    min-height:88px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+    max-width:108px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    min-height:28px;
+  }
+}
+/* On 320x568, retain legible real labels while revealing more of all
+ * three chest illustrations before the fixed Porto bottom navigation. */
+@media(max-width:354px),(max-height:640px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    min-height:156px;
+    padding:6px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+    height:126px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    max-width:136px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    min-height:22px;
+    margin-top:0;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest{
+    min-height:136px;
+    padding:4px 2px 5px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{
+    min-height:75px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+    max-width:91px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    min-height:27px;
+    font-size:10.5px;
+  }
+}
+
+
+/* QA 320/390/430: diagonal "EM BREVE" corner ribbon must not obscure
+ * the genuine PACK DO CAPITÃO heading (seen in PR draft first capture).
+ * Keep a diagonal visual badge, but tuck it into the upper-right corner. */
+.w7-screen[data-work7-screen="shop"] .w7-pack-ribbon{
+  top:0;
+  right:-19px;
+  width:86px;
+  padding:3px 0;
+  font-size:9px;
+  line-height:1.05;
+}
+
+/* WORK7 / #104 — 16 Nov 18h: compact LOCAL typography/hierarchy rhythm.
+ * Compared to 05-cartas.webp and 06-loja.webp at native 384x512 and mobile
+ * 390x844, the old work7 masthead+tabs+status used too much vertical space
+ * before the illustrated 4x2 collection / three-chest offer row. Bring live
+ * captions closer to their art, not by scaling down that art, but by trimming
+ * redundant gutters above it. All content remains genuine stateful HTML.
+ *
+ * No shell/HUD/Porto/nav overrides, no economy or payments, no release files.
+ * This is NOT an approval claim: approved:false until human review.
+ */
+.w7-screen[data-work7-screen="cards"],
+.w7-screen[data-work7-screen="shop"]{
+  gap:4px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero,
+.w7-screen[data-work7-screen="shop"] .w7-hero{
+  height:53px;
+  min-height:53px;
+  padding-block:1px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs,
+.w7-screen[data-work7-screen="shop"] .w7-tabs{
+  min-height:38px;
+  padding:2px 3px;
+  gap:3px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-tabs button,
+.w7-screen[data-work7-screen="shop"] .w7-tabs button{
+  min-height:30px;
+  padding:4px 3px;
+  font-size:clamp(11.5px,3.12vw,13.5px);
+  line-height:1.04;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-content{
+  gap:6px;
+  padding-top:6px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status{
+  min-height:32px;
+  padding:3px 8px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status strong{
+  font-size:clamp(14px,3.75vw,17px);
+  line-height:1.08;
+}
+.w7-screen[data-work7-screen="cards"] .w7-collection-status span{
+  font-size:clamp(10px,2.62vw,11.5px);
+  line-height:1.12;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+  column-gap:5px;
+  row-gap:6px;
+  padding-top:1px;
+  padding-bottom:3px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+  font-size:clamp(11px,3.18vw,14px);
+  line-height:1.02;
+  min-height:26px;
+  padding:4px 1px 3px;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  font-size:clamp(10.5px,2.72vw,12px);
+  line-height:1.03;
+  letter-spacing:.1px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-content{
+  gap:6px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+  margin-top:1px;
+  min-height:24px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading strong{
+  font-size:clamp(17px,4.4vw,21px);
+  line-height:1;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chests-heading span{
+  font-size:clamp(10px,2.65vw,12px);
+  font-weight:900;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest>strong{
+  font-size:clamp(12px,3.55vw,16px);
+  line-height:1.06;
+  letter-spacing:.05px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  font-size:clamp(11.5px,3.12vw,14px);
+  letter-spacing:.15px;
+}
+.w7-screen[data-work7-screen="shop"] .w7-captain-pack-info p{
+  line-height:1.28;
+}
+/* 384x512 reference and 320x568 regression: reclaim the SAME upper gutters
+ * without hiding any portrait, concept label, offer or legal disclosure. */
+@media (max-height:640px), (max-width:354px){
+  .w7-screen[data-work7-screen="cards"] .w7-hero,
+  .w7-screen[data-work7-screen="shop"] .w7-hero{
+    height:49px;
+    min-height:49px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-tabs,
+  .w7-screen[data-work7-screen="shop"] .w7-tabs{
+    min-height:35px;
+    padding:2px 3px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-tabs button,
+  .w7-screen[data-work7-screen="shop"] .w7-tabs button{
+    min-height:27px;
+    padding:3px 2px;
+    font-size:clamp(10.5px,3.05vw,12px);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-collection-content{
+    gap:5px;
+    padding-top:4px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+    min-height:29px;
+    padding:3px 6px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    row-gap:5px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+    font-size:clamp(10.5px,3vw,12px);
+    line-height:1.02;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+    font-size:clamp(10px,2.9vw,11px);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-content{
+    gap:5px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    margin-top:0;
+    min-height:22px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest>strong{
+    font-size:clamp(11px,3.55vw,13px);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    font-size:clamp(10.5px,3.25vw,12px);
+  }
+}
+
+
+/* WORK7 / #104 — 16 Nov 19h: illustrated-frame depth at native 384x512.
+ * Reference 05/06 presents its eight portraits and three treasure chests as
+ * dimensional gilded collectibles. Retain the existing image crops, sizes,
+ * labels, 4x2 / three-column geometry and actual React local game state.
+ * Pure metallic corner emboss and subtle colour-specific image lighting.
+ * No shared HUD/menu/Porto, pack density, prices, inventory or payments.
+ * approved:false — human review of exact reference | render | overlay.
+ */
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+  --w7-inlay:#e7aeff;
+  --w7-enamel:#813cb2;
+  --w7-shadow:#371a5e;
+  border-color:var(--w7-inlay);
+  border-bottom-color:var(--w7-enamel);
+  background:
+    radial-gradient(ellipse at 50% 26%,color-mix(in srgb,var(--w7-inlay) 26%,transparent),transparent 78%),
+    linear-gradient(160deg,var(--w7-enamel),var(--w7-shadow) 70%,#0a1a38);
+  box-shadow:
+    inset 0 1px #fff7ce,
+    inset 0 0 0 1px #fbe0a1b3,
+    inset 0 -4px #4d2c22a3,
+    0 0 0 1px #513319,
+    0 4px 0 #07162b,
+    0 8px 11px #020d249c;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2),
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){--w7-inlay:#b8eaff;--w7-enamel:#2979bd;--w7-shadow:#112e75}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){--w7-inlay:#c5ffda;--w7-enamel:#2ba76c;--w7-shadow:#164c4a}
+/* The legacy 4n+3 border was green on slots 3 and 7. Approved art has
+   a green third concept but a violet seventh concept. */
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+  border-color:var(--w7-inlay);
+  border-bottom-color:var(--w7-enamel);
+}
+/* All other concept frames retain the purple enamel visible in approved 05.
+   These accents are purely illustrative, NOT rarity/game-state claims. */
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  border-color:#fff0c3;
+  background:linear-gradient(180deg,#fff0bd 0%,var(--w7-enamel) 16%,var(--w7-shadow) 100%);
+  color:#fffce9;
+  text-shadow:0 1px 2px #07142c;
+  box-shadow:inset 0 1px #ffffffb3,inset 0 -2px #060f3299,0 1px 2px #050e2188;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot::after,
+.w7-screen[data-work7-screen="shop"] .w7-chest::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  z-index:3;
+  pointer-events:none;
+  border:1px solid #ffedae9c;
+  border-radius:6px;
+  background:
+    linear-gradient(135deg,var(--w7-inlay,#ffe2a0) 0 31%,#8c5927 32% 48%,transparent 51%) top left/13px 13px no-repeat,
+    linear-gradient(225deg,var(--w7-inlay,#ffe2a0) 0 31%,#8c5927 32% 48%,transparent 51%) top right/13px 13px no-repeat,
+    linear-gradient(45deg,var(--w7-inlay,#ffe2a0) 0 31%,#8c5927 32% 48%,transparent 51%) bottom left/11px 11px no-repeat,
+    linear-gradient(315deg,var(--w7-inlay,#ffe2a0) 0 31%,#8c5927 32% 48%,transparent 51%) bottom right/11px 11px no-repeat;
+  box-shadow:inset 0 0 0 1px #ffe6b43b;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+  border:1px solid #fff1c5;
+  box-shadow:
+    inset 0 0 0 1px #ffe9af,
+    0 0 0 1px #6d431f,
+    0 4px 7px #020d2ac9;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest{
+  --w7-inlay:#ffe8af;
+  --w7-glow:#ffde9e66;
+  --w7-chest-field:#44265b;
+  border-bottom-color:#784522;
+  background:
+    radial-gradient(ellipse 85% 68% at 50% 40%,var(--w7-glow),transparent 88%),
+    linear-gradient(160deg,var(--w7-chest-field),#101f42 98%);
+  box-shadow:
+    inset 0 2px #fffae0d1,
+    inset 0 0 0 2px #ffde9469,
+    inset 0 -6px #2e1c32a6,
+    0 0 0 1px #72451f,
+    0 5px 0 #08182b,
+    0 9px 12px #0008;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-rare{--w7-inlay:#bdf4ff;--w7-glow:#73dfff78;--w7-chest-field:#125984}
+.w7-screen[data-work7-screen="shop"] .w7-chest-epic{--w7-inlay:#eed0ff;--w7-glow:#ed8bff84;--w7-chest-field:#65277c}
+.w7-screen[data-work7-screen="shop"] .w7-chest-legend{--w7-inlay:#fff0a2;--w7-glow:#ffd06b9c;--w7-chest-field:#8a4c1a}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  background:
+    radial-gradient(ellipse 70% 68% at 50% 47%,var(--w7-glow),transparent 100%),
+    radial-gradient(ellipse 66% 40% at 50% 88%,#ffcf5b30,transparent 100%);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  filter:saturate(1.25) contrast(1.11) brightness(1.045) drop-shadow(0 5px 5px #06122bc2);
+  box-shadow:inset 0 1px #fff5bd80,0 5px 8px #07162aab;
+}
+@media (max-width:354px),(max-height:640px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot::after,
+  .w7-screen[data-work7-screen="shop"] .w7-chest::after{
+    inset:1px;
+    border-radius:5px;
+    background-size:9px 9px,9px 9px,8px 8px,8px 8px;
+  }
+}
+
+
+/* WORK7 / #104 — narrow illustrated title plaque, native 384×512 comparison.
+ * The approved 05/06 wood medallion occupies about half of the art width,
+ * while the previous live banner ran over two-thirds and concealed the
+ * tropical backdrop. Only the 05/06 LOCAL masthead is affected.
+ * Existing HTML titles/tabs remain selectable and readable. Never replace
+ * live UI with a static approved screenshot. approved:false.
+ */
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type{
+  width:clamp(185px,56%,220px);
+  max-width:calc(100% - 32px);
+  height:44px;
+  padding:1px 23px 3px;
+  border:3px ridge #ffe1a0;
+  border-radius:38% 38% 22% 22% / 29% 29% 36% 36%;
+  background:
+    radial-gradient(ellipse 66% 38% at 50% 0%,#f0bf6b52,transparent 95%),
+    repeating-linear-gradient(0deg,#ffdda30c 0 1px,transparent 1px 6px),
+    linear-gradient(90deg,#89512c 0%,#392017 14%,#5a321e 48%,#392017 86%,#89512c 100%);
+  box-shadow:
+    inset 0 2px 0 #ffefc2,
+    inset 0 -4px 0 #170d0b,
+    inset 0 0 0 2px #8d5827,
+    0 2px 0 #f4cf81,
+    0 5px 0 #74411d,
+    0 8px 10px #071a30a8;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::after,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::after{
+  content:"⚓︎";
+  position:absolute;
+  top:50%;
+  font-size:clamp(17px,4.8vw,22px);
+  line-height:1;
+  color:#ffe4a0;
+  text-shadow:0 1px 0 #442314,0 0 4px #ffde9673;
+  pointer-events:none;
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::before,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::before{
+  left:6px;
+  transform:translateY(-52%) rotate(-16deg);
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type::after,
+.w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type::after{
+  left:auto;
+  right:6px;
+  transform:translateY(-52%) rotate(16deg);
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero .w7-masthead-art,
+.w7-screen[data-work7-screen="shop"] .w7-hero .w7-masthead-art{
+  opacity:1;
+  filter:saturate(1.22) brightness(1.12);
+}
+.w7-screen[data-work7-screen="cards"] .w7-hero h2,
+.w7-screen[data-work7-screen="shop"] .w7-hero h2{
+  font-size:clamp(25px,7.15vw,31px)!important;
+  letter-spacing:.35px;
+  line-height:1.02!important;
+  white-space:nowrap;
+}
+@media (max-width:354px), (max-height:640px){
+  .w7-screen[data-work7-screen="cards"] .w7-hero > div:first-of-type,
+  .w7-screen[data-work7-screen="shop"] .w7-hero > div:first-of-type{
+    width:clamp(180px,58%,205px);
+    height:40px;
+    padding-inline:22px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-hero h2,
+  .w7-screen[data-work7-screen="shop"] .w7-hero h2{
+    font-size:clamp(24px,7.2vw,28px)!important;
+  }
+}
+
+
+/* WORK7 / #104 — native 384×512 badge silhouettes, approved:false.
+ * Approved 05 has small inset, high-gloss collectible plaques below each
+ * portrait; 06 uses raised green price-shaped plaques. Keep the actual
+ * honest labels PRÉVIA / EM BREVE; this is purely decorative and cannot
+ * imply real level progression, chest prices or purchasable inventory.
+ * No edits to the already-approved shared dock, Porto or header shell. */
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+  width:calc(100% - 8px);
+  min-height:23px;
+  margin-inline:auto;
+  padding:1px 2px 2px;
+  border:2px solid #ffe8a0;
+  border-bottom-color:#9b5d29;
+  border-radius:999px;
+  background:
+    linear-gradient(180deg,#fff8dcb8 0%,transparent 37%),
+    linear-gradient(180deg,var(--w7-enamel) 14%,var(--w7-shadow) 100%);
+  color:#fffce9;
+  text-shadow:0 1px 2px #091026,0 0 3px #000;
+  box-shadow:inset 0 1px #fff9dc,0 1px 0 #47291f,0 2px 4px #020b22a6;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+  border-radius:6px 6px 4px 4px;
+  box-shadow:0 0 0 1px #9b672d,0 2px 5px #020d2ad1;
+}
+.w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  border-radius:inherit;
+  background:linear-gradient(118deg,#fff1bf36 0%,transparent 21%,transparent 76%,#fff0b327 100%);
+  box-shadow:inset 1px 1px 0 #fff4c3b0,inset -1px -1px 0 #58351ca6;
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art{
+  position:relative;
+  background:
+    radial-gradient(ellipse 66% 55% at 50% 55%,var(--w7-glow),transparent 100%),
+    radial-gradient(ellipse 70% 22% at 50% 86%,#ffdda557,transparent 100%);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+  position:relative;
+  z-index:1;
+  border:0;
+  border-radius:12px;
+  -webkit-mask-image:radial-gradient(ellipse 66% 70% at 50% 49%,#000 64%,#000d 76%,transparent 100%);
+  mask-image:radial-gradient(ellipse 66% 70% at 50% 49%,#000 64%,#000d 76%,transparent 100%);
+  filter:saturate(1.27) contrast(1.12) brightness(1.045) drop-shadow(0 4px 3px #041327a8);
+}
+.w7-screen[data-work7-screen="shop"] .w7-chest-status{
+  width:calc(100% - 10px);
+  min-height:28px;
+  margin-inline:auto;
+  padding:2px 2px;
+  border:2px solid #ffefb4;
+  border-bottom-color:#735020;
+  border-radius:999px;
+  background:
+    radial-gradient(circle at 7px 50%,#ffefb8 0 1.5px,transparent 2px),
+    radial-gradient(circle at calc(100% - 7px) 50%,#ffefb8 0 1.5px,transparent 2px),
+    linear-gradient(180deg,#dcf6a4 0%,#92c75b 30%,#33844b 58%,#1d503c 100%);
+  color:#f8ffed;
+  text-shadow:0 1px 2px #12361d;
+  box-shadow:inset 0 1px #fff8d3,0 2px 0 #4d391e,0 3px 5px #06142794;
+}
+/* Very short viewports: decorations must not squeeze the honest text. */
+@media(max-width:354px),(max-height:640px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot small{
+    width:calc(100% - 4px);
+    min-height:20px;
+    padding:1px;
+    font-size:10px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    width:calc(100% - 5px);
+    min-height:27px;
+    padding:2px 1px;
+    font-size:10.5px;
+  }
+}
+
+
+/* PR #223 QA correction: at native 384×512 the approved Porto dock starts
+ * at y=430, versus y=453 in the original artwork. The first Chromium
+ * capture exposed clipped second-row labels on 05 and chest labels on 06.
+ * Compress ONLY local upper gutters and offer frames in short 355–430px
+ * viewports. Keep every portrait, all three chests and honest statuses. */
+@media (min-width:355px) and (max-height:560px) and (max-width:430px){
+  .w7-screen[data-work7-screen="cards"] .w7-hero,
+  .w7-screen[data-work7-screen="shop"] .w7-hero{
+    height:42px;
+    min-height:42px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-tabs,
+  .w7-screen[data-work7-screen="shop"] .w7-tabs{
+    min-height:31px;
+    padding:1px 3px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-tabs button,
+  .w7-screen[data-work7-screen="shop"] .w7-tabs button{
+    min-height:26px;
+    padding:2px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-collection-content{
+    padding-top:3px;
+    gap:3px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+    min-height:24px;
+    padding:2px 6px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    row-gap:4px;
+    padding-block:0;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-content{
+    gap:4px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    min-height:137px;
+    padding:5px 7px;
+    gap:5px;
+    grid-template-columns:minmax(0,43%) minmax(0,1fr);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+    height:114px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    max-width:124px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{
+    gap:3px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info h3{
+    font-size:clamp(20px,5.5vw,23px);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info p{
+    font-size:10.5px;
+    line-height:1.14;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info small{
+    font-size:9.5px;
+    line-height:1.12;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-pack-unavailable{
+    min-height:28px;
+    font-size:12px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    min-height:19px;
+    margin-top:0;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest{
+    min-height:104px;
+    padding:3px 2px;
+    gap:1px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest>strong{
+    font-size:11px;
+    line-height:1;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{
+    min-height:57px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+    max-width:74px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    min-height:21px;
+    font-size:10px;
+    padding:1px;
+  }
+}
+
+/* Native 384×512 screenshot after the gutter fix: the chest plaque was
+ * still six pixels behind the approved Porto dock (top at y=430).
+ * Raise the local plaque over the frame's lower emboss, without changing
+ * the three illustrated chests' dimensions or the shared bottom dock. */
+@media (min-width:355px) and (max-width:430px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    transform:translateY(-7px);
+  }
+}
+
+/* WORK7 / #104 — native artwork proportions 05/06 (16 Nov, 23h).
+ * Reference 384×512 compared with actual Chromium #223: the illustrated
+ * card grid has narrower inter-card gutters than the approved 4×2 layout;
+ * the three chest illustrations occupy less area than the target even though
+ * the five-tab Porto dock already begins at y≈430.
+ * This pass reallocates local space to actual approved illustration crops
+ * rather than adding filters, borders, copied page backgrounds or fake game data.
+ * Keep preview/unavailable captions visible above the shared dock.
+ * Artist review remains approved:false.
+ */
+@media (min-width:355px) and (max-width:430px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    column-gap:6px;
+    row-gap:5px;
+    padding-top:3px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+    width:calc(100% + 5px);
+    margin-left:-2.5px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    max-width:136px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art{
+    min-height:65px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+    max-width:84px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{
+    transform:translateY(-14px);
+  }
+}
+/* At taller mobile viewports the artwork can use its own natural height
+ * without the compression required by the fixed native 384×512 dock. */
+@media (min-width:355px) and (max-width:430px) and (min-height:561px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    column-gap:7px;
+    row-gap:7px;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+    width:calc(100% + 6px);
+    margin-left:-3px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+    max-width:116px;
+  }
+}
+
+/* WORK7 / #104 — 17 Nov: native 384x512 composition pass, approved:false.
+ * The original 05 portraits begin a few pixels above the prior Chromium
+ * rendering. Tighten ONLY the collection-to-grid gutter, keeping all eight
+ * actual image crops and their legible preview plaques.
+ *
+ * Original 06 gives the Captain's art more height and more breathing room
+ * than the previous pack, yet the fixed approved dock begins at y~430.
+ * Reallocate LOCAL heading/gutter space to the picture, not to fake prices.
+ * No HUD, shell, Porto, dock, purchase, state or version changes. */
+@media (min-width:355px) and (max-width:430px) and (max-height:560px){
+  /* Chromium review: moving the entire 05 grid upwards made MAE worse;
+   * retain the already merged #231 native portrait geometry. */
+  .w7-screen[data-work7-screen="shop"] .w7-content{
+    gap:2px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    min-height:144px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art{
+    height:124px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    max-width:143px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    min-height:17px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+    gap:8px;
+  }
+}
+/* On taller 390/430 mobile, use comfortable spacing rather than the
+ * condensed 384x512 dock compensation. Never restrict vertical scrolling. */
+@media (min-width:355px) and (max-width:430px) and (min-height:561px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot strong{
+    text-wrap:balance;
+    line-height:1.08;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+    gap:9px;
+  }
+}
+
+
+/* WORK7 / #104 — 17 Nov, artwork-first proportions for approved 05 / 06.
+ * The native 384×512 original gives portrait illustrations slightly more
+ * vertical room and the Captain's treasure a wider portion of its banner.
+ * Preserve the live titles, honest unavailable states and 5-item Porto dock.
+ * No additional filters, glow passes, duplicated borders or UI screenshots.
+ * Artistic status: approved:false; pending owner review. */
+@media (min-width:355px) and (max-width:430px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+    /* Reveal another sliver of each of the eight actual illustration crops,
+       rather than enlarging their frames or hiding the caption below. */
+    aspect-ratio:73/72;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    /* Move artwork/text division toward the 06 reference: chest at left,
+       content at right; retain natural height and a legible second column. */
+    grid-template-columns:minmax(0,46%) minmax(0,1fr);
+    background:
+      radial-gradient(ellipse 66% 95% at 29% 42%,#bd539078,transparent 88%),
+      linear-gradient(112deg,#572052 0%,#4b1d4f 49%,#23183e 100%);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    max-width:147px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info{
+    min-width:0;
+    padding-left:2px;
+  }
+}
+
+
+/* WORK7 / #104: 384×512 Chromium showed the three real EM BREVE plaques
+ * extending 9px into the already-approved Porto dock (y=430).
+ * Preserve pack/chest illustration heights; recoup the vertical space from
+ * the redundant local section heading, NOT by hiding the three status labels.
+ * This heading stays legible at 14px and is not part of the shared shell. */
+@media (min-width:355px) and (max-width:430px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-content{
+    gap:3px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    min-height:18px;
+    padding:0 2px;
+    margin:0;
+    line-height:1;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-info h3{
+    /* A single compact illustrated-pack heading, as in 06 reference,
+       prevents the right column becoming a tall two-line opaque panel. */
+    font-size:clamp(19px,5vw,20px);
+    white-space:nowrap;
+    overflow-wrap:normal;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading strong{
+    font-size:14px;
+    line-height:1;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading > span{
+    font-size:8.5px;
+    line-height:1;
+  }
+}
+
+
+/* In 05 at original 384×512, the second portrait row begins ~3px
+ * above the approved atlas. Space the two real rows, preserving 4 columns
+ * and the second row's PRÉVIA labels above the shared y≈430 dock. */
+@media (min-width:355px) and (max-width:430px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    row-gap:8px;
+  }
+}
+
+/* WORK7 / #104 — 17 Nov, native 384×512 lateral frame alignment against 05/06.
+ * Baseline PR #245 Chromium boxes at 384×512: first card x21/width81,
+ * first chest x16/width112, pack x16/width352; original illustrated
+ * silhouettes begin around x18. Shift/expand only the LOCAL decorative
+ * frames so real cropped concepts occupy the artwork's lateral positions.
+ * Keep Porto, five-button dock, shell, genuine labels/economy untouched.
+ * All eight conceptual portraits and three unavailable chests remain live
+ * elements (not screenshot backgrounds). Human review: approved:false. */
+@media (min-width:355px) and (max-width:430px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    width:calc(100% + 6px);
+    margin-inline:-3px;
+  }
+}
+@media (min-width:355px) and (max-width:430px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    width:calc(100% - 4px);
+    margin-left:2px;
+    transform:translateY(3px);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+    width:calc(100% - 4px);
+    margin-left:2px;
+    transform:translateY(2px);
+  }
+}
+
+
+/* WORK7 / #104 — native illustrated deck 05/06, 17 Nov 03h */
+/* Native 384×512 comparison: the approved 05 atlas sits inside one deep,
+ * carved navy collection recess (x≈12..374, y≈154..444), not eight isolated
+ * cards floating on turquoise. Draw the recess BEHIND the existing HTML
+ * cards/status, never as a screenshot or as a replacement for live content.
+ * In 06 the illustrated Captain's chest must occupy a larger fraction of the
+ * real pack, without changing its text column, true inventory or dock.
+ * Only WORK7 local classes; zero changes to economy, shared shell or menu.
+ * Human visual approval remains false. */
+@media (min-width:355px) and (max-width:430px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    position:relative;
+    isolation:isolate;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
+    content:"";
+    position:absolute;
+    inset:-40px -6px -12px;
+    z-index:-1;
+    pointer-events:none;
+    border:2px solid #b69a70;
+    border-bottom-color:#695035;
+    border-radius:13px;
+    background:
+      radial-gradient(ellipse 85% 60% at 50% 18%,#263b576b,transparent 84%),
+      linear-gradient(180deg,#111e35 0%,#07182d 60%,#0b1830 100%);
+    box-shadow:inset 0 2px 0 #e3b96e4f,inset 0 0 0 3px #0c1427,0 4px 8px #041021b8;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+    position:relative;
+    z-index:2;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    /* The existing 149×126 approved original chest is visibly undersized
+       at 384×512: reveal more illustration, not a painted UI screenshot. */
+    transform:translate(-2px,5px) scale(1.07);
+    transform-origin:52% 55%;
+  }
+}
+
+
+
+/* WORK7 / #104 — true 320px 05/06 artwork framing, 17 Nov 04h.
+ * The native 384x512 reference already aligns correctly on the merged HEAD.
+ * Measured Chromium 320x568: the last chest plaque only clears the Porto
+ * dock by 7px and portraits are 3px too far inset. Reallocate ONLY local
+ * gutters and pictorial columns; keep all genuine labels, pictures and art.
+ * No screenshot background, fake purchase, shared shell, nav or release. */
+@media (max-width:354px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    width:calc(100% + 8px);
+    margin-left:-4px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-content{
+    gap:2px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    min-height:148px;
+    padding-block:4px;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chests-heading{
+    min-height:19px;
+    margin:0;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-grid{
+    width:calc(100% + 6px);
+    margin-left:-3px;
+  }
+}
+
+/* WORK7 / #104 — 17 Nov 05:21: native 384x512 pictorial ROI pass.
+ * Feature matching against unscaled approved 06 showed the chest crops were
+ * oversized inside their already-aligned frames (rare/epic ~13%; pack ~6%).
+ * Reframe original art only; no screenshot backgrounds, new effects or state.
+ * 320px stays EXACTLY as merged #263. approved:false until human review. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    transform:translate(-4px,7px) scale(1.01);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{
+    transform:translate(-2px,0) scale(.88);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
+    transform:translate(4px,0) scale(.9);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+    transform:translate(4px,4px) scale(1.02);
+  }
+}
+
+
+/* WORK7 / #104 — native 384x512 illustrated pigment calibration, 17 Nov 06:23.
+ * Reference-aligned original image crops only: temper bright highlights on
+ * the eight concept portraits and three real chest illustrations. The real
+ * labels PRÉVIA / EM BREVE remain separate readable HTML; no new borders,
+ * screenshot backgrounds, state, Porto, dock, prices or effects.
+ * Short native viewport ONLY; #263 mobile 320px layout stays unchanged.
+ * Artistic approval: false pending owner's visual review. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(.88);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(.88) drop-shadow(0 4px 3px #041327a8);
+  }
+}
+
+/* WORK7/#104 — native 384×512 image registration, 17 Nov 07h.
+ * Pixel-geometry review against approved 05: illustrated 4×2 grid is
+ * approximately 2px too high. Shift its local collection art ONLY, leaving
+ * the shared header, tabs, menu and live PRÉVIA labels unchanged.
+ * The original 06 Captain chest has slightly deeper shadows: retain the
+ * actual illustration and its existing filter chain while toning highlights.
+ * This rule is intentionally inactive at 320px and tall mobile viewports.
+ * No screenshot backdrop, payments, catalogue data or new gameplay. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid{
+    transform:translateY(2px);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    filter:saturate(1.2) contrast(1.06) brightness(.95) drop-shadow(0 6px 5px #14062ca3);
+  }
+}
+
+/* WORK7/#104 — native 384x512 illustration field calibration (17 Nov 08h).
+ * The original 05 places its gold card frames on a carved dark navy album,
+ * not the bright teal recess present in the previous rendering. Restore
+ * the illustrated background palette while leaving actual 8 image assets,
+ * touch targets, captions, header and fixed five-item dock untouched.
+ * In 06 bring the three real chest crops closer to the original pigment,
+ * not by replacing them or altering their unavailable status.
+ * Only native short screens: do not repeat merged 320px spacing fixes.
+ * approved:false — visual review belongs to the owner. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-collection-content{
+    background:
+      radial-gradient(ellipse 92% 95px at 50% 0%,#49677b45,transparent 92%),
+      linear-gradient(180deg,#18374d 0%,#102b43 44%,#0a2039 70%,#061a33 100%);
+  }
+  /* The approved 05 inventory header is deep navy rather than cyan:
+     retain real CARTAS count and concept caption as editable HTML. */
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+    background:linear-gradient(90deg,#101e2e,#152734 50%,#101e2e);
+  }
+  /* Same honest PRÉVIA label; use the approved 05 green nameplate pigment
+     on the two sail/shield concepts, without adding fake level numbers. */
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) small,
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) small{
+    background:linear-gradient(180deg,#fff0bd 0%,#9fe54a 16%,#2ba345 74%,#145c2a 100%);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-art .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(.92) drop-shadow(0 4px 3px #041327a8);
+  }
+}
+
+/* WORK7/#104 — 17 Nov 2026: original 05/06 native pictorial-value registration.
+ * At 384x512, both original approved physical frames are materially darker
+ * than the current render, although the artwork placement already aligns.
+ * Tone the entire individual artwork frame (not the shared page, menu or HUD):
+ * carved navy 4x2 cards and rarer, physically deeper chest surrounds.
+ * 320px, 390x844 and 430x932 layouts remain deliberately unchanged.
+ * The same live eight portraits, three chests, labels and genuine no-purchase
+ * states remain DOM and pointer-accessible; no screenshot repaint.
+ * approved:false until human review. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+    filter:brightness(.88);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest{
+    filter:brightness(.89);
+  }
+}
+
+
+/* WORK7/#104 — native 384x512 carved-frame depth, 17 Nov 10h.
+ * Earlier passes registered the live 4x2 and three chest shapes. The native
+ * reference carries a deeper shadow INSIDE the metal/wood inlays; unlike
+ * additional halos, this pass leaves the eight real approved illustrations,
+ * corner hardware, preview status, individual text and clickable surfaces
+ * intact. Restrict to 355-390px SHORT screens so #263 320px safety spacing
+ * and the taller mobile views remain pixel-identical to merged HEAD.
+ * The WORK7-only Chromium A/B test restores the exact pre-PR filters/inlays
+ * in the same page/frame; no screenshot background is ever used in the UI.
+ * Artistic approval: false (0/8), pending human review. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+    filter:brightness(.81);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest{
+    filter:brightness(.80);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot::before,
+  .w7-screen[data-work7-screen="shop"] .w7-chest::before{
+    box-shadow:
+      inset 0 0 0 1px #472714ae,
+      inset 0 3px 6px #080c237a,
+      inset 0 -2px 1px #ffdb7b2b;
+  }
+}
+
+/* WORK7/#104 — native 384×512 carved album + treasure panel, 17 Nov 11h.
+ * The source 05 has a steel/charcoal atlas recess, not a luminous gold
+ * outline around the entire section. Individual eight gilded picture frames
+ * remain untouched, with genuine PRÉVIA and local count intact. On 06 the
+ * reference velvet is royal violet rather than reddish-brown. No new
+ * screenshot backgrounds, filters, halos, opaque UI covers or fake offers.
+ * This native-only material pass leaves 320px and tall screens pixel-identical.
+ * approved:false, 0/8 until human review. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-collection-status{
+    border-color:transparent transparent #49515b;
+    border-radius:0;
+    box-shadow:none;
+    background:transparent;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
+    border-color:#515a5f;
+    border-bottom-color:#343b41;
+    background:
+      radial-gradient(ellipse 85% 60% at 50% 18%,#37495740,transparent 84%),
+      linear-gradient(180deg,#171f2a 0%,#101a26 60%,#111720 100%);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    background:
+      radial-gradient(ellipse 66% 95% at 29% 42%,#cb3e9678,transparent 88%),
+      linear-gradient(112deg,#4d0f66 0%,#460a6c 49%,#160c4d 100%);
+  }
+}
+
+/* WORK7/#104 — 17 Nov 12h: selective pictorial exposure on native 384×512.
+ * A/B against true merged v0.1.65: the original 05 paints the bomb, sail,
+ * cannon, shield and mine brighter than our clipped source crop, while their
+ * darker carved physical frames are already calibrated (#283/#288).
+ * Illuminate the five REAL artwork crops only (not the frame, label or text).
+ * On original 06 the rare/epic REAL chests are underexposed but the Captain
+ * pack and legendary chest already match their source value closely.
+ * No new halo, bevel, screenshot backdrop, invented offers or gameplay.
+ * 320×568 and taller phones are pixel-identical; approved:false (0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop,
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop,
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop,
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop,
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.075);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop,
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(1.11) drop-shadow(0 4px 3px #041327a8);
+  }
+}
+
+/* WORK7/#104 — native 384×512 material-field value registration, 17 Nov 13h.
+ * Real approved 05/06 art reviewed against merged v0.1.66. The original
+ * card atlas is a charcoal-blue carved recess, and the Captain's velvet is
+ * deeper violet than the rendered chest backing. Tune only the BACKING
+ * beneath live HTML/illustrations, without global overlays or new effects.
+ * Never darken the real art, captions or unavailable controls. 320×568 and
+ * tall portrait sizes preserve merged geometry and identical paint.
+ * No screenshot UI, fabricated economy or purchases; approved:false 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
+    background:
+      radial-gradient(ellipse 85% 60% at 50% 18%,#28394237,transparent 84%),
+      linear-gradient(180deg,#121a24 0%,#0c1621 60%,#0d131c 100%);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    background:
+      radial-gradient(ellipse 66% 95% at 29% 42%,#a51c6655,transparent 88%),
+      linear-gradient(112deg,#360957 0%,#31065a 49%,#110839 100%);
+  }
+}
+
+
+/* WORK7 / #104 — native 384×512 source-art tonal depth (17 Nov, 14h).
+ * The reference portraits show materially brighter highlights on the
+ * bombardier, shield, elite crew and mine than the merged 0.1.67 crops;
+ * the legendary treasure is also underlit inside its unchanged frame.
+ * Raise only the corresponding REAL approved illustration pixels; the
+ * existing carved borders, physical sizes, captions, honest disabled
+ * offerings and actual game data stay untouched. At 320×568 and all tall
+ * screens the CSS is intentionally inactive. Not an approved artwork. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.19);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.16);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(.96);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.18);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(1.16) drop-shadow(0 4px 3px #041327a8);
+  }
+}
+
+/* WORK7 / #104 — 384×512 native carved frame relief, 17 Nov 15h.
+ * After genuine Chromium A/B rejected the first strong card inlay (MAE
+ * 62.56 -> 63.55), remove it entirely. Recalibrate the physical material
+ * value of the eight REAL card frames and three chest frames instead.
+ * The approved original is substantially darker at the inlays; preserve
+ * authentic art, one real pack, captions, unavailable states and all DOM.
+ * Short native viewport ONLY: #263 320px + tall displays unaffected.
+ * Before/after CSS tested in the same paused real Chromium scene.
+ * approved:false; WORK0 owns all merging, publishing and version numbers. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+    filter:brightness(.72);
+  }
+  /* Keep approved chest brightness on HEAD: the observed .70 trial made
+   * shop MAE 64.18 -> 64.21. Use ONLY the measured winning inset. */
+  .w7-screen[data-work7-screen="shop"] .w7-chest::before{
+    box-shadow:
+      inset 0 0 0 3px #071321cd,
+      inset 0 2px 11px 3px #020817c5,
+      inset 0 -2px 1px #e7b77529;
+  }
+}
+
+
+/* WORK7 / #104 — 17 Nov 16h, controlled native-value pass.
+ * Adjust only individual REAL approved relief panels at 384x512.
+ * The prior 8-card .72 and 3-chest .80 filters are preserved as the
+ * same-frame baseline in work7-visual.test.ts. Per-panel image-value
+ * calibration avoids modifying art URLs, content, geometry or mechanics.
+ * All original PRÉVIA/EM BREVE labels remain real live DOM, as do the
+ * single pack, four-by-two grid and three chests. No effect at 320x568
+ * or tall viewports. Human approval required; approved:false (0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.66)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.77)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.64)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.65)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.62)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.71)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.62)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.71)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.68)}
+  /* Brighten genuine unavailable labels inside the darker carved frames. */
+  .w7-screen[data-work7-screen="shop"] .w7-chest-status{filter:brightness(1.12)}
+}
+
+/* WORK7 / #104 — 17 Nov 17h: restrained optically carved card/chest recesses.
+ * Native 384×512 ONLY, calibrated against the CURRENT v0.1.70 integrated HEAD.
+ * Four selected REAL relief materials receive deeper interior light falloff;
+ * the nine remaining live illustrations/frames, 4×2 layout, one pack, genuine
+ * PRÉVIA/EM BREVE labels, economy and touch geometry stay unchanged.
+ * 320×568 + taller mobiles unchanged; never a screenshot background.
+ * This trial MUST pass controlled same-frame HEAD MAE/ROI gate in Chromium.
+ * approved:false (0/8) pending human visual acceptance. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.63)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.61)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.59)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.65)}
+  /* The Captain's panel is visibly lighter than the original, but darkening
+     the whole panel alone underexposes the REAL painted chest. Counterbalance
+     only its source crop after the local panel material-value correction. */
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{filter:brightness(.88)}
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    filter:saturate(1.2) contrast(1.06) brightness(1.08) drop-shadow(0 6px 5px #14062ca3)
+  }
+}
+
+
+/* WORK7/#104 — 17 Nov 18h: native, per-frame contrast registration.
+ * Calibrated with the exact 384×512 source screenshots from CI #44141082800:
+ * refine individual frame values only, preserving approved live artwork, the
+ * 4×2 grid, single genuine pack, all three chests and PRÉVIA/EM BREVE.
+ * The independent Chromium gate will reject any regression in global MAE,
+ * artwork ROI, 320px dock clearance, geometry or interactive touch.
+ * These rules DO NOT apply to 320×568 or tall phones. approved:false 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.585)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.745)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.58)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.64)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(1.20) drop-shadow(0 4px 3px #041327a8)
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(1.20) drop-shadow(0 4px 3px #041327a8)
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{
+    filter:saturate(1.27) contrast(1.12) brightness(1.40) drop-shadow(0 4px 3px #041327a8)
+  }
+}
+
+
+/* WORK7/#104 — source-art pigment + native treasure relief; HEAD v0.1.81.
+ * The eight conceptual cards keep their genuine 4×2 frames, the single
+ * Captain pack and three honest unavailable chests stay live HTML. Only
+ * original illustration light and native treasure relief are recalibrated.
+ * Same-frame A/B; 320px and tall screens untouched; approved:false (0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.36)
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.20)
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.73)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.74)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.60)}
+}
+
+
+/* WORK7/#104 — 18 Nov 06:24 UTC. Native source-art luminance only.
+ * This pass retains all eight true approved 05 portrait crops, the single
+ * approved 06 Captain pack and all three genuine chest crops. Calibrated
+ * against ORIGINAL vs integrated v0.1.82 same-pixel image-region error,
+ * with final Chromium A/B and touch/ROI regression gate in work7-visual.test.
+ * No mock counters, prices, screenshot backdrops, layout, labels, menu,
+ * shared header or 320px changes. Human visual approval remains false. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.49)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.20)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.05)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.03)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.55)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.30)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.31)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.32) drop-shadow(0 4px 3px #041327a8)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.32) drop-shadow(0 4px 3px #041327a8)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{filter:saturate(1.27) contrast(1.12) brightness(1.59) drop-shadow(0 4px 3px #041327a8)}
+}
+
+
+/* WORK7/#104 — 18 Nov 07:35 UTC. Verified Cartas 05 relief, Loja 06 untouched.
+ * Original 00 + eight-screen mosaic + 01–08 references remain the fidelity
+ * contract. Rejected both shop candidate variants because REAL pack/chest
+ * ROI worsened; preserve integrated HEAD 06 exactly.
+ * Only three real physical 05 cards' carved backing values change on the
+ * native short viewport. Eight actual original images 4×2, PRÉVIA, all
+ * real data and five-button dock remain; no 320px/tall-screen changes.
+ * approved:false (0/8), WORK0 alone may integrate after verified CI. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.71)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.56)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.58)}
+}
+
+/* WORK7/#104 — 18 Nov 08:20 UTC, native 384x512 frame-chroma registration.
+ * Per-card painted relief values, calibrated against the original 05 approved
+ * 384x512 image and true merged v0.1.85 Chromium render. Source image crops,
+ * 4x2 geometry, pack/chests, honest PRÉVIA/EM BREVE text and touch remain live.
+ * The paint correction remains isolated to the WORK7 card frames at 384x512;
+ * 320px and taller viewports are untouched, as are dock, Porto and header.
+ * Full native same-frame A/B MAE/ROI gate must pass before WORK0 considers it.
+ * No image screenshots or monetization changes; approved:false, 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.48) saturate(1.90) contrast(.83)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.65) saturate(1.75) contrast(.75)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.47) saturate(1.03) contrast(.76)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.52) saturate(2.00) contrast(.79)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.45) saturate(2.00) contrast(.85)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.65) saturate(1.30) contrast(.92)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.46) saturate(1.55) contrast(.82)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.64) saturate(1.90) contrast(.88)}
+}
+
+/* WORK7/#104 — 18 Nov 09:32 UTC. Native 384×512 independent material pass.
+ * Exact current merged #384 filter field is the baseline. This pass only
+ * recalibrates genuine original 05 frame/pigment value on 4 of 8 actual
+ * illustrated cards; images and all live text remain unchanged. No 320px or
+ * tall-phone effect. Interactive A/B + MAE/ROI must pass before approval.
+ * No approved screenshot backgrounds; approved:false, 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){filter:brightness(.50) saturate(1.70) contrast(.87)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.43) saturate(1.20) contrast(.74)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.42) saturate(2.30) contrast(.76)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.42) saturate(1.75) contrast(.79)}
+}
+
+
+/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.
+ * Start from the actual merged #392 + v0.1.88 HEAD (563d7abc66).
+ * Eight ORIGINAL WEBP art crops, not screenshot backgrounds. Tune pigment
+ * luminance INSIDE existing relief frames to match the approved 05 art; do
+ * not change any source, layout, hit target, label, currency or shared shell.
+ * Native short viewport only. 320×568 and tall mobiles are unchanged.
+ * Same-frame baseline MUST be the #392 merged field plus original crop values;
+ * require strict global MAE and source-art ROI improvement in real Chromium.
+ * No ownership of Porto, dock, header or 06 Shop. approved:false; 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.95)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.36)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.27)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.11)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.86)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.45)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.52)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.60)}
+}
+
+
+/* WORK7/#104 — 18 Nov 11:20 UTC, eight-card native source pigment/depth registration.
+ * The exact WORK0 v0.1.89 HEAD is the prior #395 merged 05 crop field.
+ * Tune only two proven-positive TRUE reference-source 05 art sublayers in original 4x2
+ * frames; no geometry, screenshot backgrounds, new economy or menu overrides.
+ * Candidate 1 failed native MAE/ROI; reject six regressing card highlights.
+ * Retain only original slot 1/3 brightening: measured positive in actual
+ * CI #44294562149 same-frame native captures, with six slots reverted.
+ * Labels remain live PRÉVIA; 320x568 and taller screens are unchanged.
+ * Compare strict REAL native global MAE + ROI against #395 in Chromium.
+ * approved:false 0/8; WORK0 alone owns merges, HTTP and releases. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.09)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.37)}
+}
+
+
+/* WORK7/#104 — 18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.
+ * Re-measure against integrated WORK0 v0.1.90 + #400, NOT v0.1.89.
+ * Two source crop luminances adjusted (not frames, geometry or labels).
+ * Visual target is the ORIGINAL 384x512 approved image, not screenshot UI.
+ * Only 384x512 short viewport; 320px and tall phones unaffected.
+ * Keep 4x2 eight REAL art images, PRÉVIA, unique pack and 3 unavailable
+ * chests. WORK0 owns merges, versioning and publishing. approved:false 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(2.14)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3) .w7-approved-crop{filter:saturate(1.25) contrast(1.13) brightness(1.67)}
+}
+
+
+/* WORK7/#104 — 18 Nov 13:45 UTC. True 384×512 carved-frame inlay.
+ * Source: priority 00 original + eight-screen mosaic + authentic 01–08 WebP.
+ * The genuine 05 eight-card atlas keeps its 4×2 geometry and illustration
+ * crops: only the NATIVE frame material/relief is retuned. Independent
+ * same-scene Chromium sweep compared seven inset depths: 2px enamel inlay
+ * measured 60.739 global and 54.907 card-ROI MAE on the candidate.
+ * Original live PREVIEW labels, single genuine 06 pack, three EM BREVE chests,
+ * real coins, Porto, dock, shell, 320px and tall screens are all unchanged.
+ * No screenshot backgrounds. approved:false; 0/8. WORK0 integration only. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot{
+    box-shadow:inset 0 0 2px 2px #f1bd76aa,0 3px 0 #06142b;
+  }
+}
+
+/* WORK7/#104 — 18 Nov native 06 real source-art pigment calibration.
+ * Reject the first image-scale candidate (failed 65.35 -> 67.03 global).
+ * Corrected same-frame base is v0.1.93 HEAD scale(1.01), not the older
+ * scale(1.07) from an overridden media query. Preserve the exact live
+ * crop, original genuine pack, 3 chests, 8 cards, labels and all layout.
+ * Correct only pigment: softening oversaturated magenta and recovering
+ * warm gold illumination in the authentic approved Captain WEBP illustration.
+ * Source WEBP and all hitboxes/text/320px/tall sizes remain unchanged.
+ * WORK0 alone may merge; approved:false (0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+    filter:saturate(1.05) contrast(1.06) brightness(1.16) drop-shadow(0 6px 5px #14062ca3);
+  }
+}
+
+
+/* WORK7/#104 — 18 Nov 20:30 UTC. Native card 4+7 inlay/exposure candidate.
+ * Starting HEAD c92c8c82 (v0.1.96); do not mix unmerged #426/#433/#436/#430.
+ * Fourth and seventh genuine approved 05 4×2 portraits only, original WebP intact.
+ * Leaves three original chests, unique pack, live PRÉVIA/EM BREVE labels,
+ * 320px labels/dock, Porto, shared shell, economy and gameplay untouched.
+ * Source: 00 original/mosaic and actual 01–08 approved design WebPs.
+ * CI strict SAME-FRAME A/B MAE + eight-card ROI gate before review.
+ * approved:false (0/8); no merge, publication or versioning by WORK7. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
+    filter:brightness(.49) saturate(2.00) contrast(.79);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+    filter:brightness(.40) saturate(1.75) contrast(.79);
+  }
+}
+
+
+/* WORK7/#104 — 19 Nov: native carved enamel shadow registration (unapproved)
+ * The authentic 05 portraits remain eight independent real WEBP crops in
+ * their approved 4x2 positions. Local relief value on the fifth lower-row
+ * painted-metal frame only: retain all exact sizes, live PRÉVIA plaques,
+ * real crew inventory, navigation and locked/unavailable states.
+ * No screenshot background, currency, global shell or 320px change.
+ * Test against exact parent cc44ce2ce in frozen native Chromium.
+ * approved:false 0/8; WORK0 exclusively controls merge and publication. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)}
+}
+
+/* WORK7 / #104 — 19 Nov 02:23 UTC. Genuine 06 legendary chest embossed metal rim.
+ * Scope: original approved 06 single true legendary chest only, native 384x512.
+ * Recessed shade transitions and a softer gold lower bevel restore physical
+ * depth WITHOUT moving the original source illustration or text. Source
+ * assets/design-approved/{00*,01..08}.webp remain the sole visual contract.
+ * 4x2 genuine 05 images, one live captain pack and three live chests retain
+ * their exact geometry, genuine PRÉVIA/EM BREVE labels, real state and touch.
+ * 320x568 and tall screens are unchanged. No screenshots as backgrounds.
+ * Same-frame strict MAE + chest/pack ROI QA gate required before WORK0 review.
+ * approved:false; 0/8 pending human review. No publishing by WORK7. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
+    box-shadow:
+      inset 0 0 0 3px #071321cd,
+      inset 0 2px 8px 3px #020817a9,
+      inset 0 -2px 2px #e7b77545;
+  }
+}

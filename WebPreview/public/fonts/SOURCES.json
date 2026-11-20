@@ -1,0 +1,47 @@
+[
+  {
+    "file": "font-0.ttf",
+    "source": "https://fonts.gstatic.com/s/barlow/v13/7cHpv4kjgoGqM7EPCw.ttf",
+    "bytes": 82624
+  },
+  {
+    "file": "font-1.ttf",
+    "source": "https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E3_-gc4A.ttf",
+    "bytes": 81924
+  },
+  {
+    "file": "font-2.ttf",
+    "source": "https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E30-8c4A.ttf",
+    "bytes": 85876
+  },
+  {
+    "file": "font-3.ttf",
+    "source": "https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E3t-4c4A.ttf",
+    "bytes": 85776
+  },
+  {
+    "file": "font-4.ttf",
+    "source": "https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E3q-0c4A.ttf",
+    "bytes": 87600
+  },
+  {
+    "file": "font-5.ttf",
+    "source": "https://fonts.gstatic.com/s/barlowcondensed/v13/HTxwL3I-JCGChYJ8VI-L6OO_au7B4-Lw_3E.ttf",
+    "bytes": 81448
+  },
+  {
+    "file": "font-6.ttf",
+    "source": "https://fonts.gstatic.com/s/barlowcondensed/v13/HTxwL3I-JCGChYJ8VI-L6OO_au7B4873_3E.ttf",
+    "bytes": 86636
+  },
+  {
+    "file": "font-7.ttf",
+    "source": "https://fonts.gstatic.com/s/barlowcondensed/v13/HTxwL3I-JCGChYJ8VI-L6OO_au7B46r2_3E.ttf",
+    "bytes": 87120
+  },
+  {
+    "file": "font-8.ttf",
+    "source": "https://fonts.gstatic.com/s/barlowcondensed/v13/HTxwL3I-JCGChYJ8VI-L6OO_au7B47b1_3E.ttf",
+    "bytes": 87556
+  }
+]

@@ -1,0 +1,914 @@
+import * as T from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Battle, predict, SHIPS, type BattleEvent } from './battle';
+import { SoftwareRenderer } from './software-renderer';
+import { PirateAudio } from './audio';
+import { makeShip, type ShipArt } from './ships';
+import { hullImpactPlacement } from './impact-visuals';
+import { rippleState } from './water-vfx';
+import { cannonFxState, cannonSmokeState, CANNON_FX_DURATION, CANNON_SMOKE_DURATION } from './cannon-vfx';
+import { battleCameraPose, battleEnemyScale, battleEnemyBroadsideYaw, battleDeckMuzzleWorld, battleCentralCannonYaw } from './battle-framing';
+import { makeBattleDeck } from './battle-deck';
+import { projectileFromMuzzle, firstPersonArc, firstPersonShotPosition } from './battle-shot-presentation';
+import { makeBattleForegroundSail } from './battle-foreground-sail';
+import { createBattleSkyTexture } from './battle-atmosphere';
+export type Metrics = { fps: number; renderMs: number; calls: number; triangles: number; geometries: number; textures: number; effects: number; heapMB?: number };
+export class OceanScene {
+  renderer: T.WebGLRenderer | SoftwareRenderer; compatibility=false; scene=new T.Scene(); camera=new T.PerspectiveCamera(42,1,.1,220); controls: OrbitControls;
+  ships: Record<'player'|'enemy',ShipArt>; private water: T.ShaderMaterial; private raf=0; private previous=0; private elapsed=0;
+  private canvas: HTMLCanvasElement; private resizeObserver: ResizeObserver; private trail: T.Line;
+  private pathGeometry=new T.BufferGeometry().setAttribute('position',new T.BufferAttribute(new Float32Array(240*3),3)); private path: T.Line; private marker: T.Mesh;
+  private ball: T.Mesh; private ballAura: T.Mesh; private particleGeometry=new T.IcosahedronGeometry(1,0); private particleMaterial=new T.MeshBasicMaterial({color:'#fff'});
+  private particles: { mesh:T.Mesh;velocity:T.Vector3;age:number;life:number;size:number;smoke:boolean }[]=[];
+  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private muzzleFlash:Partial<Record<'player'|'enemy',T.Mesh>>={}; private recoilAge:Record<'player'|'enemy',number>={player:Infinity,enemy:Infinity}; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'='battle'; private harbourDock=new T.Group(); private worldScenery=new T.Group(); private battleBattery=new T.Group(); private battleForegroundSail=new T.Group(); private batteryFlashes:T.Mesh[]=[]; private batteryMuzzles:T.Vector3[]=[]; private activeBatteryMuzzle=0; private playerArcTarget:T.Vector3|null=null; private playerArcDuration=1; private battleSky:T.CanvasTexture; private battleAccentLights=new T.Group(); private shake=0;
+  private shipPointers=new Set<number>(); private shipStart: {x:number;y:number}|null=null; private shipMoved=false;
+  private renderMs=0;private lastRender=0;private frameSamples:number[]=[];private metricsAt=0; private pirateAudio=new PirateAudio(); paused=false; disposed=false;
+  private onContextLost=(event:Event)=>{event.preventDefault();this.paused=true;this.onError('The 3D view was interrupted. Reload to restore the ocean.');};
+  private onVisibility=()=>{this.previous=0;this.pirateAudio.setHidden(document.hidden);};
+  constructor(private host:HTMLElement, public battle:Battle, private onFrame:()=>void,private onMetrics:(m:Metrics)=>void,private onError:(message:string)=>void,private onShipSelection:(selected:boolean)=>void=()=>{}){
+    const probe=document.createElement('canvas');const context=probe.getContext('webgl2',{antialias:true,alpha:false,powerPreference:'high-performance'});
+    this.compatibility=!context;this.renderer=context?new T.WebGLRenderer({canvas:probe,context,antialias:true,alpha:false}):new SoftwareRenderer();
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));this.renderer.outputColorSpace=T.SRGBColorSpace;this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.2;
+    this.canvas=this.renderer.domElement;host.append(this.canvas);this.canvas.setAttribute('aria-label','3D naval battlefield. Drag to orbit, pinch to zoom.');
+    this.canvas.addEventListener('webglcontextlost',this.onContextLost);
+    this.canvas.addEventListener('pointerdown',this.shipPointerDown,true);
+    this.canvas.addEventListener('pointermove',this.shipPointerMove,true);
+    this.canvas.addEventListener('pointerup',this.shipPointerUp,true);
+    this.canvas.addEventListener('pointercancel',this.shipPointerUp,true);
+    this.battleSky=createBattleSkyTexture();
+    this.scene.background=this.battleSky;this.scene.fog=new T.FogExp2('#9ddff4',.0055);
+    const hemi=new T.HemisphereLight('#e7f8ff','#497f8b',2.6);this.scene.add(hemi);
+    const sun=new T.DirectionalLight('#ffe3af',3.6);sun.position.set(-24,40,15);this.scene.add(sun);
+    const rim=new T.DirectionalLight('#97deff',1.4);rim.position.set(16,12,-18);this.scene.add(rim);
+    // Battle-only sculptural light: warm sidelight models the enemy's RED
+    // broadside and cool fill separates the two foreground guns from the
+    // timber. No shadows, extra water layers, camera motion or gameplay effects.
+    // The entire rig is hidden in Porto: its approved lighting is preserved.
+    this.battleAccentLights.name='battle-only-broadside-light';
+    const broadsideKey=new T.PointLight('#ffca92',540,56,2);
+    broadsideKey.position.set(17,15,6);this.battleAccentLights.add(broadsideKey);
+    const gunDeckFill=new T.PointLight('#93c6e9',390,40,2);
+    gunDeckFill.position.set(-5,12,64);this.battleAccentLights.add(gunDeckFill);
+    this.battleAccentLights.visible=false;this.scene.add(this.battleAccentLights);
+
+    this.water=new T.ShaderMaterial({uniforms:{time:{value:0},sun:{value:new T.Vector3(-24,40,15).normalize()},battleMode:{value:1}},vertexShader:`
+      uniform float time; uniform float battleMode;
+      varying vec3 vWorld; varying vec3 vNormal; varying float vWave;
+      float wave(vec2 p){
+        // Porto keeps its ORIGINAL calmer animated water, pixel-for-pixel in
+        // the vertex stage. The stronger, layered rolling seas are Batalha-only.
+        float harbour=sin(p.x*.47+time*1.15)*.12+
+          sin(p.y*.68-time*1.3)*.08+
+          sin((p.x+p.y)*1.3-time*1.7)*.035;
+        if(battleMode<.5)return harbour;
+        // Three crossing wavelengths build actual 3D illustrated swells;
+        // only visual vertices move, never the physical ship/shot coordinates.
+        float rolling=sin(p.y*.275-time*.76+
+          sin(p.x*.145+time*.20)*1.14)*.66;
+        float crossSea=sin(p.x*.47+p.y*.29+time*.96)*.30;
+        float chop=sin(p.y*1.12-p.x*.32-time*1.74)*.095;
+        // Waves grow around the distant broadside, but ease off as the
+        // spectator's real wooden deck approaches the screen. The plane's
+        // local -Y axis becomes world +Z after its -90 degree rotation.
+        float deckFade=1.-.55*smoothstep(44.,72.,-p.y);
+        return (rolling+crossSea+chop)*deckFade;
+      }
+      void main(){vec3 p=position;p.z=wave(p.xy);float dx=(wave(p.xy+vec2(.05,0.))-p.z)/.05;float dy=(wave(p.xy+vec2(0.,.05))-p.z)/.05;vNormal=normalize(mat3(modelMatrix)*vec3(-dx,-dy,1.));vec4 world=modelMatrix*vec4(p,1.);vWorld=world.xyz;vWave=p.z;gl_Position=projectionMatrix*viewMatrix*world;}
+    `,fragmentShader:`
+      uniform float time;uniform vec3 sun;uniform float battleMode;
+      varying vec3 vWorld;varying vec3 vNormal;varying float vWave;
+      void main(){
+        vec3 view=normalize(cameraPosition-vWorld);
+        vec3 n=normalize(vNormal);
+        float fres=pow(1.-max(dot(view,n),0.),3.);
+        float spec=pow(max(dot(n,normalize(sun+view)),0.),95.);
+        float pattern=sin(vWorld.x*2.4+sin(vWorld.z*1.7+time)*1.5)*sin(vWorld.z*2.8-time*1.4);
+        float chop=sin(vWorld.x*5.1+time*3.2)*sin(vWorld.z*4.7-time*2.4);
+        float oldFoam=smoothstep(.86,1.,pattern)*.16+smoothstep(.91,1.,chop+vWave*.28)*.07;
+        vec3 col=mix(vec3(.009,.30,.50),vec3(.025,.66,.86),clamp(.5+vWave*2.,0.,1.));
+        col=mix(col,vec3(.38,.78,.83),fres*.7);
+        col+=vec3(.72,.93,.91)*oldFoam+vec3(1.,.86,.55)*spec*.85;
+        float fog=1.-exp(-length(cameraPosition-vWorld)*.008);
+        col=mix(col,vec3(.6,.85,.87),fog);
+        // Battle-only whitecaps: waves remain animated and ship collisions untouched.
+        if(battleMode>.5){
+          // Battle-only: broad, interleaved painted swells replace the
+          // repeating high-frequency blue tile/white checkerboard. The
+          // physical ocean geometry, cannon ballistics and Porto shader path
+          // are unchanged. Fewer sin() layers improve mobile GPU budget.
+          float longSwell=sin(vWorld.z*.24-time*.58+
+            sin(vWorld.x*.115+time*.14)*1.41);
+          float crossSwell=sin(vWorld.x*.32+vWorld.z*.13+time*.41);
+          float lip=sin(vWorld.z*.53-time*.94+
+            sin(vWorld.x*.39-vWorld.z*.12+time*.26)*.70);
+          float brokenEdge=sin(vWorld.x*1.13-vWorld.z*.23+
+            sin(vWorld.z*.26+time*.18)*1.3);
+          float ridge=smoothstep(.43,.82,
+            longSwell*.74+crossSwell*.22+lip*.12);
+          float fragmented=.32+.68*smoothstep(-.27,.81,brokenEdge);
+          float crestMask=ridge*fragmented;
+          float foam=crestMask*(.21+
+            .31*smoothstep(.25,.78,lip));
+          // Foam is sparse near the viewer and lies on real undulating
+          // crests rather than washing every adjacent polygon white.
+          float eyeDistance=length(cameraPosition.xz-vWorld.xz);
+          foam*=.91-.19*(1.-smoothstep(14.,78.,eyeDistance));
+          // Hand-painted wakes attached to the visible ship positions, not
+          // generated as camera-facing CSS or postprocessing screenshots.
+          vec2 playerShip=vec2(-10.,3.);
+          vec2 enemyShip=vec2(10.,-3.);
+          float a=length((vWorld.xz-playerShip)/vec2(3.2,6.8));
+          float b=length((vWorld.xz-enemyShip)/vec2(4.15,8.5));
+          float hullSurf=max(exp(-pow((a-.88)*4.5,2.)),
+            exp(-pow((b-.89)*5.7,2.)));
+          float wake=sin(vWorld.z*1.33-time*2.31+
+            sin(vWorld.x*.68)*.46)*.5+.5;
+          foam=max(foam,hullSurf*(.22+.23*wake));
+          // A second, diagonal breaker family gives the waves actual foamy
+          // irregular edges, rather than one endlessly repeated dark ridge.
+          // All calculations live INSIDE the battleMode block: the existing
+          // animated Porto water remains exactly as shipped.
+          float curling=sin(vWorld.x*.91+vWorld.z*.48-time*.82+
+            sin(vWorld.x*.17-vWorld.z*.25+time*.12)*1.38);
+          float edgeBreak=smoothstep(.56,.90,curling)*
+            smoothstep(.28,.67,longSwell*.73+crossSwell*.22+lip*.16);
+          float irregular=.46+.54*(.5+.5*
+            sin(vWorld.x*2.1-vWorld.z*1.63+sin(vWorld.z*.51)*.67));
+          foam=max(foam,edgeBreak*irregular*.59);
+          foam=clamp(foam,0.,.64);
+          // Rich turquoise illuminated wave faces and pale foam are closer
+          // to the approved naval painting than uniform navy stripes.
+          // Keep the physically moving mesh, ripples and trajectories intact.
+          vec3 deep=mix(vec3(.010,.14,.30),vec3(.024,.45,.62),
+            clamp(.55+vWave*.82+longSwell*.16+crossSwell*.08,0.,1.));
+          deep*=1.-.09*(1.-ridge);
+          // Turquoise is confined to genuine diagonal ridges, not a blanket colour tint.
+          deep=mix(deep,vec3(.10,.64,.79),clamp(edgeBreak*.34+ridge*.12,0.,.48));
+          deep=mix(deep,vec3(.18,.62,.70),fres*.27);
+          col=mix(deep,vec3(.91,.98,.96),foam);
+          col+=vec3(.78,.91,.82)*spec*.22;
+          col=mix(col,vec3(.37,.67,.78),fog*.45);
+        }
+        gl_FragColor=vec4(col,1.);
+      }
+    `});
+    const ocean=new T.Mesh(new T.PlaneGeometry(210,210,190,190),this.water);ocean.rotation.x=-Math.PI/2;ocean.position.y=-.05;this.scene.add(ocean);
+    this.ships={player:makeShip(false),enemy:makeShip(true)};
+    for(const side of ['player','enemy'] as const){this.ships[side].root.position.set(SHIPS[side].x,0,SHIPS[side].z);this.scene.add(this.ships[side].root);
+      const foam=new T.Mesh(new T.RingGeometry(1,1.09,40),new T.MeshBasicMaterial({color:'#b5f9ed',transparent:true,opacity:.45,side:T.DoubleSide,depthWrite:false}));foam.rotation.x=-Math.PI/2;foam.scale.set(2.3,5.3,1);foam.position.set(SHIPS[side].x,.09,SHIPS[side].z);this.scene.add(foam);this.foam.push(foam);
+    }
+    // Battle 02 only: expand the *visible* red silhouette with real wind-filled
+    // canvas skirts. The enemy root stays at its unchanged physics position.
+    this.dressBattleEnemy();
+    // A single pooled flash per ship rides the correct firing-side centre gun.
+    // No dynamic geometry or material allocations during a cannon shot.
+    const flashGeometry=new T.SphereGeometry(1,10,8);
+    const flashMaterial=new T.MeshBasicMaterial({color:'#ffda79',transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending});
+    for(const side of ['player','enemy'] as const){
+      const direction=side==='player'?1:-1;
+      const gun=this.ships[side].guns.find(g=>Math.sign(g.position.x)===direction&&Math.abs(g.position.z)<.1);
+      if(!gun)continue;
+      const flash=new T.Mesh(flashGeometry,flashMaterial.clone());
+      flash.position.set(direction*1.15,0,0);flash.visible=false;gun.add(flash);this.muzzleFlash[side]=flash;
+    }
+    flashMaterial.dispose();
+    this.environment();this.scene.add(this.worldScenery);this.buildHarbourDock();this.buildPortBackdrop();this.buildHarbourDetails();this.scene.add(this.harbourDock);
+    // A real low-poly teak deck and pair of cannons frame the battle in portrait.
+    // This geometry is never shown over the already-approved Porto scene.
+    const battery=makeBattleDeck(true);this.battleBattery=battery.group;this.batteryFlashes=battery.flashes;this.batteryMuzzles=battery.muzzles;this.battleBattery.visible=false;this.scene.add(this.battleBattery);
+    this.dressBattleDeck();
+    // The black near-field player sail matches the approved Batalha composition;
+    // it is never part of Porto or the physics ships, and cannot block DOM HUD.
+    this.battleForegroundSail=makeBattleForegroundSail();
+    // The player's rig is beside the camera, not an opponent shown to the left.
+    // Shift only the battle-only sail into the safe left viewport edge.
+    this.battleForegroundSail.position.x+=2.3;
+    this.battleForegroundSail.visible=false;this.scene.add(this.battleForegroundSail);
+    this.controls=new OrbitControls(this.camera,this.canvas);this.controls.enableDamping=true;this.controls.enablePan=false;this.controls.minDistance=18;this.controls.maxDistance=110;this.controls.minPolarAngle=.32;this.controls.maxPolarAngle=1.28;this.controls.target.set(0,2,0);this.controls.rotateSpeed=.5;
+    this.path=new T.Line(this.pathGeometry,new T.LineDashedMaterial({color:'#f9e5a4',dashSize:.35,gapSize:.2,transparent:true,opacity:.85}));this.scene.add(this.path);
+    this.marker=new T.Mesh(new T.RingGeometry(.48,.58,36),new T.MeshBasicMaterial({color:'#ffdf7e',side:T.DoubleSide,transparent:true,opacity:.9,depthTest:false}));this.marker.rotation.x=-Math.PI/2;this.scene.add(this.marker);
+    // A readable ember outline belongs to the one TRUE ball, not to a second
+    // simulated shot. Rendered in Batalha only, anchored to its live position.
+    this.ball=new T.Mesh(new T.SphereGeometry(.32,12,8),new T.MeshStandardMaterial({color:'#262731',metalness:.8,roughness:.2,emissive:'#e87524',emissiveIntensity:.55}));this.ball.visible=false;this.scene.add(this.ball);
+    this.ballAura=new T.Mesh(new T.SphereGeometry(.62,12,8),
+      new T.MeshBasicMaterial({color:'#ffae56',transparent:true,opacity:.38,
+        depthWrite:false,blending:T.AdditiveBlending}));
+    this.ballAura.visible=false;this.scene.add(this.ballAura);
+    this.trail=new T.Line(new T.BufferGeometry(),new T.LineBasicMaterial({color:'#ffde8c',transparent:true,opacity:.9}));this.scene.add(this.trail);
+    // All effects reuse a bounded mesh pool; no geometry/material allocation per shot.
+    for(let i=0;i<160;i++){const mesh=new T.Mesh(this.particleGeometry,this.particleMaterial.clone());mesh.visible=false;this.scene.add(mesh);this.pool.push(mesh);}
+    // Reuse eight foam shockwave rings: no allocations on cannon fire or impact.
+    const rippleGeometry=new T.RingGeometry(.75,1,32);
+    const rippleMaterial=new T.MeshBasicMaterial({color:'#d8faff',side:T.DoubleSide,transparent:true,opacity:0,depthWrite:false});
+    for(let i=0;i<8;i++){const ring=new T.Mesh(rippleGeometry,rippleMaterial.clone());ring.rotation.x=-Math.PI/2;ring.visible=false;this.scene.add(ring);this.ripplePool.push(ring);}
+    this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(host);this.resize();this.home();document.addEventListener('visibilitychange',this.onVisibility);this.raf=requestAnimationFrame(this.animate);
+  }
+  /** A first-person three-dimensional bulwark, not a second playable ship.
+   * All parts are descendants of the battle-only cannon deck: Porto and the
+   * existing five-item nav can never render or interact with them. */
+  /** Battle-only sculpted gunwale: the player looks past TWO tapering side
+   * rails into the sea, rather than across a horizontal wooden fence.
+   * Geometry is a child of the existing cannon battery, never the Porto ship,
+   * projectile system, DOM/HUD or navigation. */
+
+  /**
+   * Batalha 02: hand-shaped crimson cloth widens the actual opponent silhouette,
+   * especially in a narrow portrait. The curved hems are Three.js geometry;
+   * no 2D compositing, duplicate ships, photo backgrounds or extra hit targets.
+   * These panels are attached to the enemy's existing rig and do not enter
+   * its sails[] array, cannon origins, collision model or damage simulation.
+   * Porto always hides this enemy root and is therefore entirely unaffected.
+   */
+  private dressBattleEnemy(){
+    const rig=this.ships.enemy.rig;
+    const cloth=new T.BufferGeometry();
+    const positions:number[]=[],colors:number[]=[],indices:number[]=[];
+    const bright=new T.Color('#d96758'),shadow=new T.Color('#53222c');
+    const goldLine:number[]=[];
+    // local coordinates: mast Z, cloth foot Y, height, original yard end X,
+    // flank and wind extension. Each panel joins its ORIGINAL mast, never
+    // detaches a cloth decal into HUD space or creates a third vessel.
+    const panels:[number,number,number,number,number,number][]=[
+      [.90,4.16,3.67,2.20,1,1.28],
+      [.90,4.16,3.67,2.20,-1,.97],
+      [-2.10,3.02,3.55,1.70,1,1.02],
+      [-2.10,3.02,3.55,1.70,-1,.80],
+      [3.42,4.24,2.43,1.35,1,.68]
+    ];
+    const cols=8,rows=12;
+    for(let p=0;p<panels.length;p++){
+      const [z,foot,height,edge,sign,extension]=panels[p];
+      const offset=positions.length/3;
+      const point=(u:number,v:number):[number,number,number]=>{
+        // Squared head and foot, rounded wind-filled midsection: no pointed
+        // crimson spikes that obscure the opposing Jolly Roger at phone size.
+        const belly=.62+.38*Math.pow(Math.max(0,Math.sin(Math.PI*v)),.62)
+          +.055*Math.sin(v*Math.PI*4+p*.75);
+        const sag=.13*Math.sin(Math.PI*u)*(1-v);
+        return [
+          sign*(edge+extension*u*belly),
+          foot+height*v-sag,
+          z+.09+.48*u*Math.sin(Math.PI*v)+.20*Math.sin(u*Math.PI)*Math.sin(v*Math.PI)
+            +.105*Math.sin(u*Math.PI*5+.35*Math.sin(v*Math.PI))*Math.sin(v*Math.PI)
+        ];
+      };
+      for(let iy=0;iy<=rows;iy++){
+        const v=iy/rows;
+        for(let ix=0;ix<=cols;ix++){
+          const u=ix/cols;
+          positions.push(...point(u,v));
+          const fold=.5+.5*Math.cos(u*Math.PI*5+.35*Math.sin(v*Math.PI));
+          const sun=.20+.45*(1-u)+.20*Math.sin(v*Math.PI*3+.5*p)+.30*fold;
+          const tone=shadow.clone().lerp(bright,Math.max(.10,Math.min(.89,sun)));
+          colors.push(tone.r,tone.g,tone.b);
+        }
+      }
+      for(let iy=0;iy<rows;iy++)for(let ix=0;ix<cols;ix++){
+        const a=offset+iy*(cols+1)+ix,b=a+cols+1;
+        indices.push(a,b,a+1,a+1,b,b+1);
+      }
+      // Gilded sewn hems are genuinely connected to the curved cloth edge.
+      for(let i=0;i<rows;i++){
+        goldLine.push(...point(1,i/rows),...point(1,(i+1)/rows));
+        // A handful of long cloth folds follow the wind, not a gridded decal.
+        if(i%3===0){
+          goldLine.push(...point(.48,i/rows),...point(.48,(i+1)/rows));
+        }
+      }
+      goldLine.push(...point(0,1),...point(1,1));
+    }
+    cloth.setAttribute('position',new T.Float32BufferAttribute(positions,3));
+    cloth.setAttribute('color',new T.Float32BufferAttribute(colors,3));
+    cloth.setIndex(indices);
+    cloth.computeVertexNormals();
+    cloth.computeBoundingSphere();
+    const fabric=new T.Mesh(cloth,new T.MeshStandardMaterial({
+      vertexColors:true,side:T.DoubleSide,roughness:.87,metalness:0
+    }));
+    fabric.name='battle-only-billowed-red-silhouette';
+    fabric.castShadow=true;
+    rig.add(fabric);
+    const seams=new T.LineSegments(
+      new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(goldLine,3)),
+      new T.LineBasicMaterial({color:'#d4a56e',transparent:true,opacity:.85})
+    );
+    seams.name='battle-only-red-hem-stitching';
+    rig.add(seams);
+  }
+
+  private dressBattleDeck(){
+    // The new first-person rig has ONE central cannon and its own gunwales.
+    // Do not dress it with the rejected pair of side-cannon supports.
+    if(this.batteryMuzzles.length===1)return;
+    const dressing=new T.Group();
+    dressing.name='battle-only-wooden-bulwark';
+    const oak=new T.MeshStandardMaterial({color:'#945a2f',roughness:.77,metalness:.03});
+    const darkOak=new T.MeshStandardMaterial({color:'#4c2d23',roughness:.91});
+    const sunlit=new T.MeshStandardMaterial({color:'#c88c4b',roughness:.7});
+    const gold=new T.MeshStandardMaterial({color:'#e5b76b',metalness:.58,roughness:.36});
+    const rope=new T.MeshStandardMaterial({color:'#c6a474',roughness:.91});
+    const iron=new T.MeshStandardMaterial({color:'#26303c',metalness:.69,roughness:.38});
+    const box=new T.BoxGeometry(1,1,1);
+    const sphere=new T.SphereGeometry(1,9,7);
+    const add=(g:T.BufferGeometry,m:T.Material,x:number,y:number,z:number,sx=1,sy=1,sz=1)=>{
+      const part=new T.Mesh(g,m);part.position.set(x,y,z);part.scale.set(sx,sy,sz);
+      dressing.add(part);return part;
+    };
+    // Hand-laid near-field planks run toward the opponent; alternate caulk
+    // lines and copper nail heads give depth without replacing the live deck.
+    for(let i=-4;i<=4;i++){
+      add(box,darkOak,i*1.27+.60,.535,73.9,.055,.018,17.4);
+      if(i%2===0)for(const z of [66.4,72.0,78.0]){
+        add(sphere,gold,i*1.27+.22,.555,z,.055,.018,.055);
+      }
+    }
+    // The original straight, full-width transverse rail concealed much of the
+    // red ship. Open the centre and follow the port and starboard gunwales in
+    // perspective instead: near shoulders are broader, far ends converge.
+    for(const side of [-1,1]){
+      const edge=(z:number,y:number)=>new T.Vector3(
+        side*(6.12-(81-z)*.062),y,z);
+      const topCurve=new T.CatmullRomCurve3([
+        edge(81.3,3.12),edge(76.3,3.08),
+        edge(70.1,2.96),edge(64.0,2.81)
+      ]);
+      const brightCurve=new T.CatmullRomCurve3([
+        edge(81.0,3.19),edge(76.1,3.15),
+        edge(70.0,3.03),edge(64.1,2.88)
+      ]);
+      const lowerCurve=new T.CatmullRomCurve3([
+        edge(80.8,1.47),edge(75.8,1.48),
+        edge(69.9,1.48),edge(64.2,1.52)
+      ]);
+      const rail=new T.Mesh(new T.TubeGeometry(topCurve,30,.22,9,false),oak);
+      rail.name=side<0?'first-person-rail-port':'first-person-rail-starboard';
+      dressing.add(rail);
+      dressing.add(new T.Mesh(new T.TubeGeometry(brightCurve,30,.058,8,false),gold));
+      dressing.add(new T.Mesh(new T.TubeGeometry(lowerCurve,28,.13,8,false),darkOak));
+      for(const z of [65.2,68.7,72.2,75.7,79.2]){
+        const x=side*(6.12-(81-z)*.062),top=3.10-(81-z)*.013;
+        const height=top-1.46;
+        add(box,oak,x,(1.46+top)/2,z,.32,height,.34);
+        add(box,sunlit,x,1.54,z,.42,.16,.40);
+        add(sphere,gold,x,top+.055,z,.18,.17,.18);
+        add(sphere,iron,x-side*.018,2.22,z+.20,.08,.08,.065);
+      }
+      // Carved outside rubbing strakes run away from the spectator, framing
+      // the broadside like the approved first-person painting.
+      for(const z of [69.3,75.4]){
+        const x=side*(6.12-(81-z)*.062);
+        const line=add(box,gold,x,1.93,z,.12,.075,4.9);
+        line.rotation.y=side*.062;
+      }
+      // Coiled real rope sits beside each cannon, below the live controls.
+      const coil=new T.Mesh(new T.TorusGeometry(.48,.078,7,32,Math.PI*1.95),rope);
+      coil.rotation.x=-Math.PI/2;coil.rotation.z=side*.15;
+      coil.position.set(side*4.66,.65,77.7);dressing.add(coil);
+      const cleat=add(box,darkOak,side*4.95,.77,76.4,.64,.19,.22);
+      cleat.rotation.y=side*.3;
+    }
+    // The heavier existing cannon barrels sit farther apart. Low wooden
+    // support beams now align with those TWO muzzles; the former raised
+    // rectangular frames cut across the sea and partly hid the broadside.
+    // Align ONLY the starboard support to its isolated visual muzzle.
+    // Port remains at -3.15; no camera or shot origin changes.
+    const work6Baseline=typeof window!=='undefined' &&
+      (window.location.hostname==='127.0.0.1'||window.location.hostname==='localhost') &&
+      new URLSearchParams(window.location.search).get('work6ab')==='baseline';
+    for(const x of [-3.15,work6Baseline?3.15:5.72]){
+      add(box,oak,x,1.45,65.65,2.30,.29,.48);
+      add(box,gold,x,1.63,65.54,2.26,.10,.20);
+      for(const dx of [-.96,.96])
+        add(sphere,gold,x+dx,1.72,65.56,.13,.12,.13);
+    }
+    dressing.traverse(part=>{
+      if(part instanceof T.Mesh){part.castShadow=true;part.receiveShadow=true;}
+    });
+    this.battleBattery.add(dressing);
+  }
+
+  private environment(){
+    const stone=new T.MeshStandardMaterial({color:'#7c9291',flatShading:true}),green=new T.MeshStandardMaterial({color:'#427e55',flatShading:true}),sand=new T.MeshStandardMaterial({color:'#d4c28a'});
+    const rockGeo=new T.IcosahedronGeometry(1,1), trunkMat=new T.MeshStandardMaterial({color:'#805431'}), leafGeo=new T.SphereGeometry(1,6,4);
+    for(const [x,z,size] of [[-30,-30,6],[10,-46,8],[37,-25,5],[-48,10,5]]){
+      const beach=new T.Mesh(rockGeo,sand);beach.position.set(x,-1,z);beach.scale.set(size*1.7,2,size);this.worldScenery.add(beach);
+      for(let i=0;i<4;i++){const rock=new T.Mesh(rockGeo,stone);rock.position.set(x+Math.sin(i*2)*size*.6,size*.35,z+Math.cos(i*2)*size*.3);rock.scale.set(size*.7,size*(.6+i*.12),size*.6);this.worldScenery.add(rock);
+        const top=new T.Mesh(rockGeo,green);top.position.copy(rock.position);top.position.y+=size*.6;top.scale.set(size*.6,.65,size*.5);this.worldScenery.add(top);}
+      for(let i=0;i<3;i++){const px=x+(i-1)*size*.75,pz=z+size*.6,py=1.3;const trunk=new T.Mesh(new T.CylinderGeometry(.12,.22,4,6),trunkMat);trunk.position.set(px,py+2,pz);trunk.rotation.z=(i-1)*.12;this.worldScenery.add(trunk);
+        for(let j=0;j<6;j++){const leaf=new T.Mesh(leafGeo,green);const a=j*Math.PI/3;leaf.position.set(px+Math.cos(a)*.9,py+4,pz+Math.sin(a)*.9);leaf.scale.set(1.6,.12,.42);leaf.rotation.y=-a;leaf.rotation.z=.15;this.worldScenery.add(leaf);}}
+    }
+    // Distant lighthouse and clouds frame the arena without covering the vessels.
+    const tower=new T.Mesh(new T.CylinderGeometry(.8,1.3,6,12),new T.MeshStandardMaterial({color:'#e3d4af'}));tower.position.set(10,12,-46);this.worldScenery.add(tower);
+    const roof=new T.Mesh(new T.ConeGeometry(1.5,1.3,12),new T.MeshStandardMaterial({color:'#af5a42'}));roof.position.set(10,15.6,-46);this.worldScenery.add(roof);
+    const cloudMat=new T.MeshBasicMaterial({color:'#e5f1ed',transparent:true,opacity:.7});
+    for(let i=0;i<12;i++){const cloud=new T.Mesh(new T.SphereGeometry(1,10,6),cloudMat);cloud.position.set(-60+i*12,22+Math.sin(i)*3,-65-Math.cos(i)*10);cloud.scale.set(6,1.8,2.8);this.worldScenery.add(cloud);}
+    const gullGeo=new T.BufferGeometry().setFromPoints([new T.Vector3(-.6,0,0),new T.Vector3(0,-.2,0),new T.Vector3(.6,0,0)]);
+    for(let i=0;i<6;i++){const gull=new T.Line(gullGeo,new T.LineBasicMaterial({color:'#456770'}));gull.position.set(-18+i*7,16+Math.sin(i)*2,-25);this.worldScenery.add(gull);}
+  }
+  /** Port furniture created from original geometry, with no new textures or downloaded assets. */
+  private buildHarbourDock(){
+    const plankMat=new T.MeshStandardMaterial({color:'#9d6038',roughness:.83});
+    const postMat=new T.MeshStandardMaterial({color:'#5c3421',roughness:.82});
+    const iron=new T.MeshStandardMaterial({color:'#253e49',metalness:.4,roughness:.57});
+    const lit=new T.MeshStandardMaterial({color:'#ffda71',emissive:'#ffac2c',emissiveIntensity:1.25});
+    const boardGeo=new T.BoxGeometry(3.3,.22,.56),postGeo=new T.CylinderGeometry(.21,.24,2.8,8);
+    const railGeo=new T.CylinderGeometry(.055,.055,3.2,6),barrelGeo=new T.CylinderGeometry(.43,.4,.78,10);
+    for(const side of [-1,1]){
+      const x=SHIPS.player.x+side*9.2,z=SHIPS.player.z+2;
+      for(let i=0;i<8;i++){
+        const p=new T.Mesh(boardGeo,plankMat);p.position.set(x,.38,z+i*.6);this.harbourDock.add(p);
+      }
+      for(const dx of [-1.55,1.55])for(const dz of [0,3.7]){
+        const p=new T.Mesh(postGeo,postMat);p.position.set(x+dx,.12,z+dz);this.harbourDock.add(p);
+        const cap=new T.Mesh(new T.CylinderGeometry(.26,.26,.16,8),iron);cap.position.set(x+dx,1.56,z+dz);this.harbourDock.add(cap);
+      }
+      for(let i=0;i<2;i++){
+        const barrel=new T.Mesh(barrelGeo,plankMat);barrel.position.set(x+(i?-.7:.8),1.16,z+1.4+i*1.3);this.harbourDock.add(barrel);
+        const band=new T.Mesh(new T.TorusGeometry(.42,.055,5,12),iron);band.rotation.x=Math.PI/2;band.position.copy(barrel.position);band.position.y+=.24;this.harbourDock.add(band);
+      }
+      const lampPost=new T.Mesh(new T.CylinderGeometry(.07,.07,2,7),iron);lampPost.position.set(x+side*1.3,1.65,z+.4);this.harbourDock.add(lampPost);
+      const lantern=new T.Mesh(new T.SphereGeometry(.26,10,8),lit);lantern.position.set(x+side*1.3,2.8,z+.4);this.harbourDock.add(lantern);
+      // A small rail reinforces the silhouette without introducing physics colliders.
+      const rail=new T.Mesh(railGeo,postMat);rail.rotation.x=Math.PI/2;rail.position.set(x+side*1.48,1.1,z+1.85);this.harbourDock.add(rail);
+    }
+    // Treasure chest anchored in world space on the left jetty, not a floating HUD badge.
+    const chest=new T.Group();
+    chest.position.set(SHIPS.player.x-9.2,.49,SHIPS.player.z+3.35);
+    const chestTimber=new T.MeshStandardMaterial({color:'#85411e',roughness:.8});
+    const chestLid=new T.MeshStandardMaterial({color:'#b36b31',roughness:.68});
+    const chestGold=new T.MeshStandardMaterial({color:'#f0be58',metalness:.62,roughness:.35});
+    const chestLock=new T.MeshStandardMaterial({color:'#5c351a',metalness:.22,roughness:.6});
+    function chestPart(geometry:T.BufferGeometry,material:T.Material,x:number,y:number,z:number){
+      const part=new T.Mesh(geometry,material);part.position.set(x,y,z);chest.add(part);return part;
+    }
+    chestPart(new T.BoxGeometry(2.05,.85,1.24),chestTimber,0,.44,0);
+    chestPart(new T.BoxGeometry(2.2,.34,1.36),chestLid,0,1.02,0);
+    for(const x of [-.73,.73]){
+      chestPart(new T.BoxGeometry(.15,1.25,1.43),chestGold,x,.66,0);
+      chestPart(new T.BoxGeometry(.24,.20,1.42),chestGold,x,1.14,0);
+    }
+    chestPart(new T.BoxGeometry(2.18,.13,1.36),chestGold,0,.13,0);
+    chestPart(new T.BoxGeometry(.37,.43,.12),chestGold,0,.79,.72);
+    chestPart(new T.BoxGeometry(.16,.22,.15),chestLock,0,.76,.81);
+    this.harbourDock.add(chest);
+    this.harbourDock.visible=false;
+  }
+  /** Separate original low-poly town, palms and striped beacon, visible only in Porto.
+   * Positioned behind the playable ship. The approved art is not used as a flat backdrop. */
+  private buildPortBackdrop(){
+    const port=this.harbourDock,ship=SHIPS.player;
+    const stone=new T.MeshStandardMaterial({color:'#969f96',flatShading:true,roughness:.94});
+    const grass=new T.MeshStandardMaterial({color:'#529458',flatShading:true,roughness:1});
+    const sand=new T.MeshStandardMaterial({color:'#e6c98b',roughness:1});
+    const plaster=[new T.MeshStandardMaterial({color:'#f5e8bf',roughness:1}),
+      new T.MeshStandardMaterial({color:'#edcbaa',roughness:1}),
+      new T.MeshStandardMaterial({color:'#f1e4cd',roughness:1})];
+    const roofMat=new T.MeshStandardMaterial({color:'#b14c32',roughness:.8});
+    const trimMat=new T.MeshStandardMaterial({color:'#5a4634',roughness:.88});
+    const seaMat=new T.MeshStandardMaterial({color:'#fce8b5',emissive:'#f5d38d',emissiveIntensity:.3});
+    const box=new T.BoxGeometry(1,1,1),isle=new T.IcosahedronGeometry(1,1);
+    // City and hills behind the vessel: avoid occluding the foreground 3D hull.
+    for(const [side,dx,dz] of [[-1,-8,-27],[1,25,-11]] as const){
+      const x=ship.x+dx,z=ship.z+dz;
+      const beach=new T.Mesh(isle,sand);beach.scale.set(7,2,4.5);beach.position.set(x,-.6,z);port.add(beach);
+      const cliff=new T.Mesh(isle,stone);cliff.scale.set(6.2,4.8,4);cliff.position.set(x,1.1,z-1.2);port.add(cliff);
+      const shrub=new T.Mesh(isle,grass);shrub.scale.set(5.9,1.2,3.7);shrub.position.set(x,4.5,z-1.2);port.add(shrub);
+      for(let i=0;i<4;i++){
+        const bx=x+(i-1.5)*2.15,bz=z-1.8+(i%2)*1.5;
+        const height=2.1+(i%3)*.72;
+        const building=new T.Mesh(box,plaster[i%3]);building.position.set(bx,5.2+height/2,bz);
+        building.scale.set(1.75,height,1.65);port.add(building);
+        const roof=new T.Mesh(new T.ConeGeometry(1.36,1.35,4),roofMat);
+        roof.rotation.y=Math.PI/4;roof.position.set(bx,5.2+height+.5,bz);port.add(roof);
+        const door=new T.Mesh(box,trimMat);door.scale.set(.4,.84,.06);
+        door.position.set(bx,5.35,bz+.86);port.add(door);
+      }
+      // Layered palms on the green slopes, with 6 long curved leaves each.
+      for(let p=0;p<3;p++){
+        const px=x+(p-1)*2.65,pz=z+1.8+p%2;
+        const trunk=new T.Mesh(new T.CylinderGeometry(.10,.19,3.5,7),trimMat);
+        trunk.position.set(px,6.7,pz);trunk.rotation.z=(p-1)*.16;port.add(trunk);
+        for(let j=0;j<6;j++){
+          const theta=j*Math.PI/3;
+          const leaf=new T.Mesh(new T.SphereGeometry(1,7,4),grass);
+          leaf.position.set(px+Math.cos(theta)*.88,8.5,pz+Math.sin(theta)*.88);
+          leaf.scale.set(1.25,.12,.37);leaf.rotation.y=-theta;leaf.rotation.z=.13;
+          port.add(leaf);
+        }
+      }
+      if(side===1){
+        // A working harbor landmark: original white/red lighthouse and glowing beacon.
+        const baseX=x+2.3,baseZ=z+.5;
+        const white=new T.MeshStandardMaterial({color:'#f9f3dc',roughness:.8});
+        const red=new T.MeshStandardMaterial({color:'#c95a42',roughness:.8});
+        for(let j=0;j<5;j++){
+          const tier=new T.Mesh(new T.CylinderGeometry(1-.10*(j+1),1-.10*j,1.65,12),j%2===0?white:red);
+          tier.position.set(baseX,5.3+j*1.65+.82,baseZ);port.add(tier);
+        }
+        const gallery=new T.Mesh(new T.CylinderGeometry(.95,.95,.3,12),trimMat);
+        gallery.position.set(baseX,13.8,baseZ);port.add(gallery);
+        const bulb=new T.Mesh(new T.SphereGeometry(.45,10,8),seaMat);bulb.position.set(baseX,14.4,baseZ);port.add(bulb);
+        const cap=new T.Mesh(new T.ConeGeometry(1.15,1.3,12),roofMat);cap.position.set(baseX,15.1,baseZ);port.add(cap);
+        // Shadowed lantern gallery and four long window slits give the beacon
+        // a clear maritime silhouette rather than a blank striped cylinder.
+        const glass=new T.MeshStandardMaterial({color:'#154d69',metalness:.25,roughness:.36,
+          emissive:'#ffd37b',emissiveIntensity:.2});
+        for(let a=0;a<4;a++){
+          const angle=a*Math.PI/2;
+          const window=new T.Mesh(new T.BoxGeometry(.24,.76,.11),glass);
+          window.position.set(baseX+Math.sin(angle)*.73,12.05,baseZ+Math.cos(angle)*.73);
+          window.rotation.y=angle;port.add(window);
+        }
+      }
+    }
+  }
+
+  /** Extra architectural layers for the approved tropical harbour.
+   * Original 3D geometry is switched off outside Porto; nothing here is a screenshot.
+   * Materials and primitive geometries are shared to keep mobile memory bounded.
+   */
+  private buildHarbourDetails(){
+    const port=this.harbourDock,ship=SHIPS.player;
+    const cream=new T.MeshStandardMaterial({color:'#f7dfad',roughness:.92});
+    const ivory=new T.MeshStandardMaterial({color:'#fff2d2',roughness:.9});
+    const coral=new T.MeshStandardMaterial({color:'#c66745',roughness:.82});
+    const stone=new T.MeshStandardMaterial({color:'#a6a795',roughness:.95});
+    const darkStone=new T.MeshStandardMaterial({color:'#747b78',roughness:.95});
+    const leaf=new T.MeshStandardMaterial({color:'#348a4e',roughness:.94,side:T.DoubleSide});
+    const palmWood=new T.MeshStandardMaterial({color:'#6f4c30',roughness:.92});
+    const wood=new T.MeshStandardMaterial({color:'#81512d',roughness:.84});
+    const gold=new T.MeshStandardMaterial({color:'#f9c75a',metalness:.5,roughness:.3});
+    const windowMat=new T.MeshStandardMaterial({color:'#21546b',roughness:.64});
+    const block=new T.BoxGeometry(1,1,1),cone=new T.ConeGeometry(1,1,4);
+    const cylinder=new T.CylinderGeometry(1,1,1,8),rock=new T.IcosahedronGeometry(1,1);
+    function add(g:T.BufferGeometry,m:T.Material,x:number,y:number,z:number,sx=1,sy=1,sz=1){
+      const mesh=new T.Mesh(g,m);mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);port.add(mesh);
+      return mesh;
+    }
+    // A layered Mediterranean fortress with staggered towers and battlements.
+    // Located behind the player ship so sails remain a clear touch target.
+    const castleX=ship.x+20,castleZ=ship.z-24;
+    add(rock,darkStone,castleX,.8,castleZ,8,5.7,5.6);
+    add(rock,leaf,castleX,4.0,castleZ,8,1.7,5.9);
+    for(const [dx,dz,h] of [[-4.5,0,7],[2.9,-2,8.8],[-.6,-1.8,6.4]]){
+      const x=castleX+dx,z=castleZ+dz;
+      add(block,cream,x,3.5+h/2,z,2.4,h,2.25);
+      add(block,stone,x,3.6+h,z,2.8,.46,2.6);
+      for(const xx of [-1.03,0,1.03]){
+        add(block,ivory,x+xx,4.05+h,z+1.08,.45,.76,.38);
+      }
+      const roof=add(cone,coral,x,4.65+h,z,1.95,1.75,1.95);
+      roof.rotation.y=Math.PI/4;
+      for(let j=0;j<2;j++){
+        add(block,windowMat,x,4.9+j*1.65,z+1.17,.52,.78,.08);
+        add(block,ivory,x,4.9+j*1.65-.47,z+1.24,.69,.12,.12);
+      }
+      // Golden heraldic banners add identifiable architecture without flat art.
+      const banner=add(block,coral,x-.64,3.7+h*.44,z+1.23,.58,1.24,.075);
+      banner.rotation.z=-.05;
+      add(block,gold,x-.64,4.33+h*.44,z+1.28,.66,.10,.10);
+    }
+    // Sunlit whitewashed houses fill the coast, with readable coloured windows.
+    const houses:[number,number,number,number][]=[
+      [7,-19,3.0,2.6],[9,-22,3.8,2.2],[14,-24,4.2,2.9],
+      [16,-27,2.8,2.5],[22,-13,3.1,2.9],[26,-15,4.3,3.2],
+      [30,-17,3.6,2.8],[24,-9,2.5,2.4]
+    ];
+    for(let i=0;i<houses.length;i++){
+      const [ox,oz,h,w]=houses[i],x=ship.x+ox,z=ship.z+oz,y=4.7+h*.5;
+      add(block,i%3===0?ivory:cream,x,y,z,w,h,w*.78);
+      const roof=add(cone,coral,x,y+h/2+.65,z,w*.86,1.5,w*.75);
+      roof.rotation.y=Math.PI/4;
+      for(const side of [-1,1]){
+        add(block,windowMat,x+side*w*.23,y+.2,z+w*.39+.04,.36,.57,.08);
+        add(block,ivory,x+side*w*.23,y+.2,z+w*.39+.09,.44,.07,.10);
+      }
+      add(block,wood,x,y-h*.26,z+w*.39+.06,.56,h*.46,.09);
+      // Dark arched lintels, terracotta ledges and pale facade edging are
+      // readable at phone size; only a handful of shared box geometries.
+      add(block,coral,x,y+h*.34,z+w*.39+.10,w*.80,.12,.15);
+      add(block,ivory,x-w*.42,y,z+w*.39+.08,.10,h*.85,.10);
+      add(block,ivory,x+w*.42,y,z+w*.39+.08,.10,h*.85,.10);
+    }
+    // 3D tapered palm leaves, built as triangles with a curved drooping tip.
+    const frondGeo=new T.BufferGeometry();
+    frondGeo.setAttribute('position',new T.Float32BufferAttribute([
+      0,0,0, 1.65,.16,.18, 2.7,-.30,0,
+      0,0,0, 2.7,-.30,0, 1.50,.14,-.27
+    ],3));
+    frondGeo.computeVertexNormals();
+    const palms:[number,number,number][]=[
+      [-23,-23,5.7],[-13,-22,6.2],[-8,-29,5.0],[18,-11,5.6],
+      [28,-11,6.8],[24,-18,5.0]
+    ];
+    for(const [ox,oz,h] of palms){
+      const x=ship.x+ox,z=ship.z+oz;
+      const trunk=add(cylinder,palmWood,x,h/2+4.8,z,.20,h,.24);
+      trunk.rotation.z=ox<0?-.12:.12;
+      for(let i=0;i<8;i++){
+        const leafMesh=new T.Mesh(frondGeo,leaf);
+        leafMesh.position.set(x,4.8+h,z);
+        leafMesh.rotation.y=i*Math.PI/4;
+        leafMesh.rotation.z=(i%2===0?.06:-.06);
+        port.add(leafMesh);
+      }
+      add(rock,leaf,x,4.9,z,1.1,.26,1.1);
+    }
+    // Near-water pilings, rope rails and lanterns frame the bottom of the screen.
+    // These remain to the sides; no decorative overlay may intercept ship touches.
+    const railwood=new T.CylinderGeometry(.11,.14,2.4,8);
+    for(const side of [-1,1]){
+      const x=ship.x+side*11.5;
+      for(let i=0;i<5;i++){
+        const z=ship.z+9+i*1.9;
+        add(railwood,wood,x,.65,z,1,1,1);
+        add(new T.CylinderGeometry(.18,.18,.17,8),gold,x,1.94,z);
+      }
+    }
+  }
+
+  private resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();if(this.cameraMode==='battle')this.home();else if(this.cameraMode==='harbour')this.showHarbour();}
+  home(){this.cameraMode='battle';this.scene.background=this.battleSky;this.water.uniforms.battleMode.value=1;this.battleAccentLights.visible=true;
+    // Cinematic battle-only art scale; the genuine physics ships and hit logic stay live.
+    // Reset to the original size in Porto so its approved composition/touch remain identical.
+    // Slightly enlarge ONLY the enemy's existing live render mesh in Batalha.
+    // Its world position, actual hull collision, HP and projectile origins remain unchanged.
+    const battleAspect=this.host.clientWidth/Math.max(1,this.host.clientHeight);
+    this.ships.player.root.scale.setScalar(1.25);
+    // Mobile enemy is deliberately smaller in this FIRST PERSON stage so
+    // its red sails stop masking sky/ocean; body geometry stays real and hit
+    // locations are unchanged. The Porto model resets to 1x in showHarbour().
+    this.ships.enemy.root.scale.setScalar(battleEnemyScale(battleAspect));
+    // Battle-only broadside: reveal the enemy's three-dimensional port flank
+    // instead of aiming its narrow bow straight at the camera. No camera
+    // movement, hit-point changes, altered controls or Porto composition.
+    this.ships.enemy.root.rotation.y=battleEnemyBroadsideYaw(battleAspect);
+    // First-person broadside: the player is standing behind the live gun deck.
+    // Keep the player's physics ship active for HP, firing, collisions and scars;
+    // hide only its exterior hull from this camera (never from Porto).
+    this.ships.player.root.visible=false;
+    // The black sail wall is no longer in the first-person mobile sightline.
+    this.battleForegroundSail.visible=false;
+    // Comparison at 390x844 showed that the tighter off-axis lens clips the
+    // live player ship. Restore both hulls fully inside the playable viewport.
+    this.camera.fov=42;this.camera.updateProjectionMatrix();
+    const pose=battleCameraPose(this.host.clientWidth/Math.max(1,this.host.clientHeight));
+    this.camera.position.set(...pose.position);
+    // Native 384x512 artwork: the player's large black sail is cropped by the
+    // LEFT edge, not parked in the center. Tall phone framing stays unchanged.
+    // This is one existing battle-only sail, never a third ship or a new jib.
+    this.battleForegroundSail.position.x=pose.sailX;
+    // The giant black left sail hid the enemy and half the arena on mobile.
+    // Keep a thin rigged foreground silhouette, freeing the central ocean.
+    this.battleForegroundSail.scale.set(pose.sailScaleX,pose.sailScaleY,1);
+    this.battleForegroundSail.visible=!pose.showBattery;
+    // A fixed forward-looking viewpoint, not the rejected moving camera.
+    // The battle-only camera targets the actual fixed pose in battle-framing.ts.
+    // On 320/384 the starboard enemy is closer, right-of-centre and framed
+    // above both real foreground cannon muzzles. 390/430 retain their prior
+    // fixed pose; this never moves the camera while the battle runs.
+    this.controls.target.set(...pose.target);
+    this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;
+    // Keep the real gunner's eye aligned behind the single cannon on phones.
+    this.controls.enableRotate=!pose.showBattery;
+    this.battleBattery.visible=pose.showBattery;
+    this.battleBattery.position.x=pose.batteryOffsetX;
+    this.battleBattery.position.z=pose.batteryOffsetZ;
+    // Both full 3D cannon assemblies shrink together on mobile, freeing
+    // the lower ocean/target. Visible muzzle coordinates follow the same
+    // transform, preserving live projectile/fire-smoke continuity.
+    this.battleBattery.scale.setScalar(pose.batteryScale);
+    this.lastAim=''; // reproject the real muzzle-to-target line on resize
+    this.controls.update();}
+  deck(){this.cameraMode='deck';this.camera.position.set(-17,7,12);this.controls.target.set(8,3,-2);this.controls.update();}
+  /** A real, close-up 3D harbour view: the player's animated ship, not a static mockup. */
+  showHarbour(){
+    this.cameraMode='harbour';this.battleAccentLights.visible=false;this.camera.fov=42;this.camera.updateProjectionMatrix();
+    this.scene.background=new T.Color('#58baf1');this.water.uniforms.battleMode.value=0;
+    this.ships.player.root.scale.setScalar(1);this.ships.enemy.root.scale.setScalar(1);
+    this.ships.player.root.visible=true;
+    this.shipPointers.clear();this.shipStart=null;this.battleBattery.visible=false;this.battleForegroundSail.visible=false;this.worldScenery.visible=true;this.ships.enemy.root.visible=false;this.foam[1].visible=false;this.harbourDock.visible=true;
+    this.path.visible=false;this.marker.visible=false;this.ball.visible=false;this.ballAura.visible=false;this.trail.visible=false;
+    this.controls.enableRotate=false;this.controls.enableZoom=false;this.controls.maxPolarAngle=1.28;
+    const ship=SHIPS.player,portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85;
+    this.controls.target.set(ship.x,portrait?3.5:2.9,ship.z+(portrait?1:0));
+    // Verified in the 390x844 Chromium capture: the old close camera cropped
+    // the starboard bow, left flank and upper sails. Pull back in portrait so
+    // all four live sails fit between the HUD columns and clear the battle CTA.
+    // Keep the ship raycast-touchable; never substitute a flat hero picture.
+    this.camera.position.set(ship.x-(portrait?26.4:18),portrait?11.4:9.4,ship.z+(portrait?23.3:17));
+    this.controls.update();
+  }
+  /** Harbour only: activate OrbitControls if touch begins on real ship geometry. */
+  private shipPointerDown=(event:PointerEvent)=>{
+    if(this.cameraMode!=='harbour'||this.paused)return;
+    const box=this.canvas.getBoundingClientRect();
+    if(!box.width||!box.height)return;
+    const p=new T.Vector2((event.clientX-box.left)/box.width*2-1,-(event.clientY-box.top)/box.height*2+1);
+    const ray=new T.Raycaster();ray.setFromCamera(p,this.camera);
+    const hit=ray.intersectObject(this.ships.player.root,true).length>0;
+    if(!hit&&!this.shipPointers.size){this.onShipSelection(false);return;}
+    this.shipPointers.add(event.pointerId);
+    if(!this.shipStart)this.shipStart={x:event.clientX,y:event.clientY};
+    this.shipMoved=false;
+    this.controls.enableRotate=true;this.controls.enableZoom=true;
+  };
+  private shipPointerMove=(event:PointerEvent)=>{
+    if(this.cameraMode!=='harbour'||!this.shipPointers.has(event.pointerId)||!this.shipStart)return;
+    if(Math.hypot(event.clientX-this.shipStart.x,event.clientY-this.shipStart.y)>6)this.shipMoved=true;
+  };
+  private shipPointerUp=(event:PointerEvent)=>{
+    if(!this.shipPointers.has(event.pointerId))return;
+    this.shipPointers.delete(event.pointerId);
+    if(!this.shipMoved)this.onShipSelection(true);
+    if(this.shipPointers.size===0){this.shipStart=null;this.controls.enableRotate=false;this.controls.enableZoom=false;}
+  };
+  /** Return to the live first-person battle deck; never a two-ships side view. */
+  showBattle(){this.water.uniforms.battleMode.value=1;this.shipPointers.clear();this.shipStart=null;this.ships.enemy.root.visible=true;this.foam[1].visible=true;this.harbourDock.visible=false;this.worldScenery.visible=false;this.controls.enableRotate=true;this.controls.enableZoom=true;this.controls.minDistance=18;this.controls.maxDistance=110;this.home();}
+  toggleMusic(){return this.pirateAudio.toggleMusic();}
+  toggleEffects(){return this.pirateAudio.toggleEffects();}
+  /** The same muzzle point used for real 3D flash geometry and ball render. */
+  private playerMuzzleWorld():T.Vector3|null {
+    const muzzle=this.batteryMuzzles[this.activeBatteryMuzzle];
+    if(!muzzle)return null;
+    const central=this.battleBattery.getObjectByName('first-person-central-recoil');
+    // Recoil, flash, smoke and projectile follow the exact animated barrel
+    // transform, not a guessed position on the invisible physics ship.
+    return central?battleDeckMuzzleWorld(central,muzzle)
+      :battleDeckMuzzleWorld(this.battleBattery,muzzle);
+  }
+  private effect(event:BattleEvent){
+    this.pirateAudio.play(event);
+    if(event.type==='fire'&&event.side==='player'){
+      this.activeBatteryMuzzle=(Math.max(0,this.battle.shotsFired-1))%Math.max(1,this.batteryMuzzles.length);
+      if(this.batteryMuzzles.length===1){
+        const flight=predict(this.battle.yaw,this.battle.power);
+        const end=flight[flight.length-1];
+        this.playerArcTarget=end?new T.Vector3(end.x,end.y,end.z):null;
+        this.playerArcDuration=Math.max(.055,(flight.length-1)*.055);
+      }
+    }
+    if(event.type==='fire')this.recoilAge[event.side]=0;if(event.type==='result')return;this.shake=event.type==='hit'?.18:.07;
+    if(event.type==='splash'||event.type==='hit'){
+      const ring=this.ripplePool.pop();
+      if(ring){ring.position.set(event.position.x,.14,event.position.z);ring.scale.setScalar(.6);ring.visible=true;
+        this.ripples.push({mesh:ring,age:0,life:event.type==='splash'?1.25:.85});}
+    }
+    if(event.type==='hit'){
+      const marks=this.ships[event.side].scars;
+      const index=this.impactCounts[event.side]++;
+      if(index<marks.length){
+        const pos=hullImpactPlacement(event.position,SHIPS[event.side]);
+        const mark=marks[index];mark.position.set(pos.x,pos.y,pos.z);
+        mark.rotation.y=pos.side*Math.PI/2;mark.visible=true;
+      }
+    }
+    // Player smoke originates at the actual selected visible cannon, never
+    // at the hidden physics origin to the right of the deck.
+    const vfxOrigin=event.type==='fire'&&event.side==='player'&&this.battleBattery.visible
+      ?this.playerMuzzleWorld():null;
+    const count=event.type==='hit'?38:event.type==='splash'?30:18;
+    for(let i=0;i<count && this.pool.length;i++){const mesh=this.pool.pop()!;const smoke=event.type!=='splash'&&i>count*.45;const angle=i*2.399;const speed=event.type==='fire'?1.5:3.4;
+      const color=event.type==='splash'?'#c3fcfa':smoke?'#535c5e':i%3===0?'#ad6b39':'#ffc54a';(mesh.material as T.MeshBasicMaterial).color.set(color);(mesh.material as T.MeshBasicMaterial).transparent=true;(mesh.material as T.MeshBasicMaterial).opacity=1;
+      mesh.position.set(vfxOrigin?.x??event.position.x,vfxOrigin?.y??event.position.y,vfxOrigin?.z??event.position.z);mesh.visible=true;const size=smoke?.3:.07+Math.random()*.13;mesh.scale.setScalar(size);
+      this.particles.push({mesh,velocity:new T.Vector3(Math.cos(angle)*speed*(.3+Math.random()),smoke?1.5:2+Math.random()*4,Math.sin(angle)*speed*(.3+Math.random())),age:0,life:smoke?2.4:1.1+Math.random()*.4,size,smoke});
+    }
+  }
+  reset(){this.battle.reset();this.recoilAge={player:Infinity,enemy:Infinity};for(const flash of Object.values(this.muzzleFlash))flash.visible=false;this.impactCounts={player:0,enemy:0};for(const ship of Object.values(this.ships))ship.scars.forEach(m=>m.visible=false);for(const p of this.particles){p.mesh.visible=false;this.pool.push(p.mesh);}this.particles=[];for(const ripple of this.ripples){ripple.mesh.visible=false;this.ripplePool.push(ripple.mesh);}this.ripples=[];this.ball.visible=false;this.ballAura.visible=false;this.trail.visible=false;this.shake=0;this.lastAim='';this.activeBatteryMuzzle=0;this.playerArcTarget=null;this.playerArcDuration=1;for(const flare of this.batteryFlashes)flare.visible=false;const smokeRig=this.battleBattery.getObjectByName('first-person-central-smoke');if(smokeRig)smokeRig.visible=false;this.home();}
+  getMetrics():Metrics{const info=this.renderer.info;const perf=performance as Performance & {memory?:{usedJSHeapSize:number}};return{fps:this.frameSamples.length?Math.round(1000/(this.frameSamples.reduce((a,b)=>a+b,0)/this.frameSamples.length)):0,renderMs:Math.round(this.renderMs),calls:info.render.calls,triangles:info.render.triangles,geometries:info.memory.geometries,textures:info.memory.textures,effects:this.particles.length,heapMB:perf.memory?Math.round(perf.memory.usedJSHeapSize/1048576):undefined};}
+  private animate=(timestamp:number)=>{
+    if(this.disposed)return;this.raf=requestAnimationFrame(this.animate);if(document.hidden||this.paused){this.previous=0;return;}
+    if(this.compatibility&&timestamp-this.lastRender<45)return;this.lastRender=timestamp;
+    const raw=this.previous?(timestamp-this.previous):16.7,dt=Math.min(raw/1000,.25);this.previous=timestamp;this.elapsed+=dt;this.frameSamples.push(raw);if(this.frameSamples.length>120)this.frameSamples.shift();
+    if(this.cameraMode==='battle'||this.cameraMode==='deck'){this.battle.tick(dt);for(const event of this.battle.drainEvents())this.effect(event);}
+    // The optional LOCAL visual A/B probe freezes only the rendered sea and
+    // decorative ship bob/sails at one frame. Gameplay, HP, camera and ticks
+    // remain untouched. This flag is ignored in the public Pages host.
+    const abFrame=typeof window!=='undefined' &&
+      (window.location.hostname==='127.0.0.1'||window.location.hostname==='localhost') &&
+      new URLSearchParams(window.location.search).has('work6ab');
+    const pictureTime=abFrame?2.25:this.elapsed;
+    this.water.uniforms.time.value=pictureTime;
+    for(const [side,art] of Object.entries(this.ships) as ['player'|'enemy',ShipArt][]){const health=this.battle.health[side];const damage=1-health/100;
+      art.root.position.y=Math.sin(pictureTime*1.1+(side==='player'?0:2))*.075-(health===0?1.3:0);art.root.rotation.z=Math.sin(pictureTime*.9)*.018+(health===0?(side==='enemy'?-.23:.23):damage*.035);
+      art.root.rotation.x=Math.sin(pictureTime*.75+2)*.014;art.rig.rotation.z=damage>.5?damage*.14:0;
+      art.sails.forEach((s,i)=>{s.rotation.y=Math.sin(pictureTime*1.3+i)*.035;s.scale.y=health<=42?.86:1;});art.flags.forEach((f,i)=>f.rotation.y=Math.sin(pictureTime*3+i)*.18);
+      if(this.recoilAge[side]<(side==='player'?CANNON_SMOKE_DURATION:CANNON_FX_DURATION))this.recoilAge[side]+=dt;
+      const cannonFx=cannonFxState(this.recoilAge[side]),flash=this.muzzleFlash[side],direction=side==='player'?1:-1;
+      if(flash){flash.visible=cannonFx.visible;flash.scale.set(cannonFx.flashScale,cannonFx.flashScale*.58,cannonFx.flashScale*.58);
+        (flash.material as T.MeshBasicMaterial).opacity=cannonFx.flashOpacity;}
+      for(const gun of art.guns){
+        const gunDirection=Math.sign(gun.position.x)||1;
+        gun.position.x=gunDirection*1.62-(gunDirection===direction?direction*cannonFx.recoil:0);
+        gun.position.y=1.56-(this.battle.shot?.age&&this.battle.shot.side===side?Math.max(0,.1-this.battle.shot.age)*1.2:0);
+      }
+    }
+    // A live broadside briefly illuminates the real foreground cannon muzzles.
+    const batteryFx=cannonFxState(this.recoilAge.player);
+    const centralRecoil=this.battleBattery.getObjectByName('first-person-central-recoil');
+    if(centralRecoil){
+      centralRecoil.position.z=68+batteryFx.recoil*.62;
+      // Actual bearing is computed below from the live target and deck pivot.
+      // The earlier 0.20 yaw multiplier visually contradicted the touch HUD.
+    }
+    for(const [index,flare] of this.batteryFlashes.entries()){flare.visible=this.battleBattery.visible&&batteryFx.visible&&index===this.activeBatteryMuzzle;flare.scale.setScalar(Math.max(.05,batteryFx.flashScale*.75));(flare.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity;}
+    const centralBlast=this.battleBattery.getObjectByName('first-person-central-blast-ring') as T.Mesh|undefined;
+    if(centralBlast){
+      centralBlast.visible=this.battleBattery.visible&&batteryFx.visible;
+      centralBlast.scale.setScalar(.54+batteryFx.flashScale*.74);
+      (centralBlast.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity*.64;
+    }
+    // The ignition jet uses the SAME animated recoil transform and barrel
+    // axis as the flash/smoke and is never visible outside the firing envelope.
+    const centralJet=this.battleBattery.getObjectByName('first-person-central-fire-jet') as T.Mesh|undefined;
+    if(centralJet){
+      centralJet.visible=this.battleBattery.visible&&batteryFx.visible;
+      centralJet.scale.setScalar(.55+batteryFx.flashScale*.7);
+      (centralJet.material as T.MeshBasicMaterial).opacity=batteryFx.flashOpacity*.92;
+    }
+    // Powder smoke hangs briefly in front of the ACTUAL moving muzzle. Six
+    // instanced puffs = one bounded draw call, zero per-shot mesh allocations.
+    const smokeRig=this.battleBattery.getObjectByName('first-person-central-smoke') as T.Group|undefined;
+    if(smokeRig){
+      const plume=cannonSmokeState(this.recoilAge.player);
+      smokeRig.visible=this.battleBattery.visible&&plume.visible;
+      smokeRig.scale.setScalar(plume.scale);
+      const wisps=smokeRig.getObjectByName('first-person-central-smoke-puffs') as T.InstancedMesh|undefined;
+      if(wisps)(wisps.material as T.MeshBasicMaterial).opacity=plume.opacity;
+    }
+    this.foam.forEach((f,i)=>{(f.material as T.MeshBasicMaterial).opacity=.3+Math.sin(pictureTime*2+i)*.12;f.scale.x=2.25+Math.sin(pictureTime)*.09;});
+    for(let i=this.ripples.length-1;i>=0;i--){const ripple=this.ripples[i];ripple.age+=dt;const state=rippleState(ripple.age,ripple.life);
+      if(state.finished){ripple.mesh.visible=false;this.ripplePool.push(ripple.mesh);this.ripples.splice(i,1);continue;}
+      ripple.mesh.scale.setScalar(state.scale);ripple.mesh.position.y=state.surfaceY;(ripple.mesh.material as T.MeshBasicMaterial).opacity=state.opacity;
+    }
+    const aimKey=`${this.battle.yaw}:${this.battle.power}`;
+    this.path.visible=this.marker.visible=(this.cameraMode==='battle'||this.cameraMode==='deck')&&this.battle.phase==='ready';
+    if(aimKey!==this.lastAim){
+      this.lastAim=aimKey;
+      const physics=predict(this.battle.yaw,this.battle.power);
+      const impact=physics[physics.length-1];
+      if(centralRecoil&&this.battleBattery.visible&&impact){
+        // Recompute on each user aim change (not on every animation frame).
+        // Align the visible ONE cannon with the same real simulated target
+        // that already drives the aim path and rendered projectile.
+        const pivot=centralRecoil.getWorldPosition(new T.Vector3());
+        centralRecoil.rotation.y=battleCentralCannonYaw(pivot,impact);
+        centralRecoil.updateWorldMatrix(true,true);
+      }
+      const mouth=this.batteryMuzzles.length===1&&this.battleBattery.visible?this.playerMuzzleWorld():null;
+      const points=mouth?physics.map((_,i)=>{
+        const p=firstPersonArc(mouth,impact,i/Math.max(1,physics.length-1));
+        return new T.Vector3(p.x,p.y,p.z);
+      }):physics.map(p=>new T.Vector3(p.x,p.y,p.z));
+      const attr=this.pathGeometry.attributes.position;points.forEach((p,i)=>attr.setXYZ(i,p.x,p.y,p.z));attr.needsUpdate=true;this.pathGeometry.setDrawRange(0,points.length);this.pathGeometry.computeBoundingSphere();this.path.computeLineDistances();this.marker.position.copy(points[points.length-1]);this.marker.position.y=Math.max(.16,this.marker.position.y);}
+    this.marker.rotation.z+=dt*.4;
+    if(this.battle.shot){const s=this.battle.shot;this.ball.visible=true;const visibleMuzzle=s.side==='player'&&this.battleBattery.visible?this.playerMuzzleWorld():null;
+      const rendered=visibleMuzzle&&this.playerArcTarget&&this.batteryMuzzles.length===1
+        ?firstPersonShotPosition(s,visibleMuzzle,this.playerArcTarget,this.playerArcDuration)
+        :visibleMuzzle?projectileFromMuzzle(s,visibleMuzzle):s.position;
+      this.ball.position.set(rendered.x,rendered.y,rendered.z);
+      // The one moving ball receives a short, warm outline for ocean contrast.
+      // No extra hitbox, simulation launch, damage or changed turn timing.
+      this.ballAura.visible=s.side==='player'&&this.battleBattery.visible;
+      if(this.ballAura.visible){
+        this.ballAura.position.copy(this.ball.position);
+        this.ballAura.scale.setScalar(Math.max(.48,.92-Math.min(s.age,1.2)*.35));
+        (this.ballAura.material as T.MeshBasicMaterial).opacity=Math.max(.14,.4-Math.min(s.age,1.2)*.18);
+      }
+      this.trail.visible=true;
+      const p=this.ball.position.clone();
+      const v=visibleMuzzle&&this.playerArcTarget&&this.batteryMuzzles.length===1
+        ?(() => {const next=firstPersonArc(visibleMuzzle,this.playerArcTarget!,
+          (s.age+.035)/this.playerArcDuration);return new T.Vector3(next.x,next.y,next.z).sub(p).normalize();})()
+        :new T.Vector3(s.velocity.x,s.velocity.y-12*s.age,s.velocity.z).normalize();
+      this.trail.geometry.setFromPoints([p,p.clone().addScaledVector(v,-1.2)]);}else{this.ball.visible=false;this.ballAura.visible=false;this.trail.visible=false;}
+    for(let i=this.particles.length-1;i>=0;i--){const p=this.particles[i];p.age+=dt;if(p.age>=p.life){p.mesh.visible=false;this.pool.push(p.mesh);this.particles.splice(i,1);continue;}p.mesh.position.addScaledVector(p.velocity,dt);if(!p.smoke)p.velocity.y-=8*dt;const alpha=1-p.age/p.life;(p.mesh.material as T.MeshBasicMaterial).opacity=alpha;p.mesh.scale.setScalar(p.size*(p.smoke?1+p.age*2:Math.max(.2,alpha)));}
+    this.controls.update();if(this.shake>0){this.camera.position.y+=Math.sin(timestamp*.1)*this.shake;this.shake*=.86;}
+    const renderStart=performance.now();this.renderer.render(this.scene,this.camera);this.renderMs=performance.now()-renderStart;
+    // LOCAL CHROMIUM EVIDENCE ONLY: a Playwright screenshot can take >1 second
+    // on SwiftShader and miss a 300ms muzzle blast entirely. Capture the real
+    // GPU drawing buffer DURING the exact frames of the animated firing event.
+    // No frame reads, state changes or allocations on the published website.
+    const shotQA=(window.location.hostname==='127.0.0.1'||window.location.hostname==='localhost')
+      &&new URLSearchParams(window.location.search).has('work6shots');
+    if(shotQA&&this.cameraMode==='battle'&&this.battleBattery.visible
+      &&this.recoilAge.player>=0&&this.recoilAge.player<CANNON_FX_DURATION
+      &&this.renderer instanceof T.WebGLRenderer){
+      const diagnostics=window as typeof window & {
+        __royalShotFrames?: {ageSec:number;width:number;height:number;rgba:Uint8Array}[]
+      };
+      const frames=diagnostics.__royalShotFrames??(diagnostics.__royalShotFrames=[]);
+      const milestones=[0,.08,.16,.25,.34];
+      if(frames.length<milestones.length&&this.recoilAge.player>=milestones[frames.length]){
+        const gl=this.renderer.getContext(),width=gl.drawingBufferWidth,height=gl.drawingBufferHeight;
+        if(width>0&&height>0&&width<=1280&&height<=1280){
+          const rgba=new Uint8Array(width*height*4);
+          gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,rgba);
+          if(gl.getError()===gl.NO_ERROR)frames.push({ageSec:this.recoilAge.player,width,height,rgba});
+        }
+      }
+    }
+    this.onFrame();if(timestamp-this.metricsAt>1000){this.metricsAt=timestamp;this.onMetrics(this.getMetrics());}
+  };
+  dispose(){this.disposed=true;cancelAnimationFrame(this.raf);this.resizeObserver.disconnect();document.removeEventListener('visibilitychange',this.onVisibility);this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.canvas.removeEventListener('pointerdown',this.shipPointerDown,true);this.canvas.removeEventListener('pointermove',this.shipPointerMove,true);this.canvas.removeEventListener('pointerup',this.shipPointerUp,true);this.canvas.removeEventListener('pointercancel',this.shipPointerUp,true);this.controls.dispose();const geometries=new Set<T.BufferGeometry>(),materials=new Set<T.Material>(),textures=new Set<T.Texture>();this.scene.traverse(o=>{if(o instanceof T.Mesh||o instanceof T.Line){geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:[o.material]){materials.add(m);for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);}}});geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());this.battleSky.dispose();this.renderer.dispose();this.canvas.remove();this.pirateAudio.dispose();}
+}

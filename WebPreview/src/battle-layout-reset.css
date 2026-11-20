@@ -1,0 +1,357 @@
+/* Desktop keeps all original camera/audio/restart controls visible. */
+.in-battle .battle-utilities {display:contents}
+.in-battle .view-controls .battle-utilities-toggle {display:none}
+.in-battle .battle-utilities-actions {display:contents}
+/* WORK 0 / #104 — systemic mobile battle hierarchy. Batalha ONLY.
+   Reference: assets/design-approved/02-batalha.webp.
+   Preserve the Porto, five-item navigation and all live controls. The settings
+   drawer is disclosure UI, not an extra gameplay feature. */
+@media (max-width:600px) {
+  .app.in-battle {height:100dvh;min-height:0;overflow:hidden}
+
+  /* One title, one exit, and one compact health row; the large duplicate
+     brand/currency slabs previously ate the first third of the battlefield. */
+  .in-battle .battle-approved-top {
+    height:46px;top:0;padding-top:max(8px,env(safe-area-inset-top));
+    display:flex;align-items:flex-start;justify-content:center
+  }
+  .in-battle .battle-approved-logo,
+  .in-battle .battle-approved-currencies {display:none}
+  .in-battle .battle-approved-banner {
+    margin:0;width:auto;height:34px;padding:0 8px;
+    border:0;border-radius:0;background:none;box-shadow:none;
+    font:900 22px/34px 'Barlow Condensed',sans-serif;
+    text-shadow:0 2px 5px #071a33;letter-spacing:1.1px
+  }
+  .in-battle .battle-approved-banner svg {width:13px;height:13px;opacity:.75}
+  .in-battle .return-harbour {
+    top:max(8px,env(safe-area-inset-top));left:10px;
+    height:36px;min-height:36px;padding:6px 10px;border:1px solid #b89459;
+    border-radius:7px;font:800 12px 'Barlow Condensed',sans-serif;
+    box-shadow:0 2px 5px #081b32ab;background:#0a2948d9;
+    letter-spacing:.2px
+  }
+  .in-battle .battle-hud {
+    top:max(52px,calc(env(safe-area-inset-top) + 49px));
+    left:50%;width:calc(100% - 18px);gap:4px
+  }
+  .in-battle .health-card {
+    min-height:46px;padding:5px 7px;gap:0;border:1px solid #9a824f;
+    border-radius:7px;box-shadow:0 2px 7px #071b3499;
+    background:linear-gradient(#183b62de,#0a274de8)
+  }
+  .in-battle .health-crest {display:none}
+  .in-battle .ship-label {font-size:8px;letter-spacing:.1px}
+  .in-battle .ship-label strong {font-size:10px}
+  .in-battle .health-detail h2 {
+    font:800 clamp(12px,3.6vw,17px)/1 'Barlow Condensed',sans-serif;
+    margin:2px 0 4px;max-width:100%
+  }
+  .in-battle .health-track {height:6px;border:0}
+  .in-battle .round {flex-basis:28px;gap:1px}
+  .in-battle .round .battle-versus {font-size:18px}
+  .in-battle .round span {font-size:8px;margin-top:2px}
+
+  /* Keep five existing camera/audio/restart actions, but not five giant
+     ornaments blocking the enemy and fighting the primary DISPARAR CTA. */
+  .in-battle .view-controls {
+    top:max(8px,env(safe-area-inset-top));right:9px;bottom:auto;left:auto;
+    transform:none;width:auto;padding:0;display:block;pointer-events:auto
+  }
+  .in-battle .battle-utilities {position:relative;display:block}
+  .in-battle .view-controls .battle-utilities-toggle {
+    list-style:none;display:grid;place-items:center;
+    width:36px;height:36px;border:1px solid #ae935d;border-radius:8px;
+    background:#0a2948e8;color:#ffe9b5;cursor:pointer;
+    box-shadow:0 2px 5px #081b32ab
+  }
+    .in-battle .battle-utilities-toggle span {font-size:23px;line-height:1}
+  .in-battle .battle-utilities-toggle:focus-visible {outline:3px solid #fff2ab;outline-offset:2px}
+  .in-battle .battle-utilities-actions {
+    position:absolute;top:42px;right:0;width:162px;padding:8px;
+    display:none;grid-template-columns:repeat(3,44px);gap:6px;
+    border:1px solid #b9955b;border-radius:9px;
+    background:#082641f5;box-shadow:0 9px 22px #02162ad9
+  }
+  .in-battle .battle-utilities-actions.is-open {display:grid}
+  .in-battle .view-controls .battle-utilities-actions button,
+  .in-battle .view-controls .battle-utilities-actions button:last-child {
+    position:static;display:grid;place-items:center;
+    width:44px;height:44px;flex:none;margin:0;padding:0;
+    border:1px solid #8b9bac;border-radius:7px;
+    background:#184265;color:#f9e5b6;box-shadow:none
+  }
+  .in-battle .view-controls .battle-utilities-actions button svg {width:21px;height:21px;filter:none}
+  .in-battle .view-controls .battle-utilities-actions button.active {border-color:#ffe5a0;background:#76532f}
+
+  /* The stage must remain visually dominant at 320-430px. Two deliberately
+     quiet sliders flank ONE recognisable firing control over the real deck. */
+  .in-battle .command-deck {
+    height:160px;bottom:0;left:0;right:0;width:100%;
+    border:0;border-radius:0;box-shadow:none;
+    background:linear-gradient(180deg,transparent 0%,#0c24314d 38%,#14232abb 100%);
+    pointer-events:none;overflow:visible
+  }
+  .in-battle .command-deck::before {display:none}
+  .in-battle .command-deck .turn-line {
+    position:absolute;top:-27px;left:12px;right:12px;
+    width:auto;height:25px;min-height:25px;padding:4px 9px;
+    border:1px solid #8a805a;border-radius:7px;
+    background:#0b2d4ce8;box-shadow:0 2px 6px #081c31a8
+  }
+  .in-battle .command-deck .turn-line strong {font-size:11px}
+  .in-battle .command-deck .turn-line .message {font-size:10px;max-width:63%}
+  .in-battle .command-deck .controls-body {padding:0;min-height:0}
+  .in-battle .command-deck .sliders {
+    position:absolute;left:10px;right:10px;bottom:20px;
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:clamp(100px,28vw,128px);min-height:68px;
+    padding:0;margin:0;border:0;border-radius:0;
+    background:none;box-shadow:none;pointer-events:auto
+  }
+  .in-battle .command-deck .sliders label {
+    min-width:0;padding:7px 5px 4px;
+    border:1px solid #8e8465;border-radius:7px;
+    background:#0a2c48d6;box-shadow:none
+  }
+  .in-battle .command-deck .sliders label>span {font-size:11px;gap:2px}
+  .in-battle .command-deck .sliders label>span svg {display:none}
+  .in-battle .command-deck .sliders b {font-size:13px}
+  .in-battle .command-deck .sliders input {height:30px;margin:0;touch-action:none}
+  .in-battle .command-deck .sliders .scale {font-size:7px}
+  .in-battle .command-deck .fire-button {
+    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+    width:94px;height:94px;flex:none;
+    border:3px solid #e6b868;border-radius:50%;
+    background:radial-gradient(circle at 35% 20%,#f56c4a,#c81d30 68%,#69172c);
+    box-shadow:0 0 0 2px #4f3628,0 7px 12px #0317289e;
+    pointer-events:auto
+  }
+  .in-battle .command-deck .fire-button svg {width:23px;height:23px}
+  .in-battle .command-deck .fire-button>span {font-size:23px;line-height:1}
+  .in-battle .command-deck .fire-button>small {font-size:8px}
+  .in-battle .command-deck .fire-button:active {transform:translate(-50%,2px)}
+  .in-battle .command-deck .deck-footer {display:none}
+}
+@media (max-width:350px) {
+  .in-battle .command-deck .sliders {left:6px;right:6px;gap:100px}
+  .in-battle .command-deck .sliders label>span {font-size:10px}
+  .in-battle .command-deck .sliders .scale {font-size:6px}
+  .in-battle .command-deck .fire-button {width:88px;height:88px;bottom:27px}
+}
+
+
+/* WORK 0 / #104 · Battle 02, stage-first structural mobile pass.
+   320×568 / native 384×512 / 390×844 / 430×932: the active turn
+   belongs with captain HP, not halfway across the opposing ship.
+   Move the EXISTING non-interactive status cue beside the HP hierarchy;
+   simplify the lower interaction surfaces so the moving 3D stage is dominant.
+   No new controls, fake coins, screenshot art, Porto or shared dock changes.
+   Do not consider this visually approved until real Chromium A/B review. */
+@media (max-width:600px) {
+  .in-battle .battle-hud {
+    top:max(49px,calc(env(safe-area-inset-top) + 46px));
+  }
+  .in-battle .health-card {
+    min-height:44px;
+    border-color:#8e865f;
+    box-shadow:0 2px 5px #06192e88;
+  }
+  .in-battle .command-deck {
+    height:150px;
+    background:linear-gradient(180deg,transparent 0%,#112a3433 36%,#16262c9c 100%);
+    box-shadow:none;
+  }
+  .in-battle .command-deck .turn-line {
+    position:fixed;
+    top:max(107px,calc(env(safe-area-inset-top) + 103px));
+    left:50%;right:auto;bottom:auto;
+    transform:translateX(-50%);
+    width:max-content;max-width:calc(100vw - 54px);
+    height:24px;min-height:24px;padding:4px 10px;
+    border:1px solid #93865c;border-radius:12px;
+    background:#092944db;box-shadow:0 2px 6px #06182b88;
+    gap:7px;
+  }
+  .in-battle .command-deck .turn-line strong {font-size:11px}
+  .in-battle .command-deck .turn-line .message {
+    max-width:48vw;margin-left:0;font-size:10px;
+  }
+  .in-battle .command-deck .sliders {
+    bottom:15px;min-height:68px;
+  }
+  .in-battle .command-deck .sliders label {
+    padding:6px 6px 4px;
+    border:1px solid #9d8c69;
+    background:linear-gradient(180deg,#092942d6,#0a2335a1);
+    box-shadow:none;
+  }
+  .in-battle .command-deck .fire-button {
+    bottom:21px;
+    box-shadow:0 0 0 2px #4f3628,0 5px 12px #03172888;
+  }
+}
+@media (max-width:350px) {
+  .in-battle .command-deck .sliders {bottom:14px}
+  .in-battle .command-deck .fire-button {bottom:24px}
+}
+
+/* WORK0 / #104 - true gunner stage, not the former stacked dashboard.
+   Mobile only. Move essential identity into the two live HP plates;
+   reserve the middle of the viewport for the actual 3D cannon and enemy.
+   There are NO new controls, simulated resources or screen captures in UI.
+   Porto and its five-button dock remain untouched. */
+@media (max-width:600px) {
+  .in-battle .battle-approved-top {
+    display:none;
+  }
+  .in-battle .return-harbour {
+    top:max(8px,env(safe-area-inset-top));
+    min-width:52px;min-height:36px;
+    border:1px solid #bb9a63;
+    background:rgba(9,38,65,.82);
+    box-shadow:0 2px 8px rgba(4,23,38,.23);
+  }
+  .in-battle .battle-hud {
+    top:max(47px,calc(env(safe-area-inset-top) + 43px));
+    width:calc(100% - 18px);gap:6px;
+  }
+  .in-battle .health-card {
+    min-height:42px;padding:4px 8px;
+    border:1px solid rgba(211,178,116,.67);
+    background:linear-gradient(180deg,rgba(11,46,78,.82),rgba(7,29,57,.80));
+    box-shadow:0 3px 9px rgba(5,20,40,.26);
+  }
+  .in-battle .health-detail h2 {margin:1px 0 4px}
+  .in-battle .ship-label {color:#d6e8ed}
+  .in-battle .health-track {height:7px}
+  .in-battle .round {flex-basis:28px}
+  /* Turn messaging is INFORMATION, not another floating navy card. */
+  .in-battle .command-deck .turn-line {
+    position:fixed;
+    top:max(97px,calc(env(safe-area-inset-top) + 93px));
+    left:50%;right:auto;
+    transform:translateX(-50%);
+    height:20px;min-height:20px;padding:2px 9px;
+    width:max-content;max-width:calc(100vw - 48px);
+    border:0;border-radius:10px;
+    color:#f9e9ba;background:rgba(6,38,67,.70);
+    box-shadow:0 1px 4px rgba(2,22,37,.20);
+  }
+  .in-battle .command-deck .turn-line .message {
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    max-width:42vw;font-size:9px;
+  }
+  /* A short, translucent control rail leaves the wooden deck and moving
+     sea visible; each slider stays a genuine >=44 px touch target. */
+  .in-battle .command-deck {
+    height:127px;
+    background:linear-gradient(180deg,transparent 0%,
+      rgba(7,27,38,.21) 36%,rgba(7,24,33,.70) 100%);
+  }
+  .in-battle .command-deck .sliders {
+    bottom:10px;left:9px;right:9px;
+    gap:clamp(96px,28vw,128px);
+    min-height:62px;
+  }
+  .in-battle .command-deck .sliders label {
+    min-height:60px;padding:5px 6px 2px;
+    border:1px solid rgba(196,172,115,.69);
+    border-radius:8px;
+    background:rgba(6,35,58,.76);
+    box-shadow:0 2px 8px rgba(4,18,31,.18);
+  }
+  .in-battle .command-deck .sliders label>span {font-size:10px}
+  .in-battle .command-deck .sliders .scale {color:#d3e0de}
+  .in-battle .command-deck .fire-button {
+    bottom:13px;width:88px;height:88px;
+    border:3px solid #e9c277;
+    box-shadow:0 0 0 2px #62452c,0 3px 10px rgba(2,20,35,.35);
+  }
+  .in-battle .command-deck .fire-button>span {font-size:21px}
+  .in-battle .view-controls .battle-utilities-toggle {
+    border-color:rgba(187,154,99,.80);
+    background:rgba(9,38,65,.82);
+    box-shadow:0 2px 8px rgba(4,23,38,.23);
+  }
+}
+@media (max-width:350px) {
+  .in-battle .command-deck .sliders {gap:95px;left:6px;right:6px}
+  .in-battle .command-deck .fire-button {width:82px;height:82px;bottom:16px}
+}
+@media (max-width:600px) and (max-height:560px) {
+  .in-battle .command-deck {height:117px}
+  .in-battle .command-deck .turn-line {top:max(92px,calc(env(safe-area-inset-top) + 88px))}
+}
+
+/* WORK0 / issue #104 · Batalha 02 visual hierarchy.
+   The original reference has two captain portraits OUTSIDE the live HP bars.
+   Use actual vector portraits, not screenshot/UI crops. This makes the two
+   teams instantly recognizable while keeping one-row health and open 3D stage.
+   Battle-only: no Porto, dock, title or economy changes. */
+@media (max-width:600px) {
+  .in-battle .battle-hud {
+    gap:4px;
+    top:max(47px,calc(env(safe-area-inset-top) + 43px));
+  }
+  .in-battle .health-card {
+    position:relative;min-height:49px;
+    padding:6px 7px 5px 49px;
+    align-items:center;overflow:visible;
+    background:linear-gradient(180deg,rgba(12,51,84,.90),rgba(6,29,57,.88));
+    border-color:#c5a572;
+  }
+  .in-battle .health-card.enemy {padding:6px 49px 5px 7px}
+  .in-battle .health-card .battle-captain-medallion {
+    position:absolute;top:50%;left:-4px;
+    transform:translateY(-50%);
+    display:grid;place-items:center;
+    flex:none;width:47px;height:47px;
+    padding:1px;border:3px solid #e8bd68;
+    border-radius:50%;
+    background:radial-gradient(circle at 40% 25%,#f8d891,#875227 76%,#4e2e22);
+    box-shadow:inset 0 0 0 1px #fff4b4,0 2px 5px #041a2db0;
+    overflow:hidden;z-index:2;
+  }
+  .in-battle .health-card.enemy .battle-captain-medallion {
+    left:auto;right:-4px;
+    border-color:#cf9f60;
+  }
+  .in-battle .battle-captain-medallion svg {
+    width:41px;height:41px;display:block;flex:none;
+    filter:none;
+  }
+  .in-battle .health-card .health-detail {
+    flex:1 1 auto;min-width:0;width:100%;
+  }
+  .in-battle .health-card .ship-label {
+    display:flex;align-items:center;justify-content:space-between;
+    gap:2px;white-space:nowrap;font-size:8px;letter-spacing:0;
+  }
+  .in-battle .health-card .ship-label strong {font-size:9px}
+  .in-battle .health-card .health-detail h2 {
+    font-size:clamp(10px,2.8vw,13px);
+    margin:3px 0 4px;
+  }
+  .in-battle .health-card .health-track {height:7px}
+  .in-battle .round {flex-basis:26px;min-width:26px}
+  .in-battle .round .battle-versus {font-size:17px}
+  .in-battle .command-deck .turn-line {
+    top:max(106px,calc(env(safe-area-inset-top) + 102px));
+  }
+}
+@media (max-width:350px) {
+  .in-battle .health-card {min-height:44px;padding-left:39px}
+  .in-battle .health-card.enemy {padding-right:39px;padding-left:5px}
+  .in-battle .health-card .battle-captain-medallion {
+    width:39px;height:39px;border-width:2px;left:-2px
+  }
+  .in-battle .health-card.enemy .battle-captain-medallion {
+    right:-2px;left:auto
+  }
+  .in-battle .battle-captain-medallion svg {width:35px;height:35px}
+  .in-battle .health-card .ship-label {font-size:7px}
+  .in-battle .health-card .ship-label strong {font-size:8px}
+  .in-battle .health-card .health-detail h2 {font-size:10px}
+  .in-battle .command-deck .turn-line {top:max(101px,calc(env(safe-area-inset-top) + 97px))}
+}

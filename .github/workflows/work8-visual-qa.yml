@@ -1,0 +1,55 @@
+name: WORK8 Approved Panels Visual QA
+
+on:
+  pull_request:
+    branches:
+      - work6/web-3d-preview
+    paths:
+      - 'WebPreview/src/work8-panels.tsx'
+      - 'WebPreview/src/work8-panels.css'
+      - 'WebPreview/scripts/capture-work8.mjs'
+      - '.github/workflows/work8-visual-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  work8-mosaic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: WebPreview
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: WebPreview/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Check build and existing game tests
+        run: |
+          npm test
+          npm run build -- --base=/royal-pirate/
+      - name: Capture real mobile screens and compare original frames
+        run: |
+          set -euo pipefail
+          npx vite preview --host 127.0.0.1 --port 4178 --strictPort --base=/royal-pirate/ >/tmp/work8-vite.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
+          for n in $(seq 1 60); do
+            if curl -fsS --max-time 2 -o /dev/null http://127.0.0.1:4178/royal-pirate/; then break; fi
+            sleep 0.25
+          done
+          CHROME_BIN="$(command -v google-chrome || command -v chromium)" node scripts/capture-work8.mjs
+      - name: Upload real screenshots + comparisons at 320, 384, 390, 430
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: work8-mosaic-qa-${{ github.run_id }}
+          path: WebPreview/work8-qa/
+          retention-days: 3
+          if-no-files-found: ignore

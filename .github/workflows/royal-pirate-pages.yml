@@ -1,0 +1,176 @@
+name: Publish Royal Pirate Web Preview (GitHub Pages)
+
+on:
+  push:
+    branches:
+      - work6/web-3d-preview
+    paths:
+      - 'WebPreview/**'
+      - '.github/workflows/royal-pirate-pages.yml'
+  pull_request:
+    branches:
+      - work6/web-3d-preview
+    paths:
+      - 'WebPreview/**'
+      - '.github/workflows/royal-pirate-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: royal-pirate-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    outputs:
+      release_version: ${{ steps.release.outputs.version }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: WebPreview
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: WebPreview/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Test game
+        run: npm test
+      - name: Build preview for GitHub Pages
+        run: npm run build -- --base=/royal-pirate/
+      - name: Assert release version and project asset paths
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          import assert from 'node:assert/strict';
+          const version = JSON.parse(readFileSync('package.json', 'utf8')).version;
+          const html = readFileSync('dist/index.html', 'utf8');
+          const css = readFileSync('dist/fonts/fonts.css', 'utf8');
+          assert.ok(html.includes('v' + version), 'visible version must match package version');
+          const { existsSync } = await import('node:fs');
+          const manifest = JSON.parse(readFileSync('dist/manifest.webmanifest','utf8'));
+          assert.equal(manifest.start_url,'./');
+          assert.equal(manifest.scope,'./');
+          assert.equal(manifest.icons.length,2);
+          assert.ok(existsSync('dist/icon-192.png') && existsSync('dist/icon-512.png'));
+          assert.ok(existsSync('dist/sw.js'), 'PWA worker must be deployed');
+          assert.ok(html.includes('/royal-pirate/manifest.webmanifest'), 'PWA manifest must have project base path');
+          assert.ok(html.includes('/royal-pirate/fonts/fonts.css'), 'font stylesheet must use project base path');
+          assert.ok(!css.includes('url(/fonts/'), 'font files must resolve relative to their stylesheet');
+          assert.ok(css.includes('url(./font-0.ttf)'), 'self-hosted font paths must work under project path');
+          console.log('Release v' + version + ': version and project asset paths validated.');
+          NODE
+      - name: Expose verified release version
+        id: release
+        run: echo "version=$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).version')" >> "$GITHUB_OUTPUT"
+      - name: Capture real Porto canvas at 390x844 mobile viewport
+        continue-on-error: false
+        run: |
+          set -euo pipefail
+          npx vite preview --host 127.0.0.1 --port 4173 --strictPort --base=/royal-pirate/ >/tmp/royal-porto-vite.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 40); do
+            if curl -fsS --max-time 2 -o /dev/null http://127.0.0.1:4173/royal-pirate/; then
+              break
+            fi
+            sleep 0.25
+          done
+          CHROME_BIN="$(command -v google-chrome || command -v chromium)" node scripts/capture-porto.mjs
+          python3 scripts/assert-forge-visibility.py porto-qa/forge-mobile-390x844.png
+      # No credentials, no mutation, no false equivalence from an HTTP 200.
+      # Compares visible release markers and same-origin JS/CSS SHA-256.
+      # Failure/absence of Sites must not prevent a valid Pages publication.
+      - name: Audit public GitHub Pages and ChatGPT Sites parity (read only)
+        if: always()
+        continue-on-error: true
+        env:
+          EXPECTED_RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: node scripts/audit-sites-parity.mjs
+
+      - name: Upload short-lived browser snapshot and mobile QA data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: porto-mobile-qa-${{ github.run_id }}
+          path: WebPreview/porto-qa/
+          if-no-files-found: ignore
+          retention-days: 1
+
+      - name: Upload verified site
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: WebPreview/dist
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: royal-pirate-web-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Read Pages configuration
+        uses: actions/configure-pages@v5
+      - name: Publish GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Verify public Pages HTTP, release label, and CSS
+        env:
+          RELEASE_VERSION: ${{ needs.verify.outputs.release_version }}
+          PUBLIC_URL: https://drozz2025.github.io/royal-pirate/
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 18); do
+            echo "Checking public release v${RELEASE_VERSION} (attempt ${attempt}/18)"
+            if curl --max-time 15 -fsSL "${PUBLIC_URL}" -o /tmp/royal-pirate-index.html &&
+               grep -Fq "v${RELEASE_VERSION}" /tmp/royal-pirate-index.html &&
+               grep -Fq '/royal-pirate/fonts/fonts.css' /tmp/royal-pirate-index.html &&
+               curl --max-time 15 -fsSL "${PUBLIC_URL}fonts/fonts.css" -o /tmp/royal-pirate-fonts.css &&
+               curl --max-time 15 -fsSL "${PUBLIC_URL}manifest.webmanifest" -o /tmp/royal-pirate-manifest.json &&
+               curl --max-time 15 -fsSL "${PUBLIC_URL}icon-192.png" -o /tmp/royal-pirate-icon.png &&
+               curl --max-time 15 -fsSL "${PUBLIC_URL}sw.js" -o /tmp/royal-pirate-sw.js; then
+                 echo "PUBLIC RELEASE VERIFIED: v${RELEASE_VERSION} at ${PUBLIC_URL}"
+                 exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Public Pages HTTP/version verification failed; do not announce the release as live."
+          exit 1
+
+  audit:
+    if: ${{ always() && github.event_name == 'push' }}
+    needs: [verify, deploy]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Record release attempt in issue 23
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERIFY_RESULT: ${{ needs.verify.result }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+          RELEASE_VERSION: ${{ needs.verify.outputs.release_version }}
+        run: |
+          set -euo pipefail
+          RUN_LINK="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          if [[ "$VERIFY_RESULT" == "success" && "$DEPLOY_RESULT" == "success" ]]; then
+            RESULT="Publicação e verificação HTTP: APROVADAS"
+          else
+            RESULT="Publicação NÃO confirmada; consultar logs e corrigir o bloqueio"
+          fi
+          BODY=$(printf 'WORK 6 — Pages | %s\nVersão compilada: v%s\nCI verify: %s\nDeploy + HTTP: %s\nExecução: %s\nBranch: %s\nNão alterar main nem anunciar URL sem deploy e HTTP aprovados.' "$RESULT" "${RELEASE_VERSION:-desconhecida}" "$VERIFY_RESULT" "$DEPLOY_RESULT" "$RUN_LINK" "$GITHUB_REF_NAME")
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/23/comments" --raw-field "body=$BODY"

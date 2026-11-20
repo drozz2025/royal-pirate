@@ -1,0 +1,26 @@
+{
+  "name": "royal-pirate-web-preview",
+  "version": "0.1.117",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/generate-icons.mjs",
+    "dev": "vite --host 0.0.0.0",
+    "prebuild": "node scripts/generate-icons.mjs",
+    "build": "tsc --noEmit && vite build",
+    "test": "node --import tsx --test --test-concurrency=2 tests/*.test.ts"
+  },
+  "dependencies": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.16",
+    "@types/react-dom": "19.1.9",
+    "@types/three": "0.180.0",
+    "typescript": "5.9.3",
+    "vite": "7.1.12",
+    "tsx": "4.20.6"
+  }
+}

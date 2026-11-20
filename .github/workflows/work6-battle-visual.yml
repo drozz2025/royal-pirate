@@ -1,0 +1,110 @@
+name: WORK6 Battle visual evidence 01-02
+on:
+  pull_request:
+    branches: [work6/web-3d-preview]
+    paths:
+      - 'WebPreview/src/battle-layout-reset.css'
+      - 'WebPreview/src/battle-approved.css'
+      - 'WebPreview/src/main.tsx'
+      - 'WebPreview/src/battle-framing.ts'
+      - 'WebPreview/src/battle-deck.ts'
+      - 'WebPreview/tests/work0-battle-mobile-systemic.test.ts'
+      - 'WebPreview/src/scene.ts'
+      - 'WebPreview/src/battle-atmosphere.ts'
+      - 'WebPreview/tests/battle-atmosphere.test.ts'
+      - 'WebPreview/src/ships.ts'
+      - 'WebPreview/tests/battle-enemy-presentation.test.ts'
+      - 'WebPreview/src/battle-foreground-sail.ts'
+      - 'WebPreview/tests/battle-foreground-sail.test.ts'
+      - 'WebPreview/scripts/work6-visual-capture.mjs'
+      - '.github/workflows/work6-battle-visual.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  battle-visual:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: WebPreview/package-lock.json
+      - name: Install locked dependencies
+        working-directory: WebPreview
+        run: npm ci
+      - name: Unit tests
+        working-directory: WebPreview
+        run: npm test
+      - name: Typecheck and production build
+        working-directory: WebPreview
+        run: npm run build -- --base=/royal-pirate/
+      - name: Use runner's verified system Chromium (avoid apt mirror stalls)
+        working-directory: WebPreview
+        run: |
+          set -euo pipefail
+          # The Pages verify workflow already captures WebGL with this preinstalled
+          # Chrome binary. Playwright's --with-deps previously stalled apt for 16m
+          # and cancelled the actual visual screenshots, even though tests passed.
+          npm install --no-save --no-package-lock playwright@1.56.1
+          chrome="$(command -v google-chrome || command -v chromium)"
+          test -x "$chrome"
+          "$chrome" --version
+          echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+      - name: Capture real 320/384/390/430 eight-screen dock and Batalha
+        working-directory: WebPreview
+        run: |
+          # Render the *built* public Pages app, not Vite dev source: otherwise
+          # 05/06 WebP can be missing in evidence even though public images work.
+          npx vite preview --host 127.0.0.1 --port 5173 --strictPort --base=/royal-pirate/ > /tmp/royal-work6-vite.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:5173/royal-pirate/ > /dev/null && break || sleep 2; done
+          node scripts/work6-visual-capture.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build reference | render | overlay evidence (not an approval)
+        working-directory: WebPreview
+        run: |
+          pip install pillow
+          python - <<'PY'
+          from PIL import Image, ImageOps, ImageDraw
+          from pathlib import Path
+          root=Path('work6-qa')
+          refs={'porto':Path('../assets/design-approved/01-porto.webp'),
+                'battle':Path('../assets/design-approved/02-batalha.webp'),
+                'frota':Path('../assets/design-approved/03-frota.webp'),
+                'forja':Path('../assets/design-approved/04-melhorias-forja.webp'),
+                'cartas':Path('../assets/design-approved/05-cartas.webp'),
+                'loja':Path('../assets/design-approved/06-loja.webp'),
+                'missoes':Path('../assets/design-approved/07-missoes.webp'),
+                'ranking':Path('../assets/design-approved/08-ranking-perfil.webp')}
+          for screen, refpath in refs.items():
+              source=Image.open(refpath).convert('RGB')
+              for w,h in [(320,568),(384,512),(390,844),(430,932)]:
+                  render=Image.open(root/f'{screen}-{w}x{h}.png').convert('RGB')
+                  assert render.size==(w,h),f'{screen} screenshot is not {w}x{h}'
+                  scaled=ImageOps.contain(source,(w,h),Image.Resampling.LANCZOS)
+                  ref=Image.new('RGB',(w,h),'#10263d')
+                  ref.paste(scaled,((w-scaled.width)//2,(h-scaled.height)//2))
+                  overlay=Image.blend(ref,render,.5)
+                  compared=Image.new('RGB',(w*3,h))
+                  for i,panel in enumerate((ref,render,overlay)):compared.paste(panel,(w*i,0))
+                  draw=ImageDraw.Draw(compared)
+                  for i,label in enumerate(('REFERENCE (CONTAIN)','REAL CHROMIUM','50% OVERLAY')):
+                      draw.rectangle((w*i,0,w*(i+1),23),fill='#07182b')
+                      draw.text((w*i+7,6),label,fill='#f7d697')
+                  compared.save(root/f'compare-{screen}-{w}x{h}.png')
+                  print(f'{screen} {w}x{h}: reference | render | overlay generated; approved:false')
+          PY
+      - name: Upload reproducible visual comparisons
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: work6-battle-visual-320-390-430
+          path: WebPreview/work6-qa/
+          if-no-files-found: warn
+          retention-days: 14
