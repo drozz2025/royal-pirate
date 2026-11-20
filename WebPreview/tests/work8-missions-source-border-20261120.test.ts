@@ -111,9 +111,9 @@ test('07 Missions: three live mission emblems plus active controls improve appro
     const afterLayout=await geometry();
     const selectedAfter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-art")).filter');
     assert.notEqual(selectedAfter,selectedBefore,'live mission illustrations must gain approved-source luminosity');
-    assert.match(selectedAfter,/brightness\\(2\\)/,'native Chromium must apply brightness(2) only to authentic mission artwork');
+    assert.match(selectedAfter,/brightness\(2\)/,'native Chromium must apply brightness(2) only to authentic mission artwork');
     const actionFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest[data-state=active] > button")).filter');
-    assert.match(actionFilter,/brightness\\(1\\.5\\)/,'native Chromium must illuminate only real active mission actions');
+    assert.match(actionFilter,/brightness\(1\.5\)/,'native Chromium must illuminate only real active mission actions');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
     assert.deepEqual(afterLayout.tabBoxes,beforeLayout.tabBoxes,'tab tap targets and layout must not shift');
