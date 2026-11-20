@@ -252,6 +252,17 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         {id:'warm-slate',paint:'linear-gradient(173deg,#303234 0%,#1a242b 52%,#0b1921 100%)'},
         {id:'steel-sheen',paint:'radial-gradient(ellipse 70% 65% at 48% 0%,#c48a4b24 0%,transparent 75%),linear-gradient(173deg,#283038 0%,#18222b 55%,#0a1721 100%)'},
         {id:'prior-HEAD',paint:'radial-gradient(ellipse 76% 94% at 32% 0%,#a86e3738 0%,transparent 77%),repeating-linear-gradient(2deg,transparent 0 10px,#c89b5410 10px 11px,transparent 12px 21px),linear-gradient(173deg,#1a1f23 0%,#131c24 52%,#0b161e 100%)'},
+        {id:'source-charcoal-minus-1',paint:'linear-gradient(173deg,#242828 0%,#151e24 50%,#081520 100%)'},
+        {id:'source-charcoal-blue-1',paint:'linear-gradient(173deg,#252a2a 0%,#161e26 50%,#091622 100%)'},
+        {id:'source-charcoal-neutral',paint:'linear-gradient(173deg,#262929 0%,#161e24 50%,#091621 100%)'},
+        {id:'source-charcoal-low-warmth',paint:'linear-gradient(173deg,#262a29 0%,#171f24 50%,#0a1621 100%)'},
+        {id:'source-charcoal-dark-ink',paint:'linear-gradient(173deg,#232727 0%,#141d22 50%,#08151e 100%)'},
+        {id:'source-charcoal-soft-steel',paint:'linear-gradient(173deg,#262a2b 0%,#171f26 50%,#0b1723 100%)'},
+        {id:'source-charcoal-vertical',paint:'linear-gradient(180deg,#252929 0%,#161f25 50%,#091621 100%)'},
+        {id:'source-charcoal-160',paint:'linear-gradient(160deg,#252929 0%,#161f25 50%,#091621 100%)'},
+        {id:'source-charcoal-highlights',paint:'radial-gradient(ellipse 90% 72% at 18% 5%,#b8854530,transparent 75%),linear-gradient(173deg,#252929 0%,#161f25 50%,#091621 100%)'},
+        {id:'source-charcoal-ember-dim',paint:'radial-gradient(ellipse 75% 60% at 88% 0%,#a9562b14,transparent 78%),linear-gradient(173deg,#252929 0%,#161f25 50%,#091621 100%)'},
+        {id:'source-charcoal-upper-blue',paint:'radial-gradient(ellipse 90% 72% at 20% 5%,#24608424,transparent 76%),linear-gradient(173deg,#252929 0%,#161f25 50%,#091621 100%)'},
         {id:'forge-warm-edge',paint:'radial-gradient(ellipse 72% 72% at 8% 88%,#bb68302b 0%,transparent 78%),linear-gradient(173deg,#292e2f 0%,#18252a 55%,#0b1722 100%)'}
       ];
     const paintShots:[string,string][]=[['HEAD',images[0][1]]];
