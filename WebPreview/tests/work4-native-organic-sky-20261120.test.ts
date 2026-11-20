@@ -25,10 +25,10 @@ test('WORK4 organic sky candidate cannot change approved 03/04 art, real data, d
   }
   assert.ok(paint,'native scoped candidate is present');
   assert.match(paint,/@media \(width:384px\) and \(height:512px\)/);
-  assert.match(paint,/background:radial-gradient\(ellipse 140% 160%/);
-  assert.match(paint,/mask-image:radial-gradient\(ellipse 142% 120%/);
+  assert.match(paint,/background:linear-gradient\(180deg,#051a30f7 0%,#072a42ed 44%,#0d618900 100%\)/);
+  assert.doesNotMatch(paint,/mask-image:/,'preserve the HEAD source-sky edge mask');
   assert.equal((paint.match(/\.w4-harbour-stage::after/g)||[]).length,1);
-  assert.doesNotMatch(paint,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-reference-sea|\.w4-reference-ship|\.w4-cannon-art|\.w4-forge|contain:paint|transform:|position:|pointer-events:|height:|width:)/);
+  assert.doesNotMatch(paint,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-reference-sea|\.w4-reference-ship|\.w4-cannon-art|\.w4-forge|contain:paint|transform:|position:|pointer-events:|(?:^|[;{}])\s*height:|(?:^|[;{}])\s*width:)/);
   assert.ok(css.includes('radial-gradient(ellipse 110% 123% at 30% 50%'),'merged approved source coast survives');
   assert.ok(css.includes('svg.w4-reference-sea'),'single original water crop survives');
   assert.ok(css.includes('radial-gradient(ellipse 140% 122% at 37% 49%'),'protected Forge cannon survives');
@@ -123,7 +123,7 @@ test('WORK4 Fleet native organic sky A/B: ORIGINAL BEFORE RENDER OVERLAY and pro
   assert.equal(geometry.sea,1,'exactly one approved source sea');
   assert.equal(geometry.dock,5,'five dock buttons still present and touchable');
   assert.equal(geometry.realLevels,3,'existing real levels preserved');
-  await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const href=document.querySelector('svg.w4-reference-ship image')?.getAttribute('href');if(!href||!(await fetch(href)).ok)throw Error('approved ship source not loaded');const style=document.createElement('style');style.id='work4-native-ab-baseline';style.textContent="+JSON.stringify(selector+"{background:"+oldGradient+"!important;-webkit-mask-image:"+oldMask+"!important;mask-image:"+oldMask+"!important;}")+";document.head.append(style);return true;})()");
+  await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const node=document.querySelector('svg.w4-reference-ship image');const href=node?.getAttribute('href')||node?.href?.baseVal;if(!href||!href.includes('03-frota')||!node.getBoundingClientRect().width)throw Error('approved ship source not in scene');const style=document.createElement('style');style.id='work4-native-ab-baseline';style.textContent="+JSON.stringify(selector+"{background:"+oldGradient+"!important;-webkit-mask-image:"+oldMask+"!important;mask-image:"+oldMask+"!important;}")+";document.head.append(style);return true;})()");
   await delay(180);
   const before=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
   await evaluate("document.getElementById('work4-native-ab-baseline')?.remove();true");
