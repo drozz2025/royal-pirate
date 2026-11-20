@@ -235,7 +235,7 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         {id:'coast-lip-6px',paint:null,seam:'left:-6px;width:6px;background:linear-gradient(90deg,transparent 0%,#082c48de 100%);'},
         {id:'coast-lip-8px',paint:null,seam:'left:-8px;width:8px;background:linear-gradient(90deg,transparent 0%,#082c48de 100%);'},
         {id:'coast-lip-12px',paint:null,seam:'left:-12px;width:12px;background:linear-gradient(90deg,transparent 0%,#082c48de 100%);'},
-        {id:'coast-lip-10px-colour',paint:null,seam:'left:-10px;width:10px;background:linear-gradient(90deg,transparent 0%,#07415aee 100%);'},
+        {id:'prior-10px-colour',paint:null,seam:'left:-10px;width:10px;background:linear-gradient(90deg,transparent 0%,#082c48de 100%);'},
         {id:'deep-coast',paint:'linear-gradient(90deg,#073d52ec 0%,#092a41f2 22%,#071d33f8 55%,#031529fc 100%)'},
         {id:'source-blue',paint:'linear-gradient(90deg,#06506adf 0%,#08344bee 20%,#081f36f9 55%,#031529fc 100%)'},
         {id:'muted-slate',paint:'linear-gradient(90deg,#0a354bea 0%,#0b2a42f3 22%,#071c34f9 55%,#031529fc 100%)'},
@@ -321,6 +321,21 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         'small protected native visual adjustment must not materially regress frame MAE');
       const oldLine=pigments.records.find((r:any)=>r.id==='prior-silver-edge');
       assert.ok(oldLine,'capture legacy 1px silver edge from real Chromium');
+      const previousColour=pigments.records.find((r:any)=>r.id==='prior-10px-colour');
+      assert.ok(previousColour,'previous real 10px photo-coast ink is captured');
+      assert.ok(after.seam < previousColour.seam-.35,
+        'new source-matched 10px ink must improve genuine photo edge ROI');
+      assert.ok(after.full < previousColour.full-.005,
+        'new source-matched ink must improve full-frame original MAE');
+      assert.equal(previousColour.shipOrCannonChanged,0,
+        'source ink may not change Royal Crown artwork');
+      assert.equal(previousColour.dockChanged,0,'source ink may not change WORK0 dock');
+      console.log('WORK4_NATIVE_COLOUR_LIP_WINNER '+JSON.stringify({
+        oldFull:previousColour.full,newFull:after.full,
+        oldSeam:previousColour.seam,newSeam:after.seam,
+        changedPixels:previousColour.changedFromHead,
+        shipChanged:previousColour.shipOrCannonChanged,
+        dockChanged:previousColour.dockChanged}));
       const lip=pigments.records.find((r:any)=>r.id==='rejected-14px-coast-lip');
       assert.ok(lip,'native same-frame rejected photo-bridge captured');
       assert.ok(after.seam < lip.seam-.20,
