@@ -1889,6 +1889,77 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
 
+
+    /* WORK8/#104: real 07-only seven-day caption registration against approved
+       original 384x512. Both screenshots are from this exact Chromium page,
+       with all WebP art decoded, fonts loaded, animation frozen and DPR1.
+       No DOM/values/hitbox/content substitutions. */
+    const captionBaselineClass='work8-missions-day-caption-registration-ab-baseline';
+    const captionLayout=()=>evalJs('(()=>{const rect=e=>{const r=e?.getBoundingClientRect();return r?{x:r.x,y:r.y,right:r.right,bottom:r.bottom}:null};const day=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")];const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")];return {captions:day.map(li=>rect(li.querySelector("small"))),chests:day.map(li=>rect(li.querySelector(".w8-approved-chest"))),days:day.map(rect),quests:quests.map(rect),questButtons:quests.map(e=>rect(e.querySelector("button"))),nav:rect(document.querySelector(".app-sheet > .harbour-nav")),dockCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,documentWidth:document.documentElement.scrollWidth,labels:day.map(li=>li.querySelector("small")?.textContent?.trim())};})()');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(captionBaselineClass)+');true');
+    await delay(160);
+    const captionBeforeLayout=await captionLayout();
+    const captionBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(captionBaselineClass)+');true');
+    await delay(160);
+    const captionAfterLayout=await captionLayout();
+    const captionAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const captionSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+captionBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+captionAfter))
+      .replace('chests:[20,356,370,427],dock:', 'chests:[20,356,370,427],dayLabels:[21,404,365,429],dock:');
+    assert.notEqual(captionSource,source,'native A/B must contain two different real Chromium captures');
+    const captionMetrics=await evalJs(captionSource);
+    const captionMontage=await evalJs('(async()=>{const urls='+JSON.stringify([
+      'data:image/webp;base64,'+orig,'data:image/png;base64,'+captionBefore,'data:image/png;base64,'+captionAfter
+    ])+';const images=await Promise.all(urls.map(s=>new Promise((ok,fail)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=fail;im.src=s})));if(images.some(i=>i.width!==384||i.height!==512))throw Error("source and render MUST be native 384x512");const canvas=document.createElement("canvas");canvas.width=1536;canvas.height=512;const c=canvas.getContext("2d");images.forEach((im,n)=>c.drawImage(im,n*384,0));c.drawImage(images[0],1152,0);c.globalAlpha=.5;c.drawImage(images[2],1152,0);return canvas.toDataURL("image/png").split(",")[1]})()');
+    for(const [name,data] of [
+      ['work8-07-caption-BEFORE-384x512.png',captionBefore],
+      ['work8-07-caption-RENDER-384x512.png',captionAfter],
+      ['work8-07-caption-OVERLAY-384x512.png',captionMetrics.overlays[1]],
+      ['work8-07-caption-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png',captionMontage]
+    ])writeFileSync(join(evidence,name),Buffer.from(data,'base64'));
+    const captionReport={
+      issue:104,scope:'WORK8 exclusively 07 Missões: native placement of seven existing day captions',
+      baseHead:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
+      original:'assets/design-approved/07-missoes.webp',
+      references:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(s=>'assets/design-approved/'+s),
+      viewport:{width:384,height:512,dpr:1},
+      method:'two real production-CSS screenshots in one decoded, paused Chromium scene and frame',
+      before:captionBeforeLayout,after:captionAfterLayout,
+      metrics:captionMetrics.metrics,unchanged:captionMetrics.unchanged,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-07-caption-native-mae-roi.json'),JSON.stringify(captionReport,null,2));
+    console.log('WORK8_07_SEVEN_CAPTIONS_SOURCE_AB '+JSON.stringify(captionReport));
+    assert.equal(captionAfterLayout.quests.length,3,'preserve three genuine objectives');
+    assert.equal(captionAfterLayout.days.length,7,'preserve seven genuine rewards');
+    assert.equal(captionAfterLayout.dockCount,5,'WORK0 five-item dock untouched');
+    assert.deepEqual(captionBeforeLayout.labels,captionAfterLayout.labels,'all seven authentic day captions unchanged');
+    assert.deepEqual(captionBeforeLayout.days,captionAfterLayout.days,'seven daily reward hitboxes must not move');
+    assert.deepEqual(captionBeforeLayout.chests,captionAfterLayout.chests,'seven chest-art positions must not move');
+    assert.deepEqual(captionBeforeLayout.questButtons,captionAfterLayout.questButtons,'all three quest touch targets unchanged');
+    assert.deepEqual(captionBeforeLayout.nav,captionAfterLayout.nav,'five-button dock layout unchanged');
+    assert.ok(captionAfterLayout.documentWidth<=386,'no horizontal overflow at native 384');
+    for(let i=0;i<7;i++){
+      assert.ok(captionBeforeLayout.captions[i]&&captionAfterLayout.captions[i],'all seven real labels present');
+      assert.ok(Math.abs(captionAfterLayout.captions[i].y-captionBeforeLayout.captions[i].y-10)<.15,
+        'the only label translation is 10px down');
+      assert.ok(captionAfterLayout.captions[i].bottom<=captionAfterLayout.nav.y+1,
+        'day '+(i+1)+' caption must never hide beneath the fixed dock');
+      assert.ok(captionAfterLayout.chests[i].bottom<=captionAfterLayout.nav.y+1,
+        'day '+(i+1)+' reward chest must remain above the fixed dock');
+    }
+    assert.ok(captionMetrics.metrics.dayLabels.delta < -0.04 && captionMetrics.metrics.full.delta < -0.002,
+      'native seven-caption source ROI and full-frame MAE must improve, not merely move text');
+    assert.ok(Math.abs(captionMetrics.metrics.quests.delta)<.05 &&
+      captionMetrics.unchanged.dock<.10 && captionMetrics.unchanged.header<.10,
+      'three authentic missions and shared WORK0 dock/HUD must remain visually stable');
+
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
