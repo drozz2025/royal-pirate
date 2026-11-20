@@ -3157,3 +3157,37 @@
       linear-gradient(165deg,#181d26 0%,#252327 56%,#272324 100%)!important;
   }
 }
+
+
+/* WORK4/#104 — 20 Nov: native 384×512 roster visibility above protected dock.
+   A/B screenshots revealed that 4 cards ran about 20px under the WORK0
+   five-button dock; labels/status and the Crown hit target were occluded.
+   Keep the original miniatures and all four true slot labels. Shorten only
+   the WORK4 cards at the exact reference size; no source painting, ocean,
+   320/390/430 layouts, WORK0 dock or progression data is changed.
+   The existing real nav keeps its own z-index and touch behavior. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-ship-roster {
+    padding-bottom:1px;
+  }
+  .w4-fleet #w4-fleet-panel > .w4-ship-roster > .w4-ship-slot {
+    box-sizing:border-box;
+    height:82px;
+    min-height:82px;
+    padding:2px 1px 3px;
+    gap:0;
+  }
+  .w4-fleet #w4-fleet-panel > .w4-ship-roster > .w4-ship-slot > .w4-slot-art {
+    height:50px;
+    min-height:0;
+    flex:0 0 50px;
+  }
+  .w4-fleet #w4-fleet-panel > .w4-ship-roster > .w4-ship-slot > strong {
+    font-size:10px;
+    line-height:1;
+  }
+  .w4-fleet #w4-fleet-panel > .w4-ship-roster > .w4-ship-slot > small {
+    font-size:7px;
+    line-height:1.05;
+  }
+}
