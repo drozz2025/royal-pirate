@@ -20,12 +20,12 @@ test('WORK4 native Fleet removes only the duplicate vector water; all approved a
     assert.equal(img.toString('ascii',0,4),'RIFF',name);
     assert.equal(img.toString('ascii',8,12),'WEBP',name);
   }
-  assert.match(paint,/@media \\(width:384px\\) and \\(height:512px\\)/);
-  assert.match(paint,/\\.w4-r03-coastal-depth/);
+  assert.match(paint,/@media \(width:384px\) and \(height:512px\)/);
+  assert.match(paint,/\.w4-r03-coastal-depth/);
   assert.match(paint,/opacity:0!important/);
-  assert.doesNotMatch(paint,/(?:\\.app-|\\.porto-|\\.harbour-nav|\\.w4-reference-sea|\\.w4-reference-ship|\\.w4-cannon-art|contain:paint|transform:|position:|pointer-events:)/);
-  assert.match(css,/radial-gradient\\(ellipse 110% 123% at 30% 50%/);
-  assert.match(css,/svg\\.w4-reference-sea/);
+  assert.doesNotMatch(paint,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-reference-sea|\.w4-reference-ship|\.w4-cannon-art|contain:paint|transform:|position:|pointer-events:)/);
+  assert.match(css,/radial-gradient\(ellipse 110% 123% at 30% 50%/);
+  assert.match(css,/svg\.w4-reference-sea/);
 });
 
 const chrome=[process.env.CHROME_BIN,'chromium','google-chrome'].filter(Boolean)
