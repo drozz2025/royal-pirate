@@ -65,10 +65,14 @@ export function createPreviewCompassBinnacle(
   push(brass,tick);
  }
  // Needle is genuinely raised 3D metal; it does not report game navigation.
- const needle=new T.OctahedronGeometry(1,0);
- needle.scale(.065,.032,p.radius*.73);
- needle.translate(x,top+.080,z);
- push(brass,needle);
+ // ConeGeometry is indexed, matching the ring/cylinder/box primitives in
+ // the same merged bronze mesh (unindexed polyhedra cannot be merged with them).
+ for(const direction of [-1,1]){
+  const needle=new T.ConeGeometry(.065,p.radius*.73,4);
+  needle.rotateX(direction*Math.PI/2);
+  needle.translate(x,top+.080,z+direction*p.radius*.17);
+  push(brass,needle);
+ }
  sphere(brass,x,top+.11,z,.050);
  // Class silhouettes are structurally different, not just uniform scaling.
  if(shipClass==='scout'){
