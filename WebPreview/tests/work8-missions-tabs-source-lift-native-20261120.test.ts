@@ -8,7 +8,7 @@ import {setTimeout as delay} from 'node:timers/promises';
 
 /* WORK8 / #104 — exact source/native Chromium controlled tab A/B.
    The real three missions and seven rewards remain untouched; the only
-   candidate is the paint filter of the two INACTIVE category tabs. */
+   candidate is a root-opt-out-isolated paint filter of the two INACTIVE category tabs. */
 test('WORK8 07 source-light inactive navy: real Chromium same-frame A/B and touch', {timeout:240000}, async()=>{
   await delay(55000); // avoid simultaneous expensive Chromium sessions
   const chrome=process.env.CHROME_BIN ||
@@ -87,11 +87,11 @@ test('WORK8 07 source-light inactive navy: real Chromium same-frame A/B and touc
     assert.ok(decoded>=8,'all source-painted authentic decorations must decode');
     await delay(280);
     await evaluate('(()=>{document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
-    const lumaProperty='--work8-missions-tabs-luma';
-    await evaluate('document.documentElement.style.setProperty('+JSON.stringify(lumaProperty)+',"1");true');
+    const baselineClass='work8-missions-tabs-source-depth-ab-baseline';
+    await evaluate('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
     await delay(700); // let the real native CSS filter transition settle fully
     const beforeLayout=await layout(),before=await screenshot();
-    await evaluate('document.documentElement.style.removeProperty('+JSON.stringify(lumaProperty)+');true');
+    await evaluate('document.documentElement.classList.remove('+JSON.stringify(baselineClass)+');true');
     await delay(700); // identical settled frame; no mid-transition MAE samples
     const afterLayout=await layout(),after=await screenshot();
     const original=readFileSync(new URL('../../assets/design-approved/07-missoes.webp',import.meta.url)).toString('base64');
