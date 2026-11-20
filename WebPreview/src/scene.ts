@@ -6,6 +6,7 @@ import { PirateAudio } from './audio';
 import { makeShip, type ShipArt } from './ships';
 import { type ShipLoadout, type ModuleSlot } from './ship-modules';
 import { syncShipyardPreview } from './shipyard-preview-sync';
+import { animateShipyardWind } from './shipyard-wind';
 import { shipyardCameraOffset, shipyardPartTarget, shipyardPartCameraOffset, type ShipyardView } from './shipyard-camera';
 import { releaseShipyardResources } from './shipyard-resources';
 import { preferredShipyardPixelRatio, adjustedShipyardPixelRatio } from './shipyard-render-budget';
@@ -246,6 +247,7 @@ export class OceanScene {
        art.root.rotation.z=Math.sin(this.elapsed*.9)*.018;
        art.sails.forEach((s,i)=>{s.rotation.y=Math.sin(this.elapsed*1.3+i)*.035;});
        art.flags.forEach((f,i)=>{f.rotation.y=Math.sin(this.elapsed*3+i)*.18;});
+       animateShipyardWind(art.root,this.elapsed);
      }
      this.foam.forEach((f,i)=>{(f.material as T.MeshBasicMaterial).opacity=.3+Math.sin(this.elapsed*2+i)*.12;f.scale.x=2.25+Math.sin(this.elapsed)*.09;});
     for(let i=this.ripples.length-1;i>=0;i--){const ripple=this.ripples[i];ripple.age+=dt;const state=rippleState(ripple.age,ripple.life);
