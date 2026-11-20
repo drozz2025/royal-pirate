@@ -189,6 +189,47 @@ test('07 Missions: three real objective objective-board widths improve approved 
     };
     writeFileSync(join(evidence,'work8-missions-quest-alignment-native-ab.json'),JSON.stringify(report,null,2));
     console.log('WORK8 07 real objective-board troughs native Chromium A/B '+JSON.stringify(compared.metrics));
+
+    // Exploratory, STRICTLY native and same-frame: discover a real visual
+    // correction instead of accepting a regressive width guess. Every trial
+    // reuses the original approved 07 image, current real DOM and paused animations.
+    // These trials are evidence only; no experimental style is shipped.
+    const trials=[
+      ...[-3,-2,-1,0,1,2,3].map(n=>({name:'margin-'+n,margin:n+'px'})),
+      ...[1.1,1.25,1.4,1.6,1.8,2.0].map(n=>({name:'art-luma-'+n,art:'brightness('+n+')'})),
+      ...[1.08,1.16,1.24].map(n=>({name:'art-scale-'+n,scale:'scale('+n+')'})),
+      ...[1.25,1.5,1.8,2.1].map(n=>({name:'text-luma-'+n,text:'brightness('+n+')'})),
+      ...[.50,.53,.57,.60,.64,.68].map(n=>({name:'whole-board-'+n,list:'brightness('+n+') saturate(1.055)'})),
+      ...[1.25,1.5,1.75].map(n=>({name:'buttons-'+n,button:'brightness('+n+')'})),
+      ...[1.2,1.5,1.8].map(n=>({name:'reward-icons-'+n,reward:'brightness('+n+')'}))
+    ];
+    const sweep:any[]=[];
+    await evalJs('document.documentElement.classList.add("work8-missions-quest-alignment-ab-baseline");true');
+    for(const trial of trials){
+      const js='(()=>{const t='+JSON.stringify(trial)+';'+
+        'const list=document.querySelector(".w8-approved-missions .w8-approved-quest-list");'+
+        'list.style.removeProperty("filter");if(t.list)list.style.setProperty("filter",t.list,"important");'+
+        'document.querySelectorAll(".w8-approved-missions .w8-approved-quest").forEach(e=>{e.style.marginInline=t.margin||""});'+
+        'document.querySelectorAll(".w8-approved-missions .w8-approved-quest-art").forEach(e=>{e.style.filter=t.art||"";e.style.transform=t.scale||""});'+
+        'document.querySelectorAll(".w8-approved-missions .w8-approved-quest-core").forEach(e=>{e.style.filter=t.text||""});'+
+        'document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards").forEach(e=>{e.style.filter=t.reward||""});'+
+        'document.querySelectorAll(".w8-approved-missions .w8-approved-quest > button").forEach(e=>{e.style.filter=t.button||""});'+
+        'return true})()';
+      await evalJs(js);
+      await delay(35);
+      const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      const scoreJs='(async()=>{const src='+JSON.stringify(['data:image/webp;base64,'+original,'data:image/png;base64,'+shot])+'.map(s=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=s}));'+
+        'const imgs=await Promise.all(src);const px=imgs.map(i=>{const c=document.createElement("canvas");c.width=384;c.height=512;const g=c.getContext("2d");g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data});'+
+        'function mae(r){let s=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;for(let j=0;j<3;j++){s+=Math.abs(px[0][k+j]-px[1][k+j]);n++}}return s/n}'+
+        'return {full:mae([0,0,384,512]),missions:mae([12,155,372,321]),rows:mae([20,160,368,318])}})()';
+      sweep.push({...trial,...await evalJs(scoreJs)});
+    }
+    await evalJs('(()=>{document.querySelector(".w8-approved-missions .w8-approved-quest-list").style.removeProperty("filter");document.querySelectorAll(".w8-approved-missions .w8-approved-quest").forEach(e=>e.style.removeProperty("margin-inline"));for(const q of [".w8-approved-missions .w8-approved-quest-art",".w8-approved-missions .w8-approved-quest-core",".w8-approved-missions .w8-approved-quest-rewards",".w8-approved-missions .w8-approved-quest > button"]){document.querySelectorAll(q).forEach(e=>{e.style.removeProperty("filter");e.style.removeProperty("transform")})}document.documentElement.classList.remove("work8-missions-quest-alignment-ab-baseline");return true})()');
+    const sorted=sweep.slice().sort((a,b)=>a.full-b.full);
+    console.log('WORK8 NATIVE 07 STYLE SWEEP baseline '+JSON.stringify(compared.metrics));
+    console.log('WORK8 NATIVE 07 STYLE SWEEP SORTED '+JSON.stringify(sorted));
+    writeFileSync(join(evidence,'work8-missions-style-sweep-384x512.json'),JSON.stringify({reference:'07-missoes.webp',sameFrame:true,approved:false,baseline:compared.metrics.full.baseline,results:sorted},null,2));
+
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
     assert.ok(compared.metrics.questRegistration.delta<-.01,'objective-board troughs must improve authentic 07 source ROI');
     assert.ok(compared.metrics.full.delta<-.0001,'objective-board widths must improve full 07 frame');
