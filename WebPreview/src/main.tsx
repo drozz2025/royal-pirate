@@ -44,7 +44,9 @@ function App(){
    if(harbour||appScreen||!loaded||error||engine.current.phase!=='ready')return;
    if(!(event.target instanceof HTMLCanvasElement))return;
    if(event.pointerType==='mouse'&&event.button!==0)return;
-   if(!event.isPrimary){aimPointer.current=null;return;}
+   // A second finger must not invalidate the first captured gunner drag.
+   // Elevation is deliberately unchanged: only horizontal aim moves.
+   if(!event.isPrimary)return;
    if(aimPointer.current)return;
    aimPointer.current={id:event.pointerId,startX:event.clientX,startYaw:engine.current.yaw};
    event.currentTarget.setPointerCapture(event.pointerId);
@@ -60,6 +62,11 @@ function App(){
  };
  const onSceneAimEnd=(event:React.PointerEvent<HTMLDivElement>)=>{
    if(aimPointer.current?.id!==event.pointerId)return;
+   // Fast Safari finger release may arrive after the last move event.
+   // Commit only an actual release, never an interrupted/cancelled gesture.
+   if(event.type==='pointerup'&&engine.current.phase==='ready'){
+     aim(bearingFromDrag(aimPointer.current.startYaw,aimPointer.current.startX,event.clientX,event.currentTarget.clientWidth),engine.current.power);
+   }
    aimPointer.current=null;
    if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);
    event.preventDefault();event.stopPropagation();
