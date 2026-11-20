@@ -221,6 +221,75 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
     variants:sealReport.variants.map(x=>({id:x.id,...x.metrics}))
   }));
 
+
+  // WORK4 native visibility regression discovered in the real 384x512
+  // independent SHA comparison. Hold the same scene, paused frame, fonts
+  // and prices; switch only the four locally owned roster cards.
+  const restoreRoster = [
+    '.w4-fleet #w4-fleet-panel > .w4-ship-roster{padding-bottom:3px!important;}',
+    '.w4-fleet #w4-fleet-panel > .w4-ship-roster > .w4-ship-slot{height:auto!important;min-height:104px!important;padding:4px 1px 5px!important;gap:2px!important;}',
+    '.w4-fleet #w4-fleet-panel > .w4-ship-roster > .w4-ship-slot > .w4-slot-art{height:62px!important;min-height:0!important;flex:none!important;}'
+  ].join('');
+  const clipGeometry="(()=>{const rect=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?{top:r.top,bottom:r.bottom,height:r.height}:null};"+
+    "const slots=[...document.querySelectorAll('.w4-fleet .w4-ship-roster > .w4-ship-slot')];"+
+    "return {roster:rect('.w4-fleet .w4-ship-roster'),dock:rect('.harbour-nav.app-dock-porto'),"+
+    "slots:slots.map(e=>{const r=e.getBoundingClientRect();const label=e.querySelector('strong')?.getBoundingClientRect();"+
+    "const status=e.querySelector('small')?.getBoundingClientRect();return {top:r.top,bottom:r.bottom,"+
+    "labelBottom:label?.bottom,statusBottom:status?.bottom,clickable:e.tagName==='BUTTON'}}),"+
+    "dockCount:document.querySelectorAll('.harbour-nav.app-dock-porto .harbour-nav-item').length}})()";
+  await evaluate("(()=>{const s=document.createElement('style');s.id='work4-legacy-roster';s.textContent="+
+    JSON.stringify(restoreRoster)+";document.head.append(s);return true})()");
+  await delay(120);
+  const rosterBeforeGeometry=await evaluate(clipGeometry);
+  const rosterBefore=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
+  await evaluate("(()=>{document.getElementById('work4-legacy-roster')?.remove();return true})()");
+  await delay(120);
+  const rosterAfterGeometry=await evaluate(clipGeometry);
+  const rosterAfter=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
+  assert.equal(rosterAfterGeometry.dockCount,5,'WORK0 dock still has exactly five entries');
+  assert.equal(rosterAfterGeometry.slots.length,4,'four real Fleet slots remain');
+  assert.equal(rosterAfterGeometry.slots.filter((x:any)=>x.clickable).length,1,'only Royal Crown is selectable');
+  assert.ok(rosterBeforeGeometry.roster.bottom>rosterBeforeGeometry.dock.top,
+    'same-frame legacy layout must reproduce a genuine dock overlap');
+  assert.ok(rosterAfterGeometry.roster.bottom<=rosterAfterGeometry.dock.top-1,
+    'all card borders must finish clear of the untouched WORK0 dock');
+  for(const item of rosterAfterGeometry.slots){
+    assert.ok(item.labelBottom<=rosterAfterGeometry.dock.top-2,'ship name must not be covered');
+    assert.ok(item.statusBottom<=rosterAfterGeometry.dock.top-2,'availability must not be covered');
+    assert.ok(item.bottom<=rosterAfterGeometry.dock.top-1,'entire card must be visible');
+  }
+  const rosterPixelStudy="(async()=>{"+
+    "const sources=['data:image/webp;base64,"+approved+"','data:image/png;base64,"+rosterBefore+"','data:image/png;base64,"+rosterAfter+"'];"+
+    "const images=await Promise.all(sources.map(async src=>{const im=new Image();im.src=src;await im.decode();return im}));"+
+    "if(images.some(i=>i.width!==384||i.height!==512))throw Error('must compare native screenshots');"+
+    "const data=images.map(im=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
+      "const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);return x.getImageData(0,0,384,512).data});"+
+    "const boxes={full:[0,0,384,512],roster:[0,344,384,431],ship:[31,176,216,304],sea:[188,306,218,338],dock:[0,433,384,512]};"+
+    "const roi=(box)=>{let sumB=0,sumA=0,changed=0,n=0;for(let y=box[1];y<box[3];y++)for(let x=box[0];x<box[2];x++){"+
+      "let k=(y*384+x)*4,v=false;for(let j=0;j<3;j++){sumB+=Math.abs(data[0][k+j]-data[1][k+j]);sumA+=Math.abs(data[0][k+j]-data[2][k+j]);"+
+      "v ||=data[1][k+j]!==data[2][k+j];n++}if(v)changed++}return {before:sumB/n,after:sumA/n,changedPixels:changed}};"+
+    "const stats=Object.fromEntries(Object.entries(boxes).map(([n,b])=>[n,roi(b)]));"+
+    "const c=document.createElement('canvas');c.width=1536;c.height=512;const x=c.getContext('2d');"+
+    "images.forEach((im,i)=>x.drawImage(im,i*384,0));x.drawImage(images[0],1152,0);"+
+    "x.globalAlpha=.5;x.drawImage(images[2],1152,0);x.globalAlpha=1;"+
+    "return {boxes,stats,comparison:c.toDataURL('image/png').split(',')[1]}})()";
+  const rosterStudy=await evaluate(rosterPixelStudy);
+  for(const area of ['ship','sea','dock']){
+    assert.equal(rosterStudy.stats[area].changedPixels,0,
+      'compacting WORK4 cards must leave '+area+' pixel-identical');
+  }
+  assert.ok(rosterStudy.stats.roster.changedPixels>200,'actual roster pixels must change');
+  const rosterReport={
+    approved:false,screensApproved:0,viewport:'384x512',
+    comparison:'same native Chromium scene/frame; before legacy ship cards, after compact WORK4-only cards',
+    beforeGeometry:rosterBeforeGeometry,afterGeometry:rosterAfterGeometry,
+    roiBoxes:rosterStudy.boxes,roi:rosterStudy.stats,
+    note:'Visibility and touch take priority over a purely global RGB MAE; ship, sea and dock pixel invariants are strict.'
+  };
+  writeFileSync(join(qa,'work4-native-roster-dock-clearance-ab.json'),JSON.stringify(rosterReport,null,2)+'\n');
+  writeFileSync(join(qa,'original-before-render-overlay-fleet-roster-384x512.png'),Buffer.from(rosterStudy.comparison,'base64'));
+  console.log('WORK4_FLEET_ROSTER_AB '+JSON.stringify(rosterReport));
+
   writeFileSync(join(qa,'original-before-render-overlay-fleet-continuous-inset-384x512.png'),Buffer.from(result.comparison,'base64'));
   const report={approved:false,screensApproved:0,viewport:'384x512',source:'03-frota.webp',frame:'same Chromium page; paused animations; same persisted data',geometry,roiBoxes:result.roiBoxes,roi:result.metrics,
     note:'Ship composition ROI x31–216 and sea interior x188–218 must remain unchanged; overlap/feather belongs to the photoJoin x219–258. MAE is evidence, not human artistic approval.'};
