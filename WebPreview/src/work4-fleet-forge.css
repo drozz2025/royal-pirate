@@ -3246,3 +3246,17 @@
     background:linear-gradient(173deg,#252929 0%,#161f25 50%,#091621 100%)!important;
   }
 }
+
+
+/* WORK4/#104 — remove the artificial Fleet silver-line seam on native 384x512.
+   The existing source-registered sea and single Royal Crown remain untouched.
+   The 1px bright inset line on the live stats card reads as a rectangular
+   photographic cut against the soft 10px coast feather. Let the existing
+   gradient do the blending instead, without any extra wave, content, hitbox,
+   repositioning, dock change or non-native responsive CSS. Human signoff: 0/8.
+   Compare same-frame Chromium with the old inset stroke before merge. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    box-shadow:none;
+  }
+}
