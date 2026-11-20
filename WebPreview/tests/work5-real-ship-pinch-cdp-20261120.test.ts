@@ -145,7 +145,7 @@ test('WORK5: real ship selection and measured two-finger zoom in mobile Chromium
     // Small viewport: ship must still be raycast-touchable without scrolling.
     for(const [width,height] of [[384,512],[320,568]] as const){
       await metrics(width,height);
-      await waitFor('window.__work5.canvasRect().width>0','canvas after resize');
+      await waitFor('(()=>{const v=window.__work5.viewport();return Math.abs(v.width-'+width+')<1 && Math.abs(v.height-'+height+')<1 && Math.abs(v.aspect-'+(width/height)+')<.015 && v.pixelWidth>0 && v.pixelHeight>0})()','canvas/camera resized to '+width+'x'+height);
       point=await hit();
       await evaluate('window.__work5.clearSelected()');
       await send('touchStart',[{...point,id:3}]);
