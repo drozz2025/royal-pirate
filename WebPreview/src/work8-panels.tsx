@@ -595,13 +595,13 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
           }
         }
         /* WORK8/#104 — 07 Missões ONLY. Real source-art tabs: after the
-           failed darkening experiment #676 (inactive ROI +0.0258), lift
+           failed darkening experiment #676 (inactive ROI +0.0258), calibrate
            ONLY the two INACTIVE category faces. Keep all tab hitboxes,
            source art, three real missions, seven rewards and WORK0 dock.
            The CSS variable can be set to 1 by native Chromium for true A/B. */
         @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
           .w8-approved-missions .w8-approved-tabs button:not([aria-pressed="true"]) {
-            filter:brightness(var(--work8-missions-tabs-luma, 1.18));
+            filter:brightness(var(--work8-missions-tabs-luma, .84));
           }
         }
       `}</style>
