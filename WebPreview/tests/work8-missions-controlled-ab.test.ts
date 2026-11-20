@@ -1899,14 +1899,14 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(160);
     const earlyBeforeGeometry=await headingLayout();
     const earlyBeforeFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:first-child .w8-approved-chest > svg.w8-art")).filter');
-    const earlyBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const w8EarlyLightBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove('+JSON.stringify(earlyLightClass)+');true');
     await delay(160);
     const earlyAfterGeometry=await headingLayout();
     const earlyAfterFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:first-child .w8-approved-chest > svg.w8-art")).filter');
-    const earlyAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const w8EarlyLightAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     const earlyScoreJs='(async()=>{const urls='+JSON.stringify([
-      'data:image/webp;base64,'+orig,'data:image/png;base64,'+earlyBefore,'data:image/png;base64,'+earlyAfter
+      'data:image/webp;base64,'+orig,'data:image/png;base64,'+w8EarlyLightBefore,'data:image/png;base64,'+w8EarlyLightAfter
     ])+';const ims=await Promise.all(urls.map(src=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src=src})));'+
       'if(ims.some(i=>i.width!==384||i.height!==512))throw Error("not native 384x512");'+
       'const pix=ims.map(i=>{const c=document.createElement("canvas");c.width=384;c.height=512;const x=c.getContext("2d");x.drawImage(i,0,0);return x.getImageData(0,0,384,512).data});'+
@@ -1919,9 +1919,9 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     const earlyMeasured=await evalJs(earlyScoreJs);
     const earlyDeltas=Object.fromEntries(Object.keys(earlyMeasured.scores[0]).map(k=>[k,earlyMeasured.scores[1][k]-earlyMeasured.scores[0][k]]));
     writeFileSync(join(evidence,'work8-missions-early-chests-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png'),Buffer.from(earlyMeasured.montage,'base64'));
-    writeFileSync(join(evidence,'work8-missions-early-chests-BEFORE-384x512.png'),Buffer.from(earlyBefore,'base64'));
-    writeFileSync(join(evidence,'work8-missions-early-chests-RENDER-384x512.png'),Buffer.from(earlyAfter,'base64'));
-    const earlyReport={issue:104,scope:'07 Missions / day 1–3 artwork only',
+    writeFileSync(join(evidence,'work8-missions-early-chests-BEFORE-384x512.png'),Buffer.from(w8EarlyLightBefore,'base64'));
+    writeFileSync(join(evidence,'work8-missions-early-chests-RENDER-384x512.png'),Buffer.from(w8EarlyLightAfter,'base64'));
+    const w8EarlyLightReport={issue:104,scope:'07 Missions / day 1–3 artwork only',
       reference:'assets/design-approved/07-missoes.webp',
       requiredReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
       viewport:'384x512 native Chromium DPR1',sameScene:true,animationsPaused:true,
@@ -1929,8 +1929,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       before:earlyMeasured.scores[0],render:earlyMeasured.scores[1],delta:earlyDeltas,
       changedPixels:earlyMeasured.changed,geometry:{before:earlyBeforeGeometry,after:earlyAfterGeometry},
       approved:false,approvedScreens:0};
-    writeFileSync(join(evidence,'work8-missions-early-chests-native-ab.json'),JSON.stringify(earlyReport,null,2));
-    console.log('WORK8_EARLY_CHESTS_NATIVE_AB '+JSON.stringify(earlyReport));
+    writeFileSync(join(evidence,'work8-missions-early-chests-native-ab.json'),JSON.stringify(w8EarlyLightReport,null,2));
+    console.log('WORK8_EARLY_CHESTS_NATIVE_AB '+JSON.stringify(w8EarlyLightReport));
     assert.notEqual(earlyBeforeFilter,earlyAfterFilter,'visual change must actually render');
     assert.ok(earlyMeasured.changed>0,'no inert CSS candidates');
     assert.deepEqual(earlyBeforeGeometry,earlyAfterGeometry,'positions of 7 rewards and dock cannot move');
