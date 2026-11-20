@@ -115,7 +115,7 @@ test('07 Missions: third genuine mission enamel source comparison at native 384x
     await delay(180);
     const afterLayout=await geometry();
     const selectedAfter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest:nth-child(3)")).filter');
-    assert.notEqual(selectedAfter,selectedBefore,'third real mission row's paint must differ');
+    assert.notEqual(selectedAfter,selectedBefore,'third real mission row paint must differ');
     assert.match(selectedAfter,/brightness\(1\.09\)/,'native Chromium must apply third row brightness(1.09)');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
