@@ -17,6 +17,7 @@ on:
       - work2/original-cabin-gallery-20261119
       - work2/shipyard-camera-presets-20261120
       - work2/shipyard-part-focus-20261120
+      - work2/original-modular-cannon-collars-20261120
   pull_request:
     branches:
       - work2/original-stern-heraldry-20261119
@@ -25,6 +26,7 @@ on:
       - work2/verified-player-level-gate-20261119
       - work2/original-standing-rigging-20261119
       - work2/original-armour-20261119
+      - work2/shipyard-part-focus-20261120
     paths:
       - 'WebPreview/**'
       - '.github/workflows/work2-shipyard-verify.yml'
