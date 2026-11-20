@@ -1946,8 +1946,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(captionAfterLayout.documentWidth<=386,'no horizontal overflow at native 384');
     for(let i=0;i<7;i++){
       assert.ok(captionBeforeLayout.captions[i]&&captionAfterLayout.captions[i],'all seven real labels present');
-      assert.ok(Math.abs(captionAfterLayout.captions[i].y-captionBeforeLayout.captions[i].y-10)<.15,
-        'the only label translation is 10px down');
+      assert.ok(Math.abs(captionAfterLayout.captions[i].y-captionBeforeLayout.captions[i].y-2)<.15,
+        'the only label translation is 2px down');
       assert.ok(captionAfterLayout.captions[i].bottom<=captionAfterLayout.nav.y+1,
         'day '+(i+1)+' caption must never hide beneath the fixed dock');
       assert.ok(captionAfterLayout.chests[i].bottom<=captionAfterLayout.nav.y+1,
