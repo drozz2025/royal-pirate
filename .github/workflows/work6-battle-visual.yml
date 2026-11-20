@@ -42,7 +42,7 @@ jobs:
         run: npm test
       - name: Typecheck and production build
         working-directory: WebPreview
-        run: npm run build
+        run: npm run build -- --base=/royal-pirate/
       - name: Use runner's verified system Chromium (avoid apt mirror stalls)
         working-directory: WebPreview
         run: |
@@ -58,8 +58,10 @@ jobs:
       - name: Capture real 320/384/390/430 eight-screen dock and Batalha
         working-directory: WebPreview
         run: |
-          npm run dev -- --host 127.0.0.1 > /tmp/royal-work6-vite.log 2>&1 &
-          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:5173/ > /dev/null && break || sleep 2; done
+          # Render the *built* public Pages app, not Vite dev source: otherwise
+          # 05/06 WebP can be missing in evidence even though public images work.
+          npx vite preview --host 127.0.0.1 --port 5173 --strictPort --base=/royal-pirate/ > /tmp/royal-work6-vite.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:5173/royal-pirate/ > /dev/null && break || sleep 2; done
           node scripts/work6-visual-capture.mjs
       - uses: actions/setup-python@v5
         with:
