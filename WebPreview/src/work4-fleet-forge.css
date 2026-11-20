@@ -3192,6 +3192,15 @@
   }
 }
 
+
+/* WORK4/#104 — same-frame native 384×512 text-only paint validation, 20 Nov.
+   Compare original approved Forja 04 against real 8/9/10/11px Chromium
+   samples, with animations paused and actual three material amounts retained.
+   The selected 11px caption is both more legible and closer to source than
+   the preceding 9px: full RGB MAE 52.76542 -> 52.68689; local cost-row ROI
+   39.28850 -> 38.18529. Cannon, furnace and five-button WORK0 dock:
+   0 changed pixels in the controlled A/B. No changes outside native 384×512.
+   Artistic approval is still false until explicit human review. */
 /* WORK4/#104 — native 384x512 cost-caption legibility, kept only where
    A/B source ROI improves. The experimental ship-card label enlargement
    was rejected because real pixel comparison worsened the roster composition.
@@ -3199,7 +3208,7 @@
    Forge text paint only; live amounts, cannon, hearth and five-item dock stay. */
 @media (width:384px) and (height:512px) {
   .w4-forge #w4-forge-panel [aria-label="Custo e materiais disponíveis"] small {
-    font-size:9px;
+    font-size:11px;
     line-height:1.05;
     letter-spacing:-.1px;
   }
