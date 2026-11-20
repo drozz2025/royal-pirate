@@ -76,3 +76,10 @@
 .shipyard-camera-presets button:focus-visible{outline:3px solid #fff8db;outline-offset:2px}
 .shipyard-camera-presets button:active{transform:translateY(1px)}
 @media(max-height:720px){.shipyard-camera-presets{margin-bottom:4px}.shipyard-camera-presets button{min-height:36px}}
+
+/* WORK 2: optional close-up button is distinct from economy and equip actions. */
+.shipyard-part-focus{border:1px solid #eac77e!important;border-radius:8px;
+ padding:6px 10px!important;background:#204966!important;color:#fff1c8!important;
+ text-decoration:none!important;font-weight:900!important;min-height:40px!important}
+.shipyard-part-focus[aria-pressed="true"]{background:linear-gradient(#e5c07b,#a46b30)!important;color:#112d49!important}
+.shipyard-part-focus:focus-visible{outline:3px solid #fff8dc;outline-offset:2px}
