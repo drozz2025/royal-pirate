@@ -83,3 +83,13 @@
  text-decoration:none!important;font-weight:900!important;min-height:40px!important}
 .shipyard-part-focus[aria-pressed="true"]{background:linear-gradient(#e5c07b,#a46b30)!important;color:#112d49!important}
 .shipyard-part-focus:focus-visible{outline:3px solid #fff8dc;outline-offset:2px}
+
+/* Preview-only undo/redo; disabled state is explicit even on narrow screens. */
+.shipyard-parts-tools .shipyard-history-button{
+ border:1px solid #b3c2d0;border-radius:7px;text-decoration:none;
+ background:#102e4a;color:#ffe3a2;font-weight:900;padding:5px 8px;
+ min-height:40px;touch-action:manipulation}
+.shipyard-parts-tools .shipyard-history-button:disabled{
+ opacity:.46;cursor:not-allowed;color:#a8bccb}
+.shipyard-parts-tools .shipyard-history-button:focus-visible{
+ outline:3px solid #ffe5ae;outline-offset:2px}
