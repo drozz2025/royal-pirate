@@ -440,14 +440,15 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  if(config.shipClass==='scout'){
   const jibGeometry=new T.BufferGeometry();
   jibGeometry.setAttribute('position',new T.Float32BufferAttribute([
-   0,6.6,3.75, -.30,4.8,5.15, 0,4.1,6.25, 0,4.05,3.8
+   0,0,0, -.30,-1.8,1.4, 0,-2.5,2.5, 0,-2.55,.05
   ],3));
   jibGeometry.setIndex([0,1,3,1,2,3]);
   jibGeometry.computeVertexNormals();
   const jibCloth=paint(sailColor,0);
   jibCloth.roughness=.9;
   jibCloth.side=T.DoubleSide;
-  const jib=part(jibGeometry,jibCloth,0,0,0);
+  // Keep the same resting vertices, but hinge at the jib's top anchor for wind.
+  const jib=part(jibGeometry,jibCloth,0,6.6,3.75);
   jib.name='scout-fore-and-aft-jib';
  }
  // Previewing 20 levels can change sail colours many times. All sails share
