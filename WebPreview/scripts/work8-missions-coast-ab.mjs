@@ -75,11 +75,11 @@ try {
   await run('(async()=>{await document.fonts.ready;const sources=[...new Set([...document.querySelectorAll(".w8-approved-missions image")].map(i=>i.getAttribute("href")).filter(Boolean))];await Promise.all(sources.map(src=>new Promise(resolve=>{const i=new Image();i.onload=i.onerror=resolve;i.src=src})));document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return sources.length})()');
 
   const status=()=>run('(()=>{const q=s=>document.querySelector(s),rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const quest=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")];const days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")];const nav=q(".app-sheet > .harbour-nav");return {quest:quest.length,days:days.length,navCount:nav.querySelectorAll(".harbour-nav-item").length,nav:rect(nav),header:rect(q(".app-sheet-header")),questBoxes:quest.map(rect),dayBoxes:days.map(rect),chests:days.map(d=>rect(d.querySelector(".w8-approved-chest"))),captions:days.map(d=>rect(d.querySelector("small"))),text:quest.map(d=>d.querySelector("strong").textContent),rewards:quest.map(d=>[...d.querySelectorAll(".w8-approved-quest-rewards strong")].map(x=>x.textContent)),overflow:document.documentElement.scrollWidth};})()');
-  await run('document.documentElement.classList.add("work8-missions-coast-hue-ab-baseline");true');
+  await run('document.documentElement.classList.add("work8-missions-title-register-ab-baseline");true');
   await sleep(150);
   const geometryBefore=await status();
   const before=await grab('missions-coast-BEFORE-384x512.png');
-  await run('document.documentElement.classList.remove("work8-missions-coast-hue-ab-baseline");true');
+  await run('document.documentElement.classList.remove("work8-missions-title-register-ab-baseline");true');
   await sleep(150);
   const geometryAfter=await status();
   const after=await grab('missions-coast-RENDER-384x512.png');
@@ -97,7 +97,7 @@ try {
     const W=384,H=512;
     if(images.some(i=>i.width!==W||i.height!==H))throw Error('original and native Chromium must both be 384x512');
     const imagePixels=images.map(i=>{const c=document.createElement('canvas');c.width=W;c.height=H;const t=c.getContext('2d');t.drawImage(i,0,0);return t.getImageData(0,0,W,H).data});
-    const roi={full:[0,0,384,512],scenic:[0,95,384,183],quest:[12,155,372,326],daily:[12,326,373,437],chests:[18,354,371,430],header:[0,0,384,70],dock:[0,452,384,512]};
+    const roi={full:[0,0,384,512],title:[15,72,369,120],quest:[12,155,372,326],daily:[12,326,373,437],chests:[18,354,371,430],header:[0,0,384,70],dock:[0,452,384,512]};
     const mae=(a,b,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=4*(y*W+x);for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++}}return sum/n};
     const scores={};for(const [name,r] of Object.entries(roi)){const baseline=mae(imagePixels[0],imagePixels[1],r),candidate=mae(imagePixels[0],imagePixels[2],r);scores[name]={baseline,candidate,delta:candidate-baseline}}
     const unchanged={header:mae(imagePixels[1],imagePixels[2],roi.header),dock:mae(imagePixels[1],imagePixels[2],roi.dock),quest:mae(imagePixels[1],imagePixels[2],roi.quest),daily:mae(imagePixels[1],imagePixels[2],roi.daily)};
@@ -123,32 +123,32 @@ try {
   const measured=await compare(before,after,true);
   if(measured.overlay)writeFileSync(join(dir,'missions-coast-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png'),Buffer.from(measured.overlay,'base64'));
   if(measured.diff)writeFileSync(join(dir,'missions-coast-DIFF-384x512.png'),Buffer.from(measured.diff,'base64'));
-  console.log('WORK8 #104 COAST ORIGINAL/BEFORE/RENDER 384x512 '+JSON.stringify(measured.scores));
+  console.log('WORK8 #104 TITLE ORIGINAL/BEFORE/RENDER 384x512 '+JSON.stringify(measured.scores));
 
   // Controlled colour exploration. These are investigative variants, not
   // production app states. The same DOM, profile, viewport and frozen frame
   // are used for every sample and are compared to the source artwork.
   const sweep=[];
-  const svg='.w8-approved-missions .w8-approved-scene .w8-seascape > g:first-of-type';
-  for(const hue of [-24,-16,-8,0,8,10,12,16,24,32]){
-    for(const bright of [.74,.80,.86]){
-      const filter='brightness('+bright+') saturate(1.02) hue-rotate('+hue+'deg)';
-      await run('document.querySelector('+JSON.stringify(svg)+').style.filter='+JSON.stringify(filter)+';true');
+  const svg='.w8-approved-missions .w8-approved-title > svg.w8-approved-painting-title-missions';
+  for(const dx of [-6,-4,-2,0,2,4,6]){
+    for(const dy of [-6,-4,-2,0,2,4,6]){
+      const transform='translateX(calc(-50% + '+dx+'px)) translateY('+dy+'px)';
+      await run('document.querySelector('+JSON.stringify(svg)+').style.transform='+JSON.stringify(transform)+';true');
       await sleep(35);
       const shot=await grab(null);
       const score=await compare(before,shot,false);
-      sweep.push({hue,bright,full:score.scores.full.delta,scenic:score.scores.scenic.delta});
+      sweep.push({dx,dy,full:score.scores.full.delta,title:score.scores.title.delta});
     }
   }
-  await run('document.querySelector('+JSON.stringify(svg)+').style.removeProperty("filter");true');
+  await run('document.querySelector('+JSON.stringify(svg)+').style.removeProperty("transform");true');
   sweep.sort((x,y)=>x.full-y.full);
-  console.log('WORK8 #104 COAST 30 native parameter candidates, best 12 '+JSON.stringify(sweep.slice(0,12)));
+  console.log('WORK8 #104 TITLE 30 native parameter candidates, best 12 '+JSON.stringify(sweep.slice(0,12)));
   const report={issue:104,branch:'WORK8 coast tint',base:'HEAD verified by source PR metadata',
     original:'assets/design-approved/07-missoes.webp',
     mandatoryReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'].map(n=>'assets/design-approved/'+n),
     viewport:'384x512 DPR1; one genuine native Chromium scene/frame, animations paused',
     comparison:'ORIGINAL / BEFORE toggled opt-out root class / RENDER production style / OVERLAY',
-    effect:'decorative 07 coastal panorama only; no 08 Ranking, game-state or WORK0 dock edits',
+    effect:'decorative 07 07 title artwork only; no 08 Ranking, game-state or WORK0 dock edits',
     measured:measured.scores,unchanged:measured.unchanged,
     baseline:geometryBefore,candidate:geometryAfter,topSweep:sweep.slice(0,15),approved:false,approvedScreens:0};
   writeFileSync(join(dir,'work8-missions-coast-native-ab.json'),JSON.stringify(report,null,2));
@@ -179,8 +179,8 @@ try {
   await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   assert.ok(await run('document.querySelectorAll(".w8-approved-tabs button")[0].getAttribute("aria-pressed")==="true"'),'native DIÁRIAS touch must work');
   console.log('WORK8 #104 native touch and 5-item menu responsive regression PASS');
-  assert.ok(measured.scores.scenic.delta<-.02 && measured.scores.full.delta<-.002,
-    'scenic candidate must actually improve ORIGINAL source MAE and scenic ROI; inspect topSweep for better hue');
+  assert.ok(measured.scores.title.delta<-.02 && measured.scores.full.delta<-.002,
+    'title registration must actually improve ORIGINAL source MAE and title ROI; inspect topSweep for better geometry');
 } finally {
   try{socket?.close()}catch{}
   chrome.kill('SIGTERM');
