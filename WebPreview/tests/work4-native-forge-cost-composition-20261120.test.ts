@@ -152,9 +152,17 @@ test('WORK4 Forja 04: A/B cost-board relief vs approved source, cannon and dock 
     {id:'caption-9-release',css:'',caption:{size:9,top:0}},
     {id:'caption-9-clear',css:'',caption:{size:9,top:-3}},
     {id:'caption-10-clear',css:'',caption:{size:10,top:-3}},
-    {id:'caption-12-clear',css:'',caption:{size:12,top:-3}}
+    {id:'caption-12-clear',css:'',caption:{size:12,top:-3}},
+    {id:'caption-9-flush',css:'',caption:{size:9,top:-0.1}},
+    {id:'caption-10-release',css:'',caption:{size:10,top:0}},
+    {id:'caption-10-flush',css:'',caption:{size:10,top:-0.1}},
+    {id:'caption-11-release',css:'',caption:{size:11,top:0}},
+    {id:'caption-11-flush',css:'',caption:{size:11,top:-0.1}},
+    {id:'caption-11-safe',css:'',caption:{size:11,top:-1}},
+    {id:'caption-12-release',css:'',caption:{size:12,top:0}}
   ];
   const captures:string[]=[];
+  const candidateGeometry:Array<{bottom:number,dockTop:number,clearance:number,fontSize:string}>=[];
   const selector='.w4-forge #w4-forge-panel > .w4-materials:where(*)';
   for(const p of paints){
     const injected=(p.css?selector+'{background:'+p.css+'!important;}':'')+
@@ -165,6 +173,8 @@ test('WORK4 Forja 04: A/B cost-board relief vs approved source, cannon and dock 
         '.w4-forge #w4-forge-panel > .w4-improve-button{top:'+p.caption.top+'px!important;}}':'');
     const applied=await evaluate("(()=>{let s=document.getElementById('w4-cost-paint-study');if(!s){s=document.createElement('style');s.id='w4-cost-paint-study';document.head.append(s)}s.textContent="+JSON.stringify(injected)+";return getComputedStyle(document.querySelector('.w4-forge #w4-forge-panel > .w4-materials')).backgroundImage})()");
     assert.ok(typeof applied==='string'&&applied.length>8,'CSS candidate actually computed');
+    const cg=await evaluate("(()=>{const b=document.querySelector('.w4-forge #w4-forge-panel > .w4-improve-button').getBoundingClientRect();const d=document.querySelector('.app-sheet .harbour-nav.app-dock-porto').getBoundingClientRect();return {bottom:b.bottom,dockTop:d.top,clearance:d.top-b.bottom,fontSize:getComputedStyle(document.querySelector('.w4-forge #w4-forge-panel [aria-label=\\\"Custo e materiais disponíveis\\\"] small')).fontSize}})()");
+    candidateGeometry.push(cg);
     captures.push(await shot());
   }
   const calculate="(async()=>{"+
@@ -178,7 +188,8 @@ test('WORK4 Forja 04: A/B cost-board relief vs approved source, cannon and dock 
     "const regions={global:[0,0,384,512],materials:box(m),costsAndAction:[16,318,375,430],cannon:[18,153,175,305],furnace:[129,168,171,294],dock:[0,433,384,512]};"+
     "const measure=(a,b,r)=>{let s=0,n=0,c=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=4*(y*384+x);let changed=false;for(let i=0;i<3;i++){s+=Math.abs(a[k+i]-b[k+i]);n++;if(a[k+i]!==b[k+i])changed=true}if(changed)c++}return {mae:s/n,changedPixels:c}};"+
     "const records=samples.map((p,i)=>({index:i,roi:Object.fromEntries(Object.entries(regions).map(([name,b])=>[name,{mae:measure(src,p,b).mae,changedPixels:measure(samples[0],p,b).changedPixels}]))}));"+
-    "const before=records[0];const admitted=records.filter(r=>r.roi.cannon.changedPixels===0&&r.roi.furnace.changedPixels===0&&r.roi.dock.changedPixels===0&&r.roi.global.mae<=before.roi.global.mae&&r.roi.costsAndAction.mae<=before.roi.costsAndAction.mae);"+
+    "const clearance="+JSON.stringify(candidateGeometry.map(x=>x.clearance))+";"+
+    "const before=records[0];const admitted=records.filter(r=>clearance[r.index]>=-0.1&&r.roi.cannon.changedPixels===0&&r.roi.furnace.changedPixels===0&&r.roi.dock.changedPixels===0&&r.roi.global.mae<=before.roi.global.mae&&r.roi.costsAndAction.mae<=before.roi.costsAndAction.mae);"+
     "admitted.sort((a,b)=>(a.roi.costsAndAction.mae-b.roi.costsAndAction.mae)||(a.roi.global.mae-b.roi.global.mae));"+
     "const best=admitted[0]||before;const grid=document.createElement('canvas');grid.width=1536;grid.height=512;const g=grid.getContext('2d');g.drawImage(ref,0,0);g.drawImage(ims[0],384,0);g.drawImage(ims[best.index],768,0);g.drawImage(ref,1152,0);g.globalAlpha=.5;g.drawImage(ims[best.index],1152,0);"+
     "return {records,bestIndex:best.index,regions,grid:grid.toDataURL('image/png').split(',')[1]}})()";
@@ -187,12 +198,13 @@ test('WORK4 Forja 04: A/B cost-board relief vs approved source, cannon and dock 
   assert.equal(pixels.records[0].roi.cannon.changedPixels,0);
   const report={approved:false,approvedScreens:0,screen:'04 Forja',reference:'04-melhorias-forja.webp',
     viewport:'384x512 DPR1',frame:'same paused Chromium scene; actual live prices unchanged',
-    geometry,regions:pixels.regions,candidates:paints.map((p,i)=>({...p,...pixels.records[i]})),
+    geometry,regions:pixels.regions,candidates:paints.map((p,i)=>({...p,...pixels.records[i],geometry:candidateGeometry[i]})),
     winner:pixels.bestIndex,selected:paints[pixels.bestIndex].id,
     decision:pixels.bestIndex===0?'HEAD retained: no safe material gradient improves source MAE':'Candidate measured: requires isolated production commit and human review'};
   writeFileSync(join(out,'work4-forge-cost-composition-20261120.json'),JSON.stringify(report,null,2)+'\n');
   writeFileSync(join(out,'work4-original-before-render-overlay-cost-384x512.png'),Buffer.from(pixels.grid,'base64'));
-  console.log('WORK4_FORGE_COST_COMPOSITION '+JSON.stringify({selected:report.selected,winner:report.winner,base:report.candidates[0].roi,winnerROI:report.candidates[report.winner].roi,geometry}));
+  console.log('WORK4_FORGE_COST_COMPOSITION '+JSON.stringify({selected:report.selected,winner:report.winner,base:report.candidates[0].roi,winnerROI:report.candidates[report.winner].roi,geometry,
+    typographyComparisons:report.candidates.filter(x=>x.id.startsWith('caption')).map(x=>({id:x.id,global:x.roi.global.mae,costsAndAction:x.roi.costsAndAction.mae,material:x.roi.materials.mae,clearance:x.geometry.clearance,fontSize:x.geometry.fontSize}))}));
   await evaluate("(()=>{document.getElementById('w4-cost-paint-study')?.remove();return true})()");
   const responsive=[];
   for(const [width,height] of [[320,568],[390,844],[430,932]]){
