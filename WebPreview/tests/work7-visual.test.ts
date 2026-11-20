@@ -50,6 +50,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Native 05 WORK7 candidate must exist');
+  assert.ok(cssText.includes('20 Nov 14:28 UTC: native Captain velvet/enamel depth.'),
+    'Isolated Captain panel pigment source must exist');
   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
     'Only genuine native 06 legendary physical rim is changed in this candidate');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
@@ -63,13 +65,15 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // frame filter. Previous #411/#422 and live artwork stay untouched.
   // The override is installed on the SAME page and animation frame.
   // It is inert for Shop and for 320/tall viewports.
+  // Exact merged HEAD 10830c86: restore ONLY the novel Captain-pack
+  // native pigment. Do not revert an older LEGEND or CARDS correction, as
+  // that would compare against a stale pre-HEAD frame.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack {
+        background:
+          radial-gradient(ellipse 66% 95% at 29% 42%,#a51c6655,transparent 88%),
+          linear-gradient(112deg,#360957 0%,#31065a 49%,#110839 100%) !important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -427,7 +431,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           assert.ok(geometry.labels.every((label:any)=>label.bottom<=geometry.nav.y+1),
             'All true PRÉVIA / EM BREVE labels must stay above the dock at native size');
           assert.ok(baselineGeometry,'HEAD baseline boxes must be recorded, not inferred');
-          assert.deepEqual({slots:geometry.slots,chests:geometry.chests,pack:geometry.pack,packArt:geometry.packArt,labels:geometry.labels.map((l:any)=>({x:l.x,y:l.y,width:l.width,height:l.height,bottom:l.bottom}))},baselineGeometry,'Pure WORK7 card enamel filtering may not move one original illustration, label or hit area');
+          assert.deepEqual({slots:geometry.slots,chests:geometry.chests,pack:geometry.pack,packArt:geometry.packArt,labels:geometry.labels.map((l:any)=>({x:l.x,y:l.y,width:l.width,height:l.height,bottom:l.bottom}))},baselineGeometry,'Pure WORK7 native material edit may not move one original illustration, label or hit area');
           assert.deepEqual(comparison.referenceSize,[384,512],'Approved 05/06 originals are 384×512 and must be compared natively without scaling');
           if(kind==='cards') {
             assert.ok(geometry.slots[0].x>=17 && geometry.slots[0].x<=20,
@@ -463,6 +467,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(card.roiMaeAfter,card.roiMaeBefore,
     'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
   assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
+    'Native 06 Captain pack native pigment must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
