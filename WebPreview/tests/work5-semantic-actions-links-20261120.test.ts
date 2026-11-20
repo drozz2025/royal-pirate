@@ -91,7 +91,10 @@ test('WORK5: all five bottom-route controls remain labelled, local profile save/
     const tabs=buttons(nav![1]);
     assert.equal(tabs.length,5,'Wrong number of dock controls on '+route);
     assert.ok(tabs.every(tab=>tab.name.trim().length>0),'Unnamed dock route in '+route);
-    assert.equal((html.match(/aria-current="page"/g)||[]).length,1,
+    // Secondary sheets do not correspond to a bottom-tab destination.
+    // Frota/Forja and Ranking/Perfil share one selected parent tab.
+    const expectedCurrent=['fleet','forge','cards','shop','ranking','profile'].includes(route)?1:0;
+    assert.equal((html.match(/aria-current="page"/g)||[]).length,expectedCurrent,
       'Wrong current navigation state in '+route);
   }
   const profile=htmlFor('profile');
