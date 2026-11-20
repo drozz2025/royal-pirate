@@ -4351,3 +4351,17 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 20 Nov 01:25 UTC. Native 384x512 Captain offer velvet exposure.
+ * Authentic 06 pack artwork and its live unavailable label stay intact.
+ * Short native screen ONLY; attenuate the full source-coloured Captain
+ * offer by 0.84/0.88 vs HEAD to deepen purple velvet without changing
+ * the genuinely cropped artwork, buttons, content, hitboxes or geometry.
+ * This must beat exact HEAD MAE and shop ROI in paused same-frame Chromium.
+ * No 320px changes, no screenshot backdrop, no monetization, no shared UI.
+ * approved:false · 0/8. WORK0 owns merging, versions, release and HTTP. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    filter:brightness(.84);
+  }
+}
