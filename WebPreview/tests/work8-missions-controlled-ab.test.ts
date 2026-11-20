@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline","work8-missions-meter-relief-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -294,6 +294,9 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(questLayoutAfter.chests.every((c:any)=>c.bottom<=questLayoutAfter.nav.top+2),'all seven chests visible over the dock');
     assert.ok(questLayoutAfter.questButtons.every((b:any)=>b.bottom<=questLayoutAfter.nav.top&&b.bottom-b.top>=30),'three genuine CTA hit targets remain usable');
     assert.ok(questCompare.unchanged.dock<0.1&&questCompare.unchanged.header<0.1,'shared header/dock must have zero paint regressions');
+    /* Preserve the original source MAE gates. The new meter-relief candidate
+       is disabled throughout legacy checks and assessed in its own Chromium
+       same-frame A/B at the end of this test, without weakening prior gates. */
     assert.ok(questCompare.metrics.full.delta<-.03 && questCompare.metrics.quests.delta<-.12,
       'visual changes must improve true 384x512 original-frame quest and full-screen MAE');
     assert.ok(Math.abs(questCompare.metrics.daily.delta)<.03&&Math.abs(questCompare.metrics.chests.delta)<.03,
@@ -1658,7 +1661,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        after clearing historic flags. Three real live objectives, seven actual
        daily rewards and the WORK0 five-button dock remain in the real DOM. */
     const glowFlag='work8-missions-quest-board-luma-ab-baseline';
-    await evalJs('(()=>{const r=document.documentElement;[...r.classList].filter(x=>x.startsWith("work8-missions-")&&x.endsWith("-ab-baseline")&&x!=='+JSON.stringify(glowFlag)+').forEach(x=>r.classList.remove(x));r.classList.add('+JSON.stringify(glowFlag)+');document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
+    await evalJs('(()=>{const r=document.documentElement;[...r.classList].filter(x=>x.startsWith("work8-missions-")&&x.endsWith("-ab-baseline")&&x!=='+JSON.stringify(glowFlag)+'&&x!=="work8-missions-meter-relief-ab-baseline").forEach(x=>r.classList.remove(x));r.classList.add('+JSON.stringify(glowFlag)+');document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
     await delay(180);
     const glowRects=await evalJs('(()=>[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-list")].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
     assert.equal(glowRects.length,1,'one genuine board containing three live objectives');
@@ -1888,6 +1891,59 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(realDayDelta.chests<.02 && Math.abs(realDayDelta.quest)<.02 &&
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
+
+
+    /* WORK8/#104 — meter-edge relief ONLY, same actual DOM, state and native
+       paused Chromium 384x512 frame. No synthetic mission progress.
+       A source pixel gate must reject a decorative change if it is worse. */
+    const meterFlag='work8-missions-meter-relief-ab-baseline';
+    const meterStyle=()=>evalJs('getComputedStyle(document.querySelector(".w8-approved-quest .w8-approved-meter")).filter');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(meterFlag)+');true');
+    await delay(220);
+    const meterBeforeLayout=await headingLayout();
+    const meterBeforeStyle=await meterStyle();
+    const meterBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(meterFlag)+');true');
+    await delay(220);
+    const meterAfterLayout=await headingLayout();
+    const meterAfterStyle=await meterStyle();
+    const meterAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const meterPixels=await evalJs('(async()=>{'
+      +'const links='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+meterBefore,'data:image/png;base64,'+meterAfter])+';'
+      +'const ims=await Promise.all(links.map(s=>new Promise((yes,no)=>{const i=new Image();i.onload=()=>yes(i);i.onerror=no;i.src=s})));'
+      +'if(ims.some(i=>i.width!==384||i.height!==512))throw Error("source and frames MUST be native 384x512");'
+      +'const pixels=ims.map(im=>{const c=document.createElement("canvas");c.width=384;c.height=512;const g=c.getContext("2d");g.drawImage(im,0,0);return g.getImageData(0,0,384,512).data});'
+      +'const rois={full:[0,0,384,512],threeMeters:[65,183,198,313],questRows:[12,155,372,321],daily:[12,325,372,437],dock:[0,451,384,512],header:[0,0,384,70]};'
+      +'const score=(a,b,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=(y*384+x)*4;for(let k=0;k<3;k++){sum+=Math.abs(a[p+k]-b[p+k]);n++}}return sum/n};'
+      +'const metrics=Object.fromEntries(Object.entries(rois).map(([k,v])=>{const before=score(pixels[0],pixels[1],v),after=score(pixels[0],pixels[2],v);return[k,{before,after,delta:after-before,frameDifference:score(pixels[1],pixels[2],v)}]}));'
+      +'const cv=document.createElement("canvas");cv.width=1536;cv.height=512;const g=cv.getContext("2d");ims.forEach((im,i)=>g.drawImage(im,384*i,0));g.drawImage(ims[0],1152,0);g.globalAlpha=.5;g.drawImage(ims[2],1152,0);'
+      +'return {metrics,montage:cv.toDataURL("image/png").split(",")[1]}})()');
+    saveCoast('work8-meter-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png',meterPixels.montage);
+    saveCoast('work8-meter-BEFORE-384x512.png',meterBefore);
+    saveCoast('work8-meter-RENDER-384x512.png',meterAfter);
+    const meterReport={issue:104,screen:'07 Missões ONLY',
+      baseSha:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
+      references:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      viewport:{width:384,height:512,dpr:1},sameScene:true,animationsPaused:true,
+      baselineColor:meterBeforeStyle,renderColor:meterAfterStyle,
+      metrics:meterPixels.metrics,before:meterBeforeLayout,after:meterAfterLayout,
+      approved:false,approvedScreens:0};
+    writeFileSync(join(evidence,'work8-meter-native-ab-roi.json'),JSON.stringify(meterReport,null,2));
+    console.log('WORK8_METER_SOURCE_NATIVE_AB '+JSON.stringify(meterReport));
+    assert.notEqual(meterBeforeStyle,meterAfterStyle,'source-painted edge must actually change');
+    assert.deepEqual(meterBeforeLayout,meterAfterLayout,'no 3 quests, 7 rewards, 5-button dock or hitbox movement');
+    assert.equal(meterAfterLayout.questCount,3);
+    assert.equal(meterAfterLayout.dayCount,7);
+    assert.equal(meterAfterLayout.dockCount,5);
+    assert.ok(meterAfterLayout.chests.every((c:any)=>c.bottom<=meterAfterLayout.nav.top+2),'all seven chests above dock');
+    assert.ok(meterPixels.metrics.threeMeters.delta < -0.01 && meterPixels.metrics.full.delta < -0.0005,
+      'both SOURCE 3-meter ROI and full-native MAE must improve');
+    assert.ok(Math.abs(meterPixels.metrics.daily.delta)<0.03 &&
+      Math.abs(meterPixels.metrics.dock.delta)<0.03 &&
+      Math.abs(meterPixels.metrics.header.delta)<0.03,
+      'non-WORK8 areas and seven reward artwork stay unchanged');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
