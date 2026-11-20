@@ -1,0 +1,83 @@
+name: WORK0 real base vs head visual fidelity (8 screens)
+on:
+  pull_request:
+    branches: [work6/web-3d-preview]
+    paths:
+      - 'WebPreview/src/*.css'
+      - 'WebPreview/src/ships.ts'
+      - 'WebPreview/src/scene.ts'
+      - 'WebPreview/src/battle-deck.ts'
+      - 'WebPreview/src/battle-framing.ts'
+      - 'WebPreview/src/battle-shot-presentation.ts'
+      - 'WebPreview/src/main.tsx'
+      - 'WebPreview/src/harbour.tsx'
+      - 'WebPreview/src/app-screens.tsx'
+      - 'WebPreview/scripts/work0-true-basehead-*'
+      - '.github/workflows/work0-true-basehead.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  visual-base-head:
+    # Never deploy, push, or publish from this visual review job.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout real BASE SHA independently
+        uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.base.sha }}'
+          path: baseline
+          persist-credentials: false
+      - name: Checkout actual PR HEAD SHA independently
+        uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.head.sha }}'
+          path: candidate
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build both real commits using same locked dependencies
+        run: |
+          set -euo pipefail
+          npm --prefix baseline/WebPreview ci
+          npm --prefix candidate/WebPreview ci
+          npm --prefix baseline/WebPreview run build -- --base=/royal-pirate/
+          npm --prefix candidate/WebPreview run build -- --base=/royal-pirate/
+      - name: Install test-only browser and image scorer
+        run: |
+          set -euo pipefail
+          npm --prefix candidate/WebPreview install --no-save --no-package-lock playwright@1.56.1
+          python -m pip install pillow
+          chrome="$(command -v google-chrome || command -v chromium)"
+          test -x "$chrome"
+          echo "CHROME_BIN=$chrome" >> "$GITHUB_ENV"
+          "$chrome" --version
+      - name: Run genuine base and head builds on separate localhost ports
+        run: |
+          set -euo pipefail
+          (cd baseline/WebPreview && ./node_modules/.bin/vite preview --host 127.0.0.1 --port 5173 --strictPort --base=/royal-pirate/ > /tmp/royal-base-vite.log 2>&1) &
+          (cd candidate/WebPreview && ./node_modules/.bin/vite preview --host 127.0.0.1 --port 5174 --strictPort --base=/royal-pirate/ > /tmp/royal-head-vite.log 2>&1) &
+          for i in $(seq 1 45); do
+            if curl --fail --silent http://127.0.0.1:5173/royal-pirate/ > /dev/null &&
+               curl --fail --silent http://127.0.0.1:5174/royal-pirate/ > /dev/null; then break; fi
+            sleep 2
+          done
+          curl --fail --silent http://127.0.0.1:5173/royal-pirate/ >/dev/null
+          curl --fail --silent http://127.0.0.1:5174/royal-pirate/ >/dev/null
+      - name: Capture 8 navigable screens in native and mobile viewports
+        working-directory: candidate/WebPreview
+        run: node scripts/work0-true-basehead-capture.mjs
+      - name: Render approved | BASE | HEAD | real pixel difference evidence
+        working-directory: candidate/WebPreview
+        run: python scripts/work0-true-basehead-score.py work0-qa ../assets/design-approved
+      - name: Publish visual QA artifacts only (NEVER a game release)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: work0-true-base-head-8-screens
+          path: candidate/WebPreview/work0-qa/
+          retention-days: 7
+          if-no-files-found: warn
