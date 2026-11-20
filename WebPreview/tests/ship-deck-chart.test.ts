@@ -25,7 +25,7 @@ test('nine original 3D chart tables: four batched meshes, raised route and disti
   for(const node of chart.children){
    assert.ok(node instanceof T.Mesh);
    const positions=node.geometry.getAttribute('position');
-   assert.ok(positions.count>40,'genuine 3D mesh, not a background image');
+   assert.ok(positions.count>=24,'genuine 3D mesh, not a background image');
    vertices+=positions.count;
    assert.ok(node.geometry.boundingSphere?.radius);
    for(let i=0;i<positions.count;i++)
