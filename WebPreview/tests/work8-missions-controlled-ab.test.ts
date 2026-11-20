@@ -1899,11 +1899,13 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     const clarityFlag='work8-missions-action-clarity-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(clarityFlag)+');true');
     await delay(140);
+    await evalJs('(()=>{document.querySelectorAll(".w8-approved-missions .w8-approved-quest[data-state=active] > button").forEach(b=>b.getAnimations().forEach(a=>{try{a.finish()}catch{}}));return true})()');
     const clarityBeforeLayout=await headingLayout();
     const clarityBeforeFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-quest[data-state=active] > button")).filter');
     const clarityBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove('+JSON.stringify(clarityFlag)+');true');
     await delay(140);
+    await evalJs('(()=>{document.querySelectorAll(".w8-approved-missions .w8-approved-quest[data-state=active] > button").forEach(b=>b.getAnimations().forEach(a=>{try{a.finish()}catch{}}));return true})()');
     const clarityAfterLayout=await headingLayout();
     const clarityAfterFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-quest[data-state=active] > button")).filter');
     const clarityAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
@@ -1939,6 +1941,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     console.log('WORK8_ACTION_CLARITY_AB '+JSON.stringify(clarityReport));
     assert.notEqual(clarityBeforeFilter,clarityAfterFilter,
       'real active buttons must receive the new CSS filter');
+    assert.match(clarityBeforeFilter,/brightness\(1\.18\)/,'BASE must be the integrated 1.18, not a transitional intermediate');
+    assert.match(clarityAfterFilter,/brightness\(1\.3\)/,'RENDER must be the settled 1.30 production filter');
     assert.deepEqual(clarityBeforeLayout,clarityAfterLayout,
       'active buttons, quest rows, seven chest artwork and WORK0 dock geometry must not move');
     assert.equal(clarityAfterLayout.questCount,3);
