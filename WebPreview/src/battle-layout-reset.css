@@ -117,7 +117,7 @@
   .in-battle .command-deck .sliders label>span {font-size:11px;gap:2px}
   .in-battle .command-deck .sliders label>span svg {display:none}
   .in-battle .command-deck .sliders b {font-size:13px}
-  .in-battle .command-deck .sliders input {height:30px;margin:0;touch-action:pan-y}
+  .in-battle .command-deck .sliders input {height:30px;margin:0;touch-action:none}
   .in-battle .command-deck .sliders .scale {font-size:7px}
   .in-battle .command-deck .fire-button {
     position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
