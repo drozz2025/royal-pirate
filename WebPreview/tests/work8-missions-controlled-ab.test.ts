@@ -1957,6 +1957,24 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     const seaV3After=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     const seaV3BeforeScore=await sourceScores(seaV3Before);
     const seaV3AfterScore=await sourceScores(seaV3After);
+    /* Source-search SKY-only rather than guessing a palette. This is temporary
+       test-only inline CSS, removed before protected-geometry and final gates. */
+    const skySelector='.w8-seascape-missions > rect:first-of-type';
+    const skyOptions=[0.72,0.82,0.90,1,1.08,1.14,1.20,1.24,1.28,1.32,1.35,1.38,1.42,1.46,1.5,1.58];
+    const skyRows=[];
+    for(const lum of skyOptions){
+      await evalJs('document.querySelector('+JSON.stringify(skySelector)+').style.setProperty("filter","brightness('+lum+')","important");true');
+      await delay(24);
+      const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      const scores=await sourceScores(shot);
+      skyRows.push({skyBrightness:lum,full:scores.full,coast:scores.coast,quests:scores.quests,daily:scores.daily,dock:scores.dock,
+        deltaFull:scores.full-seaV3BeforeScore.full,deltaCoast:scores.coast-seaV3BeforeScore.coast});
+    }
+    await evalJs('document.querySelector('+JSON.stringify(skySelector)+').style.removeProperty("filter");true');
+    writeFileSync(join(evidence,'work8-missions-v3-sky-source-sweep.json'),JSON.stringify({
+      issue:104,method:'real same-frame Chromium 384x512 native, source sky-only palette sweep',
+      baseline:seaV3BeforeScore,candidates:skyRows,approved:false,approvedScreens:0},null,2));
+    console.log('WORK8_V3_SKY_SWEEP '+JSON.stringify(skyRows));
     const seaV3Delta=Object.fromEntries(Object.keys(seaV3BeforeScore).map(k=>[k,seaV3AfterScore[k]-seaV3BeforeScore[k]]));
     assert.notEqual(seaV3BeforeCss,seaV3AfterCss,'production 07 sky CSS must change real SVG paint');
     assert.deepEqual(seaV3BeforeGeom,seaV3AfterGeom,'native controlled 07 source comparison must keep all hitboxes');
