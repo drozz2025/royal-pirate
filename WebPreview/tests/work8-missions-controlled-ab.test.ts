@@ -1898,14 +1898,14 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(140);
     const headingBeforeGeom=await headingLayout();
     const headingFilterBefore=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(headingSelector)+')).filter');
-    const headingBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const headingPigmentBeforeShot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove('+JSON.stringify(headingFlag)+');true');
     await delay(140);
     const headingAfterGeom=await headingLayout();
     const headingFilterAfter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(headingSelector)+')).filter');
-    const headingAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const headingPigmentAfterShot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     const headingCalc='(async()=>{'+
-      'const urls='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+headingBefore,'data:image/png;base64,'+headingAfter])+';'+
+      'const urls='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+headingPigmentBeforeShot,'data:image/png;base64,'+headingPigmentAfterShot])+';'+
       'const images=await Promise.all(urls.map(s=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=s})));'+
       'if(images.some(i=>i.width!==384||i.height!==512))throw Error("Native 384x512 DPR1 required");'+
       'const pix=images.map(i=>{const c=document.createElement("canvas");c.width=384;c.height=512;const p=c.getContext("2d");p.drawImage(i,0,0);return p.getImageData(0,0,384,512).data});'+
@@ -1919,8 +1919,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     const headingScored=await evalJs(headingCalc);
     const headingDelta=Object.fromEntries(Object.keys(headingScored.before).map(k=>[k,headingScored.render[k]-headingScored.before[k]]));
     saveCoast('missions-daily-heading-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png',headingScored.overlay);
-    saveCoast('missions-daily-heading-before-384x512.png',headingBefore);
-    saveCoast('missions-daily-heading-render-384x512.png',headingAfter);
+    saveCoast('missions-daily-heading-before-384x512.png',headingPigmentBeforeShot);
+    saveCoast('missions-daily-heading-render-384x512.png',headingPigmentAfterShot);
     const headingReport={
       issue:104,work:'WORK8',screen:'07 Missões',
       baseSha:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
