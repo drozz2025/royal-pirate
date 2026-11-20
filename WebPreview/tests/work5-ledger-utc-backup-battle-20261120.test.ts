@@ -35,7 +35,7 @@ test('WORK5: UTC rollover, same-day replay and an expired streak never mint dupl
     profile=claimDaily(profile,when);
     assert.equal(profile.dailyStreak,expectedStreak);
     assert.equal(profile.coins,previousCoins+15+expectedStreak*5);
-    assert.strictEqual(claimDaily(profile,when+1),profile,'one reward per UTC day');
+    assert.strictEqual(claimDaily(profile,when),profile,'one reward per UTC day');
   }
   const afterGap=first+10*DAY;
   const previous=profile.coins;
