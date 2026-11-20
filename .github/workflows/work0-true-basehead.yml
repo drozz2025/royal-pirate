@@ -73,6 +73,9 @@ jobs:
       - name: Render approved | BASE | HEAD | real pixel difference evidence
         working-directory: candidate/WebPreview
         run: python scripts/work0-true-basehead-score.py work0-qa ../assets/design-approved
+      - name: Guard real native 384x512 static-screen regressions (never art approval)
+        working-directory: candidate/WebPreview
+        run: node scripts/work0-native-regression-gate.mjs work0-qa/true-basehead-report.json
       - name: Publish visual QA artifacts only (NEVER a game release)
         if: always()
         uses: actions/upload-artifact@v4
