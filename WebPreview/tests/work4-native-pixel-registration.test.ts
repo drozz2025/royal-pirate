@@ -2174,10 +2174,13 @@ test('WORK4 Forge native charcoal only changes local material paint, never compo
 test('WORK4 native source-cannon contour stays isolated from costs, navigation and compositor',()=>{
   const suffix=css.split('WORK4/#104 — native 384x512 Forge source cannon feather')[1];
   assert.ok(suffix,'a source-measured native cannon contour is required');
-  assert.match(suffix,/@media \(width:384px\) and \(height:512px\)/);
-  assert.match(suffix,/radial-gradient\(ellipse 125% 115% at 37% 49%/);
-  assert.match(suffix,/linear-gradient\(to bottom,#000 0%,#000 96%,transparent 100%\)/);
-  assert.doesNotMatch(suffix,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-resource-grid|contain:paint|translateZ)/);
+  // Inspect only the cannon's own media rule: later WORK4 material-board CSS
+  // is unrelated and must not trigger a false-positive protected-scope check.
+  const rules=(suffix.split('*/')[1]||'').split('/*')[0];
+  assert.match(rules,/@media \(width:384px\) and \(height:512px\)/);
+  assert.match(rules,/radial-gradient\(ellipse 125% 115% at 37% 49%/);
+  assert.match(rules,/linear-gradient\(to bottom,#000 0%,#000 96%,transparent 100%\)/);
+  assert.doesNotMatch(rules,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-resource-grid|contain:paint|translateZ)/);
 });
 
 
