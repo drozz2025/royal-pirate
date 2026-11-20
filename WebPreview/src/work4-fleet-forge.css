@@ -3106,8 +3106,9 @@
    The 390/430 fixes of #255/#260 are outside this exact viewport rule. */
 @media (width:384px) and (height:512px) {
   .w4-fleet #w4-fleet-panel > .w4-harbour-stage::after {
-    background:radial-gradient(ellipse 140% 160% at 88% -12%,#061c31ed 0%,#082c43e8 42%,#092a4000 100%);
-    -webkit-mask-image:radial-gradient(ellipse 142% 120% at 100% 0%,#000 0%,#000 72%,transparent 100%);
-    mask-image:radial-gradient(ellipse 142% 120% at 100% 0%,#000 0%,#000 72%,transparent 100%);
+    /* Preserve verified source-sky colour through 44% of this overlay.
+       Only interpolate a source-blue transparent foot to replace the hard
+       dark-to-cyan cut, without moving the existing water or ship masks. */
+    background:linear-gradient(180deg,#051a30f7 0%,#072a42ed 44%,#0d618900 100%);
   }
 }
