@@ -7,11 +7,11 @@ import {join} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 
 /** WORK8/#104: unscaled 07-missoes source, SAME real Chromium DOM/frame.
- * The root switch only hides/reveals decorative claimed-day chest and claimed-day chest
+ * The root switch only hides/reveals decorative real day 1–3 chest and real day 1–3 chest
  * WebP crops. Real progress, numerical values, gem availability and five-item
  * shared dock MUST be identical. No mocked app state, image backdrop or
  * APPROVED flag. */
-test('07 Missions: actual source-painted first-three genuine claimed chest art in three real reward columns / Chromium native', {timeout:220000}, async()=>{
+test('07 Missions: actual source-painted first-three genuine actual chest art in seven real day boxes / Chromium native', {timeout:220000}, async()=>{
   await delay(2000); // Parallel test suites have separate ports and profiles
   for(const file of ['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']) {
     assert.ok(existsSync(new URL('../../assets/design-approved/'+file,import.meta.url)),'required reference '+file);
@@ -79,16 +79,16 @@ test('07 Missions: actual source-painted first-three genuine claimed chest art i
     await wait('.w8-approved-missions .w8-approved-quest-list');
     await evalJs('(async()=>{const u=[...new Set([...document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting image")].map(x=>x.getAttribute("href")).filter(Boolean))];await Promise.all(u.map(async src=>{const img=new Image();img.src=src;await img.decode()}));await document.fonts.ready;document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return u.length})()');
     await delay(250);
-    const geometry=()=>evalJs('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const nav=document.querySelector(".app-sheet > .harbour-nav");const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")],days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],buttons=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button, .w8-approved-missions .w8-approved-quest > button")],dockButtons=[...nav.querySelectorAll(".harbour-nav-item")];return {questCount:quests.length,days:days.length,dockCount:dockButtons.length,tabAndActionCount:buttons.length,questBoxes:quests.map(rect),dayBoxes:days.map(rect),rewardBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(rect),nav:rect(nav),captions:days.map(d=>rect(d.querySelector("small"))),documentWidth:document.documentElement.scrollWidth,labels:quests.map(q=>q.querySelector(".w8-approved-quest-core strong")?.textContent),rewards:quests.map(q=>[...q.querySelectorAll(".w8-approved-quest-rewards strong")].map(s=>s.textContent)),glyphs:document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-claimed-day chest").length}})()');
+    const geometry=()=>evalJs('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const nav=document.querySelector(".app-sheet > .harbour-nav");const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")],days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],buttons=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button, .w8-approved-missions .w8-approved-quest > button")],dockButtons=[...nav.querySelectorAll(".harbour-nav-item")];return {questCount:quests.length,days:days.length,dockCount:dockButtons.length,tabAndActionCount:buttons.length,questBoxes:quests.map(rect),dayBoxes:days.map(rect),rewardBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(rect),nav:rect(nav),captions:days.map(d=>rect(d.querySelector("small"))),documentWidth:document.documentElement.scrollWidth,labels:quests.map(q=>q.querySelector(".w8-approved-quest-core strong")?.textContent),rewards:quests.map(q=>[...q.querySelectorAll(".w8-approved-quest-rewards strong")].map(s=>s.textContent)),glyphs:document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-real day 1–3 chest").length}})()');
     const beforeLayout=await geometry();
-    const beforeInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:first-child .w8-approved-chest > svg.w8-approved-painting")).filter');
+    const beforeInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:first-child .w8-approved-chest > svg.w8-art-chest")).filter');
     const before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove("work8-missions-early-chests-ab-baseline");true');
     await delay(180);
     const afterLayout=await geometry();
-    const afterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:first-child .w8-approved-chest > svg.w8-approved-painting")).filter');
-    assert.notEqual(afterInk,beforeInk,'green chest paint must differ from baseline');
-    assert.match(afterInk,/brightness\(1\.8\)/,'source crop must use the measured restored green engraving');
+    const afterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:first-child .w8-approved-chest > svg.w8-art-chest")).filter');
+    assert.notEqual(afterInk,beforeInk,'day 1 chest SVG paint must differ from baseline');
+    assert.match(afterInk,/brightness\(1\.34\)/,'source crop must use the measured restored green engraving');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
     assert.deepEqual(afterLayout.labels,beforeLayout.labels,'real mission objective labels unchanged');
