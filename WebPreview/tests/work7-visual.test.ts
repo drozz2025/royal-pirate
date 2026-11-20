@@ -65,12 +65,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // It is inert for Shop and for 320/tall viewports.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
-      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-epic{--w7-chest-field:#65277c!important}
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/', '--outDir', privateBuildDir],
@@ -271,6 +266,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           const enabled = await evaluate("(()=>{const s=document.createElement('style');s.id='work7-css-baseline';s.textContent="+JSON.stringify(cssBaseline)+";document.head.appendChild(s);return true})()");
           assert.ok(enabled,'Isolated work7 CSS-only baseline installed');
           await sleep(200);
+          if(kind==='shop' && width===384 && height===512){
+            assert.equal(await evaluate("getComputedStyle(document.querySelector('.w7-chest-epic')).getPropertyValue('--w7-chest-field').trim()"), '#65277c',
+              'The real prior HEAD epic enamel pigment is actually restored for A/B');
+          }
           // Actual HEAD geometry before this PR, measured in the same browser
           // and viewport. Position/area validation matters beyond global MAE.
           baselineGeometry = await evaluate("(()=>{"+
@@ -301,6 +300,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           }
         }
 
+        if(kind==='shop' && width===384 && height===512){
+          assert.equal(await evaluate("getComputedStyle(document.querySelector('.w7-chest-epic')).getPropertyValue('--w7-chest-field').trim()"), '#5a2270',
+            'The genuine native 06 epic enamel pigment is actually applied in Chromium');
+        }
         const screen = await command('Page.captureScreenshot', {
           format:'png',fromSurface:true,captureBeyondViewport:false
         });
@@ -463,6 +466,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(card.roiMaeAfter,card.roiMaeBefore,
     'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
   assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
+    'Native 06 epic-enamel pigment must improve strict global MAE AND true pack/chests ROI vs starting HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
