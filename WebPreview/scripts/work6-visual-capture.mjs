@@ -26,6 +26,27 @@ try {
     // the shared five-button dock on 384×512 / 320×568. No mock screens.
     const verifySheet=async(name)=>{
       await page.locator('.app-sheet').waitFor({state:'visible',timeout:10000});
+      // WORK0 / #104: DOM ready is NOT image ready. Previously this runner
+      // clicked through 05/06 and captured blank card/chest artwork because
+      // source WebP decoding had not completed. Require the actual approved
+      // art to decode before producing evidence, rather than scoring a false
+      // empty panel. Fail fast on broken Vite URLs or zero-dimension images.
+      const kind=name==='cartas'?'cards':name==='loja'?'shop':null;
+      if(kind){
+        const expected=kind==='cards'?8:4;
+        await page.waitForFunction(({kind,expected})=>{
+          const images=[...document.querySelectorAll('[data-work7-screen="'+kind+'"] .w7-approved-crop img')];
+          return images.length===expected&&images.every(img=>img.complete&&img.naturalWidth>0&&img.naturalHeight>0);
+        },{kind,expected},{timeout:15000});
+        const art=await page.evaluate(async kind=>{
+          const images=[...document.querySelectorAll('[data-work7-screen="'+kind+'"] .w7-approved-crop img')];
+          await Promise.all(images.map(img=>img.decode()));
+          return images.map(img=>({url:img.currentSrc,width:img.naturalWidth,height:img.naturalHeight}));
+        },kind);
+        if(art.length!==expected||art.some(item=>item.width!==384||item.height!==512))
+          throw Error('Approved source artwork missing before '+name+' screenshot: '+JSON.stringify(art));
+        await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+      }
       const geometry=await page.evaluate(()=>{
         const app=document.querySelector('.app.with-app-sheet');
         const sheet=document.querySelector('.app-sheet');
