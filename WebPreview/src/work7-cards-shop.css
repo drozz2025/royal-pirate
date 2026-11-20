@@ -4351,3 +4351,27 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 20 Nov 05:30 UTC: independent native-enamel hue correction
+ * Source contract: approved 00 original + 00 eight-screen mosaic + 01–08,
+ * particularly the genuine 06 artwork. The three 384x512 chest frames have
+ * cyan/magenta/ochre enamel fields which the approved panels render more
+ * chromatically saturated than current HEAD; modify the backing enamel and
+ * its radial reflection ONLY, not the true WebP chest art, its framing or text.
+ * Inert on 320x568 and tall phones. No screenshots, prices, purchases or
+ * shared header/dock/shell. The same-frame Chromium gate compares exact HEAD
+ * colors with these proposed live CSS materials. approved:false — 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{
+    --w7-chest-field:#064a98;
+    --w7-glow:#399aff9c;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{
+    --w7-chest-field:#85208e;
+    --w7-glow:#dd71ffba;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{
+    --w7-chest-field:#aa5b09;
+    --w7-glow:#ffe065c9;
+  }
+}
