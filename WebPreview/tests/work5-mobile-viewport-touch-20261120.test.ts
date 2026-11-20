@@ -377,5 +377,6 @@ test('WORK5: Chromium emulated touchscreen opens eight approved views, preserves
   }
 });
 
-test.todo('WORK5: measured camera zoom after real two-finger pinch on 3D ship is not yet verified');
+// Measured pinch now has a dedicated real-Chromium test in
+// work5-real-ship-pinch-cdp-20261120.test.ts; no stale TODO here.
 test.todo('WORK5: the 10-second turn clock and ten-shot limit require implementation before browser assertion');
