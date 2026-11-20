@@ -1899,7 +1899,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        paused Chromium 384x512 frame. No synthetic mission progress.
        A source pixel gate must reject a decorative change if it is worse. */
     const meterFlag='work8-missions-meter-relief-ab-baseline';
-    const meterStyle=()=>evalJs('getComputedStyle(document.querySelector(".w8-approved-quest .w8-approved-meter")).borderTopColor');
+    const meterStyle=()=>evalJs('getComputedStyle(document.querySelector(".w8-approved-quest .w8-approved-meter")).filter');
     await evalJs('document.documentElement.classList.add('+JSON.stringify(meterFlag)+');true');
     await delay(220);
     const meterBeforeLayout=await headingLayout();
