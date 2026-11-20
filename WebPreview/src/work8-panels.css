@@ -5487,53 +5487,26 @@
 }
 
 
-/* WORK8/#104 — 07 Missões EXCLUSIVELY, original 384x512 bevel engraving.
-   Use ONLY the six-pixel EDGES of the user's approved 07 source painting,
-   never source text, objectives, rewards, progress or action artwork. All
-   interior pixels and live game data remain React-driven. The existing
-   0.55-brightness quest board contains this image: compensate its child
-   decoration with 1.82 brightness without touching the board filter.
-   No geometry, navigation, dock, Porto, Ranking 08 or other WORK files.
-   Opt-out root switch makes a strict same-DOM paused-frame Chromium A/B.
-   approved:false; 0/8 until direct human approval. */
+
+/* WORK8/#104 — 07 Missões ONLY; genuine artwork and active-button legibility.
+   The original-edge study was REJECTED: Chromium full MAE +0.775 and three
+   real quest ROI +2.626, with undesirable duplicate source text in strips.
+   A previous 32-option genuine Chromium same-frame style sweep measured
+   brighter authentic quest art (brightness(2)) at full MAE -0.080 and
+   authentic action enamel (brightness(1.5)) at full MAE -0.057 separately.
+   Combine ONLY these live decorative/active controls and require a NEW
+   production A/B visual comparison, not assumptions or hidden mock content.
+   No progress, claimability, numbers, seven rewards, geometry, 08 Ranking,
+   Porto, dock, shell, economy, Unity or unrelated WORK files touched.
+   Baseline opt-out is used exclusively by Chromium same-scene QA.
+   approved:false; 0/8 until human approves. */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
-  :root:not(.work8-missions-source-border-ab-baseline)
-  .w8-approved-missions .w8-approved-quest::before {
-    content:"";
-    position:absolute;
-    inset:0;
-    width:auto;
-    height:auto;
-    z-index:5;
-    border:0;
-    border-radius:inherit;
-    box-shadow:none;
-    background-image:url('../../assets/design-approved/07-missoes.webp');
-    background-repeat:no-repeat;
-    background-size:384px 512px;
-    filter:brightness(1.82);
-    pointer-events:none;
-    -webkit-mask:
-      linear-gradient(#000 0 0) top/100% 6px no-repeat,
-      linear-gradient(#000 0 0) bottom/100% 6px no-repeat,
-      linear-gradient(#000 0 0) left/6px 100% no-repeat,
-      linear-gradient(#000 0 0) right/6px 100% no-repeat;
-    mask:
-      linear-gradient(#000 0 0) top/100% 6px no-repeat,
-      linear-gradient(#000 0 0) bottom/100% 6px no-repeat,
-      linear-gradient(#000 0 0) left/6px 100% no-repeat,
-      linear-gradient(#000 0 0) right/6px 100% no-repeat;
+  :root:not(.work8-missions-quest-readability-ab-baseline)
+  .w8-approved-missions .w8-approved-quest-art {
+    filter:brightness(2);
   }
-  :root:not(.work8-missions-source-border-ab-baseline)
-  .w8-approved-missions .w8-approved-quest:nth-child(1)::before {
-    background-position:-16px -159px;
-  }
-  :root:not(.work8-missions-source-border-ab-baseline)
-  .w8-approved-missions .w8-approved-quest:nth-child(2)::before {
-    background-position:-16px -212px;
-  }
-  :root:not(.work8-missions-source-border-ab-baseline)
-  .w8-approved-missions .w8-approved-quest:nth-child(3)::before {
-    background-position:-16px -266px;
+  :root:not(.work8-missions-quest-readability-ab-baseline)
+  .w8-approved-missions .w8-approved-quest[data-state="active"] > button {
+    filter:brightness(1.5);
   }
 }
