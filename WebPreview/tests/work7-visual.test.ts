@@ -301,7 +301,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         }
 
         if(kind==='cards' && width===384 && height===512){
-          const shadow=await evaluate("getComputedStyle(document.querySelector('[data-work7-screen=\\\"cards\\\"] .w7-approved-slot'),'::before').boxShadow");
+          const shadow=await evaluate("getComputedStyle(document.querySelector('[data-work7-screen=cards] .w7-approved-slot'),'::before').boxShadow");
           assert.equal(shadow,'none','The native 05 inlay is genuinely changed in the rendered Chromium DOM');
         }
         const screen = await command('Page.captureScreenshot', {
