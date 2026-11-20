@@ -109,7 +109,7 @@ test('07 Missions: authentic 07 mission border improve approved 384x512 Chromium
     await evalJs('document.documentElement.classList.remove("work8-missions-source-border-ab-baseline");true');
     await delay(180);
     const afterLayout=await geometry();
-    const selectedAfter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-art")).filter');
+    const selectedAfter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest"),"::before").backgroundImage');
     assert.notEqual(selectedAfter,selectedBefore,'the real card edge must acquire original art');
     assert.match(selectedAfter,/07-missoes/,'only the decorative edge uses the approved WebP artwork');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
