@@ -162,7 +162,11 @@ test('WORK5: Chromium emulated touchscreen opens eight approved views, preserves
     await waitFor('!document.querySelector(".app-player-name-edit button[type=submit]")?.disabled','profile submit enabled');
     await tap('.app-player-name-edit button[type=submit]');
     await waitFor('JSON.parse(localStorage.getItem("royal-pirate:local-profile:v1")||"{}").playerName==="Capitao QA"','profile saved');
+    // Page.reload acknowledges the command before the old document disappears.
+    // A sentinel prevents accidentally reading the previous React tree mid-reload.
+    await evalInPage('document.documentElement.setAttribute("data-work5-pre-reload","1")');
     await command('Page.reload',{ignoreCache:true});
+    await waitFor('!document.documentElement.hasAttribute("data-work5-pre-reload") && !!document.querySelector(".harbour-screen .harbour-battle-button")','new document mounted after reload',18000);
     await waitFor('document.querySelector(".harbour-player-name")?.textContent==="Capitao QA"','profile reloaded',18000);
 
     // The actual 3D battle scene and its fire action, not just the briefing modal.
