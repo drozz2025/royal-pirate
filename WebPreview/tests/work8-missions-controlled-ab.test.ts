@@ -1894,7 +1894,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        changes ONLY the existing Missions SVG coastal backdrop in the same
        loaded/paused Chromium frame. No DOM replacement, ranking, dock, fake
        economy or day/missions state. The winner is NOT a release. */
-    await evalJs('document.documentElement.classList.remove("work8-missions-coast-ab-baseline");true');
+    await evalJs('document.documentElement.classList.remove("work8-missions-coast-ab-baseline");document.documentElement.classList.add("work8-missions-coast-v3-ab-baseline");true');
     await delay(120);
     const seaSelector='.w8-approved-missions .w8-approved-scene .w8-seascape';
     const seaBeforeFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(seaSelector)+')).filter');
@@ -1937,6 +1937,59 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     writeFileSync(join(evidence,'work8-missions-sea-source-sweep.json'),JSON.stringify(seaResearch,null,2));
     writeFileSync(join(evidence,'work8-missions-sea-before-384x512.png'),Buffer.from(seaBefore,'base64'));
     console.log('WORK8_SEA_SOURCE_SWEEP '+JSON.stringify(seaResearch));
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline");true');
+
+
+    /* WORK8 #104: production A/B on ONE decoded, paused Missions 07 scene.
+       The previous 12-sample research is recorded but does not count as
+       shipping evidence. This test toggles ONLY the real v3 CSS, compares the
+       same Chrome frame pixel-by-pixel with approved ORIGINAL, and rejects
+       protected-region and geometry regressions. */
+    await evalJs('document.documentElement.classList.remove("work8-missions-coast-ab-baseline");true');
+    await delay(120);
+    const seaV3BeforeGeom=await headingLayout();
+    const seaV3BeforeCss=await evalJs('getComputedStyle(document.querySelector(".w8-seascape-missions")).filter');
+    const seaV3Before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove("work8-missions-coast-v3-ab-baseline");true');
+    await delay(120);
+    const seaV3AfterGeom=await headingLayout();
+    const seaV3AfterCss=await evalJs('getComputedStyle(document.querySelector(".w8-seascape-missions")).filter');
+    const seaV3After=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const seaV3BeforeScore=await sourceScores(seaV3Before);
+    const seaV3AfterScore=await sourceScores(seaV3After);
+    const seaV3Delta=Object.fromEntries(Object.keys(seaV3BeforeScore).map(k=>[k,seaV3AfterScore[k]-seaV3BeforeScore[k]]));
+    assert.notEqual(seaV3BeforeCss,seaV3AfterCss,'production 07 sky CSS must change real SVG paint');
+    assert.deepEqual(seaV3BeforeGeom,seaV3AfterGeom,'native controlled 07 source comparison must keep all hitboxes');
+    assert.equal(seaV3AfterGeom.questCount,3);
+    assert.equal(seaV3AfterGeom.dayCount,7);
+    assert.equal(seaV3AfterGeom.dockCount,5);
+    assert.ok(seaV3AfterGeom.chests.every((c:any)=>c.bottom<=seaV3AfterGeom.nav.top+2),'seven reward art boxes above WORK0 dock');
+    const seaV3Montage=await evalJs('(async()=>{const urls='+JSON.stringify([
+      'data:image/webp;base64,'+orig,
+      'data:image/png;base64,'+seaV3Before,
+      'data:image/png;base64,'+seaV3After
+    ])+';const images=await Promise.all(urls.map(s=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=s})));'+
+      'const canvas=document.createElement("canvas");canvas.width=1536;canvas.height=512;const ctx=canvas.getContext("2d");'+
+      'images.forEach((im,n)=>ctx.drawImage(im,n*384,0));ctx.drawImage(images[0],1152,0);ctx.globalAlpha=.5;ctx.drawImage(images[2],1152,0);'+
+      'return canvas.toDataURL("image/png").split(",")[1]})()');
+    writeFileSync(join(evidence,'work8-missions-coast-v3-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png'),Buffer.from(seaV3Montage,'base64'));
+    writeFileSync(join(evidence,'work8-missions-coast-v3-before-384x512.png'),Buffer.from(seaV3Before,'base64'));
+    writeFileSync(join(evidence,'work8-missions-coast-v3-render-384x512.png'),Buffer.from(seaV3After,'base64'));
+    const seaV3Report={issue:104,scope:'07 Missions actual SVG maritime backdrop and separated source sky ONLY',
+      reference:'assets/design-approved/07-missoes.webp',
+      mandatoryReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      viewport:{width:384,height:512,dpr:1},samePausedLiveScene:true,
+      beforeCss:seaV3BeforeCss,renderCss:seaV3AfterCss,
+      before:seaV3BeforeScore,render:seaV3AfterScore,delta:seaV3Delta,
+      geometry:seaV3AfterGeom,approved:false,approvedScreens:0};
+    writeFileSync(join(evidence,'work8-missions-coast-v3-REAL-production-ab.json'),JSON.stringify(seaV3Report,null,2));
+    console.log('WORK8_SEA_V3_PRODUCTION '+JSON.stringify(seaV3Report));
+    assert.ok(seaV3Delta.full<-0.005 && seaV3Delta.coast<-0.02,
+      'genuine 07 shipped source MUST improve both FULL and actual COAST source ROI');
+    assert.ok(seaV3Delta.quests<=.01 && seaV3Delta.daily<=.01 && Math.abs(seaV3Delta.dock)<.01,
+      'protected quest/daily/dock source regions cannot regress');
     await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline");true');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
