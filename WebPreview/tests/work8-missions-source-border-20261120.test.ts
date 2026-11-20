@@ -10,7 +10,7 @@ import {setTimeout as delay} from 'node:timers/promises';
  * The root switch changes ONLY the pigment of three existing objective objective-board widths. Real progress,
  * objective counts, rewards, claimability, touch targets and WORK0 five-item dock MUST be identical. No mocked app state, image backdrop or
  * APPROVED flag. */
-test('07 Missions: authentic 07 mission border improve approved 384x512 Chromium MAE', {timeout:220000}, async()=>{
+test('07 Missions: three live mission emblems plus active controls improve approved 384x512 Chromium MAE', {timeout:220000}, async()=>{
   await delay(60000); // avoid interfering with concurrently running native Chromium visual suites
   for(const file of ['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']) {
     assert.ok(existsSync(new URL('../../assets/design-approved/'+file,import.meta.url)),'required reference '+file);
@@ -96,7 +96,7 @@ test('07 Missions: authentic 07 mission border improve approved 384x512 Chromium
     await cmd('Emulation.setDeviceMetricsOverride',{width:384,height:512,mobile:true,deviceScaleFactor:1,screenWidth:384,screenHeight:512});
     await cmd('Page.navigate',{url:'http://127.0.0.1:4295/'});
     await wait('.harbour-screen .harbour-nav-item');
-    await evalJs('document.documentElement.classList.add("work8-missions-source-border-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-quest-readability-ab-baseline");true');
     const clicked=await evalJs('(()=>{const b=[...document.querySelectorAll(".harbour-screen button")].find(x=>x.textContent?.includes("MISSÕES"));b?.click();return !!b})()');
     assert.ok(clicked,'real Porto->Missões navigation required');
     await wait('.w8-approved-missions .w8-approved-quest-list');
@@ -104,14 +104,16 @@ test('07 Missions: authentic 07 mission border improve approved 384x512 Chromium
     await delay(250);
     const geometry=()=>evalJs('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const nav=document.querySelector(".app-sheet > .harbour-nav");const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")],days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],buttons=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button, .w8-approved-missions .w8-approved-quest > button")],dockButtons=[...nav.querySelectorAll(".harbour-nav-item")];return {questCount:quests.length,days:days.length,dockCount:dockButtons.length,tabAndActionCount:buttons.length,tabBoxes:[...document.querySelectorAll(\".w8-approved-missions .w8-approved-tabs button\")].map(rect),questBoxes:quests.map(rect),dayBoxes:days.map(rect),rewardBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(rect),nav:rect(nav),meters:quests.map(q=>rect(q.querySelector(".w8-approved-meter"))),captions:days.map(d=>rect(d.querySelector("small"))),documentWidth:document.documentElement.scrollWidth,labels:quests.map(q=>q.querySelector(".w8-approved-quest-core strong")?.textContent),rewards:quests.map(q=>[...q.querySelectorAll(".w8-approved-quest-rewards strong")].map(s=>s.textContent)),glyphs:document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem").length}})()');
     const beforeLayout=await geometry();
-    const selectedBefore=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest"),"::before").backgroundImage');
+    const selectedBefore=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-art")).filter');
     const before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    await evalJs('document.documentElement.classList.remove("work8-missions-source-border-ab-baseline");true');
+    await evalJs('document.documentElement.classList.remove("work8-missions-quest-readability-ab-baseline");true');
     await delay(180);
     const afterLayout=await geometry();
-    const selectedAfter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest"),"::before").backgroundImage');
-    assert.notEqual(selectedAfter,selectedBefore,'the real card edge must acquire original art');
-    assert.match(selectedAfter,/07-missoes/,'only the decorative edge uses the approved WebP artwork');
+    const selectedAfter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-art")).filter');
+    assert.notEqual(selectedAfter,selectedBefore,'live mission illustrations must gain approved-source luminosity');
+    assert.match(selectedAfter,/brightness\\(2\\)/,'native Chromium must apply brightness(2) only to authentic mission artwork');
+    const actionFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest[data-state=active] > button")).filter');
+    assert.match(actionFilter,/brightness\\(1\\.5\\)/,'native Chromium must illuminate only real active mission actions');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
     assert.deepEqual(afterLayout.tabBoxes,beforeLayout.tabBoxes,'tab tap targets and layout must not shift');
@@ -155,7 +157,7 @@ test('07 Missions: authentic 07 mission border improve approved 384x512 Chromium
       Math.max(...beforeLayout.questBoxes.map((r:number[])=>r[1]+r[3]))-questMinY
     ]);
     assert.ok(activeRoi[2]>activeRoi[0]&&activeRoi[3]>activeRoi[1],'three true objective-board widths must be visible at native reference viewport');
-    console.log('WORK8 authentic bevel/quest ROI',JSON.stringify({activeRoi,stripRoi}));
+    console.log('WORK8 real emblem and action ROI',JSON.stringify({activeRoi,stripRoi}));
     const injected=script.replace('__ORIGINAL__',JSON.stringify('data:image/webp;base64,'+original))
       .replace('__BEFORE__',JSON.stringify('data:image/png;base64,'+before))
       .replace('__AFTER__',JSON.stringify('data:image/png;base64,'+after))
@@ -166,11 +168,11 @@ test('07 Missions: authentic 07 mission border improve approved 384x512 Chromium
     // Direct same-DOM/frame comparison of the actual current seven day captions against the approved original.
     const compared=await evalJs(injected);
     const save=(name:string,b64:string)=>writeFileSync(join(evidence,name),Buffer.from(b64,'base64'));
-    save('missions-original-edge-original-384x512.webp',original);
-    save('missions-original-edge-before-384x512.png',before);
-    save('missions-original-edge-render-384x512.png',after);
-    save('missions-original-edge-original-before-overlay.png',compared.overlays[0]);
-    save('missions-original-edge-original-render-overlay.png',compared.overlays[1]);
+    save('missions-quest-readability-original-384x512.webp',original);
+    save('missions-quest-readability-before-384x512.png',before);
+    save('missions-quest-readability-render-384x512.png',after);
+    save('missions-quest-readability-original-before-overlay.png',compared.overlays[0]);
+    save('missions-quest-readability-original-render-overlay.png',compared.overlays[1]);
     // A four-panel artifact uses the SAME decoded, paused Chromium frame.
     // No synthetic state and no scaling of the native approved 384x512 artwork.
     const fourPanelSource='(async()=>{const src='+JSON.stringify([
@@ -178,21 +180,21 @@ test('07 Missions: authentic 07 mission border improve approved 384x512 Chromium
       'data:image/png;base64,'+before,
       'data:image/png;base64,'+after
     ])+';const pics=await Promise.all(src.map(v=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=v})));const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");pics.forEach((im,n)=>x.drawImage(im,384*n,0));x.drawImage(pics[0],1152,0);x.globalAlpha=.5;x.drawImage(pics[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()';
-    save('missions-original-edge-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png',await evalJs(fourPanelSource));
+    save('missions-quest-readability-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png',await evalJs(fourPanelSource));
     const report={
       issue:104,scope:'WORK8 exclusively 07 Missões: native source-cropped six-pixel frame of three genuine missions',
       reference:'assets/design-approved/07-missoes.webp',
       mandatoryRefs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']].map(n=>'assets/design-approved/'+n),
-      viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-source-border-ab-baseline',
+      viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-quest-readability-ab-baseline',
       metrics:compared.metrics,unchanged:compared.unchanged,
       geometry:{before:beforeLayout,after:afterLayout},approved:false,approvedScreens:0,
       candidate:'Three original source-art pictograms brightened to source painting; real game data unchanged'
     };
-    writeFileSync(join(evidence,'work8-missions-original-edge-native-ab.json'),JSON.stringify(report,null,2));
+    writeFileSync(join(evidence,'work8-missions-quest-readability-native-ab.json'),JSON.stringify(report,null,2));
     console.log('WORK8 07 real objective-board troughs native Chromium A/B '+JSON.stringify(compared.metrics));
 
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
-    assert.ok(compared.metrics.questRegistration.delta<-.10,'original three mission borders must improve 07 source ROI');
+    assert.ok(compared.metrics.questRegistration.delta<-.10,'real emblems plus active buttons must improve 07 mission ROI');
     assert.ok(compared.metrics.full.delta<-.04,'original three mission borders must improve full 07 source frame');
     assert.ok(compared.metrics.daily.delta<.10&&compared.metrics.chests.delta<.10,'daily reward strip cannot regress');
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
@@ -207,12 +209,12 @@ test('07 Missions: authentic 07 mission border improve approved 384x512 Chromium
     }
     const narrow=await evalJs('(()=>{const days=document.querySelector(".w8-approved-days"),nav=document.querySelector(".app-sheet > .harbour-nav"),sheet=document.querySelector(".app-sheet-content");if(sheet)sheet.scrollTop=sheet.scrollHeight;if(days)days.scrollLeft=days.scrollWidth;const a=days.getBoundingClientRect(),b=days.lastElementChild.getBoundingClientRect();return {sevenVisible:b.left>=a.left-2&&b.right<=a.right+2,sevenAboveDock:b.bottom<=nav.getBoundingClientRect().top+2,dock:nav.querySelectorAll(".harbour-nav-item").length,quest:document.querySelectorAll(".w8-approved-quest").length,days:days.children.length,width:document.documentElement.scrollWidth}})()');
     assert.ok(narrow.sevenVisible&&narrow.sevenAboveDock&&narrow.width<=322&&narrow.dock===5&&narrow.quest===3&&narrow.days===7);
-    save('missions-original-edge-320x568.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+    save('missions-quest-readability-320x568.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     for(const viewport of [{width:390,height:844},{width:430,height:932}]){
       await cmd('Emulation.setDeviceMetricsOverride',{...viewport,mobile:true,deviceScaleFactor:1,screenWidth:viewport.width,screenHeight:viewport.height});
       await delay(180);
       assert.ok(await evalJs('document.documentElement.scrollWidth<='+String(viewport.width+2)));
-      save('missions-original-edge-'+viewport.width+'x'+viewport.height+'.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
+      save('missions-quest-readability-'+viewport.width+'x'+viewport.height+'.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     }
   } finally {
     try{ws?.close()}catch{}
