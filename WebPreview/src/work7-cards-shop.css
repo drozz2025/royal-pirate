@@ -4366,4 +4366,9 @@
       radial-gradient(ellipse 66% 95% at 29% 42%,#ad216b55,transparent 88%),
       linear-gradient(112deg,#310852 0%,#29065d 49%,#090848 100%);
   }
+  /* Deep blue metallic field under the authentic rare chest painting.
+     Source remains a genuine cropped asset; title/status remain live DOM. */
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{
+    --w7-chest-field:#124a75;
+  }
 }
