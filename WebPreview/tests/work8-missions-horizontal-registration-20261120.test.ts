@@ -109,8 +109,9 @@ test('07 Missions: three genuine source-art mission badges improve approved 384x
     await evalJs('document.documentElement.classList.remove("work8-missions-quest-alignment-ab-baseline");true');
     await delay(180);
     const afterLayout=await geometry();
-    const selectedAfter=await evalJs('document.querySelector(".w8-approved-missions .w8-approved-quest").getBoundingClientRect().width');
-    assert.notEqual(selectedAfter,selectedBefore,'original mission pictograms must be source-brightened in native Chromium');
+    const selectedAfter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-art")).filter');
+    assert.notEqual(selectedAfter,selectedBefore,'the source-art treatment must actually change, not merely the unchanged quest width');
+    assert.match(selectedAfter,/brightness\(2\)/,'Chromium must apply the exact measured 2x art luminance to all three real mission pictograms');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
     assert.deepEqual(afterLayout.tabBoxes,beforeLayout.tabBoxes,'tab tap targets and layout must not shift');
