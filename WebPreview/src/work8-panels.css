@@ -5487,20 +5487,18 @@
 }
 
 
-/* WORK8/#104 — 07 Missões ONLY: seventh genuine royal chest size registration.
-   The approved 384×512 art shows the real day-7 crown/chest occupying a
-   broader outline than the existing source WebP crop. Scale the SAME
-   approved painting within its existing real reward tile, without changing
-   quest progress, daily-claim state, day captions, hitboxes or the dock.
-   Root flag isolates BEFORE from RENDER on the identical paused Chromium
-   DOM/frame. Never applies to Ranking 08 or other WORK scenes.
-   Strict A/B gate decides whether to integrate. approved:false / 0-8. */
+/* WORK8/#104 — 07 Missões ONLY: source-calibrated genuine DAY 7 royal art.
+   Native Chromium rejected changing its size or position: that moves approved
+   source coordinates and increases pixel error. Instead restore only the
+   existing real WebP crop's gold luminance, without moving a single box or
+   touching 3 real quests, 7 live rewards, Ranking, Porto or WORK0 dock.
+   Root flag toggles candidate off for SAME DOM/FRAME native A/B strict gate.
+   approved:false 0/8; integration remains WORK0-only. */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
   :root:not(.work8-missions-royal-scale-ab-baseline)
   .w8-approved-missions .w8-approved-days li:nth-child(7)
   .w8-approved-chest > svg.w8-approved-painting-chest-royal {
-    top:-12px;
-    transform:translateX(-50%) scale(1.12);
-    transform-origin:50% 45%;
+    filter:contrast(1.07) saturate(1.07) brightness(1.40)
+      drop-shadow(0 1px 1px #011625);
   }
 }
