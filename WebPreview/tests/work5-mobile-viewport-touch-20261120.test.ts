@@ -322,6 +322,51 @@ test('WORK5: Chromium emulated touchscreen opens eight approved views, preserves
     await auditCompactSheet('Forja');
     await back();
 
+
+    // WORK5 session-restore regression for issue #153 (140 -> 40 gold).
+    // Exercise the actual React page after reload rather than only parseProfile().
+    // Local-only persistence is being tested; synchronization between tabs is not.
+    const seedProfile = await evalInPage('(()=>{const key="royal-pirate:local-profile:v1";'+
+      'const p=JSON.parse(localStorage.getItem(key)||"null");'+
+      'if(!p)return false;p.coins=140;p.playerName="Capitao 140";'+
+      'localStorage.setItem(key,JSON.stringify(p));return true})()');
+    assert.equal(seedProfile,true,'A real local captain profile must exist before reload');
+    await evalInPage('document.documentElement.setAttribute("data-work5-140-pre-reload","1")');
+    await command('Page.reload',{ignoreCache:true});
+    await waitFor('!document.documentElement.hasAttribute("data-work5-140-pre-reload") && !!document.querySelector(".harbour-screen .harbour-nav")',
+      'new React document after 140-coin reload',18000);
+    await waitFor('!document.querySelector(".loading")','3D ready after 140-coin restore',18000);
+    await waitFor('document.querySelector(".harbour-player-name")?.textContent==="Capitao 140" && '+ 
+      'document.querySelector(".harbour-stat[aria-label=\\\"140 locally earned coins\\\"]")!==null',
+      '140 coins and captain identity restored on Porto',18000);
+    const walletRoutes = [
+      ['.harbour-screen .harbour-nav-item:nth-child(2)','Frota'],
+      ['.harbour-screen .harbour-nav-item:nth-child(3)','Cartas'],
+      ['.harbour-screen .harbour-nav-item:nth-child(4)','Loja'],
+      ['.harbour-screen .harbour-nav-item:nth-child(5)','Ranking'],
+      ['.harbour-screen .harbour-flank-right button:nth-child(2)','Missões'],
+      ['.harbour-screen .harbour-profile','O meu perfil'],
+    ] as const;
+    for (const [selector,label] of walletRoutes) {
+      await tap(selector);
+      await opened(label);
+      const goldLabel = await evalInPage('document.querySelector(".app-sheet .app-wallet-gold")?.getAttribute("aria-label")');
+      assert.equal(goldLabel,'140 moedas de ouro ganhas localmente',
+        'Local 140-coin wallet changed when opening '+label);
+      await back();
+    }
+    assert.equal(await evalInPage('JSON.parse(localStorage.getItem("royal-pirate:local-profile:v1")||"{}").coins'),
+      140,'Route changes must not silently overwrite the persisted 140-coin save');
+
+    // Keyboard regression: Escape must close an accessible sheet without
+    // launching a different game screen. This uses browser CDP key events.
+    await tap('.harbour-screen .harbour-profile');
+    await opened('O meu perfil');
+    await command('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+    await command('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+    await waitFor('!document.querySelector(".app-sheet") && !!document.querySelector(".harbour-screen:not([aria-hidden=true]) .harbour-nav")',
+      'Escape closes Profile and returns to Porto');
+
     assert.deepEqual(exceptions,[],'Actual browser runtime exceptions');
   }finally{
     try{socket?.close();}catch{}
