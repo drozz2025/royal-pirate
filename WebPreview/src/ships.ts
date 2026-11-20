@@ -128,6 +128,19 @@ function addLionFigurehead(root:T.Group){
   root.add(statue);
 }
 
+/** Only the hostile galleon's visible timber has a naval sheer and a
+ * raised, tapered keel. The player's approved Porto hull keeps its original
+ * flat station heights. Render geometry only: Battle hitboxes are unchanged.
+ * z=-4.9 is stern, z=+5 is the sharp bow. */
+export function enemyGalleonPlankHeight(z:number,y:number):number {
+  const bow=Math.max(0,Math.min(1,(z-1.3)/3.7));
+  const stern=Math.max(0,Math.min(1,(-z-2.4)/2.5));
+  const rim=.65*bow*bow+.24*stern*stern;
+  const keel=.44*bow*bow+.27*stern*stern;
+  const along=Math.max(0,Math.min(1,(y+.5)/2.95));
+  return y+keel*(1-along)+rim*along;
+}
+
 export type ShipArt = { root: T.Group; rig: T.Group; sails: T.Mesh[]; flags: T.Mesh[]; guns: T.Group[]; scars: T.Mesh[]; trim: T.MeshStandardMaterial; health: number };
 export function makeShip(red = false): ShipArt {
   const root = new T.Group(), rig = new T.Group(); root.add(rig);
@@ -149,7 +162,7 @@ export function makeShip(red = false): ShipArt {
     const positions: number[] = [], indices: number[] = [];
     for (const side of [-1,1]) {
       const start = positions.length / 3;
-      stations.forEach((z,i) => { positions.push(side*widths[i]*factor0,y0,z, side*widths[i]*factor1,y1,z); });
+      stations.forEach((z,i) => { positions.push(side*widths[i]*factor0,red?enemyGalleonPlankHeight(z,y0):y0,z, side*widths[i]*factor1,red?enemyGalleonPlankHeight(z,y1):y1,z); });
       for(let i=0;i<stations.length-1;i++){const k=start+i*2; if(side===1) indices.push(k,k+1,k+2,k+1,k+3,k+2); else indices.push(k,k+2,k+1,k+1,k+2,k+3);}
     }
     const g = new T.BufferGeometry(); g.setAttribute('position',new T.Float32BufferAttribute(positions,3));g.setIndex(indices);g.computeVertexNormals();put(g,material,0,0,0);g.dispose();
@@ -165,10 +178,15 @@ export function makeShip(red = false): ShipArt {
   const shape = new T.Shape();stations.forEach((z,i)=>i===0?shape.moveTo(widths[i],z):shape.lineTo(widths[i],z));for(let i=stations.length-1;i>=0;i--)shape.lineTo(-widths[i],stations[i]);shape.closePath();
   const deckGeo=new T.ShapeGeometry(shape);deckGeo.rotateX(Math.PI/2);put(deckGeo,deck,0,1.97,0);deckGeo.dispose();
   for(let i=1;i<stations.length-1;i++)for(const side of [-1,1]){
-    const z=stations[i],w=widths[i];put(cube,darkWood,side*w*.96,1,z,.10,1.9,.12);put(sphere,gold,side*w*1.025,2.24,z,.07,.07,.07);
-    put(cylinder,gold,side*w,2.62,z,.045,.35,.045);
+    const z=stations[i],w=widths[i];
+    const rise=red?enemyGalleonPlankHeight(z,2.4)-2.4:0;
+    put(cube,darkWood,side*w*.96,1+rise*.45,z,.10,1.9,.12);
+    put(sphere,gold,side*w*1.025,2.24+rise,z,.07,.07,.07);
+    put(cylinder,gold,side*w,2.62+rise,z,.045,.35,.045);
   }
-  for(const side of [-1,1])for(let i=0;i<stations.length-1;i++)beam(new T.Vector3(side*widths[i],2.82,stations[i]),new T.Vector3(side*widths[i+1],2.82,stations[i+1]),.06,gold);
+  for(const side of [-1,1])for(let i=0;i<stations.length-1;i++)beam(
+    new T.Vector3(side*widths[i],red?enemyGalleonPlankHeight(stations[i],2.82):2.82,stations[i]),
+    new T.Vector3(side*widths[i+1],red?enemyGalleonPlankHeight(stations[i+1],2.82):2.82,stations[i+1]),.06,gold);
   // Stern cabin, stepped quarterdeck, framed windows.
   put(cube,wood,0,2.67,-3.5,2.55,1.4,1.6);put(cube,trim,0,3.45,-3.5,2.85,.22,1.95);put(cube,gold,0,3.6,-3.5,2.96,.12,2.05);
   for(const side of [-1,1])for(const z of [-3.9,-3.2]){put(cube,gold,side*1.3,2.8,z,.09,.75,.5);put(cube,light,side*1.36,2.8,z,.02,.56,.31);put(cube,wood,side*1.38,2.8,z,.02,.06,.35);}
