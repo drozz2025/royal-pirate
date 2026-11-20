@@ -28,7 +28,7 @@ test('Batalha 02 ocean restyle remains isolated from original Porto and real bal
     'battle foam must arise from irregular, fragmented long-wave crests');
   assert.match(scene,/foam=clamp\(foam,0\.,\.64\)/,
     'real broken-crest battle foam is capped, not a tiled overlay');
-  assert.match(scene,/vec3 deep=mix\(vec3\(\.010,\.14,\.30\)/,
+  assert.match(scene,/vec3 deep=mix\(vec3\(\.005,\.105,\.235\)/,
     'deep-water palette must preserve blue troughs beneath white crests');
   assert.match(scene,/battleDeckMuzzleWorld\(this\.battleBattery,muzzle\)/,
     'the 3D cannon mouth, not a guessed offset, remains the projectile origin');
