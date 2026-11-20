@@ -264,6 +264,59 @@ test('WORK5: Chromium emulated touchscreen opens eight approved views, preserves
       await tap('.app-sheet .harbour-nav-item:first-child');
       await waitFor('!!document.querySelector(".harbour-screen:not([aria-hidden=true]) .harbour-nav")','Porto return at '+width+'x'+height);
     }
+
+    // Independent WORK5 compact portrait sweep: exercise the actual touch paths
+    // for the eight essential views, not merely a responsive DOM snapshot.
+    // This intentionally detects blocked controls without changing WORK6/WORK4.
+    await command('Emulation.setDeviceMetricsOverride',{
+      width:384,height:512,screenWidth:384,screenHeight:512,
+      deviceScaleFactor:1,mobile:true
+    });
+    await pause(300);
+    const auditCompactSheet=async(label:string)=>{
+      await opened(label);
+      const info=await evalInPage('(()=>{const s=document.querySelector(".app-sheet");'+
+        'const nav=s?.querySelector(".harbour-nav"),r=nav?.getBoundingClientRect();'+
+        'return{scrollWidth:document.documentElement.scrollWidth,innerWidth,innerHeight,'+
+        'modal:s?.getAttribute("aria-modal"),labelledBy:s?.getAttribute("aria-labelledby"),'+
+        'titleId:s?.querySelector("#app-screen-title")?.id,dockBottom:r?.bottom,'+
+        'items:[...nav?.querySelectorAll("button")||[]].map(b=>{const q=b.getBoundingClientRect();'+
+        'const x=q.left+q.width/2,y=q.top+q.height/2,hit=document.elementFromPoint(x,y);'+
+        'return{width:q.width,height:q.height,accessible:!!(b.getAttribute("aria-label")||b.textContent?.trim()),'+
+        'hit:hit===b||b.contains(hit)}})}})()');
+      assert.equal(info.innerWidth,384,'Unexpected compact viewport: '+label);
+      assert.equal(info.innerHeight,512,'Unexpected compact viewport: '+label);
+      assert.ok(info.scrollWidth<=386,'Compact horizontal overflow on '+label+': '+JSON.stringify(info));
+      assert.equal(info.modal,'true','Missing accessible modal on '+label);
+      assert.equal(info.labelledBy,info.titleId,'Unlabelled compact view '+label);
+      assert.ok(Math.abs(info.dockBottom-512)<=2,'Dock clipped in compact '+label+': '+JSON.stringify(info));
+      assert.equal(info.items.length,5,'Wrong bottom menu in compact '+label);
+      assert.ok(info.items.every((b:any)=>b.hit&&b.accessible&&b.width>=35&&b.height>=35),
+        'Compact bottom buttons unreachable/unlabelled in '+label+': '+JSON.stringify(info));
+    };
+    const compactViews=[
+      ['.harbour-screen .harbour-nav-item:nth-child(3)','Cartas'],
+      ['.harbour-screen .harbour-nav-item:nth-child(4)','Loja'],
+      ['.harbour-screen .harbour-nav-item:nth-child(5)','Ranking'],
+      ['.harbour-screen .harbour-flank-right button:nth-child(2)','Missões'],
+      ['.harbour-screen .harbour-profile','O meu perfil'],
+      ['.harbour-screen .harbour-flank-left button:nth-child(1)','Batalha'],
+    ] as const;
+    for(const [selector,label] of compactViews){
+      await tap(selector);
+      await auditCompactSheet(label);
+      await back();
+    }
+    await tap('.harbour-screen .harbour-nav-item:nth-child(2)');
+    await auditCompactSheet('Frota');
+    const hasCompactForge=await evalInPage('(()=>{const el=[...document.querySelectorAll(".w4-fleet button")]'+
+      '.find(b=>b.textContent?.includes("ABRIR MELHORIAS"));'+
+      'if(el)el.setAttribute("data-work5-compact-forge","1");return !!el})()');
+    assert.ok(hasCompactForge,'Frota has no Forja control in compact portrait');
+    await tap('[data-work5-compact-forge="1"]');
+    await auditCompactSheet('Forja');
+    await back();
+
     assert.deepEqual(exceptions,[],'Actual browser runtime exceptions');
   }finally{
     try{socket?.close();}catch{}
