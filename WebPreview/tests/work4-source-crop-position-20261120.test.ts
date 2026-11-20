@@ -198,7 +198,7 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
       shots:images,rois})+";const img=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;await i.decode();if(i.width!==384||i.height!==512)throw Error('native pixel dimensions');return i};"+
       "const pixels=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(i,0,0);return ctx.getImageData(0,0,384,512).data};"+
       "const reference=await img('webp',input.reference),ref=pixels(reference);"+
-      "const frames=[];for(const [id,bytes] of input.shots){const raw=await img('png',bytes);const p=pixels(raw);const scores={};for(const [name,b] of Object.entries(input.rois)){let sum=0,n=0,diff=0;for(let y=b[1];y<b[3];y++)for(let x=b[0];x<b[2];x++){let changed=false;const k=(y*384+x)*4;for(let ch=0;ch<3;ch++){sum+=Math.abs(p[k+ch]-ref[k+ch]);n++;if(p[k+ch]!==p[k+ch])changed=true}}scores[name]=sum/n}frames.push({id,scores,pixels:p})}"+
+      "const frames=[];for(const [id,bytes] of input.shots){const raw=await img('png',bytes);const p=pixels(raw);const scores={};for(const [name,b] of Object.entries(input.rois)){let sum=0,n=0;for(let y=b[1];y<b[3];y++)for(let x=b[0];x<b[2];x++){const k=(y*384+x)*4;for(let ch=0;ch<3;ch++){sum+=Math.abs(p[k+ch]-ref[k+ch]);n++}}scores[name]=sum/n}frames.push({id,scores,pixels:p})}"+
       "const base=frames[0];const changed=(candidate,b)=>{let count=0;for(let y=b[1];y<b[3];y++)for(let x=b[0];x<b[2];x++){const k=(y*384+x)*4;let diff=false;for(let c=0;c<3;c++)if(candidate.pixels[k+c]!==base.pixels[k+c])diff=true;if(diff)count++;}return count};"+
       "const records=frames.map(item=>({id:item.id,...item.scores,protectedChanged:{dock:changed(item,input.rois.dock),"+
       (screen==='fleet'?"cards:changed(item,input.rois.cards)":"costs:changed(item,input.rois.costs)")+"}}));"+
@@ -233,7 +233,10 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         {id:'deep-coast',paint:'linear-gradient(90deg,#073d52ec 0%,#092a41f2 22%,#071d33f8 55%,#031529fc 100%)'},
         {id:'source-blue',paint:'linear-gradient(90deg,#06506adf 0%,#08344bee 20%,#081f36f9 55%,#031529fc 100%)'},
         {id:'muted-slate',paint:'linear-gradient(90deg,#0a354bea 0%,#0b2a42f3 22%,#071c34f9 55%,#031529fc 100%)'},
-        {id:'waterfall',paint:'linear-gradient(90deg,#0b4963dc 0%,#092a44f4 35%,#071e34fb 65%,#031529fc 100%)'}
+        {id:'waterfall',paint:'linear-gradient(90deg,#0b4963dc 0%,#092a44f4 35%,#071e34fb 65%,#031529fc 100%)'},
+        {id:'coast-soft-azure',paint:'linear-gradient(90deg,#075b70d0 0%,#07394de9 18%,#071f34f7 56%,#031529fc 100%)'},
+        {id:'coast-deep-indigo',paint:'linear-gradient(90deg,#06314be5 0%,#08263fed 18%,#061c31f8 56%,#031529fc 100%)'},
+        {id:'coast-timber-edge',paint:'linear-gradient(90deg,#154451d9 0%,#102e42ef 20%,#081d32f8 56%,#031529fc 100%)'}
       ]
       :[
         {id:'HEAD',paint:null},
@@ -241,7 +244,9 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         {id:'smoke-iron',paint:'linear-gradient(173deg,#26292b 0%,#1b242a 52%,#0a1924 100%)'},
         {id:'warm-foundry',paint:'radial-gradient(ellipse 76% 94% at 32% 0%,#b66d3235 0%,transparent 77%),linear-gradient(173deg,#25292a 0%,#172126 52%,#0b161e 100%)'},
         {id:'warm-slate',paint:'linear-gradient(173deg,#303234 0%,#1a242b 52%,#0b1921 100%)'},
-        {id:'steel-sheen',paint:'radial-gradient(ellipse 70% 65% at 48% 0%,#c48a4b24 0%,transparent 75%),linear-gradient(173deg,#283038 0%,#18222b 55%,#0a1721 100%)'}
+        {id:'steel-sheen',paint:'radial-gradient(ellipse 70% 65% at 48% 0%,#c48a4b24 0%,transparent 75%),linear-gradient(173deg,#283038 0%,#18222b 55%,#0a1721 100%)'},
+        {id:'forge-charcoal',paint:'linear-gradient(173deg,#252929 0%,#161f25 50%,#091621 100%)'},
+        {id:'forge-warm-edge',paint:'radial-gradient(ellipse 72% 72% at 8% 88%,#bb68302b 0%,transparent 78%),linear-gradient(173deg,#292e2f 0%,#18252a 55%,#0b1722 100%)'}
       ];
     const paintShots:[string,string][]=[['HEAD',images[0][1]]];
     for(const candidate of paintCandidates.slice(1)){
@@ -309,20 +314,37 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
     console.log('WORK4_PHOTO_MATERIAL_PIGMENT_AB '+JSON.stringify({screen,best:pigments.best,records:pigments.records}));
     console.log('WORK4_SOURCE_CROP_A_B '+JSON.stringify({screen,winner:report.winner,records:report.records}));
   }
+  // Visit BOTH owned screens at each real mobile viewport. The previous sweep
+  // only captured Forja and could miss Frota's roster/dock regression at 320/390/430.
+  // Preserve WORK0 dock and genuine live navigation; never modify another WORK's CSS.
   const responsive=[];
   for(const [width,height] of [[320,568],[390,844],[430,932]]){
     await cmd('Emulation.setDeviceMetricsOverride',{
       width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height
     });
     await sleep(120);
-    const state=await geometry();
-    assert.equal(state.dockItems,5,'responsive real WORK0 nav at '+width);
-    assert.equal(state.overflow,false,'responsive viewport no overflow at '+width);
-    assert.ok(state.cannon?.[2]>100,'responsive original cannon at '+width);
-    assert.ok(state.costs,'three actual costs remain accessible at '+width);
+    const forge=await geometry();
+    assert.equal(forge.dockItems,5,'Forja real WORK0 nav at '+width);
+    assert.equal(forge.overflow,false,'Forja horizontal overflow at '+width);
+    assert.ok(forge.cannon?.[2]>100,'original forge cannon present at '+width);
+    assert.ok(forge.costs,'actual upgrade prices remain in DOM at '+width);
     writeFileSync(join(folder,'work4-forge-crop-qa-'+width+'x'+height+'.png'),
       Buffer.from(await shot(),'base64'));
-    responsive.push({width,height,...state});
+    responsive.push({width,height,screen:'forge',...forge});
+    await touch('.harbour-screen .harbour-nav-item:nth-child(2)');
+    await until("!!document.querySelector('.w4-fleet .w4-reference-ship')");
+    await sleep(110);
+    const fleet=await geometry();
+    assert.equal(fleet.dockItems,5,'Frota real WORK0 nav at '+width);
+    assert.equal(fleet.overflow,false,'Frota horizontal overflow at '+width);
+    assert.equal(fleet.cards,4,'Frota four live ship slots at '+width);
+    assert.ok(fleet.ship?.[2]>100,'one genuine Royal Crown at '+width);
+    writeFileSync(join(folder,'work4-fleet-crop-qa-'+width+'x'+height+'.png'),
+      Buffer.from(await shot(),'base64'));
+    responsive.push({width,height,screen:'fleet',...fleet});
+    const open=await evaluate("(()=>{const b=document.querySelector('.w4-fleet .w4-action-pair button.w4-primary');if(!b)return false;b.click();return true;})()");
+    assert.equal(open,true,'Frota to Forja navigation at '+width);
+    await until("!!document.querySelector('.w4-forge .w4-reference-cannon')");
   }
   writeFileSync(join(folder,'work4-source-crop-qa-summary.json'),
     JSON.stringify({approved:false,approvedScreens:0,sourceAssets:approvedNames,
