@@ -245,7 +245,7 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         {id:'warm-foundry',paint:'radial-gradient(ellipse 76% 94% at 32% 0%,#b66d3235 0%,transparent 77%),linear-gradient(173deg,#25292a 0%,#172126 52%,#0b161e 100%)'},
         {id:'warm-slate',paint:'linear-gradient(173deg,#303234 0%,#1a242b 52%,#0b1921 100%)'},
         {id:'steel-sheen',paint:'radial-gradient(ellipse 70% 65% at 48% 0%,#c48a4b24 0%,transparent 75%),linear-gradient(173deg,#283038 0%,#18222b 55%,#0a1721 100%)'},
-        {id:'forge-charcoal',paint:'linear-gradient(173deg,#252929 0%,#161f25 50%,#091621 100%)'},
+        {id:'prior-HEAD',paint:'radial-gradient(ellipse 76% 94% at 32% 0%,#a86e3738 0%,transparent 77%),repeating-linear-gradient(2deg,transparent 0 10px,#c89b5410 10px 11px,transparent 12px 21px),linear-gradient(173deg,#1a1f23 0%,#131c24 52%,#0b161e 100%)'},
         {id:'forge-warm-edge',paint:'radial-gradient(ellipse 72% 72% at 8% 88%,#bb68302b 0%,transparent 78%),linear-gradient(173deg,#292e2f 0%,#18252a 55%,#0b1722 100%)'}
       ];
     const paintShots:[string,string][]=[['HEAD',images[0][1]]];
@@ -300,6 +300,15 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         'small protected native visual adjustment must not materially regress frame MAE');
     }
 
+    if(screen==='forge'){
+      const before=pigments.records.find((r:any)=>r.id==='prior-HEAD');
+      const after=pigments.records.find((r:any)=>r.id==='HEAD');
+      assert.ok(before&&after,'actual previous Forja 04 material pigment exists');
+      assert.ok(after.materials<before.materials-.005,
+        'new source-charcoal material ROI improves against real prior board');
+      assert.ok(after.full<before.full-.003,
+        'new charcoal cannot regress full 384x512 source MAE');
+    }
     for(const record of pigments.records.slice(1)){
       assert.ok(record.changedFromHead>0,'paint A/B candidate must change real pixels: '+record.id);
       assert.equal(record.shipOrCannonChanged,0,'ship/cannon source region is immutable');
@@ -331,7 +340,10 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
     writeFileSync(join(folder,'work4-forge-crop-qa-'+width+'x'+height+'.png'),
       Buffer.from(await shot(),'base64'));
     responsive.push({width,height,screen:'forge',...forge});
-    await touch('.harbour-screen .harbour-nav-item:nth-child(2)');
+    // Forge is a nested Frota view: the dock's active Frota icon does not
+    // reroute when tapped again. Use the real local 'Voltar à Frota' action.
+    const back=await evaluate("(()=>{const b=document.querySelector('.w4-forge #w4-forge-panel > .w4-action-pair button');if(!b)return false;b.click();return true;})()");
+    assert.equal(back,true,'existing nested return-to-Frota action at '+width);
     await until("!!document.querySelector('.w4-fleet .w4-reference-ship')");
     await sleep(110);
     const fleet=await geometry();
