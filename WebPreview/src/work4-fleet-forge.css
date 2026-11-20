@@ -3261,3 +3261,17 @@
   }
 }
 
+
+
+/* WORK4/#104 — native 10px coast lip colour registered after source A/B
+   20 Nov 18h, actual same-paused-frame Chromium 384×512 against approved 03.
+   10px SOURCE colour match #07415aee: photo-join RGB MAE 12.27124 ->
+   11.78457, full frame 48.62491 -> 48.61574. Other 6/8/12/14px
+   bridges were worse. Change ink ONLY, not width, shape or hitboxes.
+   No additional ocean, ship or costs; Royal Crown and WORK0 dock unchanged.
+   Other viewport rules remain unmodified; approved:false, human 0/8. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after {
+    background:linear-gradient(90deg,transparent 0%,#07415aee 100%);
+  }
+}
