@@ -3094,3 +3094,22 @@
     border-color:#725a46;
   }
 }
+
+/* WORK4/#104 — 20 Nov 02h: coast-only source silhouette expansion.
+   A/B candidate, NOT art-approved. Reframe the edge of the SINGLE source
+   Royal Crown/coast without introducing a new sea, ship, or fake bitmap HUD.
+   Keep 03 source-water registration, all live stats/roster/touch targets,
+   and 04 Forja's protected paint compositor entirely untouched.
+   Only 384×512 native reference viewport: no 320/390/430 regression. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {
+    -webkit-mask-image:
+      radial-gradient(ellipse 118% 133% at 30% 50%,#000 0%,#000 86%,transparent 99%),
+      linear-gradient(to bottom,transparent 0%,#000 2%,#000 97%,transparent 100%);
+    mask-image:
+      radial-gradient(ellipse 118% 133% at 30% 50%,#000 0%,#000 86%,transparent 99%),
+      linear-gradient(to bottom,transparent 0%,#000 2%,#000 97%,transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-composite:intersect;
+  }
+}
