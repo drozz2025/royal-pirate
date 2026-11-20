@@ -1,7 +1,7 @@
 /* ROYAL PIRATE static-preview SW: only cache public same-origin files under its own scope.
  * The profile stays in localStorage; never cache user profiles or API requests.
  */
-const CACHE='royal-pirate-web-v0.1.114';
+const CACHE='royal-pirate-web-v0.1.115';
 const PREFIX='royal-pirate-web-';
 const SCOPE=self.registration.scope;
 const insideScope=url=>url.origin===self.location.origin&&url.href.startsWith(SCOPE);
