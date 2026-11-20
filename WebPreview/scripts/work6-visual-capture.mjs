@@ -34,10 +34,23 @@ try {
       const kind=name==='cartas'?'cards':name==='loja'?'shop':null;
       if(kind){
         const expected=kind==='cards'?8:4;
-        await page.waitForFunction(({kind,expected})=>{
-          const images=[...document.querySelectorAll('[data-work7-screen="'+kind+'"] .w7-approved-crop img')];
-          return images.length===expected&&images.every(img=>img.complete&&img.naturalWidth>0&&img.naturalHeight>0);
-        },{kind,expected},{timeout:15000});
+        try{
+          await page.waitForFunction(({kind,expected})=>{
+            const images=[...document.querySelectorAll('[data-work7-screen="'+kind+'"] .w7-approved-crop img')];
+            return images.length===expected&&images.every(img=>img.complete&&img.naturalWidth>0&&img.naturalHeight>0);
+          },{kind,expected},{timeout:15000});
+        }catch(error){
+          const diag=await page.evaluate(kind=>({
+            kind,screen:document.querySelector('[data-work7-screen]')?.getAttribute('data-work7-screen'),
+            imgs:[...document.querySelectorAll('[data-work7-screen="'+kind+'"] .w7-approved-crop img')].map(img=>({
+              complete:img.complete,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight,
+              src:img.currentSrc,outer:img.outerHTML.slice(0,120)
+            })),
+            allImgs:document.images.length,
+            screenText:document.querySelector('.app-sheet')?.textContent?.slice(0,150)
+          }),kind);
+          throw new Error('Artwork decoding timeout: '+JSON.stringify(diag)+'; '+String(error));
+        }
         const art=await page.evaluate(async kind=>{
           const images=[...document.querySelectorAll('[data-work7-screen="'+kind+'"] .w7-approved-crop img')];
           await Promise.all(images.map(img=>img.decode()));
