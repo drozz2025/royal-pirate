@@ -128,6 +128,8 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
   // Candidate study only: preserve the shipped WORK4 finish until a same-frame
   // source comparison supports changing it. One cannon, one real flame and all
   // costs/dock remain invariant; samples are temporary injected CSS.
+  // 20 Nov 22h: seven further real cannon iron and hearth-light alternatives
+  // all in a single native paused Chromium frame; diagnostic only, no gameplay.
   const variants=[
     {
       "id": "before",
@@ -188,6 +190,14 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
       "paint": "radial-gradient(ellipse 48% 82% at 12% 84%,#493326 0%,#302724 39%,transparent 90%),linear-gradient(165deg,#181d26 0%,#252327 56%,#272324 100%)",
       "extra": ".w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description{display:grid!important;grid-template-columns:40px minmax(0,1fr)!important;grid-template-rows:11px 23px 20px auto!important;column-gap:7px!important;row-gap:0!important;align-content:start!important;}\n.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description > .w4-forge-medallion{grid-column:1!important;grid-row:1 / 4!important;align-self:start!important;width:38px!important;height:38px!important;margin:0!important;}\n.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description > .w4-forge-medallion .w4-tab-symbol{width:27px!important;height:27px!important;}\n.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description > span{grid-column:2!important;grid-row:1!important;align-self:center!important;white-space:nowrap!important;font-size:7px!important;transform:scaleX(.74)!important;transform-origin:left center!important;}\n.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description > h3{grid-column:2!important;grid-row:2!important;margin:0!important;align-self:center!important;font-size:19px!important;line-height:1!important;}\n.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description > strong{grid-column:2!important;grid-row:3!important;align-self:center!important;font-size:16px!important;}\n.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description > .w4-forge-live-levels{grid-column:1/-1!important;grid-row:4!important;margin-top:5px!important;padding-top:2px!important;}"
     }
+,
+    {"id":"iron-barrel-contrast-102","extra":".w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon{filter:contrast(1.02)!important;}","paint":"radial-gradient(ellipse 48% 82% at 12% 84%,#493326 0%,#302724 39%,transparent 90%),linear-gradient(165deg,#181d26 0%,#252327 56%,#272324 100%)"},
+    {"id":"iron-barrel-saturate-102","extra":".w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon{filter:saturate(1.02)!important;}","paint":"radial-gradient(ellipse 48% 82% at 12% 84%,#493326 0%,#302724 39%,transparent 90%),linear-gradient(165deg,#181d26 0%,#252327 56%,#272324 100%)"},
+    {"id":"iron-barrel-warm-102","extra":".w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon{filter:brightness(1.015) saturate(1.025)!important;}","paint":"radial-gradient(ellipse 48% 82% at 12% 84%,#493326 0%,#302724 39%,transparent 90%),linear-gradient(165deg,#181d26 0%,#252327 56%,#272324 100%)"},
+    {"id":"iron-barrel-cool-102","extra":".w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon{filter:contrast(1.015) saturate(.98)!important;}","paint":"radial-gradient(ellipse 48% 82% at 12% 84%,#493326 0%,#302724 39%,transparent 90%),linear-gradient(165deg,#181d26 0%,#252327 56%,#272324 100%)"},
+    {"id":"ember-depth-8percent","extra":".w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene{box-shadow:inset 0 -10px 24px #e77a2514!important;}","paint":"radial-gradient(ellipse 48% 82% at 12% 84%,#493326 0%,#302724 39%,transparent 90%),linear-gradient(165deg,#181d26 0%,#252327 56%,#272324 100%)"},
+    {"id":"ember-depth-16percent","extra":".w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene{box-shadow:inset 0 -12px 26px #e77a2529!important;}","paint":"radial-gradient(ellipse 48% 82% at 12% 84%,#493326 0%,#302724 39%,transparent 90%),linear-gradient(165deg,#181d26 0%,#252327 56%,#272324 100%)"},
+    {"id":"iron-satin-matte","extra":".w4-forge .w4-forge-scene > svg.w4-cannon-art.w4-reference-cannon{filter:brightness(.99) contrast(1.015)!important;}","paint":"radial-gradient(ellipse 48% 82% at 12% 84%,#493326 0%,#302724 39%,transparent 90%),linear-gradient(165deg,#181d26 0%,#252327 56%,#272324 100%)"}
   ];
   const shots=[];
   for(const shift of variants){
