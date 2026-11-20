@@ -343,6 +343,43 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
+        // Same-frozen-frame diagnostic ONLY: candidate 05 metal pigments
+        // are sampled against 05 approved WebP, without writing production CSS.
+        if(kind==='cards' && width===384 && height===512){
+          const variants:Array<[string,string]>=[
+            ['head','inset 0 0 0 1px #472714ae,inset 0 3px 6px #080c237a,inset 0 -2px 1px #ffdb7b2b'],
+            ['current','inset 0 0 0 1px #dfa95ca6,inset 0 2px 5px #080c2360,inset 0 -2px 1px #ffdb7b52'],
+            ['gold-soft','inset 0 0 0 1px #996b3c93,inset 0 2px 5px #080c234c,inset 0 -2px 1px #ffdb7b45'],
+            ['gold-bright','inset 0 0 0 1px #ffcc86ac,inset 0 1px 3px #080c2340,inset 0 -2px 1px #ffdb7b55'],
+            ['gold-thick','inset 0 0 0 2px #dfa351a8,inset 0 1px 2px #080c233c,inset 0 -2px 2px #f8c17966'],
+            ['gold-pale','inset 0 0 0 1px #fff0c066,inset 0 1px 3px #080c2340,inset 0 -2px 1px #ffdb7b55'],
+            ['gold-soft2','inset 0 0 0 1px #d8a26380,inset 0 3px 6px #080c237a,inset 0 -2px 1px #ffdb7b2b'],
+            ['dark-thin','inset 0 0 0 1px #0913298a,inset 0 1px 4px #02081777,inset 0 -2px 1px #f2c47734'],
+            ['no-shadow','none'],
+            ['head-no-top','inset 0 0 0 1px #472714ae,inset 0 -2px 1px #ffdb7b2b'],
+            ['head-brighter-bottom','inset 0 0 0 1px #472714ae,inset 0 3px 6px #080c237a,inset 0 -2px 1px #ffdb7b7a']
+          ];
+          for(const [label,shadow] of variants){
+            const css='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot::before'+
+              '{box-shadow:'+shadow+'!important}}';
+            await evaluate("(()=>{let s=document.createElement('style');s.id='work7-sweep-card';s.textContent="+JSON.stringify(css)+";document.head.appendChild(s);return true})()");
+            await sleep(85);
+            const shot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+            const m=await evaluate("(async()=>{"+
+              "const load=src=>new Promise((ok,bad)=>{let i=new Image();i.onload=()=>ok(i);i.onerror=bad;i.src=src});"+
+              "const r=await load("+JSON.stringify(refUrl)+"),q=await load("+JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+");"+
+              "let can=document.createElement('canvas');can.width=384;can.height=512;let ctx=can.getContext('2d');"+
+              "ctx.drawImage(r,0,0);let a=ctx.getImageData(0,0,384,512).data;ctx.clearRect(0,0,384,512);"+
+              "ctx.drawImage(q,0,0);let b=ctx.getImageData(0,0,384,512).data;let s=0,n=0,rs=0,rn=0;"+
+              "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;for(let k=0;k<3;k++){let d=Math.abs(a[p+k]-b[p+k]);s+=d;n++;if(x>=18&&x<365&&y>=195&&y<428){rs+=d;rn++}}}"+
+              "return {global:Math.round(s/n*10000)/10000,roi:Math.round(rs/rn*10000)/10000}})()");
+            console.log('WORK7 CARD METAL SWEEP '+label+' '+JSON.stringify(m));
+            await evaluate("(()=>{document.getElementById('work7-sweep-card')?.remove();return true})()");
+            await sleep(50);
+          }
+        }
+
         // WORK7 experimental tuning grid, never applied to the production UI:
         // same 384x512 screenshot frame and same approved artwork for every
         // real-chest brightness candidate; log absolute native MAE/ROI and
