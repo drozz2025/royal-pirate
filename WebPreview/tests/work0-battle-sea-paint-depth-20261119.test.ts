@@ -18,7 +18,8 @@ test('Battle foam material is truly animated/fragmented and gated off for Porto'
   assert.match(parts[1],/float edgeBreak=smoothstep\(\.56,\.90,curling\)/);
   assert.match(parts[1],/float foam=crestMask\*\(\.21\+/);
   assert.match(parts[1],/foam=clamp\(foam,0\.,\.64\)/);
-  assert.match(parts[1],/col=mix\(deep,vec3\(\.91,\.98,\.96\),foam\)/);
+  assert.match(parts[1],/vec3 deep=mix\(vec3\(\.005,\.105,\.235\),vec3\(\.019,\.34,\.51\)/, 'navy troughs and restrained blue crests are battle-only');
+  assert.match(parts[1],/col=mix\(deep,vec3\(\.91,\.97,\.94\),foam\)/);
   assert.match(scene,/new T\.PlaneGeometry\(210,210,190,190\)/);
   assert.match(scene,/this\.water\.uniforms\.battleMode\.value=0/);
   assert.match(scene,/this\.water\.uniforms\.battleMode\.value=1/);
