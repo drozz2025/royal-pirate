@@ -594,6 +594,16 @@ export function MissionsPanel({profile,onDaily,onMission,onNavigate}:{
             gap:2px;
           }
         }
+        /* WORK8/#104 — 07 Missões ONLY: quieter inactive navy category
+           plaques measured against the native 384x512 approved art. The
+           selected category, labels, tap targets and WORK0 dock never move.
+           Production root opt-out isolates the exact same-frame A/B. */
+        @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+          :root:not(.work8-missions-tabs-luma-ab-baseline)
+          .w8-approved-missions .w8-approved-tabs button:not([aria-pressed="true"]) {
+            filter:brightness(.75);
+          }
+        }
       `}</style>
       <section className="w8-approved-daily" aria-label="7-day supply route" title={canClaim?'Next claim earns '+(15+next*5)+' coins':'Recompensa de hoje já recolhida'}>
         <h3>Recompensa Diária<W8ApprovedPainting art="daily-heading"/></h3>
