@@ -231,7 +231,7 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         {id:'HEAD',paint:null},
         {id:'prior-HEAD',paint:'linear-gradient(90deg,#082c48de 0%,#09253ff1 20%,#061d33f8 55%,#031529fc 100%)'},
         {id:'prior-silver-edge',paint:null,shadow:'inset 1px 0 #bad4cf27'},
-        {id:'prior-coast-lip',paint:null,seam:'left:-10px;width:10px;background:linear-gradient(90deg,transparent 0%,#082c48de 100%);'},
+        {id:'rejected-14px-coast-lip',paint:null,seam:'left:-14px;width:14px;background:linear-gradient(90deg,transparent 0%,#07415aee 100%);'},
         {id:'deep-coast',paint:'linear-gradient(90deg,#073d52ec 0%,#092a41f2 22%,#071d33f8 55%,#031529fc 100%)'},
         {id:'source-blue',paint:'linear-gradient(90deg,#06506adf 0%,#08344bee 20%,#081f36f9 55%,#031529fc 100%)'},
         {id:'muted-slate',paint:'linear-gradient(90deg,#0a354bea 0%,#0b2a42f3 22%,#071c34f9 55%,#031529fc 100%)'},
@@ -262,11 +262,11 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
       const applied=await evaluate("(()=>getComputedStyle(document.querySelector("+
         JSON.stringify(paintSelector)+")).backgroundImage)()");
       assert.ok(applied.includes('gradient('),'candidate must really repaint its DOM element');
-      if(candidate.id==='prior-coast-lip'){
+      if(candidate.id==='rejected-14px-coast-lip'){
         const coast=await evaluate("(()=>{const s=getComputedStyle(document.querySelector("+
           JSON.stringify(paintSelector)+"),'::after');return {width:s.width,background:s.backgroundImage}})()");
-        assert.equal(coast.width,'10px','previous 10px coastline bridge actually restored');
-        assert.ok(coast.background.includes('gradient('),'previous coast transition visibly rendered');
+        assert.equal(coast.width,'14px','14px experimental coastline bridge actually applied');
+        assert.ok(coast.background.includes('gradient('),'experimental coast paint visibly rendered');
       }
       if(candidate.id==='prior-silver-edge'){
         const silver=await evaluate("getComputedStyle(document.querySelector("+JSON.stringify(paintSelector)+")).boxShadow");
@@ -316,13 +316,17 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         'small protected native visual adjustment must not materially regress frame MAE');
       const oldLine=pigments.records.find((r:any)=>r.id==='prior-silver-edge');
       assert.ok(oldLine,'capture legacy 1px silver edge from real Chromium');
-      const lip=pigments.records.find((r:any)=>r.id==='prior-coast-lip');
-      assert.ok(lip,'native same-frame former photo-bridge captured');
+      const lip=pigments.records.find((r:any)=>r.id==='rejected-14px-coast-lip');
+      assert.ok(lip,'native same-frame rejected photo-bridge captured');
+      assert.ok(after.seam < lip.seam-.20,
+        'the production 10px original coast bridge must outperform rejected 14px seam');
+      assert.ok(after.full<=lip.full,
+        'reject coast feather enlargements that worsen global MAE');
       assert.equal(lip.shipOrCannonChanged,0,'coast transition may not move the Crown');
       assert.equal(lip.dockChanged,0,'coast transition may not alter WORK0 dock');
-      console.log('WORK4_COAST_BRIDGE_A_B '+JSON.stringify({
-        beforeFull:lip.full,afterFull:after.full,
-        beforeSeam:lip.seam,afterSeam:after.seam,
+      console.log('WORK4_COAST_BRIDGE_REJECTED_A_B '+JSON.stringify({
+        productionFull:after.full,rejectedFull:lip.full,
+        productionSeam:after.seam,rejectedSeam:lip.seam,
         changedPixels:lip.changedFromHead,shipChanged:lip.shipOrCannonChanged,
         dockChanged:lip.dockChanged}));
       console.log('WORK4_SILVER_EDGE_A_B '+JSON.stringify({newSeam:after.seam,oldSeam:oldLine.seam,
