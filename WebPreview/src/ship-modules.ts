@@ -8,6 +8,7 @@ import { createPreviewDeckRopeCoils } from './ship-deck-rope-coils';
 import { createPreviewDeckLongboats } from './ship-deck-longboats';
 import { createPreviewDeckHatches } from './ship-deck-hatches';
 import { createPreviewSternRudder } from './ship-stern-rudders';
+import { createPreviewBoardingLadders } from './ship-boarding-ladders';
 import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
 import { createPreviewCabinGallery, type PreviewCabinModule } from './ship-cabin';
 import { createPreviewCannonRefit, type PreviewCannonModule } from './ship-cannons';
@@ -317,6 +318,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // An original tapered wooden rudder with class-specific forged hinges and
  // hull-tier refits: decorative 3D shipyard art, NOT a steering or combat change.
  additions.add(createPreviewSternRudder(config.shipClass,config.modules.hull as PreviewHullModule));
+ // Original sculpted boarding ladders follow the hull refit visually only.
+ // They are disposable shipyard geometry, not climbable gameplay collision.
+ additions.add(createPreviewBoardingLadders(config.shipClass,config.modules.hull as PreviewHullModule));
  // Raised-quarterdeck and admiral cabin silhouettes are preview-only meshes.
  // They never alter the persistent fleet, resources or battle ship geometry.
  additions.add(createPreviewCabinGallery(config.shipClass,config.modules.cabin as PreviewCabinModule));
