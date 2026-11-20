@@ -7,6 +7,7 @@ import { createPreviewCannonRefit, type PreviewCannonModule } from './ship-canno
 import { createPreviewFigurehead, type PreviewFigureheadModule } from './ship-figureheads';
 import { createPreviewHullRelief, type PreviewHullModule } from './ship-hull-relief';
 import { createPreviewSailEmbroidery, type PreviewSailModule } from './ship-sail-embroidery';
+import { createPreviewFlagHeraldry, type PreviewFlagModule } from './ship-flag-heraldry';
 
 /** Original modular ship system. All 20 levels are supported by progression gates,
  * not 20 duplicated meshes. Neither currency nor ownership is fabricated here. */
@@ -304,6 +305,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // Real cambered stitching overlays both sails in a single disposable GPU draw.
  // Class motif and dye tier change ONLY the appearance of the 3D editor ship.
  additions.add(createPreviewSailEmbroidery(config.shipClass,config.modules.sails as PreviewSailModule));
+ // Real double-faced stitched icons for both rig flags, one accessory mesh.
+ // Purely a preview decoration; the original battle flags remain in the rig.
+ additions.add(createPreviewFlagHeraldry(config.shipClass,config.modules.flag as PreviewFlagModule));
  const hull=config.modules.hull,armor=config.modules.armor;
  if(hull!=='hull-oak')for(const side of [-1,1])for(const z of [-2.6,-1,1,2.6])
   cube(hull==='hull-royal'?brass:warm,side*1.55,1.04,z,.2,1.25,.18);

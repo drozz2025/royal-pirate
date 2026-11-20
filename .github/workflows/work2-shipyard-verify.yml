@@ -21,6 +21,7 @@ on:
       - work2/original-prow-figureheads-20261120
       - work2/original-hull-relief-20261120
       - work2/original-embroidered-sails-20261120
+      - work2/original-flag-heraldry-20261120
   pull_request:
     branches:
       - work2/original-stern-heraldry-20261119
