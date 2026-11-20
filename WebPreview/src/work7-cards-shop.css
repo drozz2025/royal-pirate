@@ -4351,3 +4351,16 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 20 Nov 04:19 UTC — native 384×512 carved treasure frame depth.
+ * Three genuine 06 chest panels receive deeper colour-registered recesses;
+ * each retains its individual approved WebP crop and LIVE EM BREVE plaque.
+ * Compare the EXACT HEAD .73/.74/.60 filters against this native material,
+ * frozen in the same Chromium DOM/frame, before asking WORK0 to integrate.
+ * This is not a screenshot background. 320px and tall phones unchanged.
+ * No changes to Cards/Porto/dock/HUD/economy. approved:false 0/8. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.68)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.69)}
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.54)}
+}
