@@ -87,11 +87,11 @@ test('WORK8 07 approved navy on inactive tabs: real Chromium same-frame A/B and 
     assert.ok(decoded>=8,'all source-painted authentic decorations must decode');
     await delay(280);
     await evaluate('(()=>{document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));return true})()');
-    const flag='work8-missions-tabs-luma-ab-baseline';
-    await evaluate('document.documentElement.classList.add('+JSON.stringify(flag)+');true');
+    const lumaProperty='--work8-missions-tabs-luma';
+    await evaluate('document.documentElement.style.setProperty('+JSON.stringify(lumaProperty)+',"1");true');
     await delay(700); // let the real native CSS filter transition settle fully
     const beforeLayout=await layout(),before=await screenshot();
-    await evaluate('document.documentElement.classList.remove('+JSON.stringify(flag)+');true');
+    await evaluate('document.documentElement.style.removeProperty('+JSON.stringify(lumaProperty)+');true');
     await delay(700); // identical settled frame; no mid-transition MAE samples
     const afterLayout=await layout(),after=await screenshot();
     const original=readFileSync(new URL('../../assets/design-approved/07-missoes.webp',import.meta.url)).toString('base64');
