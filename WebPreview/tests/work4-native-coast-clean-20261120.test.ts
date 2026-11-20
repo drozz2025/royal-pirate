@@ -12,6 +12,7 @@ const paint=css.split(marker)[1]?.split('/*')[0]||'';
 const selector='.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label';
 const oldGradient='linear-gradient(90deg,#082c48de 0%,#09253ff1 20%,#061d33f8 55%,#031529fc 100%)';
 const approved=readFileSync(new URL('../../assets/design-approved/03-frota.webp',import.meta.url)).toString('base64');
+const forgeApproved=readFileSync(new URL('../../assets/design-approved/04-melhorias-forja.webp',import.meta.url)).toString('base64');
 
 test('WORK4 Fleet source seam uses local native paint, never ship geometry, sea or shared UI',()=>{
   assert.ok(paint,'native source inset must exist');
@@ -159,6 +160,41 @@ test('WORK4 Fleet native live-inset controlled A/B: same Chromium frame, per-ROI
     note:'MAE is evidence, not human artistic approval. Only the live inset pigment changes.'};
   writeFileSync(join(qa,'work4-native-live-inset-source-ab.json'),JSON.stringify(report,null,2)+'\n');
   console.log('WORK4_CLEAN_COAST_NATIVE_AB '+JSON.stringify(report));
+  // Independent real 04 Forja visual score. The current PR changes only Fleet
+  // pigments; this capture prevents a misleading "Forge improved" claim.
+  const enterForge=await evaluate("(()=>{const b=document.querySelector('.w4-fleet .w4-action-pair button.w4-primary');if(!b)return false;b.click();return true})()");
+  assert.equal(enterForge,true,'live Fleet to Forge control must work at native 384');
+  await until("!!document.querySelector('.w4-forge .w4-reference-cannon')");
+  await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());return true})()");
+  await delay(150);
+  const forgeGeometry=await evaluate("(()=>({cannon:document.querySelectorAll('.w4-forge .w4-reference-cannon').length,costs:document.querySelectorAll('.w4-forge .w4-resource-grid strong').length,upgrade:!!document.querySelector('.w4-forge .w4-improve-button'),dock:document.querySelectorAll('.app-sheet .harbour-nav.app-dock-porto .harbour-nav-item').length}))()");
+  assert.deepEqual(forgeGeometry,{cannon:1,costs:3,upgrade:true,dock:5},
+    'one source cannon, three real costs, real upgrade and five dock controls');
+  const forgeFrame=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
+  const forgeExpression="(async()=>{const decode=async(src)=>{const im=new Image();im.src=src;await im.decode();return im;};"+
+    "const [src,live]=await Promise.all([decode("+JSON.stringify('data:image/webp;base64,'+forgeApproved)+"),decode("+JSON.stringify('data:image/png;base64,'+forgeFrame)+")]);"+
+    "if([src,live].some(im=>im.width!==384||im.height!==512))throw Error('Forge needs native 384x512 sources');"+
+    "const buf=(im)=>{const can=document.createElement('canvas');can.width=384;can.height=512;const x=can.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);return x.getImageData(0,0,384,512).data;};"+
+    "const a=buf(src),b=buf(live),boxes={full:[0,0,384,512],cannon:[18,153,190,305],furnace:[129,168,200,294],materials:[16,329,375,430],dock:[0,433,384,512]};"+
+    "let mae={};for(const [name,[x1,y1,x2,y2]] of Object.entries(boxes)){let sum=0,n=0;for(let y=y1;y<y2;y++)for(let x=x1;x<x2;x++){const k=(y*384+x)*4;for(let z=0;z<3;z++){sum+=Math.abs(a[k+z]-b[k+z]);n++;}}mae[name]=sum/n;}"+
+    "const can=document.createElement('canvas');can.width=1152;can.height=512;const ctx=can.getContext('2d');ctx.drawImage(src,0,0);ctx.drawImage(live,384,0);ctx.drawImage(src,768,0);ctx.globalAlpha=.5;ctx.drawImage(live,768,0);ctx.globalAlpha=1;"+
+    "return {mae,panel:can.toDataURL('image/png').split(',')[1]};})()";
+  const forgeResult=await evaluate(forgeExpression);
+  for(const [region,value] of Object.entries(forgeResult.mae as Record<string,number>)){
+    assert.ok(Number.isFinite(value)&&value>=0&&value<=255,'valid native Forge RGB MAE: '+region);
+  }
+  const forgeReport={approved:false,approvedScreens:0,viewport:'384x512',
+    source:'04-melhorias-forja.webp',frame:'native Chromium, paused animations',
+    changedProductionPixels:'none in Forge; WORK4 PR CSS edits Fleet only',
+    geometry:forgeGeometry,roi:forgeResult.mae};
+  writeFileSync(join(qa,'work4-forge-source-384x512-original-render-overlay.png'),
+    Buffer.from(forgeResult.panel,'base64'));
+  writeFileSync(join(qa,'work4-forge-reference-roi-384x512.json'),
+    JSON.stringify(forgeReport,null,2)+'\n');
+  console.log('WORK4_FORGE_NATIVE_SOURCE_ROI '+JSON.stringify(forgeReport));
+  const returnToFleet=await evaluate("(()=>{const b=document.querySelector('.w4-forge #w4-forge-panel > .w4-action-pair button');if(!b)return false;b.click();return true})()");
+  assert.equal(returnToFleet,true,'native Forge return action');
+  await until("!!document.querySelector('.w4-fleet .w4-reference-ship')");
   // Both owned pages, three additional real mobile frames; no local synthetic screenshot.
   // The new rule is native-384-only, so responsive layout and WORK0 dock stay untouched.
   const mobileQA=[];
