@@ -50,7 +50,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Native 05 WORK7 candidate must exist');
-  assert.ok(cssText.includes('/* WORK7/#104 — 20 Nov 01:25 UTC. Native 384x512 Captain offer velvet exposure.'), 'New native-only Captain offer material exists');
+  assert.ok(cssText.includes('/* WORK7/#104 — 20 Nov 01:45 UTC. Native 384x512 hand-painted metal relief.'), 'True 05 card metal-depth change exists');
   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
     'Only genuine native 06 legendary physical rim is changed in this candidate');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
@@ -64,16 +64,21 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // frame filter. Previous #411/#422 and live artwork stay untouched.
   // The override is installed on the SAME page and animation frame.
   // It is inert for Shop and for 320/tall viewports.
-  // Exact 9e496517 merged HEAD, not stale pre-#591 or an older
-  // WORK7 experimental inlay: restore only the new pack filter in the
-  // SAME DOM, animation frame, and 384x512 viewport.
+  // Restore only this candidate's four 05 carved-frame pigments to the
+  // exact merged 9e496517 HEAD in the SAME DOM, frame, and viewport.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
-        filter:brightness(.88)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
+        filter:brightness(.49) saturate(2.00) contrast(.79)!important;
       }
-      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
-        filter:saturate(1.05) contrast(1.06) brightness(1.16) drop-shadow(0 6px 5px #14062ca3)!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+        filter:brightness(.65) saturate(1.30) contrast(.92)!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+        filter:brightness(.40) saturate(1.75) contrast(.79)!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
+        filter:brightness(.64) saturate(1.90) contrast(.88)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -462,11 +467,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const card=native.find(screen=>screen.kind==='cards');
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
-  assert.equal(card.maeRgbAfter,card.maeRgbBefore,
-    '05 Cartas must stay exactly pixel-identical to the true starting HEAD');
-  assert.equal(card.roiMaeAfter,card.roiMaeBefore,
-    'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
-  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 Captain pack velvet must improve strict global MAE AND true pack/chests ROI vs exact 9e496517 HEAD: '+
-    JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
+  assert.ok(card.maeRgbAfter < card.maeRgbBefore && card.roiMaeAfter < card.roiMaeBefore,
+    'Exact native 05 four-frame pigments must improve both global MAE and eight-card ROI: '+
+    JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
+  assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
+    '06 Loja remains pixel-identical to the exact merged HEAD');
+  assert.equal(shop.roiMaeAfter,shop.roiMaeBefore,
+    'Captain pack and all three chests remain pixel-identical to the HEAD');
 });
