@@ -4351,3 +4351,19 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 20 Nov 10:23 UTC, native 384x512 velvet pack relief trial.
+ * Standalone genuine Captain's pack panel only: layered painted velvet and
+ * grazing light. The one approved WEBP chest remains a separate illustration,
+ * with true unavailable button/text and all real state untouched.
+ * 320px label spacing, tall phones, 05 cards, Porto/dock/global shell stay
+ * byte-for-byte unchanged. Same-frame strict HEAD MAE+ROI gate below.
+ * Artistic approval stays false (0/8); WORK0-only merge/release. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    background:
+      radial-gradient(ellipse 66% 95% at 28% 40%,#d34da877,transparent 85%),
+      radial-gradient(ellipse 57% 81% at 77% 13%,#8a4dd547,transparent 87%),
+      linear-gradient(112deg,#4c0f67 0%,#390b65 49%,#110839 100%);
+  }
+}
