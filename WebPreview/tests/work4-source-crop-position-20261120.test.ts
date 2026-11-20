@@ -232,6 +232,10 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         {id:'prior-HEAD',paint:'linear-gradient(90deg,#082c48de 0%,#09253ff1 20%,#061d33f8 55%,#031529fc 100%)'},
         {id:'prior-silver-edge',paint:null,shadow:'inset 1px 0 #bad4cf27'},
         {id:'rejected-14px-coast-lip',paint:null,seam:'left:-14px;width:14px;background:linear-gradient(90deg,transparent 0%,#07415aee 100%);'},
+        {id:'coast-lip-6px',paint:null,seam:'left:-6px;width:6px;background:linear-gradient(90deg,transparent 0%,#082c48de 100%);'},
+        {id:'coast-lip-8px',paint:null,seam:'left:-8px;width:8px;background:linear-gradient(90deg,transparent 0%,#082c48de 100%);'},
+        {id:'coast-lip-12px',paint:null,seam:'left:-12px;width:12px;background:linear-gradient(90deg,transparent 0%,#082c48de 100%);'},
+        {id:'coast-lip-10px-colour',paint:null,seam:'left:-10px;width:10px;background:linear-gradient(90deg,transparent 0%,#07415aee 100%);'},
         {id:'deep-coast',paint:'linear-gradient(90deg,#073d52ec 0%,#092a41f2 22%,#071d33f8 55%,#031529fc 100%)'},
         {id:'source-blue',paint:'linear-gradient(90deg,#06506adf 0%,#08344bee 20%,#081f36f9 55%,#031529fc 100%)'},
         {id:'muted-slate',paint:'linear-gradient(90deg,#0a354bea 0%,#0b2a42f3 22%,#071c34f9 55%,#031529fc 100%)'},
@@ -262,11 +266,12 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
       const applied=await evaluate("(()=>getComputedStyle(document.querySelector("+
         JSON.stringify(paintSelector)+")).backgroundImage)()");
       assert.ok(applied.includes('gradient('),'candidate must really repaint its DOM element');
-      if(candidate.id==='rejected-14px-coast-lip'){
+      if('seam' in candidate && candidate.seam){
         const coast=await evaluate("(()=>{const s=getComputedStyle(document.querySelector("+
           JSON.stringify(paintSelector)+"),'::after');return {width:s.width,background:s.backgroundImage}})()");
-        assert.equal(coast.width,'14px','14px experimental coastline bridge actually applied');
-        assert.ok(coast.background.includes('gradient('),'experimental coast paint visibly rendered');
+        const width=candidate.seam.match(/width:(\\d+)px/)?.[1];
+        assert.equal(coast.width,width+'px','coast bridge variant must really apply: '+candidate.id);
+        assert.ok(coast.background.includes('gradient('),'coast paint visibly rendered');
       }
       if(candidate.id==='prior-silver-edge'){
         const silver=await evaluate("getComputedStyle(document.querySelector("+JSON.stringify(paintSelector)+")).boxShadow");
@@ -329,6 +334,8 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
         productionSeam:after.seam,rejectedSeam:lip.seam,
         changedPixels:lip.changedFromHead,shipChanged:lip.shipOrCannonChanged,
         dockChanged:lip.dockChanged}));
+      console.log('WORK4_COAST_WIDTH_SWEEP '+JSON.stringify(pigments.records.filter((r:any)=>
+        r.id==='HEAD'||r.id.includes('coast-lip'))));
       console.log('WORK4_SILVER_EDGE_A_B '+JSON.stringify({newSeam:after.seam,oldSeam:oldLine.seam,
         newFull:after.full,oldFull:oldLine.full,shipDeltaPx:oldLine.shipOrCannonChanged,
         dockDeltaPx:oldLine.dockChanged}));
