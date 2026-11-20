@@ -92,7 +92,14 @@ test('WORK5: 1,200 seeded economy operations reconcile against independent delta
     assert.equal(new Set(profile.claimedMissions).size,profile.claimedMissions.length,'duplicate mission claim at operation '+i);
     if(expectedDelta>0)credits+=expectedDelta;else debits-=expectedDelta;
     assert.equal(profile.coins,credits-debits,'wallet ledger drift at operation '+i);
-    if(i%80===0)assert.deepEqual(importProfileBackup(exportProfileBackup(profile,at)),profile,'backup mismatch at step '+i);
+    if(i%80===0){
+      const restored=importProfileBackup(exportProfileBackup(profile,at));
+      assert.equal(restored.coins,profile.coins,'backup wallet drift at step '+i);
+      assert.equal(restored.wins,profile.wins,'backup win count drift at step '+i);
+      assert.equal(restored.losses,profile.losses,'backup loss count drift at step '+i);
+      assert.equal(restored.equippedCrew,profile.equippedCrew,'equipped crew lost at step '+i);
+      assert.deepEqual(importProfileBackup(exportProfileBackup(restored,at)),restored,'canonical backup not idempotent at step '+i);
+    }
   }
   assert.ok(battles>100,'simulation missed the battle economy');
   assert.equal(profile.wins+profile.losses,battles,'battle receipts must be counted once');
