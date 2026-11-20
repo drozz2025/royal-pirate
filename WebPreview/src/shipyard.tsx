@@ -11,6 +11,8 @@ type ShipyardProps={
  onPreview:(loadout:ShipLoadout)=>void;
  /** Optional isolated preview camera; no battle camera or persistence involved. */
  onViewChange?:(view:ShipyardView)=>void;
+ /** Optional WORK 6 callback to focus the active part in the isolated 3D scene. */
+ onFocusSlot?:(slot:ModuleSlot|null)=>void;
  ownedModuleIds?:ReadonlySet<string>;
  /** Independently verified ownership of the ship class/hull, not individual modules. */
  ownedShipClasses?:ReadonlySet<ShipClass>;
@@ -25,11 +27,12 @@ const SLOT_NAMES:Record<ModuleSlot,string>={
 
 /** Interactive ship construction sandbox. Nothing here is purchased, owned,
  * persisted, awarded or injected into combat; only original 3D parts are previewed. */
-export function Shipyard({onClose,onPreview,onViewChange,ownedModuleIds,ownedShipClasses,verifiedPlayerLevel,onEquip}:ShipyardProps){
+export function Shipyard({onClose,onPreview,onViewChange,onFocusSlot,ownedModuleIds,ownedShipClasses,verifiedPlayerLevel,onEquip}:ShipyardProps){
  const [shipClass,setShipClass]=useState<ShipClass>('fighter');
  const [level,setLevel]=useState(1);
  const [slot,setSlot]=useState<ModuleSlot>('hull');
  const [cameraView,setCameraView]=useState<ShipyardView>('quarter');
+ const [focusedSlot,setFocusedSlot]=useState<ModuleSlot|null>(null);
  // Preserve sandbox designs independently per hull. A class change must not
  // silently copy its ornaments, sails and guns to another ship.
  // Preview-only React state: never a saved fleet inventory.
@@ -101,9 +104,18 @@ export function Shipyard({onClose,onPreview,onViewChange,ownedModuleIds,ownedShi
    </div>
    <div className="shipyard-slot-strip" role="group" aria-label="Ship module categories">
     {SLOTS.map(current=><button type="button" key={current} aria-pressed={slot===current}
-      className={slot===current?'active':''} onClick={()=>setSlot(current)}>{SLOT_NAMES[current]}</button>)}
+      className={slot===current?'active':''} onClick={()=>{
+       setSlot(current);
+       // Retarget only when the user deliberately enabled close-up inspection.
+       if(focusedSlot!==null){setFocusedSlot(current);onFocusSlot?.(current);}
+      }}>{SLOT_NAMES[current]}</button>)}
    </div>
    <div className="shipyard-parts-header"><strong>{SLOT_NAMES[slot]} MODULES</strong><div className="shipyard-parts-tools">
+    {onFocusSlot&&<button type="button" className="shipyard-part-focus" aria-pressed={focusedSlot===slot}
+     aria-label={focusedSlot===slot?'Return to full ship view':'Inspect '+SLOT_NAMES[slot]+' in close-up 3D'}
+     onClick={()=>{const next=focusedSlot===slot?null:slot;setFocusedSlot(next);onFocusSlot(next);}}>
+     {focusedSlot===slot?'FULL SHIP':'FOCUS '+SLOT_NAMES[slot]}
+    </button>}
     <button type="button" onClick={()=>setSelected(highestUnlockedPreviewModules(level))}
      aria-label="Preview highest unlocked modules at this demo level, without granting ownership">MAX LEVEL PREVIEW</button>
     <button type="button" onClick={()=>setSelected({})} aria-label="Reset preview modules for this ship class only">RESET CLASS</button>

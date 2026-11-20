@@ -4,8 +4,8 @@ import { Battle, predict, SHIPS, type BattleEvent } from './battle';
 import { SoftwareRenderer } from './software-renderer';
 import { PirateAudio } from './audio';
 import { makeShip, type ShipArt } from './ships';
-import { applyShipModules, type ShipLoadout } from './ship-modules';
-import { shipyardCameraOffset, type ShipyardView } from './shipyard-camera';
+import { applyShipModules, type ShipLoadout, type ModuleSlot } from './ship-modules';
+import { shipyardCameraOffset, shipyardPartTarget, shipyardPartCameraOffset, type ShipyardView } from './shipyard-camera';
 import { hullImpactPlacement } from './impact-visuals';
 import { rippleState } from './water-vfx';
 export type Metrics = { fps: number; renderMs: number; calls: number; triangles: number; geometries: number; textures: number; effects: number; heapMB?: number };
@@ -16,7 +16,7 @@ export class OceanScene {
   private pathGeometry=new T.BufferGeometry().setAttribute('position',new T.BufferAttribute(new Float32Array(240*3),3)); private path: T.Line; private marker: T.Mesh;
   private ball: T.Mesh; private particleGeometry=new T.IcosahedronGeometry(1,0); private particleMaterial=new T.MeshBasicMaterial({color:'#fff'});
   private particles: { mesh:T.Mesh;velocity:T.Vector3;age:number;life:number;size:number;smoke:boolean }[]=[];
-  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'|'inspect'|'shipyard'='battle'; private shipyardView:ShipyardView='quarter'; private shipyardArt:ShipArt|null=null; private harbourDock=new T.Group(); private shake=0;
+  private pool:T.Mesh[]=[]; private foam:T.Mesh[]=[]; private ripplePool:T.Mesh[]=[]; private ripples:{mesh:T.Mesh;age:number;life:number}[]=[]; private impactCounts:Record<'player'|'enemy',number>={player:0,enemy:0}; private lastAim=''; private cameraMode:'battle'|'deck'|'harbour'|'inspect'|'shipyard'='battle'; private shipyardView:ShipyardView='quarter'; private shipyardFocusSlot:ModuleSlot|null=null; private shipyardArt:ShipArt|null=null; private harbourDock=new T.Group(); private shake=0;
   private renderMs=0;private lastRender=0;private frameSamples:number[]=[];private metricsAt=0; private pirateAudio=new PirateAudio(); paused=false; disposed=false;
   private onContextLost=(event:Event)=>{event.preventDefault();this.paused=true;this.onError('The 3D view was interrupted. Reload to restore the ocean.');};
   private onVisibility=()=>{this.previous=0;this.pirateAudio.setHidden(document.hidden);};
@@ -142,20 +142,33 @@ export class OceanScene {
     this.ships.enemy.root.visible=false;this.foam[1].visible=false;
     this.harbourDock.visible=true;this.path.visible=false;this.marker.visible=false;
     this.ball.visible=false;this.trail.visible=false;
-    if(this.cameraMode!=='shipyard'){this.shipyardView='quarter';this.cameraMode='shipyard';this.setShipyardCamera();}
+    if(this.cameraMode!=='shipyard'){this.shipyardView='quarter';this.shipyardFocusSlot=null;this.cameraMode='shipyard';this.setShipyardCamera();}
   }
   /** Isolated fleet inspection camera presets. Orbit and pinch remain enabled. */
   setShipyardView(view:ShipyardView){
     this.shipyardView=view;
     if(this.cameraMode==='shipyard')this.setShipyardCamera();
   }
+  /** Focus a selected slot with real 3D geometry; preview only, never battle. */
+  setShipyardFocus(slot:ModuleSlot|null){
+    this.shipyardFocusSlot=slot;
+    if(this.cameraMode==='shipyard')this.setShipyardCamera();
+  }
   private setShipyardCamera(){
     this.controls.enableRotate=true;this.controls.enableZoom=true;
-    this.controls.minDistance=11;this.controls.maxDistance=35;this.controls.enablePan=false;
+    this.controls.enablePan=false;
     const portrait=this.host.clientWidth/Math.max(1,this.host.clientHeight)<.85,ship=SHIPS.player;
-    const offset=shipyardCameraOffset(this.shipyardView,portrait);
-    this.controls.target.set(ship.x,4,ship.z);
-    this.camera.position.set(ship.x+offset.x,offset.y,ship.z+offset.z);
+    const focus=this.shipyardFocusSlot&&this.shipyardArt
+      ?this.shipyardArt.root.localToWorld(new T.Vector3(
+        shipyardPartTarget(this.shipyardFocusSlot).x,
+        shipyardPartTarget(this.shipyardFocusSlot).y,
+        shipyardPartTarget(this.shipyardFocusSlot).z
+      )):null;
+    this.controls.minDistance=focus?6:11;this.controls.maxDistance=focus?25:35;
+    const offset=focus?shipyardPartCameraOffset(this.shipyardView,portrait):shipyardCameraOffset(this.shipyardView,portrait);
+    const target=focus??new T.Vector3(ship.x,4,ship.z);
+    this.controls.target.copy(target);
+    this.camera.position.set(target.x+offset.x,target.y+offset.y,target.z+offset.z);
     this.controls.update();
   }
   toggleMusic(){return this.pirateAudio.toggleMusic();}

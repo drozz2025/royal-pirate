@@ -16,6 +16,7 @@ on:
       - work2/original-armour-20261119
       - work2/original-cabin-gallery-20261119
       - work2/shipyard-camera-presets-20261120
+      - work2/shipyard-part-focus-20261120
   pull_request:
     branches:
       - work2/original-stern-heraldry-20261119
