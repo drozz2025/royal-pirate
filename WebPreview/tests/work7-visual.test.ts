@@ -393,6 +393,28 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
 
 
 
+        // Diagnostic native-only 3-chest crop position sweep: same Chromium
+        // page, DOM and frozen frame, original 06 source WebP, no UI writes.
+        // The PR is NOT accepted until an actual A/B improvement passes.
+        if(kind==='shop' && width===384 && height===512){
+          for(const delta of [-4,-3,-2,-1,0,1,2,3,4]){
+            const css='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="shop"] .w7-chest-rare .w7-approved-crop{transform:translate(-2px,'+delta+'px) scale(.88)!important}'+
+              '.w7-screen[data-work7-screen="shop"] .w7-chest-epic .w7-approved-crop{transform:translate(4px,'+delta+'px) scale(.9)!important}'+
+              '.w7-screen[data-work7-screen="shop"] .w7-chest-legend .w7-approved-crop{transform:translate(4px,'+(delta+4)+'px) scale(1.02)!important}}';
+            await evaluate("(()=>{let e=document.createElement('style');e.id='work7-pos-sweep';e.textContent="+JSON.stringify(css)+";document.head.appendChild(e);return true})()");
+            await sleep(50);
+            const shot=await command('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+            const metric=await evaluate("(async()=>{const load=s=>new Promise((ok,err)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=err;i.src=s});"+
+              "const ref=await load("+JSON.stringify(refUrl)+"),img=await load('data:image/png;base64,'+"+JSON.stringify(shot.data)+");"+
+              "let c=document.createElement('canvas');c.width=384;c.height=512;let ctx=c.getContext('2d');ctx.drawImage(ref,0,0);let a=ctx.getImageData(0,0,384,512).data;ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);let b=ctx.getImageData(0,0,384,512).data;"+
+              "let all=0,roi=0,n=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);all+=v;if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=v;n++}}}"+
+              "return {global:Math.round(all/(384*512*3)*10000)/10000,roi:Math.round(roi/n*10000)/10000}})()");
+            console.log('WORK7 CHEST POSITION SWEEP delta='+delta+' '+JSON.stringify(metric));
+            await evaluate("(()=>{document.getElementById('work7-pos-sweep')?.remove();return true})()");
+          }
+        }
+
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
