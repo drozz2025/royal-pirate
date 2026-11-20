@@ -32,6 +32,61 @@ function sealTexture(red: boolean, flag = false) {
       c.beginPath();c.moveTo(side-6,y);c.lineTo(side+6,y+8);c.stroke();
     }
   }
+  // WORK0/#104 — Batalha: original crimson sail artwork on the existing LIVE
+  // enemy meshes. The prior flat red fill dominated 02-batalha on mobile.
+  // This cloth shading covers the canvas itself, not a screenshot/HUD overlay;
+  // no extra meshes, draw calls, collisions or per-frame work. Flag and the
+  // approved royal/player sail remain byte-for-byte on their old paths.
+  if(red && !flag){
+    const wash=c.createLinearGradient(12,0,498,512);
+    wash.addColorStop(0,'rgba(37,16,33,.80)');
+    wash.addColorStop(.19,'rgba(125,37,52,.18)');
+    wash.addColorStop(.42,'rgba(248,137,95,.30)');
+    wash.addColorStop(.63,'rgba(91,24,48,.27)');
+    wash.addColorStop(1,'rgba(31,14,32,.73)');
+    c.fillStyle=wash;c.fillRect(0,0,512,512);
+    // Thirteen alternating inflated cloth gussets: their painted highlights
+    // echo the actual 3D vertices' convex belly instead of using flat stripes.
+    for(let i=0;i<13;i++){
+      const x=20+i*39;
+      const lit=i%3===1;
+      const fold=c.createLinearGradient(x-15,0,x+22,0);
+      fold.addColorStop(0,'rgba(26,10,27,.30)');
+      fold.addColorStop(.43,lit?'rgba(255,185,124,.22)':'rgba(235,104,85,.16)');
+      fold.addColorStop(1,'rgba(24,13,32,.16)');
+      c.fillStyle=fold;c.beginPath();
+      c.moveTo(x-17,0);
+      c.bezierCurveTo(x+18,100,x-31,292,x-13,512);
+      c.lineTo(x+21,512);
+      c.bezierCurveTo(x+2,298,x+35,108,x+20,0);
+      c.closePath();c.fill();
+    }
+    // Fine diagonally woven cotton and hand-stitched vertical canvas panels.
+    // Stroke counts are fixed and drawn once when the sail texture is made.
+    for(let j=0;j<67;j++){
+      const y=8+j*7.5;
+      c.strokeStyle=j%4===0?'rgba(255,218,166,.13)':'rgba(34,9,23,.11)';
+      c.lineWidth=j%4===0?1.2:.7;c.beginPath();
+      c.moveTo(9,y);c.bezierCurveTo(152,y-11,355,y+15,503,y+2);c.stroke();
+    }
+    for(let j=1;j<10;j++){
+      const x=j*51;
+      c.strokeStyle='rgba(255,207,145,.24)';c.lineWidth=1.6;
+      c.beginPath();c.moveTo(x,15);c.bezierCurveTo(x-10,144,x+13,352,x,496);c.stroke();
+      c.strokeStyle='rgba(27,10,28,.26)';c.lineWidth=1.2;
+      c.beginPath();c.moveTo(x+4,15);c.bezierCurveTo(x-6,144,x+17,352,x+4,496);c.stroke();
+    }
+    // Weathered double-gold hem and corner reinforcement: real canvas UVs.
+    c.strokeStyle='rgba(255,210,142,.66)';c.lineWidth=5;
+    c.strokeRect(19,20,474,472);
+    c.strokeStyle='rgba(74,28,35,.72)';c.lineWidth=3;
+    c.strokeRect(25,26,462,460);
+    c.save();c.setLineDash([4,9]);c.strokeStyle='#e9bb7d';
+    c.lineWidth=1.9;c.strokeRect(30,31,452,450);c.restore();
+    for(const x of [32,480])for(const y of [50,96,416,462]){
+      c.fillStyle='#f1c78e';c.beginPath();c.arc(x,y,3,0,Math.PI*2);c.fill();
+    }
+  }
   // Original skull & crossed cutlasses emblem drawn as a texture, not a copied asset.
   c.save(); c.translate(256, 266); c.strokeStyle = '#f5e5b7'; c.lineWidth = 18; c.lineCap = 'round';
   for (const s of [-1, 1]) { c.beginPath(); c.moveTo(-105, s * 78); c.quadraticCurveTo(20, -s * 10, 116, -s * 84); c.stroke(); }
