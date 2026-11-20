@@ -57,9 +57,7 @@ test('WORK5: 140 local coins remain 140 after repeated JSON reload and on all ei
 test('WORK5: purchase, upgrade, daily reward and backup visibly reconcile across every panel',()=>{
   let p=initialProfile();
   for(let n=0;n<4;n++)p=finishBattle(p,'victory',3,5,epoch+n*1000);
-  const steps:[
-    [string,number,(profile:LocalProfile)=>LocalProfile]
-  ]=[
+  const steps:Array<[string,number,(profile:LocalProfile)=>LocalProfile]>=[
     ['gunner purchase',80,x=>buyCrew(x,'gunner')],
     ['hull improvement',35,x=>improve(x,'hull')],
     ['daily reward',55,x=>claimDaily(x,epoch+6000)],
