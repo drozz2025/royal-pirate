@@ -63,13 +63,30 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // frame filter. Previous #411/#422 and live artwork stay untouched.
   // The override is installed on the SAME page and animation frame.
   // It is inert for Shop and for 320/tall viewports.
+
+  // Restore the current merged HEAD values for precisely the properties
+  // trialled here. No stale pre-#627 inlay, rim or card filter is permitted.
+  // The same screenshot, page, clock, layout and true decoded WebP artwork
+  // provide controlled BEFORE / AFTER comparisons at native 384x512.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+      .w7-screen[data-work7-screen="shop"] .w7-chest-rare{
+        --w7-chest-field:#125984!important;
+        --w7-inlay:#bdf4ff!important;
+        border-color:#75b8e0!important;
+        border-bottom-color:#784522!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-epic{
+        --w7-chest-field:#65277c!important;
+        --w7-inlay:#eed0ff!important;
+        border-color:#d18de4!important;
+        border-bottom-color:#784522!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{
+        --w7-chest-field:#8a4c1a!important;
+        --w7-inlay:#fff0a2!important;
+        border-color:#ffdc78!important;
+        border-bottom-color:#784522!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
