@@ -3191,3 +3191,22 @@
     line-height:1.05;
   }
 }
+
+
+/* WORK4/#104 · clean native 384x512 source-coast seam, 20 Nov 20h.
+   Keep the sole approved Royal Crown and its authentic sea pixel-for-pixel;
+   repaint ONLY the live statistics inset and its existing 10px fade, avoiding
+   a synthetic silver frame/rectangular photographic cut.
+   Measured candidate previously in same paused Chromium scene; the new clean
+   HEAD-based branch must revalidate against 03-frota.webp before WORK0 merge.
+   No Porto, dock, gameplay, economy, Forja, or 320/390/430 changes.
+   approved:false · 0/8 artistic screens until explicit human review. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    background:linear-gradient(90deg,#07415aee 0%,#092c45f5 20%,#061d33f8 55%,#031529fc 100%)!important;
+    box-shadow:none;
+  }
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after {
+    background:linear-gradient(90deg,transparent 0%,#07415aee 100%);
+  }
+}
