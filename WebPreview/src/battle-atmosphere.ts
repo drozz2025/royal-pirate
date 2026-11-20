@@ -14,18 +14,21 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   const paint = ctx;
 
   const sky = paint.createLinearGradient(0, 0, 0, canvas.height);
-  sky.addColorStop(0, '#1769ae');
-  sky.addColorStop(.24, '#288bce');
-  sky.addColorStop(.57, '#59b7e5');
-  sky.addColorStop(.86, '#a3d7eb');
-  sky.addColorStop(1, '#d8e7d9');
+  // Reference 02 uses luminous cobalt above the live red broadside; the prior
+  // grey-cyan gradient washed out the largest area of the mobile viewport.
+  // Keep the exact same canvas/Three texture pipeline, with no HUD overlays.
+  sky.addColorStop(0, '#064a9a');
+  sky.addColorStop(.24, '#076fce');
+  sky.addColorStop(.57, '#21a0ea');
+  sky.addColorStop(.86, '#7fc7f4');
+  sky.addColorStop(1, '#d2ecf1');
   paint.fillStyle = sky;
   paint.fillRect(0, 0, 1024, 1024);
 
   // Warm sunlit atmosphere: blends behind 3D models rather than occluding them.
   const sunlight = paint.createRadialGradient(175, 120, 2, 175, 120, 500);
-  sunlight.addColorStop(0, 'rgba(255,243,194,.49)');
-  sunlight.addColorStop(.45, 'rgba(255,228,165,.14)');
+  sunlight.addColorStop(0, 'rgba(255,243,194,.32)');
+  sunlight.addColorStop(.45, 'rgba(255,228,165,.08)');
   sunlight.addColorStop(1, 'rgba(255,235,189,0)');
   paint.fillStyle = sunlight;
   paint.fillRect(0, 0, 750, 700);
@@ -97,8 +100,8 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   // Pale cloud banks near the horizon give the sea a convincing depth cue.
   const haze = paint.createLinearGradient(0, 675, 0, 940);
   haze.addColorStop(0, 'rgba(239,249,245,0)');
-  haze.addColorStop(.56, 'rgba(243,247,235,.21)');
-  haze.addColorStop(1, 'rgba(242,245,231,.36)');
+  haze.addColorStop(.56, 'rgba(221,242,247,.15)');
+  haze.addColorStop(1, 'rgba(207,237,246,.23)');
   paint.fillStyle = haze;
   paint.fillRect(0, 675, 1024, 265);
 
@@ -109,7 +112,7 @@ export function createBattleSkyTexture(): T.CanvasTexture {
   const horizonShelf = paint.createLinearGradient(0, 610, 0, 850);
   horizonShelf.addColorStop(0, 'rgba(52,114,150,0)');
   horizonShelf.addColorStop(.47, 'rgba(45,109,147,.14)');
-  horizonShelf.addColorStop(.75, 'rgba(244,248,232,.30)');
+  horizonShelf.addColorStop(.75, 'rgba(214,241,252,.23)');
   horizonShelf.addColorStop(1, 'rgba(255,249,215,0)');
   paint.fillStyle = horizonShelf;
   paint.fillRect(0, 610, 1024, 240);
