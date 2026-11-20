@@ -407,3 +407,42 @@ test('mobile shipyard exposes a visual-only max-unlocked preset without fake own
  assert.match(html,/Each hull keeps its own preview parts/);
  assert.doesNotMatch(html,/EQUIP VERIFIED FLEET/);
 });
+
+test('shipyard combines repeated preview details into GPU instances without changing class or level',()=>{
+ for(const shipClass of ['scout','fighter','warship'] as const){
+  const root=new T.Group(),rig=new T.Group();root.add(rig);
+  const modules=highestUnlockedPreviewModules(20);
+  const model=applyShipModules(root,rig,{shipClass,level:20,modules});
+  const batches=model.children.filter((item):item is T.InstancedMesh=>item instanceof T.InstancedMesh);
+  assert.ok(batches.length>=2,shipClass+' should batch repeated decorative primitives');
+  assert.ok(batches.every(batch=>batch.count>=2));
+  const transform=new T.Matrix4();
+  const positions=new Set<string>();
+  for(const batch of batches){
+   assert.ok(batch.boundingSphere&&batch.boundingSphere.radius>0,'instance culling bounds must be computed');
+   for(let i=0;i<batch.count;i++){
+    batch.getMatrixAt(i,transform);
+    const position=new T.Vector3().setFromMatrixPosition(transform);
+    assert.ok(position.toArray().every(Number.isFinite));
+    positions.add(position.toArray().join(','));
+   }
+  }
+  assert.ok(positions.size>=10,'each class retains distinct positions for its details');
+  assert.equal(model.userData.previewOnly,true);
+  assert.equal(root.getObjectByName('modular-ship-accessories'),model);
+ }
+});
+
+test('switching classes disposes instance-matrix GPU buffers once',()=>{
+ const root=new T.Group(),rig=new T.Group();root.add(rig);
+ const first=applyShipModules(root,rig,{
+  shipClass:'warship',level:20,modules:highestUnlockedPreviewModules(20)
+ });
+ const batch=first.children.find((obj):obj is T.InstancedMesh=>obj instanceof T.InstancedMesh);
+ assert.ok(batch);
+ let released=0;
+ batch.addEventListener('dispose',()=>released++);
+ const second=applyShipModules(root,rig,{shipClass:'scout',level:1,modules:{}});
+ assert.equal(released,1);
+ assert.equal(root.getObjectByName('modular-ship-accessories'),second);
+});

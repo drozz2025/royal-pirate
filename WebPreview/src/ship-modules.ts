@@ -178,6 +178,8 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
   root.remove(previous);
   for(const geometry of geometries)geometry.dispose();
   for(const material of materials)material.dispose();
+  // Instancing owns GPU matrix buffers in addition to geometry and materials.
+  previous.traverse(object=>{if(object instanceof T.InstancedMesh)object.dispose();});
  }
  const cls=SHIP_CLASSES[config.shipClass];
  root.scale.set(cls.width,cls.height,cls.length);
@@ -465,6 +467,39 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
   const map=(old as T.MeshStandardMaterial).map;
   if(map)map.dispose();
   old.dispose();
+ }
+ // Reduce mobile draw calls: combine repeated, unnamed unit-box/cylinder
+ // decorations into GPU instances per geometry/material. Keep named steering
+ // objects, detailed mesh groups, rigging and animation independent.
+ // All instance matrices are in additions-local space, so the class scaling
+ // and camera orbit work exactly as for individual meshes.
+ const unitBox=geometryPool.get('unit-box'),unitCylinder=geometryPool.get('unit-cylinder');
+ const instanceGroups=new Map<T.Material,Map<T.BufferGeometry,T.Mesh[]>>();
+ for(const child of [...additions.children]){
+  if(!(child instanceof T.Mesh)||child.name||
+     (child.geometry!==unitBox&&child.geometry!==unitCylinder)||
+     Array.isArray(child.material))continue;
+  let byGeometry=instanceGroups.get(child.material);
+  if(!byGeometry){byGeometry=new Map();instanceGroups.set(child.material,byGeometry);}
+  const list=byGeometry.get(child.geometry)??[];
+  list.push(child);
+  byGeometry.set(child.geometry,list);
+ }
+ for(const [material,byGeometry] of instanceGroups)for(const [geometry,meshes] of byGeometry){
+  if(meshes.length<2)continue;
+  const batch=new T.InstancedMesh(geometry,material,meshes.length);
+  batch.name='shipyard-instanced-detail';
+  batch.castShadow=true;
+  batch.receiveShadow=true;
+  for(let i=0;i<meshes.length;i++){
+   const mesh=meshes[i];
+   mesh.updateMatrix();
+   batch.setMatrixAt(i,mesh.matrix);
+   additions.remove(mesh);
+  }
+  batch.instanceMatrix.needsUpdate=true;
+  batch.computeBoundingSphere();
+  additions.add(batch);
  }
  additions.userData={shipClass:config.shipClass,level:config.level,tier:progressionTier(config.level),modules:config.modules,previewOnly:true};
  return additions;

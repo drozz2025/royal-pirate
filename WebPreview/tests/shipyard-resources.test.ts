@@ -70,3 +70,21 @@ test('all editor exits call the release path without changing the battle simulat
  assert.match(source,/inspectShip\(\)[\s\S]*?this\.releaseShipyardPreview\(\)/);
  assert.match(source,/if\(this\.cameraMode==='battle'\|\|this\.cameraMode==='deck'\)\{this\.battle\.tick\(dt\)/);
 });
+
+test('exiting the editor releases instanced draw buffers and keeps shared battle geometry',()=>{
+ const scene=new T.Scene();
+ const geometry=new T.BoxGeometry(1,1,1),material=new T.MeshStandardMaterial();
+ const battle=new T.Mesh(geometry,material);scene.add(battle);
+ const shipyard=new T.Group();scene.add(shipyard);
+ const batched=new T.InstancedMesh(geometry,material,4);
+ shipyard.add(batched);
+ let batchDisposals=0,sharedGeometryDisposals=0,sharedMaterialDisposals=0;
+ batched.addEventListener('dispose',()=>batchDisposals++);
+ geometry.addEventListener('dispose',()=>sharedGeometryDisposals++);
+ material.addEventListener('dispose',()=>sharedMaterialDisposals++);
+ assert.deepEqual(releaseShipyardResources(scene,shipyard),{geometries:0,materials:0,textures:0});
+ assert.equal(batchDisposals,1);
+ assert.equal(sharedGeometryDisposals,0);
+ assert.equal(sharedMaterialDisposals,0);
+ assert.equal(battle.geometry,geometry);
+});
