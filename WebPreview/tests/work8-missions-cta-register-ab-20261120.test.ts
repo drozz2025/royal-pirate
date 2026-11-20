@@ -11,7 +11,7 @@ import {setTimeout as delay} from 'node:timers/promises';
  * same immutable three-objective scene; no player value, reward state or
  * shared dock change. Four phone viewports and native CDP touch checked. No mocked app state, image backdrop or
  * APPROVED flag. */
-test('07 Missions: real action buttons native-width registration and reward-column geometry / Chromium A/B', {timeout:220000}, async()=>{
+test('07 Missions: real action buttons native width registration without moving reward columns / Chromium A/B', {timeout:220000}, async()=>{
   await delay(40000); // Leave existing native Chromium coin/gem tests their browser startup window; independent port/profile
   for(const file of ['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']) {
     assert.ok(existsSync(new URL('../../assets/design-approved/'+file,import.meta.url)),'required reference '+file);
@@ -81,14 +81,14 @@ test('07 Missions: real action buttons native-width registration and reward-colu
     await delay(250);
     const geometry=()=>evalJs('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const nav=document.querySelector(".app-sheet > .harbour-nav");const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")],days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],buttons=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button, .w8-approved-missions .w8-approved-quest > button")],dockButtons=[...nav.querySelectorAll(".harbour-nav-item")];return {questCount:quests.length,days:days.length,dockCount:dockButtons.length,tabAndActionCount:buttons.length,questBoxes:quests.map(rect),dayBoxes:days.map(rect),rewardBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(rect),actionBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest > button")].map(rect),nav:rect(nav),captions:days.map(d=>rect(d.querySelector("small"))),documentWidth:document.documentElement.scrollWidth,labels:quests.map(q=>q.querySelector(".w8-approved-quest-core strong")?.textContent),rewards:quests.map(q=>[...q.querySelectorAll(".w8-approved-quest-rewards strong")].map(s=>s.textContent)),glyphs:document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem").length}})()');
     const beforeLayout=await geometry();
-    const beforeInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest")).gridTemplateColumns');
+    const beforeInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest > button")).width');
     const before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove("work8-missions-cta-registration-ab-baseline");true');
     await delay(180);
     const afterLayout=await geometry();
-    const afterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest")).gridTemplateColumns');
-    assert.notEqual(afterInk,beforeInk,'real action grid columns must differ from baseline');
-    assert.match(afterInk,/65px/,'real action column must be a native 65px hitbox before the paint transform');
+    const afterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest > button")).width');
+    assert.notEqual(afterInk,beforeInk,'real CTA width must differ without moving reward columns');
+    assert.match(afterInk,/65px/,'real action button must have a 65px native hitbox width');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
     assert.deepEqual(afterLayout.questBoxes,beforeLayout.questBoxes,'actual quest card geometry unchanged');
@@ -130,7 +130,7 @@ test('07 Missions: real action buttons native-width registration and reward-colu
     save('missions-cta-register-art-original-before-overlay.png',compared.overlays[0]);
     save('missions-cta-register-art-original-render-overlay.png',compared.overlays[1]);
     const report={
-      issue:104,scope:'WORK8 exclusively 07 Missões: genuine three mission action-buttons with real 3 objectives, 7 daily rewards, no mocked state',
+      issue:104,scope:'WORK8 exclusively 07 Missões: native real button surfaces only; 3 true quests, 7 rewards, no mocked state, no reward-column shifts',
       reference:'assets/design-approved/07-missoes.webp',
       mandatoryRefs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']].map(n=>'assets/design-approved/'+n),
       viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-cta-registration-ab-baseline',
