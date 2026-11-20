@@ -23,6 +23,7 @@ test('WORK4 #104 Forge source-depth revalidation uses ten mandatory approved ref
  assert.match(css,/contain:paint/);
  assert.match(css,/transform:translateZ\(0\)/);
  assert.match(css,/background-color:#2d2929!important/);
+ assert.match(css,/#543828 0%,#292322 38%/,'native warm-cast-iron production paint');
 });
 
 const chrome=[process.env.CHROME_BIN,'chromium','google-chrome'].filter(Boolean)
@@ -240,6 +241,20 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
   assert.ok(proposal.roi.workshop.changedPixels>0,'workshop pigment must change visible original pixels');
   assert.equal(proposal.roi.costs.changedPixels,0,'three real material prices must not change');
   assert.equal(proposal.roi.dock.changedPixels,0,'WORK0 global five-item dock must not change');
+
+  // Promote ONLY the previously measured non-regressing source-iron underlay.
+  // The seven new barrel/hearth filters remain rejected diagnostics: they all
+  // increased MAE. Compare prior production pigment with candidate within
+  // the same frozen Chromium scene and protect cannon, furnace, prices, dock.
+  const oldPaint=result.records[variants.findIndex(v=>v.id==='current')];
+  const warmPaint=result.records[variants.findIndex(v=>v.id==='warm-cast-iron')];
+  assert.ok(warmPaint.roi.full.mae<oldPaint.roi.full.mae,'native source iron improves full MAE');
+  assert.ok(warmPaint.roi.workshop.mae<oldPaint.roi.workshop.mae,'native source iron improves workshop MAE');
+  for(const protectedROI of ['cannon','furnace','costs','dock']){
+    assert.equal(warmPaint.roi[protectedROI].mae,oldPaint.roi[protectedROI].mae,
+      'source iron cannot worsen '+protectedROI+' ROI');
+  }
+
   const tested=variants.slice(-7).map((variant,j)=>({variant,index:variants.length-7+j}));
   assert.ok(tested.some(x=>result.changesFromRelease[x.index].cannon>0),
     'at least one iron candidate must actually change source cannon pixels');
@@ -252,6 +267,14 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
   // Remove the injected native study override: mobile captures must reflect
   // the real production CSS, not the comparison rule used at 384x512.
   await evaluate("document.getElementById('work4-forge-plaque-candidate')?.remove();true");
+  // Verify the REAL shipped style is the candidate, not only a temporary
+  // study override. Save an actual no-override production Chromium frame.
+  const productionPaint=await evaluate("getComputedStyle(document.querySelector('.w4-forge-scene')).backgroundImage");
+  assert.ok(productionPaint.includes('84, 56, 40'),
+    '384x512 release must use source-iron #543828, not previous underlay');
+  const productionPng=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data;
+  writeFileSync(join(qa,'work4-forge-production-source-iron-384x512.png'),Buffer.from(productionPng,'base64'));
+
   const mobile=[];
   for(const [width,height] of [[320,568],[390,844],[430,932]]){
     await cmd('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height});
@@ -286,6 +309,12 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
       bestNonRegressing:variants[result.bestReleaseIndex].id,
       qualifiesForArtReview:result.bestReleaseIndex!==1
     },
+    productionPromotion:{approved:false,source:'real Chromium production CSS at 384x512',
+      before:'current',render:'warm-cast-iron',appliedCssVerified:true,
+      roi:Object.fromEntries(['full','workshop','liveStats','cannon','furnace','costs','dock'].map(k=>
+        [k,{before:oldPaint.roi[k].mae,render:warmPaint.roi[k].mae,
+          delta:warmPaint.roi[k].mae-oldPaint.roi[k].mae,
+          changedPixels:result.changesFromRelease[variants.findIndex(v=>v.id==='warm-cast-iron')][k]}]))},
     study:variants.map((v,i)=>({id:v.id,roi:result.records[i].roi})),
     bestByFull:variants[result.globalWinnerIndex].id,
     bestProtected:variants[result.bestIndex].id,
