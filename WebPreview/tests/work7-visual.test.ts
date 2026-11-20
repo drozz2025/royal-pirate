@@ -54,22 +54,23 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Only genuine native 06 legendary physical rim is changed in this candidate');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
     'The final WORK7 candidate changes only genuine 05 frame inlays');
-    // The only admissible before-image is the actual merged #392 v0.1.88 field.
-  // Art and frames are restored with temporary CSS, never with older #384 values.
-  // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
-  // All eight image sublayers also restore their actual pre-PR values.
-  // These !important overrides exist ONLY for controlled same-frame A/B screenshots.
-  // Exact merged WORK0 v0.1.96 HEAD: undo ONLY THIS PR's fourth
-  // frame filter. Previous #411/#422 and live artwork stay untouched.
-  // The override is installed on the SAME page and animation frame.
-  // It is inert for Shop and for 320/tall viewports.
+    // Isolate ONLY the three new backing-enamel variables from the exact
+  // current work6 HEAD. The live approved WebP crops, original frame relief,
+  // inherited v0.1.114 parent brightness, text and geometry are unchanged.
+  // No older #392/#621 style may enter the same-frame baseline.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+      .w7-screen[data-work7-screen="shop"] .w7-chest-rare{
+        --w7-chest-field:#125984!important;
+        --w7-glow:#73dfff78!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-epic{
+        --w7-chest-field:#65277c!important;
+        --w7-glow:#ed8bff84!important;
+      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{
+        --w7-chest-field:#8a4c1a!important;
+        --w7-glow:#ffd06b9c!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
