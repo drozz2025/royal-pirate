@@ -68,10 +68,15 @@ export class OceanScene {
           sin(p.x*.145+time*.20)*1.14)*.52;
         float crossSea=sin(p.x*.47+p.y*.29+time*.96)*.24;
         float chop=sin(p.y*1.12-p.x*.32-time*1.74)*.085;
-        // Waves grow around the distant broadside, but ease off as the
-        // spectator's real wooden deck approaches the screen. The plane's
-        // local -Y axis becomes world +Z after its -90 degree rotation.
-        float deckFade=1.-.55*smoothstep(44.,72.,-p.y);
+        // Never render ocean SWELLS THROUGH the first-person oak gunner deck.
+        // Its teak is just above mean sea level, while the earlier 0.45
+        // residual swell (~0.38 world units) pierced the planks in Chromium.
+        // The port-side foreground remains open sea; damp moving vertices
+        // only near the player's actual deck (world Z>=22), with a smooth
+        // 9..22 transition. Distant battle waves stay unchanged and PORTO
+        // returns untouched in the battleMode branch above.
+        // The plane's local -Y axis maps to positive world Z.
+        float deckFade=1.-.96*smoothstep(9.,22.,-p.y);
         return (rolling+crossSea+chop)*deckFade;
       }
       void main(){vec3 p=position;p.z=wave(p.xy);float dx=(wave(p.xy+vec2(.05,0.))-p.z)/.05;float dy=(wave(p.xy+vec2(0.,.05))-p.z)/.05;vNormal=normalize(mat3(modelMatrix)*vec3(-dx,-dy,1.));vec4 world=modelMatrix*vec4(p,1.);vWorld=world.xyz;vWave=p.z;gl_Position=projectionMatrix*viewMatrix*world;}
