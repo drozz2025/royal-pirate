@@ -5485,3 +5485,22 @@
     visibility:hidden;
   }
 }
+
+
+/* WORK8 / issue #104 — 07 MISSÕES only: source-calibrated mission-row enamel.
+   The approved 384×512 image paints three separate blue-steel mission boards.
+   The existing dark relief made their real live backgrounds nearly black.
+   Restore authentic blue paint on the THREE REAL cards, without changing
+   user progress, rewards, buttons, layout, seven day chests, 08 Ranking,
+   Porto, global shell, WORK0 dock, economy or any other WORK's files.
+   This isolated root toggle makes a strict same-scene/frame native Chromium
+   ORIGINAL | BEFORE | RENDER | OVERLAY / MAE/ROI evidence possible.
+   No claim of human artistic approval. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-quest-surface-ab-baseline)
+  .w8-approved-missions .w8-approved-quest {
+    background:
+      radial-gradient(ellipse 38% 95% at 2% 14%,#629b9866,transparent 88%),
+      linear-gradient(180deg,#2b647f 0%,#194865 54%,#0e324c 100%);
+  }
+}
