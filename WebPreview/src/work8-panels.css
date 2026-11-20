@@ -5485,3 +5485,30 @@
     visibility:hidden;
   }
 }
+
+
+/* WORK8/#104 — 07 Missões only: recover the genuine objectives' foreground
+   contrast without brightening the dark navy board or changing geometry.
+   The existing small-frame board dimmer darkened the three REAL captions,
+   progress tracks, reward glyphs and action controls along with the wood.
+   Selectively recover foreground ink; never invent reward values or statuses.
+   A root opt-out provides true same-DOM paused Chromium BEFORE/RENDER evidence.
+   No Ranking 08 / Porto / WORK0 shell, dock, economy or layout selectors. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-foreground-contrast-ab-baseline)
+  .w8-approved-missions .w8-approved-quest-core > strong {
+    filter:brightness(1.7);
+  }
+  :root:not(.work8-missions-foreground-contrast-ab-baseline)
+  .w8-approved-missions .w8-approved-quest .w8-approved-meter {
+    filter:brightness(1.25);
+  }
+  :root:not(.work8-missions-foreground-contrast-ab-baseline)
+  .w8-approved-missions .w8-approved-quest-rewards {
+    filter:brightness(1.55);
+  }
+  :root:not(.work8-missions-foreground-contrast-ab-baseline)
+  .w8-approved-missions .w8-approved-quest > button {
+    filter:brightness(1.4);
+  }
+}
