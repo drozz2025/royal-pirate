@@ -5485,3 +5485,25 @@
     visibility:hidden;
   }
 }
+
+
+/* WORK8 / #104 — 07 Missões ONLY; genuine maritime sky registration.
+   Preserve the original 384×512 painted composition but separate the warm
+   SKY pigment from foreground ships and palms. Previous one-filter sweep
+   proved a trade-off (coastal ROI vs full MAE), so the experiment now alters
+   the existing SVG sky rect separately from the sea/trees. No screenshot
+   backdrop, fake prizes, changed geometry, new UI, Ranking 08, Porto or dock.
+   The TWO opt-out root flags keep historical & new Chromium A/B independent.
+   Experimental until real native source ROI + protected-region gates pass;
+   approved:false / 0 of 8. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-coast-ab-baseline):not(.work8-missions-coast-v3-ab-baseline)
+  .w8-approved-missions .w8-approved-scene .w8-seascape-missions {
+    filter:saturate(1.02) contrast(1.08) brightness(.68)
+      drop-shadow(0 3px 2px rgba(2,25,45,.32));
+  }
+  :root:not(.work8-missions-coast-ab-baseline):not(.work8-missions-coast-v3-ab-baseline)
+  .w8-approved-missions .w8-approved-scene .w8-seascape-missions > rect:first-of-type {
+    filter:brightness(1.36);
+  }
+}
