@@ -16,10 +16,10 @@ test('07 Missions: measured reward column registration native 384x512 A/B', {tim
   const chromeBin=process.env.CHROME_BIN || spawnSync('sh',['-c','command -v chromium || command -v google-chrome'],{encoding:'utf8'}).stdout.trim();
   assert.ok(chromeBin,'native Chromium is mandatory; never silently skip MAE QA');
   const evidence='work8-qa';mkdirSync(evidence,{recursive:true});
-  const build=spawnSync('npm',['run','build','--','--base=/','--outDir=work8-reward-dist'],{encoding:'utf8',timeout:120000});
+  const build=spawnSync('npm',['run','build','--','--base=/','--outDir=work8-emblems-dist'],{encoding:'utf8',timeout:120000});
   assert.equal(build.status,0,'isolated full TS+Vite build required: '+build.stdout+'\n'+build.stderr);
-  const profile=mkdtempSync(join(tmpdir(),'royal-w8-reward-'));
-  const vite=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--outDir','work8-reward-dist','--host','127.0.0.1','--port','4199','--strictPort'],{stdio:'ignore'});
+  const profile=mkdtempSync(join(tmpdir(),'royal-w8-emblems-'));
+  const vite=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--outDir','work8-emblems-dist','--host','127.0.0.1','--port','4251','--strictPort'],{stdio:'ignore'});
   let browser:ReturnType<typeof spawn>|undefined, ws:WebSocket|undefined;
   try {
     let ready=false;
