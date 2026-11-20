@@ -65,9 +65,9 @@ export class OceanScene {
         // Three crossing wavelengths build actual 3D illustrated swells;
         // only visual vertices move, never the physical ship/shot coordinates.
         float rolling=sin(p.y*.275-time*.76+
-          sin(p.x*.145+time*.20)*1.14)*.66;
-        float crossSea=sin(p.x*.47+p.y*.29+time*.96)*.30;
-        float chop=sin(p.y*1.12-p.x*.32-time*1.74)*.095;
+          sin(p.x*.145+time*.20)*1.14)*.52;
+        float crossSea=sin(p.x*.47+p.y*.29+time*.96)*.24;
+        float chop=sin(p.y*1.12-p.x*.32-time*1.74)*.085;
         // Waves grow around the distant broadside, but ease off as the
         // spectator's real wooden deck approaches the screen. The plane's
         // local -Y axis becomes world +Z after its -90 degree rotation.
@@ -136,18 +136,30 @@ export class OceanScene {
           float irregular=.46+.54*(.5+.5*
             sin(vWorld.x*2.1-vWorld.z*1.63+sin(vWorld.z*.51)*.67));
           foam=max(foam,edgeBreak*irregular*.59);
+          // WORK0 #104 / Batalha-only sea composition: stop broad cyan stripes
+          // overwhelming the ship. Deep-water troughs stay navy; ribbons of
+          // broken near-white foam follow two warped, crossing live swells.
+          // The harbour branch above remains byte-for-byte unchanged.
+          float lateralWarp=sin(vWorld.z*.18-time*.17)*1.45+
+            sin(vWorld.x*.12+vWorld.z*.09+time*.15)*.61;
+          float breaker=sin(vWorld.x*.67-vWorld.z*.41+time*.78+lateralWarp);
+          float breakerMask=smoothstep(.46,.86,breaker)*
+            smoothstep(.20,.72,longSwell*.70+crossSwell*.25+lip*.18);
+          float lace=.30+.70*smoothstep(-.45,.84,
+            sin(vWorld.x*2.55+vWorld.z*1.71-time*1.21+
+              sin(vWorld.z*.49+time*.31)*.94));
+          foam=max(foam,breakerMask*lace*.53);
           foam=clamp(foam,0.,.64);
-          // Rich turquoise illuminated wave faces and pale foam are closer
-          // to the approved naval painting than uniform navy stripes.
-          // Keep the physically moving mesh, ripples and trajectories intact.
-          vec3 deep=mix(vec3(.010,.14,.30),vec3(.024,.45,.62),
-            clamp(.55+vWave*.82+longSwell*.16+crossSwell*.08,0.,1.));
-          deep*=1.-.09*(1.-ridge);
-          // Turquoise is confined to genuine diagonal ridges, not a blanket colour tint.
-          deep=mix(deep,vec3(.10,.64,.79),clamp(edgeBreak*.34+ridge*.12,0.,.48));
-          deep=mix(deep,vec3(.18,.62,.70),fres*.27);
-          col=mix(deep,vec3(.91,.98,.96),foam);
-          col+=vec3(.78,.91,.82)*spec*.22;
+          // More uniform in the troughs, not a teal height-map checkerboard:
+          // dark-blue 3D volume with restrained warm highlights and thin
+          // hand-painted turbulent caps. No extra meshes/texture fetches.
+          vec3 deep=mix(vec3(.005,.105,.235),vec3(.019,.34,.51),
+            clamp(.49+vWave*.36+longSwell*.11+crossSwell*.10,0.,1.));
+          deep*=1.-.10*(1.-ridge);
+          deep=mix(deep,vec3(.055,.50,.64),clamp(edgeBreak*.26+ridge*.09,0.,.38));
+          deep=mix(deep,vec3(.22,.53,.64),fres*.24);
+          col=mix(deep,vec3(.91,.97,.94),foam);
+          col+=vec3(.78,.91,.82)*spec*.20;
           col=mix(col,vec3(.37,.67,.78),fog*.45);
         }
         gl_FragColor=vec4(col,1.);
