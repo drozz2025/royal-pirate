@@ -5485,3 +5485,18 @@
     visibility:hidden;
   }
 }
+
+
+/* WORK8 / issue #104 — 07 MISSÕES ONLY. At the approved native 384×512
+   source viewport, recover the enamel highlight on the EXISTING selected
+   DIÁRIAS tab. This is strictly a paint change: no labels, quests,
+   progress, seven real rewards, touch rectangles or WORK0 navigation move.
+   The opt-out class is used for real paused Chromium A/B against original
+   assets/design-approved/07-missoes.webp, not for a simulated screenshot.
+   Ranking 08 and its #264 integration are excluded. approved:false 0/8. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-selected-tab-ink-ab-baseline)
+  .w8-approved-missions .w8-approved-tabs button[aria-pressed=true] {
+    filter:brightness(1.11) saturate(1.06);
+  }
+}
