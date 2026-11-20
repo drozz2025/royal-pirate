@@ -5519,3 +5519,20 @@
     margin:0;
   }
 }
+
+
+/* WORK0/#104: carry the independently scored genuine Dia 7 chest artwork
+ * candidate from WORK8 PR #697 into the UNPUBLISHED unified comparison.
+ * Native 384x512 paused-Chromium evidence on #697: genuine royal chest
+ * ROI MAE 26.00913 -> 24.20196; whole Mission screen 52.50811 -> 52.46740.
+ * Scoped ONLY to source-sized short portrait, keeping every real reward,
+ * claim state, five-item dock, Ranking, Porto and gameplay untouched.
+ * Not artistically approved: screenshot/MAE is not owner sign-off. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-royal-enamel-v2-ab-baseline)
+  .w8-approved-missions .w8-approved-days li:nth-child(7)
+  .w8-approved-chest > svg.w8-approved-painting-chest-royal {
+    filter:contrast(1.07) saturate(1.11) brightness(1.49)
+      drop-shadow(0 1px 1px #011625);
+  }
+}
