@@ -5485,3 +5485,21 @@
     visibility:hidden;
   }
 }
+
+
+/* WORK8 / #104 — 07 Missões exclusively: source-registered day 4–6
+   authentic silver/gold/violet WebP chest details at native 384×512.
+   The previous 1.24 luminance is below the approved source artwork:
+   change paint filter ONLY; never move days, claim states or hit targets.
+   DAY 7 royal-chest PR #639 remains separate; Ranking 08 / #264,
+   Porto, five-item dock, shell and all other WORK files untouched.
+   Isolated root flag produces genuine same-scene Chromium HEAD A/B.
+   Human approval remains false / 0 of 8. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-mid-chests-luma-ab-baseline)
+  .w8-approved-missions .w8-approved-days li:nth-child(n+4):nth-child(-n+6)
+  .w8-approved-chest > svg.w8-approved-painting {
+    filter:contrast(1.07) saturate(1.07) brightness(1.42)
+      drop-shadow(0 1px 1px #011625);
+  }
+}
