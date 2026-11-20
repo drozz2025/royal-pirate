@@ -12,7 +12,7 @@ const app = readFileSync(new URL('../src/main.tsx', import.meta.url), 'utf8');
 
 test('WORK0 #104: mobile internal screens hide only the obstructing version overlay', () => {
   assert.match(sheet, /@media\s*\(max-width:600px\)\s*\{\s*body:has\(\.app\.with-app-sheet\)\s*>\s*\.rp-version\s*\{\s*display:none!important;\s*\}\s*\}/);
-  assert.match(app, /harbour&&appScreen\?' with-app-sheet':' '/);
+  assert.match(app, /harbour&&appScreen\?' with-app-sheet':''/);
   assert.match(html, /<span class="rp-version" aria-label="Game version">/);
   assert.doesNotMatch(sheet, /\.in-harbour\s+\.rp-version/);
   assert.doesNotMatch(sheet, /\.harbour-screen\s*\{\s*display:none/);
