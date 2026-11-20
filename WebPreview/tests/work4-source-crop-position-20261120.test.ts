@@ -229,7 +229,7 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
     const paintCandidates=screen==='fleet'
       ?[
         {id:'HEAD',paint:null},
-        {id:'deep-ocean',paint:'linear-gradient(90deg,#07415aee 0%,#092c45f5 20%,#061d33f8 55%,#031529fc 100%)'},
+        {id:'prior-HEAD',paint:'linear-gradient(90deg,#082c48de 0%,#09253ff1 20%,#061d33f8 55%,#031529fc 100%)'},
         {id:'deep-coast',paint:'linear-gradient(90deg,#073d52ec 0%,#092a41f2 22%,#071d33f8 55%,#031529fc 100%)'},
         {id:'source-blue',paint:'linear-gradient(90deg,#06506adf 0%,#08344bee 20%,#081f36f9 55%,#031529fc 100%)'},
         {id:'muted-slate',paint:'linear-gradient(90deg,#0a354bea 0%,#0b2a42f3 22%,#071c34f9 55%,#031529fc 100%)'},
@@ -285,6 +285,16 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
     const pigments=await evaluate(paintMetric);
     const paintGrid=pigments.grid;delete pigments.grid;
     assert.equal(pigments.records.length,paintCandidates.length);
+    if(screen==='fleet'){
+      const before=pigments.records.find((r:any)=>r.id==='prior-HEAD');
+      const after=pigments.records.find((r:any)=>r.id==='HEAD');
+      assert.ok(before&&after,'same-frame previous coast pigment must be captured');
+      assert.ok(after.seam<before.seam-.3,
+        'WORK4 source-coast seam must improve against real prior-HEAD');
+      assert.ok(after.full<=before.full+.02,
+        'small protected native visual adjustment must not materially regress frame MAE');
+    }
+
     for(const record of pigments.records.slice(1)){
       assert.ok(record.changedFromHead>0,'paint A/B candidate must change real pixels: '+record.id);
       assert.equal(record.shipOrCannonChanged,0,'ship/cannon source region is immutable');
