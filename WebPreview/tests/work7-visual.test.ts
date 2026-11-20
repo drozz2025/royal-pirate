@@ -43,6 +43,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
+  assert.ok(cssText.includes('20 Nov 02:27 UTC. Native three-chest depth'),
+    'Three real WORK7 chest relief fields are the only native candidate');
+
   assert.ok(cssText.includes('Native card 4+7 inlay/exposure candidate'),
     'Only cards 4 and 7 physical artwork filters are recalibrated in this branch');
   assert.ok(cssText.includes('18 Nov 11:20 UTC, eight-card native source pigment/depth registration.'),
@@ -64,13 +67,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // The override is installed on the SAME page and animation frame.
   // It is inert for Shop and for 320/tall viewports.
   const cssBaseline = `
+    /* Exact merged WORK0 HEAD 7d19bbce before this run; only undo
+       the three NEW parent-panel exposure changes, not historical filters. */
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
-      }
+      .w7-screen[data-work7-screen="shop"] .w7-chest-rare{filter:brightness(.73)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-epic{filter:brightness(.74)!important}
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend{filter:brightness(.60)!important}
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/', '--outDir', privateBuildDir],
