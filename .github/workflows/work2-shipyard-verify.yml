@@ -18,6 +18,7 @@ on:
       - work2/shipyard-camera-presets-20261120
       - work2/shipyard-part-focus-20261120
       - work2/original-modular-cannon-collars-20261120
+      - work2/original-prow-figureheads-20261120
   pull_request:
     branches:
       - work2/original-stern-heraldry-20261119
