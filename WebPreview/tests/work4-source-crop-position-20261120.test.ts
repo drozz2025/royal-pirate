@@ -219,7 +219,85 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
     writeFileSync(join(folder,'work4-'+screen+'-original-head-candidate-overlay-384x512.png'),
       Buffer.from(grid,'base64'));
     results.push(report);
-    console.log('WORK4_SOURCE_CROP_A_B '+JSON.stringify({screen,winner:report.winner,records:report.records}));
+    // WORK4 #104: compare LIVE coastal inset and foundry material underpaint
+    // against the original approved WebP, in the SAME frozen Chromium frame.
+    // Probe CSS never ships: only a candidate with measured positive ROI can
+    // later be promoted into WORK4-owned CSS after WORK0 reviews it.
+    const paintSelector=screen==='fleet'
+      ?'.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label'
+      :'.w4-forge #w4-forge-panel > .w4-materials:where(*)';
+    const paintCandidates=screen==='fleet'
+      ?[
+        {id:'HEAD',paint:null},
+        {id:'deep-ocean',paint:'linear-gradient(90deg,#07415aee 0%,#092c45f5 20%,#061d33f8 55%,#031529fc 100%)'},
+        {id:'deep-coast',paint:'linear-gradient(90deg,#073d52ec 0%,#092a41f2 22%,#071d33f8 55%,#031529fc 100%)'},
+        {id:'source-blue',paint:'linear-gradient(90deg,#06506adf 0%,#08344bee 20%,#081f36f9 55%,#031529fc 100%)'},
+        {id:'muted-slate',paint:'linear-gradient(90deg,#0a354bea 0%,#0b2a42f3 22%,#071c34f9 55%,#031529fc 100%)'},
+        {id:'waterfall',paint:'linear-gradient(90deg,#0b4963dc 0%,#092a44f4 35%,#071e34fb 65%,#031529fc 100%)'}
+      ]
+      :[
+        {id:'HEAD',paint:null},
+        {id:'forged-steel',paint:'linear-gradient(173deg,#273238 0%,#17252c 52%,#0b1921 100%)'},
+        {id:'smoke-iron',paint:'linear-gradient(173deg,#26292b 0%,#1b242a 52%,#0a1924 100%)'},
+        {id:'warm-foundry',paint:'radial-gradient(ellipse 76% 94% at 32% 0%,#b66d3235 0%,transparent 77%),linear-gradient(173deg,#25292a 0%,#172126 52%,#0b161e 100%)'},
+        {id:'warm-slate',paint:'linear-gradient(173deg,#303234 0%,#1a242b 52%,#0b1921 100%)'},
+        {id:'steel-sheen',paint:'radial-gradient(ellipse 70% 65% at 48% 0%,#c48a4b24 0%,transparent 75%),linear-gradient(173deg,#283038 0%,#18222b 55%,#0a1721 100%)'}
+      ];
+    const paintShots:[string,string][]=[['HEAD',images[0][1]]];
+    for(const candidate of paintCandidates.slice(1)){
+      const rule=paintSelector+'{background:'+candidate.paint+'!important;}';
+      await evaluate("(()=>{const s=document.createElement('style');s.id='work4-pigment-ab';s.textContent="+
+        JSON.stringify(rule)+";document.head.appendChild(s);return true})()");
+      const applied=await evaluate("(()=>getComputedStyle(document.querySelector("+
+        JSON.stringify(paintSelector)+")).backgroundImage)()");
+      assert.ok(applied.includes('gradient('),'candidate must really repaint its DOM element');
+      paintShots.push([candidate.id,await shot()]);
+      await evaluate("(()=>{document.getElementById('work4-pigment-ab')?.remove();return true;})()");
+      for(const key of ['stage','roster','costs','dock','dockItems','cards','overflow']){
+        assert.deepEqual((await geometry())[key],initial[key],
+          'paint-only candidate cannot move '+key);
+      }
+    }
+    const paintRois=screen==='fleet'
+      ?{full:[0,0,384,512],inset:[242,163,368,340],seam:[232,162,257,340],
+        ship:[65,205,175,307],sea:[18,307,218,358],
+        cards:[18,350,374,429],dock:[0,433,384,512]}
+      :{full:[0,0,384,512],materials:[16,340,375,404],
+        cannon:[18,153,175,305],furnace:[129,168,171,294],
+        costs:[16,340,375,404],dock:[0,433,384,512]};
+    const paintMetric="(async()=>{const input="+JSON.stringify({
+      ref:src(screen==='fleet'?'03-frota.webp':'04-melhorias-forja.webp').toString('base64'),
+      shots:paintShots,rois:paintRois})+";const load=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;await i.decode();if(i.width!==384||i.height!==512)throw Error('not native 384x512');return i};"+
+      "const pixels=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data};"+
+      "const source=await load('webp',input.ref),reference=pixels(source);const frames=[];"+
+      "for(const [id,b] of input.shots){const i=await load('png',b),p=pixels(i);const scores={};for(const [key,r] of Object.entries(input.rois)){let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;for(let c=0;c<3;c++){sum+=Math.abs(p[k+c]-reference[k+c]);n++}}scores[key]=sum/n}frames.push({id,scores,pixels:p})}"+
+      "const orig=frames[0],changed=(p,r)=>{let n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;if([0,1,2].some(c=>p[k+c]!==orig.pixels[k+c]))n++}return n};"+
+      "const records=frames.map(f=>({id:f.id,...f.scores,changedFromHead:changed(f.pixels,input.rois.full),"+
+      "shipOrCannonChanged:changed(f.pixels,input.rois."+(screen==='fleet'?'ship':'cannon')+"),"+
+      "dockChanged:changed(f.pixels,input.rois.dock)}));"+
+      "const region="+JSON.stringify(screen==='fleet'?'seam':'materials')+";"+
+      "const candidates=records.filter(r=>r.dockChanged===0&&r.shipOrCannonChanged===0&&r.full<=records[0].full+.05);"+
+      "const best=candidates.sort((a,b)=>a[region]-b[region])[0]||records[0];"+
+      "const chosen=frames.find(f=>f.id===best.id),c=document.createElement('canvas');c.width=1536;c.height=512;const g=c.getContext('2d');g.drawImage(source,0,0);"+
+      "for(const [j,p] of [[1,orig],[2,chosen]]){const cv=document.createElement('canvas');cv.width=384;cv.height=512;cv.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(p.pixels),384,512),0,0);g.drawImage(cv,j*384,0)}"+
+      "g.drawImage(source,1152,0);g.globalAlpha=.5;const layer=document.createElement('canvas');layer.width=384;layer.height=512;layer.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(chosen.pixels),384,512),0,0);g.drawImage(layer,1152,0);"+
+      "return {records,best:best.id,grid:c.toDataURL('image/png').split(',')[1]}})()";
+    const pigments=await evaluate(paintMetric);
+    const paintGrid=pigments.grid;delete pigments.grid;
+    assert.equal(pigments.records.length,paintCandidates.length);
+    for(const record of pigments.records.slice(1)){
+      assert.ok(record.changedFromHead>0,'paint A/B candidate must change real pixels: '+record.id);
+      assert.equal(record.shipOrCannonChanged,0,'ship/cannon source region is immutable');
+      assert.equal(record.dockChanged,0,'WORK0 dock pixels must stay identical');
+    }
+    writeFileSync(join(folder,'work4-'+screen+'-pigment-ab-384x512.json'),
+      JSON.stringify({approved:false,approvedScreens:0,samePausedFrame:true,
+        source:'assets/design-approved/'+(screen==='fleet'?'03-frota.webp':'04-melhorias-forja.webp'),
+        variants:paintCandidates,rois:paintRois,...pigments},null,2)+'\n');
+    writeFileSync(join(folder,'work4-'+screen+'-pigment-original-head-render-overlay-384x512.png'),
+      Buffer.from(paintGrid,'base64'));
+    console.log('WORK4_PHOTO_MATERIAL_PIGMENT_AB '+JSON.stringify({screen,best:pigments.best,records:pigments.records}));
+    console.log('WORK4_SOURCE_CROP_A_B +JSON.stringify({screen,winner:report.winner,records:report.records}));
   }
   const responsive=[];
   for(const [width,height] of [[320,568],[390,844],[430,932]]){
