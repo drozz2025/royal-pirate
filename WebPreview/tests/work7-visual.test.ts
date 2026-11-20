@@ -343,12 +343,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
-        // Same-frozen-frame diagnostic ONLY: candidate 05 metal pigments
+        // Same-frozen-frame diagnostic ONLY: candidate 05 metal pigments (selected pale-gold sweep winner retaining depth)
         // are sampled against 05 approved WebP, without writing production CSS.
         if(kind==='cards' && width===384 && height===512){
           const variants:Array<[string,string]>=[
             ['head','inset 0 0 0 1px #472714ae,inset 0 3px 6px #080c237a,inset 0 -2px 1px #ffdb7b2b'],
-            ['current','inset 0 0 0 1px #dfa95ca6,inset 0 2px 5px #080c2360,inset 0 -2px 1px #ffdb7b52'],
+            ['current','inset 0 0 0 1px #fff0c066,inset 0 1px 3px #080c2340,inset 0 -2px 1px #ffdb7b55'],
             ['gold-soft','inset 0 0 0 1px #996b3c93,inset 0 2px 5px #080c234c,inset 0 -2px 1px #ffdb7b45'],
             ['gold-bright','inset 0 0 0 1px #ffcc86ac,inset 0 1px 3px #080c2340,inset 0 -2px 1px #ffdb7b55'],
             ['gold-thick','inset 0 0 0 2px #dfa351a8,inset 0 1px 2px #080c233c,inset 0 -2px 2px #f8c17966'],
