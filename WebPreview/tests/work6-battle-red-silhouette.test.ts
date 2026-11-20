@@ -53,7 +53,11 @@ test('WORK6 #104: five curved real 3D red sail skirts extend both mast silhouett
   assert.ok(nonPlanar,'wind-filled red canvas is genuinely curved in depth');
   assert.equal(root.position.x,10);
   assert.equal(root.position.z,-3);
-  assert.equal(rig.children.length,2,'only two extra Three.js draw objects, no duplicate hull');
+  assert.equal(rig.children.length,3,'billowed red cloth, seams and one 3D opponent ornament group');
+  const ornament=rig.getObjectByName('battle-only-crimson-galleon-art');
+  assert.ok(ornament instanceof T.Group,'existing five cloth panels retain their original geometry');
+  assert.equal(ornament.userData.battleOnly,true,'new hull detailing is enemy-only');
+  assert.equal(root.children.length,1,'no duplicate playable vessel');
 });
 
 test('WORK6 #104: decorative silhouette is enemy-only and cannot change Porto or battle physics',()=>{
