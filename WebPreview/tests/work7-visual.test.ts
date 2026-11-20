@@ -72,6 +72,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
         filter:brightness(.88)!important;
       }
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop{
+        filter:saturate(1.05) contrast(1.06) brightness(1.16) drop-shadow(0 6px 5px #14062ca3)!important;
+      }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/', '--outDir', privateBuildDir],
@@ -348,14 +351,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         // only commit a verified winner in a separate revision.
         if (kind==='shop' && width===384 && height===512) {
           const candidates:[string,number][]=[
-            ['crop',.98],['crop',1.02],['crop',1.05],['crop',1.07],
-            ['crop',1.09],['crop',1.11],['crop',1.14],['crop',1.18],
-            ['crop',1.22],['crop',1.28]
+            ['crop',1.14],['crop',1.16],['crop',1.18],['crop',1.20],
+            ['crop',1.22],['crop',1.24],['crop',1.26],['crop',1.28],
+            ['crop',1.32],['crop',1.36]
           ];
           for (const [chest,value] of candidates) {
             const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
               '.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop'+
-              '{filter:saturate(1.2) contrast(1.06) brightness('+value+') drop-shadow(0 6px 5px #14062ca3)!important}}';
+              '{filter:saturate(1.05) contrast(1.06) brightness('+value+') drop-shadow(0 6px 5px #14062ca3)!important}}';
             await evaluate("(()=>{const s=document.createElement('style');s.id='w7-sweep';s.textContent="+
               JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
             await sleep(90);
