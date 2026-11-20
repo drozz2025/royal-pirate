@@ -297,7 +297,7 @@ test('WORK4 #104 same-frame source registration: ship/cannon and immutable funct
     writeFileSync(join(folder,'work4-'+screen+'-pigment-original-head-render-overlay-384x512.png'),
       Buffer.from(paintGrid,'base64'));
     console.log('WORK4_PHOTO_MATERIAL_PIGMENT_AB '+JSON.stringify({screen,best:pigments.best,records:pigments.records}));
-    console.log('WORK4_SOURCE_CROP_A_B +JSON.stringify({screen,winner:report.winner,records:report.records}));
+    console.log('WORK4_SOURCE_CROP_A_B '+JSON.stringify({screen,winner:report.winner,records:report.records}));
   }
   const responsive=[];
   for(const [width,height] of [[320,568],[390,844],[430,932]]){
