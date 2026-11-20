@@ -40,7 +40,11 @@ test('Enemy cloth has real additional fold depth and coloured vertices',()=>{
   assert.ok(Math.max(...z)-Math.min(...z)>.28,'sail has actual curved depth');
   const values=new Set([...Array(step)].map((_,i)=>colours.getX(row*step+i).toFixed(3)));
   assert.ok(values.size>=5,'sunlit and shadowed canvas panels are not flat blocks');
-  assert.equal(rig.children.length,2,'no additional sails/draw-calls or fake foreground ships');
+  assert.equal(rig.children.length,3,'original cloth, seams and one genuinely sculpted enemy-only art group');
+  const galleon=rig.getObjectByName('battle-only-crimson-galleon-art');
+  assert.ok(galleon instanceof T.Group,'new decoration remains on the same enemy rig');
+  assert.equal(galleon.userData.battleOnly,true);
+  assert.equal(rig.children.filter(part=>part instanceof T.Group).length,1,'no second ship or duplicated hull');
 });
 
 test('Battle-only visual pass does not change shot collision or harbour pipeline',()=>{
