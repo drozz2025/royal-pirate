@@ -52,13 +52,16 @@ try {
     };
     await page.locator('.harbour-nav:not(.app-dock-porto) button').filter({hasText:'FROTA'}).click();
     await verifySheet('frota');
-    await page.locator('.app-shortcuts button').filter({hasText:'Forja'}).click();
+    await page.locator('.w4-action-pair button').filter({hasText:'ABRIR MELHORIAS'}).click();
     await verifySheet('forja');
     await page.locator('.app-dock-porto button').filter({hasText:'CARTAS'}).click();
     await verifySheet('cartas');
     await page.locator('.app-dock-porto button').filter({hasText:'LOJA'}).click();
     await verifySheet('loja');
-    await page.locator('.app-shortcuts button').filter({hasText:'Missões'}).click();
+    // On 320/384px the header shortcuts are deliberately hidden. Exercise
+    // the VISIBLE real Porto flank route instead of a hidden button.
+    await page.locator('.app-dock-porto button').filter({hasText:'PORTO'}).click();
+    await page.locator('.harbour-flank-right button').filter({hasText:'MISSÕES'}).click();
     await verifySheet('missoes');
     await page.locator('.app-dock-porto button').filter({hasText:'RANKING'}).click();
     await verifySheet('ranking');
