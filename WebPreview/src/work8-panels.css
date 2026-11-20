@@ -5486,14 +5486,14 @@
   }
 }
 
-/* WORK8 / issue #104 — 07 Missões upper-cloud pigment registration only.
-   Retain the real three quests, seven rewards, all active controls and
-   the WORK0-approved Porto, HUD and five-button dock untouched.
-   The class is a local opt-out for same-frame native Chromium A/B against
-   assets/design-approved/07-missoes.webp; no mock account state. */
+/* WORK8 / issue #104 — native approved 07 title-art registration only.
+   This opt-out gate isolates a painted, noninteractive title ornament for
+   true same-scene 384x512 ORIGINAL/BEFORE/RENDER pixel comparison.
+   Existing 3 genuine mission objectives, 7 daily reward chests, gameplay,
+   08 Ranking, Porto, WORK0 shell/header/dock and economy remain untouched. */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
-  :root:not(.work8-missions-coast-hue-ab-baseline)
-  .w8-approved-missions .w8-approved-scene .w8-seascape > g:first-of-type {
-    filter:brightness(.80) saturate(1.02) hue-rotate(10deg);
+  :root:not(.work8-missions-title-register-ab-baseline)
+  .w8-approved-missions .w8-approved-title > svg.w8-approved-painting-title-missions {
+    transform:translateX(-50%) translateY(-2px);
   }
 }
