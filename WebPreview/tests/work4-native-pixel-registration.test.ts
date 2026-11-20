@@ -1612,6 +1612,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         assert.ok(Number.isFinite(ab.after.rosterArt)&&Number.isFinite(ab.after.global),'ROI measured');
         // Regression gate: the approved native card art must genuinely beat
         // the previous vector thumbnails; a working build alone is not proof.
+        console.log('WORK4_NATIVE_ROSTER_A_B_DIAGNOSTIC '+JSON.stringify({before:ab.before,after:ab.after,gain:ab.before.rosterArt-ab.after.rosterArt}));
         assert.ok(ab.before.rosterArt-ab.after.rosterArt>10,
           'approved 03 ship miniatures must reduce the native card-art MAE by >10');
         assert.ok(ab.before.global-ab.after.global>1,
