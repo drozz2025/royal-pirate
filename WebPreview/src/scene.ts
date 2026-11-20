@@ -135,7 +135,23 @@ export class OceanScene {
           float irregular=.46+.54*(.5+.5*
             sin(vWorld.x*2.1-vWorld.z*1.63+sin(vWorld.z*.51)*.67));
           foam=max(foam,edgeBreak*irregular*.59);
-          foam=clamp(foam,0.,.64);
+          // WORK0/#104: the approved Batalha ocean is a BREAKING sea rather
+          // than the current alternating solid turquoise ridges. Paint an
+          // irregular, physically anchored white lip across the actual moving
+          // 3D swell. Reuse the existing longSwell, crossSwell, brokenEdge,
+          // curling and lip fields: no extra draw calls, textures, geometries,
+          // per-frame allocations or interaction overlays. The foam remains
+          // strictly inside battleMode, so Porto's water path is unchanged.
+          float crestHeight=longSwell*.74+crossSwell*.22+lip*.12;
+          float crestLip=smoothstep(.52,.86,crestHeight);
+          float ribbonNoise=.5+.5*(brokenEdge*.62+curling*.38);
+          float fractured=smoothstep(.30,.79,ribbonNoise);
+          float whiteBreaker=crestLip*(.26+.74*fractured)
+            *(.58+.42*smoothstep(.12,.76,lip));
+          // Breakers become more legible near the broadside without whitening
+          // the wooden player's gun deck or the sheltered harbour.
+          foam=max(foam,whiteBreaker*.79);
+          foam=clamp(foam,0.,.82);
           // Rich turquoise illuminated wave faces and pale foam are closer
           // to the approved naval painting than uniform navy stripes.
           // Keep the physically moving mesh, ripples and trajectories intact.
