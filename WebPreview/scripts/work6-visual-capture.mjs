@@ -16,7 +16,7 @@ try {
     const ctx=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,reducedMotion:'reduce'});
     const page=await ctx.newPage();
     page.on('pageerror',error=>{throw error;});
-    await page.goto('http://127.0.0.1:5173/?work6shots=1',{waitUntil:'domcontentloaded'});
+    await page.goto('http://127.0.0.1:5173/royal-pirate/?work6shots=1',{waitUntil:'domcontentloaded'});
     await page.locator('.harbour-battle-button').waitFor({state:'visible',timeout:20000});
     await page.waitForTimeout(2200);
     await page.screenshot({path:resolve(root,`porto-${width}x${height}.png`),animations:'disabled'});
@@ -26,6 +26,40 @@ try {
     // the shared five-button dock on 384×512 / 320×568. No mock screens.
     const verifySheet=async(name)=>{
       await page.locator('.app-sheet').waitFor({state:'visible',timeout:10000});
+      // WORK0 / #104: DOM ready is NOT image ready. Previously this runner
+      // clicked through 05/06 and captured blank card/chest artwork because
+      // source WebP decoding had not completed. Require the actual approved
+      // art to decode before producing evidence, rather than scoring a false
+      // empty panel. Fail fast on broken Vite URLs or zero-dimension images.
+      const kind=name==='cartas'?'cards':name==='loja'?'shop':null;
+      if(kind){
+        const expected=kind==='cards'?8:4;
+        try{
+          await page.waitForFunction(({kind,expected})=>{
+            const images=[...document.querySelectorAll('[data-work7-screen="'+kind+'"] .w7-approved-crop img')];
+            return images.length===expected&&images.every(img=>img.complete&&img.naturalWidth>0&&img.naturalHeight>0);
+          },{kind,expected},{timeout:15000});
+        }catch(error){
+          const diag=await page.evaluate(kind=>({
+            kind,screen:document.querySelector('[data-work7-screen]')?.getAttribute('data-work7-screen'),
+            imgs:[...document.querySelectorAll('[data-work7-screen="'+kind+'"] .w7-approved-crop img')].map(img=>({
+              complete:img.complete,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight,
+              src:img.currentSrc,outer:img.outerHTML.slice(0,120)
+            })),
+            allImgs:document.images.length,
+            screenText:document.querySelector('.app-sheet')?.textContent?.slice(0,150)
+          }),kind);
+          throw new Error('Artwork decoding timeout: '+JSON.stringify(diag)+'; '+String(error));
+        }
+        const art=await page.evaluate(async kind=>{
+          const images=[...document.querySelectorAll('[data-work7-screen="'+kind+'"] .w7-approved-crop img')];
+          await Promise.all(images.map(img=>img.decode()));
+          return images.map(img=>({url:img.currentSrc,width:img.naturalWidth,height:img.naturalHeight}));
+        },kind);
+        if(art.length!==expected||art.some(item=>item.width!==384||item.height!==512))
+          throw Error('Approved source artwork missing before '+name+' screenshot: '+JSON.stringify(art));
+        await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+      }
       const geometry=await page.evaluate(()=>{
         const app=document.querySelector('.app.with-app-sheet');
         const sheet=document.querySelector('.app-sheet');
@@ -172,7 +206,7 @@ try {
       reducedMotion:'reduce'
     });
     const page=await ctx.newPage();
-    await page.goto('http://127.0.0.1:5173/?work6shots=1',{waitUntil:'domcontentloaded'});
+    await page.goto('http://127.0.0.1:5173/royal-pirate/?work6shots=1',{waitUntil:'domcontentloaded'});
     await page.locator('.harbour-battle-button').waitFor({state:'visible',timeout:20000});
     await page.locator('.harbour-battle-button').click();
     await page.locator('.fire-button').waitFor({state:'visible',timeout:15000});
