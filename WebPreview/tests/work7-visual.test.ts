@@ -50,6 +50,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Native 05 WORK7 candidate must exist');
+  assert.ok(cssText.includes('20 Nov 09:22 UTC, genuine 06 legendary metal exposure.'),
+    'New genuine legendary gold exposure must exist before A/B');
   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
     'Only genuine native 06 legendary physical rim is changed in this candidate');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
@@ -64,12 +66,12 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // The override is installed on the SAME page and animation frame.
   // It is inert for Shop and for 320/tall viewports.
   const cssBaseline = `
-    @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+    /* The only difference between this run's HEAD and candidate is the
+     * native 06 legendary metal filter. Never revert earlier merged rims,
+     * art crops, positions or existing WORK0/WORK7 CSS in the A/B baseline. */
+    @media (min-width:355px) and (max-width:390px) and (max-height:560px) {
+      .w7-screen[data-work7-screen="shop"] .w7-chest-legend {
+        filter:brightness(.60)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -463,6 +465,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(card.roiMaeAfter,card.roiMaeBefore,
     'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
   assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
+    'Native 06 legendary enamel exposure must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
