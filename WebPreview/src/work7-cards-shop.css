@@ -4351,3 +4351,30 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 20 Nov: original 06 three-chest native metalwork registration.
+ * Native 384×512 only: the three physical chest recesses use individual
+ * blue/violet/amber enamel and a shared GOLD carved metal outer lip, like
+ * the approved illustration (not a page screenshot or static product).
+ * This changes the frame backing only, never the four true WEBP crops, sizes,
+ * labels, genuine inventory, actions, or five-item dock. 320px/tall unchanged.
+ * Exact merged HEAD is restored in the WORK7 same-frame Chromium A/B test.
+ * Reject unless BOTH global MAE and chest+pack ROI fall. approved:false 0/8.
+ * WORK0 exclusively controls merge/version/publication/HTTP. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-chest-rare{
+    --w7-chest-field:#005f9d;
+    --w7-inlay:#ffdc8a;
+    border-color:#f1bf75;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-epic{
+    --w7-chest-field:#842099;
+    --w7-inlay:#f9cf8b;
+    border-color:#f0bd79;
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend{
+    --w7-chest-field:#b36b14;
+    --w7-inlay:#ffe0a6;
+    border-color:#f9cf82;
+  }
+}
