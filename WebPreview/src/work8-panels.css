@@ -5504,6 +5504,6 @@
   }
   :root:not(.work8-missions-coast-ab-baseline):not(.work8-missions-coast-v3-ab-baseline)
   .w8-approved-missions .w8-approved-scene .w8-seascape-missions > rect:first-of-type {
-    filter:brightness(1.36);
+    filter:brightness(1.50);
   }
 }
