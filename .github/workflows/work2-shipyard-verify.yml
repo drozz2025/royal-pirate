@@ -27,6 +27,7 @@ on:
       - work2/original-bow-anchors-20261120
       - work2/original-deck-rope-coils-20261120
       - work2/original-hanging-longboats-20261120
+      - work2/original-3d-deck-hatches-20261120
   pull_request:
     branches:
       - work2/original-stern-heraldry-20261119

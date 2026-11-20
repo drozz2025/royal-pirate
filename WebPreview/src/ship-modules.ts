@@ -6,6 +6,7 @@ import { createPreviewDeckCapstans } from './ship-deck-capstans';
 import { createPreviewBowAnchors } from './ship-bow-anchors';
 import { createPreviewDeckRopeCoils } from './ship-deck-rope-coils';
 import { createPreviewDeckLongboats } from './ship-deck-longboats';
+import { createPreviewDeckHatches } from './ship-deck-hatches';
 import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
 import { createPreviewCabinGallery, type PreviewCabinModule } from './ship-cabin';
 import { createPreviewCannonRefit, type PreviewCannonModule } from './ship-cannons';
@@ -309,6 +310,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  additions.add(createPreviewDeckRopeCoils(config.shipClass,config.modules.masts as PreviewMastModule));
  // Solid 3D lifeboat tenders are preview hull fittings, never fleet ownership.
  additions.add(createPreviewDeckLongboats(config.shipClass,config.modules.hull as PreviewHullModule));
+ // Raised deck hatches are two GPU-batched preview meshes keyed by cabin tier.
+ // Their geometry never belongs to the battle ship or persistent fleet.
+ additions.add(createPreviewDeckHatches(config.shipClass,config.modules.cabin as PreviewCabinModule));
  // Raised-quarterdeck and admiral cabin silhouettes are preview-only meshes.
  // They never alter the persistent fleet, resources or battle ship geometry.
  additions.add(createPreviewCabinGallery(config.shipClass,config.modules.cabin as PreviewCabinModule));
