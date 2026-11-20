@@ -5485,3 +5485,18 @@
     visibility:hidden;
   }
 }
+
+
+/* WORK8 / #104 — 07 MISSÕES ONLY: restore the ivory legibility of the
+   seven ACTUAL day captions against the approved 384×512 original.
+   The existing darkened daily tray attenuates its labels; retune the
+   captions alone, not day state, prizes, box dimensions or scroll.
+   This is a purely decorative root-opt-out native Chromium A/B surface.
+   Ranking 08, Porto, global dock/shell, player economy, other WORKs,
+   Unity and multiplayer must remain untouched. Human approval: 0/8. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-daily-captions-ab-baseline)
+  .w8-approved-missions .w8-approved-days li > small {
+    filter:brightness(1.42) saturate(1.04);
+  }
+}
