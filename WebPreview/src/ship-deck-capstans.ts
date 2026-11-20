@@ -44,10 +44,10 @@ export function createPreviewDeckCapstans(
   // Faceted waisted drum and oversized cap: a distinct readable silhouette.
   add(timber, new T.CylinderGeometry(radius*.71, radius*.88, .52, sides), 0, 2.27, z);
   add(timber, new T.CylinderGeometry(radius*.96, radius*.96, .085, sides), 0, 2.57, z);
-  add(forged, new T.TorusGeometry(radius*.84, .037, 4, sides*2),
-      0, 2.06, z, 0, Math.PI/2);
-  add(forged, new T.TorusGeometry(radius*.79, .033, 4, sides*2),
-      0, 2.51, z, 0, Math.PI/2);
+  add(forged, new T.TorusGeometry(radius*.84, .037, 4, sides*2).rotateX(Math.PI/2),
+      0, 2.06, z);
+  add(forged, new T.TorusGeometry(radius*.79, .033, 4, sides*2).rotateX(Math.PI/2),
+      0, 2.51, z);
 
   // Radial handles are actual low-poly timber, not a flat wheel texture.
   for (let i=0; i<spokes; i++) {
@@ -78,8 +78,8 @@ export function createPreviewDeckCapstans(
 
   if (reinforced) {
    // Level-eight ornament variant: physical additional retaining bands.
-   add(forged, new T.TorusGeometry(radius*.87, .031, 4, sides*2),
-       0, 2.27, z, 0, Math.PI/2);
+   add(forged, new T.TorusGeometry(radius*.87, .031, 4, sides*2).rotateX(Math.PI/2),
+       0, 2.27, z);
    for (const side of [-1,1]) {
     add(forged, new T.BoxGeometry(.08,.21,.09),
         side*radius*.69, 2.32, z);
