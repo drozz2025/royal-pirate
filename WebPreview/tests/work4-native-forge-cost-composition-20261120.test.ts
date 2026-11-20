@@ -173,7 +173,7 @@ test('WORK4 Forja 04: A/B cost-board relief vs approved source, cannon and dock 
         '.w4-forge #w4-forge-panel > .w4-improve-button{top:'+p.caption.top+'px!important;}}':'');
     const applied=await evaluate("(()=>{let s=document.getElementById('w4-cost-paint-study');if(!s){s=document.createElement('style');s.id='w4-cost-paint-study';document.head.append(s)}s.textContent="+JSON.stringify(injected)+";return getComputedStyle(document.querySelector('.w4-forge #w4-forge-panel > .w4-materials')).backgroundImage})()");
     assert.ok(typeof applied==='string'&&applied.length>8,'CSS candidate actually computed');
-    const cg=await evaluate("(()=>{const b=document.querySelector('.w4-forge #w4-forge-panel > .w4-improve-button').getBoundingClientRect();const d=document.querySelector('.app-sheet .harbour-nav.app-dock-porto').getBoundingClientRect();return {bottom:b.bottom,dockTop:d.top,clearance:d.top-b.bottom,fontSize:getComputedStyle(document.querySelector('.w4-forge #w4-forge-panel [aria-label=\\\"Custo e materiais disponíveis\\\"] small')).fontSize}})()");
+    const cg=await evaluate("(()=>{const b=document.querySelector('.w4-forge #w4-forge-panel > .w4-improve-button').getBoundingClientRect();const d=document.querySelector('.app-sheet .harbour-nav.app-dock-porto').getBoundingClientRect();return {bottom:b.bottom,dockTop:d.top,clearance:d.top-b.bottom,fontSize:getComputedStyle(document.querySelector('.w4-forge #w4-forge-panel [aria-label] small')).fontSize}})()");
     candidateGeometry.push(cg);
     captures.push(await shot());
   }
