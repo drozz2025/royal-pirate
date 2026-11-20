@@ -3192,25 +3192,12 @@
   }
 }
 
-/* WORK4/#104 — 20 Nov native compact readable labels.
-   The previous anti-dock overlap correction kept all four authentic roster
-   miniatures within 82px, but shrank the availability caption to a difficult
-   7px and the costs heading to 8px. Keep stage, original art, slot/button
-   geometry and every real currency amount untouched. Typography only.
-   This strictly targets 384x512, not WORK0's 390/430 or protected dock. */
+/* WORK4/#104 — native 384x512 cost-caption legibility, kept only where
+   A/B source ROI improves. The experimental ship-card label enlargement
+   was rejected because real pixel comparison worsened the roster composition.
+   Preserve one source Royal Crown, original roster pixels and all geometry.
+   Forge text paint only; live amounts, cannon, hearth and five-item dock stay. */
 @media (width:384px) and (height:512px) {
-  .w4-fleet #w4-fleet-panel > .w4-ship-roster > .w4-ship-slot > strong {
-    font-size:11px;
-    line-height:1.04;
-    letter-spacing:0;
-    text-shadow:0 1px 2px #03101f,0 0 2px #03101f;
-  }
-  .w4-fleet #w4-fleet-panel > .w4-ship-roster > .w4-ship-slot > small {
-    font-size:8px;
-    line-height:1.06;
-    letter-spacing:-.1px;
-    text-shadow:0 1px 2px #03101f;
-  }
   .w4-forge #w4-forge-panel [aria-label="Custo e materiais disponíveis"] small {
     font-size:9px;
     line-height:1.05;
