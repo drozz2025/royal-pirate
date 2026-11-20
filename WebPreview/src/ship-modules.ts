@@ -9,6 +9,7 @@ import { createPreviewDeckLongboats } from './ship-deck-longboats';
 import { createPreviewDeckHatches } from './ship-deck-hatches';
 import { createPreviewShipBell } from './ship-deck-bell';
 import { createPreviewCompassBinnacle } from './ship-deck-compass';
+import { createPreviewNavigationChart } from './ship-deck-chart';
 import { createPreviewSternRudder } from './ship-stern-rudders';
 import { createPreviewGunportShutters } from './ship-gunport-shutters';
 import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
@@ -325,6 +326,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // Original brass-and-hardwood navigational compass: decorative only.
  // The needle does not report or change ship heading or player progress.
  additions.add(createPreviewCompassBinnacle(config.shipClass,config.modules.ornaments as PreviewOrnamentModule));
+ // A raised parchment navigation chart table pairs with the starboard compass.
+ // Its 3D map is purely decorative; no player navigation, inventory or stats.
+ additions.add(createPreviewNavigationChart(config.shipClass,config.modules.ornaments as PreviewOrnamentModule));
  // An original tapered wooden rudder with class-specific forged hinges and
  // hull-tier refits: decorative 3D shipyard art, NOT a steering or combat change.
  additions.add(createPreviewSternRudder(config.shipClass,config.modules.hull as PreviewHullModule));
