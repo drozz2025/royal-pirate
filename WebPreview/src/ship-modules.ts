@@ -8,6 +8,7 @@ import { createPreviewDeckRopeCoils } from './ship-deck-rope-coils';
 import { createPreviewDeckLongboats } from './ship-deck-longboats';
 import { createPreviewDeckHatches } from './ship-deck-hatches';
 import { createPreviewShipBell } from './ship-deck-bell';
+import { createPreviewCompassBinnacle } from './ship-deck-compass';
 import { createPreviewSternRudder } from './ship-stern-rudders';
 import { createPreviewGunportShutters } from './ship-gunport-shutters';
 import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
@@ -321,6 +322,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // Original bronze bell on a class-specific timber yoke. Only ornamental preview
  // geometry: no combat audio, stats, ownership, currency or persistence.
  additions.add(createPreviewShipBell(config.shipClass,config.modules.ornaments as PreviewOrnamentModule));
+ // Original brass-and-hardwood navigational compass: decorative only.
+ // The needle does not report or change ship heading or player progress.
+ additions.add(createPreviewCompassBinnacle(config.shipClass,config.modules.ornaments as PreviewOrnamentModule));
  // An original tapered wooden rudder with class-specific forged hinges and
  // hull-tier refits: decorative 3D shipyard art, NOT a steering or combat change.
  additions.add(createPreviewSternRudder(config.shipClass,config.modules.hull as PreviewHullModule));
