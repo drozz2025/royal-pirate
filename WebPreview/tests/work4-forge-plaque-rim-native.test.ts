@@ -404,14 +404,26 @@ test('WORK4 Forge native genuine-plaque metal rim sweep: same frame, full/plaque
   assert.equal(captionPixels.records.length,captionSizes.length);
   for(const region of ['cannon','furnace','dock'])
     assert.equal(captionPixels.baseline.roi[region].changedPixels,0,'native baseline keeps '+region+' fixed');
+  assert.equal(captionPixels.bestIndex,3,
+    '11px must beat all other safe font sizes on source cost ROI');
+  assert.ok(captionPixels.records[3].roi.full.mae < captionPixels.records[1].roi.full.mae,
+    '11px must improve true native full-frame reference MAE over 9px');
+  assert.ok(captionPixels.records[3].roi.costRow.mae < captionPixels.records[1].roi.costRow.mae,
+    '11px must improve true native material-cost ROI over 9px');
+  assert.ok(captionPixels.records[3].roi.cannon.changedPixels===0 &&
+    captionPixels.records[3].roi.furnace.changedPixels===0 &&
+    captionPixels.records[3].roi.dock.changedPixels===0,
+    '11px must preserve source cannon, furnace and WORK0 dock pixels');
+  assert.match(css,/font-size:11px;[\s\S]{0,90}line-height:1\.05;/,
+    'selected 11px native caption must exist in production CSS');
   const captionReport={approved:false,screensApproved:0,source:'04-melhorias-forja.webp',
     viewport:'384x512',frame:'same original Chromium scene, animation paused',
     realCostNumbers:costNumbersBefore,geometry:captionGeometry,boxes:captionPixels.boxes,
     sizeCandidates:captionSizes.map((size,i)=>({size,...captionPixels.records[i]})),
     safeWinnerSize:captionSizes[captionPixels.bestIndex],
-    productionFontSize:9,
-    decision:captionPixels.bestIndex===1?'Production 9px retains best guarded ROI':
-      'Trial winner is experimental; needs separate code review before any CSS production change'};
+    productionFontSize:11,priorFontSize:9,
+    decision:captionPixels.bestIndex===3?'Guarded source-ROI winner implemented in WORK4 production CSS; human review still required':
+      'Experiment winner differs from implemented font size; WORK0 should reject pending correction'};
   writeFileSync(join(qa,'work4-forge-caption-size-study-384x512.json'),JSON.stringify(captionReport,null,2)+'\n');
   writeFileSync(join(qa,'original-before-render-overlay-forge-captions-384x512.png'),Buffer.from(captionPixels.overlay,'base64'));
   console.log('WORK4_FORGE_CAPTION_SIZE_AB '+JSON.stringify({safeWinnerSize:captionReport.safeWinnerSize,
