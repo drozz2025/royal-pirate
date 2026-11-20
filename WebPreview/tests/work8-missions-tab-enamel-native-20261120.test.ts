@@ -24,7 +24,7 @@ test('WORK8 07 approved navy on inactive tabs: real Chromium same-frame A/B and 
     'missing approved image '+f);
   const built=spawnSync('npm',['run','build','--','--base=/'],{encoding:'utf8',timeout:120000});
   assert.equal(built.status,0,'must screenshot production build '+built.stderr);
-  const folder='work8-qa-tabs';mkdirSync(folder,{recursive:true});
+  const folder='work8-qa';mkdirSync(folder,{recursive:true});
   const profile=mkdtempSync(join(tmpdir(),'rp-work8-tabs-'));
   const port=4193,debugPort=13300+(process.pid%2000);
   const vite=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--host','127.0.0.1','--port',String(port),'--strictPort'],{stdio:'ignore'});
