@@ -156,7 +156,8 @@ test('07 Missions: selected active tab paint improves approved 384x512 Chromium 
       mandatoryRefs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']].map(n=>'assets/design-approved/'+n),
       viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-active-tab-ink-ab-baseline',
       metrics:compared.metrics,unchanged:compared.unchanged,
-      geometry:{before:beforeLayout,after:afterLayout},approved:false,approvedScreens:0,\n      candidate:'activeTab brightness(1.13) saturate(1.04)'
+      geometry:{before:beforeLayout,after:afterLayout},approved:false,approvedScreens:0,
+      candidate:'activeTab brightness(1.13) saturate(1.04)'
     };
     writeFileSync(join(evidence,'work8-missions-active-tab-ink-native-ab.json'),JSON.stringify(report,null,2));
     console.log('WORK8 07 active tab native Chromium A/B '+JSON.stringify(compared.metrics));
