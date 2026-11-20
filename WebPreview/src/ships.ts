@@ -39,6 +39,10 @@ function sealTexture(red: boolean, flag = false) {
   // approved royal/player sail remain byte-for-byte on their old paths.
   if(red && !flag){
     const wash=c.createLinearGradient(12,0,498,512);
+    // Real browsers return CanvasGradient; older headless geometry tests use a
+    // minimal fake 2D context with no gradient object. Keep those tests on the
+    // original red texture path without weakening their ship-geometry checks.
+    if(wash && typeof wash.addColorStop==='function'){
     wash.addColorStop(0,'rgba(37,16,33,.80)');
     wash.addColorStop(.19,'rgba(125,37,52,.18)');
     wash.addColorStop(.42,'rgba(248,137,95,.30)');
@@ -85,6 +89,7 @@ function sealTexture(red: boolean, flag = false) {
     c.lineWidth=1.9;c.strokeRect(30,31,452,450);c.restore();
     for(const x of [32,480])for(const y of [50,96,416,462]){
       c.fillStyle='#f1c78e';c.beginPath();c.arc(x,y,3,0,Math.PI*2);c.fill();
+    }
     }
   }
   // Original skull & crossed cutlasses emblem drawn as a texture, not a copied asset.
