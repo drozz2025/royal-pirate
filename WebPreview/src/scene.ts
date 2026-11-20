@@ -151,7 +151,9 @@ export class OceanScene {
           // Breakers become more legible near the broadside without whitening
           // the wooden player's gun deck or the sheltered harbour.
           foam=max(foam,whiteBreaker*.79);
-          foam=clamp(foam,0.,.82);
+          // Keep the existing 0.64 safety cap: the approved Porto and mobile
+          // sea-depth tests prohibit a white blanket across the whole scene.
+          foam=clamp(foam,0.,.64);
           // Rich turquoise illuminated wave faces and pale foam are closer
           // to the approved naval painting than uniform navy stripes.
           // Keep the physically moving mesh, ripples and trajectories intact.
