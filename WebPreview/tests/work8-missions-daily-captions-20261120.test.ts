@@ -173,10 +173,10 @@ test('07 Missions: seven real daily captions improve approved 384x512 Chromium M
       viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-daily-captions-ab-baseline',
       metrics:compared.metrics,unchanged:compared.unchanged,
       geometry:{before:beforeLayout,after:afterLayout},approved:false,approvedScreens:0,
-      candidate:'seven captions brightness(1.42) saturate(1.04)'
+      candidate:'seven captions brightness(.84) saturate(1.00)'
     };
     writeFileSync(join(evidence,'work8-missions-daily-captions-native-ab.json'),JSON.stringify(report,null,2));
-    console.log('WORK8 07 active tab native Chromium A/B '+JSON.stringify(compared.metrics));
+    console.log('WORK8 07 seven day captions native Chromium A/B '+JSON.stringify(compared.metrics));
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
     assert.ok(compared.metrics.dayLabels.delta<-.01,'seven day labels must improve authentic caption ROI');
     assert.ok(compared.metrics.full.delta<-.0001,'seven day labels must improve full 07 frame');
