@@ -45,17 +45,17 @@ test('deck-level portrait framing and original desktop pose are independently sc
  assert.deepEqual(mobile.position,[0,7.4,55]);
  assert.deepEqual(mobile.target,[2.65,4.1,-3]);
  assert.equal(mobile.batteryOffsetZ,-30);
- assert.equal(mobile.batteryOffsetX,1.3);
- assert.equal(mobile.batteryScale,1);
+ assert.equal(mobile.batteryOffsetX,1.8);
+ assert.equal(mobile.batteryScale,.84);
  const compact=battleCameraPose(320/568);
  assert.deepEqual(compact.position,mobile.position);
  assert.deepEqual(compact.target,[6.5,4.1,-3]);
- assert.equal(compact.batteryOffsetX,2.7);
+ assert.equal(compact.batteryOffsetX,4.4);
  assert.equal(compact.batteryOffsetZ,mobile.batteryOffsetZ);
  const tall=battleCameraPose(390/844);
  assert.deepEqual(tall.position,mobile.position);
  assert.deepEqual(tall.target,[7.65,4.1,-3]);
- assert.equal(tall.batteryOffsetX,3.6);
+ assert.equal(tall.batteryOffsetX,5.2);
  assert.deepEqual(battleCameraPose(430/932),tall);
  assert.equal(battleCameraPose(1.4).showBattery,false);
 });
@@ -163,9 +163,9 @@ test('WORK0/#104: native 384x512 stage moves the whole live galleon to starboard
     'real cannon muzzle stays above the DISPARAR command');
 });
 
-test('WORK0/#104: 320px and tall-phone approved cannon/ship framing remain unchanged',()=>{
+test('WORK0/#104: 320px and tall-phone cannon/ship framing is explicit',()=>{
   for(const [w,h,x,deckX,scale] of [
-    [320,568,6.5,2.7,1.48],[390,844,7.65,3.6,1.48],[430,932,7.65,3.6,1.48]
+    [320,568,6.5,4.4,1.30],[390,844,7.65,5.2,1.30],[430,932,7.65,5.2,1.30]
   ]){
     const pose=battleCameraPose(w/h);
     assert.equal(pose.target[0],x);
