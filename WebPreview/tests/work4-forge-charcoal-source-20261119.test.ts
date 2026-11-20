@@ -115,11 +115,16 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
   const route=await evaluate("(()=>{const b=document.querySelector('.w4-fleet .w4-action-pair button.w4-primary');if(!b)return false;b.click();return true})()");
   assert.equal(route,true,'existing functional Frota-to-Forja button must navigate');
   await until("!!document.querySelector('.w4-forge .w4-reference-cannon')");
-  const geometry=await evaluate("(()=>({cannon:document.querySelectorAll('.w4-forge svg.w4-reference-cannon').length,liveLevels:document.querySelectorAll('.w4-forge .w4-forge-live-level').length,costs:document.querySelectorAll('.w4-forge .w4-resource-grid > div').length,dock:document.querySelectorAll('.app-sheet .harbour-nav.app-dock-porto .harbour-nav-item').length,sceneRect:(()=>{const r=document.querySelector('.w4-forge-scene').getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}})()}))()");
+  const geometry=await evaluate("(()=>({cannon:document.querySelectorAll('.w4-forge svg.w4-reference-cannon').length,liveLevels:document.querySelectorAll('.w4-forge .w4-forge-live-level').length,costs:document.querySelectorAll('.w4-forge .w4-resource-grid > div').length,dock:document.querySelectorAll('.app-sheet .harbour-nav.app-dock-porto .harbour-nav-item').length,sceneRect:(()=>{const r=document.querySelector('.w4-forge-scene').getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}})(),cannonRect:(()=>{const e=document.querySelector('.w4-forge svg.w4-reference-cannon');const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,viewBox:e.getAttribute('viewBox'),mask:getComputedStyle(e).maskImage}})(),plaqueRect:(()=>{const r=document.querySelector('.w4-forge-description').getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}})(),costsRect:(()=>{const r=document.querySelector('.w4-resource-grid').getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}})()}))()");
   assert.equal(geometry.cannon,1,'one approved source cannon only');
   assert.equal(geometry.liveLevels,3,'three real locally saved levels');
   assert.equal(geometry.costs,3,'three real resource cells');
   assert.equal(geometry.dock,5,'five shared WORK0 dock buttons');
+  assert.equal(geometry.cannonRect.viewBox,'9 146 171 161','single approved source crop has not shifted');
+  assert.ok(geometry.cannonRect.w>50&&geometry.cannonRect.h>50,'source cannon must remain visibly sized');
+  assert.ok(geometry.plaqueRect.w>45&&geometry.plaqueRect.h>40,'real level plaque must remain visible');
+  assert.ok(geometry.costsRect.w>100&&geometry.costsRect.h>20,'real costs must remain visible');
+
   await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const href=document.querySelector('svg.w4-reference-cannon image')?.getAttribute('href');if(!href||!(await fetch(href)).ok)throw Error('source forge image not loaded');return true;})()");
   // One existing REAL right-hand forge plaque. Change ONLY its 2px border pigment,
   // NOT its dimensions, the approved cannon/furnace art, progression or costs.
@@ -298,6 +303,20 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     reference:'04-melhorias-forja.webp',
     comparison:'same real Chromium Forge frame with animations paused; previous no-image underlay vs graduated workshop pigments',
     geometries:geometry,roi:rois,mobile,
+    cannonComposition:{
+      referenceCrop:geometry.cannonRect.viewBox,
+      sourceSvgBoundsCssPx:geometry.cannonRect,
+      workshopBoundsCssPx:geometry.sceneRect,
+      levelPlaqueBoundsCssPx:geometry.plaqueRect,
+      materialTableBoundsCssPx:geometry.costsRect,
+      sourceArtToSceneWidthRatio:geometry.cannonRect.w/geometry.sceneRect.w,
+      sourceArtToSceneHeightRatio:geometry.cannonRect.h/geometry.sceneRect.h,
+      // These quantify scale and physical overlap; they are NOT a substitute
+      // for the independently sampled cannon/furnace source RGB MAE.
+      overlapWithPlaqueCssPx:(()=>{const a=geometry.cannonRect,b=geometry.plaqueRect;
+        return Math.max(0,Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x))*
+          Math.max(0,Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y));})()
+    },
     releaseComparison:{
       reference:'same genuine 04 WEBP; HEAD release current underlay as baseline',
       release:variants[1].id,
