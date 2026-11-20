@@ -5488,8 +5488,10 @@
 
 
 /* WORK8/#104 — 07 MISSÕES only: reference-blue active Diárias tab.
-   Native 384x512 approved painting uses brighter turquoise enamel than the
-   integrated dark-blue face. Retune ONLY its decorative painted surface;
+   Native 384x512 approved painting uses deeper, less luminous blue enamel
+   than the integrated selected face. A brighter trial worsened native MAE;
+   a restrained darker treatment improved full-frame and selected-tab ROI.
+   Retune ONLY its decorative painted surface;
    no size, hitbox, labels, mission progress, seven reward chests, scroll,
    Ranking 08, WORK0 dock, Porto, economy, Unity or multiplayer changes.
    The root opt-out is for one-DOM/frame native Chromium A/B evidence.
