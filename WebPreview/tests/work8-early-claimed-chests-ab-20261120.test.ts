@@ -87,8 +87,8 @@ test('07 Missions: actual source-painted first-three genuine claimed chest art i
     await delay(180);
     const afterLayout=await geometry();
     const afterInk=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:first-child .w8-approved-chest > svg.w8-approved-painting")).filter');
-    assert.notEqual(afterInk,beforeInk,'real source-painted gem must be present in production only');
-    assert.match(afterInk,/brightness\\(1\\.8\\)/,'source crop must use the measured restored green engraving');
+    assert.notEqual(afterInk,beforeInk,'green chest paint must differ from baseline');
+    assert.match(afterInk,/brightness\(1\.8\)/,'source crop must use the measured restored green engraving');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
     assert.deepEqual(afterLayout.labels,beforeLayout.labels,'real mission objective labels unchanged');
@@ -137,8 +137,8 @@ test('07 Missions: actual source-painted first-three genuine claimed chest art i
     writeFileSync(join(evidence,'work8-missions-early-chests-art-native-ab.json'),JSON.stringify(report,null,2));
     console.log('WORK8 07 reward grid controlled Chromium A/B '+JSON.stringify(compared.metrics));
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
-    assert.ok(compared.metrics.firstThreeChests.delta<-.05,'claimed chest source-art ROI must strictly improve');
-    assert.ok(compared.metrics.full.delta<-.005,'real claimed chest source sprites must improve full frame');
+    assert.ok(compared.metrics.firstThreeChests.delta<-.05,'first-three actual reward-chest ROI must strictly improve');
+    assert.ok(compared.metrics.full.delta<-.005,'real reward chest paint must improve full frame');
     assert.ok(compared.metrics.daily.delta<0&&compared.metrics.chests.delta<0,'daily rewards and chest band must both improve');
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
