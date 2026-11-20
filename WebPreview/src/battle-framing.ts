@@ -49,11 +49,11 @@ export function battleEnemyScale(aspect:number):number {
   // WORK0 #104 / 20 Nov: structurally reframe the approved short 384×512
   // Batalha. Scale down the broadside just enough that the entire aftcastle
   // fits on the right after moving it toward the approved starboard third.
-  // Tall/320px framing is deliberately unchanged: its opponent already
-  // approaches the right screen edge.
+  // All portrait crops now reclaim clear sky around the real broadside;
+  // keep the aftcastle in frame without moving collision geometry.
   // Presentation only: physical hull, damage hitbox and Porto stay unchanged.
-  if(aspect<.62)return 1.48; // 320×568, 390×844 and 430×932: protect the stern
-  if(aspect<.80)return 1.42; // 384×512: preserve full broadside and starboard margin
+  if(aspect<.62)return 1.30; // 320×568, 390×844 and 430×932: protect the stern
+  if(aspect<.80)return 1.35; // 384×512: preserve full broadside and starboard margin
   return 1.82; // preserve desktop
 }
 /** Batalha 02: turn the existing live red ship into a readable starboard broadside.
@@ -87,13 +87,14 @@ export function battleCameraPose(aspect: number): CameraPose {
       // in the RIGHT third instead of blocking the cannon centreline.
       // Move the existing live gun deck laterally with that pan to preserve
       // the real muzzle near x=50%, rather than reprojecting a fake shot.
-      // Narrow/tall crops preserve their already edge-safe framing.
+      // Camera stays fixed; move the actual battery laterally as it shrinks
+      // so its physical muzzle remains centered in 320/384/390px crops.
       position: [0, 7.4, 55],
       target: [ultraTall ? 7.65 : compact ? 6.5 : 2.65, 4.1, -3],
       showBattery: true,
       batteryOffsetZ: -30,
-      batteryOffsetX: ultraTall ? 3.6 : compact ? 2.7 : 1.3,
-      batteryScale: 1,
+      batteryOffsetX: ultraTall ? 5.2 : compact ? 4.4 : 1.8,
+      batteryScale: .84,
       // Legacy optional edge rig is now HIDDEN for portrait battle.
       sailX: -11,
       sailScaleX: .33,
