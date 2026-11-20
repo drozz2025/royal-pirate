@@ -5487,16 +5487,17 @@
 }
 
 /* WORK8 / issue #104 — 07 MISSÕES ONLY: coastal reference tone.
-   The approved 07-missoes.webp has a calmer blue tropical backdrop than the
-   current oversaturated foliage. Calibrate only the scene illustration behind
+   The approved 07-missoes.webp has a subtly darker blue tropical backdrop than the
+   current coastal panorama. Calibrate only the scene illustration behind
    the three REAL quest cards and seven REAL daily rewards. The selector is
    scoped strictly to Missões; 08 Ranking, WORK0 shell/dock, Porto, economy,
    Unity, and all game state/scroll/touch coordinates remain unchanged.
    This root opt-out is for SAME real Chromium DOM/frame baseline capture.
    approved:false — 0/8, integration and publishing exclusively WORK0. */
 @media (min-width:351px) and (max-width:440px) {
-  :root:not(.work8-missions-coastal-tone-ab-baseline)
+  :root:not(.work8-missions-coastal-tone-ab-baseline):not(.work8-missions-coast-ab-baseline)
   .w8-approved-missions .w8-approved-scene .w8-seascape {
-    filter:saturate(1.06) contrast(1.07) brightness(1.08)!important;
+    filter:saturate(1.02) contrast(1.08) brightness(.77)
+      drop-shadow(0 3px 2px rgba(2,25,45,.32));
   }
 }
