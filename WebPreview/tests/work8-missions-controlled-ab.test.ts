@@ -1889,6 +1889,61 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
 
+
+    /* WORK8 07: A/B of newly illuminated early-day authentic chest artwork.
+       Keep the identical Chromium DOM/frame, 384x512 DPR1, decoded original
+       and paused animations. Toggle only this fresh CSS rule, not an old
+       unrelated gate. No claimed-state simulation. */
+    const earlyLightClass='work8-missions-early-chest-light-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(earlyLightClass)+');true');
+    await delay(160);
+    const earlyBeforeGeometry=await headingLayout();
+    const earlyBeforeFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:first-child .w8-approved-chest > svg.w8-art")).filter');
+    const earlyBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(earlyLightClass)+');true');
+    await delay(160);
+    const earlyAfterGeometry=await headingLayout();
+    const earlyAfterFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-days li:first-child .w8-approved-chest > svg.w8-art")).filter');
+    const earlyAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const earlyScoreJs='(async()=>{const urls='+JSON.stringify([
+      'data:image/webp;base64,'+orig,'data:image/png;base64,'+earlyBefore,'data:image/png;base64,'+earlyAfter
+    ])+';const ims=await Promise.all(urls.map(src=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src=src})));'+
+      'if(ims.some(i=>i.width!==384||i.height!==512))throw Error("not native 384x512");'+
+      'const pix=ims.map(i=>{const c=document.createElement("canvas");c.width=384;c.height=512;const x=c.getContext("2d");x.drawImage(i,0,0);return x.getImageData(0,0,384,512).data});'+
+      'const rois={full:[0,0,384,512],earlyChests:[20,356,166,427],allChests:[20,356,370,427],daily:[13,325,373,436],quests:[12,155,372,321],dock:[0,451,384,512],header:[0,0,384,70]};'+
+      'const mae=(a,b,r)=>{let s=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){let p=4*(384*y+x);for(let k=0;k<3;k++){s+=Math.abs(a[p+k]-b[p+k]);n++}}return s/n};'+
+      'const scores=[pix[1],pix[2]].map(p=>Object.fromEntries(Object.entries(rois).map(([key,r])=>[key,mae(pix[0],p,r)])));'+
+      'let changed=0;for(let p=0;p<pix[1].length;p+=4){if(pix[1][p]!==pix[2][p]||pix[1][p+1]!==pix[2][p+1]||pix[1][p+2]!==pix[2][p+2])changed++}'+
+      'const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");for(let j=0;j<3;j++)x.drawImage(ims[j],384*j,0);x.drawImage(ims[0],1152,0);x.globalAlpha=.5;x.drawImage(ims[2],1152,0);'+
+      'return {scores,changed,montage:c.toDataURL("image/png").split(",")[1]};})()';
+    const earlyMeasured=await evalJs(earlyScoreJs);
+    const earlyDeltas=Object.fromEntries(Object.keys(earlyMeasured.scores[0]).map(k=>[k,earlyMeasured.scores[1][k]-earlyMeasured.scores[0][k]]));
+    writeFileSync(join(evidence,'work8-missions-early-chests-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png'),Buffer.from(earlyMeasured.montage,'base64'));
+    writeFileSync(join(evidence,'work8-missions-early-chests-BEFORE-384x512.png'),Buffer.from(earlyBefore,'base64'));
+    writeFileSync(join(evidence,'work8-missions-early-chests-RENDER-384x512.png'),Buffer.from(earlyAfter,'base64'));
+    const earlyReport={issue:104,scope:'07 Missions / day 1–3 artwork only',
+      reference:'assets/design-approved/07-missoes.webp',
+      requiredReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      viewport:'384x512 native Chromium DPR1',sameScene:true,animationsPaused:true,
+      beforeFilter:earlyBeforeFilter,afterFilter:earlyAfterFilter,
+      before:earlyMeasured.scores[0],render:earlyMeasured.scores[1],delta:earlyDeltas,
+      changedPixels:earlyMeasured.changed,geometry:{before:earlyBeforeGeometry,after:earlyAfterGeometry},
+      approved:false,approvedScreens:0};
+    writeFileSync(join(evidence,'work8-missions-early-chests-native-ab.json'),JSON.stringify(earlyReport,null,2));
+    console.log('WORK8_EARLY_CHESTS_NATIVE_AB '+JSON.stringify(earlyReport));
+    assert.notEqual(earlyBeforeFilter,earlyAfterFilter,'visual change must actually render');
+    assert.ok(earlyMeasured.changed>0,'no inert CSS candidates');
+    assert.deepEqual(earlyBeforeGeometry,earlyAfterGeometry,'positions of 7 rewards and dock cannot move');
+    assert.equal(earlyAfterGeometry.questCount,3);
+    assert.equal(earlyAfterGeometry.dayCount,7);
+    assert.equal(earlyAfterGeometry.dockCount,5);
+    assert.ok(earlyAfterGeometry.chests.every((c:any)=>c.bottom<=earlyAfterGeometry.nav.top+2),
+      'all seven actual artworks must remain above WORK0 dock');
+    assert.ok(earlyDeltas.full<-.003 && earlyDeltas.earlyChests<-.05 && earlyDeltas.allChests<-.01,
+      'candidate must improve exact 07 original full+target ROI+all chests');
+    assert.ok(Math.abs(earlyDeltas.quests)<.02&&Math.abs(earlyDeltas.dock)<.02&&Math.abs(earlyDeltas.header)<.02,
+      'never change missions, dock or header outside targeted seven-day art');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
