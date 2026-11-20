@@ -3212,6 +3212,12 @@
     line-height:1.05;
     letter-spacing:-.1px;
   }
+  /* The real 44px action must clear the WORK0 fixed dock; after the
+     11px material caption its native bottom was 430.03px vs dock y=430.
+     Shift only WORK4's action paint/hitbox 3px up, not the WORK0 dock. */
+  .w4-forge #w4-forge-panel > .w4-improve-button {
+    top:-3px;
+  }
 }
 
 
