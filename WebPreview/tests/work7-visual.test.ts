@@ -396,6 +396,50 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
 
 
 
+        // EXPERIMENT ONLY: same-frame native chest-material A/B sweep on the
+        // exact HEAD. Nothing from this sweep modifies production CSS.
+        if (kind==='shop' && width===384 && height===512) {
+          const materialVariants:[string,string][]=[
+            ['head',''],
+            ['navy-inlay','background:radial-gradient(ellipse 66% 55% at 50% 55%,var(--w7-glow),transparent 100%),linear-gradient(#132e4a,#07182a)!important;box-shadow:none!important;'],
+            ['deep-inlay','background:radial-gradient(ellipse 75% 55% at 50% 39%,var(--w7-glow),transparent 83%),linear-gradient(#14253b,#030a1d)!important;box-shadow:none!important;'],
+            ['warm-inlay','background:radial-gradient(ellipse 80% 75% at 50% 43%,var(--w7-glow),transparent 92%),linear-gradient(#332534,#061126)!important;box-shadow:none!important;'],
+            ['cyan-inlay','background:radial-gradient(ellipse 66% 55% at 50% 55%,#4daac955,transparent 95%),linear-gradient(#143e5a,#06192d)!important;box-shadow:none!important;'],
+            ['rim-shadow','box-shadow:inset 0 2px 6px #020817a8,inset 0 -2px 2px #f3bd6e3d!important;'],
+            ['rim-faint','box-shadow:inset 0 1px 3px #02081761,inset 0 -1px 1px #f3bd6e22!important;'],
+            ['rim-soft','box-shadow:inset 0 0 0 1px #ffd38d33,inset 0 2px 3px #030b1e55!important;'],
+            ['royal-velvet','background:radial-gradient(ellipse 71% 63% at 50% 52%,var(--w7-glow),transparent 88%),linear-gradient(#2b143d,#040e25)!important;box-shadow:none!important;'],
+            ['gold-wood','background:repeating-linear-gradient(170deg,#c5a27116 0 1px,transparent 1px 7px),radial-gradient(ellipse 68% 61% at 50% 47%,var(--w7-glow),transparent 95%)!important;box-shadow:none!important;'],
+            ['metal-dark','background:linear-gradient(165deg,#081527,#040a1a)!important;box-shadow:inset 0 2px 3px #02081780!important;'],
+            ['golden-halo','background:radial-gradient(ellipse 64% 68% at 50% 50%,#ffe0a566,transparent 95%),linear-gradient(#0d2438,#020b1d)!important;box-shadow:none!important;'],
+            ['black-recess','background:radial-gradient(ellipse 50% 46% at 50% 44%,var(--w7-glow),transparent 75%),linear-gradient(#091726,#020713)!important;box-shadow:none!important;']
+          ];
+          for (const [name,rules] of materialVariants) {
+            const override=cssBaseline+'@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="shop"] .w7-chest-art{'+rules+'}}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-material-sweep';s.textContent="+
+              JSON.stringify(override)+";document.head.appendChild(s);return true})()");
+            await sleep(80);
+            const variant=await command('Page.captureScreenshot',{
+              format:'png',fromSurface:true,captureBeyondViewport:false
+            });
+            const score=await evaluate("(async()=>{"+
+              "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "const ref=await load("+JSON.stringify(refUrl)+"),candidate=await load("+JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(variant.data)+");"+
+              "const canvas=document.createElement('canvas');canvas.width=384;canvas.height=512;const ctx=canvas.getContext('2d');"+
+              "ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;ctx.clearRect(0,0,384,512);"+
+              "ctx.drawImage(candidate,0,0);const b=ctx.getImageData(0,0,384,512).data;let sum=0,roi=0,count=0,rCount=0;"+
+              "for(let y=0;y<512;y++)for(let x=0;x<384;x++)for(let k=0;k<3;k++){const p=(y*384+x)*4;"+
+              "const d=Math.abs(a[p+k]-b[p+k]);sum+=d;count++;if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=d;rCount++}}"+
+              "return {global:Math.round(sum/count*10000)/10000,roi:Math.round(roi/rCount*10000)/10000};})()");
+            console.log('WORK7 MATERIAL EXPERIMENT '+name+': '+JSON.stringify(score));
+            await evaluate("(()=>{document.getElementById('w7-material-sweep')?.remove();return true})()");
+            await sleep(40);
+          }
+        }
+
+
+
 
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
