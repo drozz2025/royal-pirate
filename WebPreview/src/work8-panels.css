@@ -5498,6 +5498,14 @@
    At 320x568 and taller viewport layouts this style is entirely inactive.
    Artistic approval remains false (0/8). */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  /* Reserve the EXACT 74px baseline of all seven real reward tiles. The
+     12px glyph box alone would otherwise reduce the height of CSS-grid
+     auto rows and move the chests/panel; never allow that regression. */
+  :root:not(.work8-missions-seven-caption-source-ab-baseline)
+  .w8-approved-missions .w8-approved-days li {
+    min-height:74px;
+    height:74px;
+  }
   :root:not(.work8-missions-seven-caption-source-ab-baseline)
   .w8-approved-missions .w8-approved-days li > small {
     /* The old 24px line box wasted 12px above the painted glyphs.
