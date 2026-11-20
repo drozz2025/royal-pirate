@@ -11,6 +11,7 @@ const marker='WORK4/#104 — controlled 20 Nov native Fleet 03 organic sky seam.
 const paint=css.split(marker)[1]?.split('/*')[0]||'';
 const selector='.w4-fleet #w4-fleet-panel > .w4-harbour-stage::after';
 const oldGradient='linear-gradient(180deg,#051a30f7 0%,#072a42ed 44%,#092a4000 100%)';
+const oldMask='linear-gradient(to right,transparent 0%,#000 13%,#000 100%)';
 const approved=readFileSync(new URL('../../assets/design-approved/03-frota.webp',import.meta.url)).toString('base64');
 
 test('WORK4 organic sky candidate cannot change approved 03/04 art, real data, dock or responsive CSS',()=>{
@@ -122,7 +123,7 @@ test('WORK4 Fleet native organic sky A/B: ORIGINAL BEFORE RENDER OVERLAY and pro
   assert.equal(geometry.sea,1,'exactly one approved source sea');
   assert.equal(geometry.dock,5,'five dock buttons still present and touchable');
   assert.equal(geometry.realLevels,3,'existing real levels preserved');
-  await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const href=document.querySelector('svg.w4-reference-ship image')?.getAttribute('href');if(!href||!(await fetch(href)).ok)throw Error('approved ship source not loaded');const style=document.createElement('style');style.id='work4-native-ab-baseline';style.textContent="+JSON.stringify(selector+"{background:"+oldGradient+"!important;}")+";document.head.append(style);return true;})()");
+  await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const href=document.querySelector('svg.w4-reference-ship image')?.getAttribute('href');if(!href||!(await fetch(href)).ok)throw Error('approved ship source not loaded');const style=document.createElement('style');style.id='work4-native-ab-baseline';style.textContent="+JSON.stringify(selector+"{background:"+oldGradient+"!important;-webkit-mask-image:"+oldMask+"!important;mask-image:"+oldMask+"!important;}")+";document.head.append(style);return true;})()");
   await delay(180);
   const before=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
   await evaluate("document.getElementById('work4-native-ab-baseline')?.remove();true");
