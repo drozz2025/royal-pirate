@@ -353,4 +353,72 @@ test('WORK4 Forge native genuine-plaque metal rim sweep: same frame, full/plaque
       plaque:x.metrics.plaque.mae,heading:x.metrics.heading.mae,
       cannonChanges:x.metrics.cannon.changedPixels,costsChanges:x.metrics.costs.changedPixels}))}));
 
+  // WORK4 20 Nov caption-size paint ROI: 384x512 actual Chromium, zero data changes.
+  // The original source costs label is legible, while the current native 9px
+  // typography is small. Trial 8/9/10/11px without moving the source cannon,
+  // flames, real upgrade button, or five-item shared dock. The winner is a
+  // measurement only; production CSS must be changed in a separate decision.
+  await evaluate("(()=>{document.getElementById('work4-forge-header-study')?.remove();document.getElementById('work4-forge-plaque-candidate')?.remove();return true})()");
+  const captionSizes=[8,9,10,11];
+  const captionShots:string[]=[];
+  const costNumbersBefore=await evaluate("Array.from(document.querySelectorAll('.w4-forge .w4-resource-grid strong'),e=>e.textContent?.trim())");
+  assert.equal(costNumbersBefore.length,3,'live costs remain three real values');
+  for(const size of captionSizes){
+    const rule='.w4-forge #w4-forge-panel [aria-label="Custo e materiais disponíveis"] small{font-size:'+size+'px!important;line-height:1.05!important;letter-spacing:-.1px!important;}';
+    await evaluate("(()=>{let e=document.getElementById('work4-forge-caption-study');"+
+      "if(!e){e=document.createElement('style');e.id='work4-forge-caption-study';document.head.append(e)}"+
+      "e.textContent="+JSON.stringify(rule)+";return true})()");
+    const fontSize=await evaluate("getComputedStyle(document.querySelector('.w4-forge #w4-forge-panel [aria-label=\"Custo e materiais disponíveis\"] small')).fontSize");
+    assert.equal(fontSize,size+'px','genuine applied caption CSS, no no-op screenshots');
+    await delay(150);
+    captionShots.push((await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string);
+  }
+  const costNumbersAfter=await evaluate("Array.from(document.querySelectorAll('.w4-forge .w4-resource-grid strong'),e=>e.textContent?.trim())");
+  assert.deepEqual(costNumbersAfter,costNumbersBefore,'typography never changes material amounts');
+  const captionGeometry=await evaluate("(()=>{const b=document.querySelector('.w4-improve-button').getBoundingClientRect();return {buttonHeight:b.height,buttonBottom:b.bottom,navCount:document.querySelectorAll('.harbour-nav-item').length,scrollWidth:document.documentElement.scrollWidth,width:innerWidth}})()");
+  assert.ok(captionGeometry.buttonHeight>=40 && captionGeometry.scrollWidth<=384+2);
+  assert.equal(captionGeometry.navCount,5,'WORK0 five-item dock preserved');
+  const captionPixelEval="(async()=>{"+
+    "const png="+JSON.stringify(captionShots)+";"+
+    "const load=async(src)=>{const i=new Image();i.src=src;await i.decode();return i};"+
+    "const images=await Promise.all([load('data:image/webp;base64,"+reference+"'),...png.map(s=>load('data:image/png;base64,'+s))]);"+
+    "if(images.some(i=>i.width!==384||i.height!==512))throw Error('native 384x512 required');"+
+    "const cv=img=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
+    "const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0);return x.getImageData(0,0,384,512).data;};"+
+    "const [ref,...shots]=images.map(cv),base=shots[1];"+
+    "const boxes={full:[0,0,384,512],costRow:[16,342,375,401],costLabel:[16,364,375,386],"+
+    "costValues:[16,385,375,430],cannon:[18,153,175,305],furnace:[129,168,171,294],dock:[0,453,384,512]};"+
+    "const roi=(reference,frame,box)=>{let total=0,n=0,changed=0;"+
+    "for(let y=box[1];y<box[3];y++)for(let x=box[0];x<box[2];x++){"+
+    "const p=(y*384+x)*4;let diff=false;for(let k=0;k<3;k++){total+=Math.abs(reference[p+k]-frame[p+k]);n++;if(base[p+k]!==frame[p+k])diff=true;}"+
+    "if(diff)changed++;}return {mae:total/n,changedPixels:changed}};"+
+    "const records=shots.map((frame,index)=>({index,roi:Object.fromEntries(Object.entries(boxes).map(([name,b])=>[name,roi(ref,frame,b)]))}));"+
+    "const baseRecord=records[1];const eligible=records.filter(r=>['cannon','furnace','dock'].every(k=>r.roi[k].changedPixels===0));"+
+    "eligible.sort((a,b)=>(a.roi.costRow.mae-b.roi.costRow.mae)||(a.roi.full.mae-b.roi.full.mae));"+
+    "const best=eligible[0];"+
+    "const compare=document.createElement('canvas');compare.width=1536;compare.height=512;"+
+    "const out=compare.getContext('2d');out.drawImage(images[0],0,0);out.drawImage(images[2],384,0);out.drawImage(images[best.index+1],768,0);"+
+    "out.drawImage(images[0],1152,0);out.globalAlpha=.5;out.drawImage(images[best.index+1],1152,0);"+
+    "return {records,bestIndex:best.index,baseline:baseRecord,boxes,overlay:compare.toDataURL('image/png').split(',')[1]}})()";
+  const captionPixels=await evaluate(captionPixelEval);
+  assert.equal(captionPixels.records.length,captionSizes.length);
+  for(const region of ['cannon','furnace','dock'])
+    assert.equal(captionPixels.baseline.roi[region].changedPixels,0,'native baseline keeps '+region+' fixed');
+  const captionReport={approved:false,screensApproved:0,source:'04-melhorias-forja.webp',
+    viewport:'384x512',frame:'same original Chromium scene, animation paused',
+    realCostNumbers:costNumbersBefore,geometry:captionGeometry,boxes:captionPixels.boxes,
+    sizeCandidates:captionSizes.map((size,i)=>({size,...captionPixels.records[i]})),
+    safeWinnerSize:captionSizes[captionPixels.bestIndex],
+    productionFontSize:9,
+    decision:captionPixels.bestIndex===1?'Production 9px retains best guarded ROI':
+      'Trial winner is experimental; needs separate code review before any CSS production change'};
+  writeFileSync(join(qa,'work4-forge-caption-size-study-384x512.json'),JSON.stringify(captionReport,null,2)+'\n');
+  writeFileSync(join(qa,'original-before-render-overlay-forge-captions-384x512.png'),Buffer.from(captionPixels.overlay,'base64'));
+  console.log('WORK4_FORGE_CAPTION_SIZE_AB '+JSON.stringify({safeWinnerSize:captionReport.safeWinnerSize,
+    productionFontSize:captionReport.productionFontSize,geometry:captionGeometry,
+    candidates:captionReport.sizeCandidates.map(x=>({size:x.size,full:x.roi.full.mae,
+      costs:x.roi.costRow.mae,cannonDeltaPx:x.roi.cannon.changedPixels,
+      furnaceDeltaPx:x.roi.furnace.changedPixels,dockDeltaPx:x.roi.dock.changedPixels}))}));
+  await evaluate("document.getElementById('work4-forge-caption-study')?.remove();true");
+
 });
