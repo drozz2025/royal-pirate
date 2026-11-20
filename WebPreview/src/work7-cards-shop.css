@@ -4351,3 +4351,20 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 20 Nov: restore Captain pack plum illumination from authentic 06 source.
+ * Replaces only the short-native live CSS material field, not the authentic
+ * cropped chest, pack geometry, price, real currency, labels or availability.
+ * The approved 06 reference shows a luminous purple left vignette on a darker
+ * violet/navy panel. This is native CSS, never a whole-screen image background.
+ * Other phone sizes and other WORK-owned UI remain byte-for-byte unchanged.
+ * Strict frozen-frame Chromium MAE / Captain+3 chests ROI gate is mandatory.
+ * approved:false / 0 of 8; integration exclusively by WORK0. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    background:
+      radial-gradient(ellipse 74% 86% at 30% 41%,#bd3c98a6,transparent 82%),
+      linear-gradient(112deg,#4e0f65 0%,#3a0a61 49%,#12083e 100%);
+  }
+}
