@@ -35,6 +35,7 @@ on:
       - work2/shipyard-instanced-gpu-batching-20261120
       - work2/adaptive-shipyard-mobile-dpr-20261120
       - work2/shipyard-preview-geometry-reuse-20261120
+      - work2/original-ship-bells-20261120
   pull_request:
     branches:
       - work2/shipyard-instanced-gpu-batching-20261120
