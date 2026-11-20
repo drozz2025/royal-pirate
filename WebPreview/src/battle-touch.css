@@ -10,3 +10,18 @@
   touch-action:none;
   cursor:ew-resize;
 }
+
+/* WORK0 #104 · 20 Nov: the native bearing bar remains operable as a fallback
+ * to drag-on-deck aiming. Its old 18px pointer box was not usable on a small
+ * iPhone. Enlarge the invisible range hit region without shifting the visible
+ * track, overlapping DISPARAR or changing the stored yaw limits. Both ranges
+ * now use 44px capture boxes and prevent Safari from turning a shot into scroll.
+ * The existing canvas still handles horizontal gun bearing; vertical movement
+ * never changes elevation or power. This is battle-only. */
+.in-battle #bearing {
+  height:44px;
+  min-height:44px;
+  margin-block:-12px;
+  touch-action:none;
+  cursor:ew-resize;
+}
