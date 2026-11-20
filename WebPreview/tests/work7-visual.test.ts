@@ -50,6 +50,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Native 05 WORK7 candidate must exist');
+  assert.ok(cssText.includes('20 Nov 18:24 UTC. Genuine 06 Captain velvet material'),
+    'Isolated native Captain material paint is present, not a screenshot background');
   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
     'Only genuine native 06 legendary physical rim is changed in this candidate');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
@@ -63,13 +65,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // frame filter. Previous #411/#422 and live artwork stay untouched.
   // The override is installed on the SAME page and animation frame.
   // It is inert for Shop and for 320/tall viewports.
+  // Restore EXACT WORK0 starting HEAD native Captain's background only.
+  // Previous chest bevel and original eight cards remain identical in both
+  // screenshots; same paused browser frame, same touch state and asset URLs.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+      .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+        background:radial-gradient(ellipse 66% 95% at 29% 42%,#a51c6655,transparent 88%),
+                   linear-gradient(112deg,#360957 0%,#31065a 49%,#110839 100%)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -463,6 +466,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.equal(card.roiMaeAfter,card.roiMaeBefore,
     'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
   assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
+    'Native 06 Captain velvet must improve strict global MAE AND true pack/chests ROI vs verified WORK0 HEAD: '+
     JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
 });
