@@ -195,7 +195,7 @@ test('07 Missions: three live mission emblems plus active controls improve appro
 
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
     assert.ok(compared.metrics.questRegistration.delta<-.10,'real emblems plus active buttons must improve 07 mission ROI');
-    assert.ok(compared.metrics.full.delta<-.04,'original three mission borders must improve full 07 source frame');
+    assert.ok(compared.metrics.full.delta<-.04,'authentic mission artwork and real active actions must improve full 07 source frame');
     assert.ok(compared.metrics.daily.delta<.10&&compared.metrics.chests.delta<.10,'daily reward strip cannot regress');
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
@@ -209,11 +209,14 @@ test('07 Missions: three live mission emblems plus active controls improve appro
     }
     const narrow=await evalJs('(()=>{const days=document.querySelector(".w8-approved-days"),nav=document.querySelector(".app-sheet > .harbour-nav"),sheet=document.querySelector(".app-sheet-content");if(sheet)sheet.scrollTop=sheet.scrollHeight;if(days)days.scrollLeft=days.scrollWidth;const a=days.getBoundingClientRect(),b=days.lastElementChild.getBoundingClientRect();return {sevenVisible:b.left>=a.left-2&&b.right<=a.right+2,sevenAboveDock:b.bottom<=nav.getBoundingClientRect().top+2,dock:nav.querySelectorAll(".harbour-nav-item").length,quest:document.querySelectorAll(".w8-approved-quest").length,days:days.children.length,width:document.documentElement.scrollWidth}})()');
     assert.ok(narrow.sevenVisible&&narrow.sevenAboveDock&&narrow.width<=322&&narrow.dock===5&&narrow.quest===3&&narrow.days===7);
+    assert.match(await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-art")).filter'),/brightness\(2\)/,'320 mobile must show real source pictograms illuminated');
     save('missions-quest-readability-320x568.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     for(const viewport of [{width:390,height:844},{width:430,height:932}]){
       await cmd('Emulation.setDeviceMetricsOverride',{...viewport,mobile:true,deviceScaleFactor:1,screenWidth:viewport.width,screenHeight:viewport.height});
       await delay(180);
       assert.ok(await evalJs('document.documentElement.scrollWidth<='+String(viewport.width+2)));
+      assert.match(await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-art")).filter'),/brightness\(2\)/,'art contrast must be visible on '+viewport.width+'px mobile');
+      assert.match(await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest[data-state=active] > button")).filter'),/brightness\(1\.5\)/,'active buttons remain distinct on '+viewport.width+'px mobile');
       save('missions-quest-readability-'+viewport.width+'x'+viewport.height+'.png',(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data);
     }
   } finally {
