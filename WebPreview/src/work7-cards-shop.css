@@ -4351,3 +4351,21 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 20 Nov 09:22 UTC, genuine 06 legendary metal exposure.
+ * The original approved 06 gold chest has a more luminous engraved face
+ * than the current short-native frame; restore warm relief within the
+ * already integrated geometry and authentic approved WEBP crop. This is a
+ * strictly LOCAL layer on the original, unavailable chest, never a
+ * screenshot background. Existing legendary beveled rim stays intact.
+ * 320×568 and tall portrait layouts remain byte-for-byte identical;
+ * genuine EM BREVE labels, the 4×2 cards, pack and dock remain live.
+ * Human approval: false, 0/8. The Chromium same-frame test must prove
+ * strict 384×512 global and pack/chest ROI improvement against THIS HEAD.
+ */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px) {
+  .w7-screen[data-work7-screen="shop"] .w7-chest-legend {
+    filter:brightness(.68) saturate(1.08);
+  }
+}
