@@ -173,3 +173,25 @@ test('WORK0/#104: 320px and tall-phone cannon/ship framing is explicit',()=>{
     assert.equal(battleEnemyScale(w/h),scale);
   }
 });
+
+
+test('WORK0 #104: mobile 3D sightline gains real sky and halves cannon screen occlusion without moving the muzzle off centre',()=>{
+ for(const [w,h,oldOffset] of [[320,568,2.7],[384,512,1.3],[390,844,3.6],[430,932,3.6]]){
+   const pose=battleCameraPose(w/h), scale=pose.batteryScale;
+   const worldLeft=(offset:number,s:number)=>new T.Vector3(offset-1.42*s,1.8*s,pose.batteryOffsetZ+68*s);
+   const worldRight=(offset:number,s:number)=>new T.Vector3(offset+1.42*s,1.8*s,pose.batteryOffsetZ+68*s);
+   const oldWidth=screen(w,h,worldRight(oldOffset,1)).x-screen(w,h,worldLeft(oldOffset,1)).x;
+   const currentWidth=screen(w,h,worldRight(pose.batteryOffsetX,scale)).x-screen(w,h,worldLeft(pose.batteryOffsetX,scale)).x;
+   assert.ok(currentWidth<oldWidth*.66,'actual near-gun occlusion shrinks by at least one third at '+w+'x'+h);
+   assert.ok(currentWidth>w*.1,'real gun remains clearly visible at '+w+'x'+h);
+   const enemyTop=screen(w,h,new T.Vector3(10,8.4*battleEnemyScale(w/h),-3)).y;
+   assert.ok(enemyTop>h*.32&&enemyTop<h*.36,'enemy sails leave more clear sky at '+w+'x'+h);
+   const gun=makeBattleDeck(true);
+   gun.group.position.set(pose.batteryOffsetX,0,pose.batteryOffsetZ);
+   gun.group.scale.setScalar(scale);
+   const recoil=gun.group.getObjectByName('first-person-central-recoil')!;
+   const muzzle=battleDeckMuzzleWorld(recoil,gun.muzzles[0]);
+   const p=screen(w,h,muzzle);
+   assert.ok(Math.abs(p.x-w/2)<w*.065,'true barrel muzzle remains aligned with the central touch sightline');
+ }
+});
