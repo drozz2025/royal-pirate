@@ -2200,8 +2200,12 @@ test('WORK4 source-cannon visual refinement is native-only and cost/dock-safe',(
 test('WORK4 99%-bottom source-forge feather remains native, live and dock-safe',()=>{
   const tail=css.split('WORK4/#104 — 20:00 source-forge cannon edge:')[1];
   assert.ok(tail,'new source mask has a dedicated isolated block');
-  assert.match(tail,/@media \(width:384px\) and \(height:512px\)/);
-  assert.match(tail,/linear-gradient\(to bottom,#000 0%,#000 99%,transparent 100%\)/);
-  assert.match(tail,/mask-composite:intersect/);
-  assert.doesNotMatch(tail,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-resource-grid|\.w4-improve-button|position:fixed)/);
+  // Only inspect the source-cannon rule; later unrelated WORK4 CSS comments
+  // legitimately mention .w4-materials without changing the cannon mask.
+  const rules=(tail.split('*/')[1]||'').split('/*')[0];
+  assert.match(rules,/@media \(width:384px\) and \(height:512px\)/);
+  assert.match(rules,/linear-gradient\(to bottom,#000 0%,#000 99%,transparent 100%\)/);
+  assert.match(rules,/mask-composite:intersect/);
+  assert.equal((rules.match(/\.w4-cannon-art\.w4-reference-cannon/g)||[]).length,1);
+  assert.doesNotMatch(rules,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-materials|\.w4-resource-grid|\.w4-improve-button|position:fixed)/);
 });
