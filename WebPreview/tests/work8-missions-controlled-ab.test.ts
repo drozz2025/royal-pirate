@@ -1896,61 +1896,61 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        The prior 1.18 active-button correction must be active on BOTH sides
        of this A/B — unlike earlier immutable regression gates above. */
     await evalJs('document.documentElement.classList.remove("work8-missions-action-enamel-ab-baseline");true');
-    const actionClass='work8-missions-action-clarity-ab-baseline';
-    await evalJs('document.documentElement.classList.add('+JSON.stringify(actionClass)+');true');
+    const clarityFlag='work8-missions-action-clarity-ab-baseline';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(clarityFlag)+');true');
     await delay(140);
-    const actionBeforeLayout=await headingLayout();
-    const actionBeforeFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-quest[data-state=active] > button")).filter');
-    const actionBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    await evalJs('document.documentElement.classList.remove('+JSON.stringify(actionClass)+');true');
+    const clarityBeforeLayout=await headingLayout();
+    const clarityBeforeFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-quest[data-state=active] > button")).filter');
+    const clarityBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(clarityFlag)+');true');
     await delay(140);
-    const actionRenderLayout=await headingLayout();
-    const actionRenderFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-quest[data-state=active] > button")).filter');
-    const actionRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
-    const actionMetricsExpression=source
-      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+actionBefore))
-      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+actionRender))
+    const clarityAfterLayout=await headingLayout();
+    const clarityAfterFilter=await evalJs('getComputedStyle(document.querySelector(".w8-approved-quest[data-state=active] > button")).filter');
+    const clarityAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const clarityMetricsExpression=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+clarityBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+clarityAfter))
       .replace('quests:[12,155,372,321],daily:',
         'quests:[12,155,372,321],actionButtons:[294,169,367,322],actionButtonsLower:[294,212,367,322],daily:');
-    assert.notEqual(actionMetricsExpression,source,'native CTA A/B must use newly captured real screenshots');
-    const actionCompare=await evalJs(actionMetricsExpression);
-    const actionMontageExpression='(async()=>{const urls='+JSON.stringify([
+    assert.notEqual(clarityMetricsExpression,source,'native CTA A/B must use newly captured real screenshots');
+    const clarityCompare=await evalJs(clarityMetricsExpression);
+    const clarityMontageExpression='(async()=>{const urls='+JSON.stringify([
       'data:image/webp;base64,'+orig,
-      'data:image/png;base64,'+actionBefore,
-      'data:image/png;base64,'+actionRender
+      'data:image/png;base64,'+clarityBefore,
+      'data:image/png;base64,'+clarityAfter
     ])+';const ims=await Promise.all(urls.map(u=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=u})));const cv=document.createElement("canvas");cv.width=1536;cv.height=512;const x=cv.getContext("2d");ims.forEach((im,n)=>x.drawImage(im,n*384,0));x.drawImage(ims[0],1152,0);x.globalAlpha=.5;x.drawImage(ims[2],1152,0);return cv.toDataURL("image/png").split(",")[1]})()';
-    const actionMontage=await evalJs(actionMontageExpression);
-    writeFileSync(join(evidence,'missions-action-clarity-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png'),Buffer.from(actionMontage,'base64'));
-    writeFileSync(join(evidence,'missions-action-clarity-before-384x512.png'),Buffer.from(actionBefore,'base64'));
-    writeFileSync(join(evidence,'missions-action-clarity-render-384x512.png'),Buffer.from(actionRender,'base64'));
-    const actionReport={
+    const clarityMontage=await evalJs(clarityMontageExpression);
+    writeFileSync(join(evidence,'missions-action-clarity-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png'),Buffer.from(clarityMontage,'base64'));
+    writeFileSync(join(evidence,'missions-action-clarity-before-384x512.png'),Buffer.from(clarityBefore,'base64'));
+    writeFileSync(join(evidence,'missions-action-clarity-render-384x512.png'),Buffer.from(clarityAfter,'base64'));
+    const clarityReport={
       issue:104,scope:'07 Missões: existing active blue buttons only',
       source:'assets/design-approved/07-missoes.webp',
       referenceSet:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
         '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
         '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
       sameScenePausedFrame:true,viewport:{width:384,height:512,devicePixelRatio:1},
-      beforeFilter:actionBeforeFilter,renderFilter:actionRenderFilter,
-      roi:actionCompare.metrics,unchanged:actionCompare.unchanged,
-      geometry:{before:actionBeforeLayout,render:actionRenderLayout},
+      beforeFilter:clarityBeforeFilter,renderFilter:clarityAfterFilter,
+      roi:clarityCompare.metrics,unchanged:clarityCompare.unchanged,
+      geometry:{before:clarityBeforeLayout,render:clarityAfterLayout},
       approved:false,approvedScreens:0
     };
-    writeFileSync(join(evidence,'work8-missions-action-clarity-native-ab.json'),JSON.stringify(actionReport,null,2));
-    console.log('WORK8_ACTION_CLARITY_AB '+JSON.stringify(actionReport));
-    assert.notEqual(actionBeforeFilter,actionRenderFilter,
+    writeFileSync(join(evidence,'work8-missions-action-clarity-native-ab.json'),JSON.stringify(clarityReport,null,2));
+    console.log('WORK8_ACTION_CLARITY_AB '+JSON.stringify(clarityReport));
+    assert.notEqual(clarityBeforeFilter,clarityAfterFilter,
       'real active buttons must receive the new CSS filter');
-    assert.deepEqual(actionBeforeLayout,actionRenderLayout,
+    assert.deepEqual(clarityBeforeLayout,clarityAfterLayout,
       'active buttons, quest rows, seven chest artwork and WORK0 dock geometry must not move');
-    assert.equal(actionRenderLayout.questCount,3);
-    assert.equal(actionRenderLayout.dayCount,7);
-    assert.equal(actionRenderLayout.dockCount,5);
-    assert.ok(actionRenderLayout.chests.every((r:any)=>r.bottom<=actionRenderLayout.nav.top+2),
+    assert.equal(clarityAfterLayout.questCount,3);
+    assert.equal(clarityAfterLayout.dayCount,7);
+    assert.equal(clarityAfterLayout.dockCount,5);
+    assert.ok(clarityAfterLayout.chests.every((r:any)=>r.bottom<=clarityAfterLayout.nav.top+2),
       'seven genuine daily rewards must remain above the unchanged dock');
-    assert.ok(actionCompare.unchanged.dock<.1 && actionCompare.unchanged.header<.1,
+    assert.ok(clarityCompare.unchanged.dock<.1 && clarityCompare.unchanged.header<.1,
       'new button enamel must not repaint the global header or dock');
-    assert.ok(actionCompare.metrics.full.delta<0 &&
-      actionCompare.metrics.actionButtons.delta<-.02 &&
-      actionCompare.metrics.actionButtonsLower.delta<-.03,
+    assert.ok(clarityCompare.metrics.full.delta<0 &&
+      clarityCompare.metrics.actionButtons.delta<-.02 &&
+      clarityCompare.metrics.actionButtonsLower.delta<-.03,
       'new active-button paint MUST improve the true source MAE on entire screen and CTA ROIs');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
