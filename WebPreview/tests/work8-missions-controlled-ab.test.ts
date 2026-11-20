@@ -1889,6 +1889,56 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
 
+
+    /* WORK8/#104 — experimental SOURCE-MEASURED 07 sea light. This sweep
+       changes ONLY the existing Missions SVG coastal backdrop in the same
+       loaded/paused Chromium frame. No DOM replacement, ranking, dock, fake
+       economy or day/missions state. The winner is NOT a release. */
+    await evalJs('document.documentElement.classList.remove("work8-missions-coast-ab-baseline");true');
+    await delay(120);
+    const seaSelector='.w8-approved-missions .w8-approved-scene .w8-seascape';
+    const seaBeforeFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(seaSelector)+')).filter');
+    const seaBeforeGeometry=await headingLayout();
+    const seaBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const sourceScores=async(png:string)=>{
+      const urls=['data:image/webp;base64,'+orig,'data:image/png;base64,'+png];
+      return evalJs('(async()=>{const urls='+JSON.stringify(urls)+';'+
+        'const images=await Promise.all(urls.map(s=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=s})));'+
+        'if(images.some(i=>i.width!==384||i.height!==512))throw Error("native 384x512 required");'+
+        'const px=images.map(im=>{const c=document.createElement("canvas");c.width=384;c.height=512;const ctx=c.getContext("2d");ctx.drawImage(im,0,0);return ctx.getImageData(0,0,384,512).data});'+
+        'const areas={full:[0,0,384,512],coast:[0,72,384,157],quests:[12,155,372,321],daily:[13,325,373,436],dock:[0,451,384,512]};'+
+        'const score=r=>{let sum=0,count=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=4*(384*y+x);for(let j=0;j<3;j++){sum+=Math.abs(px[0][k+j]-px[1][k+j]);count++}}return sum/count};'+
+        'return Object.fromEntries(Object.entries(areas).map(([name,roi])=>[name,score(roi)]))})()');
+    };
+    const seaBaseline=await sourceScores(seaBefore);
+    const seaRows=[];
+    const seaCandidates=[0.62,0.68,0.74,0.78,0.82,0.85,0.88,0.91,0.94,0.98,1.04,1.1];
+    for(const b of seaCandidates){
+      const filter='saturate(1.02) contrast(1.08) brightness('+b+') drop-shadow(0 3px 2px rgba(2,25,45,.32))';
+      await evalJs('document.querySelector('+JSON.stringify(seaSelector)+').style.setProperty("filter",'+JSON.stringify(filter)+',"important");true');
+      await delay(55);
+      const shot=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+      const mae=await sourceScores(shot);
+      seaRows.push({brightness:b,mae,delta:{full:mae.full-seaBaseline.full,coast:mae.coast-seaBaseline.coast}});
+    }
+    await evalJs('document.querySelector('+JSON.stringify(seaSelector)+').style.removeProperty("filter");true');
+    await delay(100);
+    const seaAfterGeometry=await headingLayout();
+    assert.deepEqual(seaBeforeGeometry,seaAfterGeometry,'sea-only test must preserve chest/day/quest/dock geometry');
+    assert.equal(seaAfterGeometry.questCount,3);
+    assert.equal(seaAfterGeometry.dayCount,7);
+    assert.equal(seaAfterGeometry.dockCount,5);
+    assert.ok(seaAfterGeometry.chests.every((c:any)=>c.bottom<=seaAfterGeometry.nav.top+2),
+      'all seven reward chest images stay clear of the dock');
+    const seaResearch={screen:'07 Missions only',source:'assets/design-approved/07-missoes.webp',
+      viewport:'native 384x512 DPR1',sameScenePausedFrame:true,
+      beforeFilter:seaBeforeFilter,before:seaBaseline,
+      samples:seaRows,geometry:seaAfterGeometry,approved:false,approvedScreens:0};
+    writeFileSync(join(evidence,'work8-missions-sea-source-sweep.json'),JSON.stringify(seaResearch,null,2));
+    writeFileSync(join(evidence,'work8-missions-sea-before-384x512.png'),Buffer.from(seaBefore,'base64'));
+    console.log('WORK8_SEA_SOURCE_SWEEP '+JSON.stringify(seaResearch));
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline");true');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
