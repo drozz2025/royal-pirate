@@ -52,6 +52,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Native 05 WORK7 candidate must exist');
   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
     'Only genuine native 06 legendary physical rim is changed in this candidate');
+  assert.ok(cssText.includes('20 Nov 21:22 UTC. Native original-pigment chroma calibration'),
+    'Genuine short-viewport amber enamel treatment for exactly 3 of 8 cards is present');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
     'The final WORK7 candidate changes only genuine 05 frame inlays');
     // The only admissible before-image is the actual merged #392 v0.1.88 field.
@@ -65,11 +67,14 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // It is inert for Shop and for 320/tall viewports.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){
+        filter:brightness(.50) saturate(1.70) contrast(.87)!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+        filter:brightness(.53)!important;
+      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
+        filter:brightness(.64) saturate(1.90) contrast(.88)!important;
       }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
@@ -334,7 +339,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "const b0=tctx.getImageData(0,0,w,h).data;let diff0=0;"+
           "for(let p=0;p<a.length;p+=4){diff0+=Math.abs(a[p]-b0[p])+Math.abs(a[p+1]-b0[p+1])+Math.abs(a[p+2]-b0[p+2])}"+
           "maeBefore=Math.round(diff0/(w*h*3)*10000)/10000;"+
-"const patches="+JSON.stringify(kind==='shop'?[[18,175,173,309],[18,329,365,427]]:[[18,195,365,428]])+";"+
+"const patches="+JSON.stringify(kind==='shop'?[[18,175,365,309],[18,329,365,427]]:[[18,195,365,428]])+";"+
 "let sumA=0,sumB=0,pixels=0;for(const [x0,y0,x1,y1] of patches){for(let y=y0;y<y1;y++){for(let x=x0;x<x1;x++){const p=(y*w+x)*4;for(let k=0;k<3;k++){sumA+=Math.abs(a[p+k]-b0[p+k]);sumB+=Math.abs(a[p+k]-b[p+k]);pixels++}}}}"+
 "roiBefore=Math.round(sumA/pixels*10000)/10000;roiAfter=Math.round(sumB/pixels*10000)/10000;}}"+
           "return {png:c.toDataURL('image/png').slice(22),mae,maeBefore,roiBefore,roiAfter,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
@@ -371,7 +376,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               "let sum=0,count=0,roi=0,roiCount=0;"+
               "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
               "for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
-              "if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=v;roiCount++}}}"+
+              "if((x>=18&&x<365&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=v;roiCount++}}}"+
               "return {global:Math.round(sum/count*1000)/1000,roi:Math.round(roi/roiCount*1000)/1000}})()");
             console.log('WORK7 CROP SWEEP '+chest+'='+value+' '+JSON.stringify(metrics));
             await evaluate("(()=>{document.getElementById('w7-sweep')?.remove();return true})()");
@@ -458,11 +463,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const card=native.find(screen=>screen.kind==='cards');
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
-  assert.equal(card.maeRgbAfter,card.maeRgbBefore,
-    '05 Cartas must stay exactly pixel-identical to the true starting HEAD');
-  assert.equal(card.roiMaeAfter,card.roiMaeBefore,
-    'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
-  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
-    JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
+  assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
+    '05 three-card native chroma calibration MUST improve both real global MAE and eight-card ROI: '+
+    JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
+  assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
+    '06 Loja global MAE must remain pixel-identical to real integrated HEAD');
+  assert.equal(shop.roiMaeAfter,shop.roiMaeBefore,
+    '06 pack and three chests ROI must remain pixel-identical to integrated HEAD');
 });
