@@ -4351,29 +4351,15 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
-
-/* WORK7/#104 — native 384×512 only: recess, raised gilt fillet and wood-grain
- * material for the three ACTUAL chest frames, not the approved reference image
- * as a page background. The illustration remains a real cropped approved WebP,
- * the only real pack + three preview chests remain unchanged, all data/labels
- * are DOM nodes. Deep-carved inner bevel is behind the art, not an opaque
- * overlay on content. 320×568 and 390/430 tall screens are exactly untouched.
- * WORK0 sole merge/release/publish owner. approved:false; 0/8. */
+/* WORK7/#104 — physical chest-art inset, 20 Nov.
+ * Measured 13 same-frame reference vs HEAD native Chromium alternatives:
+ * competing pigment / woodgrain backgrounds regressed. Preserve genuine
+ * original WebP and gradient. Introduce a recessed gilt-edged shade BEHIND
+ * the genuine chest crop, with the frame and labels untouched. Native 384x512
+ * only; 320px correction #263 and tall devices remain unaffected.
+ * WORK0 alone merges/publishes. approved:false; 0/8. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="shop"] .w7-chest-art{
-    border-radius:8px;
-    background:
-      repeating-linear-gradient(166deg,#edbe7d0c 0 1px,transparent 1px 7px),
-      radial-gradient(ellipse 65% 53% at 50% 45%,var(--w7-glow),transparent 81%),
-      linear-gradient(180deg,#0e1a3300 20%,#050f25a3 100%);
-    box-shadow:
-      inset 0 2px 6px #020817a8,
-      inset 0 -2px 2px #f3bd6e3d;
-  }
-  .w7-screen[data-work7-screen="shop"] .w7-chest::before{
-    box-shadow:
-      inset 0 0 0 3px #071321cd,
-      inset 0 3px 7px 2px #020817c9,
-      inset 0 -2px 2px #efc17c4a;
+    box-shadow:inset 0 2px 6px #020817a8,inset 0 -2px 2px #f3bd6e3d;
   }
 }
