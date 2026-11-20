@@ -13,6 +13,8 @@ on:
       - 'WebPreview/src/harbour.tsx'
       - 'WebPreview/src/app-screens.tsx'
       - 'WebPreview/scripts/work0-true-basehead-*'
+      - 'WebPreview/scripts/work0-native-regression-gate.mjs'
+      - 'WebPreview/tests/work0-native-regression-gate.test.ts'
       - '.github/workflows/work0-true-basehead.yml'
   workflow_dispatch:
 permissions:
