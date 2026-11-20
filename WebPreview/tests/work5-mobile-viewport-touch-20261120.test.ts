@@ -96,7 +96,7 @@ test('WORK5: Chromium emulated touchscreen opens eight approved views, preserves
         'const e=document.querySelector('+JSON.stringify(selector)+');if(!e)return null;'+
         'const r=e.getBoundingClientRect(),x=Math.round(r.left+r.width/2),y=Math.round(r.top+r.height/2);'+
         'const top=document.elementFromPoint(x,y);'+
-        'return{x,y,width:r.width,height:r.height,disabled:!!e.disabled,visible:r.width>0&&r.height>0&&x>=0&&x<innerWidth&&y>=0&&y<innerHeight,hit:top===e||e.contains(top)};'+
+        'return{x,y,width:r.width,height:r.height,disabled:!!e.disabled,visible:r.width>0&&r.height>0&&x>=0&&x<innerWidth&&y>=0&&y<innerHeight,hit:top===e||e.contains(top),blocker:top?.tagName+"."+String(top?.className||"").slice(0,100)};'+
         '})()');
       assert.ok(point,'Missing touch target: '+selector);
       assert.equal(point.disabled,false,'Disabled touch target: '+selector);
@@ -313,6 +313,11 @@ test('WORK5: Chromium emulated touchscreen opens eight approved views, preserves
       '.find(b=>b.textContent?.includes("ABRIR MELHORIAS"));'+
       'if(el)el.setAttribute("data-work5-compact-forge","1");return !!el})()');
     assert.ok(hasCompactForge,'Frota has no Forja control in compact portrait');
+    // Deep scroll content may be below the fixed five-button dock at 512px.
+    // Reproduce a normal user's scroll before calling an unreachable CTA a dead button.
+    await evalInPage('document.querySelector("[data-work5-compact-forge=\\\"1\\\"]")'+
+      '?.scrollIntoView({block:"center",inline:"nearest"});true');
+    await pause(300);
     await tap('[data-work5-compact-forge="1"]');
     await auditCompactSheet('Forja');
     await back();
