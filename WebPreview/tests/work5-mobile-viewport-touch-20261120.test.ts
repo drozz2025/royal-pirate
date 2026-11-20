@@ -153,6 +153,33 @@ test('WORK5: Chromium emulated touchscreen opens eight approved views, preserves
     await opened('Missões');
     await back();
 
+    // All six side-menu actions must lead to the matching real sheet.
+    // Earlier browser coverage only tested Missões; this checks every other
+    // left/right action through emulated touchscreen events (no DOM click mocks).
+    const portalRoutes = [
+      ['.harbour-flank-left button:nth-child(1)', 'Batalha'],
+      ['.harbour-flank-left button:nth-child(2)', 'Baús'],
+      ['.harbour-flank-left button:nth-child(3)', 'Eventos'],
+      ['.harbour-flank-right button:nth-child(1)', 'Recompensas'],
+      ['.harbour-flank-right button:nth-child(3)', 'Ofertas'],
+    ] as const;
+    for (const [selector,title] of portalRoutes) {
+      await tap('.harbour-screen '+selector);
+      await opened(title);
+      const sheet = await evalInPage('(()=>{const d=document.querySelector(".app-sheet");'+
+        'const title=d?.querySelector("#app-screen-title");return{'+
+        'labelledBy:d?.getAttribute("aria-labelledby"),titleId:title?.id,'+
+        'visible:!!title&&title.getClientRects().length>0,'+
+        'dockButtons:d?.querySelectorAll(".harbour-nav-item").length,'+
+        'activeDialogs:[...document.querySelectorAll("[role=dialog]")].filter(x=>x.getClientRects().length>0).length'+
+        '}})()');
+      assert.equal(sheet.labelledBy,sheet.titleId,'Dialog heading must be linked on '+title);
+      assert.equal(sheet.visible,true,'Dialog must expose its visible title: '+title);
+      assert.equal(sheet.dockButtons,5,'Bottom menu must remain intact: '+title);
+      assert.equal(sheet.activeDialogs,1,'Only the active sheet should be exposed: '+title);
+      await back();
+    }
+
     // Browser-backed persistence: edit in React, confirm storage, reload and verify the real Porto.
     await tap('.harbour-screen .harbour-profile');
     await opened('O meu perfil');
