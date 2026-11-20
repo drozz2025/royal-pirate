@@ -24,7 +24,7 @@ test('WORK6 #104: rolling 3D battle sea stays gated away from approved Porto',()
     'use broad swells instead of obsolete high-frequency foam');
   assert.match(fragment,/float crestMask=ridge\*fragmented/,
     'broken wave ridges must govern sparse sea foam');
-  assert.match(fragment,/deep\*=1\.-\.09\*\(1\.-ridge\)/,
+  assert.match(fragment,/deep\*=1\.-\.10\*\(1\.-ridge\)/,
     'the new wave ridge must shade blue troughs');
   assert.match(fragment,/foam=clamp\(foam,0\.,\.64\)/,
     'the richer battle-only foam remains bounded at 0.64');
