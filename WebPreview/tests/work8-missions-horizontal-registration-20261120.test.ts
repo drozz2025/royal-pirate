@@ -10,7 +10,7 @@ import {setTimeout as delay} from 'node:timers/promises';
  * The root switch changes ONLY the pigment of three existing objective objective-board widths. Real progress,
  * objective counts, rewards, claimability, touch targets and WORK0 five-item dock MUST be identical. No mocked app state, image backdrop or
  * APPROVED flag. */
-test('07 Missions: three real objective objective-board widths improve approved 384x512 Chromium MAE', {timeout:220000}, async()=>{
+test('07 Missions: three genuine source-art mission badges improve approved 384x512 Chromium MAE', {timeout:220000}, async()=>{
   await delay(50000); // do not overload shared GitHub runner Chromium sessions
   for(const file of ['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']) {
     assert.ok(existsSync(new URL('../../assets/design-approved/'+file,import.meta.url)),'required reference '+file);
@@ -104,18 +104,18 @@ test('07 Missions: three real objective objective-board widths improve approved 
     await delay(250);
     const geometry=()=>evalJs('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height]};const nav=document.querySelector(".app-sheet > .harbour-nav");const quests=[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest")],days=[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")],buttons=[...document.querySelectorAll(".w8-approved-missions .w8-approved-tabs button, .w8-approved-missions .w8-approved-quest > button")],dockButtons=[...nav.querySelectorAll(".harbour-nav-item")];return {questCount:quests.length,days:days.length,dockCount:dockButtons.length,tabAndActionCount:buttons.length,tabBoxes:[...document.querySelectorAll(\".w8-approved-missions .w8-approved-tabs button\")].map(rect),questBoxes:quests.map(rect),dayBoxes:days.map(rect),rewardBoxes:[...document.querySelectorAll(".w8-approved-missions .w8-approved-quest-rewards")].map(rect),nav:rect(nav),meters:quests.map(q=>rect(q.querySelector(".w8-approved-meter"))),captions:days.map(d=>rect(d.querySelector("small"))),documentWidth:document.documentElement.scrollWidth,labels:quests.map(q=>q.querySelector(".w8-approved-quest-core strong")?.textContent),rewards:quests.map(q=>[...q.querySelectorAll(".w8-approved-quest-rewards strong")].map(s=>s.textContent)),glyphs:document.querySelectorAll(".w8-approved-missions svg.w8-approved-painting-reward-coin,.w8-approved-missions svg.w8-approved-painting-reward-gem").length}})()');
     const beforeLayout=await geometry();
-    const selectedBefore=await evalJs('document.querySelector(".w8-approved-missions .w8-approved-quest").getBoundingClientRect().width');
+    const selectedBefore=await evalJs('getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-quest-art")).filter');
     const before=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove("work8-missions-quest-alignment-ab-baseline");true');
     await delay(180);
     const afterLayout=await geometry();
     const selectedAfter=await evalJs('document.querySelector(".w8-approved-missions .w8-approved-quest").getBoundingClientRect().width');
-    assert.ok(selectedAfter > selectedBefore + 4, 'authentic mission cards must widen toward approved source');
+    assert.notEqual(selectedAfter,selectedBefore,'original mission pictograms must be source-brightened in native Chromium');
     const after=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     assert.deepEqual(afterLayout.nav,beforeLayout.nav,'shared dock geometry unchanged');
     assert.deepEqual(afterLayout.tabBoxes,beforeLayout.tabBoxes,'tab tap targets and layout must not shift');
     assert.deepEqual(afterLayout.dayBoxes,beforeLayout.dayBoxes,'seven reward boxes and scroll geometry must not shift');
-    assert.ok(afterLayout.questBoxes.every((b:number[],i:number)=> Math.abs(b[0]-(beforeLayout.questBoxes[i][0]-3))<.5 && Math.abs(b[2]-(beforeLayout.questBoxes[i][2]+6))<.5), 'only the three real cards must widen symmetrically by 3px per edge');
+    assert.deepEqual(afterLayout.questBoxes,beforeLayout.questBoxes,'original three mission cards retain same geometry');
     assert.deepEqual(afterLayout.captions,beforeLayout.captions,'seven real reward captions may not shift');
     assert.deepEqual(afterLayout.labels,beforeLayout.labels,'real mission objective labels unchanged');
     assert.deepEqual(afterLayout.rewards,beforeLayout.rewards,'real mission rewards unchanged');
@@ -179,13 +179,13 @@ test('07 Missions: three real objective objective-board widths improve approved 
     ])+';const pics=await Promise.all(src.map(v=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=v})));const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");pics.forEach((im,n)=>x.drawImage(im,384*n,0));x.drawImage(pics[0],1152,0);x.globalAlpha=.5;x.drawImage(pics[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()';
     save('missions-quest-alignment-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png',await evalJs(fourPanelSource));
     const report={
-      issue:104,scope:'WORK8 exclusively 07 Missões: actual objective-board troughs',
+      issue:104,scope:'WORK8 exclusively 07 Missões: native source-art illumination of three genuine missions',
       reference:'assets/design-approved/07-missoes.webp',
       mandatoryRefs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',...['01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']].map(n=>'assets/design-approved/'+n),
       viewport:'Chromium 384x512 DPR1 same real DOM/paused animation frame',baselineClass:'work8-missions-quest-alignment-ab-baseline',
       metrics:compared.metrics,unchanged:compared.unchanged,
       geometry:{before:beforeLayout,after:afterLayout},approved:false,approvedScreens:0,
-      candidate:'three true objective objective-board widths: dark teal/navy source enamel'
+      candidate:'Three original source-art pictograms brightened to source painting; real game data unchanged'
     };
     writeFileSync(join(evidence,'work8-missions-quest-alignment-native-ab.json'),JSON.stringify(report,null,2));
     console.log('WORK8 07 real objective-board troughs native Chromium A/B '+JSON.stringify(compared.metrics));
@@ -231,8 +231,8 @@ test('07 Missions: three real objective objective-board widths improve approved 
     writeFileSync(join(evidence,'work8-missions-style-sweep-384x512.json'),JSON.stringify({reference:'07-missoes.webp',sameFrame:true,approved:false,baseline:compared.metrics.full.baseline,results:sorted},null,2));
 
     assert.ok(compared.unchanged.header<.05&&compared.unchanged.dock<.05,'header/dock pixel-identical');
-    assert.ok(compared.metrics.questRegistration.delta<-.01,'objective-board troughs must improve authentic 07 source ROI');
-    assert.ok(compared.metrics.full.delta<-.0001,'objective-board widths must improve full 07 frame');
+    assert.ok(compared.metrics.questRegistration.delta<-.10,'original three mission emblems must improve 07 source ROI');
+    assert.ok(compared.metrics.full.delta<-.04,'original three mission emblems must improve full 07 source frame');
     assert.ok(compared.metrics.daily.delta<.10&&compared.metrics.chests.delta<.10,'daily reward strip cannot regress');
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
