@@ -5485,3 +5485,18 @@
     visibility:hidden;
   }
 }
+
+
+/* WORK8 / issue #104 — 07 MISSÕES ONLY, inactive-tab enamel contrast.
+   The approved 384x512 reference separates DIÁRIAS (selected) from the two
+   inactive navy plaques. Tint only the EXISTING inactive mission buttons,
+   retaining the blue selected CTA, accessible labels, their touch rectangles,
+   daily objectives, seven real reward slots, Ranking and shared WORK0 dock.
+   Root opt-out yields a TRUE native, paused, same-DOM BEFORE/RENDER A/B.
+   No new gameplay or fabricated values. approved:false / 0-8. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-inactive-tab-contrast-ab-baseline)
+  .w8-approved-missions > .w8-approved-tabs button:not([aria-pressed=true]) {
+    filter:brightness(.80);
+  }
+}
