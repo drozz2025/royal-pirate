@@ -4351,3 +4351,19 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 20 Nov 14:28 UTC: native Captain velvet/enamel depth.
+ * New, isolated 384×512 material pass from the ACTUAL WORK0
+ * 10830c86 HEAD. Rebalance only the 06 Captain-pack purple/navy pigment,
+ * preserving the one genuine approved chest crop, 3 honest unavailable
+ * chests, eight real 05 concept cards, live labels and untouched layout.
+ * No screenshot backing, fake prices, dock/shell change or 320px override.
+ * A/B must restore the identical HEAD background in paused Chromium.
+ * approved:false (0/8); WORK0 alone may merge, release or publish. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    background:
+      radial-gradient(ellipse 66% 95% at 29% 42%,#ad216b55,transparent 88%),
+      linear-gradient(112deg,#310852 0%,#29065d 49%,#090848 100%);
+  }
+}
