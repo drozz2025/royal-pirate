@@ -65,3 +65,14 @@
  .shipyard-parts-tools{width:100%;justify-content:space-between;gap:4px}
  .shipyard-parts-tools button{font-size:10px;min-height:36px;padding:4px 2px}
 }
+
+/* WORK 2: actual 3D camera angles, not static images or battle camera changes. */
+.shipyard-camera-presets{pointer-events:auto;align-self:center;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+ gap:4px;width:min(540px,calc(100% - 20px));margin:0 auto 8px;padding:4px;
+ border:1px solid #dcb8759c;border-radius:12px;background:#082d4de8;box-shadow:0 4px 14px #05182e66}
+.shipyard-camera-presets button{min-width:0;min-height:42px;padding:7px 2px;border:1px solid #537b9b;border-radius:8px;
+ color:#ffe7ae;background:#143b5b;font:900 clamp(9px,2.5vw,12px) 'Barlow Condensed',sans-serif;letter-spacing:.2px;text-shadow:none}
+.shipyard-camera-presets button.active{background:linear-gradient(#ffe1a0,#ae7734);border-color:#fff0bd;color:#102c45}
+.shipyard-camera-presets button:focus-visible{outline:3px solid #fff8db;outline-offset:2px}
+.shipyard-camera-presets button:active{transform:translateY(1px)}
+@media(max-height:720px){.shipyard-camera-presets{margin-bottom:4px}.shipyard-camera-presets button{min-height:36px}}

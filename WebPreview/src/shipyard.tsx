@@ -3,11 +3,14 @@ import {
   DEFAULT_MODULES, SHIP_CLASSES, SHIP_MODULES, SLOTS, progressionTier, equipAccess, highestUnlockedPreviewModules,
   mayEquip, validateOwnedFleetForPlayer, type ModuleSlot, type ShipClass, type ShipLoadout, type ResolvedShipLoadout
 } from './ship-modules';
+import { SHIPYARD_VIEWS, type ShipyardView } from './shipyard-camera';
 
 /** Optional Work 4 interface: never infer entitlements from demo preview progress. */
 type ShipyardProps={
  onClose:()=>void;
  onPreview:(loadout:ShipLoadout)=>void;
+ /** Optional isolated preview camera; no battle camera or persistence involved. */
+ onViewChange?:(view:ShipyardView)=>void;
  ownedModuleIds?:ReadonlySet<string>;
  /** Independently verified ownership of the ship class/hull, not individual modules. */
  ownedShipClasses?:ReadonlySet<ShipClass>;
@@ -22,10 +25,11 @@ const SLOT_NAMES:Record<ModuleSlot,string>={
 
 /** Interactive ship construction sandbox. Nothing here is purchased, owned,
  * persisted, awarded or injected into combat; only original 3D parts are previewed. */
-export function Shipyard({onClose,onPreview,ownedModuleIds,ownedShipClasses,verifiedPlayerLevel,onEquip}:ShipyardProps){
+export function Shipyard({onClose,onPreview,onViewChange,ownedModuleIds,ownedShipClasses,verifiedPlayerLevel,onEquip}:ShipyardProps){
  const [shipClass,setShipClass]=useState<ShipClass>('fighter');
  const [level,setLevel]=useState(1);
  const [slot,setSlot]=useState<ModuleSlot>('hull');
+ const [cameraView,setCameraView]=useState<ShipyardView>('quarter');
  // Preserve sandbox designs independently per hull. A class change must not
  // silently copy its ornaments, sails and guns to another ship.
  // Preview-only React state: never a saved fleet inventory.
@@ -83,6 +87,11 @@ export function Shipyard({onClose,onPreview,ownedModuleIds,ownedShipClasses,veri
    <small>{SHIP_CLASSES[shipClass].description} · {progressionTier(level).toUpperCase()} TIER · {ownedShipClasses?.has(shipClass)?'VERIFIED FLEET HULL':'HULL PREVIEW ONLY'}</small>
   </div>
   <div className="shipyard-orbit-hint" aria-hidden="true">↔ DRAG TO ROTATE · PINCH TO ZOOM</div>
+  {onViewChange&&<div className="shipyard-camera-presets" role="group" aria-label="3D ship viewing angle">
+   {SHIPYARD_VIEWS.map(view=><button type="button" key={view.id} aria-pressed={cameraView===view.id}
+    className={cameraView===view.id?'active':''} onClick={()=>{setCameraView(view.id);onViewChange(view.id);}}
+    aria-label={'Show '+view.label+' view of the preview ship'}>{view.label}</button>)}
+  </div>}
   <div className="shipyard-panel">
    <div className="shipyard-level">
     <label htmlFor="shipyard-level">DEMO PREVIEW LEVEL <strong>{level} / 20</strong></label>
