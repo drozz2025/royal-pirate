@@ -3094,3 +3094,16 @@
     border-color:#725a46;
   }
 }
+
+/* WORK4/#104 — 20 Nov: remove the SECOND artificial sea plane on native Frota.
+   The approved 03 crop plus the approved water-only bridge already supply
+   genuine coast/foam. The TropicalBackdrop path group paints an independent
+   flat teal water shape underneath them: that creates a visible hard junction.
+   Remove this secondary sea PLANE, not the coastal silhouettes, ship or source
+   image. 384×512 only. Other breakpoints and WORK0 surface remain untouched.
+   This is a reversible A/B candidate until ROI/MAE Chromium approval. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet .w4-tropical-art .w4-r03-coastal-depth {
+    opacity:0!important;
+  }
+}
