@@ -118,7 +118,7 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
   await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const e=document.querySelector('svg.w4-reference-ship image');const src=e?.getAttribute('href')||e?.href?.baseVal;if(!src||!(await fetch(src)).ok)throw Error('approved fleet source missing');return true;})()");
   // TRUE old-HEAD baseline: restore the release's native procedural stage
   // underpaint only. Keep identical sources, state, compositor and frame.
-  const beforeStyle=await evaluate("(()=>{const s=document.createElement('style');s.id='work4-native-original-underpaint';s.textContent="+JSON.stringify('.w4-fleet #w4-fleet-panel > .w4-harbour-stage{background:radial-gradient(ellipse 50% 22% at 46% 12%,#e3fcffbb,transparent 95%),linear-gradient(180deg,#0877c1 0%,#109bc7 39%,#10b2bf 53%,#095989 83%,#052a4d)!important;')+"}';document.head.append(s);return true;})()");
+  const beforeStyle=await evaluate("(()=>{const s=document.createElement('style');s.id='work4-native-original-underpaint';s.textContent="+JSON.stringify('.w4-fleet #w4-fleet-panel > .w4-harbour-stage{background:radial-gradient(ellipse 50% 22% at 46% 12%,#e3fcffbb,transparent 95%),linear-gradient(180deg,#0877c1 0%,#109bc7 39%,#10b2bf 53%,#095989 83%,#052a4d)!important;}')+";document.head.append(s);return true;})()");
   assert.equal(beforeStyle,true);
   await delay(180);
   const before=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
