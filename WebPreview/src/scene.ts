@@ -692,6 +692,10 @@ export class OceanScene {
     this.controls.maxPolarAngle=pose.showBattery?1.50:1.28;
     // Keep the real gunner's eye aligned behind the single cannon on phones.
     this.controls.enableRotate=!pose.showBattery;
+    // First-person touch aims the actual cannon; Safari pinch/trackpad zoom
+    // must not shift the fixed sightline or detach the shot from the bore.
+    // Desktop orbit and Porto's existing ship-only gesture policy remain intact.
+    this.controls.enableZoom=!pose.showBattery;
     this.battleBattery.visible=pose.showBattery;
     this.battleBattery.position.x=pose.batteryOffsetX;
     this.battleBattery.position.z=pose.batteryOffsetZ;
