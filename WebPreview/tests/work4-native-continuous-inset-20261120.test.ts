@@ -37,7 +37,7 @@ test('WORK4 continuous live inset is source-scoped, not a second ship or fake wa
 });
 
 test('WORK4 approved coastal alpha easing is native-only, with no artificial image or gameplay edits',()=>{
-  const block=css.split('21 Nov, real 384×512 coastal photo seam')[1]||'';
+  const block=(css.split('21 Nov, real 384×512 coastal photo seam')[1]||'').split('/* WORK4/#104 — composite Forge cannon/level-plaque edge')[0];
   assert.match(block,/@media \(width:384px\) and \(height:512px\)/);
   assert.match(block,/background:linear-gradient\(90deg,transparent 0%,#082c4820 18%,#082c48b0 40%,#082c48de 100%\)/);
   assert.doesNotMatch(block,/(?:\.app-|\.harbour-nav|\.w4-reference-sea|\.w4-reference-ship|\.w4-cannon-art|\.w4-forge)/);
