@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline","work8-missions-quest-label-ink-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1888,6 +1888,75 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(realDayDelta.chests<.02 && Math.abs(realDayDelta.quest)<.02 &&
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
+
+
+    /* WORK8/#104 — production quest-label ink, real 07 only. Both native
+       captures use the IDENTICAL live mission DOM, player state and paused
+       Chromium frame. The opt-out class disables only this PR's text paint. */
+    const questInkFlag='work8-missions-quest-label-ink-ab-baseline';
+    const questHeadingSelector='.w8-approved-missions .w8-approved-quest-core > strong';
+    const questHeadingRects=await evalJs('(()=>[...document.querySelectorAll('+JSON.stringify(questHeadingSelector)+')].map(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}))()');
+    const questMissionState=()=>evalJs('(()=>({titles:[...document.querySelectorAll(".w8-approved-quest-core > strong")].map(e=>e.textContent),objectives:document.querySelectorAll(".w8-approved-quest").length,rewards:document.querySelectorAll(".w8-approved-days li").length,nav:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length}))()');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(questInkFlag)+');document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));true');
+    await delay(160);
+    const questInkBeforeGeometry=await readLayout();
+    const questInkBeforeState=await questMissionState();
+    const questInkBeforeCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(questHeadingSelector)+')).filter');
+    const questInkBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(questInkFlag)+');true');
+    await delay(160);
+    const questInkRenderGeometry=await readLayout();
+    const questInkRenderState=await questMissionState();
+    const questInkRenderCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(questHeadingSelector)+')).filter');
+    const questInkRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const questInkEval='(async()=>{'+
+      'const u='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+questInkBefore,'data:image/png;base64,'+questInkRender])+';'+
+      'const imgs=await Promise.all(u.map(s=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=bad;i.src=s})));'+
+      'if(imgs.some(i=>i.width!==384||i.height!==512))throw Error("Native 384x512 required");'+
+      'const rasters=imgs.map(i=>{const c=document.createElement("canvas");c.width=384;c.height=512;const x=c.getContext("2d");x.drawImage(i,0,0);return x.getImageData(0,0,384,512).data});'+
+      'const labels='+JSON.stringify(questHeadingRects)+';'+
+      'const rois={full:[[0,0,384,512]],quest:[[12,155,372,321]],labels,daily:[[13,325,373,436]],header:[[0,0,384,70]],dock:[[0,451,384,512]]};'+
+      'const mae=(r,b,areas)=>{let sum=0,count=0;for(const box of areas){const x0=Math.max(0,Math.floor(box[0])),y0=Math.max(0,Math.floor(box[1])),x1=Math.min(384,Math.ceil(box[2])),y1=Math.min(512,Math.ceil(box[3]));for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){const j=4*(384*y+x);for(let k=0;k<3;k++){sum+=Math.abs(r[j+k]-b[j+k]);count++}}}return sum/Math.max(1,count)};'+
+      'const out={};for(const [k,rs] of Object.entries(rois)){const before=mae(rasters[0],rasters[1],rs),render=mae(rasters[0],rasters[2],rs);out[k]={before,render,delta:render-before,renderDeltaFromBefore:mae(rasters[1],rasters[2],rs)}}'+
+      'const c=document.createElement("canvas");c.width=1536;c.height=512;const ctx=c.getContext("2d");imgs.forEach((im,n)=>ctx.drawImage(im,384*n,0));ctx.drawImage(imgs[0],1152,0);ctx.globalAlpha=.5;ctx.drawImage(imgs[2],1152,0);'+
+      'return {metrics:out,montage:c.toDataURL("image/png").split(",")[1]}})()';
+    const questInkMeasurements=await evalJs(questInkEval);
+    writeFileSync(join(evidence,'work8-missions-quest-label-original-before-render-overlay-384x512.png'),Buffer.from(questInkMeasurements.montage,'base64'));
+    writeFileSync(join(evidence,'work8-missions-quest-label-before-384x512.png'),Buffer.from(questInkBefore,'base64'));
+    writeFileSync(join(evidence,'work8-missions-quest-label-render-384x512.png'),Buffer.from(questInkRender,'base64'));
+    const questInkReport={
+      issue:104,screen:'07 Missões',scope:'Three genuine objective heading text only',
+      baseHead:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
+      approvedReferences:[
+        '00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'
+      ].map(f=>'assets/design-approved/'+f),
+      viewport:{width:384,height:512,dpr:1},
+      sameScene:true,sameDOM:true,pausedAnimations:true,
+      labelRects:questHeadingRects,beforeCss:questInkBeforeCss,renderCss:questInkRenderCss,
+      metrics:questInkMeasurements.metrics,
+      geometryBefore:questInkBeforeGeometry,geometryRender:questInkRenderGeometry,
+      stateBefore:questInkBeforeState,stateRender:questInkRenderState,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-quest-label-native-ab.json'),JSON.stringify(questInkReport,null,2));
+    console.log('WORK8_MISSIONS_QUEST_LABEL_NATIVE_AB '+JSON.stringify(questInkReport));
+    assert.equal(questHeadingRects.length,3,'exactly three real mission labels');
+    assert.notEqual(questInkBeforeCss,questInkRenderCss,'the production text actually changes');
+    assert.deepEqual(questInkBeforeGeometry,questInkRenderGeometry,'no mission/chest/dock geometry movement');
+    assert.deepEqual(questInkBeforeState,questInkRenderState,'no fabricated player or mission states');
+    assert.equal(questInkRenderState.objectives,3);
+    assert.equal(questInkRenderState.rewards,7);
+    assert.equal(questInkRenderState.nav,5);
+    assert.ok(questInkRenderGeometry.dayContent.every(v=>!v[0]||v[0].bottom<=questInkRenderGeometry.nav.top+2),
+      'all seven actual chests above the WORK0 dock');
+    assert.ok(questInkMeasurements.metrics.labels.delta<-.04 && questInkMeasurements.metrics.full.delta<-.001,
+      'native text ROI and full screenshot must both improve vs approved art');
+    assert.ok(Math.abs(questInkMeasurements.metrics.daily.delta)<.01 &&
+      Math.abs(questInkMeasurements.metrics.dock.delta)<.01 &&
+      Math.abs(questInkMeasurements.metrics.header.delta)<.01,
+      'the seven rewards, WORK0 header and five-item dock do not regress');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
