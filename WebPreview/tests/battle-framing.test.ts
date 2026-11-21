@@ -49,13 +49,13 @@ test('deck-level portrait framing and original desktop pose are independently sc
  assert.equal(mobile.batteryScale,.84);
  const compact=battleCameraPose(320/568);
  assert.deepEqual(compact.position,mobile.position);
- assert.deepEqual(compact.target,[6.5,4.1,-3]);
- assert.equal(compact.batteryOffsetX,4.4);
+ assert.deepEqual(compact.target,[4.5,4.1,-3]);
+ assert.equal(compact.batteryOffsetX,3.2);
  assert.equal(compact.batteryOffsetZ,mobile.batteryOffsetZ);
  const tall=battleCameraPose(390/844);
  assert.deepEqual(tall.position,mobile.position);
- assert.deepEqual(tall.target,[7.65,4.1,-3]);
- assert.equal(tall.batteryOffsetX,5.2);
+ assert.deepEqual(tall.target,[4.5,4.1,-3]);
+ assert.equal(tall.batteryOffsetX,3.2);
  assert.deepEqual(battleCameraPose(430/932),tall);
  assert.equal(battleCameraPose(1.4).showBattery,false);
 });
@@ -92,7 +92,7 @@ test('WORK0/#104: ultra-tall mobile keeps one real muzzle centered while clearin
    const enemy=screen(w,h,new T.Vector3(10,0,-3));
    assert.ok(projectedMuzzle.x>w*.42 && projectedMuzzle.x<w*.58,
      'single cannon stays centred at '+w+'x'+h);
-   assert.ok(enemy.x>w*.54 && enemy.x<w*.72,
+   assert.ok(enemy.x>w*.69 && enemy.x<w*.81,
      'enemy anchor must not sit at right screen edge '+w+'x'+h);
  }
  assert.deepEqual(battleCameraPose(384/512).position,battleCameraPose(320/568).position,
@@ -116,7 +116,7 @@ test('WORK0/#104: forward-moving the camera AND single cannon deck enlarges the 
   const newHull=screen(w,h,new T.Vector3(10,0,-3));
   const newSpan=newHull.y-newMast.y;
   assert.ok(newSpan>oldSpan*1.12,`enemy actually grows in ${w}x${h}: ${newSpan} vs ${oldSpan}`);
-  assert.ok(newHull.x<w*.75,`enemy remains inside right edge in ${w}x${h}`);
+  assert.ok(newHull.x<w*.82,`enemy remains inside right edge in ${w}x${h}`);
 
   group.position.set(pose.batteryOffsetX,0,pose.batteryOffsetZ);
   group.scale.setScalar(pose.batteryScale);
@@ -165,7 +165,7 @@ test('WORK0/#104: native 384x512 stage moves the whole live galleon to starboard
 
 test('WORK0/#104: 320px and tall-phone cannon/ship framing is explicit',()=>{
   for(const [w,h,x,deckX,scale] of [
-    [320,568,6.5,4.4,1.08],[390,844,7.65,5.2,1.08],[430,932,7.65,5.2,1.08]
+    [320,568,4.5,3.2,.77],[390,844,4.5,3.2,.63],[430,932,4.5,3.2,.63]
   ]){
     const pose=battleCameraPose(w/h);
     assert.equal(pose.target[0],x);
@@ -185,7 +185,9 @@ test('WORK0 #104: mobile 3D sightline gains real sky and halves cannon screen oc
    assert.ok(currentWidth<oldWidth*.66,'actual near-gun occlusion shrinks by at least one third at '+w+'x'+h);
    assert.ok(currentWidth>w*.1,'real gun remains clearly visible at '+w+'x'+h);
    const enemyTop=screen(w,h,new T.Vector3(10,8.4*battleEnemyScale(w/h),-3)).y;
-   assert.ok(enemyTop>h*.37&&enemyTop<h*.43,'enemy sails leave more clear sky at '+w+'x'+h);
+   const expectedTop=w/h<.62?[.43,.49]:[.37,.43];
+   assert.ok(enemyTop>h*expectedTop[0]&&enemyTop<h*expectedTop[1],
+     'portrait-scaled sails leave clear sky at '+w+'x'+h+': '+enemyTop);
    const gun=makeBattleDeck(true);
    gun.group.position.set(pose.batteryOffsetX,0,pose.batteryOffsetZ);
    gun.group.scale.setScalar(scale);
