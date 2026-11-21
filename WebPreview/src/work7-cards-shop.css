@@ -4355,7 +4355,8 @@
 
 /* WORK7/#104 21 Nov 2026: genuine source-art warmer ink registration.
  * One original approved 05 portrait only (card 5), 384x512 native.
- * Candidate art on card 7 was worse; reverted after 24-control sweep.\n * Keep actual 4x2 eight cards, the full 06 shop, all live PRÉVIA/EM BREVE,
+ * Candidate art on card 7 was worse; reverted after 24-control sweep.
+ * Keep actual 4x2 eight cards, the full 06 shop, all live PRÉVIA/EM BREVE,
  * genuine economy, tap targets, dock and 320/tall layouts unchanged.
  * CSS uses original approved WEBP crops; never a screenshot background.
  * This is an unapproved A/B candidate: approved:false, 0/8.
@@ -4369,13 +4370,15 @@
 /* WORK7/#104 21 Nov: native 05 approved-grid charcoal depth.
  * One compact native painted backdrop behind REAL 4x2 card DOM, not a
  * screenshot, without changing images, their positions or touch targets.
+ * Chosen from 11 frozen-frame Chromium underlay sweep variants: mix-30
+ * protects both native full-frame MAE and original eight-card ROI versus HEAD.
  * Measured against exact base v0.1.117, 384x512; 320px remains untouched.
  * No shop, Porto, dock, global header or economy changes.
  * approved:false; 0/8 until human review and WORK0 integration. */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
     background:
-      radial-gradient(ellipse 85% 60% at 50% 18%,#17243540,transparent 84%),
-      linear-gradient(180deg,#121927 0%,#081321 60%,#0c1525 100%);
+      radial-gradient(ellipse 85% 60% at 50% 18%,#1c2a3a3d,transparent 84%),
+      linear-gradient(180deg,#121a28 0%,#091422 60%,#0d1524 100%);
   }
 }
