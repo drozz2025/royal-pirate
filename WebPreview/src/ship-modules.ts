@@ -7,6 +7,7 @@ import { createPreviewBowAnchors } from './ship-bow-anchors';
 import { createPreviewDeckRopeCoils } from './ship-deck-rope-coils';
 import { createPreviewDeckLongboats } from './ship-deck-longboats';
 import { createPreviewBoardingLadders } from './ship-boarding-ladders';
+import { createPreviewDeckShotRacks } from './ship-deck-shot-racks';
 import { createPreviewDeckHatches } from './ship-deck-hatches';
 import { createPreviewShipBell } from './ship-deck-bell';
 import { createPreviewCompassBinnacle } from './ship-deck-compass';
@@ -321,6 +322,8 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // Original rope-and-timber boarding ladders are a 3D preview rigging fitting.
  // Module tiers affect appearance only; they cannot grant a ladder or a ship.
  additions.add(createPreviewBoardingLadders(config.shipClass,config.modules.masts as PreviewMastModule));
+ // Stacked cannon-shot display racks are visual-only; they do not give player ammo.
+ additions.add(createPreviewDeckShotRacks(config.shipClass,config.modules.cannons as PreviewCannonModule));
  // Raised deck hatches are two GPU-batched preview meshes keyed by cabin tier.
  // Their geometry never belongs to the battle ship or persistent fleet.
  additions.add(createPreviewDeckHatches(config.shipClass,config.modules.cabin as PreviewCabinModule));
