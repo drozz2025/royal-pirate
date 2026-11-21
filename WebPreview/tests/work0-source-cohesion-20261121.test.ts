@@ -38,3 +38,19 @@ test('WORK0: Missions real SVG chests 1-3 treated without touching player progre
   assert.match(candidate, /filter:brightness\(\.78\)/);
   assert.doesNotMatch(candidate, /\.harbour-nav|\.w8-ranking|pointer-events:\s*none/);
 });
+
+
+test('WORK0: real source chests 4–7 retain explicit old-vs-new A/B and no dock edits', () => {
+  const css=source('work8-panels.css');
+  const marker=css.indexOf('WORK0/#104: candidate from independently tested WORK8 #764');
+  assert.ok(marker>=0,'candidate attribution and draft status');
+  const live=css.indexOf(':root:not(.work8-missions-chest-art-ink-ab-baseline)');
+  assert.ok(live>=0,'production treatment scoped by root class');
+  const candidate=css.slice(live,css.indexOf('/*',live));
+  assert.match(candidate,/li:nth-child\\(n\\+4\\)/);
+  assert.match(candidate,/brightness\\(1\\.50\\)/);
+  const baseline=css.slice(marker);
+  assert.match(baseline,/:root\\.work8-missions-chest-art-ink-ab-baseline/);
+  assert.match(baseline,/brightness\\(1\\.24\\)/);
+  assert.doesNotMatch(baseline,/\\.harbour-nav|\\.w8-ranking|pointer-events:\\s*none|position:/);
+});
