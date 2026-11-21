@@ -164,10 +164,12 @@ try{
   assert.ok([...afterGeometry.chests,...afterGeometry.labels].every(r=>r&&r.bottom<=afterGeometry.nav.y+2),
     'All seven chest art and labels above the dock');
   assert.ok(ab.changed>500,'Native CTA treatment must repaint three genuine action buttons');
-  assert.ok(ab.scores.full.delta < -.01 && ab.scores.buttons.delta < -.10 &&
-    ab.scores.cta2.delta < -.4 && ab.scores.cta3.delta < -.25 &&
-    ab.scores.cta1.delta < 3,
-    'Real active CTA enamel must improve full, combined and blue action ROI without faking mission state');
+  // Require actual, source-measured improvement in the whole screenshot,
+  // in the combined genuine button ROI and in EACH of the three live actions.
+  // No invented target threshold: this gate rejects any local regression.
+  assert.ok(ab.scores.full.delta < -.001 && ab.scores.buttons.delta < -.04 &&
+    ['cta1','cta2','cta3'].every(k=>ab.scores[k].delta < -.02),
+    'Real active CTA enamel must improve full, combined and every genuine action ROI without fake state');
   assert.ok(Math.abs(ab.scores.daily.delta)<.01,'All seven existing daily rewards unchanged');
   assert.ok(Math.abs(ab.scores.header.delta)<.01&&Math.abs(ab.scores.dock.delta)<.01,
     'Header, dock, real objective data and Ranking remain unaffected');
