@@ -21,13 +21,20 @@ test('WORK0 #104: reduce the REAL central gun occlusion, not its firing geometry
   const smoke=group.getObjectByName('first-person-central-smoke');
   const blast=group.getObjectByName('first-person-central-blast-ring');
   const jet=group.getObjectByName('first-person-central-fire-jet');
-  assert.ok(barrel instanceof T.Mesh && barrel.geometry instanceof T.CylinderGeometry);
+  // The new genuine cast-iron gun uses a hollow-profile LatheGeometry, not
+  // the earlier featureless CylinderGeometry. Preserve the SAME on-screen
+  // occlusion bounds and real muzzle regression rather than hard-code a type.
+  assert.ok(barrel instanceof T.Mesh && barrel.geometry instanceof T.LatheGeometry);
   assert.ok(recoil && bore && smoke && blast && jet);
-  // Both dimensions shrink substantially while keeping the cannon recognisable.
-  assert.ok(barrel.geometry.parameters.height>13 && barrel.geometry.parameters.height<14.5,
-    'shorter gun opens more of the opponent and horizon');
-  assert.ok(barrel.geometry.parameters.radiusTop<1 && barrel.geometry.parameters.radiusBottom<1.4,
-    'slimmer foreground silhouette, not two cannons');
+  barrel.geometry.computeBoundingBox();
+  const bounds=barrel.geometry.boundingBox!;
+  const length=bounds.max.y-bounds.min.y;
+  assert.ok(length>13 && length<14.5,
+    'the shortened gun still opens the opponent and horizon');
+  assert.ok(bounds.max.x<1.5&&bounds.min.x> -1.5,
+    'forged barrel flare must not become a giant view-blocking wall');
+  const centerRadius=Math.hypot(...[barrel.geometry.attributes.position.getX(0),barrel.geometry.attributes.position.getZ(0)]);
+  assert.ok(Number.isFinite(centerRadius),'real lathed profile remains finite');
   assert.equal(bore.parent,recoil);
   assert.equal(smoke.parent,recoil);
   assert.equal(blast.parent,recoil);

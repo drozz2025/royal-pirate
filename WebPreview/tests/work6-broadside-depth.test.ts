@@ -73,6 +73,9 @@ test('legacy geometry retains two real cannons, while the LIVE mobile battle pre
     camera.position.set(...pose.position);camera.lookAt(...pose.target);camera.updateMatrixWorld();
     const centralGroup=central.group;
     centralGroup.position.set(pose.batteryOffsetX,0,pose.batteryOffsetZ);
+    // Mirror the live scene.home() transform: the entire real deck is reduced
+    // in portrait, so projecting the unscaled group produces a false failure.
+    centralGroup.scale.setScalar(pose.batteryScale);
     const barrel=centralGroup.getObjectByName('first-person-central-recoil')!;
     barrel.updateWorldMatrix(true,false);
     for(const muzzle of central.muzzles.map(v=>v.clone().applyMatrix4(barrel.matrixWorld))){

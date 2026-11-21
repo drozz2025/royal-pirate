@@ -10,3 +10,29 @@
   touch-action:none;
   cursor:ew-resize;
 }
+
+/* WORK0 #104 · 20 Nov: the native bearing bar remains operable as a fallback
+ * to drag-on-deck aiming. Its old 18px pointer box was not usable on a small
+ * iPhone. Enlarge the invisible range hit region without shifting the visible
+ * track, overlapping DISPARAR or changing the stored yaw limits. Both ranges
+ * now use 44px capture boxes and prevent Safari from turning a shot into scroll.
+ * The existing canvas still handles horizontal gun bearing; vertical movement
+ * never changes elevation or power. This is battle-only. */
+.in-battle #bearing {
+  height:44px;
+  min-height:44px;
+  margin-block:-12px;
+  touch-action:none;
+  cursor:ew-resize;
+}
+
+/* WORK0 #104 · native 384×512 Chromium review: the development version
+ * counter covers BOMBORDO, and the live FPS counter covers LONGO on the
+ * same bottom 44px touch rail. These are developer diagnostics, NOT game
+ * actions. Hide them ONLY while the compact battle is in progress; the
+ * diagnostics toggle remains usable from Porto. Avoid stealing touches from
+ * either slider or DISPARAR. The game release is still verified in CI. */
+@media (max-width:600px) {
+  .in-battle .bottom-note {display:none;}
+  body:has(.in-battle) > .rp-version {display:none!important;}
+}

@@ -44,16 +44,24 @@ export type CameraPose = {
 /** Battle-only enemy presentation size. Scale the LIVE 3D model, not its
  * simulation/hitboxes: the old 1.88x red ship swallowed the centre on phones.
  * The 02 reference has clear sky, a starboard opponent and open sea between guns.
+ * WORK0 21 Nov: reference-vs-Chromium comparison found the live broadside
+ * ~25% wider than the approved ship at native 384x512. The subsequent
+ * narrow-FOV reduction to 0.63 on 390x844 left its broadside too small.
+ * Current 24-capture Chromium evidence: the mobile broadside had shrunk to a thumbnail.
+ * Change only the existing THREE.JS render root, not hitbox or Porto.
  * Desktop remains unchanged; Porto's 1x model is restored by showHarbour(). */
 export function battleEnemyScale(aspect:number):number {
   // WORK0 #104 / 20 Nov: structurally reframe the approved short 384×512
   // Batalha. Scale down the broadside just enough that the entire aftcastle
   // fits on the right after moving it toward the approved starboard third.
-  // Tall/320px framing is deliberately unchanged: its opponent already
-  // approaches the right screen edge.
+  // Keep the shorter 384x512 enemy composition and preserve genuine
+  // perspective on tall phones: a tiny 0.63 ship left an empty, unplayable
+  // band of sky and reduced the opponent's visible target to a thumbnail.
+  // Increase genuine 3D presence, then re-aim the optical target to leave
+  // the aftcastle inside the starboard edge and the central muzzle aligned.
   // Presentation only: physical hull, damage hitbox and Porto stay unchanged.
-  if(aspect<.62)return 1.48; // 320×568, 390×844 and 430×932: protect the stern
-  if(aspect<.80)return 1.42; // 384×512: preserve full broadside and starboard margin
+  if(aspect<.62)return 1.10; // 320x568, 390x844 and 430x932: legible real 3D broadside
+  if(aspect<.80)return 1.17; // native 384x512: broadside enlarged but entirely visible
   return 1.82; // preserve desktop
 }
 /** Batalha 02: turn the existing live red ship into a readable starboard broadside.
@@ -74,26 +82,37 @@ export function battleCameraPose(aspect: number): CameraPose {
     // down ONE central gun barrel. The opponent remains ahead at starboard,
     // showing its long hull in profile. This changes only battle presentation.
     // Full perspective makes the enemy grow when zooming toward its hull.
-    // Ultra-tall phones have a narrower horizontal field of view. In real
-    // 390x844 Chromium evidence the enemy stern touches the right edge.
-    // Pan the first-person camera AND battle-only gunner deck together:
-    // the single muzzle remains centred while the broadside stays visible.
-    // Never move the simulated ships, physics, Porto or five-item dock.
-    const ultraTall = aspect < .50;
-    const compact = aspect >= .50 && aspect < .62; // 320x568: guard the galleon's stern
+    // At 390x844 the narrower horizontal FOV enlarged/cropped the enemy.
+    // Scale the live presentation proportionally to aspect and pan its broadside
+    // toward starboard while moving the real deck so the muzzle stays centred.
+    // Never move simulated hulls, collision geometry, Porto or the dock.
+    // Smoothly reframe actual perspective as portrait aspect changes. The old
+    // threshold at 0.50/0.62 jumped by 1.3 world units between near-identical
+    // iPhones, visibly jerking the red ship and gun muzzle across the view.
+    // Keep the previously measured 390x844, 320x568 and 384x512 endpoints.
+    // The native 384x512 camera pans 0.3 units farther port: projection of
+    // the actual enemy centre gains >24px of starboard clearance compared with
+    // the pre-approved wide crop, without moving hulls or collision geometry.
+    const compactAspect = 320 / 568;
+    const mix = (a:number,b:number,t:number) => a + (b-a)*Math.max(0,Math.min(1,t));
+    const targetX = aspect <= .50 ? 5.8 :
+      aspect <= compactAspect ? mix(5.8,4.5,(aspect-.50)/(compactAspect-.50)) :
+      mix(4.5,3.0,(aspect-compactAspect)/(.75-compactAspect));
+    const gunX = mix(3.2,1.8,(aspect-compactAspect)/(.75-compactAspect));
     return {
       // Keep the gunner eye at deck height. At the native 384x512 reference
       // crop, aim the camera further toward the PORT side so the enemy reads
       // in the RIGHT third instead of blocking the cannon centreline.
       // Move the existing live gun deck laterally with that pan to preserve
       // the real muzzle near x=50%, rather than reprojecting a fake shot.
-      // Narrow/tall crops preserve their already edge-safe framing.
+      // Reframe by phone aspect: short 320×568 stays 4.5; taller
+      // 390×844/430×932 pan 5.8 to retain full broadside and central real muzzle.
       position: [0, 7.4, 55],
-      target: [ultraTall ? 7.65 : compact ? 6.5 : 2.65, 4.1, -3],
+      target: [targetX, 4.1, -3],
       showBattery: true,
       batteryOffsetZ: -30,
-      batteryOffsetX: ultraTall ? 3.6 : compact ? 2.7 : 1.3,
-      batteryScale: 1,
+      batteryOffsetX: gunX,
+      batteryScale: .84,
       // Legacy optional edge rig is now HIDDEN for portrait battle.
       sailX: -11,
       sailScaleX: .33,

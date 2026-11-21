@@ -90,6 +90,30 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
   const dressing=new T.Group();
   dressing.name='first-person-premium-gundeck';
   group.add(dressing);
+  // WORK0/#104: the original teak stops at local Z=76, while the gunner
+  // camera stands at world Z=55 (local Z≈101 on portrait phones). That left
+  // a conspicuous wedge of OCEAN between the cannon carriage and the lower
+  // controls. Continue the SAME real 3D boards aft to Z=106.2, just behind
+  // the camera, without a screenshot plane, extra ship or physics changes.
+  // Two instanced draws cover nine boards instead of nine new mesh draws.
+  for(const [name,material,indices] of [
+    ['first-person-deck-aft-oak',deck,[-4,-2,0,2,4]],
+    ['first-person-deck-aft-warm',alternate,[-3,-1,1,3]]
+  ] as const){
+    const batch=new T.InstancedMesh(box,material,indices.length);
+    batch.name=name;
+    const tr=new T.Object3D();
+    indices.forEach((i,j)=>{
+      tr.position.set(i*1.33,.22,91);
+      tr.scale.set(1.28,.37,30.4);
+      tr.updateMatrix();
+      batch.setMatrixAt(j,tr.matrix);
+    });
+    batch.instanceMatrix.needsUpdate=true;
+    batch.computeBoundingSphere();
+    batch.receiveShadow=true;
+    dressing.add(batch);
+  }
   const oak=new T.MeshStandardMaterial({color:'#81502e',roughness:.78});
   const oakEdge=new T.MeshStandardMaterial({color:'#bf8750',roughness:.70});
   const brass=new T.MeshStandardMaterial({color:'#e5b46d',roughness:.37,metalness:.65});
@@ -185,19 +209,58 @@ export function makeSingleBattleDeck(): {group:T.Group; flashes:T.Mesh[]; muzzle
   const direction=mouth.clone().sub(breech).normalize();
   const rotation=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),direction);
   const mouthFace=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,0,1),direction);
-  const tube=new T.Mesh(new T.CylinderGeometry(.94,1.31,breech.distanceTo(mouth),28,1),iron);
+  // WORK0/#104: an actual cast, tapering naval barrel rather than one
+  // featureless cylinder with four painted rings. The longitudinal profile
+  // gives the muzzle a flared rim and an OPEN dark bore; it has no collider,
+  // does not change the live muzzle coordinate, yaw or recoil animation.
+  // One LatheGeometry replaces the original cylinder (same draw-call count).
+  const barrelLength=breech.distanceTo(mouth), half=barrelLength/2;
+  const profile=[
+    new T.Vector2(0,-half),
+    new T.Vector2(1.18,-half),
+    new T.Vector2(1.38,-half+.12),
+    new T.Vector2(1.42,-half+.33),
+    new T.Vector2(1.24,-half+.57),
+    new T.Vector2(1.21,-half+2.15),
+    new T.Vector2(1.13,-half+3.68),
+    new T.Vector2(1.10,-half+5.25),
+    new T.Vector2(1.01,half-2.00),
+    new T.Vector2(1.01,half-.78),
+    new T.Vector2(1.13,half-.46),
+    new T.Vector2(1.27,half-.25),
+    new T.Vector2(1.27,half-.08),
+    new T.Vector2(1.22,half),
+    new T.Vector2(.75,half),
+    new T.Vector2(.74,half-.46),
+  ];
+  const tube=new T.Mesh(new T.LatheGeometry(profile,36),iron);
   tube.name='first-person-central-cannon';
-  tube.position.copy(breech).add(mouth).multiplyScalar(.5);tube.quaternion.copy(rotation);recoil.add(tube);
-  const breechCap=new T.Mesh(new T.SphereGeometry(1.25,18,12),iron);
+  tube.position.copy(breech).add(mouth).multiplyScalar(.5);
+  tube.quaternion.copy(rotation);recoil.add(tube);
+  const breechCap=new T.Mesh(new T.SphereGeometry(1.23,18,12),iron);
+  breechCap.name='first-person-central-cascabel';
   breechCap.position.copy(breech);recoil.add(breechCap);
-  for(const t of [.22,.60,.86,1]){
-    const radius=1.31-(1.31-.94)*t;
-    const ring=new T.Mesh(new T.TorusGeometry(radius,.09,10,30),gold);
-    ring.position.copy(breech).lerp(mouth,t);ring.quaternion.copy(mouthFace);recoil.add(ring);
+  // Forged reinforcing hoops and a pair of cast trunnions transform with the
+  // same single recoil group. This produces a legible silhouette in portrait
+  // without creating a second cannon or moving flash/smoke/trajectory.
+  for(const [t,radius] of [[.18,1.23],[.52,1.12],[.80,1.04],[.972,1.26]]){
+    const ring=new T.Mesh(new T.TorusGeometry(radius,.095,10,36),gold);
+    ring.position.copy(breech).lerp(mouth,t);ring.quaternion.copy(mouthFace);
+    recoil.add(ring);
   }
-  const darkMouth=new T.Mesh(new T.CircleGeometry(.85,32),bore);
+  for(const side of [-1,1]){
+    const trunnion=new T.Mesh(new T.CylinderGeometry(.39,.39,.43,18),gold);
+    trunnion.name=side<0?'first-person-port-trunnion':'first-person-starboard-trunnion';
+    trunnion.rotation.z=Math.PI/2;
+    trunnion.position.copy(breech).lerp(mouth,.19).add(new T.Vector3(side*1.32,0,0));
+    recoil.add(trunnion);
+  }
+  // The black inside of the bore is physically behind its annular metal lip;
+  // the external mouth position remains the unmodified vector consumed by
+  // the real smoke, flash and projectile origin in scene.ts.
+  const darkMouth=new T.Mesh(new T.CircleGeometry(.74,32),bore);
   darkMouth.name='first-person-central-muzzle';
-  darkMouth.position.copy(mouth).addScaledVector(direction,.065);
+  darkMouth.position.copy(mouth).addScaledVector(direction,-.43);
   darkMouth.quaternion.copy(mouthFace);recoil.add(darkMouth);
   const flash=new T.Mesh(new T.SphereGeometry(1.14,14,10),flame);
   flash.name='first-person-central-flash';

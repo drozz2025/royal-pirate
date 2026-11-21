@@ -2820,7 +2820,7 @@
    Compare with merged HEAD in one paused Chromium frame before approval. */
 @media (width:384px) and (height:512px) {
   .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
-    width:53%;
+    width:51%;
     right:1.5%;
     border-color:#8a9ba1;
     box-shadow:inset 0 1px #f6ddb06b,0 3px 7px #06101a9c;
@@ -3191,3 +3191,108 @@
     line-height:1.05;
   }
 }
+
+
+/* WORK4/#104 · clean native 384x512 source-coast seam, 20 Nov 20h.
+   Keep the sole approved Royal Crown and its authentic sea pixel-for-pixel;
+   repaint ONLY the live statistics inset and its existing 10px fade, avoiding
+   a synthetic silver frame/rectangular photographic cut.
+   Measured candidate previously in same paused Chromium scene; the new clean
+   HEAD-based branch must revalidate against 03-frota.webp before WORK0 merge.
+   No Porto, dock, gameplay, economy, Forja, or 320/390/430 changes.
+   approved:false · 0/8 artistic screens until explicit human review. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label {
+    background:linear-gradient(90deg,#07415aee 0%,#092c45f5 20%,#061d33f8 55%,#031529fc 100%)!important;
+    box-shadow:none;
+  }
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after {
+    background:linear-gradient(90deg,transparent 0%,#063a59 100%);
+  }
+}
+
+
+/* WORK0 #104 accepted WORK4 #732 forge edge */
+/* 384x512 only: source cannon stays visible beneath the existing level plaque.
+   Retain integrator's 51% width, 3 actual prices, Porto and dock. DRAFT. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+    -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+    mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+  }
+}
+
+/* WORK0/#104 integration of WORK4 #732: 03 Frota source-photo top edge.
+   Original approved 03 image at 384x512 shows a carved dark menu lip;
+   the candidate's bright cyan 12px upper strip disrupted that join.
+   Keep REAL Royal Crown and sea photographs unchanged; this is an inert
+   12px gradient over the existing photo only, not a fake 2nd ocean/ship.
+   WORK4 native paused-frame A/B at 384x512:
+   top ROI MAE 67.05120 -> 50.72562; full 48.61659 -> 48.32038;
+   original sea, Crown and WORK0 dock pixel-identical. No 320/390/430 shifts.
+   Artistic approval still FALSE; do not publish from this commit alone. */
+.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-fleet-photo-top-shade {
+  position:absolute;
+  width:0;
+  height:0;
+  opacity:0;
+  pointer-events:none;
+}
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-fleet-photo-top-shade {
+    opacity:1;
+    position:absolute;
+    top:3px;
+    left:0;
+    z-index:2;
+    width:64%;
+    height:12px;
+    background:linear-gradient(180deg,#03192b 0%,#03192b 20%,#03192b00 100%);
+    -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 91%,transparent 100%);
+    mask-image:linear-gradient(90deg,#000 0%,#000 91%,transparent 100%);
+  }
+}
+
+/* WORK4/#104 — 21 Nov, real 384×512 coastal photo seam alpha easing.
+   Controlled ORIGINAL | BEFORE | TRIAL | OVERLAY in ONE paused Chromium
+   Fleet scene, baseline compared with 9 treatments, CI #44887437791.
+   Eased 10px lip retained more approved source coast than the merged linear
+   fade: whole RGB MAE 48.633286 → 48.609709, photo join
+   10.099173 → 9.615152, coastline 6.141480 → 5.532550.
+   Royal Crown central/full, approved sea, costs and WORK0 5-item dock:
+   ZERO pixel changes. No second ship, fake waves, geometry or touch changes.
+   320/390/430 retain #255/#260 exactly; WORK0 alone may integrate.
+   approved:false, 0/8 until human approval. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after {
+    background:linear-gradient(90deg,transparent 0%,#082c4820 18%,#082c48b0 40%,#082c48de 100%);
+  }
+}
+
+/* WORK4/#104 — composite Forge cannon/level-plaque edge (21 Nov 2026).
+   At the verified 384×512 source reference only, move the EXISTING plaque's
+   left edge away from the ONE original cannon (53% -> 51%), retain its three
+   real level rows and give it a charcoal/bronze rim. Its 22px left alpha edge
+   exposes the genuine workshop/cannon painting instead of a hard rectangle.
+   The previously separately measured width, rim and feather are evaluated
+   TOGETHER against the actual base in a new same-frame Chromium A/B gate.
+   320×568, 390×844, 430×932, four Fleet slots, original ship, furnace,
+   prices, touches, shared 5-item WORK0 dock and #255/#260 stay unchanged.
+   Artistic approval is false, 0/8. WORK0 alone may merge or release. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+    width:51%;
+    border-color:#4d4039;
+    -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+    mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+  }
+}
+
+/* WORK0/#104 — 21 Nov 2026, integrated QA rejection.
+   The standalone WORK4 dark-cove underpaint was NOT safe after integration:
+   same-frame Chromium on combined #696 found only +0.0545 full-frame MAE
+   (required +0.20) and -0.5698 on photo edge (required +0.30).
+   Keep the existing approved-source sea bridge and composite shore layers;
+   do not ship the blue 384x512 background override. WORK4 can propose a
+   separate candidate after an integrated 384x512 + 320/390/430 A/B review.
+   No Porto, dock, input, progression or other work area is affected. */

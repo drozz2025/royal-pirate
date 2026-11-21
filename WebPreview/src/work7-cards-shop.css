@@ -4351,3 +4351,78 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 — 20 Nov 19:25 UTC. Consolidated proven-positive genuine 05 relief.
+ * Preserve the original first card inlay and reveal seven approved illustration
+ * sources by removing only their excessive inner masking shadow. Native 384x512
+ * only; exact 4x2 layout, genuine labels, rivets and gold outer border unchanged.
+ * Consolidates the measured seven-card improvement from unmerged WORK7 #682.
+ * No screenshots used as backgrounds. Human approval is still pending (0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(n+2)::before{
+    box-shadow:none;
+  }
+}
+
+/* WORK7/#104 — 20 Nov 19:25 UTC. Consolidated genuine Captain pack paint.
+ * Rebalance only the NATIVE background's blue-violet depth, not its actual
+ * approved source WEBP, offer, position or touch region. Consolidates the
+ * measured true-pack/chest ROI enhancement from unmerged WORK7 #687.
+ * No currency/economy changes, screenshot UI, dock, header or global CSS.
+ * 320x568 and tall screens remain wholly untouched. approved:false (0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    background:
+      radial-gradient(ellipse 70% 95% at 29% 42%,#a51c6660,transparent 88%),
+      linear-gradient(112deg,#340957 0%,#2b075f 49%,#0c0843 100%);
+  }
+}
+
+
+/* WORK0/#104 — from WORK7 #710 native source enamel. Source-approved art,
+   existing 4x2 cards and shop pack; only 384x512 color/material corrections.
+   Visual review pending (approved:false; 0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){
+    filter:brightness(.50) saturate(1.70) contrast(.87) hue-rotate(-16deg) brightness(1.085) saturate(.96);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
+    filter:brightness(.43) saturate(1.20) contrast(.74) hue-rotate(18deg) brightness(.95) saturate(1.10);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
+    filter:brightness(.49) saturate(2.00) contrast(.79) hue-rotate(-8deg) brightness(.92) saturate(1.08);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+    filter:brightness(.65) saturate(1.30) contrast(.92) hue-rotate(4deg) brightness(.96);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+    filter:brightness(.40) saturate(1.75) contrast(.79) hue-rotate(-8deg) brightness(.93) saturate(1.10);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
+    filter:brightness(.64) saturate(1.90) contrast(.88) hue-rotate(-13deg) brightness(.99) saturate(1.11);
+  }
+  /* WORK7 21 Nov: original fifth bombardment card, true local native frame enamel test.
+   * Separate pigmented metal relief; no UI text or approved source pixels replaced. */
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04)
+           brightness(.91) saturate(1.22) hue-rotate(-8deg) contrast(.91);
+  }
+}
+
+
+/* WORK0 #104 accepted WORK7 #723 real cards */
+/* Original 05 card five art and painted 4x2 recess only, reference-native
+   384x512. No full-screen screenshot, fake prices, Porto or dock changes.
+   Integrated MAE/ROI and human art validation still required. DRAFT. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px) {
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop {
+    filter:saturate(1.25) contrast(1.13) brightness(2.05) hue-rotate(-10deg);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before {
+    background:radial-gradient(ellipse 85% 60% at 50% 18%,#1c2a3a3d,transparent 84%),
+      linear-gradient(180deg,#121a28 0%,#091422 60%,#0d1524 100%);
+  }
+}

@@ -5311,7 +5311,7 @@
   :root:not(.work8-missions-chest-art-ink-ab-baseline)
   .w8-approved-missions .w8-approved-days li:nth-child(n+4)
   .w8-approved-chest > svg.w8-approved-painting {
-    filter:contrast(1.07) saturate(1.07) brightness(1.24)
+    filter:contrast(1.07) saturate(1.07) brightness(1.50)
       drop-shadow(0 1px 1px #011625);
   }
 }
@@ -5483,5 +5483,186 @@
   :root:not(.work8-missions-real-gem-ab-baseline)
   .w8-approved-missions .w8-approved-quest-rewards .w8-approved-gem .w8-reward-fallback {
     visibility:hidden;
+  }
+}
+
+
+/* WORK8/#104 — 07 MISSÕES ONLY, 384x512: keep seven genuine daily labels
+   readable and visually source-registered, without shifting a single reward
+   tile, chest artwork, claim action or WORK0's fixed five-button dock.
+   Native approved 07-missoes.webp shows Dia 1–7 lettering at y≈417–426;
+   the current Chromium labels are drawn above their intended baseline.
+   Shortening ONLY each static glyph's line box repositions its ink while
+   preserving the label bottom and the seven chest / dock boundaries.
+   A root opt-out supplies real SAME FRAME BEFORE/RENDER test captures.
+   At 320x568 and taller viewport layouts this style is entirely inactive.
+   Artistic approval remains false (0/8). */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  /* Reserve the EXACT 74px baseline of all seven real reward tiles. The
+     12px glyph box alone would otherwise reduce the height of CSS-grid
+     auto rows and move the chests/panel; never allow that regression. */
+  :root:not(.work8-missions-seven-caption-source-ab-baseline)
+  .w8-approved-missions .w8-approved-days li {
+    min-height:74px;
+    height:74px;
+  }
+  :root:not(.work8-missions-seven-caption-source-ab-baseline)
+  .w8-approved-missions .w8-approved-days li > small {
+    /* The old 24px line box wasted 12px above the painted glyphs.
+       Correct the glyph baseline INSIDE the original tile bounds, instead
+       of translating its 24px box underneath the WORK0 dock. */
+    box-sizing:border-box;
+    height:12px;
+    min-height:12px;
+    line-height:12px;
+    padding:0;
+    margin:0;
+  }
+}
+
+
+/* WORK0/#104: carry the independently scored genuine Dia 7 chest artwork
+ * candidate from WORK8 PR #697 into the UNPUBLISHED unified comparison.
+ * Native 384x512 paused-Chromium evidence on #697: genuine royal chest
+ * ROI MAE 26.00913 -> 24.20196; whole Mission screen 52.50811 -> 52.46740.
+ * Scoped ONLY to source-sized short portrait, keeping every real reward,
+ * claim state, five-item dock, Ranking, Porto and gameplay untouched.
+ * Not artistically approved: screenshot/MAE is not owner sign-off. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-royal-enamel-v2-ab-baseline)
+  .w8-approved-missions .w8-approved-days li:nth-child(7)
+  .w8-approved-chest > svg.w8-approved-painting-chest-royal {
+    filter:contrast(1.07) saturate(1.11) brightness(1.49)
+      drop-shadow(0 1px 1px #011625);
+  }
+}
+
+
+/* WORK8/#104 — 07 Missões only: calibrate the emerald VECTOR chest icons
+   of actual Day 1–3 rewards against the native 384×512 approved frame.
+   Days 1–3 use state-aware vectors (only Days 4–7 use source-art crops).
+   Their claimed/locked states, seven real rewards and live captions remain
+   data-driven. Filter only the existing actual chest icons, not overlays,
+   actions, labels, geometry or the WORK0 five-item dock. The root opt-out
+   switches the identical paused Chromium DOM between BEFORE and RENDER.
+   No Ranking 08, Porto, shared shell, economy, multiplayer or Unity edits.
+   approved:false (0/8) until human visual acceptance. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-emerald-chests-ab-baseline)
+  .w8-approved-missions .w8-approved-days li:nth-child(-n+3)
+  .w8-approved-chest > svg.w8-art-chest {
+    filter:brightness(.78) contrast(1.08) saturate(1.12)
+      drop-shadow(0 1px 1px #011625);
+  }
+}
+
+/* WORK0/#104 integration of independently validated WORK8 #727.
+   Seven REAL day captions on the native 384x512 approved composition.
+   WORK8's frozen-frame Chromium A/B showed label-region MAE
+   40.361864 -> 34.954057, with no repositioned chests, dock or quests.
+   This CSS-only transfer is a DRAFT candidate: approved:false, 0/8.
+   Do not claim those base-vs-WORK8 metrics prove integrated #696. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-day-legibility-ab-baseline)
+  .w8-approved-missions .w8-approved-days li > small {
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    color:#fff4df;
+    text-shadow:0 1px 1px #071625;
+  }
+}
+
+
+/* WORK0 #104 accepted WORK8 #734 daily tiles */
+/* Green enamel upper / navy caption foot on genuine Days 1-3, as approved
+   07 reference. Only existing image-backed DOM; rewards, Ranking, Porto,
+   interactions, seven chests and five-button dock untouched. DRAFT. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-day-footer-ab-baseline):not(.work8-missions-early-tile-enamel-ab-baseline)
+  .w8-approved-missions .w8-approved-days li:nth-child(-n+3) {
+    background-image:linear-gradient(180deg,
+      #135436 0%,#093d27 58%,#061d30 60%,#041525 100%)!important;
+  }
+}
+
+
+/* WORK0/#104: controlled transfer of genuine Day 1-3 chest pigment from WORK8 #747.
+   The worker's release-branch Chromium 384x512 37-treatment A/B reported
+   chest ROI 39.0173 -> 35.5576, full screen 52.5112 -> 52.3676.
+   These measurements are NOT evidence for the combined #696 candidate:
+   recapture all 24 native frames and review its integrated changes.
+   This changes ONLY existing chest SVG paints at reference-sized phones;
+   preserves actual state, rewards, Porto, dock, touch and geometry.
+   DRAFT: approved:false, 0/8. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-natural-wood-ab-baseline)
+  .w8-approved-missions .w8-approved-days li:nth-child(-n+3)
+  .w8-approved-chest > svg.w8-art {
+    filter:hue-rotate(60deg) saturate(.94) brightness(.78)
+      drop-shadow(0 3px 2px #041525);
+  }
+}
+
+/* WORK8/#104 — 07 Missões ONLY: native 384x512 source-art legibility.
+   The three real quest illustrations already use approved WebP crops. Restore
+   the silver/wood engraving in those existing pictograms without moving the
+   cards, progress bars, reward values or touch targets. No Ranking/08, dock,
+   Porto, economy, Unity or another worker's stylesheet is modified.
+   The root opt-out isolates BEFORE/RENDER on the identical paused CDP frame.
+   Human approval: false, 0/8. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-quest-icon-relief-ab-baseline)
+  .w8-approved-missions .w8-approved-quest-art > svg.w8-approved-painting {
+    filter:brightness(1.75) contrast(1) saturate(1.06)
+           drop-shadow(0 2px 1px #031627b0);
+  }
+}
+
+/* WORK8/#104 — 07 Missões: use ONLY the empty approved coastal scenery at
+   far left/right of the 384x512 reference, strictly BELOW the WORK0 HUD and
+   ABOVE the live tabs. The center title, all quest rows, their genuine
+   progress/rewards and the seven-day board remain live React, not a screenshot.
+   Two alpha mask bands discard every source UI pixel; the second mask softens
+   the seam into the existing animated sea. Does not affect Ranking 08.
+   Native BEFORE/RENDER is toggled with the root opt-out class. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-coast-source-ab-baseline)
+  .w8-approved-missions .w8-approved-scene::before {
+    content:"";
+    position:absolute;
+    top:12px;
+    left:0;
+    right:0;
+    height:47px;
+    z-index:3;
+    pointer-events:none;
+    background-image:url('../../assets/design-approved/07-missoes.webp');
+    background-size:384px 512px;
+    background-repeat:no-repeat;
+    background-position:center -72px;
+    -webkit-mask-image:
+      linear-gradient(90deg,#000 0 22%,transparent 29% 71%,#000 78% 100%),
+      linear-gradient(180deg,#000 0 68%,transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-image:
+      linear-gradient(90deg,#000 0 22%,transparent 29% 71%,#000 78% 100%),
+      linear-gradient(180deg,#000 0 68%,transparent 100%);
+    mask-composite:intersect;
+  }
+}
+
+
+/* WORK0/#104: candidate from independently tested WORK8 #764.
+   At native 384x512, restore exact BASE 1.24 for controlled same-frame A/B
+   via the existing opt-out root class. The proposed 1.50 only affects the
+   original source-paint of real rewards Days 4-7, not their state or hitboxes.
+   WORK8 draft ROI evidence is NOT an approval of this integrated candidate. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root.work8-missions-chest-art-ink-ab-baseline
+  .w8-approved-missions .w8-approved-days li:nth-child(n+4)
+  .w8-approved-chest > svg.w8-approved-painting {
+    filter:contrast(1.07) saturate(1.07) brightness(1.24)
+      drop-shadow(0 1px 1px #011625);
   }
 }

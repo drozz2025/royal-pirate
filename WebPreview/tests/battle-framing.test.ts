@@ -43,21 +43,43 @@ test('WORK6 18 Nov: one camera-aligned FIRST PERSON barrel and right-side enemy 
 test('deck-level portrait framing and original desktop pose are independently scoped',()=>{
  const mobile=battleCameraPose(384/512);
  assert.deepEqual(mobile.position,[0,7.4,55]);
- assert.deepEqual(mobile.target,[2.65,4.1,-3]);
+ assert.deepEqual(mobile.target,[3.0,4.1,-3]);
  assert.equal(mobile.batteryOffsetZ,-30);
- assert.equal(mobile.batteryOffsetX,1.3);
- assert.equal(mobile.batteryScale,1);
+ assert.equal(mobile.batteryOffsetX,1.8);
+ assert.equal(mobile.batteryScale,.84);
  const compact=battleCameraPose(320/568);
  assert.deepEqual(compact.position,mobile.position);
- assert.deepEqual(compact.target,[6.5,4.1,-3]);
- assert.equal(compact.batteryOffsetX,2.7);
+ assert.deepEqual(compact.target,[4.5,4.1,-3]);
+ assert.equal(compact.batteryOffsetX,3.2);
  assert.equal(compact.batteryOffsetZ,mobile.batteryOffsetZ);
  const tall=battleCameraPose(390/844);
  assert.deepEqual(tall.position,mobile.position);
- assert.deepEqual(tall.target,[7.65,4.1,-3]);
- assert.equal(tall.batteryOffsetX,3.6);
+ assert.deepEqual(tall.target,[5.8,4.1,-3]);
+ assert.equal(tall.batteryOffsetX,3.2);
  assert.deepEqual(battleCameraPose(430/932),tall);
  assert.equal(battleCameraPose(1.4).showBattery,false);
+});
+
+test('WORK0/#104: first-person red broadside and real cannon do not jump at mobile aspect thresholds',()=>{
+  const compactAspect=320/568;
+  // Old three-way aspect thresholds caused abrupt camera/gun movement when
+  // browser chrome, a notch or a neighbouring iPhone aspect changed.
+  for(const boundary of [.50,compactAspect,.62,.75]) {
+    const before=battleCameraPose(boundary-.0001);
+    const after=battleCameraPose(boundary+.0001);
+    assert.ok(Math.abs(after.target[0]-before.target[0])<.01,
+      'camera pan continuity at '+boundary);
+    assert.ok(Math.abs(after.batteryOffsetX-before.batteryOffsetX)<.01,
+      'real cannon deck continuity at '+boundary);
+  }
+  let previousX=Infinity;
+  for(let aspect=.45;aspect<=.75;aspect+=.005) {
+    const pose=battleCameraPose(aspect);
+    assert.ok(pose.target[0]<=previousX+1e-8,'opponent pan moves monotonically across portrait widths');
+    assert.ok(pose.batteryOffsetX>=1.8-1e-9 && pose.batteryOffsetX<=3.2+1e-9,
+      'gun deck follows optical centre in a finite range');
+    previousX=pose.target[0];
+  }
 });
 
 test('battle uses the fixed deck pose, Porto original ship and true barrel matrix',()=>{
@@ -92,7 +114,7 @@ test('WORK0/#104: ultra-tall mobile keeps one real muzzle centered while clearin
    const enemy=screen(w,h,new T.Vector3(10,0,-3));
    assert.ok(projectedMuzzle.x>w*.42 && projectedMuzzle.x<w*.58,
      'single cannon stays centred at '+w+'x'+h);
-   assert.ok(enemy.x>w*.54 && enemy.x<w*.72,
+   assert.ok(enemy.x>w*.69 && enemy.x<w*.81,
      'enemy anchor must not sit at right screen edge '+w+'x'+h);
  }
  assert.deepEqual(battleCameraPose(384/512).position,battleCameraPose(320/568).position,
@@ -116,7 +138,7 @@ test('WORK0/#104: forward-moving the camera AND single cannon deck enlarges the 
   const newHull=screen(w,h,new T.Vector3(10,0,-3));
   const newSpan=newHull.y-newMast.y;
   assert.ok(newSpan>oldSpan*1.12,`enemy actually grows in ${w}x${h}: ${newSpan} vs ${oldSpan}`);
-  assert.ok(newHull.x<w*.75,`enemy remains inside right edge in ${w}x${h}`);
+  assert.ok(newHull.x<w*.82,`enemy remains inside right edge in ${w}x${h}`);
 
   group.position.set(pose.batteryOffsetX,0,pose.batteryOffsetZ);
   group.scale.setScalar(pose.batteryScale);
@@ -139,7 +161,7 @@ test('WORK0/#104: native 384x512 stage moves the whole live galleon to starboard
   assert.ok(opponent.x-(1+oldNdc.x)*w/2>24,
     'actual 3D perspective must shift the enemy at least 24 pixels');
   const scale=battleEnemyScale(aspect),yaw=battleEnemyBroadsideYaw(aspect);
-  assert.ok(scale>=1.35&&scale<=1.45,
+  assert.ok(scale>=1.14&&scale<=1.20,
     'short-screen galleon has room for the complete aftcastle');
   // Project both physical ends and both broadside gunwale edges after the
   // same live root yaw and presentation scale used by OceanScene.home().
@@ -163,13 +185,55 @@ test('WORK0/#104: native 384x512 stage moves the whole live galleon to starboard
     'real cannon muzzle stays above the DISPARAR command');
 });
 
-test('WORK0/#104: 320px and tall-phone approved cannon/ship framing remain unchanged',()=>{
+test('WORK0/#104: 320px and tall-phone cannon/ship framing is explicit',()=>{
   for(const [w,h,x,deckX,scale] of [
-    [320,568,6.5,2.7,1.48],[390,844,7.65,3.6,1.48],[430,932,7.65,3.6,1.48]
+    [320,568,4.5,3.2,1.10],[390,844,5.8,3.2,1.10],[430,932,5.8,3.2,1.10]
   ]){
     const pose=battleCameraPose(w/h);
     assert.equal(pose.target[0],x);
     assert.equal(pose.batteryOffsetX,deckX);
     assert.equal(battleEnemyScale(w/h),scale);
+  }
+});
+
+
+test('WORK0 #104: mobile 3D sightline gains real sky and halves cannon screen occlusion without moving the muzzle off centre',()=>{
+ for(const [w,h,oldOffset] of [[320,568,2.7],[384,512,1.3],[390,844,3.6],[430,932,3.6]]){
+   const pose=battleCameraPose(w/h), scale=pose.batteryScale;
+   const worldLeft=(offset:number,s:number)=>new T.Vector3(offset-1.42*s,1.8*s,pose.batteryOffsetZ+68*s);
+   const worldRight=(offset:number,s:number)=>new T.Vector3(offset+1.42*s,1.8*s,pose.batteryOffsetZ+68*s);
+   const oldWidth=screen(w,h,worldRight(oldOffset,1)).x-screen(w,h,worldLeft(oldOffset,1)).x;
+   const currentWidth=screen(w,h,worldRight(pose.batteryOffsetX,scale)).x-screen(w,h,worldLeft(pose.batteryOffsetX,scale)).x;
+   assert.ok(currentWidth<oldWidth*.66,'actual near-gun occlusion shrinks by at least one third at '+w+'x'+h);
+   assert.ok(currentWidth>w*.1,'real gun remains clearly visible at '+w+'x'+h);
+   const enemyTop=screen(w,h,new T.Vector3(10,8.4*battleEnemyScale(w/h),-3)).y;
+   const expectedTop=w/h<.62?[.35,.43]:[.35,.41];
+   assert.ok(enemyTop>h*expectedTop[0]&&enemyTop<h*expectedTop[1],
+     'portrait-scaled sails leave clear sky at '+w+'x'+h+': '+enemyTop);
+   const gun=makeBattleDeck(true);
+   gun.group.position.set(pose.batteryOffsetX,0,pose.batteryOffsetZ);
+   gun.group.scale.setScalar(scale);
+   const recoil=gun.group.getObjectByName('first-person-central-recoil')!;
+   const muzzle=battleDeckMuzzleWorld(recoil,gun.muzzles[0]);
+   const p=screen(w,h,muzzle);
+   assert.ok(Math.abs(p.x-w/2)<w*.065,'true barrel muzzle remains aligned with the central touch sightline');
+ }
+});
+
+test('WORK0/#104: taller phones show a larger but fully framed real 3D starboard broadside',()=>{
+  for(const [w,h] of [[390,844],[430,932]]){
+    const aspect=w/h,scale=battleEnemyScale(aspect),yaw=battleEnemyBroadsideYaw(aspect);
+    assert.ok(scale>=1.08&&scale<=1.12,'the real enemy cannot shrink to a thumbnail at '+w+'x'+h);
+    // Project all four physical hull corners after the same live yaw/scale
+    // as OceanScene.home(). No fake 2D target and no hull hitbox changes.
+    for(const z of [-5,5])for(const x of [-1.8,1.8]){
+      const world=new T.Vector3(
+        10+scale*(Math.cos(yaw)*x+Math.sin(yaw)*z),
+        0,
+        -3+scale*(-Math.sin(yaw)*x+Math.cos(yaw)*z));
+      const point=screen(w,h,world);
+      assert.ok(point.x>6&&point.x<w-6,
+        'full real 3D hull (including stern) stays within '+w+'x'+h+': '+point.x);
+    }
   }
 });

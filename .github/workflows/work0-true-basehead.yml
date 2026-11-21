@@ -7,12 +7,16 @@ on:
       - 'WebPreview/src/ships.ts'
       - 'WebPreview/src/scene.ts'
       - 'WebPreview/src/battle-deck.ts'
+      - 'WebPreview/src/battle-enemy-ornaments.ts'
+      - 'WebPreview/tests/work0-battle-broadside-gunports-20261121.test.ts'
       - 'WebPreview/src/battle-framing.ts'
       - 'WebPreview/src/battle-shot-presentation.ts'
       - 'WebPreview/src/main.tsx'
       - 'WebPreview/src/harbour.tsx'
       - 'WebPreview/src/app-screens.tsx'
       - 'WebPreview/scripts/work0-true-basehead-*'
+      - 'WebPreview/scripts/work0-native-regression-gate.mjs'
+      - 'WebPreview/tests/work0-native-regression-gate.test.ts'
       - '.github/workflows/work0-true-basehead.yml'
   workflow_dispatch:
 permissions:
@@ -49,7 +53,18 @@ jobs:
       - name: Install test-only browser and image scorer
         run: |
           set -euo pipefail
-          npm --prefix candidate/WebPreview install --no-save --no-package-lock playwright@1.56.1
+          # Keep the Vite/Rollup lockfiles immutable: npm install inside the
+          # candidate project re-resolves rollup and can fail npm registry 404
+          # even though the separately verified npm ci + builds succeeded.
+          # Install only the test browser in an isolated ephemeral prefix,
+          # then expose its ESM package to candidate's read-only test script.
+          mkdir -p "$RUNNER_TEMP/royal-playwright"
+          npm --prefix "$RUNNER_TEMP/royal-playwright" install --no-save --no-package-lock playwright@1.56.1
+          for dep in playwright playwright-core; do
+            if [ ! -e "candidate/WebPreview/node_modules/$dep" ]; then
+              ln -s "$RUNNER_TEMP/royal-playwright/node_modules/$dep" "candidate/WebPreview/node_modules/$dep"
+            fi
+          done
           python -m pip install pillow
           chrome="$(command -v google-chrome || command -v chromium)"
           test -x "$chrome"
@@ -73,6 +88,9 @@ jobs:
       - name: Render approved | BASE | HEAD | real pixel difference evidence
         working-directory: candidate/WebPreview
         run: python scripts/work0-true-basehead-score.py work0-qa ../assets/design-approved
+      - name: Guard real native 384x512 static-screen regressions (never art approval)
+        working-directory: candidate/WebPreview
+        run: node scripts/work0-native-regression-gate.mjs work0-qa/true-basehead-report.json
       - name: Publish visual QA artifacts only (NEVER a game release)
         if: always()
         uses: actions/upload-artifact@v4

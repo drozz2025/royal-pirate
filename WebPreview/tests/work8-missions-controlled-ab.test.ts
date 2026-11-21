@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline","work8-missions-royal-enamel-v2-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1888,6 +1888,69 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(realDayDelta.chests<.02 && Math.abs(realDayDelta.quest)<.02 &&
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
+
+
+    /* WORK8/#104: genuine Dia 1–7 inscriptions. Compare the PRODUCTION CSS,
+       toggled on a single loaded Chromium scene/frame at 384x512 DPR1.
+       This is the existing real account scene, not fake player state.
+       The new opt-out has remained OFF in historical gates above. */
+    const sevenCaptionFlag='work8-missions-seven-caption-source-ab-baseline';
+    const sevenCaptionLayout=()=>evalJs('(()=>{const r=e=>{const b=e?.getBoundingClientRect();return b?{left:b.left,top:b.top,right:b.right,bottom:b.bottom}:null};return {labels:[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li > small")].map(r),chests:[...document.querySelectorAll(".w8-approved-missions .w8-approved-chest")].map(r),days:[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li")].map(r),dock:r(document.querySelector(".app-sheet > .harbour-nav")),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,questCount:document.querySelectorAll(".w8-approved-missions .w8-approved-quest").length,dayCount:document.querySelectorAll(".w8-approved-missions .w8-approved-days li").length,scrollWidth:document.documentElement.scrollWidth}})()');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(sevenCaptionFlag)+');true');
+    await delay(160);
+    const sevenBeforeLayout=await sevenCaptionLayout();
+    const sevenBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(sevenCaptionFlag)+');true');
+    await delay(160);
+    const sevenAfterLayout=await sevenCaptionLayout();
+    const sevenAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const sevenSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+sevenBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+sevenAfter))
+      .replace('chests:[20,356,370,427],dock:', 'chests:[20,356,370,427],captions:[20,398,369,429],dock:');
+    assert.notEqual(sevenSource,source,'new test must compare real new screenshots');
+    const sevenScore=await evalJs(sevenSource);
+    const sevenMosaicExpression='(async()=>{const urls='+JSON.stringify([
+      'data:image/webp;base64,'+orig,
+      'data:image/png;base64,'+sevenBefore,
+      'data:image/png;base64,'+sevenAfter
+    ])+';const images=await Promise.all(urls.map(s=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=s})));const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");images.forEach((im,n)=>x.drawImage(im,384*n,0));x.drawImage(images[0],1152,0);x.globalAlpha=.5;x.drawImage(images[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()';
+    writeFileSync(join(evidence,'missions-seven-captions-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png'),
+      Buffer.from(await evalJs(sevenMosaicExpression),'base64'));
+    writeFileSync(join(evidence,'missions-seven-captions-before-384x512.png'),Buffer.from(sevenBefore,'base64'));
+    writeFileSync(join(evidence,'missions-seven-captions-render-384x512.png'),Buffer.from(sevenAfter,'base64'));
+    const sevenReport={
+      issue:104,screen:'07 Missões',scope:'Seven real Dia 1–7 inscriptions only',
+      source:'assets/design-approved/07-missoes.webp',
+      viewport:{width:384,height:512,deviceScaleFactor:1},
+      sameNativeScene:true,pausedAnimations:true,
+      approvedAssets:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      before:sevenBeforeLayout,after:sevenAfterLayout,
+      roi:sevenScore.metrics,unchanged:sevenScore.unchanged,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'missions-seven-captions-native-mae-roi.json'),JSON.stringify(sevenReport,null,2));
+    console.log('WORK8_SEVEN_CAPTIONS_NATIVE '+JSON.stringify({roi:sevenScore.metrics,labelsBefore:sevenBeforeLayout.labels,labelsAfter:sevenAfterLayout.labels}));
+    assert.equal(sevenAfterLayout.questCount,3,'must keep three actual missions');
+    assert.equal(sevenAfterLayout.dayCount,7,'must keep all seven real rewards');
+    assert.equal(sevenAfterLayout.navCount,5,'five actual WORK0 dock entries');
+    assert.ok(sevenAfterLayout.scrollWidth<=386,'native 384 content does not overflow');
+    assert.deepEqual(sevenBeforeLayout.chests,sevenAfterLayout.chests,'seven genuine chest artworks cannot shift');
+    assert.deepEqual(sevenBeforeLayout.days,sevenAfterLayout.days,'seven live reward boxes cannot shift');
+    assert.deepEqual(sevenBeforeLayout.dock,sevenAfterLayout.dock,'WORK0 five-item dock geometry unchanged');
+    assert.ok(sevenAfterLayout.chests.every(c=>c.bottom<=sevenAfterLayout.dock.top+1),
+      'all seven real chest illustrations above dock');
+    assert.ok(sevenAfterLayout.labels.length===7 && sevenAfterLayout.labels.every(
+      (c,i)=>c.bottom<=sevenAfterLayout.dock.top-2 && c.top>=sevenBeforeLayout.labels[i].top+12),
+      'all seven captions fully visible with original source registration above dock');
+    assert.ok(sevenScore.unchanged.dock<.1 && sevenScore.unchanged.header<.1,
+      'original WORK0 dock and header pixels unchanged');
+    assert.ok(sevenScore.metrics.full.delta<-.03 && sevenScore.metrics.captions.delta<-.15,
+      'must improve original 384x512 global RGB MAE and source-label ROI');
+    assert.ok(Math.abs(sevenScore.metrics.quests.delta)<.05,
+      'must not degrade existing three genuine missions');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);

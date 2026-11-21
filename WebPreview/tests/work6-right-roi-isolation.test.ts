@@ -58,6 +58,9 @@ test('WORK6: new single barrel replaces the visible right/left pair on 4 mobiles
     camera.lookAt(...pose.target);
     camera.updateMatrixWorld();
     group.position.set(pose.batteryOffsetX,0,pose.batteryOffsetZ);
+    // Use the exact deck world transform applied by OceanScene.home().
+    // An unscaled barrel must not be used to judge the live mobile sightline.
+    group.scale.setScalar(pose.batteryScale);
     barrel.updateWorldMatrix(true,false);
     const projection=muzzles.map(m=>{
       const ndc=m.clone().applyMatrix4(barrel.matrixWorld).project(camera);

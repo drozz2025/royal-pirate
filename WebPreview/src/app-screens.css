@@ -800,3 +800,14 @@
   .app.with-app-sheet {height:100dvh;min-height:0;max-height:100dvh}
   .app.with-app-sheet .app-sheet {height:100%;min-height:0;max-height:100%;overflow:hidden}
 }
+
+/* WORK0/#104 · 20 Nov: keep the runtime version diagnostic in the HTML for
+ * release auditing, but never let its fixed badge COVER a working navigation
+ * tab on 320–600px internal screens (Frota, Forja, Cartas, Loja, Missões,
+ * Ranking). Chromium 384×512 showed v0.1.117 laid directly over the first
+ * tab; this is a genuine visible collision, not just a visual MAE tweak.
+ * Scope to mounted internal sheets only: approved Porto stays byte-identical,
+ * battle has its own diagnostic visibility rule, dock/touches are unchanged. */
+@media (max-width:600px) {
+  body:has(.app.with-app-sheet) > .rp-version { display:none!important; }
+}
