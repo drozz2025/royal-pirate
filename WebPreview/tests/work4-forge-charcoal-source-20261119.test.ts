@@ -274,6 +274,28 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
   await evaluate("document.getElementById('work4-forge-plaque-candidate')?.remove();true");
   const liveRim=await evaluate("getComputedStyle(document.querySelector('.w4-forge-description')).borderTopColor");
   assert.equal(liveRim,'rgb(77, 64, 57)','production border must use measured source pigment');
+  // A/B integrity: after removing every injected study rule, the REAL shipped
+  // CSS must paint exactly the same 384x512 pixels as our "current" candidate.
+  // Otherwise the ROI numbers describe an experiment, not production.
+  await delay(130);
+  const productionScreenshot=(await cmd('Page.captureScreenshot',{
+    format:'png',captureBeyondViewport:false
+  })).data as string;
+  const nativeProof=await evaluate("(async()=>{"+
+    "const open=async s=>{const im=new Image();im.src='data:image/png;base64,'+s;await im.decode();return im;};"+
+    "const [candidate,actual]=await Promise.all(["+
+      "open("+JSON.stringify(shots[variants.findIndex(v=>v.id==='current')]) +"),"+
+      "open("+JSON.stringify(productionScreenshot)+")]);"+
+    "const pixels=im=>{const canvas=document.createElement('canvas');canvas.width=384;canvas.height=512;"+
+      "const context=canvas.getContext('2d',{willReadFrequently:true});context.drawImage(im,0,0);"+
+      "return context.getImageData(0,0,384,512).data;};"+
+    "if(candidate.width!==384||candidate.height!==512||actual.width!==384||actual.height!==512)"+
+      "throw Error('Production native screenshot geometry mismatch');"+
+    "const a=pixels(candidate),b=pixels(actual);let changed=0;"+
+    "for(let i=0;i<a.length;i+=4)if(a[i]!==b[i]||a[i+1]!==b[i+1]||a[i+2]!==b[i+2])changed++;"+
+    "return {width:actual.width,height:actual.height,changedPixels:changed};})()");
+  assert.equal(nativeProof.changedPixels,0,
+    'the measured current variant MUST exactly reproduce the actual shipped 384x512 scene');
   const mobile=[];
   for(const [width,height] of [[320,568],[390,844],[430,932]]){
     await cmd('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height});
