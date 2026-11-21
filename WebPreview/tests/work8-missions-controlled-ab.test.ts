@@ -1897,6 +1897,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        or state replacement; existing 320-scroll/touch/menu checks follow. */
     const dayInkFlag='work8-missions-day-legibility-ab-baseline';
     const dayInkGeometry=()=>evalJs('(()=>({quests:document.querySelectorAll(".w8-approved-quest").length,days:document.querySelectorAll(".w8-approved-days li").length,nav:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,labels:[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li > small")].map(el=>{const r=el.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}),chests:[...document.querySelectorAll(".w8-approved-missions .w8-approved-chest")].map(el=>{const r=el.getBoundingClientRect();return {top:r.top,bottom:r.bottom}}),dock:(()=>{const r=document.querySelector(".app-sheet > .harbour-nav").getBoundingClientRect();return {top:r.top,bottom:r.bottom}})(),width:document.documentElement.scrollWidth}))()');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(dayInkFlag)+');true');
+    await delay(155);
     const inkBeforeGeometry=await dayInkGeometry();
     const inkBeforeCss=await evalJs('(()=>{const s=getComputedStyle(document.querySelector(".w8-approved-days li > small"));return [s.display,s.alignItems,s.justifyContent,s.color].join("|")})()');
     const inkBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
