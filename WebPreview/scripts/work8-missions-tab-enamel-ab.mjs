@@ -144,7 +144,7 @@ try{
 
 
   const result={
-    candidate:{filter:'brightness(1.08) saturate(1.05)'},
+    candidate:{filter:'brightness(.75) saturate(1.35)'},
     issue:104,scope:'WORK8 07 Missões only: native selected DAILY tab enamel; real data; no Ranking or dock changes',
     base:'work6/web-3d-preview',reference:'assets/design-approved/07-missoes.webp',
     frame:'same genuine Chromium document/frame; native 384x512 DPR1; WebP decoded; animations paused',
