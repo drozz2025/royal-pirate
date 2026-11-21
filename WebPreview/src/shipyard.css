@@ -111,3 +111,13 @@
 .shipyard-reference>small{display:block;margin-top:3px;color:#c8d9e1;
  font:600 10px 'Barlow',sans-serif;line-height:1.35}
 @media(max-width:370px){.shipyard-reference{padding:6px}.shipyard-reference-actions{gap:4px}}
+
+/* Optional scene-only 360° orbit: six compact touch targets, no HUD overlap. */
+.shipyard-camera-presets.has-tour{grid-template-columns:repeat(6,minmax(0,1fr))}
+.shipyard-camera-presets.has-tour button{font-size:clamp(8px,2.15vw,11px);letter-spacing:0}
+.shipyard-camera-presets .shipyard-tour-button{background:linear-gradient(155deg,#e8bf70,#9a632d);color:#11283c;border-color:#ffe1a3}
+.shipyard-camera-presets .shipyard-tour-button.active{background:#d5eadb;color:#103c32;border-color:#b6f6d2}
+.shipyard-camera-presets .shipyard-tour-button:disabled{opacity:.55}
+.shipyard-tour-hint{display:block;pointer-events:none;align-self:center;max-width:95vw;
+ margin:-5px auto 5px;text-align:center;color:#e8dcba;text-shadow:0 1px 4px #071629;
+ font:600 9px 'Barlow',sans-serif}
