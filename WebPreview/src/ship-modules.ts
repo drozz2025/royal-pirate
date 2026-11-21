@@ -25,6 +25,7 @@ import { createPreviewGunportShutters } from './ship-gunport-shutters';
 import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
 import { createPreviewCabinGallery, type PreviewCabinModule } from './ship-cabin';
 import { createPreviewCannonRefit, type PreviewCannonModule } from './ship-cannons';
+import { createPreviewGunBreeching } from './ship-cannon-breeching';
 import { createPreviewFigurehead, type PreviewFigureheadModule } from './ship-figureheads';
 import { createPreviewHullRelief, type PreviewHullModule } from './ship-hull-relief';
 import { createPreviewSailEmbroidery, type PreviewSailModule } from './ship-sail-embroidery';
@@ -373,6 +374,10 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // calls across the complete broadside. These overlay the base cannon models;
  // none of the battle gun groups or combat stats are ever replaced.
  additions.add(createPreviewCannonRefit(config.shipClass,config.modules.cannons as PreviewCannonModule));
+ // Working breeching ropes and forged eyebolts run beside the SIX existing
+ // broadside guns. Sculpted per class; strictly decorative, batched into two
+ // meshes and isolated from combat, ammunition, purchases and hull ownership.
+ additions.add(createPreviewGunBreeching(config.shipClass,config.modules.cannons as PreviewCannonModule));
  if(config.modules.cannons!=='cannons-bronze')for(const side of [-1,1])for(const z of [-1.8,0,1.8]){
   ring(config.modules.cannons==='cannons-gold'?brass:iron,side*2.6,1.56,z,.24,.07,6,12);
  }
