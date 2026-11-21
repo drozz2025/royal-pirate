@@ -4351,3 +4351,20 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 21 Nov 2026: genuine source-art warmer ink registration.
+ * Two original approved 05 portraits only (cards 5 and 7), 384x512 native.
+ * Keep actual 4x2 eight cards, the full 06 shop, all live PRÉVIA/EM BREVE,
+ * genuine economy, tap targets, dock and 320/tall layouts unchanged.
+ * CSS uses original approved WEBP crops; never a screenshot background.
+ * This is an unapproved A/B candidate: approved:false, 0/8.
+ */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(2.05) hue-rotate(-15deg);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{
+    filter:saturate(1.25) contrast(1.13) brightness(1.73) hue-rotate(-8deg);
+  }
+}
