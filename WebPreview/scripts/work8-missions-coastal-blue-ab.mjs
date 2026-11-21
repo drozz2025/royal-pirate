@@ -101,7 +101,7 @@ try{
     'questButtons:[...document.querySelectorAll(".w8-approved-quest > button")].map(rect),'+
     'tabs:[...document.querySelectorAll(".w8-approved-tabs button")].map(rect),'+
     'docWidth:document.documentElement.scrollWidth,'+
-    'sceneFilter:getComputedStyle(document.querySelector('.w8-approved-missions .w8-approved-scene .w8-seascape')).filter};})()';
+    'sceneFilter:getComputedStyle(document.querySelector(".w8-approved-missions .w8-approved-scene .w8-seascape")).filter};})()';
   const capture=async()=> (await cmd('Page.captureScreenshot',{
     format:'png',fromSurface:true,captureBeyondViewport:false
   })).data;
