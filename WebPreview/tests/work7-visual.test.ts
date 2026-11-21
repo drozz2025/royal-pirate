@@ -50,7 +50,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   assert.ok(cssText.includes('18 Nov 12:21 UTC. Genuine 05 source art: local highlight registration.'),
     'Previous integrated true-image correction remains present');
   assert.ok(cssText.includes('19 Nov: native carved enamel shadow registration'), 'Original native 05 relief remains');
-  assert.ok(cssText.includes("Source 05 / frame #2: colder blue wind canvas"), "WORK7 wind card uses a native pigment pass, not new source art");
+  assert.ok(cssText.includes("original fifth bombardment card, true local native frame enamel test"), "WORK7 original fifth card uses native color material only, not new source art");
   assert.ok(cssText.includes('20 Nov 23:25 UTC; controlled combination'),
     'New WORK7 native only combined 05/06 genuine source-art treatment exists');
   assert.ok(cssText.includes('Genuine 06 legendary chest embossed metal rim'),
@@ -78,7 +78,6 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){
         filter:brightness(.50) saturate(1.70) contrast(.87)!important;
       }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.65) saturate(1.75) contrast(.75)!important;}
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
         filter:brightness(.43) saturate(1.20) contrast(.74)!important;
       }
@@ -370,6 +369,45 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "return {png:c.toDataURL('image/png').slice(22),mae,maeBefore,roiBefore,roiAfter,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
+
+        // WORK7 source-art material experiment: test real original fifth frame in
+        // the SAME frozen 384x512 Chromium scene, then reject candidates which
+        // do not improve genuine approved-image MAE / the full 4x2 ROI.
+        // The sweep is diagnostic; it does not mutate production game state.
+        if (kind==='cards' && width===384 && height===512) {
+          const candidates:[string,string][]=[
+            ['prior-705','brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04)'],
+            ['matte-1','brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04) brightness(.94) saturate(1.26) hue-rotate(-11deg) contrast(.89)'],
+            ['matte-2','brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04) brightness(.91) saturate(1.22) hue-rotate(-8deg) contrast(.91)'],
+            ['matte-3','brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04) brightness(.97) saturate(1.12) hue-rotate(-5deg) contrast(.92)'],
+            ['gold-4','brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04) brightness(.98) saturate(1.28) hue-rotate(-14deg) contrast(.94)'],
+            ['soft-5','brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04) brightness(.93) saturate(1.10) hue-rotate(-3deg) contrast(.96)'],
+            ['neutral-6','brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04) brightness(.94) saturate(1.25) contrast(.90)'],
+          ];
+          for (const [name,value] of candidates) {
+            const injected='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5)'+
+              '{filter:'+value+'!important}}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-matte-sweep';s.textContent="+
+              JSON.stringify(injected)+";document.head.appendChild(s);return true})()");
+            await sleep(75);
+            const shot=await command('Page.captureScreenshot',{
+              format:'png',fromSurface:true,captureBeyondViewport:false
+            });
+            const score=await evaluate("(async()=>{"+
+              "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "const [ref,live]=await Promise.all([load("+JSON.stringify(refUrl)+"),load("+JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+")]);"+
+              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+              "const cx=cv.getContext('2d');cx.drawImage(ref,0,0);const a=cx.getImageData(0,0,384,512).data;"+
+              "cx.clearRect(0,0,384,512);cx.drawImage(live,0,0);const b=cx.getImageData(0,0,384,512).data;"+
+              "let global=0,roi=0,rc=0;for(let y=0;y<512;y++)for(let x=0;x<384;x++){"+
+              "const p=(y*384+x)*4;for(let k=0;k<3;k++){const v=Math.abs(a[p+k]-b[p+k]);global+=v;"+
+              "if(x>=18&&x<365&&y>=195&&y<428){roi+=v;rc++}}}"+
+              "return {global:Math.round(global/(384*512*3)*10000)/10000,roi:Math.round(roi/rc*10000)/10000}})()");
+            console.log('WORK7 SLOT5 A/B SWEEP '+name+' '+JSON.stringify(score));
+            await evaluate("(()=>{document.getElementById('w7-matte-sweep')?.remove();return true})()");
+          }
+        }
 
         // WORK7 experimental tuning grid, never applied to the production UI:
         // same 384x512 screenshot frame and same approved artwork for every
