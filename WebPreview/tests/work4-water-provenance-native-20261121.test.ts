@@ -137,6 +137,15 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
     {id:'source-water-left-0',css:water+'{left:0!important;}'},
     {id:'source-water-bottom-0',css:water+'{bottom:0!important;}'},
     {id:'source-water-backdrop-ink',css:stage+'{background:#08527a!important;}'},
+    // WORK4/#104 — candidate study ONLY. True current production colour is
+    // retained in committed CSS unless same-frame MAE proves a new winner.
+    // Each injection is reverted before measuring the next trial.
+    ...['#064563','#043b5e','#064a70','#075078','#07527d','#075882',
+      '#095d84','#0a577b','#0a4d72','#0b5c7e','#0d6289','#064f76',
+      '#0b5273','#0a4767','#075b88','#08527a'].map(color=>({
+        id:'underpaint-'+color.slice(1),css:stage+'{background:'+color+'!important;}'
+      })),
+
     {id:'remove-photo-mask',css:ship+'{-webkit-mask-image:none!important;mask-image:none!important;}'}
   ] as const;
   const boxes:Record<string,[number,number,number,number]>={
@@ -243,6 +252,27 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
   const forge=await evaluate(forgeExpression);
   assert.ok(Number.isFinite(forge.mae.cannonComposition),'cannon ROI must be measured, not a global-only MAE');
   writeFileSync(join(qa,'original-render-overlay-forge-cannon-384x512.png'),Buffer.from(forge.comparison,'base64'));
+
+  // This is research, not a silent mutation of visual production:
+  // compare each colour with the actual committed candidate, not just the old
+  // released procedural gradient. Guard source ship/WORK0 dock and water.
+  const chromaticTrials=results.filter(x=>x.id.startsWith('underpaint-')&&
+    x.metrics.crownCore.changedPixels===0&&x.metrics.dock.changedPixels===0&&
+    x.metrics.authenticWater.trial<=production.authenticWater.trial+.01&&
+    x.metrics.lowerWaterJoin.trial<=production.lowerWaterJoin.trial+.01)
+    .sort((a,b)=>a.metrics.full.trial-b.metrics.full.trial);
+  const bestChromatic=chromaticTrials[0];
+  const chromaticStudy={baseline:'#08527a',baselineFull:production.full.trial,
+    baselineEdge:production.photoEdge.trial,
+    best:bestChromatic&&{id:bestChromatic.id,full:bestChromatic.metrics.full.trial,
+      photoEdge:bestChromatic.metrics.photoEdge.trial,
+      fullGain:production.full.trial-bestChromatic.metrics.full.trial,
+      edgeGain:production.photoEdge.trial-bestChromatic.metrics.photoEdge.trial},
+    viable:!!bestChromatic&&bestChromatic.metrics.full.trial<=production.full.trial-.02&&
+      bestChromatic.metrics.photoEdge.trial<=production.photoEdge.trial-.02};
+  writeFileSync(join(qa,'work4-underpaint-chromatic-study-384x512.json'),
+    JSON.stringify(chromaticStudy,null,2)+'\n');
+  console.log('WORK4_UNDERPAINT_CHROMATIC_STUDY '+JSON.stringify(chromaticStudy));
 
   const report={approved:false,approvedScreens:0,sourceFiles:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],viewport:'384x512',scene:'single paused Chromium frame, unchanged source/profile',geometry,forgeGeometry,forgeRoiMae:forge.mae,viewportResults,productionCssRoi:production,productionScreenshot:'original-before-render-overlay-fleet-384x512.png',selectedForFurtherArtReview:selected?.id??null,shownTrial:strongest.id,thresholds:{full:0.20,photoEdge:0.30,authenticWaterMinDelta:0,lowerWaterJoinMinDelta:-0.01},results:results.map(({id,metrics})=>({id,metrics})),note:'The reviewed deep-blue stage underpaint is now WORK4 production CSS only at native 384x512; all other CSS variants are temporary injected trials. MAE is not human artistic approval.'};
   writeFileSync(join(qa,'work4-water-provenance-ab.json'),JSON.stringify(report,null,2)+'\n');
