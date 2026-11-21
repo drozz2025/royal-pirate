@@ -79,7 +79,7 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     for(let i=0;i<140;i++){
       if(browser.exitCode!==null)break;
       try{
-        const p=Number(readFileSync(join(activeProfile,'DevToolsActivePort'),'utf8').split('\\n')[0]);
+        const p=Number(readFileSync(join(activeProfile,'DevToolsActivePort'),'utf8').split('\n')[0]);
         if(p>0){
           const res=await fetch('http://127.0.0.1:'+p+'/json/list',{signal:AbortSignal.timeout(750)});
           if(res.ok)target=(await res.json() as any[]).find(item=>item.type==='page'&&item.webSocketDebuggerUrl);
