@@ -320,6 +320,89 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
     Buffer.from(railStudy.overlay,'base64'));
   console.log('WORK4_FLEET_TOP_RAIL_AB '+JSON.stringify(railEvidence));
 
+  // WORK4/#104: prospectively investigate only the approved photo's top lip.
+  // This is a genuine same-frame Chromium A/B study, NOT a blind CSS promotion.
+  // Keep the compiled 12px treatment in production unless a later review
+  // confirms an objectively better local seam without a protected-ROI change.
+  const lipOptions=[
+    {id:'compiled-12px',height:12,stop:20,ink:'#03192b'},
+    {id:'short-9px',height:9,stop:20,ink:'#03192b'},
+    {id:'short-10px',height:10,stop:20,ink:'#03192b'},
+    {id:'tall-14px',height:14,stop:20,ink:'#03192b'},
+    {id:'tall-16px',height:16,stop:20,ink:'#03192b'},
+    {id:'soft-stop-10',height:12,stop:10,ink:'#03192b'},
+    {id:'soft-stop-30',height:12,stop:30,ink:'#03192b'},
+    {id:'dark-coast-ink',height:12,stop:20,ink:'#041e32'},
+    {id:'deep-edge-ink',height:12,stop:20,ink:'#021728'}
+  ];
+  const lipFrames:string[]=[];
+  for(const variant of lipOptions){
+    await evaluate("(()=>{let s=document.getElementById('work4-top-lip-study');"+
+      "if(s)s.remove();return true})()");
+    if(variant.id!=='compiled-12px'){
+      const paint=railSelector+'{height:'+variant.height+'px!important;'+
+        'background:linear-gradient(180deg,'+variant.ink+' 0%,'+variant.ink+' '+
+        variant.stop+'%,'+variant.ink+'00 100%)!important}';
+      await evaluate("(()=>{const s=document.createElement('style');"+
+        "s.id='work4-top-lip-study';s.textContent="+JSON.stringify(paint)+
+        ";document.head.append(s);return true})()");
+    }
+    await delay(100);
+    lipFrames.push((await cmd('Page.captureScreenshot',{
+      format:'png',captureBeyondViewport:false
+    })).data as string);
+  }
+  await evaluate("(()=>{document.getElementById('work4-top-lip-study')?.remove();return true})()");
+  const lipSweep=await evaluate("(async()=>{"+
+    "const urls=['data:image/webp;base64,"+approved+"',..."+JSON.stringify(lipFrames)+
+      ".map(p=>'data:image/png;base64,'+p)];"+
+    "const imgs=await Promise.all(urls.map(async u=>{const i=new Image();i.src=u;await i.decode();return i}));"+
+    "if(imgs.some(i=>i.width!==384||i.height!==512))throw Error('native frame required');"+
+    "const pix=imgs.map(i=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
+    "const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data});"+
+    "const rois={full:[0,0,384,512],topPhotoLip:[18,138,241,154],"+
+      "crown:[31,176,216,304],sea:[188,306,218,338],dock:[0,433,384,512],"+
+      "rightPanel:[246,165,370,342]};"+
+    "const measure=(a,b,rect)=>{let total=0,n=0,changed=0;"+
+      "for(let y=rect[1];y<rect[3];y++)for(let x=rect[0];x<rect[2];x++){"+
+      "const k=(y*384+x)*4;let different=false;for(let c=0;c<3;c++){"+
+      "total+=Math.abs(pix[a][k+c]-pix[b][k+c]);different ||=pix[a][k+c]!==pix[b][k+c];n++}"+
+      "if(different)changed++}return {mae:total/n,changedPixels:changed}};"+
+    "const results=pix.slice(1).map((_,i)=>({index:i,roi:Object.fromEntries("+
+      "Object.entries(rois).map(([k,r])=>[k,{source:measure(0,i+1,r).mae,"+
+      "changedPixels:measure(1,i+1,r).changedPixels}]))}));"+
+    "return {rois,results}})()");
+  assert.equal(lipSweep.results.length,lipOptions.length,'all nine alternatives measured');
+  for(const row of lipSweep.results){
+    for(const protectedROI of ['crown','sea','dock','rightPanel'])
+      assert.equal(row.roi[protectedROI].changedPixels,0,
+        'top-lip candidate cannot alter '+protectedROI);
+  }
+  const sourceBaseline=lipSweep.results[0];
+  const qualified=lipSweep.results.filter((r:any)=>
+    r.roi.topPhotoLip.source<=sourceBaseline.roi.topPhotoLip.source+.000001 &&
+    r.roi.full.source<=sourceBaseline.roi.full.source+.000001);
+  qualified.sort((a:any,b:any)=>
+    a.roi.topPhotoLip.source-b.roi.topPhotoLip.source ||
+    a.roi.full.source-b.roi.full.source);
+  const bestLip=qualified[0]||sourceBaseline;
+  const sweepReport={
+    approved:false,screensApproved:0,viewport:'384x512',
+    source:'assets/design-approved/03-frota.webp',
+    study:'nine top-photograph candidates in same paused Chromium scene, only WORK4 CSS varied',
+    productionOption:lipOptions[0].id,proposedBestOption:lipOptions[bestLip.index].id,
+    roiBoxes:lipSweep.rois,variants:lipOptions.map((v,i)=>({...v,...lipSweep.results[i]})),
+    note:'Experimental only. No unreviewed style injected into production build; protect original crown, sea, panel, dock.'
+  };
+  writeFileSync(join(qa,'work4-fleet-top-lip-nine-way-sweep-384x512.json'),
+    JSON.stringify(sweepReport,null,2)+'\n');
+  console.log('WORK4_FLEET_TOP_RAIL_SWEEP '+JSON.stringify({
+    production:sourceBaseline.roi,proposedBest:lipOptions[bestLip.index],
+    best:bestLip.roi,variants:sweepReport.variants.map(v=>({
+      id:v.id,full:v.roi.full.source,lip:v.roi.topPhotoLip.source
+    }))
+  }));
+
   // WORK4 native visibility regression discovered in the real 384x512
   // independent SHA comparison. Hold the same scene, paused frame, fonts
   // and prices; switch only the four locally owned roster cards.
