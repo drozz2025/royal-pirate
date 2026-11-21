@@ -16,6 +16,8 @@ type ShipyardProps={
  onPreview:(loadout:ShipLoadout)=>void;
  /** Optional isolated preview camera; no battle camera or persistence involved. */
  onViewChange?:(view:ShipyardView)=>void;
+ /** Optional WORK 6/2 3D-only showcase; returns actual enabled state. */
+ onTourChange?:(enabled:boolean,onInterrupted:()=>void)=>boolean;
  /** Optional WORK 6 callback to focus the active part in the isolated 3D scene. */
  onFocusSlot?:(slot:ModuleSlot|null)=>void;
  ownedModuleIds?:ReadonlySet<string>;
@@ -32,9 +34,13 @@ const SLOT_NAMES:Record<ModuleSlot,string>={
 
 /** Interactive ship construction sandbox. Nothing here is purchased, owned,
  * persisted, awarded or injected into combat; only original 3D parts are previewed. */
-export function Shipyard({onClose,onPreview,onViewChange,onFocusSlot,ownedModuleIds,ownedShipClasses,verifiedPlayerLevel,onEquip}:ShipyardProps){
+export function Shipyard({onClose,onPreview,onViewChange,onTourChange,onFocusSlot,ownedModuleIds,ownedShipClasses,verifiedPlayerLevel,onEquip}:ShipyardProps){
  const [slot,setSlot]=useState<ModuleSlot>('hull');
  const [cameraView,setCameraView]=useState<ShipyardView>('quarter');
+ const [tourActive,setTourActive]=useState(false);
+ const stopTour=useCallback(()=>setTourActive(false),[]);
+ const reducedMotion=typeof window!=='undefined'&&typeof window.matchMedia==='function'
+  &&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  const [focusedSlot,setFocusedSlot]=useState<ModuleSlot|null>(null);
  const [history,setHistory]=useState(createPreviewHistory);
  const [pinnedReference,setPinnedReference]=useState<PreviewDraft|null>(null);
@@ -113,7 +119,12 @@ export function Shipyard({onClose,onPreview,onViewChange,onFocusSlot,ownedModule
    {SHIPYARD_VIEWS.map(view=><button type="button" key={view.id} aria-pressed={cameraView===view.id}
     className={cameraView===view.id?'active':''} onClick={()=>{setCameraView(view.id);onViewChange(view.id);}}
     aria-label={'Show '+view.label+' view of the preview ship'}>{view.label}</button>)}
+   {onTourChange&&<button type="button" className={'shipyard-tour-button'+(tourActive?' active':'')}
+    aria-pressed={tourActive} disabled={reducedMotion}
+    aria-label={tourActive?'Stop automatic 360-degree 3D ship preview':'Start automatic 360-degree 3D ship preview'}
+    onClick={()=>setTourActive(onTourChange(!tourActive,stopTour))}>{tourActive?'STOP 360°':'360° TOUR'}</button>}
   </div>}
+  {onTourChange&&<small className="shipyard-tour-hint">Stops on manual orbit, when leaving the shipyard, or when reduced motion is enabled.</small>}
   <div className="shipyard-panel">
    <div className="shipyard-level">
     <label htmlFor="shipyard-level">DEMO PREVIEW LEVEL <strong>{level} / 20</strong></label>
