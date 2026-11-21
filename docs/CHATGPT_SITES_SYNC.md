@@ -39,3 +39,17 @@ Documentação oficial:
 - A documentação oficial [Criar e utilizar Sites](https://help.openai.com/en/articles/20001339-creating-and-using-chatgpt-sites), consultada de novo em 21/11, diz para abrir o **Site existente**, rever alterações, guardar uma versão e publicá-la. Nem a ligação de leitura GitHub ao ChatGPT cria um deploy para `.chatgpt.site`: [Conectar GitHub](https://help.openai.com/en/articles/11145903-connecting-github-to-chatgpt).
 - O navegador autenticado do proprietário não estava disponível nesta execução e não houve ferramenta autorizada de escrita de Sites; por isso, **nenhuma chamada de publicação ou sincronização** foi feita. Ao contrário de uma verificação HTTP 200, só commit/versão + capturas + interação no mesmo release podem demonstrar paridade.
 - Candidato de código na [PR #696](https://github.com/drozz2025/royal-pirate/pull/696) recebeu duas correções de Frota da comparação original WORK4, mas continua **Draft, 0/8 de aprovação artística e sem deploy**. Até passar todos os gates, deixar Pages e o Site tal como estão.
+
+
+## Esclarecimento da documentação oficial — 21-11-2026 18h UTC
+
+Fontes oficiais consultadas nesta ronda:
+- https://learn.chatgpt.com/docs/sites/managing-a-site
+- https://learn.chatgpt.com/docs/sites/creating-a-site
+- https://help.openai.com/en/articles/20001339-creating-and-using-chatgpt-sites
+
+**Existe integração de projetos-fonte locais com o alojamento Sites, MAS NÃO um espelho automático comprovado de GitHub Pages para o Site do ROYAL PIRATE.** A documentação atual descreve a associação de um projeto local ao hosting do Sites por meio de um ficheiro `.openai/hosting.json` que pode incluir `project_id` e as bindings `d1`/`r2`. O identificador é fornecido pelo Sites depois do aprovisionamento; nunca inventar nem copiar o de outro projeto. O facto de o manifest ser suportado **não significa** que exista autorização para associar este repositório ao Site já publicado em `royal-pirate.ricardomalheiro.chatgpt.site`, nem implica deploy automático por GitHub Actions.
+
+Para projetos locais associados, a documentação separa **guardar versão** (construção, para revisão, relacionada com o commit Git) e **publicar/deploy** (atualização real do URL). A gestão da publicação exige o fluxo Sites no ChatGPT Work/desktop autorizado: abrir o Site existente, confirmar proprietário/editor e a compatibilidade do projeto local, inspecionar projeto/versões e confirmar o `project_id` antes de estabelecer a ligação. O editor CLI/IDE **não disponibiliza uma consola independente de gestão** do Site. Não foi verificado um endpoint/API externa para configurar deploy GitHub Actions → Sites do projeto existente.
+
+**Estado verificado nesta execução:** há acesso de escrita ao GitHub, mas não foi estabelecida uma sessão autenticada e autorizada de gestão do Site nem recuperado o seu `project_id`. Não criar `.openai/hosting.json` com um `project_id` adivinhado, não criar outro Site, não alterar domínio ou acesso. Continuar a publicar exclusivamente na fonte GitHub Pages quando os oito ecrãs passarem QA e revisão artística; guardar depois uma versão do MESMO Site por um editor autenticado, publicar com aprovação e comparar SHA/fingerprints/HTTP/capturas/gestos dos dois URLs. Sem nova publicação neste registo.
