@@ -8,6 +8,7 @@ import {
  createPreviewHistory, currentPreview, recordPreview, undoPreview, redoPreview,
  canUndoPreview, canRedoPreview, type PreviewDraft
 } from './shipyard-history';
+import { capturePreviewReference, comparePreviewReference } from './shipyard-reference';
 
 /** Optional Work 4 interface: never infer entitlements from demo preview progress. */
 type ShipyardProps={
@@ -36,7 +37,13 @@ export function Shipyard({onClose,onPreview,onViewChange,onFocusSlot,ownedModule
  const [cameraView,setCameraView]=useState<ShipyardView>('quarter');
  const [focusedSlot,setFocusedSlot]=useState<ModuleSlot|null>(null);
  const [history,setHistory]=useState(createPreviewHistory);
- const draft=currentPreview(history);
+ const [pinnedReference,setPinnedReference]=useState<PreviewDraft|null>(null);
+ const [viewingReference,setViewingReference]=useState(false);
+ const workingDraft=currentPreview(history);
+ // Reference A is a read-only, in-memory visual comparison; B is the editable
+ // working draft. Switching views never writes history or player state.
+ const draft=viewingReference&&pinnedReference?pinnedReference:workingDraft;
+ const comparison=pinnedReference?comparePreviewReference(pinnedReference,workingDraft):null;
  const {shipClass,level,selectedByClass}=draft;
  const selected=selectedByClass[shipClass];
  // Every meaningful visual edit is reversible; never store or replay verified
@@ -78,7 +85,7 @@ export function Shipyard({onClose,onPreview,onViewChange,onFocusSlot,ownedModule
  const verifiedLevelMatches=typeof verifiedPlayerLevel==='number'
   &&Number.isInteger(verifiedPlayerLevel)&&verifiedPlayerLevel>=1
   &&verifiedPlayerLevel<=20&&verifiedPlayerLevel===level;
- const equipEnabled=!!onEquip&&!!ownedModuleIds&&!!ownedShipClasses&&ownedShipClasses.has(shipClass)&&verifiedLevelMatches
+ const equipEnabled=!viewingReference&&!!onEquip&&!!ownedModuleIds&&!!ownedShipClasses&&ownedShipClasses.has(shipClass)&&verifiedLevelMatches
   &&SLOTS.every(s=>mayEquip(selected[s]??DEFAULT_MODULES[s],verifiedPlayerLevel,ownedModuleIds));
  const equipVerified=()=>{
   if(onEquip&&ownedModuleIds&&ownedShipClasses&&equipEnabled&&verifiedPlayerLevel!==undefined){
@@ -96,7 +103,7 @@ export function Shipyard({onClose,onPreview,onViewChange,onFocusSlot,ownedModule
    <div className="shipyard-class-options" role="group" aria-label="Ship class">
     {(Object.keys(SHIP_CLASSES) as ShipClass[]).map(type=>
      <button type="button" key={type} className={type===shipClass?'active':''}
-      aria-pressed={type===shipClass} onClick={()=>commitDraft({...draft,shipClass:type})}>{SHIP_CLASSES[type].name}</button>
+      aria-pressed={type===shipClass} disabled={viewingReference} onClick={()=>commitDraft({...draft,shipClass:type})}>{SHIP_CLASSES[type].name}</button>
     )}
    </div>
    <small>{SHIP_CLASSES[shipClass].description} · {progressionTier(level).toUpperCase()} TIER · {ownedShipClasses?.has(shipClass)?'VERIFIED FLEET HULL':'HULL PREVIEW ONLY'}</small>
@@ -110,9 +117,34 @@ export function Shipyard({onClose,onPreview,onViewChange,onFocusSlot,ownedModule
   <div className="shipyard-panel">
    <div className="shipyard-level">
     <label htmlFor="shipyard-level">DEMO PREVIEW LEVEL <strong>{level} / 20</strong></label>
-    <input id="shipyard-level" type="range" min={1} max={20} step={1} value={level}
+    <input id="shipyard-level" type="range" min={1} max={20} step={1} value={level} disabled={viewingReference}
       onChange={event=>chooseLevel(Number(event.target.value))}/>
     <span>Levels demonstrate visual unlock gates only — no player progress is saved.</span>
+   </div>
+   <div className="shipyard-reference" role="group" aria-label="Temporary visual ship A/B comparison">
+    <div className="shipyard-reference-actions">
+     <button type="button" disabled={viewingReference}
+      aria-label="Pin current visual ship as temporary reference A"
+      onClick={()=>{setPinnedReference(capturePreviewReference(workingDraft));setViewingReference(false);}}>
+      PIN REFERENCE A
+     </button>
+     <button type="button" disabled={!pinnedReference}
+      aria-pressed={viewingReference}
+      aria-label={viewingReference?'Return to editable visual ship B':'View pinned visual reference A'}
+      onClick={()=>setViewingReference(previous=>!previous)}>
+      {viewingReference?'VIEW CURRENT B':'VIEW PINNED A'}
+     </button>
+     <button type="button" disabled={!pinnedReference}
+      aria-label="Discard temporary visual reference A"
+      onClick={()=>{setPinnedReference(null);setViewingReference(false);}}>CLEAR A</button>
+    </div>
+    <span role="status">{!pinnedReference?'Pin the current look as A, edit B, then alternate the same 3D camera to compare.':
+     (viewingReference?'VIEWING A · READ ONLY · ':'EDITING B · ')+
+     (comparison?.classChanged?'CLASS DIFFERENT · ':'')+
+     (comparison?.levelChanged?'LEVEL DIFFERENT · ':'')+
+     (comparison?.changedSlots.length??0)+' MODULES DIFFERENT'}
+    </span>
+    <small>No ships, modules, progression or ownership are saved by comparison. A is discarded on exit.</small>
    </div>
    <div className="shipyard-slot-strip" role="group" aria-label="Ship module categories">
     {SLOTS.map(current=><button type="button" key={current} aria-pressed={slot===current}
@@ -123,18 +155,18 @@ export function Shipyard({onClose,onPreview,onViewChange,onFocusSlot,ownedModule
       }}>{SLOT_NAMES[current]}</button>)}
    </div>
    <div className="shipyard-parts-header"><strong>{SLOT_NAMES[slot]} MODULES</strong><div className="shipyard-parts-tools">
-    <button type="button" className="shipyard-history-button" disabled={!canUndoPreview(history)}
+    <button type="button" className="shipyard-history-button" disabled={viewingReference||!canUndoPreview(history)}
      onClick={()=>setHistory(undoPreview)} aria-label="Undo last visual shipyard preview change">UNDO</button>
-    <button type="button" className="shipyard-history-button" disabled={!canRedoPreview(history)}
+    <button type="button" className="shipyard-history-button" disabled={viewingReference||!canRedoPreview(history)}
      onClick={()=>setHistory(redoPreview)} aria-label="Redo last visual shipyard preview change">REDO</button>
     {onFocusSlot&&<button type="button" className="shipyard-part-focus" aria-pressed={focusedSlot===slot}
      aria-label={focusedSlot===slot?'Return to full ship view':'Inspect '+SLOT_NAMES[slot]+' in close-up 3D'}
      onClick={()=>{const next=focusedSlot===slot?null:slot;setFocusedSlot(next);onFocusSlot(next);}}>
      {focusedSlot===slot?'FULL SHIP':'FOCUS '+SLOT_NAMES[slot]}
     </button>}
-    <button type="button" onClick={()=>setSelected(highestUnlockedPreviewModules(level))}
+    <button type="button" disabled={viewingReference} onClick={()=>setSelected(highestUnlockedPreviewModules(level))}
      aria-label="Preview highest unlocked modules at this demo level, without granting ownership">MAX LEVEL PREVIEW</button>
-    <button type="button" onClick={()=>setSelected({})} aria-label="Reset preview modules for this ship class only">RESET CLASS</button>
+    <button type="button" disabled={viewingReference} onClick={()=>setSelected({})} aria-label="Reset preview modules for this ship class only">RESET CLASS</button>
     <button type="button" onClick={()=>setDetails(!details)} aria-expanded={details}>{details?'HIDE INFO':'SHOW INFO'}</button>
    </div></div>
    <div className="shipyard-parts" role="group" aria-label={'Preview '+SLOT_NAMES[slot].toLowerCase()}>
@@ -142,7 +174,7 @@ export function Shipyard({onClose,onPreview,onViewChange,onFocusSlot,ownedModule
      const locked=module.minLevel>level;
      const selectedPart=active===module.id;
      const gate=equipAccess(module.id,level,ownedModuleIds);
-     return <button type="button" key={module.id} disabled={locked}
+     return <button type="button" key={module.id} disabled={locked||viewingReference}
       className={'shipyard-part'+(selectedPart?' selected':'')}
       aria-pressed={selectedPart} onClick={()=>setSelected(prev=>({...prev,[slot]:module.id}))}>
       <span className="shipyard-part-crest">{locked?'◇':'✦'}</span>
