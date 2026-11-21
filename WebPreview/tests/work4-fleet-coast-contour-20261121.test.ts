@@ -145,7 +145,7 @@ test('WORK4 384x512 authentic Royal Crown coast contour sweep — controlled ORI
   "const boxes={global:[0,0,384,512],coast:[190,162,245,310],photoEdge:[228,150,264,339],royalCrown:[65,205,175,307],sea:[188,306,218,338],roster:[18,338,366,432],dock:[0,433,384,512]};"+
   "const roi=(pixels,box)=>{let sum=0,n=0,changed=0;for(let y=box[1];y<box[3];y++)for(let x=box[0];x<box[2];x++){const k=(y*384+x)*4;for(let c=0;c<3;c++){sum+=Math.abs(b[k+c]-pixels[k+c]);n++}if([0,1,2].some(c=>base[k+c]!==pixels[k+c]))changed++}return {mae:sum/n,changedPixels:changed}};"+
   "const measures=frames.map(p=>Object.fromEntries(Object.entries(boxes).map(([name,box])=>[name,roi(p,box)])));"+
-  "const eligible=measures.map((m,index)=>({m,index})).filter(({m})=>m.royalCrown.changedPixels===0&&m.roster.changedPixels===0&&m.dock.changedPixels===0&&m.sea.mae<=measures[0].sea.mae+.03&&m.global.mae<measures[0].global.mae);"+
+  "const eligible=measures.map((m,index)=>({m,index})).filter(({m})=>m.royalCrown.changedPixels===0&&m.roster.changedPixels===0&&m.dock.changedPixels===0&&m.sea.mae<=measures[0].sea.mae+.03&&m.global.mae<=measures[0].global.mae-.02&&m.coast.mae<=measures[0].coast.mae-.1&&m.photoEdge.mae<=measures[0].photoEdge.mae-.1);"+
   "eligible.sort((a,b)=>a.m.photoEdge.mae-b.m.photoEdge.mae||a.m.coast.mae-b.m.coast.mae||a.m.global.mae-b.m.global.mae);"+
   "const winner=eligible.length?eligible[0].index:0;"+
   "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;const g=canvas.getContext('2d');"+
@@ -162,7 +162,7 @@ test('WORK4 384x512 authentic Royal Crown coast contour sweep — controlled ORI
    frame:'one paused Chromium Fleet page at 384x512, no animation or state changes',
    scene,boxes:result.boxes,winner:variations[result.winner],
    candidates:variations.map((v,i)=>({...v,roi:result.measures[i]})),
-   productionChanged:false,why:'Optical trial only; WORK0 must review safe visual candidate before promotion.'};
+   productionChanged:false,thresholds:{globalMAE:.02,coastMAE:.1,photoEdgeMAE:.1},why:'No visual candidate is promoted without a meaningful three-ROI improvement; preserve existing production CSS.'};
  writeFileSync(join(qa,'work4-fleet-coast-contour-384x512.json'),JSON.stringify(report,null,2)+'\n');
  writeFileSync(join(qa,'original-before-trial-overlay-fleet-coast-384x512.png'),Buffer.from(result.collage,'base64'));
  console.log('WORK4_COAST_CONTOUR_AB '+JSON.stringify({winner:report.winner,
