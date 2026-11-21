@@ -3191,3 +3191,21 @@
     line-height:1.05;
   }
 }
+
+/* WORK4/#104 — reference-source coastal join, same-frame native 384×512 A/B.
+   The approved 03-frota original continues for six genuine pixels beyond the
+   old hard x241 source crop. Show width 229px / viewBox 18 146 229 194 at 1:1
+   (JSX synchronizes the viewBox only at this viewport). This restores painted
+   coast beside the EXISTING full-height real stats. It never scales the Royal
+   Crown, creates a second ship or synthetic water, moves hit targets or alters
+   the WORK0 dock. Other phone aspect ratios and #255/#260 stay untouched.
+   QA original: 223px vs 229px, same paused Chromium 384×512 frame:
+   full MAE 48.63339→48.57894, right source-edge 13.14086→11.38848;
+   1203 frame pixels changed, 0 in protected ship, sea and dock ROIs.
+   Human approval still false. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {
+    width:229px!important;
+    max-width:229px!important;
+  }
+}
