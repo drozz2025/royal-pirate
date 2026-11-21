@@ -78,7 +78,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){
         filter:brightness(.50) saturate(1.70) contrast(.87)!important;
       }
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.65) saturate(1.75) contrast(.75)!important;}\n      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){filter:brightness(.65) saturate(1.75) contrast(.75)!important;}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
         filter:brightness(.43) saturate(1.20) contrast(.74)!important;
       }
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
