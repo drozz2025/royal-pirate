@@ -1668,12 +1668,6 @@
   .w7-screen[data-work7-screen="cards"] .w7-card-grid{
     grid-template-columns:repeat(3,minmax(0,1fr));
   }
-  /* WORK7 21 Nov: original fifth bombardment card, true local native frame enamel test.
-   * Separate pigmented metal relief; no UI text or approved source pixels replaced. */
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
-    filter:brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04)
-           brightness(.94) saturate(1.26) hue-rotate(-11deg) contrast(.89);
-  }
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
     grid-template-columns:37% 1fr;
     padding:7px;
@@ -4391,6 +4385,12 @@
   }
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
     filter:brightness(.64) saturate(1.90) contrast(.88) hue-rotate(-13deg) brightness(.99) saturate(1.11);
+  }
+  /* WORK7 21 Nov: original fifth bombardment card, true local native frame enamel test.
+   * Separate pigmented metal relief; no UI text or approved source pixels replaced. */
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04)
+           brightness(.94) saturate(1.26) hue-rotate(-11deg) contrast(.89);
   }
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
     background:
