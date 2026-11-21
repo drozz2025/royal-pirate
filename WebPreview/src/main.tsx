@@ -26,13 +26,14 @@ function App(){
  const previewShipyard=useCallback((loadout:ShipLoadout)=>{view.current?.showShipyard(loadout);},[]);
  const shipyardCamera=useCallback((angle:ShipyardView)=>{view.current?.setShipyardView(angle);},[]);
  const shipyardFocus=useCallback((slot:ModuleSlot|null)=>{view.current?.setShipyardFocus(slot);},[]);
+ const shipyardTour=useCallback((enabled:boolean,onInterrupted:()=>void)=>view.current?.setShipyardTour(enabled,onInterrupted)??false,[]);
  const inspectShip=()=>{view.current?.inspectShip();setInspecting(true);};
  const closeInspection=()=>{view.current?.showHarbour();setInspecting(false);};
  const result=state.phase==='victory'||state.phase==='defeat',ready=state.phase==='ready'&&loaded&&!error;
  return <main className={'app '+(harbour?'in-harbour':'in-battle')}>
    <div ref={host} className="ocean"/><div className="vignette"/>
    {harbour&&!inspecting&&!shipyard&&<Harbour onBattle={enterBattle} onInspect={inspectShip} onShipyard={enterShipyard}/>}
-   {harbour&&shipyard&&<Shipyard onClose={returnHarbour} onPreview={previewShipyard} onViewChange={shipyardCamera} onFocusSlot={shipyardFocus}/>}
+   {harbour&&shipyard&&<Shipyard onClose={returnHarbour} onPreview={previewShipyard} onViewChange={shipyardCamera} onTourChange={shipyardTour} onFocusSlot={shipyardFocus}/>}
    {harbour&&inspecting&&!shipyard&&<div className="ship-inspection-ui"><button type="button" onClick={closeInspection} aria-label="Back to harbour">‹ BACK TO PORT</button><div><strong>THE ROYAL CROWN</strong><span>LIVE 3D SHIP VIEWER · DRAG TO ORBIT · PINCH TO ZOOM</span></div></div>}
    {!harbour&&<button className="return-harbour" type="button" aria-label="Return to harbour" onClick={returnHarbour}>⚓ HARBOUR</button>}
    <header className="topbar"><a className="brand" href="#" aria-label="Royal Pirate"><span className="brand-emblem"><Icon name="anchor" size={28}/></span><span>ROYAL <b>PIRATE</b><small>THE FIRST BROADSIDE</small></span></a><span className="preview-pill"><i/> {compatibility?'3D COMPATIBILITY MODE':'LIVE 3D PREVIEW'}</span><button className="progress-button" aria-label="Development Progress" onClick={()=>setProgress(true)}><Icon name="chart" size={19}/><span>Development Progress</span></button></header>
