@@ -203,6 +203,22 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
   // Real previous release width: same frame, paint, content and animation state.
   variants.push({id:'plaque-width-53-control',paint:ironPaint,
     extra:'.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description{width:53%!important;}'});
+  // WORK4/#104 — candidate-only source-faithful plaque rim study, 21 Nov.
+  // This extends the EXISTING #708 native A/B, not a duplicate PR. All samples
+  // paint the existing Forge plaque's border only, in one paused 384px scene;
+  // no overlays on the original cannon/hearth, real costs, or WORK0 dock.
+  const rimSelector='.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description';
+  const rimPigments=[
+    ['aged-iron','#4f4b45'],['old-bronze','#7b624c'],
+    ['dark-brass','#624633'],['smoked-umber','#5a4b40'],
+    ['warm-pewter','#6c6860'],['charcoal-bronze','#4d4039'],
+    ['oak-iron','#71523e'],['dull-copper','#8a6043'],
+    ['cold-forge','#53606a'],['bronze-ash','#665244']
+  ] as const;
+  for(const [name,pigment] of rimPigments){
+    variants.push({id:'rim-'+name,paint:ironPaint,
+      extra:rimSelector+'{border-color:'+pigment+'!important;}'});
+  }
   const shots=[];
   const composition=[];
   for(const shift of variants){
@@ -324,6 +340,33 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     'all candidate frames preserve exactly one cannon and all three real levels');
   assert.ok(candidates.some(v=>v.shape.plaque.w!==composition[shippedIndex].plaque.w),
     'Chromium must actually apply candidate width: do not count unchanged frames as evidence');
+  const rimCandidates=variants.map((v,i)=>({id:v.id,index:i}))
+    .filter(x=>x.id.startsWith('rim-'))
+    .map(x=>({id:x.id,roi:result.records[x.index].roi,geometry:composition[x.index]}));
+  const admissibleRims=rimCandidates.filter(x=>
+    x.geometry.cannonPlaqueBoundingOverlap===0&&x.geometry.rows===3&&x.geometry.rowsFit&&
+    !x.geometry.horizontalOverflow&&x.geometry.cannonCount===1&&
+    x.roi.costs.changedPixels===0&&x.roi.dock.changedPixels===0&&
+    x.roi.cannon.mae<=shipped.roi.cannon.mae+0.00001&&
+    x.roi.furnace.mae<=shipped.roi.furnace.mae+0.00001&&
+    x.roi.full.mae<shipped.roi.full.mae&&
+    x.roi.liveStats.mae<shipped.roi.liveStats.mae);
+  admissibleRims.sort((a,b)=>a.roi.full.mae-b.roi.full.mae);
+  assert.ok(rimCandidates.length===rimPigments.length,'measure EVERY real Forge rim pigment');
+  assert.ok(rimCandidates.some(x=>x.roi.full.changedPixels>0),
+    'the source-rim study must change real painted pixels, not inert CSS');
+  const rimReport={approved:false,screensApproved:0,baseline:{
+    id:'current',full:shipped.roi.full.mae,liveStats:shipped.roi.liveStats.mae,
+    cannon:shipped.roi.cannon.mae,furnace:shipped.roi.furnace.mae},
+    tested:rimCandidates.map(x=>({id:x.id,full:x.roi.full.mae,
+      liveStats:x.roi.liveStats.mae,cannon:x.roi.cannon.mae,furnace:x.roi.furnace.mae,
+      changedPixels:x.roi.full.changedPixels,overlap:x.geometry.cannonPlaqueBoundingOverlap})),
+    admissible:admissibleRims.map(x=>x.id),
+    winner:admissibleRims[0]?.id??null,
+    productionChange:false,
+    decision:admissibleRims.length?'WORK0 may review measured rim before production promotion':'KEEP 51% production plaque; no qualifying rim color'};
+  Object.assign(report,{rimSourceStudy:rimReport});
+  console.log('WORK4_FORGE_NATIVE_RIM_STUDY '+JSON.stringify(rimReport));
   writeFileSync(join(qa,'work4-forge-depth-gradient-ab-384x512.json'),JSON.stringify(report,null,2)+'\n');
   writeFileSync(join(qa,'work4-original-before-render-overlay-forge-gradient-384x512.png'),Buffer.from(result.grid,'base64'));
   console.log('WORK4_FORGE_NATIVE_PRODUCTION_WIDTH_AB '+JSON.stringify({before:previous.roi,render:shipped.roi,originalOverlap:composition[previousIndex].cannonPlaqueBoundingOverlap,newOverlap:composition[shippedIndex].cannonPlaqueBoundingOverlap}));
