@@ -147,8 +147,8 @@ try{
   // use an image as a fake screen; these are alternative CSS paints of the same
   // three actual approved art crops, not modified gameplay or reward state.
   const variants=[
-    ...[1.60,1.78,1.90,2.00,2.12,2.24,2.38].flatMap(b=>
-      [1.0,1.05,1.10].map(c=>({brightness:b,contrast:c,saturation:1.10})))
+    ...[0.80,0.95,1.05,1.20,1.30,1.45,1.60].flatMap(b=>
+      [0.95,1.0,1.05].map(c=>({brightness:b,contrast:c,saturation:1.00})))
   ];
   const diagnostic=[];
   for(const choice of variants){
