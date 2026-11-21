@@ -55,7 +55,7 @@ export function battleEnemyScale(aspect:number):number {
   // All portrait crops now reclaim clear sky around the real broadside;
   // keep the aftcastle in frame without moving collision geometry.
   // Presentation only: physical hull, damage hitbox and Porto stay unchanged.
-  if(aspect<.62)return 1.08; // real broadside retains three masts, restores open sea on tall phones
+  if(aspect<.62)return Math.max(.60,Math.min(.82,Math.round(1.03*aspect/.75*100)/100)); // compensate narrow horizontal FOV: 320/568=.77, 390/844=.63
   if(aspect<.80)return 1.03; // native reference: enemy now occupies a smaller starboard island
   return 1.82; // preserve desktop
 }
@@ -77,26 +77,24 @@ export function battleCameraPose(aspect: number): CameraPose {
     // down ONE central gun barrel. The opponent remains ahead at starboard,
     // showing its long hull in profile. This changes only battle presentation.
     // Full perspective makes the enemy grow when zooming toward its hull.
-    // Ultra-tall phones have a narrower horizontal field of view. In real
-    // 390x844 Chromium evidence the enemy stern touches the right edge.
-    // Pan the first-person camera AND battle-only gunner deck together:
-    // the single muzzle remains centred while the broadside stays visible.
-    // Never move the simulated ships, physics, Porto or five-item dock.
-    const ultraTall = aspect < .50;
-    const compact = aspect >= .50 && aspect < .62; // 320x568: guard the galleon's stern
+    // At 390x844 the narrower horizontal FOV enlarged/cropped the enemy.
+    // Scale the live presentation proportionally to aspect and pan its broadside
+    // toward starboard while moving the real deck so the muzzle stays centred.
+    // Never move simulated hulls, collision geometry, Porto or the dock.
+    const tallPortrait = aspect < .62; // narrow horizontal FOV needs a different starboard pan from 384x512
     return {
       // Keep the gunner eye at deck height. At the native 384x512 reference
       // crop, aim the camera further toward the PORT side so the enemy reads
       // in the RIGHT third instead of blocking the cannon centreline.
       // Move the existing live gun deck laterally with that pan to preserve
       // the real muzzle near x=50%, rather than reprojecting a fake shot.
-      // Camera stays fixed; move the actual battery laterally as it shrinks
-      // so its physical muzzle remains centered in 320/384/390px crops.
+      // Camera stays fixed; pan the ACTUAL central cannon with the optical
+      // target, retaining its real muzzle world transform at each viewport.
       position: [0, 7.4, 55],
-      target: [ultraTall ? 7.65 : compact ? 6.5 : 2.65, 4.1, -3],
+      target: [tallPortrait ? 4.5 : 2.65, 4.1, -3],
       showBattery: true,
       batteryOffsetZ: -30,
-      batteryOffsetX: ultraTall ? 5.2 : compact ? 4.4 : 1.8,
+      batteryOffsetX: tallPortrait ? 3.2 : 1.8,
       batteryScale: .84,
       // Legacy optional edge rig is now HIDDEN for portrait battle.
       sailX: -11,
