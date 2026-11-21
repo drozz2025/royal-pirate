@@ -43,7 +43,7 @@ test('WORK6 18 Nov: one camera-aligned FIRST PERSON barrel and right-side enemy 
 test('deck-level portrait framing and original desktop pose are independently scoped',()=>{
  const mobile=battleCameraPose(384/512);
  assert.deepEqual(mobile.position,[0,7.4,55]);
- assert.deepEqual(mobile.target,[3.3,4.1,-3]);
+ assert.deepEqual(mobile.target,[3.0,4.1,-3]);
  assert.equal(mobile.batteryOffsetZ,-30);
  assert.equal(mobile.batteryOffsetX,1.8);
  assert.equal(mobile.batteryScale,.84);
@@ -58,6 +58,28 @@ test('deck-level portrait framing and original desktop pose are independently sc
  assert.equal(tall.batteryOffsetX,3.2);
  assert.deepEqual(battleCameraPose(430/932),tall);
  assert.equal(battleCameraPose(1.4).showBattery,false);
+});
+
+test('WORK0/#104: first-person red broadside and real cannon do not jump at mobile aspect thresholds',()=>{
+  const compactAspect=320/568;
+  // Old three-way aspect thresholds caused abrupt camera/gun movement when
+  // browser chrome, a notch or a neighbouring iPhone aspect changed.
+  for(const boundary of [.50,compactAspect,.62,.75]) {
+    const before=battleCameraPose(boundary-.0001);
+    const after=battleCameraPose(boundary+.0001);
+    assert.ok(Math.abs(after.target[0]-before.target[0])<.01,
+      'camera pan continuity at '+boundary);
+    assert.ok(Math.abs(after.batteryOffsetX-before.batteryOffsetX)<.01,
+      'real cannon deck continuity at '+boundary);
+  }
+  let previousX=Infinity;
+  for(let aspect=.45;aspect<=.75;aspect+=.005) {
+    const pose=battleCameraPose(aspect);
+    assert.ok(pose.target[0]<=previousX+1e-8,'opponent pan moves monotonically across portrait widths');
+    assert.ok(pose.batteryOffsetX>=1.8-1e-9 && pose.batteryOffsetX<=3.2+1e-9,
+      'gun deck follows optical centre in a finite range');
+    previousX=pose.target[0];
+  }
 });
 
 test('battle uses the fixed deck pose, Porto original ship and true barrel matrix',()=>{
