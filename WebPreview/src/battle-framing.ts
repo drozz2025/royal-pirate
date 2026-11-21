@@ -93,10 +93,10 @@ export function battleCameraPose(aspect: number): CameraPose {
       // in the RIGHT third instead of blocking the cannon centreline.
       // Move the existing live gun deck laterally with that pan to preserve
       // the real muzzle near x=50%, rather than reprojecting a fake shot.
-      // Reframe the FIRST-PERSON sightline, not the HUD or the physical shot.
-      // The existing battery/muzzle matrices stay attached to the same 3D gun.
+      // Reframe by phone aspect: short 320×568 stays 4.5; taller
+      // 390×844/430×932 pan 5.8 to retain full broadside and central real muzzle.
       position: [0, 7.4, 55],
-      target: [tallPortrait ? 6.5 : 3.3, 4.1, -3],
+      target: [aspect < .50 ? 5.8 : tallPortrait ? 4.5 : 3.3, 4.1, -3],
       showBattery: true,
       batteryOffsetZ: -30,
       batteryOffsetX: tallPortrait ? 3.2 : 1.8,
