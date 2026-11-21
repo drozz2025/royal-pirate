@@ -232,17 +232,18 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
 
   // WORK4/#104 — the approved source already contains the right coast up to
   // x258; live <svg> currently crops it at x241. Compare *viewBox coverage*
-  // in the SAME paused 384x512 scene, without stretching or adding any
+  // in the SAME paused 384x512 scene, keeping width === viewBox width (1:1)
+  // rather than scaling the real Royal Crown, and without adding any
   // bitmap/wave. No experimental candidate is promoted by this QA script.
   const cropWidths=[223,229,235,241,247];
   const cropFrames:string[]=[];
   const cropGeometry:any[]=[];
   for(const width of cropWidths){
-    cropGeometry.push(await evaluate("(()=>{const e=document.querySelector('.w4-fleet svg.w4-reference-ship');if(!e)throw Error('missing source');e.setAttribute('viewBox','18 146 "+width+" 194');const r=e.getBoundingClientRect();return {viewBox:e.getAttribute('viewBox'),x:r.x,y:r.y,width:r.width,height:r.height}})()"));
+    cropGeometry.push(await evaluate("(()=>{const e=document.querySelector('.w4-fleet svg.w4-reference-ship');if(!e)throw Error('missing source');e.style.setProperty('width','"+width+"px','important');e.style.setProperty('max-width','"+width+"px','important');e.setAttribute('viewBox','18 146 "+width+" 194');const r=e.getBoundingClientRect();return {viewBox:e.getAttribute('viewBox'),x:r.x,y:r.y,width:r.width,height:r.height}})()"));
     await delay(110);
     cropFrames.push((await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string);
   }
-  await evaluate("(()=>{document.querySelector('.w4-fleet svg.w4-reference-ship')?.setAttribute('viewBox','18 146 223 194');return true})()");
+  await evaluate("(()=>{const e=document.querySelector('.w4-fleet svg.w4-reference-ship');e?.setAttribute('viewBox','18 146 223 194');e?.style.removeProperty('width');e?.style.removeProperty('max-width');return true})()");
   const cropScan="(async()=>{"+
     "const sources=['data:image/webp;base64,"+approved+"',..."+JSON.stringify(cropFrames)+".map(x=>'data:image/png;base64,'+x)];"+
     "const images=await Promise.all(sources.map(async src=>{const im=new Image();im.src=src;await im.decode();if(im.width!==384||im.height!==512)throw Error('non-native crop frame');return im}));"+
