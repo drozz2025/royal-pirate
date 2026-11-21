@@ -382,6 +382,54 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           }
         }
 
+
+        // Experimental WORK7-only 05 frame underlay; no candidate is saved
+        // to the game by this sweep. Same frozen 384x512 live Chromium DOM.
+        // Region scorer uses both full-frame and authentic eight-card ROI.
+        if(kind==='cards' && width===384 && height===512) {
+          const backdrops:[string,string][]=[
+            ['base','radial-gradient(ellipse 85% 60% at 50% 18%,#28394237,transparent 84%),linear-gradient(180deg,#121a24 0%,#0c1621 60%,#0d131c 100%)'],
+            ['charcoal-dark','radial-gradient(ellipse 85% 60% at 50% 18%,#28394237,transparent 84%),linear-gradient(180deg,#0d141d 0%,#091019 60%,#0a0d14 100%)'],
+            ['charcoal-neutral','radial-gradient(ellipse 85% 60% at 50% 18%,#28394237,transparent 84%),linear-gradient(180deg,#13171c 0%,#10151a 60%,#111217 100%)'],
+            ['brass-shadow','radial-gradient(ellipse 85% 60% at 50% 18%,#43392d30,transparent 84%),linear-gradient(180deg,#1a1b22 0%,#110f18 60%,#131018 100%)'],
+            ['deep-indigo','radial-gradient(ellipse 85% 60% at 50% 18%,#27384736,transparent 84%),linear-gradient(180deg,#111b29 0%,#0b1725 60%,#101621 100%)'],
+            ['ink-purple','radial-gradient(ellipse 85% 60% at 50% 18%,#37304736,transparent 84%),linear-gradient(180deg,#1b1527 0%,#140f21 60%,#15121b 100%)'],
+            ['warm-midnight','radial-gradient(ellipse 85% 60% at 50% 18%,#44362926,transparent 84%),linear-gradient(180deg,#191922 0%,#11121d 60%,#14131b 100%)'],
+            ['grey-slate','radial-gradient(ellipse 85% 60% at 50% 18%,#383b4337,transparent 84%),linear-gradient(180deg,#20252b 0%,#181c24 60%,#151820 100%)'],
+            ['pure-dark','radial-gradient(ellipse 85% 60% at 50% 18%,#18283020,transparent 84%),linear-gradient(180deg,#081322 0%,#06121b 60%,#0a141b 100%)'],
+            ['brown-blue','radial-gradient(ellipse 85% 60% at 50% 18%,#423a3537,transparent 84%),linear-gradient(180deg,#181a24 0%,#151821 60%,#15151d 100%)'],
+            ['blue-smoke','radial-gradient(ellipse 85% 60% at 50% 18%,#28394237,transparent 84%),linear-gradient(180deg,#1d2430 0%,#141b27 60%,#0f1823 100%)'],
+            ['ink-edge','radial-gradient(ellipse 85% 60% at 50% 18%,#17243540,transparent 84%),linear-gradient(180deg,#121927 0%,#081321 60%,#0c1525 100%)'],
+            ['deep-teal','radial-gradient(ellipse 85% 60% at 50% 18%,#283f4240,transparent 84%),linear-gradient(180deg,#121d23 0%,#0d1a24 60%,#0c1720 100%)']
+          ];
+          for(const [id,gradient] of backdrops){
+            const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-grid::before'+
+              '{background:'+gradient+'!important}}';
+            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-underlay-sweep';s.textContent="+
+              JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
+            await sleep(80);
+            const shot=await command('Page.captureScreenshot',{
+              format:'png',fromSurface:true,captureBeyondViewport:false
+            });
+            const metrics=await evaluate("(async()=>{"+
+              "const load=src=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
+              "const ref=await load("+JSON.stringify(refUrl)+"),img=await load("+
+                JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+");"+
+              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
+              "const ctx=cv.getContext('2d');ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
+              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
+              "let sum=0,count=0,roi=0,roiCount=0;"+
+              "for(let y=0;y<512;y++)for(let x=0;x<384;x++){const p=(y*384+x)*4;"+
+              "for(let k=0;k<3;k++){const v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
+              "if(x>=18&&x<365&&y>=195&&y<428){roi+=v;roiCount++}}}"+
+              "return {global:Math.round(sum/count*10000)/10000,roi:Math.round(roi/roiCount*10000)/10000}})()");
+            console.log('WORK7 UNDERLAY SOURCE SWEEP '+id+' '+JSON.stringify(metrics));
+            await evaluate("(()=>{document.getElementById('w7-underlay-sweep')?.remove();return true})()");
+            await sleep(35);
+          }
+        }
+
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
           maeRgbBefore:comparison.maeBefore,maeRgbAfter:comparison.mae,
