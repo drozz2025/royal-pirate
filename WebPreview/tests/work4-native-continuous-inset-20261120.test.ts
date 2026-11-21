@@ -243,7 +243,15 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
     await delay(110);
     cropFrames.push((await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string);
   }
-  await evaluate("(()=>{const e=document.querySelector('.w4-fleet svg.w4-reference-ship');e?.setAttribute('viewBox','18 146 223 194');e?.style.removeProperty('width');e?.style.removeProperty('max-width');return true})()");
+  await evaluate("(()=>{const e=document.querySelector('.w4-fleet svg.w4-reference-ship');e?.setAttribute('viewBox','18 146 229 194');e?.style.removeProperty('width');e?.style.removeProperty('max-width');return true})()");
+  const actualProduction=await evaluate("(()=>{const e=document.querySelector('.w4-fleet svg.w4-reference-ship');const box=e?.getBoundingClientRect();return {viewBox:e?.getAttribute('viewBox'),width:box?.width,height:box?.height,cssWidth:getComputedStyle(e).width}})()");
+  assert.equal(actualProduction.viewBox,'18 146 229 194','actual native Work4 source crop must ship at 229px');
+  assert.equal(actualProduction.width,229,'native 1:1 real approved source must have width 229px');
+  assert.equal(actualProduction.height,194,'native source must retain exact 194px height');
+  await delay(110);
+  const productionPixels=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
+  const parity=await evaluate("(async()=>{const source=['"+cropFrames[1]+"','"+productionPixels+"'];const imgs=await Promise.all(source.map(async b=>{const i=new Image();i.src='data:image/png;base64,'+b;await i.decode();return i}));const pixel=im=>{const c=document.createElement('canvas');c.width=384;c.height=512;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(im,0,0);return ctx.getImageData(0,0,384,512).data};const a=pixel(imgs[0]),b=pixel(imgs[1]);let changed=0;for(let k=0;k<a.length;k+=4){if(a[k]!==b[k]||a[k+1]!==b[k+1]||a[k+2]!==b[k+2])changed++}return {changed,totalPixels:384*512}})()");
+  assert.equal(parity.changed,0,'promoted real 229px crop must exactly match the tested candidate in production');
   const cropScan="(async()=>{"+
     "const sources=['data:image/webp;base64,"+approved+"',..."+JSON.stringify(cropFrames)+".map(x=>'data:image/png;base64,'+x)];"+
     "const images=await Promise.all(sources.map(async src=>{const im=new Image();im.src=src;await im.decode();if(im.width!==384||im.height!==512)throw Error('non-native crop frame');return im}));"+
@@ -259,12 +267,20 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
   safeCrop.sort((a,b)=>a.roi.sourceEdge.mae-b.roi.sourceEdge.mae||
     a.roi.full.mae-b.roi.full.mae);
   const cropWinner=safeCrop[0]||cropRecords[0];
+  assert.equal(cropWinner.width,229,'source edge ROI must select safe production 229px vs native alternatives');
+  assert.ok(cropRecords[1].roi.full.mae<cropRecords[0].roi.full.mae-0.02,'global MAE must materially improve');
+  assert.ok(cropRecords[1].roi.sourceEdge.mae<cropRecords[0].roi.sourceEdge.mae-1,'photo edge must improve >1 MAE point');
+  for(const protectedROI of ['ship','crown','sea','dock']){
+    assert.equal(cropRecords[1].roi[protectedROI].changed,0,
+      '229px actual source crop may not mutate protected '+protectedROI);
+  }
   const cropReport={approved:false,screensApproved:0,viewport:'384x512',
     source:'03-frota.webp',comparison:'single Chromium scene, exact original source clip, paused animations',
     originalViewBox:'18 146 223 194',roiBoxes:cropMetrics.regions,
     variants:cropRecords,safeWinnerWidth:cropWinner.width,
-    decision:cropWinner.width===223?'Keep original registered crop: candidate is unsafe or less faithful':
-      'Measured candidate only; do not ship until human review and WORK0 integration'};
+    decision:cropWinner.width===229?'Promoted one source-pixel authentic coastal crop; awaiting artistic sign-off':
+      'Do not merge: wrong candidate outperforms production 229px source crop',
+    actualProduction,productionVsCandidate:parity};
   writeFileSync(join(qa,'work4-fleet-source-crop-coverage-ab.json'),JSON.stringify(cropReport,null,2)+'\n');
   writeFileSync(join(qa,'work4-fleet-source-crop-coverage-winner-384x512.png'),
     Buffer.from(cropFrames[cropWidths.indexOf(cropWinner.width)],'base64'));
