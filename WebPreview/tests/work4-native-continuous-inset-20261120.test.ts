@@ -273,6 +273,53 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
   }));
 
 
+  // WORK4/#104 native top photograph seam: compare the compiled 12px
+  // iron/sky transition OFF vs ON, never two different animation frames.
+  const railSelector='.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-fleet-photo-top-shade';
+  assert.equal(await evaluate("document.querySelectorAll("+JSON.stringify(railSelector)+").length"),1,
+    'exactly one inert top-rail overlay, no duplicate vessel');
+  await evaluate("(()=>{const e=document.createElement('style');e.id='work4-rail-ab-off';e.textContent="+
+    JSON.stringify(railSelector+'{display:none!important;}')+
+    ";document.head.append(e);return true})()");
+  await delay(140);
+  const railBefore=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
+  await evaluate("(()=>{document.getElementById('work4-rail-ab-off')?.remove();return true})()");
+  await delay(140);
+  const railAfter=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
+  const railStudy=await evaluate("(async()=>{"+
+    "const src=['data:image/webp;base64,"+approved+"','data:image/png;base64,"+railBefore+"','data:image/png;base64,"+railAfter+"'];"+
+    "const images=await Promise.all(src.map(async s=>{const i=new Image();i.src=s;await i.decode();return i}));"+
+    "if(images.some(i=>i.width!==384||i.height!==512))throw Error('strict native 384x512');"+
+    "const px=images.map(i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(i,0,0);return x.getImageData(0,0,384,512).data});"+
+    "const boxes={full:[0,0,384,512],topPhotoLip:[18,138,241,154],crown:[31,176,216,304],sea:[188,306,218,338],dock:[0,433,384,512]};"+
+    "const roi=r=>{let before=0,after=0,changed=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;let ch=false;for(let c=0;c<3;c++){before+=Math.abs(px[0][k+c]-px[1][k+c]);after+=Math.abs(px[0][k+c]-px[2][k+c]);ch ||=px[1][k+c]!==px[2][k+c];n++}if(ch)changed++}return {before:before/n,after:after/n,changedPixels:changed}};"+
+    "const metrics=Object.fromEntries(Object.entries(boxes).map(([k,v])=>[k,roi(v)]));"+
+    "const cv=document.createElement('canvas');cv.width=1536;cv.height=512;const ctx=cv.getContext('2d');"+
+    "ctx.drawImage(images[0],0,0);ctx.drawImage(images[1],384,0);ctx.drawImage(images[2],768,0);"+
+    "ctx.drawImage(images[0],1152,0);ctx.globalAlpha=.5;ctx.drawImage(images[2],1152,0);"+
+    "return {boxes,metrics,overlay:cv.toDataURL('image/png').split(',')[1]}})()");
+  for(const area of ['crown','sea','dock'])
+    assert.equal(railStudy.metrics[area].changedPixels,0,'photo upper lip must not change '+area);
+  assert.ok(railStudy.metrics.topPhotoLip.changedPixels>=100,
+    'measurable real source top-lip pixels change in Chromium');
+  assert.ok(railStudy.metrics.topPhotoLip.after<railStudy.metrics.topPhotoLip.before,
+    'upper source join must improve against ORIGINAL, never optimize unrelated HUD');
+  assert.ok(railStudy.metrics.full.after<railStudy.metrics.full.before,
+    'overall native MAE must not regress after the upper lip');
+  const railEvidence={
+    approved:false,screensApproved:0,viewport:'384x512',
+    source:'assets/design-approved/03-frota.webp',
+    comparison:'ORIGINAL / BEFORE (shade hidden) / RENDER (compiled source shade) / OVERLAY, same paused Chromium frame',
+    geometry:'12px soft top join, no new photo or water',
+    roiBoxes:railStudy.boxes,roi:railStudy.metrics,
+    protected:['crown','sea','dock']
+  };
+  writeFileSync(join(qa,'work4-fleet-top-rail-source-ab-384x512.json'),
+    JSON.stringify(railEvidence,null,2)+'\n');
+  writeFileSync(join(qa,'work4-fleet-top-rail-original-before-render-overlay-384x512.png'),
+    Buffer.from(railStudy.overlay,'base64'));
+  console.log('WORK4_FLEET_TOP_RAIL_AB '+JSON.stringify(railEvidence));
+
   // WORK4/#104 — diagnostic ONLY: the approved image has no hard cyan bar
   // across the TOP of the source photograph. Compare actual 2% production
   // fade with softer 4–12% contours on the SAME paused 384x512 scene/frame.
