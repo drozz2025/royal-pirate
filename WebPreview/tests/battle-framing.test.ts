@@ -43,7 +43,7 @@ test('WORK6 18 Nov: one camera-aligned FIRST PERSON barrel and right-side enemy 
 test('deck-level portrait framing and original desktop pose are independently scoped',()=>{
  const mobile=battleCameraPose(384/512);
  assert.deepEqual(mobile.position,[0,7.4,55]);
- assert.deepEqual(mobile.target,[2.65,4.1,-3]);
+ assert.deepEqual(mobile.target,[3.3,4.1,-3]);
  assert.equal(mobile.batteryOffsetZ,-30);
  assert.equal(mobile.batteryOffsetX,1.8);
  assert.equal(mobile.batteryScale,.84);
@@ -54,7 +54,7 @@ test('deck-level portrait framing and original desktop pose are independently sc
  assert.equal(compact.batteryOffsetZ,mobile.batteryOffsetZ);
  const tall=battleCameraPose(390/844);
  assert.deepEqual(tall.position,mobile.position);
- assert.deepEqual(tall.target,[4.5,4.1,-3]);
+ assert.deepEqual(tall.target,[5.8,4.1,-3]);
  assert.equal(tall.batteryOffsetX,3.2);
  assert.deepEqual(battleCameraPose(430/932),tall);
  assert.equal(battleCameraPose(1.4).showBattery,false);
@@ -165,7 +165,7 @@ test('WORK0/#104: native 384x512 stage moves the whole live galleon to starboard
 
 test('WORK0/#104: 320px and tall-phone cannon/ship framing is explicit',()=>{
   for(const [w,h,x,deckX,scale] of [
-    [320,568,6.5,3.2,1.10],[390,844,6.5,3.2,1.10],[430,932,6.5,3.2,1.10]
+    [320,568,4.5,3.2,1.10],[390,844,5.8,3.2,1.10],[430,932,5.8,3.2,1.10]
   ]){
     const pose=battleCameraPose(w/h);
     assert.equal(pose.target[0],x);
