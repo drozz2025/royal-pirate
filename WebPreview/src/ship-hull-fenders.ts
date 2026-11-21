@@ -63,14 +63,24 @@ export function createPreviewHullFenders(shipClass:ShipClass,hullModule:PreviewH
   const body=new T.LatheGeometry(points,10);
   body.translate(x,bottom,z);bodies.push(body);
   // Class-scaled braided helix woven around the full, non-flat fender body.
-  const splinePoints:T.Vector3[]=[];
-  for(let i=0;i<=24;i++){
-   const t=i/24,angle=t*profile.turns*2*Math.PI;
+  const helixPoints:T.Vector3[]=[];
+  for(let i=0;i<=12;i++){
+   const t=i/12,angle=t*profile.turns*2*Math.PI;
    const w=radius*(.75+.28*Math.sin(Math.PI*t));
-   splinePoints.push(new T.Vector3(x+Math.cos(angle)*w,
+   helixPoints.push(new T.Vector3(x+Math.cos(angle)*w,
     bottom+.08+t*(length-.16),z+Math.sin(angle)*w));
   }
-  cords.push(new T.TubeGeometry(new T.CatmullRomCurve3(splinePoints),24,.022,4,false));
+  // Explicit short cylindrical rope strands avoid curve arc-length tables
+  // and retain low-poly woven silhouettes at phone-size viewing distances.
+  for(let i=1;i<helixPoints.length;i++){
+   const start=helixPoints[i-1],end=helixPoints[i];
+   const direction=end.clone().sub(start),length=direction.length();
+   const strand=new T.CylinderGeometry(.020,.020,length,5);
+   strand.applyQuaternion(new T.Quaternion().setFromUnitVectors(
+    new T.Vector3(0,1,0),direction.normalize()));
+   strand.translate((start.x+end.x)/2,(start.y+end.y)/2,(start.z+end.z)/2);
+   cords.push(strand);
+  }
   // One horizontal lashing at each end, plus class-specific lashings.
   for(let band=0;band<profile.strands;band++){
    const y=bottom+.11+(length-.22)*band/Math.max(1,profile.strands-1);
