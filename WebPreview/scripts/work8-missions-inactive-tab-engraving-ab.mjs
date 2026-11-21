@@ -113,7 +113,7 @@ try{
   await delay(140);
   const afterGeometry=await evaluate(geometry);
   const render=await capture();
-  assert.notEqual(beforeGeometry.inactiveTabEdges,afterGeometry.inactiveTabEdges,
+  assert.notDeepEqual(beforeGeometry.inactiveTabEdges,afterGeometry.inactiveTabEdges,
     'Candidate must change the real 07 inactive tab filter');
   // Every approved visual reference is required; never substitute fake captures.
   const required=['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
@@ -142,7 +142,7 @@ try{
   writeFileSync(join(out,'work8-inactive-tab-engraving-render-384x512.png'),Buffer.from(render,'base64'));
   writeFileSync(join(out,'work8-inactive-tab-engraving-original-before-render-overlay-384x512.png'),Buffer.from(ab.montage,'base64'));
   const result={
-    issue:104,scope:'WORK8 07 Missões only, selected real daily tab enamel only',
+    issue:104,scope:'WORK8 07 Missões only, existing inactive weekly/events tab borders',
     base:'work6/web-3d-preview',reference:'assets/design-approved/07-missoes.webp',
     frame:'same genuine Chromium document/frame; native 384x512 DPR1; WebP decoded; animations paused',
     scores:ab.scores,changedPixels:ab.changed,referenceAndRenderSizes:ab.sizes,
@@ -163,7 +163,7 @@ try{
     'All seven chest art and labels above the dock');
   assert.ok(ab.changed>150,'This is an actual 07 inactive tab visual change');
   assert.ok(ab.scores.full.delta<0&&ab.scores.inactiveTabs.delta<-.05,
-    'Candidate must REDUCE native-reference MAE for full and selected tab ROI');
+    'Candidate must REDUCE native-reference MAE for full and inactive tab ROI');
   assert.ok(Math.abs(ab.scores.header.delta)<.01&&Math.abs(ab.scores.dock.delta)<.01,
     'Header, dock, real objective data and Ranking remain unaffected');
   // Explicit narrow-phone interaction: actual CDP touch events and 320px scrolling.
