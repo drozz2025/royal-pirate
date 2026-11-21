@@ -73,6 +73,7 @@ on:
       - work2/shipyard-fine-detail-lod-20261121
       - work2/shipyard-cinematic-orbit-20261121
       - work2/original-keel-cutwater-20261121
+      - work2/original-cannon-breeching-20261121
     paths:
       - 'WebPreview/**'
       - '.github/workflows/work2-shipyard-verify.yml'
