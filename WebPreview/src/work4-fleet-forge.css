@@ -3207,7 +3207,7 @@
     box-shadow:none;
   }
   .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after {
-    background:linear-gradient(90deg,transparent 0%,#07415aee 100%);
+    background:linear-gradient(90deg,transparent 0%,#063a59 100%);
   }
 }
 
@@ -3219,5 +3219,36 @@
   .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
     -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
     mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+  }
+}
+
+/* WORK0/#104 integration of WORK4 #732: 03 Frota source-photo top edge.
+   Original approved 03 image at 384x512 shows a carved dark menu lip;
+   the candidate's bright cyan 12px upper strip disrupted that join.
+   Keep REAL Royal Crown and sea photographs unchanged; this is an inert
+   12px gradient over the existing photo only, not a fake 2nd ocean/ship.
+   WORK4 native paused-frame A/B at 384x512:
+   top ROI MAE 67.05120 -> 50.72562; full 48.61659 -> 48.32038;
+   original sea, Crown and WORK0 dock pixel-identical. No 320/390/430 shifts.
+   Artistic approval still FALSE; do not publish from this commit alone. */
+.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-fleet-photo-top-shade {
+  position:absolute;
+  width:0;
+  height:0;
+  opacity:0;
+  pointer-events:none;
+}
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-fleet-photo-top-shade {
+    opacity:1;
+    position:absolute;
+    top:3px;
+    left:0;
+    z-index:2;
+    width:64%;
+    height:12px;
+    background:linear-gradient(180deg,#03192b 0%,#03192b 20%,#03192b00 100%);
+    -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 91%,transparent 100%);
+    mask-image:linear-gradient(90deg,#000 0%,#000 91%,transparent 100%);
   }
 }
