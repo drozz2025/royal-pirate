@@ -3194,3 +3194,15 @@
     line-height:1.05;
   }
 }
+
+/* WORK4/#104, 21 Nov 2026: ten same-frame Chromium bronze/iron rims
+   tested against the approved 04 source. Charcoal-bronze #4d4039 reduces
+   full MAE 52.777459->52.633545 and real level plaque ROI 39.355226->38.503798.
+   Only the existing native 384x512 live panel rim changes, not the genuine
+   cannon, hearth, materials/costs, five-item dock or other viewports.
+   WORK0 controls all merges/releases. approved:false until human review. */
+@media (width:384px) and (height:512px) {
+ .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+   border-color:#4d4039;
+ }
+}

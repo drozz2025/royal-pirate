@@ -219,6 +219,9 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     variants.push({id:'rim-'+name,paint:ironPaint,
       extra:rimSelector+'{border-color:'+pigment+'!important;}'});
   }
+  // Recreate the previous shipped bronze rim as an A/B control, not a release style.
+  variants.push({id:'rim-shipped-previous-control',paint:ironPaint,
+    extra:rimSelector+'{border-color:#725a46!important;}'});
   const shots=[];
   const composition=[];
   for(const shift of variants){
@@ -245,8 +248,10 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     "const valid=records.filter(r=>r.roi.costs.changedPixels===0&&r.roi.dock.changedPixels===0&&['full','workshop','cannon','furnace'].every(name=>r.roi[name].mae<=baseline.roi[name].mae));"+
     "valid.sort((x,y)=>(x.roi.full.mae-y.roi.full.mae)||(x.roi.workshop.mae-y.roi.workshop.mae)||(x.roi.furnace.mae-y.roi.furnace.mae));"+
     "const best=valid[0];if(!best)throw Error('baseline must remain an admissible candidate');"+
+    "const oldRimIndex="+variants.findIndex(v=>v.id==='rim-shipped-previous-control')+";"+
+    "const rimChange={};for(const [name,box] of Object.entries(boxes))rimChange[name]=count(shots[oldRimIndex],shots[1],box);"+
     "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;const g=canvas.getContext('2d');g.drawImage(original,0,0);g.drawImage(screens[0],384,0);g.drawImage(screens[best.index],768,0);g.drawImage(original,1152,0);g.globalAlpha=.5;g.drawImage(screens[best.index],1152,0);"+
-    "return {records,bestIndex:best.index,globalWinnerIndex:globalWinner.index,baseline,geometry:"+JSON.stringify(geometry)+",grid:canvas.toDataURL('image/png').split(',')[1]};})()";
+    "return {records,bestIndex:best.index,globalWinnerIndex:globalWinner.index,baseline,rimChange,geometry:"+JSON.stringify(geometry)+",grid:canvas.toDataURL('image/png').split(',')[1]};})()";
   const result=await evaluate(script);
 
   assert.equal(result.records.length,variants.length,'all controlled source paint variants measured');
@@ -265,6 +270,8 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
   // Remove the injected native study override: mobile captures must reflect
   // the real production CSS, not the comparison rule used at 384x512.
   await evaluate("document.getElementById('work4-forge-plaque-candidate')?.remove();true");
+  const liveRim=await evaluate("getComputedStyle(document.querySelector('.w4-forge-description')).borderTopColor");
+  assert.equal(liveRim,'rgb(77, 64, 57)','production border must use measured source pigment');
   const mobile=[];
   for(const [width,height] of [[320,568],[390,844],[430,932]]){
     await cmd('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height});
@@ -302,6 +309,14 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
       : 'Candidate worsens a protected ROI: WORK0 should REJECT this Draft'};
   const shippedIndex=variants.findIndex(v=>v.id==='current');
   const shipped=result.records[shippedIndex];
+  const priorRim=result.records[variants.findIndex(v=>v.id==='rim-shipped-previous-control')];
+  assert.ok(shipped.roi.full.mae<priorRim.roi.full.mae,'new 04 border must improve global MAE');
+  assert.ok(shipped.roi.liveStats.mae<priorRim.roi.liveStats.mae,'new 04 border must improve genuine level ROI');
+  for(const region of ['cannon','furnace','costs','dock']){
+    assert.equal(shipped.roi[region].mae,priorRim.roi[region].mae,'no protected pixel regression: '+region);
+    assert.equal(result.rimChange[region],0,'no changed pixels inside protected '+region);
+  }
+  assert.ok(result.rimChange.full>0,'new iron rim must render differently in actual Chromium');
   const previousIndex=variants.findIndex(v=>v.id==='plaque-width-53-control');
   const previous=result.records[previousIndex];
   assert.ok(shipped.roi.full.mae<previous.roi.full.mae,'51% must improve the whole 384px source frame vs previous 53%');
@@ -340,6 +355,17 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     'all candidate frames preserve exactly one cannon and all three real levels');
   assert.ok(candidates.some(v=>v.shape.plaque.w!==composition[shippedIndex].plaque.w),
     'Chromium must actually apply candidate width: do not count unchanged frames as evidence');
+  const productionRimComparison={
+    source:'04-melhorias-forja.webp',approved:false,screensApproved:0,
+    before:'#725a46',render:'#4d4039',
+    full:{before:priorRim.roi.full.mae,render:shipped.roi.full.mae},
+    levels:{before:priorRim.roi.liveStats.mae,render:shipped.roi.liveStats.mae},
+    cannon:{before:priorRim.roi.cannon.mae,render:shipped.roi.cannon.mae},
+    furnace:{before:priorRim.roi.furnace.mae,render:shipped.roi.furnace.mae},
+    changedPixels:result.rimChange,costsUntouched:true,dockUntouched:true
+  };
+  Object.assign(report,{productionRimComparison});
+  console.log('WORK4_FORGE_NATIVE_RIM_RELEASE_AB '+JSON.stringify(productionRimComparison));
   const rimCandidates=variants.map((v,i)=>({id:v.id,index:i}))
     .filter(x=>x.id.startsWith('rim-'))
     .map(x=>({id:x.id,roi:result.records[x.index].roi,geometry:composition[x.index]}));
