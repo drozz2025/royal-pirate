@@ -127,31 +127,38 @@ test('WORK4 Forge native source-edge feather sweep: same frame, full/plaque/cann
   const variants=[0,2,4,6,8,10,12,16,22].map(px=>({px}));
   const screenshots:string[]=[];
   for(const v of variants){
-    const rule=v.px ? sel+'{-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 '+v.px+'px,#000 100%)!important;mask-image:linear-gradient(to right,transparent 0%,#000 '+v.px+'px,#000 100%)!important;}' : '';
+    const rule=v.px ? sel+'{-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 '+v.px+'px,#000 100%)!important;mask-image:linear-gradient(to right,transparent 0%,#000 '+v.px+'px,#000 100%)!important;}' : sel+'{-webkit-mask-image:none!important;mask-image:none!important;}';
     await evaluate("(()=>{let e=document.getElementById('work4-forge-edge-ab');if(!e){e=document.createElement('style');e.id='work4-forge-edge-ab';document.head.append(e);}e.textContent="+JSON.stringify(rule)+";return true;})()");
     await delay(160);
     screenshots.push((await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string);
   }
   await evaluate("document.getElementById('work4-forge-edge-ab')?.remove();true");
+  await delay(130);
+  const compiled=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
+  const computedMask=await evaluate("getComputedStyle(document.querySelector('.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description')).maskImage");
+  assert.ok(String(computedMask).includes('22px'),'compiled CSS must activate 22px Forge feather at native resolution');
   const expr="(async()=>{"+
     "const load=async(src)=>{const i=new Image();i.src=src;await i.decode();return i};"+
     "const original=await load('data:image/webp;base64,"+reference+"');"+
     "const renders=await Promise.all("+JSON.stringify(screenshots)+".map(s=>load('data:image/png;base64,'+s)));"+
+    "const compiled=await load('data:image/png;base64,"+compiled+"');"+
     "if([original,...renders].some(i=>i.width!==384||i.height!==512))throw Error('source dimensions must be 384x512');"+
     "const pixels=img=>{const cv=document.createElement('canvas');cv.width=384;cv.height=512;const cx=cv.getContext('2d',{willReadFrequently:true});cx.drawImage(img,0,0);return cx.getImageData(0,0,384,512).data};"+
     "const base=pixels(original),imgs=renders.map(pixels),boxes={full:[0,0,384,512],plaque:[179,145,373,316],plaqueEdge:[176,151,207,312],cannon:[18,153,175,305],barrelOverlap:[162,176,193,267],furnace:[129,168,171,294],costs:[16,329,375,430],dock:[0,433,384,512]};"+
     "const mae=(a,b,r)=>{let x=0,n=0;for(let y=r[1];y<r[3];y++)for(let i=r[0];i<r[2];i++){const k=(y*384+i)*4;for(let c=0;c<3;c++){x+=Math.abs(a[k+c]-b[k+c]);n++;}}return x/n};"+
     "const count=(a,b,r)=>{let n=0;for(let y=r[1];y<r[3];y++)for(let i=r[0];i<r[2];i++){const k=(y*384+i)*4;if(a[k]!==b[k]||a[k+1]!==b[k+1]||a[k+2]!==b[k+2])n++;}return n};"+
     "const rows=imgs.map((p,index)=>({index,roi:Object.fromEntries(Object.entries(boxes).map(([name,r])=>[name,{mae:mae(base,p,r),changedPixels:count(imgs[0],p,r)}]))}));"+
+    "const compiledDiff=count(imgs[imgs.length-1],pixels(compiled),boxes.full);"+
     "const initial=rows[0],safe=rows.filter(row=>row.roi.costs.changedPixels===0&&row.roi.dock.changedPixels===0&&"+
     "['full','plaque','cannon','furnace'].every(k=>row.roi[k].mae<=initial.roi[k].mae+.0001));"+
     "safe.sort((a,b)=>(a.roi.barrelOverlap.mae-b.roi.barrelOverlap.mae)||(a.roi.plaqueEdge.mae-b.roi.plaqueEdge.mae)||(a.roi.full.mae-b.roi.full.mae));"+
     "const winner=safe[0]||initial;"+
     "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;const ctx=canvas.getContext('2d');"+
     "ctx.drawImage(original,0,0);ctx.drawImage(renders[0],384,0);ctx.drawImage(renders[winner.index],768,0);ctx.drawImage(original,1152,0);ctx.globalAlpha=.5;ctx.drawImage(renders[winner.index],1152,0);"+
-    "return {rows,winner:winner.index,boxes,overlay:canvas.toDataURL('image/png').split(',')[1]};})()";
+    "return {rows,winner:winner.index,boxes,compiledDiff,overlay:canvas.toDataURL('image/png').split(',')[1]};})()";
   const data=await evaluate(expr);
   assert.equal(data.rows.length,variants.length);
+  assert.equal(data.compiledDiff,0,'compiled production CSS must match 22px candidate exactly');
   const initial=data.rows[0],chosen=data.rows[data.winner];
   for(const key of ['costs','dock']) assert.equal(chosen.roi[key].changedPixels,0,key+' protected');
   assert.equal(geometry.cannon,1);
@@ -162,7 +169,7 @@ test('WORK4 Forge native source-edge feather sweep: same frame, full/plaque/cann
     approved:false,screensApproved:0,reference:'assets/design-approved/04-melhorias-forja.webp',
     viewport:'384x512',frame:'same paused Chromium render, reference image 1:1',
     sourceImageCount:geometry.cannon,realCosts:geometry.costs,dockButtons:geometry.dock,
-    proposalOnly:true,roi:data.boxes,variants:variants.map((v,i)=>({...v,...data.rows[i]})),
+    proposalOnly:false,verifiedProductionCSS:true,compiledPixelDifference:data.compiledDiff,roi:data.boxes,variants:variants.map((v,i)=>({...v,...data.rows[i]})),
     safeWinner:variants[data.winner].px,
     conclusion:data.winner===0?'No safe source-edge gain; preserve production CSS':
       'Source-edge diagnostic gain only; inspect overlay before WORK0 integration'
