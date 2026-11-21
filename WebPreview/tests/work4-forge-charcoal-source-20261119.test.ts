@@ -50,29 +50,52 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     'preview','--outDir',buildDir,'--host','127.0.0.1','--port',String(port),'--strictPort','--base=/royal-pirate/'
   ],{stdio:'ignore'});
   const profile=mkdtempSync(join(tmpdir(),'rp-work4-forge-plaque-'));
+  const browserProfiles=[profile];
   let browser:ReturnType<typeof spawn>|undefined;
   let ws:WebSocket|undefined;
   t.after(async()=>{ws?.close();browser?.kill('SIGTERM');preview.kill('SIGTERM');
-    await delay(450);rmSync(profile,{recursive:true,force:true,maxRetries:12,retryDelay:250});
+    await delay(450);
+    for(const p of browserProfiles)rmSync(p,{recursive:true,force:true,maxRetries:12,retryDelay:250});
   });
   const origin='http://127.0.0.1:'+port+'/royal-pirate/';
   let live=false;
   for(let i=0;i<120;i++){try{live=(await fetch(origin,{signal:AbortSignal.timeout(750)})).ok;if(live)break;}catch{}await delay(120);}
   assert.ok(live,'production preview must be live');
-  browser=spawn(chrome!,[
-    '--headless=new','--no-sandbox','--disable-dev-shm-usage',
-    '--remote-allow-origins=*','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'
-  ],{stdio:'ignore'});
+  // Shared CI runners occasionally start Chromium without a DevTools page.
+  // Retry fresh isolated browser profiles; never skip the real browser test.
   let target:any=null;
-  for(let i=0;i<270;i++){
-    if(browser.exitCode!==null)throw Error('Chromium exited early');
-    try{const p=Number(readFileSync(join(profile,'DevToolsActivePort'),'utf8').split('\n')[0]);
-      if(p>0){const res=await fetch('http://127.0.0.1:'+p+'/json/list',{signal:AbortSignal.timeout(750)});
-        if(res.ok)target=(await res.json() as any[]).find(item=>item.type==='page');}
-    }catch{}
-    if(target)break;await delay(100);
+  const launchFailures:string[]=[];
+  for(let attempt=0;attempt<3&&!target?.webSocketDebuggerUrl;attempt++){
+    const activeProfile=attempt===0?profile:mkdtempSync(join(tmpdir(),'rp-work4-forge-retry-'));
+    if(attempt>0)browserProfiles.push(activeProfile);
+    let chromeErrors='';
+    browser=spawn(chrome!,[
+      '--headless=new','--no-sandbox','--disable-dev-shm-usage',
+      '--no-first-run','--no-default-browser-check',
+      '--remote-allow-origins=*','--remote-debugging-port=0',
+      '--user-data-dir='+activeProfile,'about:blank'
+    ],{stdio:['ignore','ignore','pipe']});
+    browser.stderr?.on('data',chunk=>{chromeErrors=(chromeErrors+String(chunk)).slice(-1800);});
+    for(let i=0;i<140;i++){
+      if(browser.exitCode!==null)break;
+      try{
+        const p=Number(readFileSync(join(activeProfile,'DevToolsActivePort'),'utf8').split('\\n')[0]);
+        if(p>0){
+          const res=await fetch('http://127.0.0.1:'+p+'/json/list',{signal:AbortSignal.timeout(750)});
+          if(res.ok)target=(await res.json() as any[]).find(item=>item.type==='page'&&item.webSocketDebuggerUrl);
+        }
+      }catch{}
+      if(target?.webSocketDebuggerUrl)break;
+      await delay(100);
+    }
+    if(!target?.webSocketDebuggerUrl){
+      launchFailures.push('attempt '+(attempt+1)+': exit='+(browser.exitCode??'running')+' stderr='+chromeErrors.slice(-500));
+      browser.kill('SIGTERM');
+      await delay(400);
+    }
   }
-  assert.ok(target?.webSocketDebuggerUrl,'Chromium debugger target');
+  assert.ok(target?.webSocketDebuggerUrl,
+    'Chromium debugger target after three isolated attempts; '+launchFailures.join(' | '));
   ws=new WebSocket(target.webSocketDebuggerUrl);
   await new Promise<void>((yes,no)=>{
     ws!.addEventListener('open',()=>yes(),{once:true});
