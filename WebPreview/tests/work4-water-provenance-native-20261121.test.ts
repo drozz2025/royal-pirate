@@ -286,7 +286,7 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
       r.metrics.photoEdge.trial<=production.photoEdge.before-.30)?.id??null
   };
   writeFileSync(join(qa,'work4-integrated-coast-junction-sweep-384x512.json'),
-    JSON.stringify(coastJointStudy,null,2)+'\\n');
+    JSON.stringify(coastJointStudy,null,2)+'\n');
   console.log('WORK4_INTEGRATED_COAST_JUNCTION '+JSON.stringify(coastJointStudy));
   if(protectedComposite[0]){
     const composite=await evaluate(metricExpression(protectedComposite[0].screenshot,true));
