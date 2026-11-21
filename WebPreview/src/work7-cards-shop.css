@@ -4351,3 +4351,57 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 20 Nov 23:25 UTC; controlled combination of previously
+ * measured native improvements (#689, #698, #701). The integrated WORK0
+ * base remains 10830c86: none of those draft alternatives is in this base.
+ * 05: recover actual eight independent WEBP frame pigments + seven physical
+ * inner inlays. 06: rebalance ONLY the genuine Captain-pack velvet.
+ * No screenshot backgrounds, new UI, balances, controls or asset replacements.
+ * Strictly native 384x512: 320x568 and tall devices are untouched.
+ * HUMAN APPROVAL: false, 0/8; WORK0 alone merges or publishes. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(n+2)::before{
+    box-shadow:none;
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){
+    filter:brightness(.50) saturate(1.70) contrast(.87) hue-rotate(-16deg) brightness(1.085) saturate(.96);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
+    filter:brightness(.43) saturate(1.20) contrast(.74) hue-rotate(18deg) brightness(.95) saturate(1.10);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
+    filter:brightness(.49) saturate(2.00) contrast(.79) hue-rotate(-8deg) brightness(.92) saturate(1.08);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+    filter:brightness(.65) saturate(1.30) contrast(.92) hue-rotate(-4deg) brightness(1.04);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+    filter:brightness(.40) saturate(1.75) contrast(.79) hue-rotate(-8deg) brightness(.93) saturate(1.10);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
+    filter:brightness(.64) saturate(1.90) contrast(.88) hue-rotate(-13deg) brightness(.99) saturate(1.11);
+  }
+  /* WORK7 21 Nov: original fifth bombardment card, true local native frame enamel test.
+   * Separate pigmented metal relief; no UI text or approved source pixels replaced. */
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04)
+           brightness(.91) saturate(1.22) hue-rotate(-8deg) contrast(.91);
+  }
+  .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
+    background:
+      radial-gradient(ellipse 70% 95% at 29% 42%,#a51c6660,transparent 88%),
+      linear-gradient(112deg,#340957 0%,#2b075f 49%,#0c0843 100%);
+  }
+}
+
+/* WORK7/#104 — 21 Nov 01:30 UTC. Native sixth genuine naval-shield enamel.
+ * Change only the pigment/exposure of the sixth of eight authentic 4x2
+ * illustrated slots, within exact 384x512. Compare in same frozen Chromium
+ * frame against actual merged base and predecessor #710. No backdrop screenshots,
+ * fake contents, commerce, shared shell, Porto, dock, 320px edits or release.
+ * Human approval remains false (0/8). WORK0 exclusively merges/publishes. */
