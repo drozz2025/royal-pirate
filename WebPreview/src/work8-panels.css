@@ -5487,10 +5487,11 @@
 }
 
 
-/* WORK8/#104 — 07 Missões only: recover the authentic emerald artwork
-   luminance of the existing Day 1–3 chests in the 384×512 approved frame.
-   Their actual claimed/locked states, all seven rewards and live captions
-   remain data-driven. Filter the ORIGINAL source paintings only, not overlays,
+/* WORK8/#104 — 07 Missões only: calibrate the emerald VECTOR chest icons
+   of actual Day 1–3 rewards against the native 384×512 approved frame.
+   Days 1–3 use state-aware vectors (only Days 4–7 use source-art crops).
+   Their claimed/locked states, seven real rewards and live captions remain
+   data-driven. Filter only the existing actual chest icons, not overlays,
    actions, labels, geometry or the WORK0 five-item dock. The root opt-out
    switches the identical paused Chromium DOM between BEFORE and RENDER.
    No Ranking 08, Porto, shared shell, economy, multiplayer or Unity edits.
@@ -5498,8 +5499,8 @@
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
   :root:not(.work8-missions-emerald-chests-ab-baseline)
   .w8-approved-missions .w8-approved-days li:nth-child(-n+3)
-  .w8-approved-chest > svg.w8-approved-painting {
-    filter:brightness(1.44) contrast(1.09) saturate(1.12)
+  .w8-approved-chest > svg.w8-art-chest {
+    filter:brightness(.78) contrast(1.08) saturate(1.12)
       drop-shadow(0 1px 1px #011625);
   }
 }
