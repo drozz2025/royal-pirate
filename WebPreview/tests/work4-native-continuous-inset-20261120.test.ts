@@ -284,6 +284,22 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
   writeFileSync(join(qa,'work4-fleet-source-crop-coverage-ab.json'),JSON.stringify(cropReport,null,2)+'\n');
   writeFileSync(join(qa,'work4-fleet-source-crop-coverage-winner-384x512.png'),
     Buffer.from(cropFrames[cropWidths.indexOf(cropWinner.width)],'base64'));
+  // Four genuinely rendered panels for the promoted source crop. The previous
+  // inset montage measures a different change; this one must compare 223px
+  // BEFORE with the actual 229px RENDER at the exact same paused Chromium frame.
+  const cropMontageExpression="(async()=>{"+
+    "const urls=['data:image/webp;base64,"+approved+"','data:image/png;base64,"+cropFrames[0]+"','data:image/png;base64,"+productionPixels+"'];"+
+    "const imgs=await Promise.all(urls.map(async src=>{const im=new Image();im.src=src;await im.decode();return im}));"+
+    "if(imgs.some(im=>im.width!==384||im.height!==512))throw Error('crop montage requires native 384x512 pixels');"+
+    "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;const ctx=canvas.getContext('2d');"+
+    "ctx.drawImage(imgs[0],0,0);ctx.drawImage(imgs[1],384,0);ctx.drawImage(imgs[2],768,0);"+
+    "ctx.drawImage(imgs[0],1152,0);ctx.globalAlpha=.5;ctx.drawImage(imgs[2],1152,0);ctx.globalAlpha=1;"+
+    "return {width:canvas.width,height:canvas.height,png:canvas.toDataURL('image/png').split(',')[1]}})()";
+  const cropMontage=await evaluate(cropMontageExpression);
+  assert.equal(cropMontage.width,1536,'four source-crop panels must each be 384px');
+  assert.equal(cropMontage.height,512,'source-crop montage must use native height');
+  writeFileSync(join(qa,'original-before-render-overlay-fleet-source-crop-384x512.png'),
+    Buffer.from(cropMontage.png,'base64'));
   console.log('WORK4_FLEET_SOURCE_CROP_COVERAGE '+JSON.stringify({
     safeWinnerWidth:cropWinner.width,decision:cropReport.decision,
     variants:cropRecords.map(x=>({width:x.width,geometry:x.geometry,roi:x.roi}))
