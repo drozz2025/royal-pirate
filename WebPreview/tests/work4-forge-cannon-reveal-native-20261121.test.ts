@@ -23,7 +23,7 @@ test('WORK4 Forge unsafe 41% study uses all ten approved WebP references',()=>{
  assert.match(css,/contain:paint/);
  assert.match(css,/transform:translateZ\(0\)/);
  assert.match(css,/background-color:#2d2929!important/);
- assert.doesNotMatch(css,/width:41%/,'rejected 41% plaque must not ship');
+ assert.ok(!css.includes('WORK4/#104 — native 384×512 cannon reveal candidate'), 'rejected Forge 41% candidate block must not ship');
  assert.doesNotMatch(css,/border-color:#4d4039/,'rejected plaque border must not ship');
  assert.doesNotMatch(css,/linear-gradient\(to right,transparent 0%,#000 22px,#000 100%\)/,'rejected 22px mask must not ship');
 });
