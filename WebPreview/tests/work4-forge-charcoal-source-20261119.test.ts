@@ -292,11 +292,12 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     v.roi.cannon.mae<=shipped.roi.cannon.mae &&
     v.roi.furnace.mae<=shipped.roi.furnace.mae);
   eligible.sort((a,b)=>a.roi.full.mae-b.roi.full.mae);
-  Object.assign(report,{nativeResizeGate:{
+  const gate={
     production:{id:'current',roi:shipped.roi,shape:composition[shippedIndex]},
     eligible:eligible.map(x=>({id:x.id,roi:x.roi,shape:x.shape})),
     decision:eligible.length?'Candidate(s) pass numerical source/functional guard; NOT approved until WORK0 reviews':'No candidate beats current source without regressing protected ROIs; KEEP existing production width'
-  }});
+  };
+  Object.assign(report,{nativeResizeGate:gate});
   assert.equal(composition.length,variants.length,'each candidate must use a measured live browser frame');
   assert.ok(candidates.every(v=>v.shape.cannonCount===1&&v.shape.rows===3),
     'all candidate frames preserve exactly one cannon and all three real levels');
@@ -304,6 +305,6 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     'Chromium must actually apply candidate width: do not count unchanged frames as evidence');
   writeFileSync(join(qa,'work4-forge-depth-gradient-ab-384x512.json'),JSON.stringify(report,null,2)+'\n');
   writeFileSync(join(qa,'work4-original-before-render-overlay-forge-gradient-384x512.png'),Buffer.from(result.grid,'base64'));
-  console.log('WORK4_FORGE_NATIVE_RESIZE_GATE '+JSON.stringify(report.nativeResizeGate));
+  console.log('WORK4_FORGE_NATIVE_RESIZE_GATE '+JSON.stringify(gate));
   console.log('WORK4_FORGE_GRADIENT_NATIVE_AB '+JSON.stringify(report));
 });
