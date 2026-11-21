@@ -163,13 +163,21 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
   // Compare a real coastal seam instead of adding synthetic waves. Every candidate
   // uses the SAME 384x512 DOM, artwork, frame, real stats and paused animations.
   // The existing release is a valid baseline; no candidate is published by QA.
+  // Explore the narrower *still feathered* transitions that earlier CI never
+  // measured. The 10px release remains the explicit, unchanged A/B baseline.
+  // Royal Crown, real sea, dock and original image are captured in one paused
+  // Chromium scene; this is diagnostic and never auto-promotes a candidate.
   const seams=[
     {id:'release-10',width:10},
+    {id:'feather-5',width:5},
+    {id:'feather-6',width:6},
+    {id:'feather-7',width:7},
+    {id:'feather-8',width:8},
+    {id:'feather-9',width:9},
+    {id:'feather-11',width:11},
+    {id:'feather-12',width:12},
     {id:'feather-14',width:14},
-    {id:'feather-18',width:18},
-    {id:'feather-22',width:22},
-    {id:'feather-26',width:26},
-    {id:'feather-30',width:30}
+    {id:'feather-18',width:18}
   ];
   const sourcePhotos=[] as string[];
   for(const seam of seams){
