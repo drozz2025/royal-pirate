@@ -155,6 +155,30 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
     "const metrics=Object.fromEntries(Object.entries(boxes).map(([name,r])=>[name,{before:diff(a,b,r),trial:diff(a,c,r),delta:diff(a,b,r)-diff(a,c,r),changedPixels:changed(r)}]));"+
     (compose?"const out=document.createElement('canvas');out.width=1536;out.height=512;const p=out.getContext('2d');p.drawImage(original,0,0);p.drawImage(before,384,0);p.drawImage(trial,768,0);p.drawImage(original,1152,0);p.globalAlpha=.5;p.drawImage(trial,1152,0);return {metrics,comparison:out.toDataURL('image/png').split(',')[1]};":"return {metrics};")+
     "})()";
+  // The committed CSS must independently beat the actual release baseline.
+  // A temporary water/mask trial is NOT evidence that the submitted CSS passes.
+  // This is one identical Chromium scene, animation clock and local profile.
+  const productionShot=(await cmd('Page.captureScreenshot',{
+    format:'png',captureBeyondViewport:false
+  })).data as string;
+  const productionPanel=await evaluate(metricExpression(productionShot,true));
+  const production=productionPanel.metrics as Record<string,{
+    before:number;trial:number;delta:number;changedPixels:number
+  }>;
+  assert.ok(production.full.delta>=0.20,
+    'shipped 384 stage underpaint must improve full-frame MAE by at least 0.20');
+  assert.ok(production.photoEdge.delta>=0.30,
+    'shipped underpaint must improve the real hard photo edge by at least 0.30');
+  assert.ok(production.authenticWater.delta>=0,
+    'approved photo-water ROI must not deteriorate in shipped CSS');
+  assert.ok(production.lowerWaterJoin.delta>=-0.01,
+    'shipped water join must not deteriorate beyond 0.01 RGB MAE');
+  assert.equal(production.crownCore.changedPixels,0,
+    'the real Royal Crown core must remain pixel-identical');
+  assert.equal(production.dock.changedPixels,0,
+    'WORK0 dock must remain pixel-identical');
+  writeFileSync(join(qa,'original-before-render-overlay-fleet-384x512.png'),
+    Buffer.from(productionPanel.comparison,'base64'));
   const results:Array<{id:string;metrics:any;screenshot:string}>=[];
   for(const variant of variants){
     await evaluate("(()=>{document.getElementById('work4-water-provenance-trial')?.remove();const e=document.createElement('style');e.id='work4-water-provenance-trial';e.textContent="+JSON.stringify(variant.css)+";document.head.append(e);return true;})()");
@@ -220,7 +244,7 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
   assert.ok(Number.isFinite(forge.mae.cannonComposition),'cannon ROI must be measured, not a global-only MAE');
   writeFileSync(join(qa,'original-render-overlay-forge-cannon-384x512.png'),Buffer.from(forge.comparison,'base64'));
 
-  const report={approved:false,approvedScreens:0,sourceFiles:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],viewport:'384x512',scene:'single paused Chromium frame, unchanged source/profile',geometry,forgeGeometry,forgeRoiMae:forge.mae,viewportResults,selectedForFurtherArtReview:selected?.id??null,shownTrial:strongest.id,thresholds:{full:0.20,photoEdge:0.30,authenticWaterMinDelta:0,lowerWaterJoinMinDelta:-0.01},results:results.map(({id,metrics})=>({id,metrics})),note:'The reviewed deep-blue stage underpaint is now WORK4 production CSS only at native 384x512; all other CSS variants are temporary injected trials. MAE is not human artistic approval.'};
+  const report={approved:false,approvedScreens:0,sourceFiles:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],viewport:'384x512',scene:'single paused Chromium frame, unchanged source/profile',geometry,forgeGeometry,forgeRoiMae:forge.mae,viewportResults,productionCssRoi:production,productionScreenshot:'original-before-render-overlay-fleet-384x512.png',selectedForFurtherArtReview:selected?.id??null,shownTrial:strongest.id,thresholds:{full:0.20,photoEdge:0.30,authenticWaterMinDelta:0,lowerWaterJoinMinDelta:-0.01},results:results.map(({id,metrics})=>({id,metrics})),note:'The reviewed deep-blue stage underpaint is now WORK4 production CSS only at native 384x512; all other CSS variants are temporary injected trials. MAE is not human artistic approval.'};
   writeFileSync(join(qa,'work4-water-provenance-ab.json'),JSON.stringify(report,null,2)+'\n');
   console.log('WORK4_WATER_PROVENANCE_AB '+JSON.stringify(report));
 });
