@@ -4351,3 +4351,20 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+/* WORK7/#104 - 21 Nov 2026: measured native source-frame luminance candidate.
+ * Strict scope: only frames 3-8 of the genuine eight 4x2 approved concepts,
+ * at 355-390px wide by 560px high; no screenshot backdrops or geometry edits.
+ * Real PRÉVIA/EM BREVE labels, original WEBP artwork, pack, three chests,
+ * economy, navigation, 320x568 and taller mobile viewports are unchanged.
+ * Compare against precisely verified base HEAD 10830c86f5a3bb2987333e55c0b58d9faacb71d1 using frozen-frame
+ * Chromium 384x512 and a strict global/ROI gate. approved:false 0/8.
+ */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.40) saturate(1.20) contrast(.74)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.39) saturate(2.30) contrast(.76)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.48)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.58) saturate(1.30) contrast(.92)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.37) saturate(1.75) contrast(.79)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.58) saturate(1.90) contrast(.88)}
+}
