@@ -36,6 +36,9 @@ const SLOT_NAMES:Record<ModuleSlot,string>={
  * persisted, awarded or injected into combat; only original 3D parts are previewed. */
 export function Shipyard({onClose,onPreview,onViewChange,onTourChange,onFocusSlot,ownedModuleIds,ownedShipClasses,verifiedPlayerLevel,onEquip}:ShipyardProps){
  const [slot,setSlot]=useState<ModuleSlot>('hull');
+ // Purely a display mode: leave the same preview, controls and draft intact.
+ // Hiding the editor avoids obstructing the 3D model on portrait phones.
+ const [showcase,setShowcase]=useState(false);
  const [cameraView,setCameraView]=useState<ShipyardView>('quarter');
  const [tourActive,setTourActive]=useState(false);
  const stopTour=useCallback(()=>setTourActive(false),[]);
@@ -98,12 +101,17 @@ export function Shipyard({onClose,onPreview,onViewChange,onTourChange,onFocusSlo
    onEquip(validateOwnedFleetForPlayer(draftLoadout,ownedModuleIds,verifiedPlayerLevel,ownedShipClasses));
   }
  };
- return <section className="shipyard-screen" aria-label="Ship customisation 3D sandbox">
+ return <section className={"shipyard-screen"+(showcase?" shipyard-showcase":"")} aria-label="Ship customisation 3D sandbox">
   <header className="shipyard-header">
    <button type="button" className="shipyard-back" onClick={onClose} aria-label="Return to harbour">‹ PORT</button>
    <div className="shipyard-title"><span>ROYAL PIRATE</span><strong>THE SHIPYARD</strong></div>
-   <span className="shipyard-badge">3D PREVIEW</span>
+   <button type="button" className="shipyard-showcase-toggle" aria-pressed={showcase}
+    aria-label={showcase?"Return to ship module editing":"Expand the 3D ship view without editor panels"}
+    onClick={()=>setShowcase(previous=>!previous)}>{showcase?"EDIT PARTS":"FULL 3D VIEW"}</button>
   </header>
+  {showcase&&<div className="shipyard-showcase-summary" role="status">
+   {SHIP_CLASSES[shipClass].name} · LEVEL {level}/20 · {viewingReference?"REFERENCE A":"WORKING MODEL B"} · VISUAL PREVIEW ONLY
+  </div>}
   <div className="shipyard-class-panel">
    <p className="shipyard-kicker">CHOOSE A SHIP HULL</p>
    <div className="shipyard-class-options" role="group" aria-label="Ship class">
