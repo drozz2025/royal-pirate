@@ -1,0 +1,404 @@
+/**
+ * WORK 5 — real, isolated Chromium headless interaction (when installed).
+ * Includes 320x568, 375x667, 384x512, 390x844 and 430x932 viewport checks.
+ * This is an automated emulated touch/viewport smoke test, NOT physical iPhone
+ * validation or an approval of artwork, WebGL frame quality or ship pinch.
+ * No component / CSS / gameplay / deployment code is modified.
+ */
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn,spawnSync} from 'node:child_process';
+import {mkdtemp,readFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {setTimeout as pause} from 'node:timers/promises';
+import {createServer} from 'vite';
+
+test('WORK5: Chromium emulated touchscreen opens eight approved views, preserves profile and fires once', {timeout:120_000}, async t=>{
+  const detect=spawnSync('sh',['-c','command -v google-chrome || command -v chromium || command -v chromium-browser'],{encoding:'utf8'});
+  const chromeBin=process.env.CHROME_BIN||detect.stdout.trim().split('\n')[0];
+  if(!chromeBin){t.skip('Chromium not installed: no claim of browser/mobile QA');return;}
+  const root=fileURLToPath(new URL('../',import.meta.url));
+  const profileDir=await mkdtemp(join(tmpdir(),'royal-work5-mobile-'));
+  let vite:any=null, chrome:any=null, socket:WebSocket|null=null;
+  const exceptions:string[]=[];
+  try{
+    vite=await createServer({root,server:{host:'127.0.0.1',port:0,strictPort:false},logLevel:'error'});
+    await vite.listen();
+    const addr=vite.httpServer.address();
+    assert.ok(addr&&typeof addr==='object','Vite must bind a real local port');
+    const url='http://127.0.0.1:'+addr.port+'/';
+    chrome=spawn(chromeBin,[
+      '--headless=new','--no-sandbox','--disable-dev-shm-usage',
+      '--enable-webgl','--enable-unsafe-swiftshader','--use-gl=angle','--use-angle=swiftshader',
+      '--remote-allow-origins=*','--remote-debugging-port=0',
+      '--user-data-dir='+profileDir,'about:blank'
+    ],{stdio:'ignore'});
+    chrome.on('error',()=>{});
+    let port=0;
+    for(let i=0;i<130;i++){
+      if(chrome.exitCode!==null)throw new Error('Chromium exited before starting');
+      try{
+        const active=await readFile(join(profileDir,'DevToolsActivePort'),'utf8');
+        port=Number(active.split('\n')[0]);if(port>0)break;
+      }catch{}
+      await pause(100);
+    }
+    assert.ok(port>0,'Chromium DevTools port did not start');
+    let page:any=null;
+    for(let i=0;i<45;i++){
+      try{
+        const response=await fetch('http://127.0.0.1:'+port+'/json/list',{signal:AbortSignal.timeout(1500)});
+        if(response.ok){page=(await response.json()).find((entry:any)=>entry.type==='page');if(page)break;}
+      }catch{}
+      await pause(120);
+    }
+    assert.ok(page?.webSocketDebuggerUrl,'No Chromium page target');
+    socket=new WebSocket(page.webSocketDebuggerUrl);
+    await new Promise<void>((resolve,reject)=>{
+      socket!.addEventListener('open',()=>resolve(),{once:true});
+      socket!.addEventListener('error',()=>reject(new Error('Chromium CDP connection failed')),{once:true});
+    });
+    const pending=new Map<number,{resolve:(x:any)=>void;reject:(x:Error)=>void;timer:ReturnType<typeof setTimeout>}>();
+    let serial=0;
+    socket.addEventListener('message',(event:any)=>{
+      const msg=JSON.parse(event.data);
+      if(msg.method==='Runtime.exceptionThrown')exceptions.push(msg.params?.exceptionDetails?.text||'Runtime exception');
+      if(!msg.id)return;
+      const wait=pending.get(msg.id);
+      if(!wait)return;
+      pending.delete(msg.id);clearTimeout(wait.timer);
+      msg.error?wait.reject(new Error(msg.error.message)):wait.resolve(msg.result);
+    });
+    const command=(method:string,params:any={}):Promise<any>=>new Promise((resolve,reject)=>{
+      const id=++serial;
+      const timer=setTimeout(()=>{pending.delete(id);reject(new Error('CDP timeout: '+method));},18000);
+      pending.set(id,{resolve,reject,timer});
+      socket!.send(JSON.stringify({id,method,params}));
+    });
+    const evalInPage=async(js:string):Promise<any>=>{
+      const result=await command('Runtime.evaluate',{expression:js,returnByValue:true,awaitPromise:true});
+      if(result.exceptionDetails)throw new Error(result.exceptionDetails.text||'Browser JS exception');
+      return result.result?.value;
+    };
+    const waitFor=async(js:string,label:string,ms=11000)=>{
+      const end=Date.now()+ms;
+      while(Date.now()<end){
+        if(await evalInPage(js).catch(()=>false))return;
+        await pause(130);
+      }
+      const text=await evalInPage('document.body?.innerText?.slice(0,260)').catch(()=>'?');
+      throw new Error('Timed out: '+label+'; page excerpt: '+text);
+    };
+    const tap=async(selector:string)=>{
+      const point=await evalInPage('(()=>{'+
+        'const e=document.querySelector('+JSON.stringify(selector)+');if(!e)return null;'+
+        'const r=e.getBoundingClientRect(),x=Math.round(r.left+r.width/2),y=Math.round(r.top+r.height/2);'+
+        'const top=document.elementFromPoint(x,y);'+
+        'return{x,y,width:r.width,height:r.height,disabled:!!e.disabled,visible:r.width>0&&r.height>0&&x>=0&&x<innerWidth&&y>=0&&y<innerHeight,hit:top===e||e.contains(top),blocker:top?.tagName+"."+String(top?.className||"").slice(0,100)};'+
+        '})()');
+      assert.ok(point,'Missing touch target: '+selector);
+      assert.equal(point.disabled,false,'Disabled touch target: '+selector);
+      assert.ok(point.visible,'Off-screen touch target '+selector+': '+JSON.stringify(point));
+      assert.ok(point.hit,'Touch blocked by overlay '+selector+': '+JSON.stringify(point));
+      await command('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:point.x,y:point.y,id:1}]});
+      await command('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    };
+    const opened=async(label:string)=>{
+      await waitFor('document.querySelector(".app-sheet .app-screen-title-accessible")?.textContent?.includes('+JSON.stringify(label)+')','screen '+label);
+      const inspect=await evalInPage('(()=>({'+
+        'tabs:document.querySelectorAll(".app-sheet .harbour-nav-item").length,'+
+        'modal:document.querySelector(".app-sheet")?.getAttribute("aria-modal"),'+
+        'horizontal:document.documentElement.scrollWidth>innerWidth+2,'+
+        'dockBottom:Math.round(document.querySelector(".app-sheet .harbour-nav")?.getBoundingClientRect().bottom??0)'+
+        '}))()');
+      assert.equal(inspect.tabs,5,'All screens need five real navigation tabs: '+label);
+      assert.equal(inspect.modal,'true','Sheet must have modal accessibility contract');
+      assert.equal(inspect.horizontal,false,'Horizontal overflow on '+label);
+      assert.ok(inspect.dockBottom<=845,'Dock clipped below viewport on '+label);
+      // Real CDP keyboard regression across every opened app sheet. This
+      // verifies React's modal focus trap, not merely static ARIA markup.
+      const focusable=await evalInPage('(()=>{const d=document.querySelector(".app-sheet");'+
+        'const items=[...d.querySelectorAll("button:not(:disabled),a[href],input:not(:disabled)")].filter(e=>e.getClientRects().length>0);'+
+        'if(items.length<2)return items.length;items[0].setAttribute("data-work5-focus-boundary","first");'+
+        'items[items.length-1].setAttribute("data-work5-focus-boundary","last");items[0].focus();return items.length})()');
+      assert.ok(focusable>=2,'No two keyboard-focusable actions in '+label);
+      const pressTab=async(shift:boolean)=>{
+        const modifiers=shift?8:0;
+        await command('Input.dispatchKeyEvent',{
+          type:'rawKeyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9,nativeVirtualKeyCode:9,modifiers
+        });
+        await command('Input.dispatchKeyEvent',{
+          type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9,nativeVirtualKeyCode:9,modifiers
+        });
+      };
+      await pressTab(true);
+      assert.equal(await evalInPage('document.activeElement?.getAttribute("data-work5-focus-boundary")'),
+        'last','Shift+Tab escaped '+label+' instead of wrapping to its last control');
+      await pressTab(false);
+      assert.equal(await evalInPage('document.activeElement?.getAttribute("data-work5-focus-boundary")'),
+        'first','Tab escaped '+label+' instead of wrapping to its first control');
+    };
+    const back=async()=>{
+      await tap('.app-sheet .harbour-nav-item:first-child');
+      await waitFor('!!document.querySelector(".harbour-screen:not([aria-hidden=true]) .harbour-nav")','return to Porto');
+    };
+
+    await command('Page.enable');
+    await command('Runtime.enable');
+    await command('Emulation.setDeviceMetricsOverride',{
+      width:390,height:844,screenWidth:390,screenHeight:844,deviceScaleFactor:1,mobile:true
+    });
+    await command('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:2});
+    await command('Page.navigate',{url});
+    await waitFor('!!document.querySelector(".harbour-screen .harbour-nav")','Porto mounted');
+    await waitFor('!document.querySelector(".loading")','initial scene loaded',18000);
+    assert.equal(await evalInPage('document.querySelectorAll(".harbour-nav-item").length'),5);
+
+    // Actually send CDP touch events; DOM .click() would not validate hit targets.
+    await tap('.harbour-screen .harbour-nav-item:nth-child(2)');
+    await opened('Frota');
+    const tagForge=await evalInPage('(()=>{const b=[...document.querySelectorAll(".w4-fleet button")].find(el=>el.textContent?.includes("ABRIR MELHORIAS"));if(!b)return false;b.setAttribute("data-work5-qa-target","forge");return true})()');
+    assert.ok(tagForge,'Frota has no actionable Forja transition');
+    await tap('[data-work5-qa-target="forge"]');
+    await opened('Forja');
+    await tap('.app-sheet .harbour-nav-item:nth-child(3)');
+    await opened('Cartas');
+    await tap('.app-sheet .harbour-nav-item:nth-child(4)');
+    await opened('Loja');
+    await tap('.app-sheet .harbour-nav-item:nth-child(5)');
+    await opened('Ranking');
+    await back();
+
+    await tap('.harbour-screen .harbour-flank-right button:nth-child(2)');
+    await opened('Missões');
+    await back();
+
+    // All six side-menu actions must lead to the matching real sheet.
+    // Earlier browser coverage only tested Missões; this checks every other
+    // left/right action through emulated touchscreen events (no DOM click mocks).
+    const portalRoutes = [
+      ['.harbour-flank-left button:nth-child(1)', 'Batalha'],
+      ['.harbour-flank-left button:nth-child(2)', 'Baús'],
+      ['.harbour-flank-left button:nth-child(3)', 'Eventos'],
+      ['.harbour-flank-right button:nth-child(1)', 'Recompensas'],
+      ['.harbour-flank-right button:nth-child(3)', 'Ofertas'],
+    ] as const;
+    for (const [selector,title] of portalRoutes) {
+      await tap('.harbour-screen '+selector);
+      await opened(title);
+      const sheet = await evalInPage('(()=>{const d=document.querySelector(".app-sheet");'+
+        'const title=d?.querySelector("#app-screen-title");return{'+
+        'labelledBy:d?.getAttribute("aria-labelledby"),titleId:title?.id,'+
+        'visible:!!title&&title.getClientRects().length>0,'+
+        'dockButtons:d?.querySelectorAll(".harbour-nav-item").length,'+
+        'activeDialogs:[...document.querySelectorAll("[role=dialog]")].filter(x=>x.getClientRects().length>0).length'+
+        '}})()');
+      assert.equal(sheet.labelledBy,sheet.titleId,'Dialog heading must be linked on '+title);
+      assert.equal(sheet.visible,true,'Dialog must expose its visible title: '+title);
+      assert.equal(sheet.dockButtons,5,'Bottom menu must remain intact: '+title);
+      assert.equal(sheet.activeDialogs,1,'Only the active sheet should be exposed: '+title);
+      await back();
+    }
+
+    // Browser-backed persistence: edit in React, confirm storage, reload and verify the real Porto.
+    await tap('.harbour-screen .harbour-profile');
+    await opened('O meu perfil');
+    const inputValue=await evalInPage('(()=>{const el=document.querySelector("#app-player-name");if(!el)return null;'+
+      'Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value").set.call(el,"Capitao QA");'+
+      'el.dispatchEvent(new Event("input",{bubbles:true}));return el.value;})()');
+    assert.equal(inputValue,'Capitao QA');
+    await waitFor('!document.querySelector(".app-player-name-edit button[type=submit]")?.disabled','profile submit enabled');
+    await tap('.app-player-name-edit button[type=submit]');
+    await waitFor('JSON.parse(localStorage.getItem("royal-pirate:local-profile:v1")||"{}").playerName==="Capitao QA"','profile saved');
+    // Page.reload acknowledges the command before the old document disappears.
+    // A sentinel prevents accidentally reading the previous React tree mid-reload.
+    await evalInPage('document.documentElement.setAttribute("data-work5-pre-reload","1")');
+    await command('Page.reload',{ignoreCache:true});
+    await waitFor('!document.documentElement.hasAttribute("data-work5-pre-reload") && !!document.querySelector(".harbour-screen .harbour-battle-button")','new document mounted after reload',18000);
+    await waitFor('document.querySelector(".harbour-player-name")?.textContent==="Capitao QA"','profile reloaded',18000);
+
+    // The actual 3D battle scene and its fire action, not just the briefing modal.
+    await waitFor('!document.querySelector(".loading")','3D ready after reload',18000);
+    await tap('.harbour-screen .harbour-battle-button');
+    await waitFor('!!document.querySelector(".in-battle .fire-button")','3D battle');
+    await waitFor('document.querySelector(".fire-button")?.disabled===false','battle controls ready',18000);
+    await tap('.in-battle .fire-button');
+    await waitFor('document.querySelector(".fire-button")?.disabled===true','single fire enters flight');
+    assert.equal(await evalInPage('document.querySelector(".in-battle #bearing")?.min'),'-25');
+    assert.equal(await evalInPage('document.querySelector(".in-battle #power")?.max'),'100');
+    await tap('.return-harbour');
+    await waitFor('!!document.querySelector(".harbour-screen:not([aria-hidden=true]) .harbour-nav")','return after battle');
+
+    // Short iPhone-like viewport: the five tab centres must all be genuinely hittable.
+    await command('Emulation.setDeviceMetricsOverride',{
+      width:384,height:512,screenWidth:384,screenHeight:512,deviceScaleFactor:1,mobile:true
+    });
+    await pause(250);
+    const small=await evalInPage('(()=>{const nav=document.querySelector(".harbour-screen .harbour-nav");'+
+      'const r=nav.getBoundingClientRect();return{width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,'+
+      'bottom:r.bottom,tabs:[...nav.querySelectorAll("button")].map(b=>{const q=b.getBoundingClientRect();'+
+      'const x=q.left+q.width/2,y=q.top+q.height/2,h=document.elementFromPoint(x,y);'+
+      'return{width:q.width,height:q.height,hit:h===b||b.contains(h)}})}})()');
+    assert.equal(small.width,384);
+    assert.equal(small.height,512);
+    assert.ok(small.scrollWidth<=386,'Horizontal overflow 384x512: '+JSON.stringify(small));
+    assert.ok(Math.abs(small.bottom-512)<=2,'Mobile dock not anchored: '+JSON.stringify(small));
+    assert.equal(small.tabs.length,5);
+    assert.ok(small.tabs.every((b:any)=>b.hit&&b.width>=35&&b.height>=35),
+      'Dock tab too small or blocked at 384x512: '+JSON.stringify(small));
+
+    // New WORK5 compact-viewport regression: real Chromium touch events, not
+    // DOM click mocks. The 390x844 flow above covers the approved screens;
+    // these runs specifically test extremely narrow/tall phone geometries.
+    for(const [width,height] of [[320,568],[375,667],[430,932]] as const){
+      await command('Emulation.setDeviceMetricsOverride',{
+        width,height,screenWidth:width,screenHeight:height,
+        deviceScaleFactor:1,mobile:true
+      });
+      await pause(300);
+      const geometry=await evalInPage('(()=>{const nav=document.querySelector(".harbour-screen .harbour-nav");'+
+        'const r=nav.getBoundingClientRect();return {w:innerWidth,h:innerHeight,'+
+        'scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,'+
+        'bottom:r.bottom,buttons:[...nav.querySelectorAll("button")].map(b=>{const q=b.getBoundingClientRect();'+
+        'const x=q.left+q.width/2,y=q.top+q.height/2,e=document.elementFromPoint(x,y);'+
+        'return {width:q.width,height:q.height,hit:e===b||b.contains(e)}})}})()');
+      assert.equal(geometry.w,width);
+      assert.equal(geometry.h,height);
+      assert.ok(geometry.scrollWidth<=width+2,'Horizontal document scroll on '+width+'x'+height+': '+JSON.stringify(geometry));
+      assert.ok(Math.abs(geometry.bottom-height)<=2,'Porto dock clipped on '+width+'x'+height+': '+JSON.stringify(geometry));
+      assert.equal(geometry.buttons.length,5,'Five Porto dock buttons at '+width+'x'+height);
+      assert.ok(geometry.buttons.every((b:any)=>b.width>=35&&b.height>=35&&b.hit),
+        'Porto touch targets inaccessible at '+width+'x'+height+': '+JSON.stringify(geometry));
+      await tap('.harbour-screen .harbour-nav-item:nth-child(2)');
+      await waitFor('!!document.querySelector(".app-sheet .app-screen-title-accessible")?.textContent?.includes("Frota")','Frota at '+width+'x'+height);
+      const sheet=await evalInPage('(()=>{const n=document.querySelector(".app-sheet > .harbour-nav");'+
+        'const r=n.getBoundingClientRect();return{bottom:r.bottom,scrollWidth:document.documentElement.scrollWidth,'+
+        'buttons:[...n.querySelectorAll("button")].map(b=>{const q=b.getBoundingClientRect();'+
+        'const x=q.left+q.width/2,y=q.top+q.height/2,e=document.elementFromPoint(x,y);'+
+        'return {width:q.width,height:q.height,hit:e===b||b.contains(e)}})}})()');
+      assert.ok(sheet.scrollWidth<=width+2,'Frota horizontal overflow at '+width+'x'+height+': '+JSON.stringify(sheet));
+      assert.ok(Math.abs(sheet.bottom-height)<=2,'Frota dock clipped at '+width+'x'+height+': '+JSON.stringify(sheet));
+      assert.equal(sheet.buttons.length,5,'Five Frota dock buttons at '+width+'x'+height);
+      assert.ok(sheet.buttons.every((b:any)=>b.width>=35&&b.height>=35&&b.hit),
+        'Frota touch target blocked at '+width+'x'+height+': '+JSON.stringify(sheet));
+      await tap('.app-sheet .harbour-nav-item:first-child');
+      await waitFor('!!document.querySelector(".harbour-screen:not([aria-hidden=true]) .harbour-nav")','Porto return at '+width+'x'+height);
+    }
+
+    // Independent WORK5 compact portrait sweep: exercise the actual touch paths
+    // for the eight essential views, not merely a responsive DOM snapshot.
+    // This intentionally detects blocked controls without changing WORK6/WORK4.
+    await command('Emulation.setDeviceMetricsOverride',{
+      width:384,height:512,screenWidth:384,screenHeight:512,
+      deviceScaleFactor:1,mobile:true
+    });
+    await pause(300);
+    const auditCompactSheet=async(label:string)=>{
+      await opened(label);
+      const info=await evalInPage('(()=>{const s=document.querySelector(".app-sheet");'+
+        'const nav=s?.querySelector(".harbour-nav"),r=nav?.getBoundingClientRect();'+
+        'return{scrollWidth:document.documentElement.scrollWidth,innerWidth,innerHeight,'+
+        'modal:s?.getAttribute("aria-modal"),labelledBy:s?.getAttribute("aria-labelledby"),'+
+        'titleId:s?.querySelector("#app-screen-title")?.id,dockBottom:r?.bottom,'+
+        'items:[...nav?.querySelectorAll("button")||[]].map(b=>{const q=b.getBoundingClientRect();'+
+        'const x=q.left+q.width/2,y=q.top+q.height/2,hit=document.elementFromPoint(x,y);'+
+        'return{width:q.width,height:q.height,accessible:!!(b.getAttribute("aria-label")||b.textContent?.trim()),'+
+        'hit:hit===b||b.contains(hit)}})}})()');
+      assert.equal(info.innerWidth,384,'Unexpected compact viewport: '+label);
+      assert.equal(info.innerHeight,512,'Unexpected compact viewport: '+label);
+      assert.ok(info.scrollWidth<=386,'Compact horizontal overflow on '+label+': '+JSON.stringify(info));
+      assert.equal(info.modal,'true','Missing accessible modal on '+label);
+      assert.equal(info.labelledBy,info.titleId,'Unlabelled compact view '+label);
+      assert.ok(Math.abs(info.dockBottom-512)<=2,'Dock clipped in compact '+label+': '+JSON.stringify(info));
+      assert.equal(info.items.length,5,'Wrong bottom menu in compact '+label);
+      assert.ok(info.items.every((b:any)=>b.hit&&b.accessible&&b.width>=35&&b.height>=35),
+        'Compact bottom buttons unreachable/unlabelled in '+label+': '+JSON.stringify(info));
+    };
+    const compactViews=[
+      ['.harbour-screen .harbour-nav-item:nth-child(3)','Cartas'],
+      ['.harbour-screen .harbour-nav-item:nth-child(4)','Loja'],
+      ['.harbour-screen .harbour-nav-item:nth-child(5)','Ranking'],
+      ['.harbour-screen .harbour-flank-right button:nth-child(2)','Missões'],
+      ['.harbour-screen .harbour-profile','O meu perfil'],
+      ['.harbour-screen .harbour-flank-left button:nth-child(1)','Batalha'],
+    ] as const;
+    for(const [selector,label] of compactViews){
+      await tap(selector);
+      await auditCompactSheet(label);
+      await back();
+    }
+    await tap('.harbour-screen .harbour-nav-item:nth-child(2)');
+    await auditCompactSheet('Frota');
+    const hasCompactForge=await evalInPage('(()=>{const el=[...document.querySelectorAll(".w4-fleet button")]'+
+      '.find(b=>b.textContent?.includes("ABRIR MELHORIAS"));'+
+      'if(el)el.setAttribute("data-work5-compact-forge","1");return !!el})()');
+    assert.ok(hasCompactForge,'Frota has no Forja control in compact portrait');
+    // Deep scroll content may be below the fixed five-button dock at 512px.
+    // Reproduce a normal user's scroll before calling an unreachable CTA a dead button.
+    await evalInPage('document.querySelector("[data-work5-compact-forge=\\\"1\\\"]")'+
+      '?.scrollIntoView({block:"center",inline:"nearest"});true');
+    await pause(300);
+    await tap('[data-work5-compact-forge="1"]');
+    await auditCompactSheet('Forja');
+    await back();
+
+
+    // WORK5 session-restore regression for issue #153 (140 -> 40 gold).
+    // Exercise the actual React page after reload rather than only parseProfile().
+    // Local-only persistence is being tested; synchronization between tabs is not.
+    const seedProfile = await evalInPage('(()=>{const key="royal-pirate:local-profile:v1";'+
+      'const p=JSON.parse(localStorage.getItem(key)||"null");'+
+      'if(!p)return false;p.coins=140;p.playerName="Capitao 140";'+
+      'localStorage.setItem(key,JSON.stringify(p));return true})()');
+    assert.equal(seedProfile,true,'A real local captain profile must exist before reload');
+    await evalInPage('document.documentElement.setAttribute("data-work5-140-pre-reload","1")');
+    await command('Page.reload',{ignoreCache:true});
+    await waitFor('!document.documentElement.hasAttribute("data-work5-140-pre-reload") && !!document.querySelector(".harbour-screen .harbour-nav")',
+      'new React document after 140-coin reload',18000);
+    await waitFor('!document.querySelector(".loading")','3D ready after 140-coin restore',18000);
+    await waitFor('document.querySelector(".harbour-player-name")?.textContent==="Capitao 140" && '+ 
+      'document.querySelector(".harbour-stat[aria-label=\\\"140 locally earned coins\\\"]")!==null',
+      '140 coins and captain identity restored on Porto',18000);
+    const walletRoutes = [
+      ['.harbour-screen .harbour-nav-item:nth-child(2)','Frota'],
+      ['.harbour-screen .harbour-nav-item:nth-child(3)','Cartas'],
+      ['.harbour-screen .harbour-nav-item:nth-child(4)','Loja'],
+      ['.harbour-screen .harbour-nav-item:nth-child(5)','Ranking'],
+      ['.harbour-screen .harbour-flank-right button:nth-child(2)','Missões'],
+      ['.harbour-screen .harbour-profile','O meu perfil'],
+    ] as const;
+    for (const [selector,label] of walletRoutes) {
+      await tap(selector);
+      await opened(label);
+      const goldLabel = await evalInPage('document.querySelector(".app-sheet .app-wallet-gold")?.getAttribute("aria-label")');
+      assert.equal(goldLabel,'140 moedas de ouro ganhas localmente',
+        'Local 140-coin wallet changed when opening '+label);
+      await back();
+    }
+    assert.equal(await evalInPage('JSON.parse(localStorage.getItem("royal-pirate:local-profile:v1")||"{}").coins'),
+      140,'Route changes must not silently overwrite the persisted 140-coin save');
+
+    // Keyboard regression: Escape must close an accessible sheet without
+    // launching a different game screen. This uses browser CDP key events.
+    await tap('.harbour-screen .harbour-profile');
+    await opened('O meu perfil');
+    await command('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+    await command('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+    await waitFor('!document.querySelector(".app-sheet") && !!document.querySelector(".harbour-screen:not([aria-hidden=true]) .harbour-nav")',
+      'Escape closes Profile and returns to Porto');
+
+    assert.deepEqual(exceptions,[],'Actual browser runtime exceptions');
+  }finally{
+    try{socket?.close();}catch{}
+    if(chrome){try{chrome.kill('SIGTERM');}catch{}}
+    if(vite)await vite.close();
+    await pause(150);
+    await rm(profileDir,{recursive:true,force:true}).catch(()=>{});
+  }
+});
+
+// Measured pinch now has a dedicated real-Chromium test in
+// work5-real-ship-pinch-cdp-20261120.test.ts; no stale TODO here.
+test.todo('WORK5: the 10-second turn clock and ten-shot limit require implementation before browser assertion');

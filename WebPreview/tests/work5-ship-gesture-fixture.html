@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html,body{margin:0;width:100%;height:100%;overflow:hidden}#scene{width:100vw;height:100dvh;touch-action:none}canvas{display:block;touch-action:none}</style></head>
+<body><div id="scene"></div><script type="module">
+import * as THREE from 'three';
+import {OceanScene} from '../src/scene.ts';
+import {Battle} from '../src/battle.ts';
+try {
+  let selected=false;
+  const scene=new OceanScene(document.querySelector('#scene'),new Battle(1261),()=>{},()=>{},e=>{window.__work5Error=String(e)},v=>{selected=v});
+  scene.showHarbour();
+  window.__work5={
+    distance:()=>scene.camera.position.distanceTo(scene.controls.target),
+    selected:()=>selected,
+    clearSelected:()=>{selected=false},
+    pointerCount:()=>scene.shipPointers.size,
+    zoomEnabled:()=>scene.controls.enableZoom,
+    canvasRect:()=>{const r=scene.renderer.domElement.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height}},
+    viewport:()=>{const r=scene.renderer.domElement.getBoundingClientRect();return{width:r.width,height:r.height,aspect:scene.camera.aspect,pixelWidth:scene.renderer.domElement.width,pixelHeight:scene.renderer.domElement.height}},
+    findHit:()=>{
+      const r=scene.renderer.domElement.getBoundingClientRect();
+      scene.ships.player.root.updateWorldMatrix(true,true);
+      scene.camera.updateMatrixWorld(true);
+      const ray=new THREE.Raycaster();const point=new THREE.Vector2();
+      let nearest=null,score=Infinity;
+      for(let yi=2;yi<=18;yi++)for(let xi=2;xi<=18;xi++){
+        const x=r.x+r.width*xi/20,y=r.y+r.height*yi/20;
+        point.set((x-r.x)/r.width*2-1,-(y-r.y)/r.height*2+1);
+        ray.setFromCamera(point,scene.camera);
+        if(!ray.intersectObject(scene.ships.player.root,true).length)continue;
+        const dist=Math.abs(x-(r.x+r.width/2))+Math.abs(y-(r.y+r.height/2));
+        if(dist<score){nearest={x:Math.round(x),y:Math.round(y)};score=dist;}
+      }
+      return nearest;
+    }
+  };
+} catch(e){window.__work5Error=String(e?.stack||e)}
+</script></body></html>
