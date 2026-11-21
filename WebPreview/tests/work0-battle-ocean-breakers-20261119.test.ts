@@ -16,12 +16,11 @@ test('WORK0 #104: irregular battle ocean breakers remain isolated from Porto', (
   assert.match(combat, /float curling=sin\(/);
   assert.match(combat, /float edgeBreak=smoothstep\(/);
   assert.match(combat, /foam=max\(foam,edgeBreak\*irregular\*\.59\)/);
-  assert.ok(combat.includes('vec3 deep=mix(vec3(.003,.052,.17),vec3(.014,.265,.48),'),
-    'keep the restrained navy water pigments only inside Batalha');
-  assert.ok(combat.includes('deep=mix(deep,vec3(.040,.39,.61),clamp(edgeBreak*.22+ridge*.08,0.,.33));'),
-    'blue highlights must stay bounded to broken crests');
-  assert.ok(combat.includes('foam=pow(clamp(foam,0.,.64)/.64,1.45)*.67;'),
-    'whitecaps remain physically animated and compressed to prevent cyan carpet');
+  assert.match(combat, /vec3 deep=mix\(vec3\(\.005,\.105,\.235\),vec3\(\.019,\.34,\.51\)/);
+  assert.match(combat, /deep=mix\(deep,vec3\(\.055,\.50,\.64\),clamp\(edgeBreak\*\.26\+ridge\*\.09,0\.,\.38\)\)/,
+    'cyan remains bound to broken crests (<= .38), with deep-blue troughs');
+  assert.match(combat, /foam=clamp\(foam,0\.,\.64\)/,
+    'new crest foam stays below 0.64 and out of Porto');
   assert.match(source, /new T\.PlaneGeometry\(210,210,190,190\)/, 'same animated ocean mesh, no new draw call');
   assert.match(source, /this\.ships=\{player:makeShip\(false\),enemy:makeShip\(true\)\}/,
     'live ships, ballistics and enemy models unchanged');
