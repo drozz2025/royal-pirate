@@ -23,6 +23,8 @@ test('WORK4 #104 Forge source-depth revalidation uses ten mandatory approved ref
  assert.match(css,/contain:paint/);
  assert.match(css,/transform:translateZ\(0\)/);
  assert.match(css,/background-color:#2d2929!important/);
+ // The promoted native rim must be present in the shipped WORK4 stylesheet.
+ assert.match(css,/border-color:#4d4039/,'source-validated production Forge plaque rim required');
 });
 
 const chrome=[process.env.CHROME_BIN,'chromium','google-chrome'].filter(Boolean)
