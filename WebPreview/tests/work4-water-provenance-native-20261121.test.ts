@@ -165,6 +165,12 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
   const production=productionPanel.metrics as Record<string,{
     before:number;trial:number;delta:number;changedPixels:number
   }>;
+  // Emit the actual integrated-CSS result even if a standalone WORK4
+  // improvement threshold fails. CI must never silently re-label a failed
+  // combined render as passing; this diagnostic identifies the conflicting ROI.
+  console.log('WORK4_PRODUCTION_INTEGRATED_ROI '+JSON.stringify(production));
+  writeFileSync(join(qa,'work4-production-roi-before-gate.json'),
+    JSON.stringify({approved:false,viewport:'384x512',production},null,2)+'\n');
   assert.ok(production.full.delta>=0.20,
     'shipped 384 stage underpaint must improve full-frame MAE by at least 0.20');
   assert.ok(production.photoEdge.delta>=0.30,
