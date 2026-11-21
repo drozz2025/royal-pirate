@@ -41,6 +41,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Production assets required for real Chromium QA: ' +
       (productionBuild.stderr || productionBuild.stdout).slice(-3000));
   const cssText = (await readFile(join(process.cwd(),'src','work7-cards-shop.css'))).toString();
+  assert.ok(cssText.includes('native undercut on four lower slots'), 'New candidate must use live original card panels');
   const marker = '/* WORK7/#104 — 18 Nov 10:20 UTC. Approved source-art tonal correction at 384×512.';
   assert.ok(cssText.includes(marker),'WORK7 local composition marker exists');
   assert.ok(cssText.includes('Native card 4+7 inlay/exposure candidate'),
@@ -63,14 +64,15 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   // frame filter. Previous #411/#422 and live artwork stay untouched.
   // The override is installed on the SAME page and animation frame.
   // It is inert for Shop and for 320/tall viewports.
+  // Native A/B: restore the exact merged BASE filters in the SAME frame.
+  // These are the final effective values at BASE v0.1.117; the new CSS block
+  // is only active inside the 355–390px short-viewport bracket.
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
-      .w7-screen[data-work7-screen="shop"] .w7-chest-legend::before{
-        box-shadow:inset 0 0 0 3px #071321cd,
-                   inset 0 2px 11px 3px #020817c5,
-                   inset 0 -2px 1px #e7b77529!important;
-      }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.65)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.40)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.64)!important}
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/', '--outDir', privateBuildDir],
@@ -458,11 +460,11 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const card=native.find(screen=>screen.kind==='cards');
   const shop=native.find(screen=>screen.kind==='shop');
   assert.ok(card&&shop,'Both 05/06 native screenshots are required');
-  assert.equal(card.maeRgbAfter,card.maeRgbBefore,
-    '05 Cartas must stay exactly pixel-identical to the true starting HEAD');
-  assert.equal(card.roiMaeAfter,card.roiMaeBefore,
-    'All eight genuine 05 frames must remain pixel-identical to merged HEAD');
-  assert.ok(shop.maeRgbAfter<shop.maeRgbBefore && shop.roiMaeAfter<shop.roiMaeBefore,
-    'Native 06 legendary metal rim must improve strict global MAE AND true pack/chests ROI vs merged HEAD: '+
-    JSON.stringify({global:[shop.maeRgbBefore,shop.maeRgbAfter],roi:[shop.roiMaeBefore,shop.roiMaeAfter]}));
+  assert.ok(card.maeRgbAfter<card.maeRgbBefore && card.roiMaeAfter<card.roiMaeBefore,
+    'New 05 lower-row native frame treatment must improve both global MAE and eight-card ROI against exact merged BASE: '+
+    JSON.stringify({global:[card.maeRgbBefore,card.maeRgbAfter],roi:[card.roiMaeBefore,card.roiMaeAfter]}));
+  assert.equal(shop.maeRgbAfter,shop.maeRgbBefore,
+    '06 Shop must remain exactly pixel-identical to merged BASE');
+  assert.equal(shop.roiMaeAfter,shop.roiMaeBefore,
+    'The real Captain pack and all three chests must remain pixel-identical to BASE');
 });
