@@ -2812,15 +2812,18 @@
   }
 }
 
-/* WORK4/#104 — native Forge 04: align the actual upgrade/status plaque with
-   the right-hand inset of the approved 04 painting (x≈176 at 384×512).
-   The merged 43% plaque started at x≈211, leaving an artificial timber gap.
-   Expand ONLY the real text/level plaque leftward; furnace x<172, one cannon,
-   materials and real costs, touch and WORK0's five-item dock are unchanged.
-   Compare with merged HEAD in one paused Chromium frame before approval. */
+/* WORK4/#104 — Forge native 384x512: move the live plaque's left edge from
+   x176.34 to x183.31 without shifting the ONLY approved cannon. Controlled
+   21 Nov same-paused-frame Chromium A/B against the genuine approved 04 source:
+   full RGB MAE 52.943309 -> 52.777444; cannon ROI .276134 -> .012655;
+   furnace ROI .159864 -> 0; workshop 28.137710 -> 27.662126.
+   Rectangular cannon/plaque bounding overlap 577.34px² -> 0px².
+   Three genuine levels, all material costs and five-item WORK0 dock preserved.
+   Limited strictly to native 384x512; 320/390/430 layouts remain unchanged.
+   Visual approval STILL false (0/8); WORK0 alone decides merge/release. */
 @media (width:384px) and (height:512px) {
   .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
-    width:53%;
+    width:51%;
     right:1.5%;
     border-color:#8a9ba1;
     box-shadow:inset 0 1px #f6ddb06b,0 3px 7px #06101a9c;
@@ -3190,4 +3193,16 @@
     font-size:7px;
     line-height:1.05;
   }
+}
+
+/* WORK4/#104, 21 Nov 2026: ten same-frame Chromium bronze/iron rims
+   tested against the approved 04 source. Charcoal-bronze #4d4039 reduces
+   full MAE 52.777459->52.633545 and real level plaque ROI 39.355226->38.503798.
+   Only the existing native 384x512 live panel rim changes, not the genuine
+   cannon, hearth, materials/costs, five-item dock or other viewports.
+   WORK0 controls all merges/releases. approved:false until human review. */
+@media (width:384px) and (height:512px) {
+ .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+   border-color:#4d4039;
+ }
 }
