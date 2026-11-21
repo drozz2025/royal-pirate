@@ -3129,10 +3129,10 @@
   .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after {
     content:"";
     position:absolute;
-    left:-5px;
+    left:-10px;
     top:0;
     bottom:0;
-    width:5px;
+    width:10px;
     background:linear-gradient(90deg,transparent 0%,#082c48de 100%);
     pointer-events:none;
   }
@@ -3191,9 +3191,3 @@
     line-height:1.05;
   }
 }
-
-/* WORK4/#104 — measured native coast feather: 10px→5px at 384×512.
-   Same paused Chromium frame, original 03 source, no extra photographic
-   pixels, fake waves or altered ship crop. Scope is the live stats seam;
-   320/390/430, WORK0 dock and Royal Crown remain unchanged.
-   Human approved:false; WORK0 alone integrates. */
