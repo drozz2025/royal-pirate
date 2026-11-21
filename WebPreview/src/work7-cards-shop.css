@@ -4362,9 +4362,9 @@
  */
 @media (min-width:355px) and (max-width:390px) and (max-height:560px){
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.40) saturate(1.20) contrast(.74)}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.39) saturate(2.30) contrast(.76)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.46) saturate(2.00) contrast(.79)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.48)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.58) saturate(1.30) contrast(.92)}
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.37) saturate(1.75) contrast(.79)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.35) saturate(1.75) contrast(.79)}
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.58) saturate(1.90) contrast(.88)}
 }
