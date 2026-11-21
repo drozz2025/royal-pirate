@@ -155,6 +155,32 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
       ['blue-075882','#075882'],
       ['blue-08527a','#08527a']
     ].map(([id,background])=>({id:'integrated-'+id,css:stage+'{background:'+background+'!important;}'})),
+    // Diagnose the 10px photo/inset junction as a coupled WORK0 composite.
+    // This is deliberately *not* an isolated flat-blue background sweep:
+    // the integrated photo edge is covered by an inset gradient and cannot
+    // be assessed by stage pigments alone. Keep exact approved pixels.
+    ...[
+      ['coast-source','linear-gradient(90deg,transparent 0%,#063a59 100%)'],
+      ['coast-eased','linear-gradient(90deg,transparent 0%,#082c4820 18%,#082c48b0 40%,#082c48de 100%)'],
+      ['coast-deep','linear-gradient(90deg,transparent 0%,#082c4830 38%,#041d33ed 100%)'],
+      ['coast-sky','linear-gradient(90deg,transparent 0%,#075a7480 54%,#082c48de 100%)'],
+      ['coast-muted','linear-gradient(90deg,transparent 0%,#08688840 25%,#07506db0 72%,#082c48de 100%)'],
+      ['coast-dim','linear-gradient(90deg,transparent 0%,#06496944 24%,#06334fc0 64%,#041d33f5 100%)'],
+      ['coast-ink','linear-gradient(90deg,#08527a00 0%,#08527a55 60%,#082c48de 100%)']
+    ].map(([id,gradient])=>({
+      id:'joint-'+id,
+      css:stage+'{background:#08527a!important;}'+
+        '.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after'+
+        '{background:'+gradient+'!important;}'
+    })),
+    {id:'joint-wide-16',css:stage+'{background:#08527a!important;}'+
+      '.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after'+
+      '{left:-16px!important;width:16px!important;'+
+      'background:linear-gradient(90deg,transparent 0%,#082c4830 35%,#082c48de 100%)!important;}'},
+    {id:'joint-wide-22',css:stage+'{background:#08527a!important;}'+
+      '.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after'+
+      '{left:-22px!important;width:22px!important;'+
+      'background:linear-gradient(90deg,transparent 0%,#082c4830 35%,#082c48de 100%)!important;}'},
     {id:'remove-photo-mask',css:ship+'{-webkit-mask-image:none!important;mask-image:none!important;}'}
   ] as const;
   const boxes:Record<string,[number,number,number,number]>={
@@ -223,20 +249,9 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
   writeFileSync(join(qa,'work4-integrated-underpaint-roi-sweep-384x512.json'),
     JSON.stringify(integratedStudy,null,2)+'\n');
   console.log('WORK4_INTEGRATED_COVE_SWEEP '+JSON.stringify(integratedStudy));
-  // Actual submitted CSS still fails when the production layer fails;
-  // successful injected trials are research and cannot automatically pass CI.
-  assert.ok(production.full.delta>=0.20,
-    'shipped 384 stage underpaint must improve full-frame MAE by at least 0.20');
-  assert.ok(production.photoEdge.delta>=0.30,
-    'shipped underpaint must improve the real hard photo edge by at least 0.30');
-  assert.ok(production.authenticWater.delta>=0,
-    'approved photo-water ROI must not deteriorate in shipped CSS');
-  assert.ok(production.lowerWaterJoin.delta>=-0.01,
-    'shipped water join must not deteriorate beyond 0.01 RGB MAE');
-  assert.equal(production.crownCore.changedPixels,0,
-    'the real Royal Crown core must remain pixel-identical');
-  assert.equal(production.dock.changedPixels,0,
-    'WORK0 dock must remain pixel-identical');
+  // Defer production approval gates until AFTER all visual evidence is saved.
+  // GitHub Actions uploads porto-qa/work4 even when this gate is red; otherwise
+  // a failed integration would lose the Forge and mobile ROI diagnostics.
 
   const protectedRois=['crownCore','dock'];
   const eligible=results.filter(r=>
@@ -246,6 +261,38 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
     r.metrics.authenticWater.delta>=0&&
     r.metrics.lowerWaterJoin.delta>=-0.01
   ).sort((a,b)=>b.metrics.photoEdge.delta-a.metrics.photoEdge.delta);
+  const protectedComposite=results.filter(r=>
+    r.id.startsWith('joint-') &&
+    r.metrics.crownCore.changedPixels===0 &&
+    r.metrics.shipComposition.changedPixels===0 &&
+    r.metrics.dock.changedPixels===0 &&
+    r.metrics.authenticWater.trial<=production.authenticWater.trial+.01 &&
+    r.metrics.lowerWaterJoin.trial<=production.lowerWaterJoin.trial+.01
+  ).sort((a,b)=>a.metrics.photoEdge.trial-b.metrics.photoEdge.trial);
+  const coastJointStudy={approved:false,approvedScreens:0,viewport:'384x512',
+    baseline:{full:production.full.trial,edge:production.photoEdge.trial},
+    trials:results.filter(r=>r.id.startsWith('joint-')).map(r=>({
+      id:r.id,full:r.metrics.full.trial,edge:r.metrics.photoEdge.trial,
+      fullGain:production.full.trial-r.metrics.full.trial,
+      edgeGain:production.photoEdge.trial-r.metrics.photoEdge.trial,
+      shipChanges:r.metrics.shipComposition.changedPixels,
+      crownChanges:r.metrics.crownCore.changedPixels,
+      water:r.metrics.authenticWater.trial,
+      dockChanges:r.metrics.dock.changedPixels
+    })),
+    bestProtected:protectedComposite[0]?.id??null,
+    strictCandidate:protectedComposite.find(r=>
+      r.metrics.full.trial<=production.full.before-.20 &&
+      r.metrics.photoEdge.trial<=production.photoEdge.before-.30)?.id??null
+  };
+  writeFileSync(join(qa,'work4-integrated-coast-junction-sweep-384x512.json'),
+    JSON.stringify(coastJointStudy,null,2)+'\\n');
+  console.log('WORK4_INTEGRATED_COAST_JUNCTION '+JSON.stringify(coastJointStudy));
+  if(protectedComposite[0]){
+    const composite=await evaluate(metricExpression(protectedComposite[0].screenshot,true));
+    writeFileSync(join(qa,'original-before-best-safe-junction-overlay-384x512.png'),
+      Buffer.from(composite.comparison,'base64'));
+  }
   const selected=eligible[0];
   // Evidence never silently promotes a trial into production. Human review
   // and a separate tracked CSS change are required even if the trial qualifies.
@@ -297,4 +344,20 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
   const report={approved:false,approvedScreens:0,sourceFiles:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],viewport:'384x512',scene:'single paused Chromium frame, unchanged source/profile',geometry,forgeGeometry,forgeRoiMae:forge.mae,viewportResults,productionCssRoi:production,productionScreenshot:'original-before-render-overlay-fleet-384x512.png',selectedForFurtherArtReview:selected?.id??null,shownTrial:strongest.id,thresholds:{full:0.20,photoEdge:0.30,authenticWaterMinDelta:0,lowerWaterJoinMinDelta:-0.01},results:results.map(({id,metrics})=>({id,metrics})),note:'The reviewed deep-blue stage underpaint is now WORK4 production CSS only at native 384x512; all other CSS variants are temporary injected trials. MAE is not human artistic approval.'};
   writeFileSync(join(qa,'work4-water-provenance-ab.json'),JSON.stringify(report,null,2)+'\n');
   console.log('WORK4_WATER_PROVENANCE_AB '+JSON.stringify(report));
+
+  // Actual submitted production CSS must pass independent ROI gates;
+  // successful injected trials are research and cannot automatically pass CI.
+  assert.ok(production.full.delta>=0.20,
+    'shipped 384 stage underpaint must improve full-frame MAE by at least 0.20');
+  assert.ok(production.photoEdge.delta>=0.30,
+    'shipped underpaint must improve the real hard photo edge by at least 0.30');
+  assert.ok(production.authenticWater.delta>=0,
+    'approved photo-water ROI must not deteriorate in shipped CSS');
+  assert.ok(production.lowerWaterJoin.delta>=-0.01,
+    'shipped water join must not deteriorate beyond 0.01 RGB MAE');
+  assert.equal(production.crownCore.changedPixels,0,
+    'the real Royal Crown core must remain pixel-identical');
+  assert.equal(production.dock.changedPixels,0,
+    'WORK0 dock must remain pixel-identical');
+
 });
