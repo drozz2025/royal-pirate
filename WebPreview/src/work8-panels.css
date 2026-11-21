@@ -5485,3 +5485,17 @@
     visibility:hidden;
   }
 }
+
+/* WORK8 / issue #104 — 07 Missões only: source-faithful tropical foliage enamel.
+   Test/production differ ONLY on the two genuinely painted SVG palm groups,
+   keeping the real 3 objective cards, 7 rewards, and existing five-item dock.
+   Original / BEFORE / RENDER / OVERLAY are captured at native 384x512 DPR1
+   with same live DOM/frame and animations paused; 0/8 human approvals. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-palm-ink-ab-baseline)
+  .w8-approved-missions .w8-approved-scene .w8-palm-left,
+  :root:not(.work8-missions-palm-ink-ab-baseline)
+  .w8-approved-missions .w8-approved-scene .w8-palm-right {
+    filter:saturate(.72) brightness(.90) hue-rotate(-6deg);
+  }
+}
