@@ -53,6 +53,60 @@ export function makeBattleEnemyOrnaments(): T.Group {
       medallion.rotation.y=Math.PI/2;art.add(medallion);
     }
   }
+  // WORK0/#104 — the approved Batalha shows a recognisable broadside of
+  // open gunports, not a flat red rectangular hull. Sculpt four recessed ports
+  // per live side with bronze rims and short iron muzzle lips; each follows the
+  // existing enemy render root. Four instanced GPU draws serve all eight ports.
+  // Decorative ONLY: no new guns, shots, physics, simulation, collisions,
+  // currency, UI, dock or changes to the Porto model.
+  const gunportInk=new T.MeshBasicMaterial({color:'#13161e',side:T.DoubleSide});
+  const gunportIron=new T.MeshStandardMaterial({color:'#39404b',roughness:.54,metalness:.52});
+  const portZ=[-3.2,-1.25,.9,2.85];
+  const hullHalfWidthAt=(z:number):number=>{
+    for(let i=1;i<stations.length;i++){
+      if(z<=stations[i]){
+        const t=(z-stations[i-1])/(stations[i]-stations[i-1]);
+        return widths[i-1]+(widths[i]-widths[i-1])*t;
+      }
+    }
+    return widths[widths.length-1];
+  };
+  const portMats:T.Matrix4[]=[],rimMats:T.Matrix4[]=[],barrelMats:T.Matrix4[]=[],mouthMats:T.Matrix4[]=[];
+  for(const side of [-1,1]){
+    for(const z of portZ){
+      const outer=side*(hullHalfWidthAt(z)*1.045+.095);
+      const pose=new T.Object3D();
+      pose.position.set(outer,.59,z);
+      pose.rotation.y=side*Math.PI/2;
+      pose.updateMatrix();portMats.push(pose.matrix.clone());
+      pose.position.x+=side*.018;
+      pose.updateMatrix();rimMats.push(pose.matrix.clone());
+      // A short lip emerging from the cut-out, but not an extra functional
+      // cannon: this geometry belongs exclusively to the opponent's hull.
+      pose.position.set(outer+side*.22,.59,z);
+      pose.rotation.set(0,0,Math.PI/2);
+      pose.updateMatrix();barrelMats.push(pose.matrix.clone());
+      pose.position.set(outer+side*.46,.59,z);
+      pose.rotation.set(0,side*Math.PI/2,0);
+      pose.updateMatrix();mouthMats.push(pose.matrix.clone());
+    }
+  }
+  const portParts=[
+    ['battle-broadside-gunport-bore',new T.CircleGeometry(.237,16),gunportInk,portMats],
+    ['battle-broadside-gunport-brass',new T.TorusGeometry(.245,.040,7,18),gold,rimMats],
+    ['battle-broadside-gunport-iron',new T.CylinderGeometry(.105,.138,.46,10),gunportIron,barrelMats],
+    ['battle-broadside-gunport-mouth',new T.CircleGeometry(.090,12),gunportInk,mouthMats]
+  ] as const;
+  for(const [name,geometry,material,matrices] of portParts){
+    const batch=new T.InstancedMesh(geometry,material,matrices.length);
+    batch.name=name;
+    matrices.forEach((matrix,index)=>batch.setMatrixAt(index,matrix));
+    batch.instanceMatrix.needsUpdate=true;
+    batch.computeBoundingSphere();
+    batch.castShadow=name==='battle-broadside-gunport-iron';
+    art.add(batch);
+  }
+
   // Curved quarter-gallery at the actual stern, not another vessel.
   for(const y of [2.54,3.25,3.91]){
     tube('battle-stern-gallery-gold',[
