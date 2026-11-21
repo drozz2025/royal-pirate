@@ -1900,7 +1900,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await evalJs('document.documentElement.classList.remove("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline");document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));true');
     await delay(160);
     const ctaFlag='work8-missions-active-cta-enamel-ab-baseline';
-    const ctaSelector='.w8-approved-missions .w8-approved-quest[data-state=active] > button';
+    const ctaSelector='.w8-approved-missions .w8-approved-quest:nth-child(n+2)[data-state=active] > button';
     const ctaState=()=>evalJs('(()=>({active:[...document.querySelectorAll('+JSON.stringify(ctaSelector)+')].map(b=>{const r=b.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,label:b.textContent}}),quests:document.querySelectorAll(".w8-approved-quest").length,days:document.querySelectorAll(".w8-approved-days li").length,dock:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length}))()');
     await evalJs('document.documentElement.classList.add('+JSON.stringify(ctaFlag)+');true');
     await delay(150);
@@ -1917,8 +1917,8 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     const ctaScoreExpression=source
       .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+ctaBefore))
       .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+ctaAfter))
-      .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],actions:[285,157,373,320],daily:');
-    assert.ok(ctaScoreExpression.includes('actions:[285,157,373,320]'),'native action ROI required');
+      .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],actions:[285,210,373,320],daily:');
+    assert.ok(ctaScoreExpression.includes('actions:[285,210,373,320]'),'native action ROI required');
     const ctaMeasurements=await evalJs(ctaScoreExpression);
     const ctaMontage=await evalJs('(async()=>{const u='+JSON.stringify([
       'data:image/webp;base64,'+orig,'data:image/png;base64,'+ctaBefore,
