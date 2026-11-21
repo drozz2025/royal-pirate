@@ -162,6 +162,18 @@ test('WORK4 Forge genuine BASE versus expanded source cannon and narrow live pla
     "ctx.drawImage(original,0,0);ctx.drawImage(renders[0],384,0);ctx.drawImage(promoted,768,0);ctx.drawImage(original,1152,0);ctx.globalAlpha=.5;ctx.drawImage(promoted,1152,0);"+
     "return {rows,winner:winner.index,boxes,compiledDiff,overlay:canvas.toDataURL('image/png').split(',')[1]};})()";
   const data=await evaluate(expr);
+  // Always save quantitative evidence BEFORE fidelity gates; a rejected
+  // candidate must leave readable data, not an uninformative red check.
+  writeFileSync(join(qa,'work4-forge-cannon-reveal-raw-384x512.json'),
+    JSON.stringify({approved:false,approvedScreens:0,source:'04-melhorias-forja.webp',
+      viewport:'384x512',variants,geometry,boxes:data.boxes,rows:data.rows,
+      compiledDiff:data.compiledDiff},null,2)+'\\n');
+  console.log('WORK4_FORGE_REVEAL_RAW '+JSON.stringify(data.rows.map((r:any)=>({
+    index:r.index,full:r.roi.full.mae,plaque:r.roi.plaque.mae,
+    edge:r.roi.plaqueEdge.mae,barrel:r.roi.barrelOverlap.mae,
+    cannon:r.roi.cannon.mae,furnace:r.roi.furnace.mae,
+    costsChanged:r.roi.costs.changedPixels,dockChanged:r.roi.dock.changedPixels
+  }))));
   assert.equal(data.rows.length,variants.length);
   assert.equal(data.compiledDiff,0,'compiled production CSS must match 22px candidate exactly');
   const initial=data.rows[0],chosen=data.rows[data.rows.length-1];
