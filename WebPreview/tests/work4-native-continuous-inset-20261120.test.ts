@@ -169,12 +169,24 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
     {id:'feather-18',width:18},
     {id:'feather-22',width:22},
     {id:'feather-26',width:26},
-    {id:'feather-30',width:30}
+    {id:'feather-30',width:30},
+    // WORK4/#104 new 21 Nov native colour matching: same original
+    // 10px join, SAME live scene/frame; never recolour ship or real sea.
+    {id:'seam-ink-source-blue',width:10,tone:'#075684ec'},
+    {id:'seam-ink-mid-blue',width:10,tone:'#0a4b74ed'},
+    {id:'seam-ink-deep-coast',width:10,tone:'#0b3655f6'},
+    {id:'seam-ink-harbour',width:10,tone:'#063a59'},
+    {id:'seam-ink-coastal-night',width:10,tone:'#052a44ed'},
+    {id:'seam-ink-stone-blue',width:10,tone:'#184158e0'},
+    {id:'seam-ink-charcoal',width:10,tone:'#102f46f2'},
+    {id:'seam-ink-source-ink',width:10,tone:'#09263cfb'},
+    {id:'seam-ink-deep-water',width:10,tone:'#0b3b60ef'}
   ];
   const sourcePhotos=[] as string[];
   for(const seam of seams){
     const cssOverride='.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after{'+
-      'left:-'+seam.width+'px!important;width:'+seam.width+'px!important;}';
+      'left:-'+seam.width+'px!important;width:'+seam.width+'px!important;'+
+      'background:linear-gradient(90deg,transparent 0%,'+(('tone' in seam)?seam.tone:'#082c48de')+' 100%)!important;}';
     await evaluate("(()=>{let e=document.getElementById('work4-coast-seam-study');"+
       "if(!e){e=document.createElement('style');e.id='work4-coast-seam-study';document.head.append(e)}"+
       "e.textContent="+JSON.stringify(cssOverride)+";return true})()");
@@ -200,13 +212,39 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
   assert.equal(scan.report.length,seams.length);
   const gate=scan.report.filter((r:any)=>['ship','crown','sea','dock'].every(
     key=>r.metrics[key].changed===0)&&
+    // No coast source regression just to win global MAE. Compare both local
+    // photo join and the actual shoreline instead of optimizing a flat colour.
+    r.metrics.coast.mae<=scan.report[0].metrics.coast.mae+.000001 &&
+    r.metrics.join.mae<=scan.report[0].metrics.join.mae+.000001 &&
     r.metrics.full.mae<=scan.report[0].metrics.full.mae+.000001);
   gate.sort((a:any,b:any)=>a.metrics.join.mae-b.metrics.join.mae||
     a.metrics.full.mae-b.metrics.full.mae);
   const winner=gate[0]||scan.report[0];
+  // A screenshot of an injected experiment is NOT proof of the compiled
+  // release CSS. Verify the promoted candidate is reproduced by the actual
+  // stylesheet after the diagnostic injection is completely removed.
+  assert.equal(seams[winner.index].id,'seam-ink-harbour',
+    'only the safe source-coast winner can be promoted to production');
+  const applied=await evaluate("getComputedStyle(document.querySelector('.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label'),'::after').backgroundImage");
+  assert.match(applied,/rgb\(6,\s*58,\s*89\)/,'native CSS must carry the promoted original-coast ink');
+  await delay(110);
+  const productionPng=(await cmd('Page.captureScreenshot',{
+    format:'png',captureBeyondViewport:false
+  })).data as string;
+  const productionDiff=await evaluate("(async()=>{"+
+    "const load=async b=>{const i=new Image();i.src='data:image/png;base64,'+b;await i.decode();"+
+    "const c=document.createElement('canvas');c.width=384;c.height=512;"+
+    "const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data};"+
+    "const [a,b]=await Promise.all(["+
+      JSON.stringify(sourcePhotos[winner.index])+","+JSON.stringify(productionPng)+
+    "].map(load));let changed=0;for(let i=0;i<a.length;i+=4)"+
+    "{if(a[i]!==b[i]||a[i+1]!==b[i+1]||a[i+2]!==b[i+2])changed++;}return changed})()");
+  assert.equal(productionDiff,0,'actual compiled RENDER must match promoted A/B winner pixel for pixel');
   const sealReport={
     approved:false,screensApproved:0,source:'03-frota.webp',viewport:'384x512',
-    comparison:'same paused Chromium scene, only live seam fade width changes',
+    colourSweep:'nine new source-inspired inks tested at existing 10px width; zero visual release unless manually approved',
+    requiredReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+    comparison:'same paused Chromium scene; 6 seam widths and 9 native coast pigments; actual compiled CSS RENDER cross-checked pixel-by-pixel',productionCandidate:'seam-ink-harbour',productionChangedPixelsFromCandidate:productionDiff,
     variants:seams.map((seam,i)=>({...seam,...scan.report[i]})),
     safeWinner:seams[winner.index].id,
     decision:winner.index===0?'Keep current 10px feather until meaningful source ROI gain':
@@ -216,6 +254,19 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
     JSON.stringify(sealReport,null,2)+'\n');
   writeFileSync(join(qa,'work4-fleet-safe-feather-384x512.png'),
     Buffer.from(sourcePhotos[winner.index],'base64'));
+  const montageData=await evaluate("(async()=>{"+
+    "const load=async(src)=>{const im=new Image();im.src=src;await im.decode();return im};"+
+    "const [a,b,c]=await Promise.all(["+
+       "'data:image/webp;base64,"+approved+"',"+
+       "'data:image/png;base64,"+sourcePhotos[0]+"',"+
+       "'data:image/png;base64,"+productionPng+"'"+
+    "].map(load));"+
+    "const cv=document.createElement('canvas');cv.width=1536;cv.height=512;"+
+    "const ctx=cv.getContext('2d');ctx.drawImage(a,0,0);ctx.drawImage(b,384,0);"+
+    "ctx.drawImage(c,768,0);ctx.drawImage(a,1152,0);ctx.globalAlpha=.5;"+
+    "ctx.drawImage(c,1152,0);return cv.toDataURL('image/png').split(',')[1]})()");
+  writeFileSync(join(qa,'work4-fleet-coast-ink-original-before-render-overlay-384x512.png'),
+    Buffer.from(montageData,'base64'));
   console.log('WORK4_FLEET_COAST_FEATHER_SWEEP '+JSON.stringify({
     safeWinner:sealReport.safeWinner,decision:sealReport.decision,
     variants:sealReport.variants.map(x=>({id:x.id,...x.metrics}))

@@ -3191,3 +3191,35 @@
     line-height:1.05;
   }
 }
+
+/* WORK4/#104 — native 03 coast ink sourced from original 03-frota.webp, 21 Nov 2026.
+   CI-run 44863849237: same paused Chromium 384×512 scene and 15 A/B
+   treatments, 10px film only. Base #082c48de -> source-coast #063a59:
+   full MAE 48.633167 -> 48.616652; join 10.099173 -> 9.624768;
+   real coast 6.141480 -> 5.544647. 1,951 changed pixels exclusively
+   in the WORK4 information-panel join; 0 changed in Royal Crown,
+   original water source and five-item WORK0 dock. No 320/390/430 shifts,
+   fake waves, additional ship, menu or economy changes.
+   This is a measured visual CANDIDATE, not human artistic approval. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after {
+    background:linear-gradient(90deg,transparent 0%,#063a59 100%);
+  }
+}
+
+
+
+/* WORK4/#104 — native 384x512 Forge 04 genuine source-edge transition.
+   Controlled A/B against approved 04 WebP in ONE paused Chromium frame,
+   sweep 0..22px: 22px restores barrel/hearth source pixels under the
+   existing level plaque instead of a duplicate cannon/glow.
+   Forja full RGB MAE 52.94334 -> 52.78977; barrel overlap 32.64280 ->
+   21.28205; cannon 0.27613 -> 0.00654; furnace 0.15986 -> 0.00000.
+   Real three prices, WORK0 dock, geometry, 320/390/430 unchanged.
+   Human artistic approval false (0/8); only WORK0 merges/publishes. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+    -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+    mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+  }
+}
