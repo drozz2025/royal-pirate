@@ -1225,25 +1225,9 @@ function ApprovedFleetSea(){
 }
 
 function ApprovedFleetPainting(){
-  // Render the one approved Royal Crown at source-pixel scale. At the original
-  // 384×512 reference size, uncover 6 extra authentic coastal pixels to meet
-  // the live information inset without stretching the hull or inventing sea.
-  // Other viewports retain the existing 223px registered source crop.
-  const sourceRef=React.useRef<SVGSVGElement>(null);
-  React.useLayoutEffect(()=>{
-    const element=sourceRef.current;
-    if(!element||typeof window==='undefined'||typeof window.matchMedia!=='function')return;
-    const viewport=window.matchMedia('(width: 384px) and (height: 512px)');
-    const syncSourceCrop=()=>element.setAttribute('viewBox',viewport.matches
-      ?'18 146 229 194':'18 146 223 194');
-    syncSourceCrop();
-    viewport.addEventListener('change',syncSourceCrop);
-    return ()=>{
-      viewport.removeEventListener('change',syncSourceCrop);
-      element.setAttribute('viewBox','18 146 223 194');
-    };
-  },[]);
-  return <svg ref={sourceRef} className="w4-ship-art w4-reference-ship" viewBox="18 146 223 194"
+  // Use only the reference-registered 223px source crop. The native Fleet
+  // seam is now feathered in WORK4 CSS rather than expanding/scaling the ship.
+  return <svg className="w4-ship-art w4-reference-ship" viewBox="18 146 223 194"
     data-work4-crop="fleet" role="img"
     aria-label="Galeão Royal Crown e costa tropical, arte pictórica aprovada">
     <image x="0" y="0" width="384" height="512"
