@@ -48,6 +48,7 @@ on:
       - work2/original-deck-ammunition-racks-20261121
       - work2/original-stern-lanterns-20261121
       - work2/original-keel-cutwater-20261121
+      - work2/original-gunwale-rails-20261121
   pull_request:
     branches:
       - work2/shipyard-instanced-gpu-batching-20261120
@@ -61,6 +62,7 @@ on:
       - work2/shipyard-part-focus-20261120
       - work2/shipyard-fine-detail-lod-20261121
       - work2/shipyard-cinematic-orbit-20261121
+      - work2/original-keel-cutwater-20261121
     paths:
       - 'WebPreview/**'
       - '.github/workflows/work2-shipyard-verify.yml'
