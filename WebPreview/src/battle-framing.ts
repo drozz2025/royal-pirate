@@ -86,7 +86,19 @@ export function battleCameraPose(aspect: number): CameraPose {
     // Scale the live presentation proportionally to aspect and pan its broadside
     // toward starboard while moving the real deck so the muzzle stays centred.
     // Never move simulated hulls, collision geometry, Porto or the dock.
-    const tallPortrait = aspect < .62; // narrow horizontal FOV needs a different starboard pan from 384x512
+    // Smoothly reframe actual perspective as portrait aspect changes. The old
+    // threshold at 0.50/0.62 jumped by 1.3 world units between near-identical
+    // iPhones, visibly jerking the red ship and gun muzzle across the view.
+    // Keep the previously measured 390x844, 320x568 and 384x512 endpoints.
+    // The native 384x512 camera pans 0.3 units farther port: projection of
+    // the actual enemy centre gains >24px of starboard clearance compared with
+    // the pre-approved wide crop, without moving hulls or collision geometry.
+    const compactAspect = 320 / 568;
+    const mix = (a:number,b:number,t:number) => a + (b-a)*Math.max(0,Math.min(1,t));
+    const targetX = aspect <= .50 ? 5.8 :
+      aspect <= compactAspect ? mix(5.8,4.5,(aspect-.50)/(compactAspect-.50)) :
+      mix(4.5,3.0,(aspect-compactAspect)/(.75-compactAspect));
+    const gunX = mix(3.2,1.8,(aspect-compactAspect)/(.75-compactAspect));
     return {
       // Keep the gunner eye at deck height. At the native 384x512 reference
       // crop, aim the camera further toward the PORT side so the enemy reads
@@ -96,10 +108,10 @@ export function battleCameraPose(aspect: number): CameraPose {
       // Reframe by phone aspect: short 320×568 stays 4.5; taller
       // 390×844/430×932 pan 5.8 to retain full broadside and central real muzzle.
       position: [0, 7.4, 55],
-      target: [aspect < .50 ? 5.8 : tallPortrait ? 4.5 : 3.3, 4.1, -3],
+      target: [targetX, 4.1, -3],
       showBattery: true,
       batteryOffsetZ: -30,
-      batteryOffsetX: tallPortrait ? 3.2 : 1.8,
+      batteryOffsetX: gunX,
       batteryScale: .84,
       // Legacy optional edge rig is now HIDDEN for portrait battle.
       sailX: -11,
