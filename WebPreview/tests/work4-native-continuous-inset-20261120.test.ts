@@ -163,18 +163,31 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
   // Compare a real coastal seam instead of adding synthetic waves. Every candidate
   // uses the SAME 384x512 DOM, artwork, frame, real stats and paused animations.
   // The existing release is a valid baseline; no candidate is published by QA.
-  const seams=[
+  // WORK4/#104: unlike the rejected 7% ship-photo mask, these candidates
+  // preserve EVERY original image pixel. Only the 10px pre-existing,
+  // pointer-events:none information inset transition is eased. Controlled
+  // against the exact SAME paused page, reference and local account state.
+  const seams:Array<{id:string;width:number;stops?:string}>=[
     {id:'release-10',width:10},
     {id:'feather-14',width:14},
     {id:'feather-18',width:18},
     {id:'feather-22',width:22},
     {id:'feather-26',width:26},
-    {id:'feather-30',width:30}
+    {id:'feather-30',width:30},
+    {id:'ease-early-40',width:10,
+      stops:'transparent 0%,#082c4820 18%,#082c48b0 40%,#082c48de 100%'},
+    {id:'ease-mid-60',width:10,
+      stops:'transparent 0%,#082c4840 38%,#082c48ce 60%,#082c48de 100%'},
+    {id:'ease-soft-75',width:10,
+      stops:'transparent 0%,#082c4840 30%,#082c4880 55%,#082c48de 100%'},
+    {id:'ease-opaque-45',width:10,
+      stops:'transparent 0%,#082c48de 45%,#082c48de 100%'}
   ];
   const sourcePhotos=[] as string[];
   for(const seam of seams){
     const cssOverride='.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after{'+
-      'left:-'+seam.width+'px!important;width:'+seam.width+'px!important;}';
+      'left:-'+seam.width+'px!important;width:'+seam.width+'px!important;'+
+      'background:linear-gradient(90deg,'+(seam.stops||'transparent 0%,#082c48de 100%')+')!important;}';
     await evaluate("(()=>{let e=document.getElementById('work4-coast-seam-study');"+
       "if(!e){e=document.createElement('style');e.id='work4-coast-seam-study';document.head.append(e)}"+
       "e.textContent="+JSON.stringify(cssOverride)+";return true})()");
@@ -209,13 +222,34 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
     comparison:'same paused Chromium scene, only live seam fade width changes',
     variants:seams.map((seam,i)=>({...seam,...scan.report[i]})),
     safeWinner:seams[winner.index].id,
-    decision:winner.index===0?'Keep current 10px feather until meaningful source ROI gain':
-      'Diagnostic improvement only; human inspection and WORK0 approval required'
+    decision:winner.index===0?'Keep current 10px feather: no candidate improves protected photo/ship ROIs':
+      'Diagnostic improvement ONLY; production CSS unchanged until independent review by WORK0',
+    policy:'No extra ship/water pixels; candidate may change ONLY inset fade, no shared dock or economy'
   };
   writeFileSync(join(qa,'work4-fleet-coast-feather-sweep-384x512.json'),
     JSON.stringify(sealReport,null,2)+'\n');
   writeFileSync(join(qa,'work4-fleet-safe-feather-384x512.png'),
     Buffer.from(sourcePhotos[winner.index],'base64'));
+  // Four independent pixels-only panels. NEVER substitute an experimental
+  // candidate for shipped RENDER when reporting production MAE.
+  const selectedMontage="(async()=>{const source=['data:image/webp;base64,"+approved+
+    "','data:image/png;base64,"+sourcePhotos[0]+"','data:image/png;base64,"+
+    sourcePhotos[winner.index]+"'];"+
+    "const pics=await Promise.all(source.map(async src=>{const im=new Image();im.src=src;await im.decode();return im}));"+
+    "const c=document.createElement('canvas');c.width=1536;c.height=512;const x=c.getContext('2d');"+
+    "pics.forEach((im,i)=>x.drawImage(im,i*384,0));x.drawImage(pics[0],1152,0);"+
+    "x.globalAlpha=.5;x.drawImage(pics[2],1152,0);x.globalAlpha=1;"+
+    "return c.toDataURL('image/png').split(',')[1]})()";
+  const montage=await evaluate(selectedMontage);
+  writeFileSync(join(qa,'work4-coast-easing-original-before-trial-overlay-384x512.png'),
+    Buffer.from(montage,'base64'));
+  console.log('WORK4_COAST_EASING_NATIVE_AB '+JSON.stringify({
+    approved:false,screensApproved:0,base:'release-10',safeWinner:seams[winner.index].id,
+    before:scan.report[0].metrics,trial:scan.report[winner.index].metrics,
+    allVariants:seams.map((x,i)=>({id:x.id,fullMAE:scan.report[i].metrics.full.mae,
+      joinMAE:scan.report[i].metrics.join.mae,coastMAE:scan.report[i].metrics.coast.mae,
+      shipChanged:scan.report[i].metrics.ship.changed,dockChanged:scan.report[i].metrics.dock.changed}))
+  }));
   console.log('WORK4_FLEET_COAST_FEATHER_SWEEP '+JSON.stringify({
     safeWinner:sealReport.safeWinner,decision:sealReport.decision,
     variants:sealReport.variants.map(x=>({id:x.id,...x.metrics}))
