@@ -13,6 +13,10 @@ export const NATIVE_WIDTH=384;
 export const NATIVE_HEIGHT=512;
 export const EXPECTED=['porto','battle','frota','forja','cartas','loja','missoes','ranking'];
 export const STATIC=['frota','forja','cartas','loja','missoes','ranking'];
+// Every screen must have a BASE and HEAD Chromium capture at all three
+// required phone crops. A single Batalha mobile image cannot stand in for
+// the seven other screens: the prior gate accepted 10/24 captures.
+export const REQUIRED_VIEWPORTS=[[384,512],[320,568],[390,844]];
 // Sub-0.05 RGB mean differences can be rounding/rendering noise. This
 // protects against measurable static regressions, not artistic mismatch.
 export const MAX_STATIC_REGRESSION=0.05;
@@ -21,29 +25,33 @@ export function inspectNativeVisualReport(report) {
   if(!report||!Array.isArray(report.screens))throw new Error('Missing base-vs-head screenshot report');
   if(report.artistic_approval===true)throw new Error('A pixel run cannot certify human artistic approval');
   const lines=[],failures=[];
-  for(const name of EXPECTED) {
-    const matches=report.screens.filter(s=>s.screen===name &&
-      Array.isArray(s.viewport)&&s.viewport[0]===NATIVE_WIDTH&&s.viewport[1]===NATIVE_HEIGHT);
-    if(matches.length!==1){failures.push(name+': missing or duplicate native 384x512 evidence');continue;}
-    const s=matches[0];
-    if(s.approved===true){failures.push(name+': screenshot alone must not mark human approval');continue;}
-    const base=Number(s.source_mae_base),head=Number(s.source_mae_head);
-    if(!Number.isFinite(base)||!Number.isFinite(head)||base<0||head<0||base>255||head>255){
-      failures.push(name+': invalid native MAE');continue;
+  for(const [width,height] of REQUIRED_VIEWPORTS) {
+    for(const name of EXPECTED) {
+      const matches=report.screens.filter(s=>s.screen===name &&
+        Array.isArray(s.viewport)&&s.viewport[0]===width&&s.viewport[1]===height);
+      const size=width+'x'+height;
+      if(matches.length!==1){
+        failures.push(name+': missing or duplicate '+size+' evidence');continue;
+      }
+      const s=matches[0];
+      if(s.approved===true){
+        failures.push(name+': '+size+' screenshot alone must not mark human approval');continue;
+      }
+      const base=Number(s.source_mae_base),head=Number(s.source_mae_head);
+      if(!Number.isFinite(base)||!Number.isFinite(head)||base<0||head<0||base>255||head>255){
+        failures.push(name+': invalid '+size+' MAE');continue;
+      }
+      if(width!==NATIVE_WIDTH||height!==NATIVE_HEIGHT)continue;
+      const delta=head-base;
+      const label=name.padEnd(8)+' native MAE '+base.toFixed(5)+' -> '+head.toFixed(5)+
+        ' (delta '+(delta>=0?'+':'')+delta.toFixed(5)+')';
+      lines.push(label+(STATIC.includes(name)?' [static guard]':' [dynamic/manual review]'));
+      if(STATIC.includes(name)&&delta>MAX_STATIC_REGRESSION)
+        failures.push(name+': static native regression '+delta.toFixed(5)+
+          ' exceeds '+MAX_STATIC_REGRESSION.toFixed(2)+' RGB MAE');
     }
-    const delta=head-base;
-    const label=name.padEnd(8)+' native MAE '+base.toFixed(5)+' -> '+head.toFixed(5)+
-      ' (delta '+(delta>=0?'+':'')+delta.toFixed(5)+')';
-    lines.push(label+(STATIC.includes(name)?' [static guard]':' [dynamic/manual review]'));
-    if(STATIC.includes(name)&&delta>MAX_STATIC_REGRESSION)
-      failures.push(name+': static native regression '+delta.toFixed(5)+
-        ' exceeds '+MAX_STATIC_REGRESSION.toFixed(2)+' RGB MAE');
   }
-  const hasMobile=report.screens.some(s=>Array.isArray(s.viewport)&&
-    s.viewport[0]===320&&s.viewport[1]===568) &&
-    report.screens.some(s=>Array.isArray(s.viewport)&&
-    s.viewport[0]===390&&s.viewport[1]===844);
-  if(!hasMobile)failures.push('Missing 320x568 or 390x844 mobile evidence');
+  lines.push('Screenshot coverage: all 8 screens at 384x512, 320x568 and 390x844 (24 captures required).');
   lines.push('Artistic approval: NOT granted by visual automation.');
   lines.push('Porto / Batalha moving WebGL scene: separate human and functional review required.');
   return {ok:failures.length===0,lines,failures};
