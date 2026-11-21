@@ -3129,10 +3129,10 @@
   .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after {
     content:"";
     position:absolute;
-    left:-10px;
+    left:-5px;
     top:0;
     bottom:0;
-    width:10px;
+    width:5px;
     background:linear-gradient(90deg,transparent 0%,#082c48de 100%);
     pointer-events:none;
   }
@@ -3192,20 +3192,8 @@
   }
 }
 
-/* WORK4/#104 — reference-source coastal join, same-frame native 384×512 A/B.
-   The approved 03-frota original continues for six genuine pixels beyond the
-   old hard x241 source crop. Show width 229px / viewBox 18 146 229 194 at 1:1
-   (JSX synchronizes the viewBox only at this viewport). This restores painted
-   coast beside the EXISTING full-height real stats. It never scales the Royal
-   Crown, creates a second ship or synthetic water, moves hit targets or alters
-   the WORK0 dock. Other phone aspect ratios and #255/#260 stay untouched.
-   QA original: 223px vs 229px, same paused Chromium 384×512 frame:
-   full MAE 48.63339→48.57894, right source-edge 13.14086→11.38848;
-   1203 frame pixels changed, 0 in protected ship, sea and dock ROIs.
-   Human approval still false. */
-@media (width:384px) and (height:512px) {
-  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {
-    width:229px!important;
-    max-width:229px!important;
-  }
-}
+/* WORK4/#104 — measured native coast feather: 10px→5px at 384×512.
+   Same paused Chromium frame, original 03 source, no extra photographic
+   pixels, fake waves or altered ship crop. Scope is the live stats seam;
+   320/390/430, WORK0 dock and Royal Crown remain unchanged.
+   Human approved:false; WORK0 alone integrates. */
