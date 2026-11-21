@@ -10,6 +10,7 @@ import {
 } from './shipyard-history';
 import { capturePreviewReference, comparePreviewReference } from './shipyard-reference';
 import { nextVisualUnlock, previousVisualUnlock } from './shipyard-milestones';
+import { encodePreviewBlueprint, decodePreviewBlueprint, BLUEPRINT_MAX_CHARS } from './shipyard-blueprint';
 
 /** Optional Work 4 interface: never infer entitlements from demo preview progress. */
 type ShipyardProps={
@@ -72,6 +73,26 @@ export function Shipyard({onClose,onPreview,onViewChange,onTourChange,onFocusSlo
   });
  },[]);
  const [details,setDetails]=useState(true);
+ const [blueprintOpen,setBlueprintOpen]=useState(false);
+ const [blueprintInput,setBlueprintInput]=useState('');
+ const [blueprintStatus,setBlueprintStatus]=useState('');
+ const blueprintCode=blueprintOpen?encodePreviewBlueprint(workingDraft):'';
+ const copyBlueprint=async()=>{
+  if(typeof navigator==='undefined'||!navigator.clipboard?.writeText){
+   setBlueprintStatus('Select the visual code and copy it manually.');return;
+  }
+  try{await navigator.clipboard.writeText(blueprintCode);
+   setBlueprintStatus('Visual code copied. It grants no ships or items.');
+  }catch{setBlueprintStatus('Clipboard unavailable. Select and copy the visual code manually.');}
+ };
+ const importBlueprint=()=>{
+  if(viewingReference)return;
+  try{
+   const restored=decodePreviewBlueprint(blueprintInput);
+   commitDraft(restored);
+   setBlueprintStatus('Visual preview imported into working model B. No ownership or progress saved.');
+  }catch(e){setBlueprintStatus('Cannot load visual preview: '+(e instanceof Error?e.message:'Invalid code'));}
+ };
  const chooseLevel=useCallback((value:number)=>{
   setHistory(previous=>{
    const now=currentPreview(previous);
@@ -161,6 +182,26 @@ export function Shipyard({onClose,onPreview,onViewChange,onTourChange,onFocusSlo
       disabled={viewingReference||!nextUnlock}
       onClick={()=>{if(nextUnlock)chooseLevel(nextUnlock.level);}}>NEXT ›</button>
     </div>
+   </div>
+   <div className="shipyard-blueprint" role="group" aria-label="Temporary visual blueprint sharing">
+    <button type="button" className="shipyard-blueprint-toggle" aria-expanded={blueprintOpen}
+     aria-label="Show or hide visual design sharing" onClick={()=>{setBlueprintOpen(open=>!open);setBlueprintStatus('');}}>
+     VISUAL BLUEPRINT · {blueprintOpen?'HIDE':'SHARE / IMPORT'}
+    </button>
+    {blueprintOpen&&<div className="shipyard-blueprint-panel">
+     <p>Share a 3D appearance only. This code includes no owned items, verified level, player data or purchases.</p>
+     <label htmlFor="shipyard-blueprint-out">YOUR VISUAL PREVIEW CODE</label>
+     <textarea id="shipyard-blueprint-out" readOnly rows={2} value={blueprintCode}
+      aria-label="Current visual-only design code" onFocus={event=>event.target.select()}/>
+     <button type="button" onClick={()=>void copyBlueprint()} aria-label="Copy visual-only preview code">COPY CODE</button>
+     <label htmlFor="shipyard-blueprint-in">PASTE ANOTHER VISUAL BLUEPRINT</label>
+     <textarea id="shipyard-blueprint-in" rows={2} value={blueprintInput} maxLength={BLUEPRINT_MAX_CHARS}
+      aria-label="Paste visual-only blueprint for preview, not equipping"
+      placeholder="RPV1..." onChange={event=>setBlueprintInput(event.target.value)}/>
+     <button type="button" disabled={viewingReference||!blueprintInput.trim()} onClick={importBlueprint}
+      aria-label="Load visual blueprint into the temporary editable preview">LOAD PREVIEW ONLY</button>
+     <span role="status" aria-live="polite">{blueprintStatus}</span>
+    </div>}
    </div>
    <div className="shipyard-reference" role="group" aria-label="Temporary visual ship A/B comparison">
     <div className="shipyard-reference-actions">

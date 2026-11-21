@@ -176,3 +176,26 @@
  .shipyard-milestones button{padding:6px;min-width:45px}
  .shipyard-milestone-copy small{font-size:8px}
 }
+
+/* Portable 3D visual recipe, not inventory/persistence. Collapsed by default. */
+.shipyard-blueprint{max-width:720px;margin:7px auto 3px}
+.shipyard-blueprint-toggle{width:100%;text-align:left;min-height:42px;padding:8px 12px;
+ border:1px solid #dfbf7e;border-radius:9px;color:#ffe3ad;background:#143d5e;
+ font:900 12px 'Barlow Condensed',sans-serif;letter-spacing:.5px}
+.shipyard-blueprint-toggle:focus-visible,.shipyard-blueprint-panel button:focus-visible,
+.shipyard-blueprint-panel textarea:focus-visible{outline:3px solid #fff4c6;outline-offset:2px}
+.shipyard-blueprint-panel{display:grid;grid-template-columns:1fr auto;gap:6px 9px;padding:9px;
+ border:1px solid #ba995f99;border-radius:0 0 9px 9px;background:#092944f2}
+.shipyard-blueprint-panel p,.shipyard-blueprint-panel label,
+.shipyard-blueprint-panel span{grid-column:1/-1;margin:0}
+.shipyard-blueprint-panel p,.shipyard-blueprint-panel span{font:600 10px 'Barlow',sans-serif;
+ line-height:1.45;color:#d2e1ea}
+.shipyard-blueprint-panel label{font:900 10px 'Barlow',sans-serif;color:#ffdb94}
+.shipyard-blueprint-panel textarea{min-width:0;width:100%;resize:vertical;max-height:110px;
+ padding:9px;border:1px solid #879fae;border-radius:7px;background:#031d33;color:#fff4cd;
+ font:600 11px ui-monospace,monospace;overflow-wrap:anywhere}
+.shipyard-blueprint-panel button{min-height:42px;padding:8px;border:1px solid #e4c47b;
+ border-radius:8px;background:#204c6c;color:#ffe6b7;font:900 11px 'Barlow Condensed',sans-serif}
+.shipyard-blueprint-panel button:disabled{opacity:.4;cursor:not-allowed}
+@media(max-width:390px){.shipyard-blueprint-panel{grid-template-columns:1fr}
+ .shipyard-blueprint-panel button{width:100%}}

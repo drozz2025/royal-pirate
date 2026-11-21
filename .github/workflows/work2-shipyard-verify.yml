@@ -56,6 +56,7 @@ on:
       - work2/original-deck-casks-20261121
       - work2/mobile-two-stage-detail-lod-20261121
       - work2/shipyard-unlock-milestones-20261121
+      - work2/shipyard-visual-blueprints-20261121
   pull_request:
     branches:
       - work2/shipyard-instanced-gpu-batching-20261120
