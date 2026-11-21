@@ -15,7 +15,7 @@ test('nine class and cannon-tier previews render distinct physical shot racks',(
    assert.equal(display.userData.previewOnly,true);
    assert.equal(display.userData.rackCount,racks[index]);
    assert.equal(display.userData.visualRoundCount,balls[index]);
-   assert.equal(display.children.length,tier===0?2:3);
+   assert.equal(display.children.length,3,'timber, rounds and rivets stay in three batched draws');
    assert.equal(display.userData.drawCallObjects,display.children.length);
    assert.ok(display.children.every(child=>child instanceof T.Mesh));
    const shot=display.getObjectByName('forged-shot-display') as T.Mesh;
