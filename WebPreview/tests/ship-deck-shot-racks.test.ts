@@ -10,7 +10,7 @@ test('nine class and cannon-tier previews render distinct physical shot racks',(
  const racks=[1,2,3],balls=[3,12,30];
  for(const [index,shipClass] of classes.entries()){
   const sizes:number[]=[];
-  for(const [tier,cannonModule] of modules.entries()){
+  for(const cannonModule of modules){
    const display=createPreviewDeckShotRacks(shipClass,cannonModule);
    assert.equal(display.userData.previewOnly,true);
    assert.equal(display.userData.rackCount,racks[index]);
