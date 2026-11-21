@@ -10,6 +10,7 @@ import { createPreviewBoardingLadders } from './ship-boarding-ladders';
 import { createPreviewDeckShotRacks } from './ship-deck-shot-racks';
 import { createPreviewSternLanterns } from './ship-stern-lanterns';
 import { createPreviewKeelCutwater } from './ship-keel-cutwater';
+import { createPreviewGunwaleRails } from './ship-gunwale-rails';
 import { createPreviewDeckHatches } from './ship-deck-hatches';
 import { createPreviewShipBell } from './ship-deck-bell';
 import { createPreviewCompassBinnacle } from './ship-deck-compass';
@@ -361,6 +362,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // Original scarfed keel, real 3D bow stem and class-specific carved knees.
  // Always two merged editor-only meshes; never alters battle or ownership.
  additions.add(createPreviewKeelCutwater(config.shipClass,config.modules.hull as PreviewHullModule));
+ // Raised timber gunwale balustrades: unique 3/5/7-post silhouettes for Scout,
+ // Fighter and Warship; two merged 3D meshes, without any battle or inventory changes.
+ additions.add(createPreviewGunwaleRails(config.shipClass,config.modules.ornaments as PreviewOrnamentModule));
  // Real cambered stitching overlays both sails in a single disposable GPU draw.
  // Class motif and dye tier change ONLY the appearance of the 3D editor ship.
  additions.add(createPreviewSailEmbroidery(config.shipClass,config.modules.sails as PreviewSailModule));
