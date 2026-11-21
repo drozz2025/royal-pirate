@@ -10,7 +10,7 @@ import {
 
 const CLASSES:ShipClass[]=['scout','fighter','warship'];
 const MICRO=['-deck-bell','-compass-binnacle','-navigation-chart','-deck-ropes','-deck-hatches'];
-const SECONDARY=['-deck-casks','-deck-shot-racks','-deck-capstans','-boarding-ladders','-stern-lanterns'];
+const SECONDARY=['-deck-casks','-deck-shot-racks','-deck-capstans','-boarding-ladders','-stern-lanterns','-hull-fenders'];
 
 test('all three classes and progression tiers use two-stage mobile LOD without losing premium hull silhouette',()=>{
  for(const shipClass of CLASSES)for(const level of [1,8,19,20]){
@@ -20,9 +20,9 @@ test('all three classes and progression tiers use two-stage mobile LOD without l
   const secondary=extras.children.filter(object=>SECONDARY.some(s=>object.name.endsWith(s)));
   const major=extras.children.filter(item=>!isShipyardFineDetail(item));
   assert.equal(micro.length,5,'five microscopic deck details');
-  assert.equal(secondary.length,5,'five small original accessories');
+  assert.equal(secondary.length,6,'six secondary original accessories');
   assert.ok(major.length>0,'major silhouette remains visible');
-  assert.equal(extras.children.filter(isShipyardFineDetail).length,10);
+  assert.equal(extras.children.filter(isShipyardFineDetail).length,11);
   const totalChildren=extras.children.length;
   const testedMesh=secondary[0].children[0] as T.Mesh;
   let disposed=0;testedMesh.geometry.addEventListener('dispose',()=>disposed++);
@@ -30,11 +30,11 @@ test('all three classes and progression tiers use two-stage mobile LOD without l
   assert.ok(micro.every(item=>!item.visible));
   assert.ok(secondary.every(item=>item.visible));
   assert.ok(major.every(item=>item.visible),'silhouette and large decorations retained');
-  assert.equal(updateShipyardDetailLOD(extras,39,390),5,'additional far-zoom secondary culling');
+  assert.equal(updateShipyardDetailLOD(extras,39,390),6,'additional far-zoom secondary culling');
   assert.ok(secondary.every(item=>!item.visible));
   assert.equal(updateShipyardDetailLOD(extras,37,390),0,'hysteresis avoids flicker');
   assert.equal(updateShipyardDetailLOD(extras,35,390),0);
-  assert.equal(updateShipyardDetailLOD(extras,33,390),5,'secondary details return when zooming in');
+  assert.equal(updateShipyardDetailLOD(extras,33,390),6,'secondary details return when zooming in');
   assert.ok(secondary.every(item=>item.visible));
   assert.ok(micro.every(item=>!item.visible));
   assert.equal(updateShipyardDetailLOD(extras,27,390),0);
@@ -56,13 +56,13 @@ test('desktop and tablet keep all details and mobile thresholds are deterministi
  assert.equal(SECONDARY_DETAIL_HIDE_DISTANCE-SECONDARY_DETAIL_SHOW_DISTANCE,4);
  assert.equal(updateShipyardDetailLOD(extras,50,1024),0);
  assert.equal(updateShipyardDetailLOD(extras,30,820),5);
- assert.equal(updateShipyardDetailLOD(extras,40,820),5);
+ assert.equal(updateShipyardDetailLOD(extras,40,820),6);
  assert.equal(updateShipyardDetailLOD(extras,36,820),0);
- assert.equal(updateShipyardDetailLOD(extras,34,820),5);
+ assert.equal(updateShipyardDetailLOD(extras,34,820),6);
  assert.equal(updateShipyardDetailLOD(extras,26,820),5);
  assert.equal(updateShipyardDetailLOD(extras,50,1024),0);
- assert.equal(updateShipyardDetailLOD(extras,50,390),10);
- assert.equal(updateShipyardDetailLOD(extras,50,821),10,'desktop restores all hidden props');
+ assert.equal(updateShipyardDetailLOD(extras,50,390),11);
+ assert.equal(updateShipyardDetailLOD(extras,50,821),11,'desktop restores all hidden props');
  assert.equal(extras.children.filter(child=>!child.visible).length,0);
 });
 
