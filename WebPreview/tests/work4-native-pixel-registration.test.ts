@@ -383,7 +383,17 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
         assert.equal(coastGeometry.ships,1,'only one source Royal Crown');
         assert.equal(coastGeometry.cards,4,'exactly four actual fleet roster slots');
         assert.equal(coastGeometry.nav,5,'WORK0 five-item dock');
-        const coastShots:Record<string,string>={HEAD:screenshot};
+        // This legacy contour-specific gate must isolate the PHOTO MASK only.
+        // The independently measured new WORK4 top source-rail is a separate
+        // layer and has its own stricter before/after ROI test. Disable only
+        // that decorative rail during the historic 14-way coast-mask A/B;
+        // keep every original threshold and the entire application intact.
+        await evaluate("(()=>{const s=document.createElement('style');s.id='work4-coast-only-rail-off';"+
+          "s.textContent='.w4-fleet-photo-top-shade{opacity:0!important}';document.head.append(s);return true})()");
+        await sleep(100);
+        const coastShots:Record<string,string>={HEAD:(await command('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        })).data as string};
         for(const variant of coastVariants.slice(1)){
           const cssValue=maskCSS(variant);
           await evaluate("(()=>{const s=document.createElement('style');s.id='work4-coast-candidate';"+
@@ -435,7 +445,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           (b.coast*.45+b.edge*.3+b.sea*.15+b.full*.10));
         const winner=ranked.find((m:any)=>m.full<=head.full+.12)||head;
         const montageExpr="(async()=>{const raw="+JSON.stringify({
-          original:references.fleet,before:coastShots['prior-HEAD'],render:screenshot
+          original:references.fleet,before:coastShots['prior-HEAD'],render:coastShots.HEAD
         })+";const pic=async(t,b)=>{const i=new Image();i.src='data:image/'+t+';base64,'+b;await i.decode();return i};"+
           "const [a,b,c]=await Promise.all([pic('webp',raw.original),pic('png',raw.before),pic('png',raw.render)]);"+
           "const out=document.createElement('canvas');out.width=1536;out.height=512;"+
@@ -450,6 +460,7 @@ test('WORK4 native same-frame Chromium original|before|after|overlay, ROI and fo
           baseline:old,visualWinner:head,approved:false,approvedScreens:0};
         writeFileSync(join(folder,'work4-fleet-coast-controlled-ab-native.json'),JSON.stringify(study,null,2)+'\n');
         console.log('WORK4_FLEET_COAST_CONTROLLED_AB '+JSON.stringify(study));
+        await evaluate("(()=>{document.getElementById('work4-coast-only-rail-off')?.remove();return true})()");
       }
 
       // WORK4/#104: controlled prospective sea-edge mask study against ORIGINAL 03.
