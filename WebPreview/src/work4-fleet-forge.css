@@ -3287,3 +3287,20 @@
     mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
   }
 }
+
+/* WORK4/#104 — 21 Nov 2026 source-water provenance: replace the unrelated
+   cyan procedural UNDERPAINT at native 384x512 with deep cove-blue ink.
+   This does not alter a source image, the ONE Crown, its source sea bridge,
+   right-hand live real levels, touch targets, or the protected WORK0 dock.
+   In paused Chromium on one unchanged native scene, the prior release
+   gradient vs #08527a measured RGB MAE: full 48.63393 -> 48.30773,
+   right photographic edge 5.15057 -> 4.18147; source water 0.02357 ->
+   0.02272, join 13.99074 -> 13.98795. Central Crown/dock: zero changed
+   pixels. The alternative "remove source sea" regressed all sea regions.
+   Pure local scene underpaint. Preserve responsive #255/#260 at 390/430,
+   the 320 layout and all other WORK owners. Artistic approved:false 0/8. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage {
+    background:#08527a!important;
+  }
+}
