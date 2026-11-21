@@ -5487,7 +5487,7 @@
 }
 
 
-/* WORK8 / #104 — MISSÕES 07 ONLY. Recover real active mission CTA enamel.
+/* WORK8 / #104 — MISSÕES 07 ONLY. Recover real active mission CTA enamel on rows 2 and 3.
    The short native reference paints the existing blue JOGAR buttons brighter
    than the .18 lift inherited at base. Adjust ink only; do not change button
    geometry, hit targets, state, progress, mission values, seven rewards or
@@ -5497,7 +5497,7 @@
    Human artistic approval: false / 0 of 8. */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
   :root:not(.work8-missions-active-cta-enamel-ab-baseline)
-  .w8-approved-missions .w8-approved-quest[data-state=active] > button {
+  .w8-approved-missions .w8-approved-quest:nth-child(n+2)[data-state=active] > button {
     filter:brightness(1.44) saturate(1.08) contrast(1.02);
   }
 }
