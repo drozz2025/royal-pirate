@@ -123,3 +123,33 @@
  font:600 9px 'Barlow',sans-serif}
 
 .shipyard-camera-presets.only-tour{grid-template-columns:minmax(0,1fr);max-width:180px}
+
+
+/* Ship inspection mode: free the mobile screen for the live 3D model.
+   Every module edit, verified entitlement and preview draft remains unchanged.
+   CSS display:none removes hidden controls from keyboard focus as well. */
+.shipyard-showcase-toggle{
+ flex:0 0 auto;min-height:44px;padding:8px 10px;border-radius:9px;
+ border:2px solid #ffdc91;background:linear-gradient(150deg,#f5d38b,#b57a35);
+ color:#102b43;font:900 clamp(11px,2.8vw,13px) 'Barlow Condensed',sans-serif;
+ text-shadow:none;white-space:nowrap;touch-action:manipulation}
+.shipyard-showcase-toggle[aria-pressed="true"]{background:#193f60;color:#fff1cb}
+.shipyard-showcase-toggle:focus-visible{outline:3px solid #fff8dc;outline-offset:2px}
+.shipyard-showcase{background:linear-gradient(180deg,#061c3ca8,transparent 30%,transparent 75%,#041b3766)}
+.shipyard-showcase .shipyard-class-panel,
+.shipyard-showcase .shipyard-panel,
+.shipyard-showcase .shipyard-tour-hint{display:none}
+.shipyard-showcase .shipyard-orbit-hint{
+ margin-top:auto;margin-bottom:max(18px,env(safe-area-inset-bottom));
+ font-size:12px;padding:10px 14px}
+.shipyard-showcase .shipyard-camera-presets{margin:8px auto}
+.shipyard-showcase-summary{
+ pointer-events:none;align-self:center;max-width:calc(100% - 20px);
+ margin:9px auto 0;padding:8px 11px;border:1px solid #e5c077aa;
+ border-radius:10px;background:#092e50ce;color:#fff2cf;
+ text-align:center;font:800 clamp(10px,2.65vw,12px) 'Barlow',sans-serif;
+ line-height:1.4}
+@media(max-width:390px){
+ .shipyard-showcase-toggle{padding:7px;font-size:11px}
+ .shipyard-showcase .shipyard-camera-presets{margin:5px auto}
+}
