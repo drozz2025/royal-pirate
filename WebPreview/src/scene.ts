@@ -154,21 +154,18 @@ export class OceanScene {
             sin(vWorld.x*2.55+vWorld.z*1.71-time*1.21+
               sin(vWorld.z*.49+time*.31)*.94));
           foam=max(foam,breakerMask*lace*.53);
-          // Keep the breaking edges crisp and irregular: the previous broad
-          // cyan foam carpet washed over the entire horizon. This compresses
-          // weak ripples without removing genuine moving whitecaps.
-          foam=pow(clamp(foam,0.,.64)/.64,1.45)*.67;
+          foam=clamp(foam,0.,.64);
           // More uniform in the troughs, not a teal height-map checkerboard:
           // dark-blue 3D volume with restrained warm highlights and thin
           // hand-painted turbulent caps. No extra meshes/texture fetches.
-          vec3 deep=mix(vec3(.003,.052,.17),vec3(.014,.265,.48),
+          vec3 deep=mix(vec3(.005,.105,.235),vec3(.019,.34,.51),
             clamp(.49+vWave*.36+longSwell*.11+crossSwell*.10,0.,1.));
           deep*=1.-.10*(1.-ridge);
-          deep=mix(deep,vec3(.040,.39,.61),clamp(edgeBreak*.22+ridge*.08,0.,.33));
-          deep=mix(deep,vec3(.13,.42,.62),fres*.22);
+          deep=mix(deep,vec3(.055,.50,.64),clamp(edgeBreak*.26+ridge*.09,0.,.38));
+          deep=mix(deep,vec3(.22,.53,.64),fres*.24);
           col=mix(deep,vec3(.91,.97,.94),foam);
           col+=vec3(.78,.91,.82)*spec*.20;
-          col=mix(col,vec3(.24,.53,.70),fog*.31);
+          col=mix(col,vec3(.37,.67,.78),fog*.45);
         }
         gl_FragColor=vec4(col,1.);
       }
