@@ -1889,6 +1889,70 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
 
+
+    /* WORK8 #104: native SAME-DOM, SAME-FRAME source-art test for 07's
+       three already-existing quest pictograms. This does not create art or
+       change progress, rewards, button hitboxes, the seven days or WORK0 dock.
+       A/B is on the final production CSS, not a mocked CSS override. */
+    const questIconFlag='work8-missions-quest-icons-luma-ab-baseline';
+    const questIconSelector='.w8-approved-missions .w8-approved-quest-art > svg.w8-approved-painting';
+    const questIconGeometry=()=>evalJs('(()=>{const r=e=>{const b=e.getBoundingClientRect();return [b.left,b.top,b.right,b.bottom]};return [...document.querySelectorAll('+JSON.stringify(questIconSelector)+')].map(r)})()');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(questIconFlag)+');true');
+    await delay(140);
+    const questIconBeforeGeometry=await headingLayout();
+    const questIconBeforeArt=await questIconGeometry();
+    const questIconBeforeFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(questIconSelector)+')).filter');
+    const questIconBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(questIconFlag)+');true');
+    await delay(140);
+    const questIconAfterGeometry=await headingLayout();
+    const questIconAfterArt=await questIconGeometry();
+    const questIconAfterFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(questIconSelector)+')).filter');
+    const questIconAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const questIconSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+questIconBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+questIconAfter))
+      .replace('quests:[12,155,372,321],daily:','quests:[12,155,372,321],questIcons:[19,155,78,320],daily:');
+    assert.notEqual(questIconSource,source,'live pictogram frames must replace the earlier A/B images');
+    assert.ok(questIconSource.includes('questIcons:[19,155,78,320]'),'ROI must be truly native, not inferred');
+    const questIconCompare=await evalJs(questIconSource);
+    writeFileSync(join(evidence,'missions-quest-icons-original-before-render-overlay-384x512.png'),Buffer.from(questIconCompare.overlays[1],'base64'));
+    writeFileSync(join(evidence,'missions-quest-icons-before-384x512.png'),Buffer.from(questIconBefore,'base64'));
+    writeFileSync(join(evidence,'missions-quest-icons-render-384x512.png'),Buffer.from(questIconAfter,'base64'));
+    const questIconReport={
+      issue:104,base:'work6/web-3d-preview',
+      scope:'07 Missões: the three existing source-cropped quest SVGs only',
+      reference:'assets/design-approved/07-missoes.webp',
+      requiredReferences:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      viewport:{width:384,height:512,devicePixelRatio:1},
+      sameDecodedPausedScene:true,
+      filterBefore:questIconBeforeFilter,filterRender:questIconAfterFilter,
+      metrics:questIconCompare.metrics,unchanged:questIconCompare.unchanged,
+      layoutBefore:questIconBeforeGeometry,layoutRender:questIconAfterGeometry,
+      iconsBefore:questIconBeforeArt,iconsRender:questIconAfterArt,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-quest-icons-PRODUCTION-native-ab.json'),JSON.stringify(questIconReport,null,2));
+    console.log('WORK8_QUEST_ICON_NATIVE_AB '+JSON.stringify(questIconReport));
+    assert.equal(questIconBeforeArt.length,3,'three authentic quest symbols only');
+    assert.notEqual(questIconBeforeFilter,questIconAfterFilter,'production filter must change real SVG paint');
+    assert.deepEqual(questIconBeforeArt,questIconAfterArt,'quest symbols must never move');
+    assert.deepEqual(questIconBeforeGeometry,questIconAfterGeometry,
+      'all three quests, seven rewards, five-item dock and touch boxes must stay fixed');
+    assert.equal(questIconAfterGeometry.questCount,3);
+    assert.equal(questIconAfterGeometry.dayCount,7);
+    assert.equal(questIconAfterGeometry.dockCount,5);
+    assert.ok(questIconAfterGeometry.chests.every((c:any)=>c.bottom<=questIconAfterGeometry.nav.top+2),
+      'all seven actual chest pictures stay above dock');
+    assert.ok(questIconCompare.unchanged.header<.1&&questIconCompare.unchanged.dock<.1,
+      'WORK0 header/dock may not repaint');
+    assert.ok(questIconCompare.metrics.questIcons.delta<-.08&&questIconCompare.metrics.full.delta<-.004,
+      'genuine 07 quest art and whole-frame source MAE must measurably improve');
+    assert.ok(Math.abs(questIconCompare.metrics.daily.delta)<.025&&Math.abs(questIconCompare.metrics.chests.delta)<.025,
+      'seven daily rewards must not visually regress');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
