@@ -109,7 +109,7 @@ try{
   await delay(140);
   const beforeGeometry=await evaluate(geometry);
   const before=await capture();
-  await evaluate('(()=>{document.documentElement.classList.remove("work8-missions-board-pigment-ab-baseline");const s=document.createElement("style");s.id="work8-board-candidate";s.textContent=".w8-approved-missions .w8-approved-quest-list{background:linear-gradient(165deg,#204966 0%,#123853 46%,#08213b 100%)!important}";document.head.append(s);return true})()');
+  await evaluate('document.documentElement.classList.remove("work8-missions-board-pigment-ab-baseline");true');
   await delay(140);
   const afterGeometry=await evaluate(geometry);
   const render=await capture();
@@ -182,7 +182,7 @@ try{
     JSON.stringify({top:diagnostic.slice(0,10),all:diagnostic,approved:false,approvedScreens:0},null,2));
   console.log('WORK8 SOURCE-ART RELIEF SWEEP TOP '+JSON.stringify(diagnostic.slice(0,8)));
   const result={
-    issue:104,scope:'WORK8 07 Missões only: diagnostic board pigment, no production change, no fabricated claim, prizes, progress or ranking',
+    issue:104,scope:'WORK8 07 Missões only: native-calibrated production quest-board pigment, no fabricated claim, prizes, progress or ranking',
     base:'work6/web-3d-preview',reference:'assets/design-approved/07-missoes.webp',
     frame:'same genuine Chromium document/frame; native 384x512 DPR1; WebP decoded; animations paused',
     scores:ab.scores,changedPixels:ab.changed,referenceAndRenderSizes:ab.sizes,
@@ -202,7 +202,8 @@ try{
   assert.ok([...afterGeometry.chests,...afterGeometry.labels].every(r=>r&&r.bottom<=afterGeometry.nav.y+2),
     'All seven chest art and labels above the dock');
   assert.ok(ab.changed>150,'Native board experiment must repaint 07');
-  console.log('WORK8 diagnostic only: do not promote without improved MAE '+JSON.stringify({full:ab.scores.full.delta,quests:ab.scores.quests.delta}));
+  assert.ok(ab.scores.full.delta < -.015 && ab.scores.quests.delta < -.05,
+    'Production 07 quest board must reduce true native 384x512 reference MAE in full frame and 3-mission ROI');
   assert.ok(Math.abs(ab.scores.daily.delta)<.01,'Seven reward-board pixels must stay unchanged');
   assert.ok(Math.abs(ab.scores.header.delta)<.01&&Math.abs(ab.scores.dock.delta)<.01,
     'Header, dock, real objective data and Ranking remain unaffected');
@@ -257,7 +258,7 @@ try{
     Buffer.from(await capture(),'base64'));
   console.log('WORK8 320 real touch/scroll PASS '+JSON.stringify(scroll320));
 
-  console.log('WORK8 DIAGNOSTIC: board paint candidates compared; NO production CSS promoted. approved:false 0/8.');
+  console.log('WORK8 PASS: native 07 board pigment improves ROI/full; 3 genuine objectives, 7 rewards, 5 dock items; approved:false 0/8.');
 }finally{
   try{ws?.close();}catch{}
   chrome.kill('SIGTERM');
