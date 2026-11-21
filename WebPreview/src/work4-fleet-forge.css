@@ -3223,3 +3223,28 @@
     mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
   }
 }
+
+
+/* WORK4/#104 — photo-source upper lip in the approved 03 Frota native frame.
+   Original 03-frota.webp at 384x512 shows the dark lower edge of the carved
+   menu above the tropical scene. The real source photo is already aligned
+   pixel-for-pixel from y≈152 onwards, but its cyan 138–150 upper strip
+   presently overlaps that dark edge. Shade ONLY 12px of that WORK4 source
+   join, graduating to full source opacity before the first sails. This is not
+   a synthetic water layer, second ship, shared shell or dock modification.
+   The explicit aria-hidden span is inert and has no geometry at 320/390/430.
+   A/B reference/ROI proof must pass before WORK0 may integrate (0/8). */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-fleet-photo-top-shade {
+    position:absolute;
+    top:3px;
+    left:0;
+    z-index:2;
+    width:64%;
+    height:12px;
+    pointer-events:none;
+    background:linear-gradient(180deg,#03192b 0%,#03192b 20%,#03192b00 100%);
+    -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 91%,transparent 100%);
+    mask-image:linear-gradient(90deg,#000 0%,#000 91%,transparent 100%);
+  }
+}
