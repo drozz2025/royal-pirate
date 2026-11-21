@@ -23,7 +23,10 @@ jobs:
           cache: npm
           cache-dependency-path: WebPreview/package-lock.json
       - run: npm ci
-      - name: 3D model, lifecycle and mobile culling regression
-        run: node --import tsx --test tests/ship-hull-fenders.test.ts
       - name: Production TypeScript and Vite compile (no publication)
         run: npm run build
+      - name: Focused import and one-hull 3D smoke test
+        run: | 
+          node --import tsx --input-type=module -e "console.log('Before import'); const {createPreviewHullFenders}=await import('./src/ship-hull-fenders.ts'); console.log('Before geometry'); const model=createPreviewHullFenders('scout','hull-oak'); console.log('Geometry ready',model.children.length); if(model.children.length!==2)process.exitCode=1"
+      - name: 3D model, lifecycle and mobile culling regression
+        run: node --import tsx --test tests/ship-hull-fenders.test.ts
