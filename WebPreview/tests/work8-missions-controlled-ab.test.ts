@@ -1894,6 +1894,11 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
        Chromium scene + DOM + paused time, source reference 07-missoes.webp.
        The opt-out class compares the exact old filter against the candidate
        without modifying the three genuine objectives or seven reward slots. */
+    // Return to the genuine integrated production state after completing all
+    // historical WORK8 A/B gates. The following comparison toggles ONLY our
+    // new class, so it measures the real HEAD, not a stack of old baselines.
+    await evalJs('document.documentElement.classList.remove("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline");document.querySelectorAll("*").forEach(e=>e.getAnimations?.().forEach(a=>a.pause()));true');
+    await delay(160);
     const ctaFlag='work8-missions-active-cta-enamel-ab-baseline';
     const ctaSelector='.w8-approved-missions .w8-approved-quest[data-state=active] > button';
     const ctaState=()=>evalJs('(()=>({active:[...document.querySelectorAll('+JSON.stringify(ctaSelector)+')].map(b=>{const r=b.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,label:b.textContent}}),quests:document.querySelectorAll(".w8-approved-quest").length,days:document.querySelectorAll(".w8-approved-days li").length,dock:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length}))()');
