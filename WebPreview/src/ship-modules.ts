@@ -12,6 +12,7 @@ import { createPreviewSternLanterns } from './ship-stern-lanterns';
 import { createPreviewKeelCutwater } from './ship-keel-cutwater';
 import { createPreviewGunwaleRails } from './ship-gunwale-rails';
 import { createPreviewDeckPlanking } from './ship-deck-planking';
+import { createPreviewSternWindows } from './ship-stern-windows';
 import { createPreviewDeckHatches } from './ship-deck-hatches';
 import { createPreviewShipBell } from './ship-deck-bell';
 import { createPreviewCompassBinnacle } from './ship-deck-compass';
@@ -370,6 +371,10 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // deck: class-specific staggered wood seams, only two merged opaque draws.
  // Hull module selects cosmetic finishes; no changes to combat or ownership.
  additions.add(createPreviewDeckPlanking(config.shipClass,config.modules.hull as PreviewHullModule));
+ // Real 3D raised stern window galleries: 2/3/5 class lights, cabin-tier
+ // tracery and premium finishes, batched into two mobile-friendly meshes.
+ // These are editor-only and cannot grant a ship, cabin or purchase.
+ additions.add(createPreviewSternWindows(config.shipClass,config.modules.cabin as PreviewCabinModule));
  // Real cambered stitching overlays both sails in a single disposable GPU draw.
  // Class motif and dye tier change ONLY the appearance of the 3D editor ship.
  additions.add(createPreviewSailEmbroidery(config.shipClass,config.modules.sails as PreviewSailModule));
