@@ -1225,8 +1225,6 @@ function ApprovedFleetSea(){
 }
 
 function ApprovedFleetPainting(){
-  // Use only the reference-registered 223px source crop. The native Fleet
-  // seam is now feathered in WORK4 CSS rather than expanding/scaling the ship.
   return <svg className="w4-ship-art w4-reference-ship" viewBox="18 146 223 194"
     data-work4-crop="fleet" role="img"
     aria-label="Galeão Royal Crown e costa tropical, arte pictórica aprovada">
