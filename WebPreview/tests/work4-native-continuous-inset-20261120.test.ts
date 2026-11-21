@@ -230,79 +230,49 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
   }));
 
 
-  // WORK4/#104 — the approved source already contains the right coast up to
-  // x258; live <svg> currently crops it at x241. Compare *viewBox coverage*
-  // in the SAME paused 384x512 scene, keeping width === viewBox width (1:1)
-  // rather than scaling the real Royal Crown, and without adding any
-  // bitmap/wave. No experimental candidate is promoted by this QA script.
-  const cropWidths=[223,229,235,241,247];
-  const cropFrames:string[]=[];
-  const cropGeometry:any[]=[];
-  for(const width of cropWidths){
-    cropGeometry.push(await evaluate("(()=>{const e=document.querySelector('.w4-fleet svg.w4-reference-ship');if(!e)throw Error('missing source');e.style.setProperty('width','"+width+"px','important');e.style.setProperty('max-width','"+width+"px','important');e.setAttribute('viewBox','18 146 "+width+" 194');const r=e.getBoundingClientRect();return {viewBox:e.getAttribute('viewBox'),x:r.x,y:r.y,width:r.width,height:r.height}})()"));
-    await delay(110);
-    cropFrames.push((await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string);
-  }
-  await evaluate("(()=>{const e=document.querySelector('.w4-fleet svg.w4-reference-ship');e?.setAttribute('viewBox','18 146 229 194');e?.style.removeProperty('width');e?.style.removeProperty('max-width');return true})()");
-  const actualProduction=await evaluate("(()=>{const e=document.querySelector('.w4-fleet svg.w4-reference-ship');const box=e?.getBoundingClientRect();return {viewBox:e?.getAttribute('viewBox'),width:box?.width,height:box?.height,cssWidth:getComputedStyle(e).width}})()");
-  assert.equal(actualProduction.viewBox,'18 146 229 194','actual native Work4 source crop must ship at 229px');
-  assert.equal(actualProduction.width,229,'native 1:1 real approved source must have width 229px');
-  assert.equal(actualProduction.height,194,'native source must retain exact 194px height');
+  // The original 223px Royal Crown crop is deliberately preserved. Promote
+  // only the measured 5px live-stats seam if the actual shipped CSS matches
+  // the real paused-Chromium winner and protected composition stays intact.
+  const liveFeather=await evaluate("(()=>{const s=getComputedStyle(document.querySelector('.w4-fleet .w4-stage-label'),'::after');return {left:s.left,width:s.width}})()");
+  assert.equal(liveFeather.left,'-5px','native published CSS must use the measured -5px feather');
+  assert.equal(liveFeather.width,'5px','native published CSS must not retain old 10px seam');
+  assert.equal(sealReport.safeWinner,'feather-5',
+    'source-original MAE and protected ROI must select shipped 5px feather');
   await delay(110);
-  const productionPixels=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
-  const parity=await evaluate("(async()=>{const source=['"+cropFrames[1]+"','"+productionPixels+"'];const imgs=await Promise.all(source.map(async b=>{const i=new Image();i.src='data:image/png;base64,'+b;await i.decode();return i}));const pixel=im=>{const c=document.createElement('canvas');c.width=384;c.height=512;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(im,0,0);return ctx.getImageData(0,0,384,512).data};const a=pixel(imgs[0]),b=pixel(imgs[1]);let changed=0;for(let k=0;k<a.length;k+=4){if(a[k]!==b[k]||a[k+1]!==b[k+1]||a[k+2]!==b[k+2])changed++}return {changed,totalPixels:384*512}})()");
-  assert.equal(parity.changed,0,'promoted real 229px crop must exactly match the tested candidate in production');
-  const cropScan="(async()=>{"+
-    "const sources=['data:image/webp;base64,"+approved+"',..."+JSON.stringify(cropFrames)+".map(x=>'data:image/png;base64,'+x)];"+
-    "const images=await Promise.all(sources.map(async src=>{const im=new Image();im.src=src;await im.decode();if(im.width!==384||im.height!==512)throw Error('non-native crop frame');return im}));"+
-    "const data=images.map(im=>{const c=document.createElement('canvas');c.width=384;c.height=512;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);return x.getImageData(0,0,384,512).data});"+
-    "const regions={full:[0,0,384,512],sourceEdge:[228,151,258,340],ship:[31,176,216,304],crown:[105,246,155,285],sea:[188,306,218,338],dock:[0,433,384,512]};"+
-    "const compare=(pixels,box)=>{let total=0,n=0,changed=0;for(let y=box[1];y<box[3];y++)for(let x=box[0];x<box[2];x++){const k=(y*384+x)*4;let diff=false;for(let j=0;j<3;j++){total+=Math.abs(data[0][k+j]-pixels[k+j]);diff ||= data[1][k+j]!==pixels[k+j];n++}if(diff)changed++}return {mae:total/n,changed}};"+
-    "return {regions,variants:data.slice(1).map(p=>Object.fromEntries(Object.entries(regions).map(([name,box])=>[name,compare(p,box)])))}})()";
-  const cropMetrics=await evaluate(cropScan);
-  assert.equal(cropMetrics.variants.length,cropWidths.length,'viewBox A/B must compare all actual Chromium frames');
-  const cropRecords=cropWidths.map((width,i)=>({width,geometry:cropGeometry[i],roi:cropMetrics.variants[i]}));
-  const safeCrop=cropRecords.filter(x=>['ship','crown','sea','dock'].every(key=>x.roi[key].changed===0)&&
-    x.roi.full.mae<=cropRecords[0].roi.full.mae+0.000001);
-  safeCrop.sort((a,b)=>a.roi.sourceEdge.mae-b.roi.sourceEdge.mae||
-    a.roi.full.mae-b.roi.full.mae);
-  const cropWinner=safeCrop[0]||cropRecords[0];
-  assert.equal(cropWinner.width,229,'source edge ROI must select safe production 229px vs native alternatives');
-  assert.ok(cropRecords[1].roi.full.mae<cropRecords[0].roi.full.mae-0.02,'global MAE must materially improve');
-  assert.ok(cropRecords[1].roi.sourceEdge.mae<cropRecords[0].roi.sourceEdge.mae-1,'photo edge must improve >1 MAE point');
-  for(const protectedROI of ['ship','crown','sea','dock']){
-    assert.equal(cropRecords[1].roi[protectedROI].changed,0,
-      '229px actual source crop may not mutate protected '+protectedROI);
-  }
-  const cropReport={approved:false,screensApproved:0,viewport:'384x512',
-    source:'03-frota.webp',comparison:'single Chromium scene, exact original source clip, paused animations',
-    originalViewBox:'18 146 223 194',roiBoxes:cropMetrics.regions,
-    variants:cropRecords,safeWinnerWidth:cropWinner.width,
-    decision:cropWinner.width===229?'Promoted one source-pixel authentic coastal crop; awaiting artistic sign-off':
-      'Do not merge: wrong candidate outperforms production 229px source crop',
-    actualProduction,productionVsCandidate:parity};
-  writeFileSync(join(qa,'work4-fleet-source-crop-coverage-ab.json'),JSON.stringify(cropReport,null,2)+'\n');
-  writeFileSync(join(qa,'work4-fleet-source-crop-coverage-winner-384x512.png'),
-    Buffer.from(cropFrames[cropWidths.indexOf(cropWinner.width)],'base64'));
-  // Four genuinely rendered panels for the promoted source crop. The previous
-  // inset montage measures a different change; this one must compare 223px
-  // BEFORE with the actual 229px RENDER at the exact same paused Chromium frame.
-  const cropMontageExpression="(async()=>{"+
-    "const urls=['data:image/webp;base64,"+approved+"','data:image/png;base64,"+cropFrames[0]+"','data:image/png;base64,"+productionPixels+"'];"+
+  const productionPixels=(await cmd('Page.captureScreenshot',{
+    format:'png',captureBeyondViewport:false
+  })).data as string;
+  const liveReportExpression="(async()=>{"+
+    "const urls=['data:image/webp;base64,"+approved+"','data:image/png;base64,"+sourcePhotos[0]+"','data:image/png;base64,"+productionPixels+"'];"+
     "const imgs=await Promise.all(urls.map(async src=>{const im=new Image();im.src=src;await im.decode();return im}));"+
-    "if(imgs.some(im=>im.width!==384||im.height!==512))throw Error('crop montage requires native 384x512 pixels');"+
-    "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;const ctx=canvas.getContext('2d');"+
+    "if(imgs.some(im=>im.width!==384||im.height!==512))throw Error('native source feather montage 384x512 required');"+
+    "const pix=im=>{const c=document.createElement('canvas');c.width=384;c.height=512;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(im,0,0);return ctx.getImageData(0,0,384,512).data};"+
+    "const p=imgs.map(pix);const rois={full:[0,0,384,512],photoJoin:[219,155,258,339],ship:[31,176,216,304],crown:[105,246,155,285],sea:[188,306,218,338],dock:[0,433,384,512]};"+
+    "const metric=r=>{let before=0,after=0,n=0,changed=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;let d=false;for(let c=0;c<3;c++){before+=Math.abs(p[0][k+c]-p[1][k+c]);after+=Math.abs(p[0][k+c]-p[2][k+c]);d ||= p[1][k+c]!==p[2][k+c];n++}if(d)changed++}return {before:before/n,after:after/n,changed}};"+
+    "const out=document.createElement('canvas');out.width=1536;out.height=512;const ctx=out.getContext('2d');"+
     "ctx.drawImage(imgs[0],0,0);ctx.drawImage(imgs[1],384,0);ctx.drawImage(imgs[2],768,0);"+
     "ctx.drawImage(imgs[0],1152,0);ctx.globalAlpha=.5;ctx.drawImage(imgs[2],1152,0);ctx.globalAlpha=1;"+
-    "return {width:canvas.width,height:canvas.height,png:canvas.toDataURL('image/png').split(',')[1]}})()";
-  const cropMontage=await evaluate(cropMontageExpression);
-  assert.equal(cropMontage.width,1536,'four source-crop panels must each be 384px');
-  assert.equal(cropMontage.height,512,'source-crop montage must use native height');
-  writeFileSync(join(qa,'original-before-render-overlay-fleet-source-crop-384x512.png'),
-    Buffer.from(cropMontage.png,'base64'));
-  console.log('WORK4_FLEET_SOURCE_CROP_COVERAGE '+JSON.stringify({
-    safeWinnerWidth:cropWinner.width,decision:cropReport.decision,
-    variants:cropRecords.map(x=>({width:x.width,geometry:x.geometry,roi:x.roi}))
+    "return {roi:Object.fromEntries(Object.entries(rois).map(([name,box])=>[name,metric(box)])),rois,comparison:out.toDataURL('image/png').split(',')[1]}})()";
+  const liveReport=await evaluate(liveReportExpression);
+  assert.ok(liveReport.roi.full.after<liveReport.roi.full.before-0.02,
+    'actual 5px native CSS must improve global MAE against 10px release baseline');
+  assert.ok(liveReport.roi.photoJoin.after<liveReport.roi.photoJoin.before-1,
+    'actual 5px native CSS must improve the genuine coast ROI by >1 RGB MAE');
+  for(const area of ['ship','crown','sea','dock']){
+    assert.equal(liveReport.roi[area].changed,0,
+      'native 5px seam cannot change protected '+area+' pixels');
+  }
+  writeFileSync(join(qa,'original-before-render-overlay-fleet-live-feather-384x512.png'),
+    Buffer.from(liveReport.comparison,'base64'));
+  writeFileSync(join(qa,'work4-fleet-live-5px-feather-384x512.json'),JSON.stringify({
+    approved:false,screensApproved:0,viewport:'384x512',
+    comparison:'same paused Chromium page, real released 10px BEFORE vs actual computed-CSS 5px RENDER',
+    actualProduction:liveFeather,roiBoxes:liveReport.rois,roi:liveReport.roi,
+    sourceCrop:'18 146 223 194; one registered approved Royal Crown',
+    note:'A/B protected ship, sea, dock pixels; other viewport sizes retain the 10px seam.'
+  },null,2)+'\\n');
+  console.log('WORK4_FLEET_LIVE_FEATHER_PROMOTED '+JSON.stringify({
+    actualProduction:liveFeather,roi:liveReport.roi,approved:false,screensApproved:0
   }));
 
   // WORK4 native visibility regression discovered in the real 384x512
