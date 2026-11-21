@@ -9,6 +9,7 @@ import { createPreviewDeckLongboats } from './ship-deck-longboats';
 import { createPreviewBoardingLadders } from './ship-boarding-ladders';
 import { createPreviewDeckShotRacks } from './ship-deck-shot-racks';
 import { createPreviewSternLanterns } from './ship-stern-lanterns';
+import { createPreviewKeelCutwater } from './ship-keel-cutwater';
 import { createPreviewDeckHatches } from './ship-deck-hatches';
 import { createPreviewShipBell } from './ship-deck-bell';
 import { createPreviewCompassBinnacle } from './ship-deck-compass';
@@ -357,6 +358,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // Class silhouettes and oak/ironwood/royal finishes are distinct, yet each
  // refit consumes only two preview draw objects and never affects battle.
  additions.add(createPreviewHullRelief(config.shipClass,config.modules.hull as PreviewHullModule));
+ // Original scarfed keel, real 3D bow stem and class-specific carved knees.
+ // Always two merged editor-only meshes; never alters battle or ownership.
+ additions.add(createPreviewKeelCutwater(config.shipClass,config.modules.hull as PreviewHullModule));
  // Real cambered stitching overlays both sails in a single disposable GPU draw.
  // Class motif and dye tier change ONLY the appearance of the 3D editor ship.
  additions.add(createPreviewSailEmbroidery(config.shipClass,config.modules.sails as PreviewSailModule));
