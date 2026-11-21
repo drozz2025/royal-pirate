@@ -115,8 +115,8 @@ export function Shipyard({onClose,onPreview,onViewChange,onTourChange,onFocusSlo
    <small>{SHIP_CLASSES[shipClass].description} · {progressionTier(level).toUpperCase()} TIER · {ownedShipClasses?.has(shipClass)?'VERIFIED FLEET HULL':'HULL PREVIEW ONLY'}</small>
   </div>
   <div className="shipyard-orbit-hint" aria-hidden="true">↔ DRAG TO ROTATE · PINCH TO ZOOM</div>
-  {onViewChange&&<div className={"shipyard-camera-presets"+(onTourChange?" has-tour":"")} role="group" aria-label="3D ship viewing angle">
-   {SHIPYARD_VIEWS.map(view=><button type="button" key={view.id} aria-pressed={cameraView===view.id}
+  {(onViewChange||onTourChange)&&<div className={"shipyard-camera-presets"+(onTourChange?(onViewChange?" has-tour":" only-tour"):"")} role="group" aria-label="3D ship viewing angle">
+   {onViewChange&&SHIPYARD_VIEWS.map(view=><button type="button" key={view.id} aria-pressed={cameraView===view.id}
     className={cameraView===view.id?'active':''} onClick={()=>{setCameraView(view.id);onViewChange(view.id);}}
     aria-label={'Show '+view.label+' view of the preview ship'}>{view.label}</button>)}
    {onTourChange&&<button type="button" className={'shipyard-tour-button'+(tourActive?' active':'')}
