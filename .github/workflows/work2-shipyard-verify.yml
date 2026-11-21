@@ -47,6 +47,7 @@ on:
       - work2/original-boarding-ladders-20261121
       - work2/original-deck-ammunition-racks-20261121
       - work2/original-stern-lanterns-20261121
+      - work2/original-keel-cutwater-20261121
   pull_request:
     branches:
       - work2/shipyard-instanced-gpu-batching-20261120
