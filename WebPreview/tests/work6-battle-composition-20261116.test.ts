@@ -27,7 +27,7 @@ test('WORK6: enemy scale and left sail crop are strictly battle-only, Porto rest
   // Pin the current reference-specific scale, including the 320×568 crop;
   // these checks must change together with battle-framing.ts in future PRs.
   assert.equal(battleEnemyScale(384/512),1.03);
-  assert.equal(battleEnemyScale(390/844),.63);
+  assert.equal(battleEnemyScale(390/844),.80);
   assert.equal(battleEnemyScale(320/568),.77);
   assert.equal(battleEnemyScale(1.4),1.82);
   assert.match(home,/battleForegroundSail\.position\.x=pose\.sailX/);

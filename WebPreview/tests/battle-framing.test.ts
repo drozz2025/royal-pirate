@@ -165,7 +165,7 @@ test('WORK0/#104: native 384x512 stage moves the whole live galleon to starboard
 
 test('WORK0/#104: 320px and tall-phone cannon/ship framing is explicit',()=>{
   for(const [w,h,x,deckX,scale] of [
-    [320,568,4.5,3.2,.77],[390,844,4.5,3.2,.63],[430,932,4.5,3.2,.63]
+    [320,568,4.5,3.2,.77],[390,844,4.5,3.2,.80],[430,932,4.5,3.2,.80]
   ]){
     const pose=battleCameraPose(w/h);
     assert.equal(pose.target[0],x);
@@ -196,4 +196,22 @@ test('WORK0 #104: mobile 3D sightline gains real sky and halves cannon screen oc
    const p=screen(w,h,muzzle);
    assert.ok(Math.abs(p.x-w/2)<w*.065,'true barrel muzzle remains aligned with the central touch sightline');
  }
+});
+
+test('WORK0/#104: taller phones show a larger but fully framed real 3D starboard broadside',()=>{
+  for(const [w,h] of [[390,844],[430,932]]){
+    const aspect=w/h,scale=battleEnemyScale(aspect),yaw=battleEnemyBroadsideYaw(aspect);
+    assert.ok(scale>=.79&&scale<=.82,'the real enemy cannot shrink to a thumbnail at '+w+'x'+h);
+    // Project all four physical hull corners after the same live yaw/scale
+    // as OceanScene.home(). No fake 2D target and no hull hitbox changes.
+    for(const z of [-5,5])for(const x of [-1.8,1.8]){
+      const world=new T.Vector3(
+        10+scale*(Math.cos(yaw)*x+Math.sin(yaw)*z),
+        0,
+        -3+scale*(-Math.sin(yaw)*x+Math.cos(yaw)*z));
+      const point=screen(w,h,world);
+      assert.ok(point.x>6&&point.x<w-6,
+        'full real 3D hull (including stern) stays within '+w+'x'+h+': '+point.x);
+    }
+  }
 });

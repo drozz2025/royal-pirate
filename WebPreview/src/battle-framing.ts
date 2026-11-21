@@ -45,17 +45,22 @@ export type CameraPose = {
  * simulation/hitboxes: the old 1.88x red ship swallowed the centre on phones.
  * The 02 reference has clear sky, a starboard opponent and open sea between guns.
  * WORK0 21 Nov: reference-vs-Chromium comparison found the live broadside
- * ~25% wider than the approved ship at native 384x512, and too dominant on
- * tall phones. Reduce the existing THREE.JS opponent, not its hitbox or Porto.
+ * ~25% wider than the approved ship at native 384x512. The subsequent
+ * narrow-FOV reduction to 0.63 on 390x844 left its broadside too small.
+ * Restore a legible ~0.80 scale on tall phones, keeping the stern in frame.
+ * Change only the existing THREE.JS render root, not hitbox or Porto.
  * Desktop remains unchanged; Porto's 1x model is restored by showHarbour(). */
 export function battleEnemyScale(aspect:number):number {
   // WORK0 #104 / 20 Nov: structurally reframe the approved short 384×512
   // Batalha. Scale down the broadside just enough that the entire aftcastle
   // fits on the right after moving it toward the approved starboard third.
-  // All portrait crops now reclaim clear sky around the real broadside;
-  // keep the aftcastle in frame without moving collision geometry.
+  // Keep the shorter 384x512 enemy composition and preserve genuine
+  // perspective on tall phones: a tiny 0.63 ship left an empty, unplayable
+  // band of sky and reduced the opponent's visible target to a thumbnail.
+  // Recover a clear ~0.80 broadside at 390x844/430x932 while protecting
+  // the aftcastle from clipping. Simulation and damage stay untouched.
   // Presentation only: physical hull, damage hitbox and Porto stay unchanged.
-  if(aspect<.62)return Math.max(.60,Math.min(.82,Math.round(1.03*aspect/.75*100)/100)); // compensate narrow horizontal FOV: 320/568=.77, 390/844=.63
+  if(aspect<.62)return Math.max(.75,Math.min(.82,Math.round((.80-.30*(aspect-.463))*100)/100)); // 320x568=.77; 390x844 and 430x932=.80
   if(aspect<.80)return 1.03; // native reference: enemy now occupies a smaller starboard island
   return 1.82; // preserve desktop
 }
