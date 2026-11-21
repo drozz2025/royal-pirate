@@ -5493,3 +5493,15 @@
    opt-out keeps BEFORE and RENDER in exactly the same paused frame.
    No change in boxes, hit targets, 3 missions, 7 rewards or WORK0 dock.
    DO NOT touch Ranking 08. Human approvals: false, 0/8. */
+
+/* WORK8/#104 native BEFORE is the BASE's exact 1.24 filter, not an unfiltered
+   experimental fallback. The only A/B variable is 1.24 -> 1.50.
+   This restores a truthful same-DOM/same-frame controlled comparison. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root.work8-missions-chest-art-ink-ab-baseline
+  .w8-approved-missions .w8-approved-days li:nth-child(n+4)
+  .w8-approved-chest > svg.w8-approved-painting {
+    filter:contrast(1.07) saturate(1.07) brightness(1.24)
+      drop-shadow(0 1px 1px #011625);
+  }
+}
