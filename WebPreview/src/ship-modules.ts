@@ -13,6 +13,7 @@ import { createPreviewKeelCutwater } from './ship-keel-cutwater';
 import { createPreviewGunwaleRails } from './ship-gunwale-rails';
 import { createPreviewDeckPlanking } from './ship-deck-planking';
 import { createPreviewSternWindows } from './ship-stern-windows';
+import { createPreviewSternBalconies } from './ship-stern-balconies';
 import { createPreviewDeckHatches } from './ship-deck-hatches';
 import { createPreviewShipBell } from './ship-deck-bell';
 import { createPreviewCompassBinnacle } from './ship-deck-compass';
@@ -375,6 +376,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // tracery and premium finishes, batched into two mobile-friendly meshes.
  // These are editor-only and cannot grant a ship, cabin or purchase.
  additions.add(createPreviewSternWindows(config.shipClass,config.modules.cabin as PreviewCabinModule));
+ // Curved original aft lookout decks, supports and forged rail: two opaque
+ // editor-only GPU draws per class/cabin tier; no battle or ownership state.
+ additions.add(createPreviewSternBalconies(config.shipClass,config.modules.cabin as PreviewCabinModule));
  // Real cambered stitching overlays both sails in a single disposable GPU draw.
  // Class motif and dye tier change ONLY the appearance of the 3D editor ship.
  additions.add(createPreviewSailEmbroidery(config.shipClass,config.modules.sails as PreviewSailModule));
