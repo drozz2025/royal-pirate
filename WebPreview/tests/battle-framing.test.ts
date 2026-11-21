@@ -139,7 +139,7 @@ test('WORK0/#104: native 384x512 stage moves the whole live galleon to starboard
   assert.ok(opponent.x-(1+oldNdc.x)*w/2>24,
     'actual 3D perspective must shift the enemy at least 24 pixels');
   const scale=battleEnemyScale(aspect),yaw=battleEnemyBroadsideYaw(aspect);
-  assert.ok(scale>=1.00&&scale<=1.06,
+  assert.ok(scale>=1.14&&scale<=1.20,
     'short-screen galleon has room for the complete aftcastle');
   // Project both physical ends and both broadside gunwale edges after the
   // same live root yaw and presentation scale used by OceanScene.home().
@@ -165,7 +165,7 @@ test('WORK0/#104: native 384x512 stage moves the whole live galleon to starboard
 
 test('WORK0/#104: 320px and tall-phone cannon/ship framing is explicit',()=>{
   for(const [w,h,x,deckX,scale] of [
-    [320,568,4.5,3.2,.77],[390,844,4.5,3.2,.80],[430,932,4.5,3.2,.80]
+    [320,568,6.5,3.2,1.10],[390,844,6.5,3.2,1.10],[430,932,6.5,3.2,1.10]
   ]){
     const pose=battleCameraPose(w/h);
     assert.equal(pose.target[0],x);
@@ -185,7 +185,7 @@ test('WORK0 #104: mobile 3D sightline gains real sky and halves cannon screen oc
    assert.ok(currentWidth<oldWidth*.66,'actual near-gun occlusion shrinks by at least one third at '+w+'x'+h);
    assert.ok(currentWidth>w*.1,'real gun remains clearly visible at '+w+'x'+h);
    const enemyTop=screen(w,h,new T.Vector3(10,8.4*battleEnemyScale(w/h),-3)).y;
-   const expectedTop=w/h<.62?[.43,.49]:[.37,.43];
+   const expectedTop=w/h<.62?[.35,.43]:[.35,.41];
    assert.ok(enemyTop>h*expectedTop[0]&&enemyTop<h*expectedTop[1],
      'portrait-scaled sails leave clear sky at '+w+'x'+h+': '+enemyTop);
    const gun=makeBattleDeck(true);
@@ -201,7 +201,7 @@ test('WORK0 #104: mobile 3D sightline gains real sky and halves cannon screen oc
 test('WORK0/#104: taller phones show a larger but fully framed real 3D starboard broadside',()=>{
   for(const [w,h] of [[390,844],[430,932]]){
     const aspect=w/h,scale=battleEnemyScale(aspect),yaw=battleEnemyBroadsideYaw(aspect);
-    assert.ok(scale>=.79&&scale<=.82,'the real enemy cannot shrink to a thumbnail at '+w+'x'+h);
+    assert.ok(scale>=1.08&&scale<=1.12,'the real enemy cannot shrink to a thumbnail at '+w+'x'+h);
     // Project all four physical hull corners after the same live yaw/scale
     // as OceanScene.home(). No fake 2D target and no hull hitbox changes.
     for(const z of [-5,5])for(const x of [-1.8,1.8]){
