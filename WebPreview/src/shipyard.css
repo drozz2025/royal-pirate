@@ -153,3 +153,26 @@
  .shipyard-showcase-toggle{padding:7px;font-size:11px}
  .shipyard-showcase .shipyard-camera-presets{margin:5px auto}
 }
+
+/* WORK 2: catalogue-derived visual unlock navigation; compact on iPhone.
+   This is a 3D preview control, never a player-level or purchase interface. */
+.shipyard-milestones{max-width:720px;margin:7px auto 3px;
+ display:flex;align-items:center;justify-content:space-between;gap:8px;
+ padding:7px 9px;background:#0b2b49db;border:1px solid #dfbe8299;border-radius:9px}
+.shipyard-milestone-copy{display:flex;flex-direction:column;gap:2px;min-width:0;line-height:1.3}
+.shipyard-milestone-copy strong{font:900 10px 'Barlow',sans-serif;color:#f5d08c;letter-spacing:.45px}
+.shipyard-milestone-copy span{font:900 clamp(11px,2.8vw,14px) 'Barlow Condensed',sans-serif;
+ color:#ffedc5;overflow-wrap:anywhere}
+.shipyard-milestone-copy small{font:600 9px 'Barlow',sans-serif;color:#c3d7e6}
+.shipyard-milestone-buttons{display:flex;flex:0 0 auto;gap:5px}
+.shipyard-milestones button{min-height:42px;padding:7px 9px;
+ border:1px solid #f0cf85;border-radius:8px;background:#1c4a6b;color:#fff0cb;
+ font:900 12px 'Barlow Condensed',sans-serif;touch-action:manipulation}
+.shipyard-milestones button:disabled{opacity:.38;cursor:not-allowed}
+.shipyard-milestones button:focus-visible{outline:3px solid #fff4c1;outline-offset:2px}
+@media(max-width:380px){
+ .shipyard-milestones{gap:5px;padding:5px 6px}
+ .shipyard-milestone-buttons{gap:3px}
+ .shipyard-milestones button{padding:6px;min-width:45px}
+ .shipyard-milestone-copy small{font-size:8px}
+}
