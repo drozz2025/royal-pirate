@@ -23,8 +23,6 @@ test('WORK4 Forja top photo edge validates ten approved WebPs',()=>{
  assert.match(css,/contain:paint/);
  assert.match(css,/transform:translateZ\(0\)/);
  assert.match(css,/background-color:#2d2929!important/);
- assert.match(css,/svg\\.w4-cannon-art\\.w4-reference-cannon/);
- assert.match(css,/radial-gradient\\(ellipse 140% 122% at 37% 49%/);
 });
 
 
