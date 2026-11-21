@@ -47,7 +47,7 @@ export type CameraPose = {
  * WORK0 21 Nov: reference-vs-Chromium comparison found the live broadside
  * ~25% wider than the approved ship at native 384x512. The subsequent
  * narrow-FOV reduction to 0.63 on 390x844 left its broadside too small.
- * Restore a legible ~0.80 scale on tall phones, keeping the stern in frame.
+ * Current 24-capture Chromium evidence: the mobile broadside had shrunk to a thumbnail.
  * Change only the existing THREE.JS render root, not hitbox or Porto.
  * Desktop remains unchanged; Porto's 1x model is restored by showHarbour(). */
 export function battleEnemyScale(aspect:number):number {
@@ -57,11 +57,11 @@ export function battleEnemyScale(aspect:number):number {
   // Keep the shorter 384x512 enemy composition and preserve genuine
   // perspective on tall phones: a tiny 0.63 ship left an empty, unplayable
   // band of sky and reduced the opponent's visible target to a thumbnail.
-  // Recover a clear ~0.80 broadside at 390x844/430x932 while protecting
-  // the aftcastle from clipping. Simulation and damage stay untouched.
+  // Increase genuine 3D presence, then re-aim the optical target to leave
+  // the aftcastle inside the starboard edge and the central muzzle aligned.
   // Presentation only: physical hull, damage hitbox and Porto stay unchanged.
-  if(aspect<.62)return Math.max(.75,Math.min(.82,Math.round((.80-.30*(aspect-.463))*100)/100)); // 320x568=.77; 390x844 and 430x932=.80
-  if(aspect<.80)return 1.03; // native reference: enemy now occupies a smaller starboard island
+  if(aspect<.62)return 1.10; // 320x568, 390x844 and 430x932: legible real 3D broadside
+  if(aspect<.80)return 1.17; // native 384x512: broadside enlarged but entirely visible
   return 1.82; // preserve desktop
 }
 /** Batalha 02: turn the existing live red ship into a readable starboard broadside.
@@ -93,10 +93,10 @@ export function battleCameraPose(aspect: number): CameraPose {
       // in the RIGHT third instead of blocking the cannon centreline.
       // Move the existing live gun deck laterally with that pan to preserve
       // the real muzzle near x=50%, rather than reprojecting a fake shot.
-      // Camera stays fixed; pan the ACTUAL central cannon with the optical
-      // target, retaining its real muzzle world transform at each viewport.
+      // Reframe the FIRST-PERSON sightline, not the HUD or the physical shot.
+      // The existing battery/muzzle matrices stay attached to the same 3D gun.
       position: [0, 7.4, 55],
-      target: [tallPortrait ? 4.5 : 2.65, 4.1, -3],
+      target: [tallPortrait ? 6.5 : 3.3, 4.1, -3],
       showBattery: true,
       batteryOffsetZ: -30,
       batteryOffsetX: tallPortrait ? 3.2 : 1.8,
