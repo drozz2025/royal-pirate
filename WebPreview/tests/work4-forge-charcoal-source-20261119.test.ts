@@ -235,6 +235,8 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     composition.push({id:shift.id,...shape});
     shots.push((await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string);
   }
+  // Evidence order must be ORIGINAL | previous shipped rim | actual current rim | OVERLAY.
+  // The independent experimental winner remains in JSON only: it is NOT a release render.
   const script="(async()=>{"+
     "const load=async(bytes,mime)=>{const im=new Image();im.src='data:'+mime+';base64,'+bytes;await im.decode();return im;};"+
     "const original=await load("+JSON.stringify(reference)+",'image/webp');"+
@@ -252,7 +254,7 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     "const best=valid[0];if(!best)throw Error('baseline must remain an admissible candidate');"+
     "const oldRimIndex="+variants.findIndex(v=>v.id==='rim-shipped-previous-control')+";"+
     "const rimChange={};for(const [name,box] of Object.entries(boxes))rimChange[name]=count(shots[oldRimIndex],shots[1],box);"+
-    "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;const g=canvas.getContext('2d');g.drawImage(original,0,0);g.drawImage(screens[0],384,0);g.drawImage(screens[best.index],768,0);g.drawImage(original,1152,0);g.globalAlpha=.5;g.drawImage(screens[best.index],1152,0);"+
+    "const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=512;const g=canvas.getContext('2d');g.drawImage(original,0,0);g.drawImage(screens[oldRimIndex],384,0);g.drawImage(screens[1],768,0);g.drawImage(original,1152,0);g.globalAlpha=.5;g.drawImage(screens[1],1152,0);"+
     "return {records,bestIndex:best.index,globalWinnerIndex:globalWinner.index,baseline,rimChange,geometry:"+JSON.stringify(geometry)+",grid:canvas.toDataURL('image/png').split(',')[1]};})()";
   const result=await evaluate(script);
 
