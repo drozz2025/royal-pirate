@@ -7,6 +7,8 @@ on:
       - 'WebPreview/src/ships.ts'
       - 'WebPreview/src/scene.ts'
       - 'WebPreview/src/battle-deck.ts'
+      - 'WebPreview/src/battle-enemy-ornaments.ts'
+      - 'WebPreview/tests/work0-battle-broadside-gunports-20261121.test.ts'
       - 'WebPreview/src/battle-framing.ts'
       - 'WebPreview/src/battle-shot-presentation.ts'
       - 'WebPreview/src/main.tsx'
