@@ -28,7 +28,11 @@ test('WORK0: Missions real SVG chests 1-3 treated without touching player progre
   const css=source('work8-panels.css');
   const marker=css.indexOf('WORK8/#104 — 07 Missões only: calibrate the emerald');
   assert.ok(marker>=0);
-  const candidate=css.slice(marker);
+  // Restrict the negative-scope assertion to the chest treatment under test.
+  // Subsequent, separately owned coastal artwork intentionally uses
+  // pointer-events:none on its decorative pseudo-element.
+  const nextRule=css.indexOf('\n/*',marker+1);
+  const candidate=css.slice(marker,nextRule<0?undefined:nextRule);
   assert.match(candidate, /li:nth-child\(-n\+3\)/);
   assert.match(candidate, /svg\.w8-art-chest/);
   assert.match(candidate, /filter:brightness\(\.78\)/);
