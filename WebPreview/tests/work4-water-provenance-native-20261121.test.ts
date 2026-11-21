@@ -186,7 +186,35 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
     writeFileSync(join(qa,'water-provenance-mobile-'+w+'x'+h+'.png'),Buffer.from(shot,'base64'));
     viewportResults.push(g);
   }
-  const report={approved:false,approvedScreens:0,sourceFiles:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],viewport:'384x512',scene:'single paused Chromium frame, unchanged source/profile',geometry,viewportResults,selectedForFurtherArtReview:selected?.id??null,shownTrial:strongest.id,thresholds:{full:0.03,lowerWaterJoin:0.1,authenticWater:0.1,photoEdgeMinimum:-0.2},results:results.map(({id,metrics})=>({id,metrics})),note:'All CSS changes are temporary browser-side treatments. No production visuals promoted; MAE is not human artistic approval.'};
+
+  // Independent reference ROI for the other WORK4-owned composition (04).
+  // No trial CSS is left installed when navigating; this proves the one
+  // cannon, lit furnace, three real resource costs and five-item dock coexist.
+  await cmd('Emulation.setDeviceMetricsOverride',{
+    width:384,height:512,deviceScaleFactor:1,mobile:true,screenWidth:384,screenHeight:512
+  });
+  const enteredForge=await evaluate("(()=>{const b=document.querySelector('.w4-fleet .w4-action-pair button.w4-primary');if(!b)return false;b.click();return true;})()");
+  assert.equal(enteredForge,true,'real Frota-to-Forja action survives');
+  await until("!!document.querySelector('.w4-forge svg.w4-reference-cannon')");
+  await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const e=document.querySelector('svg.w4-reference-cannon image');const src=e?.getAttribute('href')||e?.href?.baseVal;if(!src||!(await fetch(src)).ok)throw Error('approved Forge cannon source missing');return true;})()");
+  const forgeGeometry=await evaluate("(()=>({cannons:document.querySelectorAll('.w4-forge svg.w4-reference-cannon').length,realCosts:document.querySelectorAll('.w4-forge .w4-resource-grid>div').length,levels:document.querySelectorAll('.w4-forge .w4-forge-live-level').length,dock:document.querySelectorAll('.app-sheet .harbour-nav.app-dock-porto .harbour-nav-item').length}))()");
+  assert.deepEqual(forgeGeometry,{cannons:1,realCosts:3,levels:3,dock:5});
+  await delay(130);
+  const forgeShot=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
+  const forgeApproved=readFileSync(new URL('../../assets/design-approved/04-melhorias-forja.webp',import.meta.url)).toString('base64');
+  const forgeExpression="(async()=>{"+
+    "const load=async s=>{const i=new Image();i.src=s;await i.decode();if(i.width!==384||i.height!==512)throw Error('Forge not 384x512');return i;};"+
+    "const [a,b]=await Promise.all([load('data:image/webp;base64,"+forgeApproved+"'),load('data:image/png;base64,"+forgeShot+"')]);"+
+    "const pixels=i=>{const c=document.createElement('canvas');c.width=384;c.height=512;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(i,0,0);return x.getImageData(0,0,384,512).data;};"+
+    "const [x,y]=[a,b].map(pixels);const boxes={full:[0,0,384,512],cannonComposition:[24,171,171,306],furnace:[135,193,190,305],scene:[18,152,373,334],realCostBoard:[24,315,363,430],dock:[0,433,384,512]};"+
+    "const mae=r=>{let n=0,t=0;for(let yy=r[1];yy<r[3];yy++)for(let xx=r[0];xx<r[2];xx++){let k=(yy*384+xx)*4;for(let q=0;q<3;q++){t+=Math.abs(x[k+q]-y[k+q]);n++;}}return t/n;};"+
+    "const out=document.createElement('canvas');out.width=1152;out.height=512;const p=out.getContext('2d');p.drawImage(a,0,0);p.drawImage(b,384,0);p.drawImage(a,768,0);p.globalAlpha=.5;p.drawImage(b,768,0);"+
+    "return {mae:Object.fromEntries(Object.entries(boxes).map(([name,roi])=>[name,mae(roi)])),comparison:out.toDataURL('image/png').split(',')[1]};})()";
+  const forge=await evaluate(forgeExpression);
+  assert.ok(Number.isFinite(forge.mae.cannonComposition),'cannon ROI must be measured, not a global-only MAE');
+  writeFileSync(join(qa,'original-render-overlay-forge-cannon-384x512.png'),Buffer.from(forge.comparison,'base64'));
+
+  const report={approved:false,approvedScreens:0,sourceFiles:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],viewport:'384x512',scene:'single paused Chromium frame, unchanged source/profile',geometry,forgeGeometry,forgeRoiMae:forge.mae,viewportResults,selectedForFurtherArtReview:selected?.id??null,shownTrial:strongest.id,thresholds:{full:0.03,lowerWaterJoin:0.1,authenticWater:0.1,photoEdgeMinimum:-0.2},results:results.map(({id,metrics})=>({id,metrics})),note:'All CSS changes are temporary browser-side treatments. No production visuals promoted; MAE is not human artistic approval.'};
   writeFileSync(join(qa,'work4-water-provenance-ab.json'),JSON.stringify(report,null,2)+'\n');
   console.log('WORK4_WATER_PROVENANCE_AB '+JSON.stringify(report));
 });
