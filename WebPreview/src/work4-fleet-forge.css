@@ -3191,3 +3191,38 @@
     line-height:1.05;
   }
 }
+
+/* WORK4/#104 — 21 Nov, real 384×512 coastal photo seam alpha easing.
+   Controlled ORIGINAL | BEFORE | TRIAL | OVERLAY in ONE paused Chromium
+   Fleet scene, baseline compared with 9 treatments, CI #44887437791.
+   Eased 10px lip retained more approved source coast than the merged linear
+   fade: whole RGB MAE 48.633286 → 48.609709, photo join
+   10.099173 → 9.615152, coastline 6.141480 → 5.532550.
+   Royal Crown central/full, approved sea, costs and WORK0 5-item dock:
+   ZERO pixel changes. No second ship, fake waves, geometry or touch changes.
+   320/390/430 retain #255/#260 exactly; WORK0 alone may integrate.
+   approved:false, 0/8 until human approval. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after {
+    background:linear-gradient(90deg,transparent 0%,#082c4820 18%,#082c48b0 40%,#082c48de 100%);
+  }
+}
+
+/* WORK4/#104 — composite Forge cannon/level-plaque edge (21 Nov 2026).
+   At the verified 384×512 source reference only, move the EXISTING plaque's
+   left edge away from the ONE original cannon (53% -> 51%), retain its three
+   real level rows and give it a charcoal/bronze rim. Its 22px left alpha edge
+   exposes the genuine workshop/cannon painting instead of a hard rectangle.
+   The previously separately measured width, rim and feather are evaluated
+   TOGETHER against the actual base in a new same-frame Chromium A/B gate.
+   320×568, 390×844, 430×932, four Fleet slots, original ship, furnace,
+   prices, touches, shared 5-item WORK0 dock and #255/#260 stay unchanged.
+   Artistic approval is false, 0/8. WORK0 alone may merge or release. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+    width:51%;
+    border-color:#4d4039;
+    -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+    mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+  }
+}
