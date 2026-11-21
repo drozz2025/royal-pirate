@@ -3191,3 +3191,18 @@
     line-height:1.05;
   }
 }
+
+/* WORK4/#104 — native 03 coast ink sourced from original 03-frota.webp, 21 Nov 2026.
+   CI-run 44863849237: same paused Chromium 384×512 scene and 15 A/B
+   treatments, 10px film only. Base #082c48de -> source-coast #063a59:
+   full MAE 48.633167 -> 48.616652; join 10.099173 -> 9.624768;
+   real coast 6.141480 -> 5.544647. 1,951 changed pixels exclusively
+   in the WORK4 information-panel join; 0 changed in Royal Crown,
+   original water source and five-item WORK0 dock. No 320/390/430 shifts,
+   fake waves, additional ship, menu or economy changes.
+   This is a measured visual CANDIDATE, not human artistic approval. */
+@media (width:384px) and (height:512px) {
+  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-stage-label::after {
+    background:linear-gradient(90deg,transparent 0%,#063a59 100%);
+  }
+}
