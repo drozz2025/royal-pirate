@@ -4365,3 +4365,17 @@
     filter:saturate(1.25) contrast(1.13) brightness(2.05) hue-rotate(-10deg);
   }
 }
+
+/* WORK7/#104 21 Nov: native 05 approved-grid charcoal depth.
+ * One compact native painted backdrop behind REAL 4x2 card DOM, not a
+ * screenshot, without changing images, their positions or touch targets.
+ * Measured against exact base v0.1.117, 384x512; 320px remains untouched.
+ * No shop, Porto, dock, global header or economy changes.
+ * approved:false; 0/8 until human review and WORK0 integration. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
+    background:
+      radial-gradient(ellipse 85% 60% at 50% 18%,#17243540,transparent 84%),
+      linear-gradient(180deg,#121927 0%,#081321 60%,#0c1525 100%);
+  }
+}
