@@ -230,6 +230,48 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
   }));
 
 
+  // WORK4/#104 — the approved source already contains the right coast up to
+  // x258; live <svg> currently crops it at x241. Compare *viewBox coverage*
+  // in the SAME paused 384x512 scene, without stretching or adding any
+  // bitmap/wave. No experimental candidate is promoted by this QA script.
+  const cropWidths=[223,229,235,241,247];
+  const cropFrames:string[]=[];
+  const cropGeometry:any[]=[];
+  for(const width of cropWidths){
+    cropGeometry.push(await evaluate("(()=>{const e=document.querySelector('.w4-fleet svg.w4-reference-ship');if(!e)throw Error('missing source');e.setAttribute('viewBox','18 146 "+width+" 194');const r=e.getBoundingClientRect();return {viewBox:e.getAttribute('viewBox'),x:r.x,y:r.y,width:r.width,height:r.height}})()"));
+    await delay(110);
+    cropFrames.push((await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string);
+  }
+  await evaluate("(()=>{document.querySelector('.w4-fleet svg.w4-reference-ship')?.setAttribute('viewBox','18 146 223 194');return true})()");
+  const cropScan="(async()=>{"+
+    "const sources=['data:image/webp;base64,"+approved+"',..."+JSON.stringify(cropFrames)+".map(x=>'data:image/png;base64,'+x)];"+
+    "const images=await Promise.all(sources.map(async src=>{const im=new Image();im.src=src;await im.decode();if(im.width!==384||im.height!==512)throw Error('non-native crop frame');return im}));"+
+    "const data=images.map(im=>{const c=document.createElement('canvas');c.width=384;c.height=512;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);return x.getImageData(0,0,384,512).data});"+
+    "const regions={full:[0,0,384,512],sourceEdge:[228,151,258,340],ship:[31,176,216,304],crown:[105,246,155,285],sea:[188,306,218,338],dock:[0,433,384,512]};"+
+    "const compare=(pixels,box)=>{let total=0,n=0,changed=0;for(let y=box[1];y<box[3];y++)for(let x=box[0];x<box[2];x++){const k=(y*384+x)*4;let diff=false;for(let j=0;j<3;j++){total+=Math.abs(data[0][k+j]-pixels[k+j]);diff ||= data[1][k+j]!==pixels[k+j];n++}if(diff)changed++}return {mae:total/n,changed}};"+
+    "return {regions,variants:data.slice(1).map(p=>Object.fromEntries(Object.entries(regions).map(([name,box])=>[name,compare(p,box)])))}})()";
+  const cropMetrics=await evaluate(cropScan);
+  assert.equal(cropMetrics.variants.length,cropWidths.length,'viewBox A/B must compare all actual Chromium frames');
+  const cropRecords=cropWidths.map((width,i)=>({width,geometry:cropGeometry[i],roi:cropMetrics.variants[i]}));
+  const safeCrop=cropRecords.filter(x=>['ship','crown','sea','dock'].every(key=>x.roi[key].changed===0)&&
+    x.roi.full.mae<=cropRecords[0].roi.full.mae+0.000001);
+  safeCrop.sort((a,b)=>a.roi.sourceEdge.mae-b.roi.sourceEdge.mae||
+    a.roi.full.mae-b.roi.full.mae);
+  const cropWinner=safeCrop[0]||cropRecords[0];
+  const cropReport={approved:false,screensApproved:0,viewport:'384x512',
+    source:'03-frota.webp',comparison:'single Chromium scene, exact original source clip, paused animations',
+    originalViewBox:'18 146 223 194',roiBoxes:cropMetrics.regions,
+    variants:cropRecords,safeWinnerWidth:cropWinner.width,
+    decision:cropWinner.width===223?'Keep original registered crop: candidate is unsafe or less faithful':
+      'Measured candidate only; do not ship until human review and WORK0 integration'};
+  writeFileSync(join(qa,'work4-fleet-source-crop-coverage-ab.json'),JSON.stringify(cropReport,null,2)+'\n');
+  writeFileSync(join(qa,'work4-fleet-source-crop-coverage-winner-384x512.png'),
+    Buffer.from(cropFrames[cropWidths.indexOf(cropWinner.width)],'base64'));
+  console.log('WORK4_FLEET_SOURCE_CROP_COVERAGE '+JSON.stringify({
+    safeWinnerWidth:cropWinner.width,decision:cropReport.decision,
+    variants:cropRecords.map(x=>({width:x.width,geometry:x.geometry,roi:x.roi}))
+  }));
+
   // WORK4 native visibility regression discovered in the real 384x512
   // independent SHA comparison. Hold the same scene, paused frame, fonts
   // and prices; switch only the four locally owned roster cards.
