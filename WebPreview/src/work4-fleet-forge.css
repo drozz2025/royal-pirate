@@ -3191,3 +3191,22 @@
     line-height:1.05;
   }
 }
+
+/* WORK4/#104 — composite Forge cannon/level-plaque edge (21 Nov 2026).
+   At the verified 384×512 source reference only, move the EXISTING plaque's
+   left edge away from the ONE original cannon (53% -> 51%), retain its three
+   real level rows and give it a charcoal/bronze rim. Its 22px left alpha edge
+   exposes the genuine workshop/cannon painting instead of a hard rectangle.
+   The previously separately measured width, rim and feather are evaluated
+   TOGETHER against the actual base in a new same-frame Chromium A/B gate.
+   320×568, 390×844, 430×932, four Fleet slots, original ship, furnace,
+   prices, touches, shared 5-item WORK0 dock and #255/#260 stay unchanged.
+   Artistic approval is false, 0/8. WORK0 alone may merge or release. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+    width:51%;
+    border-color:#4d4039;
+    -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+    mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+  }
+}
