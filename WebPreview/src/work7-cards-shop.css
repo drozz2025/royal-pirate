@@ -4411,3 +4411,18 @@
            brightness(.91) saturate(1.22) hue-rotate(-8deg) contrast(.91);
   }
 }
+
+
+/* WORK0 #104 accepted WORK7 #723 real cards */
+/* Original 05 card five art and painted 4x2 recess only, reference-native
+   384x512. No full-screen screenshot, fake prices, Porto or dock changes.
+   Integrated MAE/ROI and human art validation still required. DRAFT. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px) {
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5) .w7-approved-crop {
+    filter:saturate(1.25) contrast(1.13) brightness(2.05) hue-rotate(-10deg);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before {
+    background:radial-gradient(ellipse 85% 60% at 50% 18%,#1c2a3a3d,transparent 84%),
+      linear-gradient(180deg,#121a28 0%,#091422 60%,#0d1524 100%);
+  }
+}

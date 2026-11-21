@@ -3210,3 +3210,14 @@
     background:linear-gradient(90deg,transparent 0%,#07415aee 100%);
   }
 }
+
+
+/* WORK0 #104 accepted WORK4 #732 forge edge */
+/* 384x512 only: source cannon stays visible beneath the existing level plaque.
+   Retain integrator's 51% width, 3 actual prices, Porto and dock. DRAFT. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+    -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+    mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+  }
+}
