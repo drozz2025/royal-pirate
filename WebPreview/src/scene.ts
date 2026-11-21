@@ -11,6 +11,7 @@ import { shipyardCameraOffset, shipyardPartTarget, shipyardPartCameraOffset, typ
 import { releaseShipyardResources } from './shipyard-resources';
 import { preferredShipyardPixelRatio, adjustedShipyardPixelRatio } from './shipyard-render-budget';
 import { updateShipyardDetailLOD } from './shipyard-detail-lod';
+import { SHIPYARD_TOUR_SPEED, shouldAutoRotateShipyard } from './shipyard-auto-orbit';
 import { hullImpactPlacement } from './impact-visuals';
 import { rippleState } from './water-vfx';
 export type Metrics = { fps: number; renderMs: number; calls: number; triangles: number; geometries: number; textures: number; effects: number; heapMB?: number };
@@ -25,8 +26,19 @@ export class OceanScene {
   private renderMs=0;private lastRender=0;private frameSamples:number[]=[];private metricsAt=0;
   private normalPixelRatio=1;private shipyardPixelRatio=1;private shipyardAdjustmentAt=0;private shipyardRenderSamples:number[]=[];
   private pirateAudio=new PirateAudio(); paused=false; disposed=false;
+  private shipyardTourRequested=false;private tourInterrupted:(()=>void)|null=null;
+  private motionPreference:MediaQueryList|null=null;
+  private onTourUserInput=()=>{
+    if(this.cameraMode!=='shipyard'||!this.shipyardTourRequested)return;
+    const notify=this.tourInterrupted;this.setShipyardTour(false);notify?.();
+  };
+  private onMotionPreferenceChange=()=>{
+    if(this.motionPreference?.matches&&this.shipyardTourRequested){
+      const notify=this.tourInterrupted;this.setShipyardTour(false);notify?.();
+    }else this.syncShipyardTour();
+  };
   private onContextLost=(event:Event)=>{event.preventDefault();this.paused=true;this.onError('The 3D view was interrupted. Reload to restore the ocean.');};
-  private onVisibility=()=>{this.previous=0;this.pirateAudio.setHidden(document.hidden);};
+  private onVisibility=()=>{this.previous=0;this.pirateAudio.setHidden(document.hidden);this.syncShipyardTour();};
   constructor(private host:HTMLElement, public battle:Battle, private onFrame:()=>void,private onMetrics:(m:Metrics)=>void,private onError:(message:string)=>void){
     const probe=document.createElement('canvas');const context=probe.getContext('webgl2',{antialias:true,alpha:false,powerPreference:'high-performance'});
     this.compatibility=!context;this.renderer=context?new T.WebGLRenderer({canvas:probe,context,antialias:true,alpha:false}):new SoftwareRenderer();
@@ -53,6 +65,9 @@ export class OceanScene {
     }
     this.environment();this.buildHarbourDock();this.scene.add(this.harbourDock);
     this.controls=new OrbitControls(this.camera,this.canvas);this.controls.enableDamping=true;this.controls.enablePan=false;this.controls.minDistance=18;this.controls.maxDistance=110;this.controls.minPolarAngle=.32;this.controls.maxPolarAngle=1.28;this.controls.target.set(0,2,0);this.controls.rotateSpeed=.5;
+    this.controls.addEventListener('start',this.onTourUserInput);
+    this.motionPreference=typeof window.matchMedia==='function'?window.matchMedia('(prefers-reduced-motion: reduce)'):null;
+    this.motionPreference?.addEventListener('change',this.onMotionPreferenceChange);
     this.path=new T.Line(this.pathGeometry,new T.LineDashedMaterial({color:'#f9e5a4',dashSize:.35,gapSize:.2,transparent:true,opacity:.85}));this.scene.add(this.path);
     this.marker=new T.Mesh(new T.RingGeometry(.48,.58,36),new T.MeshBasicMaterial({color:'#ffdf7e',side:T.DoubleSide,transparent:true,opacity:.9,depthTest:false}));this.marker.rotation.x=-Math.PI/2;this.scene.add(this.marker);
     this.ball=new T.Mesh(new T.SphereGeometry(.22,12,8),new T.MeshStandardMaterial({color:'#262731',metalness:.8,roughness:.2,emissive:'#e87524',emissiveIntensity:.35}));this.ball.visible=false;this.scene.add(this.ball);
@@ -146,6 +161,7 @@ export class OceanScene {
   showBattle(){this.ships.player.root.visible=true;this.releaseShipyardPreview();this.ships.enemy.root.visible=true;this.foam[1].visible=true;this.harbourDock.visible=false;this.controls.enableRotate=true;this.controls.enableZoom=true;this.controls.minDistance=18;this.controls.maxDistance=110;this.home();}
   /** Release isolated preview assets on exit; shared battle geometry survives. */
   private releaseShipyardPreview(){
+    this.setShipyardTour(false);
     if(!this.shipyardArt)return;
     releaseShipyardResources(this.scene,this.shipyardArt.root);
     this.shipyardArt=null;
@@ -185,6 +201,20 @@ export class OceanScene {
   setShipyardFocus(slot:ModuleSlot|null){
     this.shipyardFocusSlot=slot;
     if(this.cameraMode==='shipyard')this.setShipyardCamera();
+  }
+  /** Auto-orbit only previews isolated art; manual drag stops and reports the change to UI. */
+  setShipyardTour(requested:boolean,onInterrupted?:()=>void):boolean{
+    this.shipyardTourRequested=requested&&this.cameraMode==='shipyard';
+    this.tourInterrupted=this.shipyardTourRequested?(onInterrupted??null):null;
+    this.syncShipyardTour();
+    return this.controls.autoRotate;
+  }
+  private syncShipyardTour(){
+    if(!this.controls)return;
+    this.controls.autoRotate=shouldAutoRotateShipyard(
+      this.shipyardTourRequested,this.cameraMode,!!this.motionPreference?.matches,document.hidden
+    );
+    this.controls.autoRotateSpeed=SHIPYARD_TOUR_SPEED;
   }
   private setShipyardCamera(){
     this.controls.enableRotate=true;this.controls.enableZoom=true;
@@ -261,7 +291,7 @@ export class OceanScene {
     this.marker.rotation.z+=dt*.4;
     if(this.battle.shot){const s=this.battle.shot;this.ball.visible=true;this.ball.position.set(s.position.x,s.position.y,s.position.z);this.trail.visible=true;const p=this.ball.position.clone(),v=new T.Vector3(s.velocity.x,s.velocity.y-12*s.age,s.velocity.z).normalize();this.trail.geometry.setFromPoints([p,p.clone().addScaledVector(v,-1.2)]);}else{this.ball.visible=false;this.trail.visible=false;}
     for(let i=this.particles.length-1;i>=0;i--){const p=this.particles[i];p.age+=dt;if(p.age>=p.life){p.mesh.visible=false;this.pool.push(p.mesh);this.particles.splice(i,1);continue;}p.mesh.position.addScaledVector(p.velocity,dt);if(!p.smoke)p.velocity.y-=8*dt;const alpha=1-p.age/p.life;(p.mesh.material as T.MeshBasicMaterial).opacity=alpha;p.mesh.scale.setScalar(p.size*(p.smoke?1+p.age*2:Math.max(.2,alpha)));}
-    this.controls.update();if(this.shake>0){this.camera.position.y+=Math.sin(timestamp*.1)*this.shake;this.shake*=.86;}
+    this.controls.update(this.controls.autoRotate?dt:undefined);if(this.shake>0){this.camera.position.y+=Math.sin(timestamp*.1)*this.shake;this.shake*=.86;}
     // Narrow-phone distant views omit only tiny preview-owned deck ornaments.
     // The same meshes return on zoom-in; never change battle objects or assets.
     if(this.cameraMode==='shipyard'&&this.shipyardArt?.root.visible){
@@ -285,5 +315,5 @@ export class OceanScene {
     }
     this.onFrame();if(timestamp-this.metricsAt>1000){this.metricsAt=timestamp;this.onMetrics(this.getMetrics());}
   };
-  dispose(){this.disposed=true;cancelAnimationFrame(this.raf);this.resizeObserver.disconnect();document.removeEventListener('visibilitychange',this.onVisibility);this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.controls.dispose();const geometries=new Set<T.BufferGeometry>(),materials=new Set<T.Material>(),textures=new Set<T.Texture>();this.scene.traverse(o=>{if(o instanceof T.Mesh||o instanceof T.Line){geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:[o.material]){materials.add(m);for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);}}});geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());this.renderer.dispose();this.canvas.remove();this.pirateAudio.dispose();}
+  dispose(){this.disposed=true;cancelAnimationFrame(this.raf);this.resizeObserver.disconnect();document.removeEventListener('visibilitychange',this.onVisibility);this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.motionPreference?.removeEventListener('change',this.onMotionPreferenceChange);this.controls.removeEventListener('start',this.onTourUserInput);this.controls.dispose();const geometries=new Set<T.BufferGeometry>(),materials=new Set<T.Material>(),textures=new Set<T.Texture>();this.scene.traverse(o=>{if(o instanceof T.Mesh||o instanceof T.Line){geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:[o.material]){materials.add(m);for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);}}});geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());this.renderer.dispose();this.canvas.remove();this.pirateAudio.dispose();}
 }
