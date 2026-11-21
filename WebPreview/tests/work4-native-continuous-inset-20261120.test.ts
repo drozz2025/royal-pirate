@@ -36,6 +36,13 @@ test('WORK4 continuous live inset is source-scoped, not a second ship or fake wa
   assert.ok(css.includes('radial-gradient(ellipse 140% 122% at 37% 49%'),'protected Forge cannon survives');
 });
 
+test('WORK4 approved coastal alpha easing is native-only, with no artificial image or gameplay edits',()=>{
+  const block=css.split('21 Nov, real 384×512 coastal photo seam')[1]||'';
+  assert.match(block,/@media \(width:384px\) and \(height:512px\)/);
+  assert.match(block,/background:linear-gradient\(90deg,transparent 0%,#082c4820 18%,#082c48b0 40%,#082c48de 100%\)/);
+  assert.doesNotMatch(block,/(?:\.app-|\.harbour-nav|\.w4-reference-sea|\.w4-reference-ship|\.w4-cannon-art|\.w4-forge)/);
+});
+
 const chrome=[process.env.CHROME_BIN,'chromium','google-chrome'].filter(Boolean)
   .find(bin=>spawnSync('which',[bin!],{encoding:'utf8'}).status===0);
 const delay=(ms:number)=>new Promise<void>(done=>setTimeout(done,ms));
@@ -217,6 +224,23 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
   gate.sort((a:any,b:any)=>a.metrics.join.mae-b.metrics.join.mae||
     a.metrics.full.mae-b.metrics.full.mae);
   const winner=gate[0]||scan.report[0];
+  const eased=scan.report[seams.findIndex(x=>x.id==='ease-early-40')];
+  const base=scan.report[0];
+  assert.ok(eased.metrics.full.mae<base.metrics.full.mae-.01,
+    'final native alpha easing must improve actual full-frame MAE');
+  assert.ok(eased.metrics.join.mae<base.metrics.join.mae-.25,
+    'final native alpha easing must improve the photographic join');
+  assert.ok(eased.metrics.coast.mae<base.metrics.coast.mae-.25,
+    'final native alpha easing must improve the actual shoreline');
+  for(const region of ['ship','crown','sea','dock']){
+    assert.equal(eased.metrics[region].changed,0,
+      'native alpha easing must not touch '+region);
+  }
+  assert.equal(seams[winner.index].id,'ease-early-40',
+    'shipping alpha candidate must be the protected ROI winner');
+  const compiled=await evaluate("getComputedStyle(document.querySelector('.w4-stage-label'),'::after').backgroundImage");
+  assert.match(compiled,/18%/,'actual compiled production CSS must include eased 18% stop');
+  assert.match(compiled,/40%/,'actual compiled production CSS must include eased 40% stop');
   const sealReport={
     approved:false,screensApproved:0,source:'03-frota.webp',viewport:'384x512',
     comparison:'same paused Chromium scene, only live seam fade width changes',
