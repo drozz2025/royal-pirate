@@ -200,6 +200,9 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
       extra:'.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description{width:'+width+'%!important;}'
     });
   }
+  // Real previous release width: same frame, paint, content and animation state.
+  variants.push({id:'plaque-width-53-control',paint:ironPaint,
+    extra:'.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description{width:53%!important;}'});
   const shots=[];
   const composition=[];
   for(const shift of variants){
@@ -283,6 +286,15 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
       : 'Candidate worsens a protected ROI: WORK0 should REJECT this Draft'};
   const shippedIndex=variants.findIndex(v=>v.id==='current');
   const shipped=result.records[shippedIndex];
+  const previousIndex=variants.findIndex(v=>v.id==='plaque-width-53-control');
+  const previous=result.records[previousIndex];
+  assert.ok(shipped.roi.full.mae<previous.roi.full.mae,'51% must improve the whole 384px source frame vs previous 53%');
+  assert.ok(shipped.roi.workshop.mae<previous.roi.workshop.mae,'51% must improve native workshop ROI');
+  assert.ok(shipped.roi.cannon.mae<previous.roi.cannon.mae,'51% must reveal the original cannon rather than cover it');
+  assert.ok(shipped.roi.furnace.mae<=previous.roi.furnace.mae,'51% must not hide the approved furnace');
+  assert.equal(shipped.roi.costs.mae,previous.roi.costs.mae,'real cost pixels must be identical');
+  assert.equal(shipped.roi.dock.mae,previous.roi.dock.mae,'WORK0 dock pixels must be identical');
+  assert.equal(composition[shippedIndex].cannonPlaqueBoundingOverlap,0,'the cannon and real plaque bounds must no longer overlap');
   const candidates=variants.map((v,i)=>({id:v.id,index:i})).filter(v=>v.id.startsWith('plaque-width-')).map(v=>({
     ...v,roi:result.records[v.index].roi,shape:composition[v.index]
   }));
@@ -297,7 +309,16 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     eligible:eligible.map(x=>({id:x.id,roi:x.roi,shape:x.shape})),
     decision:eligible.length?'Candidate(s) pass numerical source/functional guard; NOT approved until WORK0 reviews':'No candidate beats current source without regressing protected ROIs; KEEP existing production width'
   };
-  Object.assign(report,{nativeResizeGate:gate});
+  Object.assign(report,{nativeResizeGate:gate,nativeProductionWidth:{
+    from:53,to:51,
+    fullMAE:{before:previous.roi.full.mae,render:shipped.roi.full.mae},
+    cannonROI:{before:previous.roi.cannon.mae,render:shipped.roi.cannon.mae},
+    furnaceROI:{before:previous.roi.furnace.mae,render:shipped.roi.furnace.mae},
+    workshopROI:{before:previous.roi.workshop.mae,render:shipped.roi.workshop.mae},
+    cannonPlaqueBoundingOverlap:{before:composition[previousIndex].cannonPlaqueBoundingOverlap,
+      render:composition[shippedIndex].cannonPlaqueBoundingOverlap},
+    approved:false,screensApproved:0
+  }});
   assert.equal(composition.length,variants.length,'each candidate must use a measured live browser frame');
   assert.ok(candidates.every(v=>v.shape.cannonCount===1&&v.shape.rows===3),
     'all candidate frames preserve exactly one cannon and all three real levels');
@@ -305,6 +326,7 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     'Chromium must actually apply candidate width: do not count unchanged frames as evidence');
   writeFileSync(join(qa,'work4-forge-depth-gradient-ab-384x512.json'),JSON.stringify(report,null,2)+'\n');
   writeFileSync(join(qa,'work4-original-before-render-overlay-forge-gradient-384x512.png'),Buffer.from(result.grid,'base64'));
+  console.log('WORK4_FORGE_NATIVE_PRODUCTION_WIDTH_AB '+JSON.stringify({before:previous.roi,render:shipped.roi,originalOverlap:composition[previousIndex].cannonPlaqueBoundingOverlap,newOverlap:composition[shippedIndex].cannonPlaqueBoundingOverlap}));
   console.log('WORK4_FORGE_NATIVE_RESIZE_GATE '+JSON.stringify(gate));
   console.log('WORK4_FORGE_GRADIENT_NATIVE_AB '+JSON.stringify(report));
 });
