@@ -61,7 +61,7 @@ test('invalid, malicious, level-locked and foreign blueprint fields are rejected
   {...object,selectedByClass:{...valid.selectedByClass,scout:{hull:'hull-fake'}}},
   {...object,selectedByClass:{...valid.selectedByClass,scout:{unknown:'hull-oak'}}},
   {...object,selectedByClass:{...valid.selectedByClass,scout:{hull:7}}},
-  {...object,selectedByClass:{...valid.selectedByClass,scout:{__proto__:null}}},
+  {...object,selectedByClass:{...valid.selectedByClass,scout:JSON.parse('{"__proto__":"hull-oak"}')}},
   null, [], 'whatever'
  ];
  for(const input of bad)assert.throws(()=>decodePreviewBlueprint(codeFor(input)));
