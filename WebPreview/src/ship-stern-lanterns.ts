@@ -93,7 +93,7 @@ export function createPreviewSternLanterns(
     const cx=x+Math.cos(angle)*radius*.83;
     const cz=z+Math.sin(angle)*radius*.83;
     const a=V(cx,lampY+height*.56,cz);
-    const b=V(cx*.0+x*.0+cx,lampY+height*.88,cz);
+    const b=V(cx,lampY+height*.88,cz);
     strut(fittings,a,b,.027);
     sphere(fittings,b.x,b.y,b.z,.049);
     totalFinials++;
