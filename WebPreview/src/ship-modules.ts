@@ -9,6 +9,7 @@ import { createPreviewDeckRopeCoils } from './ship-deck-rope-coils';
 import { createPreviewDeckLongboats } from './ship-deck-longboats';
 import { createPreviewBoardingLadders } from './ship-boarding-ladders';
 import { createPreviewDeckShotRacks } from './ship-deck-shot-racks';
+import { createPreviewDeckCasks } from './ship-deck-casks';
 import { createPreviewSternLanterns } from './ship-stern-lanterns';
 import { createPreviewKeelCutwater } from './ship-keel-cutwater';
 import { createPreviewGunwaleRails } from './ship-gunwale-rails';
@@ -303,6 +304,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  additions.add(createPreviewBoardingLadders(config.shipClass,config.modules.masts as PreviewMastModule));
  // Stacked cannon-shot display racks are visual-only; they do not give player ammo.
  additions.add(createPreviewDeckShotRacks(config.shipClass,config.modules.cannons as PreviewCannonModule));
+ // Original sculpted timber casks and forged hoops: precisely two batched
+ // editor-only draws. These props are never cargo, resources or inventory.
+ additions.add(createPreviewDeckCasks(config.shipClass,config.modules.hull as PreviewHullModule));
  // Three original stern lantern silhouettes with PBR glass and no dynamic light.
  // They follow the ornamental preview tier, never real module ownership.
  additions.add(createPreviewSternLanterns(config.shipClass,config.modules.ornaments as PreviewOrnamentModule));
