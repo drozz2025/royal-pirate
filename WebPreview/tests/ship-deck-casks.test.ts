@@ -49,8 +49,8 @@ test('royal casks change geometric details without implying an inventory grant',
  const royal=createPreviewDeckCasks('fighter','hull-royal');
  assert.ok((royal.children[1] as T.Mesh).geometry.getAttribute('position').count >
   (oak.children[1] as T.Mesh).geometry.getAttribute('position').count);
- assert.notEqual((oak.children[1] as T.MeshStandardMaterial).uuid,
-  (royal.children[1] as T.MeshStandardMaterial).uuid);
+ assert.notEqual(((oak.children[1] as T.Mesh).material as T.MeshStandardMaterial).color.getHexString(),
+  ((royal.children[1] as T.Mesh).material as T.MeshStandardMaterial).color.getHexString());
  assert.throws(()=>resolveLoadout({
   shipClass:'fighter',level:1,modules:{hull:'hull-royal'}
  }),/not unlocked/);
