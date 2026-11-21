@@ -54,7 +54,7 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
     'Only genuine native 06 legendary physical rim is changed in this candidate');
   assert.ok(cssText.includes('18 Nov 13:45 UTC. True 384×512 carved-frame inlay.'),
     'The final WORK7 candidate changes only genuine 05 frame inlays');
-  assert.ok(cssText.includes('measured native source-frame luminance candidate.'), 'Native 05 WORK7 proposal exists');
+  assert.ok(cssText.includes('native card 3/4/7 relief contrast.'), 'Native 05 WORK7 proposal exists');
     // The only admissible before-image is the actual merged #392 v0.1.88 field.
   // Art and frames are restored with temporary CSS, never with older #384 values.
   // Exact v0.1.88 merged HEAD after WORK0 integrated #392 (not stale #384).
