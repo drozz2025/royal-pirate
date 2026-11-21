@@ -37,8 +37,11 @@ export function inspectNativeVisualReport(report) {
       if(s.approved===true){
         failures.push(name+': '+size+' screenshot alone must not mark human approval');continue;
       }
-      const base=Number(s.source_mae_base),head=Number(s.source_mae_head);
-      if(!Number.isFinite(base)||!Number.isFinite(head)||base<0||head<0||base>255||head>255){
+      const base=s.source_mae_base,head=s.source_mae_head;
+      // Never coerce missing/null MAE into a plausible zero. A broken scorer
+      // must block the review instead of silently passing the release gate.
+      if(typeof base!=='number'||typeof head!=='number'||
+         !Number.isFinite(base)||!Number.isFinite(head)||base<0||head<0||base>255||head>255){
         failures.push(name+': invalid '+size+' MAE');continue;
       }
       if(width!==NATIVE_WIDTH||height!==NATIVE_HEIGHT)continue;
