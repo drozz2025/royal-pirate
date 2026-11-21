@@ -5311,7 +5311,7 @@
   :root:not(.work8-missions-chest-art-ink-ab-baseline)
   .w8-approved-missions .w8-approved-days li:nth-child(n+4)
   .w8-approved-chest > svg.w8-approved-painting {
-    filter:contrast(1.07) saturate(1.07) brightness(1.24)
+    filter:contrast(1.07) saturate(1.07) brightness(1.50)
       drop-shadow(0 1px 1px #011625);
   }
 }
@@ -5485,3 +5485,11 @@
     visibility:hidden;
   }
 }
+
+/* WORK8/#104 07 Missões ONLY — genuinely painted chests 4–7.
+   The source's native silver, gold, violet and royal relief is toned up only
+   inside already-present approved 07 crops, not any player reward or claim state.
+   384x512 source/Chromium control: root .work8-missions-chest-art-ink-ab-baseline
+   opt-out keeps BEFORE and RENDER in exactly the same paused frame.
+   No change in boxes, hit targets, 3 missions, 7 rewards or WORK0 dock.
+   DO NOT touch Ranking 08. Human approvals: false, 0/8. */
