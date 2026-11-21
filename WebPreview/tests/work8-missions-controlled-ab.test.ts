@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline","work8-missions-day-legibility-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1888,6 +1888,46 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.ok(realDayDelta.chests<.02 && Math.abs(realDayDelta.quest)<.02 &&
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
+
+
+    /* WORK8/#104: Seven genuine DAY captions; compare ORIGINAL | BEFORE |
+       RENDER | OVERLAY from one paused 384x512 Chrome frame. Disable this
+       one paint change during all historical A/B tests above. No user data
+       or state replacement; existing 320-scroll/touch/menu checks follow. */
+    const dayInkFlag='work8-missions-day-legibility-ab-baseline';
+    const dayInkGeometry=()=>evalJs('(()=>({quests:document.querySelectorAll(".w8-approved-quest").length,days:document.querySelectorAll(".w8-approved-days li").length,nav:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,labels:[...document.querySelectorAll(".w8-approved-missions .w8-approved-days li > small")].map(el=>{const r=el.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]}),chests:[...document.querySelectorAll(".w8-approved-missions .w8-approved-chest")].map(el=>{const r=el.getBoundingClientRect();return {top:r.top,bottom:r.bottom}}),dock:(()=>{const r=document.querySelector(".app-sheet > .harbour-nav").getBoundingClientRect();return {top:r.top,bottom:r.bottom}})(),width:document.documentElement.scrollWidth}))()');
+    const inkBeforeGeometry=await dayInkGeometry();
+    const inkBeforeCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-days li > small")).filter');
+    const inkBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(dayInkFlag)+');true');
+    await delay(165);
+    const inkAfterGeometry=await dayInkGeometry();
+    const inkAfterCss=await evalJs('getComputedStyle(document.querySelector(".w8-approved-days li > small")).filter');
+    const inkAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const inkRegions={full:[0,0,384,512],daily:[13,325,373,435],dock:[0,451,384,512],missions:[12,155,372,321],labels:[22,402,370,430]};
+    const inkMetrics=await evalJs('(async()=>{const data='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+inkBefore,'data:image/png;base64,'+inkAfter])+';const images=await Promise.all(data.map(src=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=bad;i.src=src})));if(images.some(i=>i.width!==384||i.height!==512))throw Error("not native 384x512");const px=images.map(im=>{const c=document.createElement("canvas");c.width=384;c.height=512;const t=c.getContext("2d");t.drawImage(im,0,0);return t.getImageData(0,0,384,512).data});const areas='+JSON.stringify(inkRegions)+';const score=(a,b,r)=>{let sum=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const i=4*(384*y+x);for(let c=0;c<3;c++){sum+=Math.abs(a[i+c]-b[i+c]);n++}}return sum/n};let changed=0;for(let i=0;i<px[1].length;i+=4){if(px[1][i]!==px[2][i]||px[1][i+1]!==px[2][i+1]||px[1][i+2]!==px[2][i+2])changed++}return {changed,roi:Object.fromEntries(Object.entries(areas).map(([k,r])=>{const before=score(px[0],px[1],r),render=score(px[0],px[2],r);return [k,{before,render,delta:render-before}]}))}})()');
+    const inkMosaic=await evalJs('(async()=>{const imgs=await Promise.all('+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+inkBefore,'data:image/png;base64,'+inkAfter])+'.map(src=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=bad;i.src=src})));const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");imgs.forEach((im,n)=>x.drawImage(im,384*n,0));x.drawImage(imgs[0],1152,0);x.globalAlpha=.50;x.drawImage(imgs[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()');
+    const inkReport={issue:104,screen:'07 Missões',approved:false,approvedScreens:0,
+      refs:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],
+      baseSha:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',sameSceneFrame:true,
+      viewport:[384,512],regionCoords:inkRegions,css:{before:inkBeforeCss,after:inkAfterCss},
+      geometry:{before:inkBeforeGeometry,after:inkAfterGeometry},...inkMetrics};
+    writeFileSync(join(evidence,'work8-07-day-captions-mae-roi.json'),JSON.stringify(inkReport,null,2));
+    writeFileSync(join(evidence,'work8-07-day-captions-original-before-render-overlay-384x512.png'),Buffer.from(inkMosaic,'base64'));
+    writeFileSync(join(evidence,'work8-07-day-captions-before-384x512.png'),Buffer.from(inkBefore,'base64'));
+    writeFileSync(join(evidence,'work8-07-day-captions-render-384x512.png'),Buffer.from(inkAfter,'base64'));
+    console.log('WORK8_DAY_CAPTIONS_NATIVE_AB '+JSON.stringify(inkReport));
+    assert.notEqual(inkBeforeCss,inkAfterCss,'candidate must be a real CSS paint delta');
+    assert.deepEqual(inkBeforeGeometry,inkAfterGeometry,'no interaction or layout changes');
+    assert.equal(inkAfterGeometry.quests,3);assert.equal(inkAfterGeometry.days,7);
+    assert.equal(inkAfterGeometry.nav,5);assert.equal(inkAfterGeometry.labels.length,7);
+    assert.ok(inkAfterGeometry.chests.every(c=>c.bottom<=inkAfterGeometry.dock.top+2),
+      'all seven chests must remain visibly above the dock');
+    assert.ok(inkMetrics.changed>0,'requires actual rendered pixel changes');
+    assert.ok(inkMetrics.roi.full.delta<-.001 && inkMetrics.roi.labels.delta<-.02,
+      'source MAE must improve for native full frame and seven DAY caption ROI');
+    assert.ok(Math.abs(inkMetrics.roi.missions.delta)<.015 && Math.abs(inkMetrics.roi.dock.delta)<.015,
+      'do not regress quests or the WORK0 dock');
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
