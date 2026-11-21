@@ -221,7 +221,7 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
     production,strictCandidate:strictCandidate??null,candidates:integratedCandidates,
     note:'WORK0 composite must pass both full and edge native ROI, not imported standalone MAE'};
   writeFileSync(join(qa,'work4-integrated-underpaint-roi-sweep-384x512.json'),
-    JSON.stringify(integratedStudy,null,2)+'\\n');
+    JSON.stringify(integratedStudy,null,2)+'\n');
   console.log('WORK4_INTEGRATED_COVE_SWEEP '+JSON.stringify(integratedStudy));
   // Actual submitted CSS still fails when the production layer fails;
   // successful injected trials are research and cannot automatically pass CI.
