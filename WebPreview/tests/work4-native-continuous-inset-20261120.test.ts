@@ -230,22 +230,25 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
   }));
 
 
-  // The original 223px Royal Crown crop is deliberately preserved. Promote
-  // only the measured 5px live-stats seam if the actual shipped CSS matches
-  // the real paused-Chromium winner and protected composition stays intact.
-  const liveFeather=await evaluate("(()=>{const s=getComputedStyle(document.querySelector('.w4-fleet .w4-stage-label'),'::after');return {left:s.left,width:s.width}})()");
-  assert.equal(liveFeather.left,'-5px','native published CSS must use the measured -5px feather');
-  assert.equal(liveFeather.width,'5px','native published CSS must not retain old 10px seam');
-  assert.equal(sealReport.safeWinner,'feather-5',
-    'source-original MAE and protected ROI must select shipped 5px feather');
+  // A/B decision gate: preserve the genuine 223px Royal Crown and the 10px
+  // release seam. All narrower and wider feather variants were measured in
+  // the SAME paused native Chromium frame, not approved by intuition.
+  const liveFeather=await evaluate("(()=>{const s=getComputedStyle(document.querySelector('.w4-fleet .w4-stage-label'),'::after');return {left:s.left,width:s.width,shipCrop:document.querySelector('.w4-fleet svg.w4-reference-ship')?.getAttribute('viewBox')}})()");
+  assert.equal(liveFeather.left,'-10px','actual production must preserve the measured native 10px feather');
+  assert.equal(liveFeather.width,'10px','actual production must preserve the verified coastal join');
+  assert.equal(liveFeather.shipCrop,'18 146 223 194','actual production must preserve registered Royal Crown crop');
+  assert.equal(sealReport.safeWinner,'release-10',
+    'all exploratory feather widths are worse than the original 10px release');
   await delay(110);
   const productionPixels=(await cmd('Page.captureScreenshot',{
     format:'png',captureBeyondViewport:false
   })).data as string;
+  // The before panel is the REAL rejected 5px experiment. The render panel
+  // is the unchanged production 10px feather; neither image is synthetic.
   const liveReportExpression="(async()=>{"+
-    "const urls=['data:image/webp;base64,"+approved+"','data:image/png;base64,"+sourcePhotos[0]+"','data:image/png;base64,"+productionPixels+"'];"+
+    "const urls=['data:image/webp;base64,"+approved+"','data:image/png;base64,"+sourcePhotos[1]+"','data:image/png;base64,"+productionPixels+"'];"+
     "const imgs=await Promise.all(urls.map(async src=>{const im=new Image();im.src=src;await im.decode();return im}));"+
-    "if(imgs.some(im=>im.width!==384||im.height!==512))throw Error('native source feather montage 384x512 required');"+
+    "if(imgs.some(im=>im.width!==384||im.height!==512))throw Error('native 384x512 evidence required');"+
     "const pix=im=>{const c=document.createElement('canvas');c.width=384;c.height=512;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(im,0,0);return ctx.getImageData(0,0,384,512).data};"+
     "const p=imgs.map(pix);const rois={full:[0,0,384,512],photoJoin:[219,155,258,339],ship:[31,176,216,304],crown:[105,246,155,285],sea:[188,306,218,338],dock:[0,433,384,512]};"+
     "const metric=r=>{let before=0,after=0,n=0,changed=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const k=(y*384+x)*4;let d=false;for(let c=0;c<3;c++){before+=Math.abs(p[0][k+c]-p[1][k+c]);after+=Math.abs(p[0][k+c]-p[2][k+c]);d ||= p[1][k+c]!==p[2][k+c];n++}if(d)changed++}return {before:before/n,after:after/n,changed}};"+
@@ -255,23 +258,23 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
     "return {roi:Object.fromEntries(Object.entries(rois).map(([name,box])=>[name,metric(box)])),rois,comparison:out.toDataURL('image/png').split(',')[1]}})()";
   const liveReport=await evaluate(liveReportExpression);
   assert.ok(liveReport.roi.full.after<liveReport.roi.full.before-0.02,
-    'actual 5px native CSS must improve global MAE against 10px release baseline');
+    'original production 10px must beat rejected 5px globally by at least .02 RGB MAE');
   assert.ok(liveReport.roi.photoJoin.after<liveReport.roi.photoJoin.before-1,
-    'actual 5px native CSS must improve the genuine coast ROI by >1 RGB MAE');
+    'original production 10px must beat rejected 5px on true coast ROI');
   for(const area of ['ship','crown','sea','dock']){
     assert.equal(liveReport.roi[area].changed,0,
-      'native 5px seam cannot change protected '+area+' pixels');
+      'WORK4 feather may not change protected '+area+' pixels');
   }
-  writeFileSync(join(qa,'original-before-render-overlay-fleet-live-feather-384x512.png'),
+  writeFileSync(join(qa,'original-before5-render10-overlay-fleet-feather-384x512.png'),
     Buffer.from(liveReport.comparison,'base64'));
-  writeFileSync(join(qa,'work4-fleet-live-5px-feather-384x512.json'),JSON.stringify({
+  writeFileSync(join(qa,'work4-fleet-5px-rejected-10px-preserved-384x512.json'),JSON.stringify({
     approved:false,screensApproved:0,viewport:'384x512',
-    comparison:'same paused Chromium page, real released 10px BEFORE vs actual computed-CSS 5px RENDER',
+    comparison:'same paused Chromium page; rejected experimental 5px BEFORE vs actual unmodified production 10px RENDER',
     actualProduction:liveFeather,roiBoxes:liveReport.rois,roi:liveReport.roi,
-    sourceCrop:'18 146 223 194; one registered approved Royal Crown',
-    note:'A/B protected ship, sea, dock pixels; other viewport sizes retain the 10px seam.'
-  },null,2)+'\\n');
-  console.log('WORK4_FLEET_LIVE_FEATHER_PROMOTED '+JSON.stringify({
+    sourceCrop:'18 146 223 194; single approved Royal Crown',
+    decision:'Reject 5px feather and preserve 10px production seam; no visual production change'
+  },null,2)+'\n');
+  console.log('WORK4_FLEET_FEATHER_REJECTION '+JSON.stringify({
     actualProduction:liveFeather,roi:liveReport.roi,approved:false,screensApproved:0
   }));
 
