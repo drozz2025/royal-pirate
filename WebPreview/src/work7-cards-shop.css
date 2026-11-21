@@ -4390,7 +4390,7 @@
    * Separate pigmented metal relief; no UI text or approved source pixels replaced. */
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
     filter:brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04)
-           brightness(.94) saturate(1.26) hue-rotate(-11deg) contrast(.89);
+           brightness(.91) saturate(1.22) hue-rotate(-8deg) contrast(.91);
   }
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
     background:
