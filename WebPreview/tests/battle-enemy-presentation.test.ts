@@ -57,7 +57,7 @@ test('enemy battle-only presentation leaves the tested camera and Porto intact',
     camera.lookAt(...pose.target);
     camera.updateMatrixWorld();
     const battleScale=battleEnemyScale(w/h);
-    assert.ok(battleScale>=.60&&battleScale<=.82,'tall-phone broadside must compensate horizontal FOV instead of filling the sky');
+    assert.ok(battleScale>=1.08&&battleScale<=1.12,'tall-phone broadside must remain legible while entirely framed');
     const points=[
       new T.Vector3(10,0,-3),
       new T.Vector3(10,battleScale*8.4,-3),
@@ -123,9 +123,9 @@ test('WORK0/#104: the live red galleon stops occupying the mobile sky in 4 refer
     const yTop=screenY(8.4*battleEnemyScale(w/h));
     const yHull=screenY(0);
     const tall=w/h<.62;
-    assert.ok(yTop>h*(tall?.43:.37)&&yTop<h*(tall?.49:.43),
+    assert.ok(yTop>h*(tall?.35:.35)&&yTop<h*(tall?.43:.41),
       'enemy must leave clear sky below compact HP header at '+w+'x'+h+': '+yTop);
-    assert.ok(yHull-yTop>h*(tall?.10:.18)&&yHull-yTop<h*(tall?.17:.24),
+    assert.ok(yHull-yTop>h*(tall?.17:.18)&&yHull-yTop<h*(tall?.26:.26),
       'galleon stays legible without covering the central gun at '+w+'x'+h);
   }
 });
