@@ -72,6 +72,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7) .w7-approved-crop{
         filter:saturate(1.25) contrast(1.13) brightness(1.52)!important;
       }
+      .w7-screen[data-work7-screen="cards"] .w7-approved-grid::before{
+        background:radial-gradient(ellipse 85% 60% at 50% 18%,#28394237,transparent 84%),linear-gradient(180deg,#121a24 0%,#0c1621 60%,#0d131c 100%)!important;
+      }
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
     ['preview', '--host', '127.0.0.1', '--port', '4287', '--strictPort', '--base=/royal-pirate/', '--outDir', privateBuildDir],
@@ -335,73 +338,18 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
           "const b0=tctx.getImageData(0,0,w,h).data;let diff0=0;"+
           "for(let p=0;p<a.length;p+=4){diff0+=Math.abs(a[p]-b0[p])+Math.abs(a[p+1]-b0[p+1])+Math.abs(a[p+2]-b0[p+2])}"+
           "maeBefore=Math.round(diff0/(w*h*3)*10000)/10000;"+
-"const patches="+JSON.stringify(kind==='shop'?[[18,175,173,309],[18,329,365,427]]:[[18,195,365,428]])+";"+
+"const patches="+JSON.stringify(kind==='shop'?[[18,175,365,309],[18,329,365,427]]:[[18,195,365,428]])+";"+
 "let sumA=0,sumB=0,pixels=0;for(const [x0,y0,x1,y1] of patches){for(let y=y0;y<y1;y++){for(let x=x0;x<x1;x++){const p=(y*w+x)*4;for(let k=0;k<3;k++){sumA+=Math.abs(a[p+k]-b0[p+k]);sumB+=Math.abs(a[p+k]-b[p+k]);pixels++}}}}"+
 "roiBefore=Math.round(sumA/pixels*10000)/10000;roiAfter=Math.round(sumB/pixels*10000)/10000;}}"+
           "return {png:c.toDataURL('image/png').slice(22),mae,maeBefore,roiBefore,roiAfter,referenceSize:[reference.naturalWidth,reference.naturalHeight]};})()");
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
-        // WORK7-only genuine source-art color calibration in the identical
-        // frozen 384x512 Chromium scene. This is instrument-only; none of
-        // these sweep candidates are persisted into the game or approved.
-        if(kind==='cards' && width===384 && height===512) {
-          const candidates:[number,number,number][]=[
-            [1,1.85,-10],[1,2.10,-10],[1,2.30,-10],[1,2.50,-10],
-            [1,2.14,0],[1,2.10,10],[1,2.30,10],[1,1.90,0],
-            [5,1.50,-20],[5,1.75,-20],[5,1.95,-20],[5,2.05,-20],
-            [5,2.20,-20],[5,2.05,-10],[5,1.86,0],[5,2.25,-10],
-            [7,1.30,-15],[7,1.52,-15],[7,1.70,-15],[7,1.90,-15],
-            [7,1.73,-8],[7,1.52,0],[7,1.80,-8],[7,1.70,10]
-          ];
-          for (const [slot,brightness,hue] of candidates) {
-            const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
-              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+slot+') .w7-approved-crop'+
-              '{filter:saturate(1.25) contrast(1.13) brightness('+brightness+') hue-rotate('+hue+'deg)!important}}';
-            await evaluate("(()=>{const s=document.createElement('style');s.id='w7-sweep';s.textContent="+
-              JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
-            await sleep(75);
-            const shot=await command('Page.captureScreenshot',{
-              format:'png',fromSurface:true,captureBeyondViewport:false
-            });
-            const metrics=await evaluate("(async()=>{"+
-              "const load=src=>new Promise((ok,fail)=>{let i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=src});"+
-              "const ref=await load("+JSON.stringify(refUrl)+"),img=await load("+
-                JSON.stringify('data:image/png;base64,')+"+"+JSON.stringify(shot.data)+");"+
-              "const cv=document.createElement('canvas');cv.width=384;cv.height=512;"+
-              "const ctx=cv.getContext('2d');ctx.drawImage(ref,0,0);const a=ctx.getImageData(0,0,384,512).data;"+
-              "ctx.clearRect(0,0,384,512);ctx.drawImage(img,0,0);const b=ctx.getImageData(0,0,384,512).data;"+
-              "let sum=0,count=0,roi=0,roiCount=0;"+
-              "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
-              "for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
-              "if(x>=18&&x<365&&y>=195&&y<428){roi+=v;roiCount++}}}"+
-              "return {global:Math.round(sum/count*10000)/10000,roi:Math.round(roi/roiCount*10000)/10000}})()");
-            console.log('WORK7 CARD SOURCE SWEEP '+slot+' brightness='+brightness+' hue='+hue+' '+JSON.stringify(metrics));
-            await evaluate("(()=>{document.getElementById('w7-sweep')?.remove();return true})()");
-            await sleep(35);
-          }
-        }
-
-
         // Experimental WORK7-only 05 frame underlay; no candidate is saved
         // to the game by this sweep. Same frozen 384x512 live Chromium DOM.
         // Region scorer uses both full-frame and authentic eight-card ROI.
         if(kind==='cards' && width===384 && height===512) {
-          const backdrops:[string,string][]=[
-            ['base','radial-gradient(ellipse 85% 60% at 50% 18%,#28394237,transparent 84%),linear-gradient(180deg,#121a24 0%,#0c1621 60%,#0d131c 100%)'],
-            ['charcoal-dark','radial-gradient(ellipse 85% 60% at 50% 18%,#28394237,transparent 84%),linear-gradient(180deg,#0d141d 0%,#091019 60%,#0a0d14 100%)'],
-            ['charcoal-neutral','radial-gradient(ellipse 85% 60% at 50% 18%,#28394237,transparent 84%),linear-gradient(180deg,#13171c 0%,#10151a 60%,#111217 100%)'],
-            ['brass-shadow','radial-gradient(ellipse 85% 60% at 50% 18%,#43392d30,transparent 84%),linear-gradient(180deg,#1a1b22 0%,#110f18 60%,#131018 100%)'],
-            ['deep-indigo','radial-gradient(ellipse 85% 60% at 50% 18%,#27384736,transparent 84%),linear-gradient(180deg,#111b29 0%,#0b1725 60%,#101621 100%)'],
-            ['ink-purple','radial-gradient(ellipse 85% 60% at 50% 18%,#37304736,transparent 84%),linear-gradient(180deg,#1b1527 0%,#140f21 60%,#15121b 100%)'],
-            ['warm-midnight','radial-gradient(ellipse 85% 60% at 50% 18%,#44362926,transparent 84%),linear-gradient(180deg,#191922 0%,#11121d 60%,#14131b 100%)'],
-            ['grey-slate','radial-gradient(ellipse 85% 60% at 50% 18%,#383b4337,transparent 84%),linear-gradient(180deg,#20252b 0%,#181c24 60%,#151820 100%)'],
-            ['pure-dark','radial-gradient(ellipse 85% 60% at 50% 18%,#18283020,transparent 84%),linear-gradient(180deg,#081322 0%,#06121b 60%,#0a141b 100%)'],
-            ['brown-blue','radial-gradient(ellipse 85% 60% at 50% 18%,#423a3537,transparent 84%),linear-gradient(180deg,#181a24 0%,#151821 60%,#15151d 100%)'],
-            ['blue-smoke','radial-gradient(ellipse 85% 60% at 50% 18%,#28394237,transparent 84%),linear-gradient(180deg,#1d2430 0%,#141b27 60%,#0f1823 100%)'],
-            ['ink-edge','radial-gradient(ellipse 85% 60% at 50% 18%,#17243540,transparent 84%),linear-gradient(180deg,#121927 0%,#081321 60%,#0c1525 100%)'],
-            ['deep-teal','radial-gradient(ellipse 85% 60% at 50% 18%,#283f4240,transparent 84%),linear-gradient(180deg,#121d23 0%,#0d1a24 60%,#0c1720 100%)']
-          ];
+          const backdrops:[string,string][]=[["mix-0","radial-gradient(ellipse 85% 60% at 50% 18%,#17243540,transparent 84%),linear-gradient(180deg,#121927 0%,#081321 60%,#0c1525 100%)"],["mix-10","radial-gradient(ellipse 85% 60% at 50% 18%,#1926373f,transparent 84%),linear-gradient(180deg,#121927 0%,#081321 60%,#0c1525 100%)"],["mix-20","radial-gradient(ellipse 85% 60% at 50% 18%,#1a28393e,transparent 84%),linear-gradient(180deg,#121927 0%,#091422 60%,#0d1524 100%)"],["mix-30","radial-gradient(ellipse 85% 60% at 50% 18%,#1c2a3a3d,transparent 84%),linear-gradient(180deg,#121a28 0%,#091422 60%,#0d1524 100%)"],["mix-40","radial-gradient(ellipse 85% 60% at 50% 18%,#1d2c3c3c,transparent 84%),linear-gradient(180deg,#121a28 0%,#091523 60%,#0e1523 100%)"],["mix-50","radial-gradient(ellipse 85% 60% at 50% 18%,#1f2e3e3b,transparent 84%),linear-gradient(180deg,#121a28 0%,#0a1523 60%,#0e1623 100%)"],["mix-60","radial-gradient(ellipse 85% 60% at 50% 18%,#2130403a,transparent 84%),linear-gradient(180deg,#111a28 0%,#0a1523 60%,#0e1623 100%)"],["mix-70","radial-gradient(ellipse 85% 60% at 50% 18%,#22324239,transparent 84%),linear-gradient(180deg,#111a28 0%,#0a1624 60%,#0f1622 100%)"],["mix-80","radial-gradient(ellipse 85% 60% at 50% 18%,#24344338,transparent 84%),linear-gradient(180deg,#111b29 0%,#0a1624 60%,#0f1622 100%)"],["mix-90","radial-gradient(ellipse 85% 60% at 50% 18%,#25364537,transparent 84%),linear-gradient(180deg,#111b29 0%,#0b1725 60%,#101621 100%)"],["mix-100","radial-gradient(ellipse 85% 60% at 50% 18%,#27384736,transparent 84%),linear-gradient(180deg,#111b29 0%,#0b1725 60%,#101621 100%)"]];
           for(const [id,gradient] of backdrops){
             const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
               '.w7-screen[data-work7-screen="cards"] .w7-approved-grid::before'+
