@@ -4351,3 +4351,19 @@
       inset 0 -2px 2px #e7b77545;
   }
 }
+
+
+/* WORK7/#104 — 21 Nov: native undercut on four lower slots, measured trial.
+ * The four true bottom-row 05 illustrated card panels are fractionally less
+ * luminous in approved 05; preserve the eight source WEBP crops, 4×2 geometry,
+ * genuinely available crew and live PRÉVIA labels. This changes ONLY local
+ * frame material at native short-phone 384×512. At 320×568 or tall phones,
+ * the selectors are inert; Porto, dock, shell, 06 shop and payments untouched.
+ * Same-scene BASE|RENDER|OVERLAY Chromium global + ROI gates are mandatory.
+ * approved:false; 0/8 until human review. No automatic merge or deployment. */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.48)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.58)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.36)}
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.57)}
+}
