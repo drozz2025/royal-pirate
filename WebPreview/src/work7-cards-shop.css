@@ -1668,6 +1668,12 @@
   .w7-screen[data-work7-screen="cards"] .w7-card-grid{
     grid-template-columns:repeat(3,minmax(0,1fr));
   }
+  /* WORK7 21 Nov: original fifth bombardment card, true local native frame enamel test.
+   * Separate pigmented metal relief; no UI text or approved source pixels replaced. */
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04)
+           brightness(.94) saturate(1.26) hue-rotate(-11deg) contrast(.89);
+  }
   .w7-screen[data-work7-screen="shop"] .w7-captain-pack{
     grid-template-columns:37% 1fr;
     padding:7px;
@@ -4367,10 +4373,6 @@
   }
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){
     filter:brightness(.50) saturate(1.70) contrast(.87) hue-rotate(-16deg) brightness(1.085) saturate(.96);
-  }
-  /* Source 05 / frame #2: colder blue wind canvas and original sail, NOT a screenshot background. */
-  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(2){
-    filter:brightness(.65) saturate(1.75) contrast(.75) hue-rotate(-22deg);
   }
   .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
     filter:brightness(.43) saturate(1.20) contrast(.74) hue-rotate(18deg) brightness(.95) saturate(1.10);
