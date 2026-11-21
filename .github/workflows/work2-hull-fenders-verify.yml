@@ -1,0 +1,29 @@
+name: WORK 2 Hull Fenders — Focused verification (no deploy)
+on:
+  push:
+    branches:
+      - work2/original-hull-fenders-20261121
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fender-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: WebPreview
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: WebPreview/package-lock.json
+      - run: npm ci
+      - name: 3D model, lifecycle and mobile culling regression
+        run: node --import tsx --test tests/ship-hull-fenders.test.ts
+      - name: Production TypeScript and Vite compile (no publication)
+        run: npm run build
