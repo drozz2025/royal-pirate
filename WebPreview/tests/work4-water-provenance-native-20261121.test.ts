@@ -21,7 +21,8 @@ test('WORK4 water provenance references and protected local crop remain stable',
   assert.doesNotMatch(paint,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-reference-sea|\.w4-reference-ship|\.w4-cannon-art|contain:paint|transform:|position:|pointer-events:)/);
   assert.ok(css.includes('radial-gradient(ellipse 110% 123% at 30% 50%'),'approved Royal Crown source contour must survive');
   assert.ok(css.includes('svg.w4-reference-sea'),'source water must survive');
-  assert.match(css,/background:#08527a!important/);
+  assert.doesNotMatch(css,/\.w4-fleet #w4-fleet-panel > \.w4-harbour-stage\s*\{\s*background:#08527a!important;/,
+    'standalone blue underpaint failed integrated full-frame + photographic edge gates and must not ship');
   for(const n of ['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']){const file=readFileSync(new URL('../../assets/design-approved/'+n,import.meta.url));assert.equal(file.toString('ascii',0,4),'RIFF',n);assert.equal(file.toString('ascii',8,12),'WEBP',n);}
 });
 
@@ -171,14 +172,13 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
   console.log('WORK4_PRODUCTION_INTEGRATED_ROI '+JSON.stringify(production));
   writeFileSync(join(qa,'work4-production-roi-before-gate.json'),
     JSON.stringify({approved:false,viewport:'384x512',production},null,2)+'\n');
-  assert.ok(production.full.delta>=0.20,
-    'shipped 384 stage underpaint must improve full-frame MAE by at least 0.20');
-  assert.ok(production.photoEdge.delta>=0.30,
-    'shipped underpaint must improve the real hard photo edge by at least 0.30');
-  assert.ok(production.authenticWater.delta>=0,
-    'approved photo-water ROI must not deteriorate in shipped CSS');
-  assert.ok(production.lowerWaterJoin.delta>=-0.01,
-    'shipped water join must not deteriorate beyond 0.01 RGB MAE');
+  // The integrated dark-blue CSS was REVERTED after full + photo edge gates
+  // both failed on genuine Chromium. The unchanged source-composite may not
+  // claim a 0.20 gain; require valid region metrics and no altered Crown/dock.
+  for(const region of ['full','photoEdge','authenticWater','lowerWaterJoin']) {
+    assert.ok(Number.isFinite(production[region].before)&&Number.isFinite(production[region].trial),
+      'native source evidence must remain measurable: '+region);
+  }
   assert.equal(production.crownCore.changedPixels,0,
     'the real Royal Crown core must remain pixel-identical');
   assert.equal(production.dock.changedPixels,0,
@@ -194,6 +194,13 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
     results.push({id:variant.id,metrics:m.metrics,screenshot:shot});
   }
   await evaluate("document.getElementById('work4-water-provenance-trial')?.remove();true");
+  // Hard rejection gate for the known-bad former CSS: it must NOT pass both
+  // promotion thresholds on the COMBINED application. Keep thresholds, never
+  // relabel this previously failed standalone improvement as approved.
+  const rejectedDarkCove=results.find(r=>r.id==='source-water-backdrop-ink');
+  assert.ok(rejectedDarkCove,'measured dark-cove ablation is mandatory');
+  assert.ok(!(rejectedDarkCove.metrics.full.delta>=.20 && rejectedDarkCove.metrics.photoEdge.delta>=.30),
+    'dark-water override unexpectedly qualifies; examine source and require human review');
   const protectedRois=['crownCore','dock'];
   const eligible=results.filter(r=>
     protectedRois.every(name=>r.metrics[name].changedPixels===0)&&
@@ -250,7 +257,7 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
   assert.ok(Number.isFinite(forge.mae.cannonComposition),'cannon ROI must be measured, not a global-only MAE');
   writeFileSync(join(qa,'original-render-overlay-forge-cannon-384x512.png'),Buffer.from(forge.comparison,'base64'));
 
-  const report={approved:false,approvedScreens:0,sourceFiles:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],viewport:'384x512',scene:'single paused Chromium frame, unchanged source/profile',geometry,forgeGeometry,forgeRoiMae:forge.mae,viewportResults,productionCssRoi:production,productionScreenshot:'original-before-render-overlay-fleet-384x512.png',selectedForFurtherArtReview:selected?.id??null,shownTrial:strongest.id,thresholds:{full:0.20,photoEdge:0.30,authenticWaterMinDelta:0,lowerWaterJoinMinDelta:-0.01},results:results.map(({id,metrics})=>({id,metrics})),note:'The reviewed deep-blue stage underpaint is now WORK4 production CSS only at native 384x512; all other CSS variants are temporary injected trials. MAE is not human artistic approval.'};
+  const report={approved:false,approvedScreens:0,sourceFiles:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],viewport:'384x512',scene:'single paused Chromium frame, unchanged source/profile',geometry,forgeGeometry,forgeRoiMae:forge.mae,viewportResults,productionCssRoi:production,productionScreenshot:'original-before-render-overlay-fleet-384x512.png',selectedForFurtherArtReview:selected?.id??null,shownTrial:strongest.id,thresholds:{full:0.20,photoEdge:0.30,authenticWaterMinDelta:0,lowerWaterJoinMinDelta:-0.01},results:results.map(({id,metrics})=>({id,metrics})),note:'WORK0 rejected and reverted the dark-blue 384x512 CSS because combined Chromium failed full-frame (>=0.20) and photo-edge (>=0.30) promotion gates. It remains a measured isolated trial, NOT production. All other variants are temporary injected trials; MAE never implies artistic approval.'};
   writeFileSync(join(qa,'work4-water-provenance-ab.json'),JSON.stringify(report,null,2)+'\n');
   console.log('WORK4_WATER_PROVENANCE_AB '+JSON.stringify(report));
 });
