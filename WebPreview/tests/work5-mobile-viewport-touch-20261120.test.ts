@@ -117,6 +117,28 @@ test('WORK5: Chromium emulated touchscreen opens eight approved views, preserves
       assert.equal(inspect.modal,'true','Sheet must have modal accessibility contract');
       assert.equal(inspect.horizontal,false,'Horizontal overflow on '+label);
       assert.ok(inspect.dockBottom<=845,'Dock clipped below viewport on '+label);
+      // Real CDP keyboard regression across every opened app sheet. This
+      // verifies React's modal focus trap, not merely static ARIA markup.
+      const focusable=await evalInPage('(()=>{const d=document.querySelector(".app-sheet");'+
+        'const items=[...d.querySelectorAll("button:not(:disabled),a[href],input:not(:disabled)")].filter(e=>e.getClientRects().length>0);'+
+        'if(items.length<2)return items.length;items[0].setAttribute("data-work5-focus-boundary","first");'+
+        'items[items.length-1].setAttribute("data-work5-focus-boundary","last");items[0].focus();return items.length})()');
+      assert.ok(focusable>=2,'No two keyboard-focusable actions in '+label);
+      const pressTab=async(shift:boolean)=>{
+        const modifiers=shift?8:0;
+        await command('Input.dispatchKeyEvent',{
+          type:'rawKeyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9,nativeVirtualKeyCode:9,modifiers
+        });
+        await command('Input.dispatchKeyEvent',{
+          type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9,nativeVirtualKeyCode:9,modifiers
+        });
+      };
+      await pressTab(true);
+      assert.equal(await evalInPage('document.activeElement?.getAttribute("data-work5-focus-boundary")'),
+        'last','Shift+Tab escaped '+label+' instead of wrapping to its last control');
+      await pressTab(false);
+      assert.equal(await evalInPage('document.activeElement?.getAttribute("data-work5-focus-boundary")'),
+        'first','Tab escaped '+label+' instead of wrapping to its first control');
     };
     const back=async()=>{
       await tap('.app-sheet .harbour-nav-item:first-child');
