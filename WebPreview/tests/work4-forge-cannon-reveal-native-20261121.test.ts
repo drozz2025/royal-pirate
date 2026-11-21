@@ -9,7 +9,7 @@ import {tmpdir} from 'node:os';
 const css=readFileSync(new URL('../src/work4-fleet-forge.css',import.meta.url),'utf8');
 const reference=readFileSync(new URL('../../assets/design-approved/04-melhorias-forja.webp',import.meta.url)).toString('base64');
 
-test('WORK4 Forge expanded approved cannon visibility A/B uses all ten approved WebP references',()=>{
+test('WORK4 Forge unsafe 41% study uses all ten approved WebP references',()=>{
  const names=['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
    '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
    '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'];
@@ -23,16 +23,16 @@ test('WORK4 Forge expanded approved cannon visibility A/B uses all ten approved 
  assert.match(css,/contain:paint/);
  assert.match(css,/transform:translateZ\(0\)/);
  assert.match(css,/background-color:#2d2929!important/);
- assert.match(css,/width:41%/,'composite keeps narrow plaque');
- assert.match(css,/border-color:#4d4039/,'composite keeps genuine charcoal rim');
- assert.match(css,/linear-gradient\(to right,transparent 0%,#000 22px,#000 100%\)/,'compiled mask is present');
+ assert.doesNotMatch(css,/width:41%/,'rejected 41% plaque must not ship');
+ assert.doesNotMatch(css,/border-color:#4d4039/,'rejected plaque border must not ship');
+ assert.doesNotMatch(css,/linear-gradient\(to right,transparent 0%,#000 22px,#000 100%\)/,'rejected 22px mask must not ship');
 });
 
 const chrome=[process.env.CHROME_BIN,'chromium','google-chrome'].filter(Boolean)
   .find(bin=>spawnSync('which',[bin!],{encoding:'utf8'}).status===0);
 const delay=(ms:number)=>new Promise<void>(done=>setTimeout(done,ms));
 
-test('WORK4 Forge genuine BASE versus expanded source cannon and narrow live plaque: same frozen Chromium frame and ROI',{
+test('WORK4 Forge rejects unsafe 41% live panel using original and one frozen Chromium frame',{
   skip:process.env.CI==='true'&&chrome?false:'CI Chromium screenshot evidence only',
   timeout:240_000
 },async t=>{
@@ -141,7 +141,7 @@ test('WORK4 Forge genuine BASE versus expanded source cannon and narrow live pla
   await delay(130);
   const compiled=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
   const computedMask=await evaluate("getComputedStyle(document.querySelector('.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description')).maskImage");
-  assert.ok(String(computedMask).includes('22px'),'compiled CSS must activate 22px Forge feather at native resolution');
+  assert.ok(!String(computedMask).includes('22px'),'rejected 22px plaque feather must not be compiled');
   const expr="(async()=>{"+
     "const load=async(src)=>{const i=new Image();i.src=src;await i.decode();return i};"+
     "const original=await load('data:image/webp;base64,"+reference+"');"+
@@ -153,7 +153,7 @@ test('WORK4 Forge genuine BASE versus expanded source cannon and narrow live pla
     "const mae=(a,b,r)=>{let x=0,n=0;for(let y=r[1];y<r[3];y++)for(let i=r[0];i<r[2];i++){const k=(y*384+i)*4;for(let c=0;c<3;c++){x+=Math.abs(a[k+c]-b[k+c]);n++;}}return x/n};"+
     "const count=(a,b,r)=>{let n=0;for(let y=r[1];y<r[3];y++)for(let i=r[0];i<r[2];i++){const k=(y*384+i)*4;if(a[k]!==b[k]||a[k+1]!==b[k+1]||a[k+2]!==b[k+2])n++;}return n};"+
     "const rows=imgs.map((p,index)=>({index,roi:Object.fromEntries(Object.entries(boxes).map(([name,r])=>[name,{mae:mae(base,p,r),changedPixels:count(imgs[0],p,r)}]))}));"+
-    "const compiledDiff=count(imgs[imgs.length-1],pixels(compiled),boxes.full);"+
+    "const compiledDiff=count(imgs[0],pixels(compiled),boxes.full);"+
     "const initial=rows[0],safe=rows.filter(row=>row.roi.costs.changedPixels===0&&row.roi.dock.changedPixels===0&&"+
     "['full','plaque','cannon','furnace'].every(k=>row.roi[k].mae<=initial.roi[k].mae+.0001));"+
     "safe.sort((a,b)=>(a.roi.barrelOverlap.mae-b.roi.barrelOverlap.mae)||(a.roi.plaqueEdge.mae-b.roi.plaqueEdge.mae)||(a.roi.full.mae-b.roi.full.mae));"+
@@ -175,10 +175,11 @@ test('WORK4 Forge genuine BASE versus expanded source cannon and narrow live pla
     costsChanged:r.roi.costs.changedPixels,dockChanged:r.roi.dock.changedPixels
   }))));
   assert.equal(data.rows.length,variants.length);
-  assert.equal(data.compiledDiff,0,'compiled production CSS must match 22px candidate exactly');
+  assert.equal(data.compiledDiff,0,'production CSS must retain the prior released picture');
   const initial=data.rows[0],chosen=data.rows[data.rows.length-1];
-  assert.ok(chosen.roi.full.mae<initial.roi.full.mae,'source-cannon reveal must improve total RGB MAE vs real base');
-  assert.ok(chosen.roi.barrelOverlap.mae<initial.roi.barrelOverlap.mae,'cannon/plaque overlap must improve');
+  assert.ok(chosen.roi.full.mae>initial.roi.full.mae+.10,'REJECT 41% trial: worsens full MAE');
+  assert.ok(chosen.roi.barrelOverlap.mae<initial.roi.barrelOverlap.mae,'41% reveals barrel, but this is insufficient to accept');
+  assert.ok(chosen.roi.plaque.mae>initial.roi.plaque.mae,'REJECT 41% trial: worsens plaque ROI');
   for(const key of ['costs','dock']) assert.equal(chosen.roi[key].changedPixels,0,key+' protected');
   assert.equal(geometry.cannon,1);
   assert.equal(geometry.liveLevels,3);
@@ -188,15 +189,15 @@ test('WORK4 Forge genuine BASE versus expanded source cannon and narrow live pla
     approved:false,screensApproved:0,reference:'assets/design-approved/04-melhorias-forja.webp',
     viewport:'384x512',frame:'same paused Chromium render, reference image 1:1',
     sourceImageCount:geometry.cannon,realCosts:geometry.costs,dockButtons:geometry.dock,
-    proposalOnly:false,verifiedProductionCSS:true,compiledPixelDifference:data.compiledDiff,roi:data.boxes,variants:variants.map((v,i)=>({...v,...data.rows[i]})),
-    safeWinner:variants[data.winner].px, promotedVariant:variants[variants.length-1],
-    conclusion:'Combined native 384x512 candidate only, pending human review; never automatic approval'
+    proposalOnly:true,verifiedProductionCSS:false,rejected:true,compiledPixelDifference:data.compiledDiff,roi:data.boxes,variants:variants.map((v,i)=>({...v,...data.rows[i]})),
+    safeWinner:variants[data.winner].px, rejectedVariant:variants[variants.length-1],
+    conclusion:'41% panel REJECTED by reference full-frame and plaque MAE; released CSS unchanged; #760 is the separate 51% candidate'
   };
-  writeFileSync(join(qa,'work4-forge-composite-384x512.json'),JSON.stringify(evidence,null,2)+'\n');
-  writeFileSync(join(qa,'original-before-render-overlay-forge-composite-384x512.png'),
+  writeFileSync(join(qa,'work4-forge-rejected-41-384x512.json'),JSON.stringify(evidence,null,2)+'\n');
+  writeFileSync(join(qa,'original-before-rejected-trial-overlay-forge-384x512.png'),
     Buffer.from(data.overlay,'base64'));
   console.log('WORK4_FORGE_COMPOSITE_AB '+JSON.stringify({
-    winner:evidence.safeWinner,promoted:evidence.promotedVariant,conclusion:evidence.conclusion,
+    winner:evidence.safeWinner,rejected:evidence.rejectedVariant,conclusion:evidence.conclusion,
     variants:evidence.variants.map(v=>({px:v.px,
       full:v.roi.full.mae,plaque:v.roi.plaque.mae,edge:v.roi.plaqueEdge.mae,
       barrel:v.roi.barrelOverlap.mae,cannon:v.roi.cannon.mae,
