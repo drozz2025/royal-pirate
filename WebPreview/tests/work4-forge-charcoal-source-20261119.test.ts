@@ -189,12 +189,26 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
       "extra": ".w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description{display:grid!important;grid-template-columns:40px minmax(0,1fr)!important;grid-template-rows:11px 23px 20px auto!important;column-gap:7px!important;row-gap:0!important;align-content:start!important;}\n.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description > .w4-forge-medallion{grid-column:1!important;grid-row:1 / 4!important;align-self:start!important;width:38px!important;height:38px!important;margin:0!important;}\n.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description > .w4-forge-medallion .w4-tab-symbol{width:27px!important;height:27px!important;}\n.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description > span{grid-column:2!important;grid-row:1!important;align-self:center!important;white-space:nowrap!important;font-size:7px!important;transform:scaleX(.74)!important;transform-origin:left center!important;}\n.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description > h3{grid-column:2!important;grid-row:2!important;margin:0!important;align-self:center!important;font-size:19px!important;line-height:1!important;}\n.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description > strong{grid-column:2!important;grid-row:3!important;align-self:center!important;font-size:16px!important;}\n.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description > .w4-forge-live-levels{grid-column:1/-1!important;grid-row:4!important;margin-top:5px!important;padding-top:2px!important;}"
     }
   ];
+
+  // WORK4/104 · native-only cannon/plaque composition candidates.
+  // Investigative styles are injected ONLY into the same paused CDP frame:
+  // no production UI, 390/430 rules, source painting or economy changes.
+  const ironPaint=variants.find(v=>v.id==='current')!.paint;
+  for(const width of [52,51,50,49,47,45]){
+    variants.push({id:'plaque-width-'+width,
+      paint:ironPaint,
+      extra:'.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description{width:'+width+'%!important;}'
+    });
+  }
   const shots=[];
+  const composition=[];
   for(const shift of variants){
     const rule='.w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-scene{background-image:'+shift.paint+'!important;}'+(shift.extra||'');
     const exp="(()=>{let style=document.getElementById('work4-forge-plaque-candidate');if(!style){style=document.createElement('style');style.id='work4-forge-plaque-candidate';document.head.append(style)}style.textContent="+JSON.stringify(rule)+";return true})()";
     await evaluate(exp);
     await delay(120);
+    const shape=await evaluate("(()=>{const cannon=document.querySelector('.w4-reference-cannon');const plaque=document.querySelector('.w4-forge-description');const scene=document.querySelector('.w4-forge-scene');const costs=document.querySelector('.w4-resource-grid');const r=e=>e.getBoundingClientRect();const c=r(cannon),p=r(plaque),s=r(scene),m=r(costs);const overlap=Math.max(0,Math.min(c.right,p.right)-Math.max(c.left,p.left))*Math.max(0,Math.min(c.bottom,p.bottom)-Math.max(c.top,p.top));const rows=[...plaque.querySelectorAll('.w4-forge-live-level')];return {cannonCount:document.querySelectorAll('.w4-reference-cannon').length,cannon:{x:c.x,y:c.y,w:c.width,h:c.height},plaque:{x:p.x,y:p.y,w:p.width,h:p.height},scene:{x:s.x,y:s.y,w:s.width,h:s.height},costs:{x:m.x,y:m.y,w:m.width,h:m.height},cannonPlaqueBoundingOverlap:overlap,rows:rows.length,rowsFit:rows.every(e=>e.getBoundingClientRect().right<=p.right+1),horizontalOverflow:document.documentElement.scrollWidth>innerWidth+2}})()");
+    composition.push({id:shift.id,...shape});
     shots.push((await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string);
   }
   const script="(async()=>{"+
@@ -255,14 +269,41 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
     reference:'04-melhorias-forja.webp',
     comparison:'same real Chromium Forge frame with animations paused; previous no-image underlay vs graduated workshop pigments',
     geometries:geometry,roi:rois,mobile,
-    study:variants.map((v,i)=>({id:v.id,roi:result.records[i].roi})),
+    study:variants.map((v,i)=>({id:v.id,roi:result.records[i].roi,composition:composition[i]})),
+    cannonPlaqueComposition:{
+      production:composition[variants.findIndex(v=>v.id==='current')],
+      candidates:composition.filter(v=>v.id.startsWith('plaque-width-')),
+      note:'Bounding-box overlap is NOT painted-pixel obstruction; native RGB source ROI is the final metric.'
+    },
     bestByFull:variants[result.globalWinnerIndex].id,
     bestProtected:variants[result.bestIndex].id,
     decision:rois.full.delta<=0&&rois.workshop.delta<=0&&
       rois.cannon.delta<=0&&rois.furnace.delta<=0
       ? 'Candidate is numerically admissible; needs human approval by WORK0 before merge'
       : 'Candidate worsens a protected ROI: WORK0 should REJECT this Draft'};
+  const shippedIndex=variants.findIndex(v=>v.id==='current');
+  const shipped=result.records[shippedIndex];
+  const candidates=variants.map((v,i)=>({id:v.id,index:i})).filter(v=>v.id.startsWith('plaque-width-')).map(v=>({
+    ...v,roi:result.records[v.index].roi,shape:composition[v.index]
+  }));
+  const eligible=candidates.filter(v=>!v.shape.horizontalOverflow && v.shape.rows===3 && v.shape.rowsFit &&
+    v.shape.cannonCount===1 && v.roi.costs.changedPixels===0 && v.roi.dock.changedPixels===0 &&
+    v.roi.full.mae<shipped.roi.full.mae &&
+    v.roi.cannon.mae<=shipped.roi.cannon.mae &&
+    v.roi.furnace.mae<=shipped.roi.furnace.mae);
+  eligible.sort((a,b)=>a.roi.full.mae-b.roi.full.mae);
+  Object.assign(report,{nativeResizeGate:{
+    production:{id:'current',roi:shipped.roi,shape:composition[shippedIndex]},
+    eligible:eligible.map(x=>({id:x.id,roi:x.roi,shape:x.shape})),
+    decision:eligible.length?'Candidate(s) pass numerical source/functional guard; NOT approved until WORK0 reviews':'No candidate beats current source without regressing protected ROIs; KEEP existing production width'
+  }});
+  assert.equal(composition.length,variants.length,'each candidate must use a measured live browser frame');
+  assert.ok(candidates.every(v=>v.shape.cannonCount===1&&v.shape.rows===3),
+    'all candidate frames preserve exactly one cannon and all three real levels');
+  assert.ok(candidates.some(v=>v.shape.plaque.w!==composition[shippedIndex].plaque.w),
+    'Chromium must actually apply candidate width: do not count unchanged frames as evidence');
   writeFileSync(join(qa,'work4-forge-depth-gradient-ab-384x512.json'),JSON.stringify(report,null,2)+'\n');
   writeFileSync(join(qa,'work4-original-before-render-overlay-forge-gradient-384x512.png'),Buffer.from(result.grid,'base64'));
+  console.log('WORK4_FORGE_NATIVE_RESIZE_GATE '+JSON.stringify(report.nativeResizeGate));
   console.log('WORK4_FORGE_GRADIENT_NATIVE_AB '+JSON.stringify(report));
 });
