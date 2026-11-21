@@ -1890,12 +1890,12 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
 
 
 
-    /* WORK8/#104: real 07 original emerald source-art gate. One native
+    /* WORK8/#104: 07 original-source-calibrated emerald VECTOR chest gate. One native
        384x512 DPR1 Chromium tab, identical decoded DOM and frozen frame.
        Toggle only this branch's CSS. Do not alter the state/representation
        of the actual 3 quests, 7 real rewards or WORK0's five-item dock. */
     const emeraldFlag='work8-missions-emerald-chests-ab-baseline';
-    const emeraldSelector='.w8-approved-missions .w8-approved-days li:nth-child(-n+3) .w8-approved-chest > svg.w8-approved-painting';
+    const emeraldSelector='.w8-approved-missions .w8-approved-days li:nth-child(-n+3) .w8-approved-chest > svg.w8-art-chest';
     const emeraldRefs=[
       '00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
       '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
@@ -1934,7 +1934,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     writeFileSync(join(evidence,'missions-emerald-before-384x512.png'),Buffer.from(emeraldBefore,'base64'));
     writeFileSync(join(evidence,'missions-emerald-render-384x512.png'),Buffer.from(emeraldRender,'base64'));
     const emeraldReport={
-      issue:104,scope:'WORK8/07 original Days 1-3 illustration paint ONLY',
+      issue:104,scope:'WORK8/07 actual Days 1-3 live emerald chest VECTOR paint ONLY',
       source:'assets/design-approved/07-missoes.webp',
       mandatoryReferences:emeraldRefs,
       baseSha:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
@@ -1947,7 +1947,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     writeFileSync(join(evidence,'work8-missions-emerald-controlled-ab.json'),
       JSON.stringify(emeraldReport,null,2));
     console.log('WORK8_EMERALD_NATIVE_AB '+JSON.stringify(emeraldReport));
-    assert.equal(emeraldBeforeCss.length,3,'exactly three genuine original chest paintings');
+    assert.equal(emeraldBeforeCss.length,3,'exactly three genuine live chest vectors');
     assert.notDeepEqual(emeraldBeforeCss,emeraldRenderCss,'new actual CSS must reach Chromium');
     assert.deepEqual(emeraldBeforeLayout,emeraldRenderLayout,'no panel, chest or WORK0 dock geometry change');
     assert.equal(emeraldRenderLayout.quests,3);
@@ -1955,7 +1955,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.equal(emeraldRenderLayout.navCount,5);
     assert.ok(emeraldRenderLayout.dayContent.every(pair=>pair.every(item=>
       item && item.top>=0 && item.bottom<=emeraldRenderLayout.nav.y+2)),
-      'all seven real chest paintings and captions above dock');
+      'all seven real chest icons and captions above dock');
     assert.ok(emeraldComparison.unchanged.header<.03 && emeraldComparison.unchanged.dock<.03,
       'WORK0 header and dock pixel-stable');
     assert.ok(emeraldComparison.metrics.emeraldChests.delta<-.02 &&
