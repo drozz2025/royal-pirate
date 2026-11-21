@@ -54,9 +54,9 @@ function attributes(attrs:string,name:string):string {
 }
 function buttonName(attrs:string,inner:string):string {
   return attributes(attrs,'aria-label')||inner
-    .replace(/<svg\\b[^>]*>[\\s\\S]*?<\\/svg>/gi,'')
-    .replace(/<[^>]+>/g,' ').replace(/&(?:amp|lt|gt|quot|nbsp|#\\d+);/g,' ')
-    .replace(/\\s+/g,' ').trim();
+    .replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi,'')
+    .replace(/<[^>]+>/g,' ').replace(/&(?:amp|lt|gt|quot|nbsp|#\d+);/g,' ')
+    .replace(/\s+/g,' ').trim();
 }
 function freezeDeep<T>(value:T):T {
   if(value&&typeof value==='object'&&!Object.isFrozen(value)){
@@ -95,23 +95,23 @@ test('WORK5: all twelve screens remain named, navigable and read-only after earn
   for(const [name,html] of pages){
     assert.ok(html.includes('<strong>'+formatted+'</strong>'),
       name+': earned wallet disappeared');
-    const buttons=[...html.matchAll(/<button\\b([^>]*)>([\\s\\S]*?)<\\/button>/g)];
+    const buttons=[...html.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)];
     assert.ok(buttons.length>=5,name+': rendered no real controls');
     for(const [i,match] of buttons.entries())
       assert.ok(buttonName(match[1],match[2]),name+': unlabelled action '+i);
-    for(const anchor of html.matchAll(/<a\\b([^>]*)>/g)){
+    for(const anchor of html.matchAll(/<a\b([^>]*)>/g)){
       const href=attributes(anchor[1],'href');
       assert.ok(href&&!/^(?:#|javascript:|data:|about:blank)$/i.test(href),
         name+': dead or dangerous link '+href);
       if(attributes(anchor[1],'target')==='_blank')
-        assert.match(attributes(anchor[1],'rel'),/\\b(?:noopener|noreferrer)\\b/,
+        assert.match(attributes(anchor[1],'rel'),/\b(?:noopener|noreferrer)\b/,
           name+': unsafe external blank-tab link');
     }
     if(name==='porto'){
       assert.match(html,/aria-label="Royal Pirate Porto"/);
       assert.equal((html.match(/class="harbour-nav-item/g)||[]).length,5);
     }else{
-      assert.match(html,/<section\\b[^>]*role="dialog"[^>]*aria-modal="true"/,
+      assert.match(html,/<section\b[^>]*role="dialog"[^>]*aria-modal="true"/,
         name+': modal lost semantics');
       assert.equal((html.match(/id="app-screen-title"/g)||[]).length,1,
         name+': modal heading missing/duplicated');
