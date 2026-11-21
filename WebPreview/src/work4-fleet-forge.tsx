@@ -1282,6 +1282,8 @@ export function FleetPanel({profile,onForge,onCrew,onPorto}:{profile:LocalProfil
         <TropicalBackdrop/>
         <ApprovedFleetSea/>
         <ApprovedFleetPainting/>
+        {/* WORK4/#104: purely decorative source-photo top join, never a second ship/water. */}
+        <span className="w4-fleet-photo-top-shade" aria-hidden="true"/>
         <div className="w4-stage-label"><span>★ NAVIO REAL</span><strong>ROYAL CROWN</strong>
           <small>1 navio disponível · Capitão {captain}</small>
           <div className="w4-stage-stats" aria-label="Níveis reais da frota">
