@@ -222,6 +222,78 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
   }));
 
 
+  // WORK4 / #104 — photo right-hand hard-cut diagnostic on the exact original
+  // 384×512. Keep the SAME paused page, live counters, DOM and ship; toggle
+  // only WORK4's trailing-edge MASK, never the actual ship/water image itself.
+  const rightEdgeSelector='.w4-fleet #w4-fleet-panel > .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship';
+  const originalRightMask=[
+    'radial-gradient(ellipse 110% 123% at 30% 50%,#000 0%,#000 84%,transparent 99%)',
+    'linear-gradient(to bottom,transparent 0%,#000 2%,#000 97%,transparent 100%)'
+  ].join(',');
+  const baselineEdgeCss=rightEdgeSelector+'{'+
+    '-webkit-mask-image:'+originalRightMask+'!important;'+
+    'mask-image:'+originalRightMask+'!important;'+
+    '-webkit-mask-composite:source-in!important;mask-composite:intersect!important;}';
+  await evaluate("(()=>{const s=document.createElement('style');"+
+    "s.id='work4-right-edge-original';s.textContent="+JSON.stringify(baselineEdgeCss)+
+    ";document.head.append(s);return true})()");
+  await delay(130);
+  const hardCut=(await cmd('Page.captureScreenshot',{
+    format:'png',captureBeyondViewport:false
+  })).data as string;
+  await evaluate("(()=>{document.getElementById('work4-right-edge-original')?.remove();return true})()");
+  await delay(130);
+  const softened=(await cmd('Page.captureScreenshot',{
+    format:'png',captureBeyondViewport:false
+  })).data as string;
+  const realMask=await evaluate("getComputedStyle(document.querySelector("+
+    JSON.stringify(rightEdgeSelector)+")).webkitMaskImage");
+  assert.match(realMask,/93%/,'actual native compiled mask includes 7% source-right transition');
+  const rightEdgeAB=await evaluate("(async()=>{"+
+    "const urls=['data:image/webp;base64,"+approved+"',"+
+    "'data:image/png;base64,"+hardCut+"','data:image/png;base64,"+softened+"'];"+
+    "const ims=await Promise.all(urls.map(async url=>{const i=new Image();i.src=url;await i.decode();return i}));"+
+    "if(ims.some(i=>i.width!==384||i.height!==512))throw Error('not 384x512 native');"+
+    "const bits=ims.map(i=>{const c=document.createElement('canvas');c.width=384;c.height=512;"+
+    "const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(i,0,0);return g.getImageData(0,0,384,512).data});"+
+    "const boxes={full:[0,0,384,512],photoRightEdge:[222,153,245,336],"+
+      "royalCrown:[31,176,216,304],sourceSea:[188,306,218,338],"+
+      "realStats:[249,165,370,341],dock:[0,433,384,512]};"+
+    "const score=box=>{let before=0,after=0,changed=0,n=0;"+
+      "for(let y=box[1];y<box[3];y++)for(let x=box[0];x<box[2];x++){"+
+      "const k=(y*384+x)*4;let edit=false;for(let p=0;p<3;p++){"+
+      "before+=Math.abs(bits[0][k+p]-bits[1][k+p]);"+
+      "after+=Math.abs(bits[0][k+p]-bits[2][k+p]);"+
+      "edit ||=bits[1][k+p]!==bits[2][k+p];n++}if(edit)changed++}"+
+      "return {before:before/n,after:after/n,changedPixels:changed}};"+
+    "const roi=Object.fromEntries(Object.entries(boxes).map(([key,box])=>[key,score(box)]));"+
+    "const cv=document.createElement('canvas');cv.width=1536;cv.height=512;"+
+    "const ctx=cv.getContext('2d');ims.forEach((im,i)=>ctx.drawImage(im,i*384,0));"+
+    "ctx.drawImage(ims[0],1152,0);ctx.globalAlpha=.5;ctx.drawImage(ims[2],1152,0);"+
+    "return {boxes,roi,montage:cv.toDataURL('image/png').split(',')[1]}})()");
+  for(const name of ['royalCrown','sourceSea','realStats','dock'])
+    assert.equal(rightEdgeAB.roi[name].changedPixels,0,
+      'right photo edge must preserve protected '+name);
+  assert.ok(rightEdgeAB.roi.photoRightEdge.changedPixels>40,
+    'feather must genuinely remove a visible portion of hard photographic cut');
+  assert.ok(rightEdgeAB.roi.photoRightEdge.after<=rightEdgeAB.roi.photoRightEdge.before,
+    'soft edge must be no further from approved source locally');
+  assert.ok(rightEdgeAB.roi.full.after<=rightEdgeAB.roi.full.before,
+    'native screen must not regress globally');
+  writeFileSync(join(qa,'work4-photo-right-edge-original-before-render-overlay-384x512.png'),
+    Buffer.from(rightEdgeAB.montage,'base64'));
+  const edgeReport={
+    approved:false,screensApproved:0,viewport:'384x512',
+    source:'assets/design-approved/03-frota.webp',
+    sameScene:true,pausedFrame:true,
+    candidate:'7% trailing fade within original Royal Crown photo, no second layer or synthetic water',
+    roiBoxes:rightEdgeAB.boxes,roi:rightEdgeAB.roi,
+    protected:['royalCrown','sourceSea','realStats','dock']
+  };
+  writeFileSync(join(qa,'work4-photo-right-edge-native-report.json'),
+    JSON.stringify(edgeReport,null,2)+'\n');
+  console.log('WORK4_PHOTO_RIGHT_EDGE_AB '+JSON.stringify(edgeReport));
+
   // WORK4 native visibility regression discovered in the real 384x512
   // independent SHA comparison. Hold the same scene, paused frame, fonts
   // and prices; switch only the four locally owned roster cards.
