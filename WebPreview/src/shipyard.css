@@ -93,3 +93,21 @@
  opacity:.46;cursor:not-allowed;color:#a8bccb}
 .shipyard-parts-tools .shipyard-history-button:focus-visible{
  outline:3px solid #ffe5ae;outline-offset:2px}
+
+
+/* In-memory A/B model inspection. Reuses the existing preview camera and
+   does not persist or equip either visual build. Accessible on narrow phones. */
+.shipyard-reference{max-width:720px;margin:7px auto 2px;padding:8px;
+ border:1px solid #b99c6999;border-radius:9px;background:#0a2945b5}
+.shipyard-reference-actions{display:grid;grid-template-columns:1.2fr 1.2fr .65fr;gap:6px}
+.shipyard-reference-actions button{min-width:0;min-height:42px;padding:7px 4px;
+ border:1px solid #e8c77d;border-radius:8px;background:#234767;color:#ffedbf;
+ font:900 clamp(10px,2.6vw,12px) 'Barlow Condensed',sans-serif;letter-spacing:.15px}
+.shipyard-reference-actions button[aria-pressed="true"]{background:linear-gradient(#f4d58d,#b07b39);color:#14304b;text-shadow:none}
+.shipyard-reference-actions button:disabled{opacity:.42;cursor:not-allowed}
+.shipyard-reference-actions button:focus-visible{outline:3px solid #fff4c4;outline-offset:2px}
+.shipyard-reference>span{display:block;margin-top:6px;color:#ffe0a2;
+ font:800 10px 'Barlow',sans-serif;line-height:1.35}
+.shipyard-reference>small{display:block;margin-top:3px;color:#c8d9e1;
+ font:600 10px 'Barlow',sans-serif;line-height:1.35}
+@media(max-width:370px){.shipyard-reference{padding:6px}.shipyard-reference-actions{gap:4px}}
