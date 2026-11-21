@@ -167,7 +167,7 @@ test('WORK4 Forge rejects unsafe 41% live panel using original and one frozen Ch
   writeFileSync(join(qa,'work4-forge-cannon-reveal-raw-384x512.json'),
     JSON.stringify({approved:false,approvedScreens:0,source:'04-melhorias-forja.webp',
       viewport:'384x512',variants,geometry,boxes:data.boxes,rows:data.rows,
-      compiledDiff:data.compiledDiff},null,2)+'\\n');
+      compiledDiff:data.compiledDiff},null,2)+'\n');
   console.log('WORK4_FORGE_REVEAL_RAW '+JSON.stringify(data.rows.map((r:any)=>({
     index:r.index,full:r.roi.full.mae,plaque:r.roi.plaque.mae,
     edge:r.roi.plaqueEdge.mae,barrel:r.roi.barrelOverlap.mae,
