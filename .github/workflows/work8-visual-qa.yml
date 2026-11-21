@@ -31,10 +31,8 @@ jobs:
           cache-dependency-path: WebPreview/package-lock.json
       - name: Install dependencies
         run: npm ci
-      - name: Check build and existing game tests
-        run: |
-          npm test
-          npm run build -- --base=/royal-pirate/
+      - name: Build before native visual gate
+        run: npm run build -- --base=/royal-pirate/
       - name: Capture real mobile screens and compare original frames
         run: |
           set -euo pipefail
@@ -48,6 +46,8 @@ jobs:
           CHROME_BIN="$(command -v google-chrome || command -v chromium)" node scripts/capture-work8.mjs
           # WORK8 #104: real 384×512 same-frame A/B and live 320px touch/scroll gate.
           CHROME_BIN="$(command -v google-chrome || command -v chromium)" node scripts/work8-missions-reward-emblem-relief-ab.mjs
+      - name: Run all game regression tests after visual gate
+        run: npm test
       - name: Upload real screenshots + comparisons at 320, 384, 390, 430
         if: always()
         uses: actions/upload-artifact@v4
