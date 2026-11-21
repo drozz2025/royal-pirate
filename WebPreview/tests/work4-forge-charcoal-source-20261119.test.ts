@@ -369,7 +369,7 @@ test('WORK4 #104 Forge original source-depth gradient: native same-frame worksho
   Object.assign(report,{productionRimComparison});
   console.log('WORK4_FORGE_NATIVE_RIM_RELEASE_AB '+JSON.stringify(productionRimComparison));
   const rimCandidates=variants.map((v,i)=>({id:v.id,index:i}))
-    .filter(x=>x.id.startsWith('rim-'))
+    .filter(x=>x.id.startsWith('rim-')&&x.id!=='rim-shipped-previous-control')
     .map(x=>({id:x.id,roi:result.records[x.index].roi,geometry:composition[x.index]}));
   const admissibleRims=rimCandidates.filter(x=>
     x.geometry.cannonPlaqueBoundingOverlap===0&&x.geometry.rows===3&&x.geometry.rowsFit&&
