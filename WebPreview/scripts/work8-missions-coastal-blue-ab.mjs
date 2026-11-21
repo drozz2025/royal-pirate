@@ -160,6 +160,57 @@ try{
     'Candidate must REDUCE native-reference MAE for full and coastal ROI');
   assert.ok(Math.abs(ab.scores.header.delta)<.01&&Math.abs(ab.scores.dock.delta)<.01,
     'Header, dock, real objective data and Ranking remain unaffected');
+  // Explicit narrow-phone interaction: actual CDP touch events and 320px scrolling.
+  // 384x512 A/B evidence above is sealed before this viewport change.
+  await cmd('Emulation.setDeviceMetricsOverride',{
+    width:320,height:568,mobile:true,deviceScaleFactor:1,
+    screenWidth:320,screenHeight:568
+  });
+  await cmd('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
+  await delay(220);
+  const tapTab=async (n)=>{
+    const center=await evaluate('(()=>{const el=document.querySelector(".w8-approved-tabs button:nth-child('+n+')");'+
+      'if(!el)return null;const r=el.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()');
+    assert.ok(center,'Narrow-screen tab '+n+' must exist');
+    await cmd('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[center]});
+    await cmd('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await delay(130);
+    return evaluate('document.querySelector(".w8-approved-tabs button:nth-child('+n+')")?.getAttribute("aria-pressed")');
+  };
+  assert.equal(await tapTab(2),'true','320px weekly tab must respond to native touch');
+  assert.equal(await tapTab(1),'true','320px daily tab must respond to native touch and restore rewards');
+  await wait('.w8-approved-days li:nth-child(7)');
+  const scroll320=await evaluate('(()=>{const panel=document.querySelector(".app-sheet-content");'+
+    'const nav=document.querySelector(".app-sheet > .harbour-nav");'+
+    'const chests=[...document.querySelectorAll(".w8-approved-days li")];'+
+    'if(!panel||!nav)return null;const navBox=nav.getBoundingClientRect();'+
+    'const before=panel.scrollTop;panel.scrollTop=panel.scrollHeight;'+
+    'const last=chests[6]?.getBoundingClientRect();'+
+    'return {width:innerWidth,height:innerHeight,documentWidth:document.documentElement.scrollWidth,'+
+    'scrollBefore:before,scrollAfter:panel.scrollTop,scrollHeight:panel.scrollHeight,'+
+    'clientHeight:panel.clientHeight,quests:document.querySelectorAll(".w8-approved-quest").length,'+
+    'rewards:chests.length,navItems:nav.querySelectorAll(".harbour-nav-item").length,'+
+    'navBottom:navBox.bottom,lastRewardBottom:last?.bottom,navTop:navBox.top};})()');
+  assert.ok(scroll320,'320px real scrolling container must exist');
+  assert.equal(scroll320.width,320);
+  assert.equal(scroll320.height,568);
+  assert.ok(scroll320.documentWidth<=322,'320px horizontal overflow regression');
+  assert.equal(scroll320.quests,3,'3 genuine objectives after narrow touch navigation');
+  assert.equal(scroll320.rewards,7,'7 real rewards after narrow touch navigation');
+  assert.equal(scroll320.navItems,5,'all five WORK0 dock controls retained at 320');
+  assert.ok(Math.abs(scroll320.navBottom-568)<2,'WORK0 dock stays pinned at bottom');
+  assert.ok(scroll320.scrollHeight<=scroll320.clientHeight+1 ||
+    scroll320.scrollAfter>scroll320.scrollBefore,
+    '320px overflow must respond to scroll');
+  assert.ok(scroll320.lastRewardBottom<=scroll320.navTop+2 ||
+    scroll320.scrollAfter>scroll320.scrollBefore,
+    'last real reward must fit above dock or be reachable through real scroll');
+  result.scroll320=scroll320;
+  writeFileSync(join(out,'work8-coastal-blue-mae-roi.json'),JSON.stringify(result,null,2));
+  writeFileSync(join(out,'work8-coastal-blue-scroll-320x568.png'),
+    Buffer.from(await capture(),'base64'));
+  console.log('WORK8 320 real touch/scroll PASS '+JSON.stringify(scroll320));
+
   console.log('WORK8 PASS: authentic 07 coastal art tuned. approved:false 0/8.');
 }finally{
   try{ws?.close();}catch{}
