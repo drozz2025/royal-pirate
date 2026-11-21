@@ -1902,13 +1902,13 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     await delay(160);
     const questInkBeforeGeometry=await readLayout();
     const questInkBeforeState=await questMissionState();
-    const questInkBeforeCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(questHeadingSelector)+')).filter');
+    const questInkBeforeCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(questHeadingSelector)+')).color');
     const questInkBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     await evalJs('document.documentElement.classList.remove('+JSON.stringify(questInkFlag)+');true');
     await delay(160);
     const questInkRenderGeometry=await readLayout();
     const questInkRenderState=await questMissionState();
-    const questInkRenderCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(questHeadingSelector)+')).filter');
+    const questInkRenderCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(questHeadingSelector)+')).color');
     const questInkRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
     const questInkEval='(async()=>{'+
       'const u='+JSON.stringify(['data:image/webp;base64,'+orig,'data:image/png;base64,'+questInkBefore,'data:image/png;base64,'+questInkRender])+';'+
@@ -1950,7 +1950,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     assert.equal(questInkRenderState.objectives,3);
     assert.equal(questInkRenderState.rewards,7);
     assert.equal(questInkRenderState.nav,5);
-    assert.ok(questInkRenderGeometry.dayContent.every(v=>!v[0]||v[0].bottom<=questInkRenderGeometry.nav.top+2),
+    assert.ok(questInkRenderGeometry.dayContent.every(v=>!v[0]||v[0].bottom<=questInkRenderGeometry.nav.y+2),
       'all seven actual chests above the WORK0 dock');
     assert.ok(questInkMeasurements.metrics.labels.delta<-.04 && questInkMeasurements.metrics.full.delta<-.001,
       'native text ROI and full screenshot must both improve vs approved art');
