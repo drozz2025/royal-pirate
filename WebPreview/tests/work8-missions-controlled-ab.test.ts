@@ -1890,6 +1890,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
 
 
 
+    {
     /* WORK8/#104 — production quest-label ink, real 07 only. Both native
        captures use the IDENTICAL live mission DOM, player state and paused
        Chromium frame. The opt-out class disables only this PR's text paint. */
@@ -1958,6 +1959,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       Math.abs(questInkMeasurements.metrics.header.delta)<.01,
       'the seven rewards, WORK0 header and five-item dock do not regress');
 
+    }
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
