@@ -21,6 +21,7 @@ test('WORK4 water provenance references and protected local crop remain stable',
   assert.doesNotMatch(paint,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-reference-sea|\.w4-reference-ship|\.w4-cannon-art|contain:paint|transform:|position:|pointer-events:)/);
   assert.ok(css.includes('radial-gradient(ellipse 110% 123% at 30% 50%'),'approved Royal Crown source contour must survive');
   assert.ok(css.includes('svg.w4-reference-sea'),'source water must survive');
+  assert.match(css,/background:#08527a!important/);
   for(const n of ['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']){const file=readFileSync(new URL('../../assets/design-approved/'+n,import.meta.url));assert.equal(file.toString('ascii',0,4),'RIFF',n);assert.equal(file.toString('ascii',8,12),'WEBP',n);}
 });
 
@@ -115,8 +116,13 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
   assert.equal(geometry.realLevels,3,'existing real levels preserved');
 
   await evaluate("(async()=>{await document.fonts.ready;document.getAnimations().forEach(a=>a.pause());const e=document.querySelector('svg.w4-reference-ship image');const src=e?.getAttribute('href')||e?.href?.baseVal;if(!src||!(await fetch(src)).ok)throw Error('approved fleet source missing');return true;})()");
+  // TRUE old-HEAD baseline: restore the release's native procedural stage
+  // underpaint only. Keep identical sources, state, compositor and frame.
+  const beforeStyle=await evaluate("(()=>{const s=document.createElement('style');s.id='work4-native-original-underpaint';s.textContent="+JSON.stringify('.w4-fleet #w4-fleet-panel > .w4-harbour-stage{background:radial-gradient(ellipse 50% 22% at 46% 12%,#e3fcffbb,transparent 95%),linear-gradient(180deg,#0877c1 0%,#109bc7 39%,#10b2bf 53%,#095989 83%,#052a4d)!important;')+"}';document.head.append(s);return true;})()");
+  assert.equal(beforeStyle,true);
   await delay(180);
   const before=(await cmd('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data as string;
+  await evaluate("document.getElementById('work4-native-original-underpaint')?.remove();true");
   // All trials are injected into the exact SAME paused native scene; no route,
   // profile, animation clock, reference image, ship, or viewport is replaced.
   const stage='.w4-fleet #w4-fleet-panel > .w4-harbour-stage';
@@ -161,11 +167,11 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
   const protectedRois=['crownCore','dock'];
   const eligible=results.filter(r=>
     protectedRois.every(name=>r.metrics[name].changedPixels===0)&&
-    r.metrics.full.delta>0.03&&
-    r.metrics.lowerWaterJoin.delta>0.1&&
-    r.metrics.authenticWater.delta>0.1&&
-    r.metrics.photoEdge.delta>=-0.2
-  ).sort((a,b)=>b.metrics.lowerWaterJoin.delta-a.metrics.lowerWaterJoin.delta);
+    r.metrics.full.delta>0.20&&
+    r.metrics.photoEdge.delta>0.30&&
+    r.metrics.authenticWater.delta>=0&&
+    r.metrics.lowerWaterJoin.delta>=-0.01
+  ).sort((a,b)=>b.metrics.photoEdge.delta-a.metrics.photoEdge.delta);
   const selected=eligible[0];
   // Evidence never silently promotes a trial into production. Human review
   // and a separate tracked CSS change are required even if the trial qualifies.
@@ -214,7 +220,7 @@ test('WORK4 Fleet one-frame source-water provenance ablation: no synthetic secon
   assert.ok(Number.isFinite(forge.mae.cannonComposition),'cannon ROI must be measured, not a global-only MAE');
   writeFileSync(join(qa,'original-render-overlay-forge-cannon-384x512.png'),Buffer.from(forge.comparison,'base64'));
 
-  const report={approved:false,approvedScreens:0,sourceFiles:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],viewport:'384x512',scene:'single paused Chromium frame, unchanged source/profile',geometry,forgeGeometry,forgeRoiMae:forge.mae,viewportResults,selectedForFurtherArtReview:selected?.id??null,shownTrial:strongest.id,thresholds:{full:0.03,lowerWaterJoin:0.1,authenticWater:0.1,photoEdgeMinimum:-0.2},results:results.map(({id,metrics})=>({id,metrics})),note:'All CSS changes are temporary browser-side treatments. No production visuals promoted; MAE is not human artistic approval.'};
+  const report={approved:false,approvedScreens:0,sourceFiles:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp','01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp','05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'],viewport:'384x512',scene:'single paused Chromium frame, unchanged source/profile',geometry,forgeGeometry,forgeRoiMae:forge.mae,viewportResults,selectedForFurtherArtReview:selected?.id??null,shownTrial:strongest.id,thresholds:{full:0.20,photoEdge:0.30,authenticWaterMinDelta:0,lowerWaterJoinMinDelta:-0.01},results:results.map(({id,metrics})=>({id,metrics})),note:'The reviewed deep-blue stage underpaint is now WORK4 production CSS only at native 384x512; all other CSS variants are temporary injected trials. MAE is not human artistic approval.'};
   writeFileSync(join(qa,'work4-water-provenance-ab.json'),JSON.stringify(report,null,2)+'\n');
   console.log('WORK4_WATER_PROVENANCE_AB '+JSON.stringify(report));
 });
