@@ -342,23 +342,25 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         await writeFile(join(output,'compare-'+kind+'-'+width+'x'+height+'.png'),
           Buffer.from(comparison.png,'base64'));
 
-        // WORK7 experimental tuning grid, never applied to the production UI:
-        // same 384x512 screenshot frame and same approved artwork for every
-        // real-chest brightness candidate; log absolute native MAE/ROI and
-        // only commit a verified winner in a separate revision.
-        if (kind==='shop' && width===384 && height===512) {
-          const candidates:[string,number][]=[
-            ['crop',.98],['crop',1.02],['crop',1.05],['crop',1.07],
-            ['crop',1.09],['crop',1.11],['crop',1.14],['crop',1.18],
-            ['crop',1.22],['crop',1.28]
+        // WORK7-only genuine source-art color calibration in the identical
+        // frozen 384x512 Chromium scene. This is instrument-only; none of
+        // these sweep candidates are persisted into the game or approved.
+        if(kind==='cards' && width===384 && height===512) {
+          const candidates:[number,number,number][]=[
+            [1,1.85,-10],[1,2.10,-10],[1,2.30,-10],[1,2.50,-10],
+            [1,2.14,0],[1,2.10,10],[1,2.30,10],[1,1.90,0],
+            [5,1.50,-20],[5,1.75,-20],[5,1.95,-20],[5,2.05,-20],
+            [5,2.20,-20],[5,2.05,-10],[5,1.86,0],[5,2.25,-10],
+            [7,1.30,-15],[7,1.52,-15],[7,1.70,-15],[7,1.90,-15],
+            [7,1.73,-8],[7,1.52,0],[7,1.80,-8],[7,1.70,10]
           ];
-          for (const [chest,value] of candidates) {
+          for (const [slot,brightness,hue] of candidates) {
             const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
-              '.w7-screen[data-work7-screen="shop"] .w7-captain-pack-art .w7-approved-crop'+
-              '{filter:saturate(1.2) contrast(1.06) brightness('+value+') drop-shadow(0 6px 5px #14062ca3)!important}}';
+              '.w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child('+slot+') .w7-approved-crop'+
+              '{filter:saturate(1.25) contrast(1.13) brightness('+brightness+') hue-rotate('+hue+'deg)!important}}';
             await evaluate("(()=>{const s=document.createElement('style');s.id='w7-sweep';s.textContent="+
               JSON.stringify(styleText)+";document.head.appendChild(s);return true})()");
-            await sleep(90);
+            await sleep(75);
             const shot=await command('Page.captureScreenshot',{
               format:'png',fromSurface:true,captureBeyondViewport:false
             });
@@ -372,16 +374,13 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               "let sum=0,count=0,roi=0,roiCount=0;"+
               "for(let y=0;y<512;y++)for(let x=0;x<384;x++){let p=(y*384+x)*4;"+
               "for(let k=0;k<3;k++){let v=Math.abs(a[p+k]-b[p+k]);sum+=v;count++;"+
-              "if((x>=18&&x<173&&y>=175&&y<309)||(x>=18&&x<365&&y>=329&&y<427)){roi+=v;roiCount++}}}"+
-              "return {global:Math.round(sum/count*1000)/1000,roi:Math.round(roi/roiCount*1000)/1000}})()");
-            console.log('WORK7 CROP SWEEP '+chest+'='+value+' '+JSON.stringify(metrics));
+              "if(x>=18&&x<365&&y>=195&&y<428){roi+=v;roiCount++}}}"+
+              "return {global:Math.round(sum/count*10000)/10000,roi:Math.round(roi/roiCount*10000)/10000}})()");
+            console.log('WORK7 CARD SOURCE SWEEP '+slot+' brightness='+brightness+' hue='+hue+' '+JSON.stringify(metrics));
             await evaluate("(()=>{document.getElementById('w7-sweep')?.remove();return true})()");
-            await sleep(55);
+            await sleep(35);
           }
         }
-
-
-
 
         report.screens.push({kind,width,height,approved:false,
           method:width===384&&height===512?'native 1:1, reference | render | 50% overlay':'reference contained, render | 50% overlay',
