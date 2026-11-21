@@ -93,7 +93,7 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
     /* Isolate the NEW 07 reward-grid A/B from historical approved comparisons.
        Those older tests retain their original measured source baselines and
        thresholds. The dedicated new Chromium test enables the grid separately. */
-    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline");true');
+    await evalJs('document.documentElement.classList.add("work8-missions-coast-ab-baseline","work8-missions-royal-chest-ab-baseline","work8-missions-mid-chests-ab-baseline","work8-missions-navy-border-ab-baseline","work8-missions-action-enamel-ab-baseline","work8-missions-reward-grid-ab-baseline","work8-missions-quest-depth-ab-baseline","work8-missions-quest-tone-ab-baseline","work8-missions-meter-ink-ab-baseline","work8-missions-day7-ground-ab-baseline","work8-missions-quest-board-luma-ab-baseline","work8-missions-title-patina-ab-baseline");true');
     const readLayout=()=>evalJs('(()=>{const r=s=>{const e=document.querySelector(s),x=e?.getBoundingClientRect();return x?{x:x.left,y:x.top,right:x.right,bottom:x.bottom}:null},day=[...document.querySelectorAll(".w8-approved-days li")].map(e=>{const x=e.getBoundingClientRect();return {x:x.left,y:x.top,right:x.right,bottom:x.bottom}});return {dayContent:[...document.querySelectorAll(".w8-approved-days li")].map(e=>[e.querySelector(".w8-approved-chest"),e.querySelector("small")].map(el=>{const x=el?.getBoundingClientRect();return x?{top:x.top,bottom:x.bottom}:null})),quests:document.querySelectorAll(".w8-approved-quest").length,days:day,nav:r(".app-sheet > .harbour-nav"),navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,daySeven:r(".w8-approved-days li:last-child"),documentWidth:document.documentElement.scrollWidth}})()');
     const baselineClass='work8-missions-frame-ab-baseline';
     await evalJs('document.documentElement.classList.add('+JSON.stringify(baselineClass)+');true');
@@ -1887,6 +1887,62 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       'SHIPPED native frame AND daily ROI must measurably improve');
     assert.ok(realDayDelta.chests<.02 && Math.abs(realDayDelta.quest)<.02 &&
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
+
+
+
+    /* WORK8 #104: actual source-painted MISSOES title patina only.
+       Native 384×512, identical decoded DOM, paused animation, same
+       original approved WebP. Explicit baseline class isolates only
+       the new static plaque filter, never Ranking 08 or WORK0 dock. */
+    const titlePatinaFlag='work8-missions-title-patina-ab-baseline';
+    const titlePatinaSelector='.w8-approved-missions .w8-approved-title > svg.w8-approved-painting-title-missions';
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(titlePatinaFlag)+');true');
+    await delay(120);
+    const titlePatinaBeforeLayout=await headingLayout();
+    const titlePatinaBeforeFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(titlePatinaSelector)+')).filter');
+    const titlePatinaBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(titlePatinaFlag)+');true');
+    await delay(120);
+    const titlePatinaRenderLayout=await headingLayout();
+    const titlePatinaRenderFilter=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(titlePatinaSelector)+')).filter');
+    const titlePatinaRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const titlePatinaSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+titlePatinaBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+titlePatinaRender))
+      .replace('header:[0,0,384,70]', 'header:[0,0,384,70],title:[95,76,289,120]');
+    assert.notEqual(titlePatinaSource,source,'title experiment uses its own screenshots and ROI');
+    const titlePatinaScores=await evalJs(titlePatinaSource);
+    const titlePatinaMosaic='(async()=>{const urls='+JSON.stringify([
+      'data:image/webp;base64,'+orig,
+      'data:image/png;base64,'+titlePatinaBefore,
+      'data:image/png;base64,'+titlePatinaRender
+    ])+';const images=await Promise.all(urls.map(src=>new Promise((ok,err)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=err;im.src=src})));if(images.some(im=>im.width!==384||im.height!==512))throw Error("Native title frame mismatch");const canvas=document.createElement("canvas");canvas.width=1536;canvas.height=512;const ctx=canvas.getContext("2d");images.forEach((im,i)=>ctx.drawImage(im,384*i,0));ctx.drawImage(images[0],1152,0);ctx.globalAlpha=.5;ctx.drawImage(images[2],1152,0);return canvas.toDataURL("image/png").split(",")[1]})()';
+    writeFileSync(join(evidence,'missions-title-patina-original-before-render-overlay-384x512.png'),Buffer.from(await evalJs(titlePatinaMosaic),'base64'));
+    writeFileSync(join(evidence,'missions-title-patina-before-384x512.png'),Buffer.from(titlePatinaBefore,'base64'));
+    writeFileSync(join(evidence,'missions-title-patina-render-384x512.png'),Buffer.from(titlePatinaRender,'base64'));
+    const titlePatinaReport={
+      issue:104,scope:'Only 07 Missions real approved MISSOES title image ink',
+      baseCommit:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',reference:'assets/design-approved/07-missoes.webp',
+      refs:dailyEnamelReport.approvedReferences,
+      native:{width:384,height:512,dpr:1},sameScenePausedFrame:true,
+      beforeFilter:titlePatinaBeforeFilter,renderFilter:titlePatinaRenderFilter,
+      metrics:titlePatinaScores.metrics,unchanged:titlePatinaScores.unchanged,
+      geometry:{before:titlePatinaBeforeLayout,render:titlePatinaRenderLayout},
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-title-patina-ab.json'),JSON.stringify(titlePatinaReport,null,2));
+    console.log('WORK8_TITLE_PATINA_NATIVE_AB '+JSON.stringify(titlePatinaReport));
+    assert.notEqual(titlePatinaBeforeFilter,titlePatinaRenderFilter,'real production plaque paint must differ');
+    assert.deepEqual(titlePatinaBeforeLayout,titlePatinaRenderLayout,'no buttons, mission, rewards or dock may move');
+    assert.equal(titlePatinaRenderLayout.questCount,3);
+    assert.equal(titlePatinaRenderLayout.dayCount,7);
+    assert.equal(titlePatinaRenderLayout.dockCount,5);
+    assert.ok(titlePatinaRenderLayout.chests.every((c:any)=>c.bottom<=titlePatinaRenderLayout.nav.top+2),'seven chests above dock');
+    assert.ok(titlePatinaScores.metrics.title.delta<-.02 && titlePatinaScores.metrics.full.delta<-.002,
+      'new source-title paint must improve local ROI and entire frame, not merely look different');
+    assert.ok(Math.abs(titlePatinaScores.metrics.quests.delta)<.02 && Math.abs(titlePatinaScores.metrics.daily.delta)<.02,
+      'three missions and seven chests must not visually regress');
+    assert.ok(titlePatinaScores.unchanged.header<.1 && titlePatinaScores.unchanged.dock<.1,'shared header/dock are unchanged');
 
 
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
