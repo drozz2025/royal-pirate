@@ -10,6 +10,7 @@ import { animateShipyardWind } from './shipyard-wind';
 import { shipyardCameraOffset, shipyardPartTarget, shipyardPartCameraOffset, type ShipyardView } from './shipyard-camera';
 import { releaseShipyardResources } from './shipyard-resources';
 import { preferredShipyardPixelRatio, adjustedShipyardPixelRatio } from './shipyard-render-budget';
+import { updateShipyardDetailLOD } from './shipyard-detail-lod';
 import { hullImpactPlacement } from './impact-visuals';
 import { rippleState } from './water-vfx';
 export type Metrics = { fps: number; renderMs: number; calls: number; triangles: number; geometries: number; textures: number; effects: number; heapMB?: number };
@@ -261,6 +262,14 @@ export class OceanScene {
     if(this.battle.shot){const s=this.battle.shot;this.ball.visible=true;this.ball.position.set(s.position.x,s.position.y,s.position.z);this.trail.visible=true;const p=this.ball.position.clone(),v=new T.Vector3(s.velocity.x,s.velocity.y-12*s.age,s.velocity.z).normalize();this.trail.geometry.setFromPoints([p,p.clone().addScaledVector(v,-1.2)]);}else{this.ball.visible=false;this.trail.visible=false;}
     for(let i=this.particles.length-1;i>=0;i--){const p=this.particles[i];p.age+=dt;if(p.age>=p.life){p.mesh.visible=false;this.pool.push(p.mesh);this.particles.splice(i,1);continue;}p.mesh.position.addScaledVector(p.velocity,dt);if(!p.smoke)p.velocity.y-=8*dt;const alpha=1-p.age/p.life;(p.mesh.material as T.MeshBasicMaterial).opacity=alpha;p.mesh.scale.setScalar(p.size*(p.smoke?1+p.age*2:Math.max(.2,alpha)));}
     this.controls.update();if(this.shake>0){this.camera.position.y+=Math.sin(timestamp*.1)*this.shake;this.shake*=.86;}
+    // Narrow-phone distant views omit only tiny preview-owned deck ornaments.
+    // The same meshes return on zoom-in; never change battle objects or assets.
+    if(this.cameraMode==='shipyard'&&this.shipyardArt?.root.visible){
+      const accessories=this.shipyardArt.root.children.find(child=>child.name==='modular-ship-accessories');
+      updateShipyardDetailLOD(accessories,
+        this.camera.position.distanceTo(this.shipyardArt.root.position),
+        this.host.clientWidth);
+    }
     const renderStart=performance.now();this.renderer.render(this.scene,this.camera);this.renderMs=performance.now()-renderStart;
     if(this.cameraMode==='shipyard'&&this.shipyardArt?.root.visible){
       this.shipyardRenderSamples.push(this.renderMs);
