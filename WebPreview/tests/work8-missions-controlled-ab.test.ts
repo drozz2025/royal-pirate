@@ -1889,6 +1889,73 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
 
+
+    /* WORK8/#104: real production-only CTA enamel, SAME native 384x512
+       Chromium scene + DOM + paused time, source reference 07-missoes.webp.
+       The opt-out class compares the exact old filter against the candidate
+       without modifying the three genuine objectives or seven reward slots. */
+    const ctaFlag='work8-missions-active-cta-enamel-ab-baseline';
+    const ctaSelector='.w8-approved-missions .w8-approved-quest[data-state=active] > button';
+    const ctaState=()=>evalJs('(()=>({active:[...document.querySelectorAll('+JSON.stringify(ctaSelector)+')].map(b=>{const r=b.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,label:b.textContent}}),quests:document.querySelectorAll(".w8-approved-quest").length,days:document.querySelectorAll(".w8-approved-days li").length,dock:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length}))()');
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(ctaFlag)+');true');
+    await delay(150);
+    const ctaBeforeLayout=await readLayout();
+    const ctaBeforeState=await ctaState();
+    const ctaBeforeCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(ctaSelector)+')).filter');
+    const ctaBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(ctaFlag)+');true');
+    await delay(150);
+    const ctaAfterLayout=await readLayout();
+    const ctaAfterState=await ctaState();
+    const ctaAfterCss=await evalJs('getComputedStyle(document.querySelector('+JSON.stringify(ctaSelector)+')).filter');
+    const ctaAfter=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const ctaScoreExpression=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+ctaBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+ctaAfter))
+      .replace('quests:[12,155,372,321],daily:', 'quests:[12,155,372,321],actions:[285,157,373,320],daily:');
+    assert.ok(ctaScoreExpression.includes('actions:[285,157,373,320]'),'native action ROI required');
+    const ctaMeasurements=await evalJs(ctaScoreExpression);
+    const ctaMontage=await evalJs('(async()=>{const u='+JSON.stringify([
+      'data:image/webp;base64,'+orig,'data:image/png;base64,'+ctaBefore,
+      'data:image/png;base64,'+ctaAfter])+';const p=await Promise.all(u.map(s=>new Promise((ok,bad)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=bad;i.src=s})));const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");p.forEach((i,n)=>x.drawImage(i,384*n,0));x.drawImage(p[0],1152,0);x.globalAlpha=.5;x.drawImage(p[2],1152,0);return c.toDataURL("image/png").split(",")[1]})()');
+    writeFileSync(join(evidence,'missions-cta-original-before-render-overlay-384x512.png'),Buffer.from(ctaMontage,'base64'));
+    writeFileSync(join(evidence,'missions-cta-before-384x512.png'),Buffer.from(ctaBefore,'base64'));
+    writeFileSync(join(evidence,'missions-cta-render-384x512.png'),Buffer.from(ctaAfter,'base64'));
+    const ctaReport={
+      issue:104,baseHead:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
+      screen:'07 Missões only; real active mission blue action enamel',
+      references:['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+        '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+        '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp']
+        .map(f=>'assets/design-approved/'+f),
+      native:{width:384,height:512,dpr:1,paused:true,sameDOM:true,sameFrame:true},
+      beforeCss:ctaBeforeCss,renderCss:ctaAfterCss,
+      roi:ctaMeasurements.metrics,unchanged:ctaMeasurements.unchanged,
+      stateBefore:ctaBeforeState,stateRender:ctaAfterState,
+      geometryBefore:ctaBeforeLayout,geometryRender:ctaAfterLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-cta-native-ab.json'),JSON.stringify(ctaReport,null,2));
+    console.log('WORK8_CTA_NATIVE_AB '+JSON.stringify(ctaReport));
+    assert.notEqual(ctaBeforeCss,ctaAfterCss,'production CTA enamel CSS actually changed');
+    assert.ok(ctaBeforeState.active.length>=1,'real active JOGAR CTA present');
+    assert.deepEqual(ctaBeforeState,ctaAfterState,'no mission CTA hitbox/progress/label changes');
+    assert.deepEqual(ctaBeforeLayout,ctaAfterLayout,'no change in real quest/days/menu geometry');
+    assert.equal(ctaAfterState.quests,3);
+    assert.equal(ctaAfterState.days,7);
+    assert.equal(ctaAfterState.dock,5);
+    assert.ok(ctaAfterLayout.dayContent.every((pair:any)=>pair.every((item:any)=>item && item.bottom<=ctaAfterLayout.nav.y+2)),
+      'all seven day chest artworks and labels above dock');
+    assert.ok(ctaMeasurements.unchanged.dock<.02 && ctaMeasurements.unchanged.header<.02,
+      'Porto header and five-item dock unaffected');
+    assert.ok(ctaMeasurements.metrics.actions.delta<-.03 &&
+      ctaMeasurements.metrics.quests.delta<-.005 &&
+      ctaMeasurements.metrics.full.delta<-.001,
+      'new active CTA must strictly improve original-source action ROI, quest ROI and full native frame');
+    assert.ok(Math.abs(ctaMeasurements.metrics.daily.delta)<.03 &&
+      Math.abs(ctaMeasurements.metrics.chests.delta)<.03,
+      'no daily or seven chest ROI regressions');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
