@@ -8,7 +8,8 @@ Last verified documentation review: 21 Nov 2026. Human art approval: **0/8**.
 - Repository: `drozz2025/royal-pirate`, development base `work6/web-3d-preview`.
 - Current unmerged visual candidate: [PR #696](https://github.com/drozz2025/royal-pirate/pull/696).
 - Public GitHub Pages address: https://drozz2025.github.io/royal-pirate/
-- Previously reported ChatGPT Sites address: https://royal-pirate.ricardomalheiro.chatgpt.site/ (**owner/editor must re-confirm in Sites → Open site; HTTP and revision parity NOT independently proven**).
+- ChatGPT Sites address tested by the repository's read-only auditor: https://royal-pirate.ricardomalheiro.chatgpt.site/ (owner/editor should still confirm it in Sites → Open site).
+- [GitHub Actions run 44833888295](https://github.com/drozz2025/royal-pirate/actions/runs/44833888295), 20 Nov 2026 at 23:13 UTC, fetched **HTTP 200 from both public addresses**, 3 JS/CSS assets on each; the Pages version was **v0.1.117**, Sites version was **unrecognized (v?)**, result **NO_VALIDATED_RELEASE**. This does **not** verify matching code or an automatic connection.
 
 ## Verified official Sites publishing method
 
