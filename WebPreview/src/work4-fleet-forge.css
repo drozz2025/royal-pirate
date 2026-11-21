@@ -3191,24 +3191,3 @@
     line-height:1.05;
   }
 }
-
-
-/* WORK4/#104 — native 384×512 cannon reveal candidate (21 Nov 18h).
-   Candidate for human visual review, not a release or approved art.
-   The earlier 53% live level plaque hides the photographed cannon and the
-   approved source's warm hearth. Trim the existing live plaque to 41%,
-   retaining the three REAL level rows and their labels, and use a 22px
-   alpha feather to blend the remaining visible source photograph.
-   Independent 384x512 same-frame Chromium ROI gate lives in
-   work4-forge-cannon-reveal-native-20261121.test.ts.
-   This is an ALTERNATIVE to open WORK4 #760 (51%); WORK0 must select only
-   one candidate. 320/390/430, dock, Porto, shell, inventory and prices
-   must remain pixel-identical. approved:false / 0 of 8. */
-@media (width:384px) and (height:512px) {
-  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
-    width:41%;
-    border-color:#4d4039;
-    -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
-    mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
-  }
-}
