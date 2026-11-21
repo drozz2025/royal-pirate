@@ -344,9 +344,9 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
         // Selection is manual, with the final production CSS fixed by code.
         if (kind==='shop' && width===384 && height===512) {
           const candidates:[string,number][]=[
-            ['base-1.01',1.01],['art-1.04',1.04],['art-1.08',1.08],
-            ['art-1.12',1.12],['chosen-1.16',1.16],
-            ['art-1.20',1.20],['art-1.24',1.24]
+            ['art-0.85',.85],['art-0.90',.90],['art-0.93',.93],
+            ['chosen-0.95',.95],['art-0.97',.97],['art-0.99',.99],
+            ['base-1.01',1.01]
           ];
           for (const [name,value] of candidates) {
             const styleText='@media (min-width:355px) and (max-width:390px) and (max-height:560px){'+
@@ -427,8 +427,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
             assert.deepEqual(geometry.labels.map((l:any)=>({x:l.x,y:l.y,width:l.width,height:l.height,bottom:l.bottom})),baselineGeometry.labels,
               '06 genuine EM BREVE labels cannot move or be obscured by artwork');
             assert.deepEqual(geometry.pack,baselineGeometry.pack,'The one real Captain pack frame stays at identical coordinates');
-            assert.ok(geometry.packArt && baselineGeometry.packArt && geometry.packArt.width>baselineGeometry.packArt.width,
-              'The original single treasure artwork must grow within its existing panel');
+            assert.ok(geometry.packArt && baselineGeometry.packArt && geometry.packArt.width<baselineGeometry.packArt.width,
+              'The original single treasure artwork must use a smaller source crop inside its unchanged panel');
           }
           assert.deepEqual(comparison.referenceSize,[384,512],'Approved 05/06 originals are 384×512 and must be compared natively without scaling');
           if(kind==='cards') {
@@ -445,8 +445,8 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
               'First chest should align with the approved x≈18 border');
             assert.ok(geometry.packArt && baselineGeometry.packArt,
               'Measure original 06 chest crop separately from its pack panel');
-            assert.ok(geometry.packArt.width>baselineGeometry.packArt.width,
-              'Original genuine Captain WebP is larger without inventing a second pack');
+            assert.ok(geometry.packArt.width<baselineGeometry.packArt.width,
+              'Original genuine Captain WebP is smaller without inventing a second pack');
           }
         }
       }
