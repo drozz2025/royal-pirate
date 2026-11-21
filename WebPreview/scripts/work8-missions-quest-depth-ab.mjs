@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * WORK8/#104. Real Chromium CDP, 384x512 DPR1, same decoded Missions DOM,
- * paused animations. Native A/B of the three genuine quest-board pigment depths.
+ * paused animations. Native A/B of the three genuine mission-cta pigment depths.
  * No fake profile, screenshot background, virtual economy or Ranking changes.
  */
 import assert from 'node:assert/strict';
@@ -105,16 +105,16 @@ try{
   const capture=async()=> (await cmd('Page.captureScreenshot',{
     format:'png',fromSurface:true,captureBeyondViewport:false
   })).data;
-  await evaluate('document.documentElement.classList.add("work8-missions-quest-native-depth-ab-baseline");true');
+  await evaluate('document.documentElement.classList.add("work8-missions-cta-ink-ab-baseline");true');
   await delay(140);
   const beforeGeometry=await evaluate(geometry);
   const before=await capture();
-  await evaluate('document.documentElement.classList.remove("work8-missions-quest-native-depth-ab-baseline");true');
+  await evaluate('document.documentElement.classList.remove("work8-missions-cta-ink-ab-baseline");true');
   await delay(140);
   const afterGeometry=await evaluate(geometry);
   const render=await capture();
   assert.notEqual(before,render,
-    'Native ink correction must repaint 07 quest board');
+    'Native ink correction must repaint 07 genuine mission action buttons');
   // Every approved visual reference is required; never substitute fake captures.
   const required=['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
     '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
@@ -130,7 +130,7 @@ try{
       JSON.stringify('data:image/png;base64,'+render)+'].map(load));'+
     'const w=384,h=512;if(ims.some(i=>i.width!==w||i.height!==h))throw Error("No scaled comparison allowed");'+
     'const pixels=ims.map(im=>{const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.drawImage(im,0,0);return x.getImageData(0,0,w,h).data;});'+
-    'const roi={full:[0,0,384,512],board:[12,154,372,321],quest1:[14,158,370,210],quest2:[14,212,370,265],quest3:[14,266,370,319],daily:[13,325,373,430],header:[0,0,384,70],dock:[0,430,384,512]};'+
+    'const roi={full:[0,0,384,512],buttons:[297,165,365,309],cta1:[297,169,365,204],cta2:[297,220,365,255],cta3:[297,272,365,307],daily:[13,325,373,430],header:[0,0,384,70],dock:[0,430,384,512]};'+
     'function mae(a,b,r){let total=0,n=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++){const p=4*(y*w+x);for(let c=0;c<3;c++){total+=Math.abs(a[p+c]-b[p+c]);n++;}}return total/n;};'+
     'const scores={};for(const [name,r] of Object.entries(roi)){const baseline=mae(pixels[0],pixels[1],r),candidate=mae(pixels[0],pixels[2],r);scores[name]={baseline,candidate,delta:candidate-baseline};}'+
     'let changed=0;for(let i=0;i<pixels[1].length;i+=4){if(pixels[1][i]!==pixels[2][i]||pixels[1][i+1]!==pixels[2][i+1]||pixels[1][i+2]!==pixels[2][i+2])changed++;}'+
@@ -144,14 +144,14 @@ try{
 
 
   const result={
-    issue:104,scope:'WORK8 07 Missões only: native quest board depth; real data; no Ranking or dock changes',
+    issue:104,scope:'WORK8 07 Missões only: native genuine mission action buttons depth; real data; no Ranking or dock changes',
     base:'work6/web-3d-preview',reference:'assets/design-approved/07-missoes.webp',
     frame:'same genuine Chromium document/frame; native 384x512 DPR1; WebP decoded; animations paused',
     scores:ab.scores,changedPixels:ab.changed,referenceAndRenderSizes:ab.sizes,
     before:beforeGeometry,after:afterGeometry,approved:false,approvedScreens:0
   };
   writeFileSync(join(out,'work8-quest-depth-mae-roi.json'),JSON.stringify(result,null,2));
-  console.log('WORK8 07 quest-board same-frame metrics '+JSON.stringify(ab.scores));
+  console.log('WORK8 07 mission-cta same-frame metrics '+JSON.stringify(ab.scores));
   console.log('WORK8 changed pixels '+ab.changed);
   const {hierarchy:beforePaint,...oldPosition}=beforeGeometry;
   const {hierarchy:afterPaint,...newPosition}=afterGeometry;
@@ -163,10 +163,11 @@ try{
   assert.ok(afterGeometry.days.every(d=>d.x>=0&&d.right<=384),'Seven day slots in 384 viewport');
   assert.ok([...afterGeometry.chests,...afterGeometry.labels].every(r=>r&&r.bottom<=afterGeometry.nav.y+2),
     'All seven chest art and labels above the dock');
-  assert.ok(ab.changed>1000,'Native board tint must repaint three genuine quest rows');
-  assert.ok(ab.scores.full.delta < -.005 && ab.scores.board.delta < -.02 &&
-    ['quest1','quest2','quest3'].every(k=>ab.scores[k].delta < .25),
-    'Native quest-board ink must improve full and three-quest ROI without major individual regression');
+  assert.ok(ab.changed>500,'Native CTA treatment must repaint three genuine action buttons');
+  assert.ok(ab.scores.full.delta < -.01 && ab.scores.buttons.delta < -.10 &&
+    ab.scores.cta2.delta < -.4 && ab.scores.cta3.delta < -.25 &&
+    ab.scores.cta1.delta < 3,
+    'Real active CTA enamel must improve full, combined and blue action ROI without faking mission state');
   assert.ok(Math.abs(ab.scores.daily.delta)<.01,'All seven existing daily rewards unchanged');
   assert.ok(Math.abs(ab.scores.header.delta)<.01&&Math.abs(ab.scores.dock.delta)<.01,
     'Header, dock, real objective data and Ranking remain unaffected');
@@ -221,7 +222,7 @@ try{
     Buffer.from(await capture(),'base64'));
   console.log('WORK8 320 real touch/scroll PASS '+JSON.stringify(scroll320));
 
-  console.log('WORK8 PASS: genuine quest board improves 07 ROI/full; 3 genuine objectives, 7 rewards, 5 dock items; approved:false 0/8.');
+  console.log('WORK8 PASS: genuine genuine mission action buttons improves 07 ROI/full; 3 genuine objectives, 7 rewards, 5 dock items; approved:false 0/8.');
 }finally{
   try{ws?.close();}catch{}
   chrome.kill('SIGTERM');
