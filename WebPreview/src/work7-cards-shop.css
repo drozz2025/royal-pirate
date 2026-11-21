@@ -4377,3 +4377,37 @@
       linear-gradient(112deg,#340957 0%,#2b075f 49%,#0c0843 100%);
   }
 }
+
+
+/* WORK0/#104 — from WORK7 #710 native source enamel. Source-approved art,
+   existing 4x2 cards and shop pack; only 384x512 color/material corrections.
+   Visual review pending (approved:false; 0/8). */
+@media (min-width:355px) and (max-width:390px) and (max-height:560px){
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(1){
+    filter:brightness(.50) saturate(1.70) contrast(.87) hue-rotate(-16deg) brightness(1.085) saturate(.96);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){
+    filter:brightness(.43) saturate(1.20) contrast(.74) hue-rotate(18deg) brightness(.95) saturate(1.10);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){
+    filter:brightness(.49) saturate(2.00) contrast(.79) hue-rotate(-8deg) brightness(.92) saturate(1.08);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){
+    filter:brightness(.65) saturate(1.30) contrast(.92) hue-rotate(4deg) brightness(.96);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){
+    filter:brightness(.40) saturate(1.75) contrast(.79) hue-rotate(-8deg) brightness(.93) saturate(1.10);
+  }
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){
+    filter:brightness(.64) saturate(1.90) contrast(.88) hue-rotate(-13deg) brightness(.99) saturate(1.11);
+  }
+  /* WORK7 21 Nov: original fifth bombardment card, true local native frame enamel test.
+   * Separate pigmented metal relief; no UI text or approved source pixels replaced. */
+  .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){
+    filter:brightness(.53) hue-rotate(-16deg) brightness(1.04) saturate(1.04)
+           brightness(.91) saturate(1.22) hue-rotate(-8deg) contrast(.91);
+  }
+}
