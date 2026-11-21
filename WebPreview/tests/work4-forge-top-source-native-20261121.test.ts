@@ -159,7 +159,7 @@ test('WORK4 Forja source-photo upper-edge A/B one frozen Chromium frame',{
     frame:'same frozen Chromium scene/profile',variants,geometry,boxes:data.boxes,rows:data.rows,
     winner:variants[data.winner].id,compiledDiff:data.compiledDiff,
     note:'Research only, not promoted. One cannon, furnace, three actual prices and five dock buttons protected.'};
-  writeFileSync(join(qa,'work4-forge-top-source-native-384x512.json'),JSON.stringify(evidence,null,2)+'\\n');
+  writeFileSync(join(qa,'work4-forge-top-source-native-384x512.json'),JSON.stringify(evidence,null,2)+'\n');
   writeFileSync(join(qa,'original-before-render-overlay-forge-top-384x512.png'),Buffer.from(data.overlay,'base64'));
   console.log('WORK4_FORGE_SOURCE_TOP_AB '+JSON.stringify({winner:evidence.winner,
     rows:data.rows.map((r:any)=>({id:variants[r.index].id,full:r.roi.full.mae,top:r.roi.sourceTop.mae,cannon:r.roi.cannon.mae,
