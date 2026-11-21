@@ -3191,26 +3191,3 @@
     line-height:1.05;
   }
 }
-
-
-/* WORK4/#104 — native approved photograph's right-hand boundary.
-   The 03 Royal Crown painting ends in a straight cyan line at the live stats
-   card. Intersect a narrow 7% trailing source-only feather with the EXISTING
-   organic mask to avoid a pasted rectangular photo, without drawing waves,
-   cloning a ship, or modifying nav/Porto/real game data. Only 384×512.
-   Candidate remains approved:false until source/ROI Chromium QA and human
-   artistic review; WORK0 alone merges or publishes. */
-@media (width:384px) and (height:512px) {
-  .w4-fleet #w4-fleet-panel > .w4-harbour-stage > svg.w4-ship-art.w4-reference-ship {
-    -webkit-mask-image:
-      radial-gradient(ellipse 110% 123% at 30% 50%,#000 0%,#000 84%,transparent 99%),
-      linear-gradient(to bottom,transparent 0%,#000 2%,#000 97%,transparent 100%),
-      linear-gradient(to right,#000 0%,#000 93%,transparent 100%);
-    -webkit-mask-composite:source-in,source-in;
-    mask-image:
-      radial-gradient(ellipse 110% 123% at 30% 50%,#000 0%,#000 84%,transparent 99%),
-      linear-gradient(to bottom,transparent 0%,#000 2%,#000 97%,transparent 100%),
-      linear-gradient(to right,#000 0%,#000 93%,transparent 100%);
-    mask-composite:intersect,intersect;
-  }
-}
