@@ -57,7 +57,7 @@ test('enemy battle-only presentation leaves the tested camera and Porto intact',
     camera.lookAt(...pose.target);
     camera.updateMatrixWorld();
     const battleScale=battleEnemyScale(w/h);
-    assert.ok(battleScale>=1.25&&battleScale<=1.4,'portrait enemy retains a readable, less dominant broadside');
+    assert.ok(battleScale>=1.00&&battleScale<=1.10,'portrait enemy retains a readable, less dominant broadside');
     const points=[
       new T.Vector3(10,0,-3),
       new T.Vector3(10,battleScale*8.4,-3),
@@ -122,9 +122,9 @@ test('WORK0/#104: the live red galleon stops occupying the mobile sky in 4 refer
     const screenY=(y:number)=> (1-new T.Vector3(10,y,-3).project(camera).y)*h/2;
     const yTop=screenY(8.4*battleEnemyScale(w/h));
     const yHull=screenY(0);
-    assert.ok(yTop>h*.27&&yTop<h*.36,
+    assert.ok(yTop>h*.37&&yTop<h*.43,
       'enemy must leave clear sky below compact HP header at '+w+'x'+h+': '+yTop);
-    assert.ok(yHull-yTop>h*.23&&yHull-yTop<h*.33,
+    assert.ok(yHull-yTop>h*.18&&yHull-yTop<h*.24,
       'galleon must be legible, but not cover the foreground guns at '+w+'x'+h);
   }
 });

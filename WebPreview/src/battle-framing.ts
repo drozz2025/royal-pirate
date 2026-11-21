@@ -44,6 +44,9 @@ export type CameraPose = {
 /** Battle-only enemy presentation size. Scale the LIVE 3D model, not its
  * simulation/hitboxes: the old 1.88x red ship swallowed the centre on phones.
  * The 02 reference has clear sky, a starboard opponent and open sea between guns.
+ * WORK0 21 Nov: reference-vs-Chromium comparison found the live broadside
+ * ~25% wider than the approved ship at native 384x512, and too dominant on
+ * tall phones. Reduce the existing THREE.JS opponent, not its hitbox or Porto.
  * Desktop remains unchanged; Porto's 1x model is restored by showHarbour(). */
 export function battleEnemyScale(aspect:number):number {
   // WORK0 #104 / 20 Nov: structurally reframe the approved short 384×512
@@ -52,8 +55,8 @@ export function battleEnemyScale(aspect:number):number {
   // All portrait crops now reclaim clear sky around the real broadside;
   // keep the aftcastle in frame without moving collision geometry.
   // Presentation only: physical hull, damage hitbox and Porto stay unchanged.
-  if(aspect<.62)return 1.30; // 320×568, 390×844 and 430×932: protect the stern
-  if(aspect<.80)return 1.35; // 384×512: preserve full broadside and starboard margin
+  if(aspect<.62)return 1.08; // real broadside retains three masts, restores open sea on tall phones
+  if(aspect<.80)return 1.03; // native reference: enemy now occupies a smaller starboard island
   return 1.82; // preserve desktop
 }
 /** Batalha 02: turn the existing live red ship into a readable starboard broadside.

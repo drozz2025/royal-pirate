@@ -139,7 +139,7 @@ test('WORK0/#104: native 384x512 stage moves the whole live galleon to starboard
   assert.ok(opponent.x-(1+oldNdc.x)*w/2>24,
     'actual 3D perspective must shift the enemy at least 24 pixels');
   const scale=battleEnemyScale(aspect),yaw=battleEnemyBroadsideYaw(aspect);
-  assert.ok(scale>=1.35&&scale<=1.45,
+  assert.ok(scale>=1.00&&scale<=1.06,
     'short-screen galleon has room for the complete aftcastle');
   // Project both physical ends and both broadside gunwale edges after the
   // same live root yaw and presentation scale used by OceanScene.home().
@@ -165,7 +165,7 @@ test('WORK0/#104: native 384x512 stage moves the whole live galleon to starboard
 
 test('WORK0/#104: 320px and tall-phone cannon/ship framing is explicit',()=>{
   for(const [w,h,x,deckX,scale] of [
-    [320,568,6.5,4.4,1.30],[390,844,7.65,5.2,1.30],[430,932,7.65,5.2,1.30]
+    [320,568,6.5,4.4,1.08],[390,844,7.65,5.2,1.08],[430,932,7.65,5.2,1.08]
   ]){
     const pose=battleCameraPose(w/h);
     assert.equal(pose.target[0],x);
@@ -185,7 +185,7 @@ test('WORK0 #104: mobile 3D sightline gains real sky and halves cannon screen oc
    assert.ok(currentWidth<oldWidth*.66,'actual near-gun occlusion shrinks by at least one third at '+w+'x'+h);
    assert.ok(currentWidth>w*.1,'real gun remains clearly visible at '+w+'x'+h);
    const enemyTop=screen(w,h,new T.Vector3(10,8.4*battleEnemyScale(w/h),-3)).y;
-   assert.ok(enemyTop>h*.32&&enemyTop<h*.36,'enemy sails leave more clear sky at '+w+'x'+h);
+   assert.ok(enemyTop>h*.37&&enemyTop<h*.43,'enemy sails leave more clear sky at '+w+'x'+h);
    const gun=makeBattleDeck(true);
    gun.group.position.set(pose.batteryOffsetX,0,pose.batteryOffsetZ);
    gun.group.scale.setScalar(scale);
