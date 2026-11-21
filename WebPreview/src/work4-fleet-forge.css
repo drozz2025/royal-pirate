@@ -3209,3 +3209,21 @@
     background:#08527a!important;
   }
 }
+
+/* WORK4/#104 — 21 Nov: Forge single-cannon plaque composite.
+   Keep the one original cannon and live furnace completely visible, while
+   reducing the right-hand level panel from 53% to 51%. A 22px alpha ramp
+   removes the rectangular photo/panel cut; charcoal-bronze replaces the
+   colder rim. Applies ONLY at the approved source frame (384x512).
+   Previously validated via same-frame Chromium A/B in draft #748:
+   full MAE 52.9433 -> 52.6884, cannon/plaque overlap 32.6428 -> 19.8941.
+   Source cannon, furnace, three actual costs, WORK0 dock and 320/390/430
+   remain untouched. Approval remains false pending human review. */
+@media (width:384px) and (height:512px) {
+  .w4-forge #w4-forge-panel > .w4-forge-stage > .w4-forge-description {
+    width:51%;
+    border-color:#4d4039;
+    -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+    mask-image:linear-gradient(to right,transparent 0%,#000 22px,#000 100%);
+  }
+}
