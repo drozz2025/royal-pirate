@@ -1889,6 +1889,81 @@ test('07 Missions: controlled same-frame 384x512 original/Chromium A/B improves 
       Math.abs(realDayDelta.dock)<.02,'prevent chest, quest, WORK0 dock regressions');
 
 
+
+    /* WORK8/#104: real 07 original emerald source-art gate. One native
+       384x512 DPR1 Chromium tab, identical decoded DOM and frozen frame.
+       Toggle only this branch's CSS. Do not alter the state/representation
+       of the actual 3 quests, 7 real rewards or WORK0's five-item dock. */
+    const emeraldFlag='work8-missions-emerald-chests-ab-baseline';
+    const emeraldSelector='.w8-approved-missions .w8-approved-days li:nth-child(-n+3) .w8-approved-chest > svg.w8-approved-painting';
+    const emeraldRefs=[
+      '00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
+      '01-porto.webp','02-batalha.webp','03-frota.webp','04-melhorias-forja.webp',
+      '05-cartas.webp','06-loja.webp','07-missoes.webp','08-ranking-perfil.webp'
+    ].map(x=>'assets/design-approved/'+x);
+    for(const p of emeraldRefs) assert.ok(readFileSync(new URL('../../'+p,import.meta.url)).length>0,
+      'Mandatory approved design reference missing: '+p);
+    await evalJs('document.documentElement.classList.add('+JSON.stringify(emeraldFlag)+');true');
+    await delay(150);
+    const emeraldBeforeLayout=await readLayout();
+    const emeraldBeforeCss=await evalJs('[...document.querySelectorAll('+JSON.stringify(emeraldSelector)+')].map(x=>getComputedStyle(x).filter)');
+    const emeraldBefore=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    await evalJs('document.documentElement.classList.remove('+JSON.stringify(emeraldFlag)+');true');
+    await delay(150);
+    const emeraldRenderLayout=await readLayout();
+    const emeraldRenderCss=await evalJs('[...document.querySelectorAll('+JSON.stringify(emeraldSelector)+')].map(x=>getComputedStyle(x).filter)');
+    const emeraldRender=(await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false})).data;
+    const emeraldScoreSource=source
+      .replace(JSON.stringify('data:image/png;base64,'+before),JSON.stringify('data:image/png;base64,'+emeraldBefore))
+      .replace(JSON.stringify('data:image/png;base64,'+after),JSON.stringify('data:image/png;base64,'+emeraldRender))
+      .replace('chests:[20,356,370,427],dock:',
+        'chests:[20,356,370,427],emeraldChests:[23,358,164,414],dock:');
+    assert.notEqual(emeraldScoreSource,source,'A/B uses new genuine native captures');
+    const emeraldComparison=await evalJs(emeraldScoreSource);
+    const emeraldFourPanel='(async()=>{const urls='+JSON.stringify([
+      'data:image/webp;base64,'+orig,
+      'data:image/png;base64,'+emeraldBefore,
+      'data:image/png;base64,'+emeraldRender
+    ])+';const imgs=await Promise.all(urls.map(s=>new Promise((ok,fail)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=s})));'+
+      'if(imgs.some(i=>i.width!==384||i.height!==512))throw Error("native 384x512 source required");'+
+      'const c=document.createElement("canvas");c.width=1536;c.height=512;const x=c.getContext("2d");'+
+      'imgs.forEach((im,n)=>x.drawImage(im,n*384,0));x.drawImage(imgs[0],1152,0);'+
+      'x.globalAlpha=.5;x.drawImage(imgs[2],1152,0);return c.toDataURL("image/png").split(",")[1];})()';
+    writeFileSync(join(evidence,'missions-emerald-ORIGINAL-BEFORE-RENDER-OVERLAY-384x512.png'),
+      Buffer.from(await evalJs(emeraldFourPanel),'base64'));
+    writeFileSync(join(evidence,'missions-emerald-before-384x512.png'),Buffer.from(emeraldBefore,'base64'));
+    writeFileSync(join(evidence,'missions-emerald-render-384x512.png'),Buffer.from(emeraldRender,'base64'));
+    const emeraldReport={
+      issue:104,scope:'WORK8/07 original Days 1-3 illustration paint ONLY',
+      source:'assets/design-approved/07-missoes.webp',
+      mandatoryReferences:emeraldRefs,
+      baseSha:'10830c86f5a3bb2987333e55c0b58d9faacb71d1',
+      renderer:'Chromium CDP native 384x512 DPR1, same scene, decoded original and paused animations',
+      stylesBefore:emeraldBeforeCss,stylesRender:emeraldRenderCss,
+      metrics:emeraldComparison.metrics,unchanged:emeraldComparison.unchanged,
+      beforeLayout:emeraldBeforeLayout,renderLayout:emeraldRenderLayout,
+      approved:false,approvedScreens:0
+    };
+    writeFileSync(join(evidence,'work8-missions-emerald-controlled-ab.json'),
+      JSON.stringify(emeraldReport,null,2));
+    console.log('WORK8_EMERALD_NATIVE_AB '+JSON.stringify(emeraldReport));
+    assert.equal(emeraldBeforeCss.length,3,'exactly three genuine original chest paintings');
+    assert.notDeepEqual(emeraldBeforeCss,emeraldRenderCss,'new actual CSS must reach Chromium');
+    assert.deepEqual(emeraldBeforeLayout,emeraldRenderLayout,'no panel, chest or WORK0 dock geometry change');
+    assert.equal(emeraldRenderLayout.quests,3);
+    assert.equal(emeraldRenderLayout.days.length,7);
+    assert.equal(emeraldRenderLayout.navCount,5);
+    assert.ok(emeraldRenderLayout.dayContent.every(pair=>pair.every(item=>
+      item && item.top>=0 && item.bottom<=emeraldRenderLayout.nav.y+2)),
+      'all seven real chest paintings and captions above dock');
+    assert.ok(emeraldComparison.unchanged.header<.03 && emeraldComparison.unchanged.dock<.03,
+      'WORK0 header and dock pixel-stable');
+    assert.ok(emeraldComparison.metrics.emeraldChests.delta<-.02 &&
+      emeraldComparison.metrics.full.delta<-.001,
+      'source-measured 07 emerald chest ROI AND full screen must improve');
+    assert.ok(Math.abs(emeraldComparison.metrics.quests.delta)<.02,
+      'all three actual mission rows must remain unchanged');
+
     await cmd('Emulation.setDeviceMetricsOverride',{width:320,height:568,mobile:true,deviceScaleFactor:1,screenWidth:320,screenHeight:568});
     await delay(200);
     const narrow=await evalJs('(()=>{const d=document.querySelector(".w8-approved-days"),a=document.querySelector(".app-sheet-content");if(a)a.scrollTop=a.scrollHeight;if(d)d.scrollLeft=d.scrollWidth;const last=d?.lastElementChild?.getBoundingClientRect(),container=d?.getBoundingClientRect(),dock=document.querySelector(".app-sheet > .harbour-nav")?.getBoundingClientRect();return {items:d?.children.length,scrollWidth:d?.scrollWidth,clientWidth:d?.clientWidth,day7Visible:last&&container?last.left>=container.left-2&&last.right<=container.right+2:false,navCount:document.querySelectorAll(".app-sheet > .harbour-nav .harbour-nav-item").length,dockBottom:dock?.bottom,width:document.documentElement.scrollWidth}})()');
