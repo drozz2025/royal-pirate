@@ -9,6 +9,7 @@ import {
  canUndoPreview, canRedoPreview, type PreviewDraft
 } from './shipyard-history';
 import { capturePreviewReference, comparePreviewReference } from './shipyard-reference';
+import { nextVisualUnlock, previousVisualUnlock } from './shipyard-milestones';
 
 /** Optional Work 4 interface: never infer entitlements from demo preview progress. */
 type ShipyardProps={
@@ -86,6 +87,10 @@ export function Shipyard({onClose,onPreview,onViewChange,onTourChange,onFocusSlo
   });
  },[]);
  useEffect(()=>{onPreview({shipClass,level,modules:selected});},[shipClass,level,selected,onPreview]);
+ // Visual unlock milestones come from the canonical 27-module catalogue,
+ // never from player progression, ownership or purchases.
+ const nextUnlock=nextVisualUnlock(level);
+ const previousUnlock=previousVisualUnlock(level);
  const items=SHIP_MODULES.filter(m=>m.slot===slot);
  const active=selected[slot]??DEFAULT_MODULES[slot];
  const draftLoadout:ShipLoadout={shipClass,level,modules:selected};
@@ -139,6 +144,23 @@ export function Shipyard({onClose,onPreview,onViewChange,onTourChange,onFocusSlo
     <input id="shipyard-level" type="range" min={1} max={20} step={1} value={level} disabled={viewingReference}
       onChange={event=>chooseLevel(Number(event.target.value))}/>
     <span>Levels demonstrate visual unlock gates only — no player progress is saved.</span>
+   </div>
+   <div className="shipyard-milestones" role="group" aria-label="Browse 3D visual unlock milestones">
+    <div className="shipyard-milestone-copy">
+     <strong>NEXT VISUAL UNLOCK</strong>
+     <span aria-live="polite">{nextUnlock
+      ? 'LV '+nextUnlock.level+' · '+nextUnlock.modules.map(module=>module.slot.toUpperCase()).join(' + ')
+      : 'LV 20 · ALL 27 VISUAL MODULES UNLOCKED'}</span>
+     <small>VISUAL PREVIEW ONLY · Level unlocks never imply ownership.</small>
+    </div>
+    <div className="shipyard-milestone-buttons">
+     <button type="button" aria-label="Go to previous visual unlock level"
+      disabled={viewingReference||!previousUnlock}
+      onClick={()=>{if(previousUnlock)chooseLevel(previousUnlock.level);}}>‹ PREV</button>
+     <button type="button" aria-label="Go to next visual unlock level"
+      disabled={viewingReference||!nextUnlock}
+      onClick={()=>{if(nextUnlock)chooseLevel(nextUnlock.level);}}>NEXT ›</button>
+    </div>
    </div>
    <div className="shipyard-reference" role="group" aria-label="Temporary visual ship A/B comparison">
     <div className="shipyard-reference-actions">
