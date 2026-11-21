@@ -1,0 +1,32 @@
+name: WORK 2 Hull Fenders — Focused verification (no deploy)
+on:
+  push:
+    branches:
+      - work2/original-hull-fenders-20261121
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fender-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: WebPreview
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: WebPreview/package-lock.json
+      - run: npm ci
+      - name: Production TypeScript and Vite compile (no publication)
+        run: npm run build
+      - name: Focused import and one-hull 3D smoke test
+        run: | 
+          node --import tsx --input-type=module -e "console.log('Before import'); const {createPreviewHullFenders}=await import('./src/ship-hull-fenders.ts'); console.log('Before geometry'); const model=createPreviewHullFenders('scout','hull-oak'); console.log('Geometry ready',model.children.length); if(model.children.length!==2)process.exitCode=1"
+      - name: 3D model, lifecycle and mobile culling regression
+        run: node --import tsx --test tests/ship-hull-fenders.test.ts

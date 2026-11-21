@@ -25,7 +25,7 @@ const MICRO_PROPS = [
 // Keep hull, rigging, cannons, planking, windows and rails fully visible.
 const SECONDARY_PROPS = [
  '-deck-casks', '-deck-shot-racks', '-deck-capstans',
- '-boarding-ladders', '-stern-lanterns'
+ '-boarding-ladders', '-stern-lanterns', '-hull-fenders'
 ] as const;
 
 type DetailTier = 'micro' | 'secondary';

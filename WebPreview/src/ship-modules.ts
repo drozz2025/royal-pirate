@@ -26,6 +26,7 @@ import { createPreviewArmour, type PreviewArmorModule } from './ship-armor';
 import { createPreviewCabinGallery, type PreviewCabinModule } from './ship-cabin';
 import { createPreviewCannonRefit, type PreviewCannonModule } from './ship-cannons';
 import { createPreviewGunBreeching } from './ship-cannon-breeching';
+import { createPreviewHullFenders } from './ship-hull-fenders';
 import { createPreviewFigurehead, type PreviewFigureheadModule } from './ship-figureheads';
 import { createPreviewHullRelief, type PreviewHullModule } from './ship-hull-relief';
 import { createPreviewSailEmbroidery, type PreviewSailModule } from './ship-sail-embroidery';
@@ -308,6 +309,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  // Original sculpted timber casks and forged hoops: precisely two batched
  // editor-only draws. These props are never cargo, resources or inventory.
  additions.add(createPreviewDeckCasks(config.shipClass,config.modules.hull as PreviewHullModule));
+ // Sculpted rope-wrapped cork fenders flank the hull in the harbour sandbox.
+ // Two batches, class-specific silhouettes; no additional equipment or shielding.
+ additions.add(createPreviewHullFenders(config.shipClass,config.modules.hull as PreviewHullModule));
  // Three original stern lantern silhouettes with PBR glass and no dynamic light.
  // They follow the ornamental preview tier, never real module ownership.
  additions.add(createPreviewSternLanterns(config.shipClass,config.modules.ornaments as PreviewOrnamentModule));
