@@ -230,25 +230,30 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
     'radial-gradient(ellipse 110% 123% at 30% 50%,#000 0%,#000 84%,transparent 99%)',
     'linear-gradient(to bottom,transparent 0%,#000 2%,#000 97%,transparent 100%)'
   ].join(',');
-  const baselineEdgeCss=rightEdgeSelector+'{'+
-    '-webkit-mask-image:'+originalRightMask+'!important;'+
-    'mask-image:'+originalRightMask+'!important;'+
-    '-webkit-mask-composite:source-in!important;mask-composite:intersect!important;}';
-  await evaluate("(()=>{const s=document.createElement('style');"+
-    "s.id='work4-right-edge-original';s.textContent="+JSON.stringify(baselineEdgeCss)+
-    ";document.head.append(s);return true})()");
-  await delay(130);
+  const trialRightMask=originalRightMask+
+    ',linear-gradient(to right,#000 0%,#000 93%,transparent 100%)';
+  const trialEdgeCss=rightEdgeSelector+'{'+
+    '-webkit-mask-image:'+trialRightMask+'!important;'+
+    'mask-image:'+trialRightMask+'!important;'+
+    '-webkit-mask-composite:source-in,source-in!important;'+
+    'mask-composite:intersect,intersect!important;}';
+  // Actual compiled, unchanged production RENDER (never use experimental
+  // pixels as proof that the candidate is already in the stylesheet).
   const hardCut=(await cmd('Page.captureScreenshot',{
     format:'png',captureBeyondViewport:false
   })).data as string;
-  await evaluate("(()=>{document.getElementById('work4-right-edge-original')?.remove();return true})()");
+  await evaluate("(()=>{const s=document.createElement('style');"+
+    "s.id='work4-right-edge-trial';s.textContent="+JSON.stringify(trialEdgeCss)+
+    ";document.head.append(s);return true})()");
   await delay(130);
   const softened=(await cmd('Page.captureScreenshot',{
     format:'png',captureBeyondViewport:false
   })).data as string;
+  await evaluate("(()=>{document.getElementById('work4-right-edge-trial')?.remove();return true})()");
   const realMask=await evaluate("getComputedStyle(document.querySelector("+
     JSON.stringify(rightEdgeSelector)+")).webkitMaskImage");
-  assert.match(realMask,/93%/,'actual native compiled mask includes 7% source-right transition');
+  assert.doesNotMatch(realMask,/93%/,
+    'rejected speculative right-edge fade is absent from compiled production CSS');
   const rightEdgeAB=await evaluate("(async()=>{"+
     "const urls=['data:image/webp;base64,"+approved+"',"+
     "'data:image/png;base64,"+hardCut+"','data:image/png;base64,"+softened+"'];"+
@@ -276,17 +281,20 @@ test('WORK4 Fleet continuous inset A/B: ORIGINAL BEFORE RENDER OVERLAY and prote
       'right photo edge must preserve protected '+name);
   assert.ok(rightEdgeAB.roi.photoRightEdge.changedPixels>40,
     'feather must genuinely remove a visible portion of hard photographic cut');
-  assert.ok(rightEdgeAB.roi.photoRightEdge.after<=rightEdgeAB.roi.photoRightEdge.before,
-    'soft edge must be no further from approved source locally');
-  assert.ok(rightEdgeAB.roi.full.after<=rightEdgeAB.roi.full.before,
-    'native screen must not regress globally');
-  writeFileSync(join(qa,'work4-photo-right-edge-original-before-render-overlay-384x512.png'),
+  // A previous CI actually found the candidate worsens source MAE locally.
+  // Never "fix" the CI by permitting a worse production mask: keep the release
+  // untouched, but persist this controlled experiment to prevent repeats.
+  const trialAccepted=
+    rightEdgeAB.roi.photoRightEdge.after<=rightEdgeAB.roi.photoRightEdge.before &&
+    rightEdgeAB.roi.full.after<=rightEdgeAB.roi.full.before;
+  writeFileSync(join(qa,'work4-photo-right-edge-original-render-trial-overlay-384x512.png'),
     Buffer.from(rightEdgeAB.montage,'base64'));
   const edgeReport={
     approved:false,screensApproved:0,viewport:'384x512',
     source:'assets/design-approved/03-frota.webp',
     sameScene:true,pausedFrame:true,
     candidate:'7% trailing fade within original Royal Crown photo, no second layer or synthetic water',
+    trialAccepted,productionPromoted:false,decision:trialAccepted?'Diagnostic improvement only — requires WORK0 visual review':'Rejected: native source photo edge/full MAE would regress',
     roiBoxes:rightEdgeAB.boxes,roi:rightEdgeAB.roi,
     protected:['royalCrown','sourceSea','realStats','dock']
   };
