@@ -5487,15 +5487,16 @@
 }
 
 
-/* WORK8/#104 - Missions 07 ONLY: a testable .55 -> .52 quest-board ink
-   correction at native 384x512. Uses the THREE genuine mission cards,
-   never modifies their values, rewards, hit targets or the seven-day tray.
-   The opt-out class provides a strict same-loaded-scene A/B. Historical
-   baseline classes remain independent so earlier visual gates still test
-   their own changes. Ranking 08, Porto and WORK0 dock are untouched.
-   Human approval remains false (0/8). */
+
+/* WORK8/#104 — 07 Missões only. Restore the measured .55 quest-board
+   pigment unchanged, and correct subdued LIVE blue "JOGAR" buttons instead.
+   Only active (not ready/claimed) quest actions receive modest enamel relief;
+   never fake completion, prize, values or button text. Styling remains scoped
+   to 384x512 source-class phones, with strict same-DOM native A/B opt-out.
+   Old independent historical baselines, 08 Ranking and WORK0 dock untouched. */
 @media (min-width:351px) and (max-width:440px) and (max-height:620px) {
-  :root:not(.work8-missions-quest-native-depth-ab-baseline):not(.work8-missions-quest-board-luma-ab-baseline):not(.work8-missions-quest-tone-ab-baseline):not(.work8-missions-quest-depth-ab-baseline):not(.work8-missions-ink-ab-baseline):not(.work8-missions-frame-ab-baseline):not(.work8-missions-enamel-ab-baseline):not(.work8-missions-ab-baseline) .w8-approved-missions .w8-approved-quest-list {
-    filter:brightness(var(--w8-missions-native-ink,.52)) saturate(1.055) !important;
+  :root:not(.work8-missions-cta-ink-ab-baseline):not(.work8-missions-quest-board-luma-ab-baseline):not(.work8-missions-quest-depth-ab-baseline):not(.work8-missions-quest-tone-ab-baseline):not(.work8-missions-ink-ab-baseline):not(.work8-missions-frame-ab-baseline):not(.work8-missions-enamel-ab-baseline):not(.work8-missions-ab-baseline)
+  .w8-approved-missions .w8-approved-quest[data-state="active"] > button {
+    filter:brightness(1.20) saturate(1.04);
   }
 }
