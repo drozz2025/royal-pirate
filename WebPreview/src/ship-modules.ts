@@ -6,6 +6,7 @@ import { createPreviewDeckCapstans } from './ship-deck-capstans';
 import { createPreviewBowAnchors } from './ship-bow-anchors';
 import { createPreviewDeckRopeCoils } from './ship-deck-rope-coils';
 import { createPreviewDeckLongboats } from './ship-deck-longboats';
+import { createPreviewBoardingLadders } from './ship-boarding-ladders';
 import { createPreviewDeckHatches } from './ship-deck-hatches';
 import { createPreviewShipBell } from './ship-deck-bell';
 import { createPreviewCompassBinnacle } from './ship-deck-compass';
@@ -317,6 +318,9 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
  additions.add(createPreviewDeckRopeCoils(config.shipClass,config.modules.masts as PreviewMastModule));
  // Solid 3D lifeboat tenders are preview hull fittings, never fleet ownership.
  additions.add(createPreviewDeckLongboats(config.shipClass,config.modules.hull as PreviewHullModule));
+ // Original rope-and-timber boarding ladders are a 3D preview rigging fitting.
+ // Module tiers affect appearance only; they cannot grant a ladder or a ship.
+ additions.add(createPreviewBoardingLadders(config.shipClass,config.modules.masts as PreviewMastModule));
  // Raised deck hatches are two GPU-batched preview meshes keyed by cabin tier.
  // Their geometry never belongs to the battle ship or persistent fleet.
  additions.add(createPreviewDeckHatches(config.shipClass,config.modules.cabin as PreviewCabinModule));
