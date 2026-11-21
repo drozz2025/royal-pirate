@@ -5585,3 +5585,21 @@
       #135436 0%,#093d27 58%,#061d30 60%,#041525 100%)!important;
   }
 }
+
+
+/* WORK0/#104: controlled transfer of genuine Day 1-3 chest pigment from WORK8 #747.
+   The worker's release-branch Chromium 384x512 37-treatment A/B reported
+   chest ROI 39.0173 -> 35.5576, full screen 52.5112 -> 52.3676.
+   These measurements are NOT evidence for the combined #696 candidate:
+   recapture all 24 native frames and review its integrated changes.
+   This changes ONLY existing chest SVG paints at reference-sized phones;
+   preserves actual state, rewards, Porto, dock, touch and geometry.
+   DRAFT: approved:false, 0/8. */
+@media (min-width:351px) and (max-width:440px) and (max-height:620px) {
+  :root:not(.work8-missions-natural-wood-ab-baseline)
+  .w8-approved-missions .w8-approved-days li:nth-child(-n+3)
+  .w8-approved-chest > svg.w8-art {
+    filter:hue-rotate(60deg) saturate(.94) brightness(.78)
+      drop-shadow(0 3px 2px #041525);
+  }
+}
