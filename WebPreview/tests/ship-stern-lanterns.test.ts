@@ -25,7 +25,7 @@ test('all nine class/ornament variants are physical three-batch stern lanterns',
    const material=glass.material as T.MeshStandardMaterial;
    assert.equal(material.emissiveIntensity,ornamentModule==='ornaments-simple'?0:ornamentModule==='ornaments-lanterns'?.55:1.05);
    // A filled glass prism has real triangles, unlike a flat sprite.
-   assert.ok(glass.geometry.getAttribute('position').count>=index*24);
+   assert.ok(glass.geometry.getAttribute('position').count>=30*(index+1));
   }
  }
 });
