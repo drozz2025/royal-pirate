@@ -141,6 +141,38 @@ try{
   writeFileSync(join(out,'work8-natural-wood-before-384x512.png'),Buffer.from(before,'base64'));
   writeFileSync(join(out,'work8-natural-wood-render-384x512.png'),Buffer.from(render,'base64'));
   writeFileSync(join(out,'work8-natural-wood-original-before-render-overlay-384x512.png'),Buffer.from(ab.montage,'base64'));
+
+  // DIAGNOSTIC ONLY: the first static timber alternative failed; sample
+  // additional native source-registered pigment variants in this same tab,
+  // without changing game state, prizes, quests or production CSS. Never
+  // select a production treatment without running the final strict gate.
+  const testPaint = [
+    ...[60,75,85,91,100,110,125,145].flatMap(h=>
+      [0.78,0.94,1.12,1.3].map(b=>({h,b,s:.94}))),
+    ...[.64,.8,1.08,1.3,1.5].map(z=>({h:91,b:1.12,s:z}))
+  ];
+  const diagnostic=[];
+  for(const choice of testPaint){
+    const color='hue-rotate('+choice.h+'deg) saturate('+choice.s+') brightness('+choice.b+') drop-shadow(0 3px 2px #041525)';
+    await evaluate('(()=>{let el=document.getElementById("work8-early-chest-sweep");'+
+      'if(!el){el=document.createElement("style");el.id="work8-early-chest-sweep";document.head.appendChild(el)};'+
+      'el.textContent='+JSON.stringify('.w8-approved-missions .w8-approved-days li:nth-child(-n+3) .w8-approved-chest > svg.w8-art {filter:'+color+' !important;}')+';return true})()');
+    await delay(65);
+    const sample=await capture();
+    const sampleReport=await evaluate('(async()=>{'+
+      'const d=src=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=src;});'+
+      'const images=await Promise.all(['+JSON.stringify('data:image/webp;base64,'+approved)+','+JSON.stringify('data:image/png;base64,'+sample)+'].map(d));'+
+      'const p=images.map(im=>{const c=document.createElement("canvas");c.width=384;c.height=512;const g=c.getContext("2d");g.drawImage(im,0,0);return g.getImageData(0,0,384,512).data});'+
+      'const m=(r)=>{let e=0,k=0;for(let y=r[1];y<r[3];y++)for(let x=r[0];x<r[2];x++)for(let i=0;i<3;i++){const n=(y*384+x)*4+i;e+=Math.abs(p[0][n]-p[1][n]);k++}return e/k};'+
+      'return {full:m([0,0,384,512]),earlyChest:m([22,355,168,411]),daily:m([13,325,373,430])}})()');
+    diagnostic.push({...choice,...sampleReport});
+  }
+  await evaluate('document.getElementById("work8-early-chest-sweep")?.remove();true');
+  diagnostic.sort((a,b)=>a.earlyChest-b.earlyChest);
+  writeFileSync(join(out,'work8-natural-wood-sweep-384x512.json'),JSON.stringify({
+    baseline:ab.scores,top:diagnostic.slice(0,12),all:diagnostic,approved:false,approvedScreens:0
+  },null,2));
+  console.log('WORK8 NATIVE PIGMENT SWEEP TOP '+JSON.stringify(diagnostic.slice(0,10)));
   const result={
     issue:104,scope:'WORK8 07 Missões only: original timber and brass on three genuine early daily reward chests, no fabricated claim',
     base:'work6/web-3d-preview',reference:'assets/design-approved/07-missoes.webp',
