@@ -1,3 +1,4 @@
+import { createPreviewHelm } from './ship-helm';
 import * as T from 'three';
 import { createPreviewStandingRigging, type PreviewMastModule } from './ship-rigging';
 import { createPreviewMastLookouts } from './ship-mast-lookouts';
@@ -274,38 +275,10 @@ export function applyShipModules(root:T.Group,rig:T.Group,loadout:ShipLoadout):T
    cube(brass,x,3.32,-5.00,.57,.055,.11);
   }
  }
- // Original class-specific helm assembly at the quarterdeck. A slim tiller
- // steers the Scout; the broadside Fighter has a four-spoke wheel; the royal
- // flagship has a larger eight-spoke wheel. These are preview ornaments only:
- // they do not change turning, collision, equipment rights or combat physics.
- if(config.shipClass==='scout'){
-  const tiller=cube(warm,0,2.97,-2.15,.13,.13,1.03);
-  tiller.name='scout-steering-tiller';
-  const grip=cube(brass,0,3.01,-1.67,.24,.15,.19);
-  grip.name='scout-tiller-grip';
-  const stand=cube(iron,0,2.48,-2.50,.16,.92,.20);
-  stand.name='scout-tiller-stand';
- }else{
-  const flagship=config.shipClass==='warship';
-  const helmY=flagship?3.39:3.18,helmZ=flagship?-2.60:-2.45;
-  const radius=flagship?.47:.36;
-  const wheel=part(sharedGeometry(flagship?'royal-helm-ring':'fighter-helm-ring',
-   ()=>new T.TorusGeometry(radius,.047,5,14)),brass,0,helmY,helmZ);
-  wheel.name=flagship?'warship-royal-helm':'fighter-broadside-helm';
-  const hub=part(sharedGeometry('helm-hub',()=>new T.CylinderGeometry(.105,.105,.14,8)),
-   warm,0,helmY,helmZ);
-  hub.rotation.x=Math.PI/2;
-  const spokeCount=flagship?8:4;
-  for(let i=0;i<spokeCount;i++){
-   const angle=2*Math.PI*i/spokeCount;
-   const spoke=tube(warm,Math.sin(angle)*radius*.5,helmY+Math.cos(angle)*radius*.5,
-    helmZ,.034,radius);
-   spoke.rotation.z=-angle;
-  }
-  const height=helmY-2.02;
-  const stand=cube(iron,0,2.02+height/2,helmZ,.13,height,.22);
-  stand.name=config.shipClass+'-helm-stand';
- }
+ // The shipyard helm retains each class's original steering silhouette,
+ // while batching detailed fittings to one GPU mesh. No battle steering changes.
+ for(const helm of createPreviewHelm(config.shipClass,config.modules.cabin as PreviewCabinModule))
+  additions.add(helm);
  // One low-cost line-buffer creates authentic 3D shrouds, ratlines and stays.
  // Shipyard-only geometry does not change rig damage, battle or entitlements.
  additions.add(createPreviewStandingRigging(config.shipClass,config.modules.masts as PreviewMastModule));
