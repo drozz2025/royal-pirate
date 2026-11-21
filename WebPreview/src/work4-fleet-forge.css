@@ -3234,8 +3234,10 @@
    a synthetic water layer, second ship, shared shell or dock modification.
    The explicit aria-hidden span is inert and has no geometry at 320/390/430.
    A/B reference/ROI proof must pass before WORK0 may integrate (0/8). */
+.w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-fleet-photo-top-shade {display:none;}
 @media (width:384px) and (height:512px) {
   .w4-fleet #w4-fleet-panel > .w4-harbour-stage > .w4-fleet-photo-top-shade {
+    display:block;
     position:absolute;
     top:3px;
     left:0;
