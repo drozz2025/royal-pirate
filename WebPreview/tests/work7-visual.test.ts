@@ -70,10 +70,10 @@ test('WORK7 / #104: real 05/06 Chromium and approved artwork comparisons', {
   const cssBaseline = `
     @media (min-width:355px) and (max-width:390px) and (max-height:560px){
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(3){filter:brightness(.43) saturate(1.20) contrast(.74)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.42) saturate(2.30) contrast(.76)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(4){filter:brightness(.49) saturate(2.00) contrast(.79)!important}
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(5){filter:brightness(.53)!important}
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(6){filter:brightness(.65) saturate(1.30) contrast(.92)!important}
-      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.42) saturate(1.75) contrast(.79)!important}
+      .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(7){filter:brightness(.40) saturate(1.75) contrast(.79)!important}
       .w7-screen[data-work7-screen="cards"] .w7-approved-slot:nth-child(8){filter:brightness(.64) saturate(1.90) contrast(.88)!important}
     }`;
   const server = spawn(join(process.cwd(), 'node_modules', '.bin', 'vite'),
