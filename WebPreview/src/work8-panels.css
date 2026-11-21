@@ -5500,6 +5500,6 @@
   .w8-approved-missions .w8-approved-quest-rewards .w8-approved-coin::before,
   :root:not(.work8-missions-reward-emblem-relief-ab-baseline)
   .w8-approved-missions .w8-approved-quest-rewards .w8-approved-gem::before {
-    filter:brightness(2.12) contrast(1.05) saturate(1.10);
+    filter:brightness(1.20) contrast(1.00) saturate(1.00);
   }
 }
