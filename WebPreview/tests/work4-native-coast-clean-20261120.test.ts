@@ -21,7 +21,7 @@ test('WORK4 Fleet source seam uses local native paint, never ship geometry, sea 
   assert.match(paint,/100%\)!important/);
   assert.equal((paint.match(/\.w4-stage-label\s*\{/g)||[]).length,1);
   assert.match(paint,/box-shadow:none/);
-  assert.match(paint,/background:linear-gradient\(90deg,transparent 0%,#07415aee/);
+  assert.match(paint,/background:linear-gradient\(90deg,transparent 0%,#063a59 100%/);
   assert.equal((paint.match(/\.w4-stage-label::after/g)||[]).length,1);
   assert.doesNotMatch(paint,/(?:\.app-|\.porto-|\.harbour-nav|\.w4-reference-sea|\.w4-reference-ship|\.w4-cannon-art|contain:paint|transform:|position:|pointer-events:)/);
   for (const filename of ['00-referencia-original-aprovada.webp','00-painel-oito-ecras.webp',
