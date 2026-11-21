@@ -32,14 +32,14 @@ const htmlCards=(profile:LocalProfile)=>renderToStaticMarkup(
 function product(html:string,id:CrewId){
   const row=html.match(new RegExp('<article class="w7-product w7-'+id+'">([\\s\\S]*?)<\\/article>'));
   assert.ok(row,'Shop lost the real '+id+' product');
-  const button=row![1].match(/<button\\b([^>]*)>([^<]*)<\\/button>/);
+  const button=row![1].match(/<button\b([^>]*)>([^<]*)<\/button>/);
   assert.ok(button,'Shop product has no actionable or disabled button for '+id);
   return {attrs:button![1],label:button![2],row:row![1]};
 }
 function checkState(html:string,id:CrewId,label:string,disabled:boolean){
   const entry=product(html,id);
   assert.equal(entry.label,label,'Unexpected Shop CTA for '+id);
-  assert.equal(/\\bdisabled(?:=""|\\s|$)/.test(entry.attrs),disabled,
+  assert.equal(/\bdisabled(?:=""|\s|$)/.test(entry.attrs),disabled,
     'Incorrect real-money/local-coin action gate for '+id);
   assert.match(entry.attrs,/aria-label="[^"]+"/,'Missing accessible Shop CTA: '+id);
 }
@@ -60,7 +60,7 @@ test('WORK5: no-balance Shop disables every recruit CTA and gives no live cash c
     'Unimplemented real-money products must not lead to a checkout');
   const cards=htmlCards(initialProfile());
   assert.match(cards,/3 de 3 cartas|1 de 3 cartas/);
-  assert.match(cards,/EQUIPADO<\\/button>/,'Starter captain not marked as equipped');
+  assert.match(cards,/EQUIPADO<\/button>/,'Starter captain not marked as equipped');
   assert.match(cards,/ilustrações conceptuais aprovadas, ainda sem cartas jogáveis/,
     'Decorative card previews must not be sold as working game powers');
 });
@@ -104,7 +104,7 @@ test('WORK5: restored local crew ownership matches Shop and Cards without new pu
   }
   const cards=htmlCards(restored);
   assert.match(cards,/3 de 3 cartas/);
-  assert.match(cards,/EQUIPADO<\\/button>/,'Equipped navigator not reflected in Cards');
+  assert.match(cards,/EQUIPADO<\/button>/,'Equipped navigator not reflected in Cards');
   assert.match(cards,/Northwind/,'Navigator missing from owned collection');
   assert.equal(restored.equippedCrew,'navigator');
   assert.equal(restored.coins,25,'Rendering changed saved gold');
